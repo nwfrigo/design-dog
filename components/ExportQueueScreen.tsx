@@ -506,7 +506,7 @@ function QueueItem({
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showBody={asset.showBody && !!asset.body}
-                  logoColor={asset.logoColor}
+                  logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -525,7 +525,7 @@ function QueueItem({
                   showBody={asset.showBody}
                   showSolutionSet={asset.showSolutionSet}
                   solution={asset.solution}
-                  logoColor={asset.logoColor}
+                  logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
                   showGridDetail2={asset.showGridDetail2}
                   gridDetail1={gridDetail1}
                   gridDetail2={gridDetail2}
@@ -547,7 +547,7 @@ function QueueItem({
                   headingSize={asset.headingSize}
                   alignment={asset.alignment}
                   ctaStyle={asset.ctaStyle}
-                  logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor as 'orange' | 'white'}
+                  logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor}
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showBody={asset.showBody && !!asset.body}
@@ -714,7 +714,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
               showBody={asset.showBody && !!asset.body}
-              logoColor={asset.logoColor}
+              logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -733,7 +733,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody}
               showSolutionSet={asset.showSolutionSet}
               solution={asset.solution}
-              logoColor={asset.logoColor}
+              logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
               showGridDetail2={asset.showGridDetail2}
               gridDetail1={gridDetail1}
               gridDetail2={gridDetail2}
@@ -755,7 +755,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               headingSize={asset.headingSize}
               alignment={asset.alignment}
               ctaStyle={asset.ctaStyle}
-              logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor as 'orange' | 'white'}
+              logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
               showBody={asset.showBody && !!asset.body}
