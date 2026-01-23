@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
+
+// Remote Chromium binary for Vercel serverless (official Sparticuz release)
+// Must match the @sparticuz/chromium-min version (v143.0.4)
+const CHROMIUM_REMOTE_URL =
+  'https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar'
 
 async function getBrowser() {
   const isVercel = !!process.env.VERCEL_ENV
 
   if (isVercel) {
-    // Production (Vercel) - use serverless chromium
-    const execPath = await chromium.executablePath()
+    // Production (Vercel) - use remote chromium binary
+    const execPath = await chromium.executablePath(CHROMIUM_REMOTE_URL)
     console.log('Chromium path:', execPath)
-    console.log('Chromium args:', chromium.args)
 
     return puppeteer.launch({
       args: chromium.args,
       executablePath: execPath,
       headless: true,
-      ignoreHTTPSErrors: true,
     })
   }
 
