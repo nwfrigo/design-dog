@@ -1,0 +1,50 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
+import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+
+interface Props {
+  eyebrow: string
+  headline: string
+  subhead: string
+  body: string
+  solution: string
+  imageUrl: string
+  showEyebrow: boolean
+  showSubhead: boolean
+  showBody: boolean
+  logoColor: 'black' | 'orange'
+  colors: ColorsConfig
+  typography: TypographyConfig
+}
+
+export function WebsiteThumbnailRender(props: Props) {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), 300)
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    <>
+      {ready && <div id="render-ready" style={{ display: 'none' }} />}
+      <WebsiteThumbnail
+        eyebrow={props.eyebrow}
+        headline={props.headline}
+        subhead={props.subhead}
+        body={props.body}
+        solution={props.solution}
+        imageUrl={props.imageUrl}
+        showEyebrow={props.showEyebrow}
+        showSubhead={props.showSubhead}
+        showBody={props.showBody}
+        logoColor={props.logoColor}
+        colors={props.colors}
+        typography={props.typography}
+        scale={1}
+      />
+    </>
+  )
+}
