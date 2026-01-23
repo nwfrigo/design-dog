@@ -16,9 +16,9 @@ async function getBrowser() {
   // Production (Vercel) - use serverless chromium
   return puppeteer.launch({
     args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
+    defaultViewport: null,
     executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
+    headless: true,
   })
 }
 
