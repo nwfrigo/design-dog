@@ -144,10 +144,12 @@ export async function POST(request: NextRequest) {
     if (showCta !== undefined) params.set('showCta', String(showCta))
 
     // Get the base URL from the request
-    const protocol = request.headers.get('x-forwarded-proto') || 'http'
+    const protocol = request.headers.get('x-forwarded-proto') || 'https'
     const host = request.headers.get('host') || 'localhost:3000'
     const baseUrl = `${protocol}://${host}`
     const renderUrl = `${baseUrl}/render/${template}?${params.toString()}`
+    console.log('Base URL:', baseUrl)
+    console.log('Render URL:', renderUrl)
 
     // Launch Puppeteer
     const browser = await getBrowser()
@@ -164,12 +166,21 @@ export async function POST(request: NextRequest) {
     })
 
     // Navigate to render page
+    console.log('Navigating to:', renderUrl)
     await page.goto(renderUrl, {
-      waitUntil: 'networkidle0',
+      waitUntil: 'networkidle2',
+      timeout: 30000,
     })
 
-    // Wait for the ready signal (indicates fonts loaded)
-    await page.waitForSelector('#render-ready', { timeout: 10000 })
+    // Wait for the ready signal (indicates fonts loaded) - longer timeout for cold starts
+    try {
+      await page.waitForSelector('#render-ready', { timeout: 20000 })
+    } catch (waitError) {
+      // Log page content for debugging
+      const pageContent = await page.content()
+      console.error('Page content at timeout:', pageContent.substring(0, 1000))
+      throw waitError
+    }
 
     // Hide any Next.js dev error overlays that might appear
     await page.evaluate(() => {
