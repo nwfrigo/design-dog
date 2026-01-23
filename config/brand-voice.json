@@ -1,0 +1,66 @@
+{
+  "companyName": "Your Company",
+  "voiceProfile": {
+    "summary": "Professional yet approachable B2B voice that emphasizes clarity and value. We speak directly to practitioners and decision-makers, avoiding jargon while demonstrating expertise.",
+    "toneDescriptors": [
+      "confident",
+      "helpful",
+      "clear",
+      "professional",
+      "human"
+    ],
+    "vocabularyPatterns": [
+      "Use active voice",
+      "Prefer 'you' over 'users' or 'customers'",
+      "Lead with benefits, not features",
+      "Use specific numbers when possible"
+    ],
+    "structureNotes": [
+      "Headlines: 6-10 words, benefit-focused",
+      "Subheads: Expand on the headline promise",
+      "Body: 2-3 sentences max, scannable",
+      "CTAs: Action verb + clear outcome"
+    ],
+    "doAndDonts": {
+      "do": [
+        "Be specific about outcomes",
+        "Use concrete examples",
+        "Address pain points directly",
+        "Create urgency without being pushy"
+      ],
+      "dont": [
+        "Use buzzwords like 'synergy' or 'leverage'",
+        "Make vague promises",
+        "Use passive voice",
+        "Write walls of text"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "type": "headline",
+      "content": "Cut reporting time by 60% with automated dashboards",
+      "context": "Analytics product promo"
+    },
+    {
+      "type": "headline",
+      "content": "The complete guide to building a data-driven culture",
+      "context": "eBook promotion"
+    },
+    {
+      "type": "body",
+      "content": "Stop spending hours pulling reports. Our platform connects to your existing tools and delivers insights automatically—so you can focus on decisions, not data wrangling.",
+      "context": "Product landing page"
+    },
+    {
+      "type": "cta",
+      "content": "Get the free guide",
+      "context": "eBook download"
+    },
+    {
+      "type": "cta",
+      "content": "Start your free trial",
+      "context": "Product signup"
+    }
+  ]
+}

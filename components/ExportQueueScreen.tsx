@@ -1,0 +1,773 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import { useStore } from '@/store'
+import type { QueuedAsset, TemplateType } from '@/types'
+import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
+import { EmailGrid, type GridDetail } from './templates/EmailGrid'
+import { SocialDarkGradient } from './templates/SocialDarkGradient'
+import {
+  fetchColorsConfig,
+  fetchTypographyConfig,
+  type ColorsConfig,
+  type TypographyConfig
+} from '@/lib/brand-config'
+import { CHANNELS, TEMPLATE_DIMENSIONS } from '@/lib/template-config'
+
+type ExportScale = '1x' | '2x'
+
+export function ExportQueueScreen() {
+  const {
+    exportQueue,
+    removeFromQueue,
+    clearQueue,
+    editQueuedAsset,
+    setCurrentScreen,
+    selectedAssets,
+    setSelectedAssets,
+    goToAsset,
+  } = useStore()
+
+  const [exportingId, setExportingId] = useState<string | null>(null)
+  const [exportingAll, setExportingAll] = useState(false)
+  const [exportAllScale, setExportAllScale] = useState<ExportScale>('2x')
+  const [previewAsset, setPreviewAsset] = useState<QueuedAsset | null>(null)
+  const [showNewAssetModal, setShowNewAssetModal] = useState(false)
+  const [pendingAssets, setPendingAssets] = useState<TemplateType[]>([])
+  const [modalExpandedChannels, setModalExpandedChannels] = useState<Set<string>>(new Set(['email']))
+
+  // Brand config state
+  const [colorsConfig, setColorsConfig] = useState<ColorsConfig | null>(null)
+  const [typographyConfig, setTypographyConfig] = useState<TypographyConfig | null>(null)
+
+  // Load brand config on mount
+  useEffect(() => {
+    async function loadConfig() {
+      try {
+        const [colors, typography] = await Promise.all([
+          fetchColorsConfig(),
+          fetchTypographyConfig(),
+        ])
+        setColorsConfig(colors)
+        setTypographyConfig(typography)
+      } catch (error) {
+        console.error('Failed to load brand config:', error)
+      }
+    }
+    loadConfig()
+  }, [])
+
+  const getTemplateName = (type: string) => {
+    switch (type) {
+      case 'website-thumbnail':
+        return 'Website Thumbnail'
+      case 'email-grid':
+        return 'Email Grid'
+      default:
+        return type
+    }
+  }
+
+  const handleExportSingle = async (asset: QueuedAsset, scale: ExportScale) => {
+    setExportingId(asset.id)
+    try {
+      const response = await fetch('/api/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template: asset.templateType,
+          scale: scale === '2x' ? 2 : 1,
+          headline: asset.headline,
+          subhead: asset.subhead,
+          body: asset.body,
+          eyebrow: asset.eyebrow,
+          solution: asset.solution,
+          logoColor: asset.logoColor,
+          showEyebrow: asset.showEyebrow,
+          showSubhead: asset.showSubhead,
+          showBody: asset.showBody,
+          imageUrl: asset.thumbnailImageUrl,
+          subheading: asset.subheading,
+          showLightHeader: asset.showLightHeader,
+          showSubheading: asset.showSubheading,
+          showSolutionSet: asset.showSolutionSet,
+          showGridDetail2: asset.showGridDetail2,
+          gridDetail1Text: asset.gridDetail1Text,
+          gridDetail2Text: asset.gridDetail2Text,
+          gridDetail3Type: asset.gridDetail3Type,
+          gridDetail3Text: asset.gridDetail3Text,
+        }),
+      })
+
+      if (!response.ok) throw new Error('Export failed')
+
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${asset.templateType}-${asset.id}.png`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Export failed:', error)
+      alert('Export failed. Please try again.')
+    } finally {
+      setExportingId(null)
+    }
+  }
+
+  const handleExportAll = async () => {
+    if (exportQueue.length === 0) return
+
+    setExportingAll(true)
+    try {
+      for (const asset of exportQueue) {
+        await handleExportSingle(asset, exportAllScale)
+      }
+    } finally {
+      setExportingAll(false)
+    }
+  }
+
+  const handleAddNewAssets = () => {
+    if (pendingAssets.length > 0) {
+      const currentLength = selectedAssets.length
+      const newAssets = [...selectedAssets, ...pendingAssets]
+      setSelectedAssets(newAssets)
+      goToAsset(currentLength)
+      setCurrentScreen('editor')
+      setShowNewAssetModal(false)
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Export Queue
+          </h2>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {exportQueue.length} {exportQueue.length === 1 ? 'asset' : 'assets'}
+          </span>
+
+          {/* New Asset Button - matches breadcrumb style */}
+          <button
+            onClick={() => { setPendingAssets([]); setShowNewAssetModal(true) }}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-700
+              hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800
+              transition-colors flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Asset
+          </button>
+        </div>
+
+        {exportQueue.length > 0 && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={clearQueue}
+              className="px-3 py-2 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+            >
+              Clear All
+            </button>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={exportAllScale}
+                onChange={(e) => setExportAllScale(e.target.value as ExportScale)}
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                  bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              >
+                <option value="1x">1x</option>
+                <option value="2x">2x</option>
+              </select>
+
+              <button
+                onClick={handleExportAll}
+                disabled={exportingAll}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400
+                  text-white rounded-lg font-medium transition-colors"
+              >
+                {exportingAll ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Exporting...
+                  </>
+                ) : (
+                  'Export All'
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Queue List */}
+      {exportQueue.length === 0 ? (
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <svg className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            No assets in queue
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
+            Add assets to the queue from the editor to export them here.
+          </p>
+          <button
+            onClick={() => setCurrentScreen('select')}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700
+              text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
+          >
+            Go to Editor
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {exportQueue.map((asset) => (
+            <QueueItem
+              key={asset.id}
+              asset={asset}
+              isExporting={exportingId === asset.id}
+              onExport={(scale) => handleExportSingle(asset, scale)}
+              onEdit={() => editQueuedAsset(asset.id)}
+              onRemove={() => removeFromQueue(asset.id)}
+              onPreview={() => setPreviewAsset(asset)}
+              getTemplateName={getTemplateName}
+              colorsConfig={colorsConfig}
+              typographyConfig={typographyConfig}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* New Asset Modal */}
+      {showNewAssetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowNewAssetModal(false)} />
+          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 w-[450px] max-w-[90vw] max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add New Assets</h3>
+            <div className="space-y-2 mb-6">
+              {CHANNELS.map((channel) => {
+                const isExpanded = modalExpandedChannels.has(channel.id)
+                const hasTemplates = channel.templates.length > 0
+                const pendingInChannel = channel.templates.filter(t =>
+                  pendingAssets.includes(t.type)
+                ).length
+
+                return (
+                  <div key={channel.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    {/* Channel Header */}
+                    <button
+                      onClick={() => {
+                        setModalExpandedChannels(prev => {
+                          const next = new Set(prev)
+                          if (next.has(channel.id)) {
+                            next.delete(channel.id)
+                          } else {
+                            next.add(channel.id)
+                          }
+                          return next
+                        })
+                      }}
+                      disabled={!hasTemplates}
+                      className={`w-full px-3 py-2.5 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50
+                        ${hasTemplates ? 'hover:bg-gray-100 dark:hover:bg-gray-800' : 'cursor-default opacity-60'}
+                        transition-colors`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg
+                          className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''} ${!hasTemplates ? 'opacity-0' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {channel.label}
+                        </span>
+                        {!hasTemplates && (
+                          <span className="text-xs text-gray-400">Coming soon</span>
+                        )}
+                      </div>
+                      {pendingInChannel > 0 && (
+                        <span className="bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                          {pendingInChannel}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Templates List */}
+                    {isExpanded && hasTemplates && (
+                      <div className="border-t border-gray-200 dark:border-gray-700">
+                        {channel.templates.map((template) => {
+                          const countInPending = pendingAssets.filter(t => t === template.type).length
+                          return (
+                            <div
+                              key={template.type}
+                              className="flex items-center gap-3 p-3 pl-10 border-b last:border-b-0 border-gray-100 dark:border-gray-800"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                                  {template.label}
+                                </div>
+                                <div className="text-xs text-gray-500 truncate">{template.description}</div>
+                              </div>
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                <button
+                                  onClick={() => {
+                                    if (countInPending > 0) {
+                                      const idx = pendingAssets.lastIndexOf(template.type)
+                                      if (idx !== -1) {
+                                        const newPending = [...pendingAssets]
+                                        newPending.splice(idx, 1)
+                                        setPendingAssets(newPending)
+                                      }
+                                    }
+                                  }}
+                                  disabled={countInPending === 0}
+                                  className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300
+                                    dark:border-gray-600 text-gray-600 dark:text-gray-400 disabled:opacity-30
+                                    hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                  </svg>
+                                </button>
+                                <span className="w-5 text-center text-xs font-medium text-gray-900 dark:text-gray-100">
+                                  {countInPending}
+                                </span>
+                                <button
+                                  onClick={() => setPendingAssets([...pendingAssets, template.type])}
+                                  className="w-6 h-6 flex items-center justify-center rounded-full border border-blue-500
+                                    text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowNewAssetModal(false)}
+                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300
+                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddNewAssets}
+                disabled={pendingAssets.length === 0}
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg
+                  hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                Add {pendingAssets.length > 0 ? `(${pendingAssets.length})` : ''}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewAsset && colorsConfig && typographyConfig && (
+        <PreviewModal
+          asset={previewAsset}
+          onClose={() => setPreviewAsset(null)}
+          colorsConfig={colorsConfig}
+          typographyConfig={typographyConfig}
+        />
+      )}
+    </div>
+  )
+}
+
+interface QueueItemProps {
+  asset: QueuedAsset
+  isExporting: boolean
+  onExport: (scale: ExportScale) => void
+  onEdit: () => void
+  onRemove: () => void
+  onPreview: () => void
+  getTemplateName: (type: string) => string
+  colorsConfig: ColorsConfig | null
+  typographyConfig: TypographyConfig | null
+}
+
+function QueueItem({
+  asset,
+  isExporting,
+  onExport,
+  onEdit,
+  onRemove,
+  onPreview,
+  getTemplateName,
+  colorsConfig,
+  typographyConfig,
+}: QueueItemProps) {
+  const [scale, setScale] = useState<ExportScale>('2x')
+
+  const dimensions = TEMPLATE_DIMENSIONS[asset.templateType]
+  const thumbnailScale = 0.12 // Scale down to fit in thumbnail area
+
+  // Build text fields list based on what has content
+  const textFields: { label: string; value: string }[] = []
+
+  if (asset.eyebrow && asset.showEyebrow) {
+    textFields.push({ label: 'Eyebrow', value: asset.eyebrow })
+  }
+  if (asset.headline) {
+    textFields.push({ label: 'Headline', value: asset.headline })
+  }
+  if (asset.subhead && asset.showSubhead) {
+    textFields.push({ label: 'Subhead', value: asset.subhead })
+  }
+  if (asset.subheading && asset.showSubheading) {
+    textFields.push({ label: 'Subheading', value: asset.subheading })
+  }
+  if (asset.body && asset.showBody) {
+    textFields.push({ label: 'Body', value: asset.body })
+  }
+  if (asset.templateType === 'email-grid') {
+    if (asset.gridDetail1Text) {
+      textFields.push({ label: 'Detail 1', value: asset.gridDetail1Text })
+    }
+    if (asset.gridDetail2Text && asset.showGridDetail2) {
+      textFields.push({ label: 'Detail 2', value: asset.gridDetail2Text })
+    }
+    if (asset.gridDetail3Text) {
+      textFields.push({ label: 'Detail 3', value: asset.gridDetail3Text })
+    }
+  }
+  if (asset.templateType === 'social-dark-gradient') {
+    if (asset.metadata && asset.showMetadata) {
+      textFields.push({ label: 'Metadata', value: asset.metadata })
+    }
+    if (asset.ctaText && asset.showCta) {
+      textFields.push({ label: 'CTA', value: asset.ctaText })
+    }
+  }
+
+  // Build grid details for EmailGrid
+  const gridDetail1: GridDetail = { type: 'data', text: asset.gridDetail1Text }
+  const gridDetail2: GridDetail = { type: 'data', text: asset.gridDetail2Text }
+  const gridDetail3: GridDetail = { type: asset.gridDetail3Type, text: asset.gridDetail3Text }
+
+  return (
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+      <div className="flex items-start gap-4">
+        {/* Preview thumbnail - renders actual asset */}
+        <button
+          onClick={onPreview}
+          className="relative group flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700
+            hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer"
+          style={{
+            width: dimensions.width * thumbnailScale,
+            height: dimensions.height * thumbnailScale
+          }}
+        >
+          {colorsConfig && typographyConfig ? (
+            <div
+              style={{
+                transform: `scale(${thumbnailScale})`,
+                transformOrigin: 'top left',
+                width: dimensions.width,
+                height: dimensions.height,
+              }}
+            >
+              {asset.templateType === 'website-thumbnail' && (
+                <WebsiteThumbnail
+                  eyebrow={asset.eyebrow}
+                  headline={asset.headline || 'Headline'}
+                  subhead={asset.subhead}
+                  body={asset.body}
+                  solution={asset.solution}
+                  imageUrl={asset.thumbnailImageUrl || undefined}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showBody={asset.showBody && !!asset.body}
+                  logoColor={asset.logoColor}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'email-grid' && (
+                <EmailGrid
+                  headline={asset.headline || 'Headline'}
+                  body={asset.body}
+                  eyebrow={asset.eyebrow}
+                  subheading={asset.subheading}
+                  showEyebrow={asset.showEyebrow}
+                  showLightHeader={asset.showLightHeader}
+                  showHeavyHeader={false}
+                  showSubheading={asset.showSubheading}
+                  showBody={asset.showBody}
+                  showSolutionSet={asset.showSolutionSet}
+                  solution={asset.solution}
+                  logoColor={asset.logoColor}
+                  showGridDetail2={asset.showGridDetail2}
+                  gridDetail1={gridDetail1}
+                  gridDetail2={gridDetail2}
+                  gridDetail3={gridDetail3}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'social-dark-gradient' && (
+                <SocialDarkGradient
+                  eyebrow={asset.eyebrow}
+                  headline={asset.headline || 'Room for a great headline.'}
+                  subhead={asset.subhead}
+                  body={asset.body}
+                  metadata={asset.metadata}
+                  ctaText={asset.ctaText}
+                  colorStyle={asset.colorStyle}
+                  headingSize={asset.headingSize}
+                  alignment={asset.alignment}
+                  ctaStyle={asset.ctaStyle}
+                  logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor as 'orange' | 'white'}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showBody={asset.showBody && !!asset.body}
+                  showMetadata={asset.showMetadata}
+                  showCta={asset.showCta}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <svg className="w-6 h-6 text-gray-400 animate-pulse" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              </svg>
+            </div>
+          )}
+
+          {/* Expand icon overlay */}
+          <div className="absolute bottom-1 right-1 p-1 bg-black/50 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </div>
+        </button>
+
+        {/* Asset info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded">
+              {getTemplateName(asset.templateType)}
+            </span>
+          </div>
+
+          {/* Text fields */}
+          <div className="space-y-1">
+            {textFields.slice(0, 4).map((field, index) => (
+              <p key={index} className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                <span className="font-medium text-gray-700 dark:text-gray-300">{field.label}:</span>{' '}
+                {field.value}
+              </p>
+            ))}
+            {textFields.length > 4 && (
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                +{textFields.length - 4} more fields
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Scale dropdown */}
+          <select
+            value={scale}
+            onChange={(e) => setScale(e.target.value as ExportScale)}
+            disabled={isExporting}
+            className="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+              bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          >
+            <option value="1x">1x</option>
+            <option value="2x">2x</option>
+          </select>
+
+          {/* Export button - blue */}
+          <button
+            onClick={() => onExport(scale)}
+            disabled={isExporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400
+              text-white text-sm rounded-lg font-medium transition-colors"
+          >
+            {isExporting ? (
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : null}
+            Export
+          </button>
+
+          {/* Edit button - matches Add to Queue styling */}
+          <button
+            onClick={onEdit}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 rounded-lg
+              hover:bg-blue-100 text-sm font-medium transition-colors border border-blue-200
+              dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/30"
+          >
+            Edit
+          </button>
+
+          {/* Remove button */}
+          <button
+            onClick={onRemove}
+            className="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+            title="Remove from queue"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+interface PreviewModalProps {
+  asset: QueuedAsset
+  onClose: () => void
+  colorsConfig: ColorsConfig
+  typographyConfig: TypographyConfig
+}
+
+function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: PreviewModalProps) {
+  const dimensions = TEMPLATE_DIMENSIONS[asset.templateType]
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
+  // Build grid details for EmailGrid
+  const gridDetail1: GridDetail = { type: 'data', text: asset.gridDetail1Text }
+  const gridDetail2: GridDetail = { type: 'data', text: asset.gridDetail2Text }
+  const gridDetail3: GridDetail = { type: asset.gridDetail3Type, text: asset.gridDetail3Text }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-8">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
+
+      {/* Modal content */}
+      <div className="relative max-w-[90vw] max-h-[90vh] overflow-auto">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-10 right-0 p-2 text-white/80 hover:text-white transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Asset preview at full size */}
+        <div
+          className="rounded-lg overflow-hidden shadow-2xl"
+          style={{ width: dimensions.width, height: dimensions.height }}
+        >
+          {asset.templateType === 'website-thumbnail' && (
+            <WebsiteThumbnail
+              eyebrow={asset.eyebrow}
+              headline={asset.headline || 'Headline'}
+              subhead={asset.subhead}
+              body={asset.body}
+              solution={asset.solution}
+              imageUrl={asset.thumbnailImageUrl || undefined}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showBody={asset.showBody && !!asset.body}
+              logoColor={asset.logoColor}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'email-grid' && (
+            <EmailGrid
+              headline={asset.headline || 'Headline'}
+              body={asset.body}
+              eyebrow={asset.eyebrow}
+              subheading={asset.subheading}
+              showEyebrow={asset.showEyebrow}
+              showLightHeader={asset.showLightHeader}
+              showHeavyHeader={false}
+              showSubheading={asset.showSubheading}
+              showBody={asset.showBody}
+              showSolutionSet={asset.showSolutionSet}
+              solution={asset.solution}
+              logoColor={asset.logoColor}
+              showGridDetail2={asset.showGridDetail2}
+              gridDetail1={gridDetail1}
+              gridDetail2={gridDetail2}
+              gridDetail3={gridDetail3}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'social-dark-gradient' && (
+            <SocialDarkGradient
+              eyebrow={asset.eyebrow}
+              headline={asset.headline || 'Room for a great headline.'}
+              subhead={asset.subhead}
+              body={asset.body}
+              metadata={asset.metadata}
+              ctaText={asset.ctaText}
+              colorStyle={asset.colorStyle}
+              headingSize={asset.headingSize}
+              alignment={asset.alignment}
+              ctaStyle={asset.ctaStyle}
+              logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor as 'orange' | 'white'}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showBody={asset.showBody && !!asset.body}
+              showMetadata={asset.showMetadata}
+              showCta={asset.showCta}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

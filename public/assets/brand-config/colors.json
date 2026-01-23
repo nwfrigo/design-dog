@@ -1,0 +1,42 @@
+{
+  "brand": {
+    "primary": "#D35F0B",
+    "primaryDark": "#060015",
+    "black": "#000000",
+    "white": "#FFFFFF"
+  },
+  "solutions": {
+    "environmental": {
+      "color": "#49763E",
+      "label": "Environmental"
+    },
+    "safety": {
+      "color": "#C3B01E",
+      "label": "Safety"
+    },
+    "health": {
+      "color": "#00767F",
+      "label": "Health"
+    },
+    "sustainability": {
+      "color": "#A61F67",
+      "label": "Sustainability"
+    },
+    "quality": {
+      "color": "#006FA3",
+      "label": "Quality"
+    },
+    "none": {
+      "color": "transparent",
+      "label": "None"
+    }
+  },
+  "ui": {
+    "border": "#D9D8D6",
+    "borderHighContrast": "#000000",
+    "textPrimary": "#000000",
+    "textSecondary": "#666666",
+    "surface": "#FFFFFF",
+    "surfaceSecondary": "#F5F5F5"
+  }
+}

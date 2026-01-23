@@ -1,0 +1,10 @@
+{
+  "images": [
+    {
+      "id": "example-1",
+      "url": "/assets/image-library/images/example.jpg",
+      "name": "Example Image",
+      "category": "Nature"
+    }
+  ]
+}
