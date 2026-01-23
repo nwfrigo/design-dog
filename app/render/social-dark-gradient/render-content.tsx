@@ -29,9 +29,18 @@ export function SocialDarkGradientRender(props: Props) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    // Signal ready after fonts load
-    const timer = setTimeout(() => setReady(true), 300)
-    return () => clearTimeout(timer)
+    // Wait for fonts to load before signaling ready
+    const waitForFonts = async () => {
+      try {
+        await document.fonts.ready
+        // Small additional delay for rendering
+        setTimeout(() => setReady(true), 100)
+      } catch {
+        // Fallback timeout if fonts API fails
+        setTimeout(() => setReady(true), 500)
+      }
+    }
+    waitForFonts()
   }, [])
 
   return (
