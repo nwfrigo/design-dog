@@ -7,11 +7,15 @@ async function getBrowser() {
 
   if (isVercel) {
     // Production (Vercel) - use serverless chromium
+    const execPath = await chromium.executablePath()
+    console.log('Chromium path:', execPath)
+    console.log('Chromium args:', chromium.args)
+
     return puppeteer.launch({
-      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
-      defaultViewport: { width: 1200, height: 628 },
-      executablePath: await chromium.executablePath(),
+      args: chromium.args,
+      executablePath: execPath,
       headless: true,
+      ignoreHTTPSErrors: true,
     })
   }
 
@@ -202,9 +206,16 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Export error:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorStack = error instanceof Error ? error.stack : ''
+    console.error('Export error:', errorMessage, errorStack)
     return NextResponse.json(
-      { error: 'Export failed', details: String(error) },
+      {
+        error: 'Export failed',
+        message: errorMessage,
+        stack: process.env.NODE_ENV === 'development' ? errorStack : undefined,
+        env: process.env.VERCEL_ENV || 'local'
+      },
       { status: 500 }
     )
   }
