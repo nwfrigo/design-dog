@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium'
 
-// Get Chrome executable path based on environment
-async function getChromePath(): Promise<string> {
-  if (process.env.VERCEL_ENV) {
+async function getBrowser() {
+  const isVercel = !!process.env.VERCEL_ENV
+
+  if (isVercel) {
     // Production (Vercel) - use serverless chromium
-    return await chromium.executablePath()
+    return puppeteer.launch({
+      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
+      defaultViewport: { width: 1200, height: 628 },
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    })
   }
 
   // Local development - find Chrome on macOS
@@ -15,26 +21,27 @@ async function getChromePath(): Promise<string> {
     '/Applications/Chromium.app/Contents/MacOS/Chromium',
   ]
 
+  let localChromePath = ''
   for (const p of paths) {
     try {
       const fs = await import('fs')
-      if (fs.existsSync(p)) return p
+      if (fs.existsSync(p)) {
+        localChromePath = p
+        break
+      }
     } catch {
       continue
     }
   }
 
-  throw new Error('Chrome not found. Install Google Chrome.')
-}
-
-async function getBrowser() {
-  const executablePath = await getChromePath()
-  const isVercel = !!process.env.VERCEL_ENV
+  if (!localChromePath) {
+    throw new Error('Chrome not found. Install Google Chrome.')
+  }
 
   return puppeteer.launch({
-    args: isVercel ? chromium.args : ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
     defaultViewport: null,
-    executablePath,
+    executablePath: localChromePath,
     headless: true,
   })
 }
