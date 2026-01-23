@@ -1318,7 +1318,7 @@ export function EditorScreen() {
                   showEyebrow={showEyebrow}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
-                  logoColor={logoColor}
+                  logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -1337,7 +1337,7 @@ export function EditorScreen() {
                   showBody={showBody}
                   showSolutionSet={showSolutionSet}
                   solution={solution}
-                  logoColor={logoColor}
+                  logoColor={logoColor === 'white' ? 'black' : logoColor}
                   showGridDetail2={showGridDetail2}
                   gridDetail1={gridDetail1}
                   gridDetail2={gridDetail2}
