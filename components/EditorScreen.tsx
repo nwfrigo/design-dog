@@ -380,7 +380,7 @@ export function EditorScreen() {
   const gridDetail3: GridDetail = { type: gridDetail3Type, text: gridDetail3Text }
 
   // Helper to get display label with numbering for duplicates
-  const getAssetLabel = (assetType: string, index: number) => {
+  const getAssetLabel = (assetType: TemplateType, index: number) => {
     const baseLabel = TEMPLATE_LABELS[assetType]
     const sameTypeCount = selectedAssets.filter(a => a === assetType).length
     if (sameTypeCount <= 1) return baseLabel
