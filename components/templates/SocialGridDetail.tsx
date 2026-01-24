@@ -160,7 +160,7 @@ export function SocialGridDetail({
         <span style={{
           color: textColor,
           fontSize: 24,
-          fontWeight: 200,
+          fontWeight: 300,
         }}>
           {detail.text}
         </span>
@@ -251,7 +251,7 @@ export function SocialGridDetail({
               alignSelf: 'stretch',
               color: textColor,
               fontSize: 84,
-              fontWeight: 200,
+              fontWeight: 300,
               lineHeight: '96px',
             }}>
               {headline || 'Room for a great headline.'}
@@ -263,7 +263,7 @@ export function SocialGridDetail({
                 alignSelf: 'stretch',
                 color: textColor,
                 fontSize: 36,
-                fontWeight: 200,
+                fontWeight: 300,
                 lineHeight: 1.3,
               }}>
                 {subhead}

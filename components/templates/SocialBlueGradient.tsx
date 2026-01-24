@@ -3,8 +3,8 @@
 import { CSSProperties } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
-// Inline SVG logo for export compatibility
-const CorityLogo = ({ fill = '#FFFFFF', height = 37 }: { fill?: string; height?: number }) => {
+// Inline SVG logo for export compatibility - always white on blue backgrounds
+const CorityLogo = ({ height = 37 }: { height?: number }) => {
   const width = Math.round(height * 2.988)
   return (
     <svg
@@ -12,7 +12,7 @@ const CorityLogo = ({ fill = '#FFFFFF', height = 37 }: { fill?: string; height?:
       viewBox="0 0 383.8 128.41"
       width={width}
       height={height}
-      fill={fill}
+      fill="#FFFFFF"
     >
       <path d="M278.36,86.3c-4.39,0-6.9-3.61-6.9-8.32V43.78h13l-6.78-17.41h-6.26V0H251.38V83.31c0,13.5,7.53,20.71,21.49,20.71,8.29,0,13.61-2.18,16.6-4.84L284,85A12.73,12.73,0,0,1,278.36,86.3Z"/>
       <path d="M112.31,24.18c-24.94,0-40,18.19-40,39.69s15.06,39.84,40,39.84c25.1,0,40.16-18.2,40.16-39.84S137.41,24.18,112.31,24.18Zm0,61.8C99.92,86,93,75.79,93,63.87c0-11.77,6.9-22,19.29-22s19.46,10.2,19.46,22C131.77,75.79,124.71,86,112.31,86Z"/>
@@ -28,11 +28,11 @@ const CorityLogo = ({ fill = '#FFFFFF', height = 37 }: { fill?: string; height?:
 }
 
 // Arrow icon for CTA link
-const ArrowIcon = ({ color = 'white', size = 22 }: { color?: string; size?: number }) => (
+const ArrowIcon = ({ size = 22 }: { size?: number }) => (
   <svg width={size} height={size * 0.8} viewBox="0 0 22 17.5" fill="none">
     <path
       d="M13 1L21 8.75M21 8.75L13 16.5M21 8.75H1"
-      stroke={color}
+      stroke="#FFFFFF"
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -45,7 +45,7 @@ export type HeadingSize = 'S' | 'M' | 'L'
 export type Alignment = 'left' | 'center'
 export type CtaStyle = 'link' | 'button'
 
-export interface SocialDarkGradientProps {
+export interface SocialBlueGradientProps {
   eyebrow: string
   headline: string
   subhead: string
@@ -56,7 +56,6 @@ export interface SocialDarkGradientProps {
   headingSize: HeadingSize
   alignment: Alignment
   ctaStyle: CtaStyle
-  logoColor: 'orange' | 'white'
   showEyebrow: boolean
   showSubhead: boolean
   showBody: boolean
@@ -68,10 +67,10 @@ export interface SocialDarkGradientProps {
 }
 
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
-  '1': '/assets/backgrounds/social-dark-gradient-1.png',
-  '2': '/assets/backgrounds/social-dark-gradient-2.png',
-  '3': '/assets/backgrounds/social-dark-gradient-3.png',
-  '4': '/assets/backgrounds/social-dark-gradient-4.png',
+  '1': '/assets/backgrounds/social-blue-gradient-1.png',
+  '2': '/assets/backgrounds/social-blue-gradient-2.png',
+  '3': '/assets/backgrounds/social-blue-gradient-3.png',
+  '4': '/assets/backgrounds/social-blue-gradient-4.png',
 }
 
 const HEADING_SIZES: Record<HeadingSize, number> = {
@@ -92,7 +91,7 @@ const BODY_SIZES: Record<HeadingSize, number> = {
   'L': 26,
 }
 
-export function SocialDarkGradient({
+export function SocialBlueGradient({
   eyebrow,
   headline,
   subhead,
@@ -103,20 +102,16 @@ export function SocialDarkGradient({
   headingSize,
   alignment,
   ctaStyle,
-  logoColor,
   showEyebrow,
   showSubhead,
   showBody,
   showMetadata,
   showCta,
-  colors,
   typography,
   scale = 1,
-}: SocialDarkGradientProps) {
+}: SocialBlueGradientProps) {
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const logoFill = logoColor === 'orange' ? colors.brand.primary : '#FFFFFF'
   const textColor = '#FFFFFF'
-  const ctaColor = '#FFFFFF' // CTA is always white on dark backgrounds
 
   const containerStyle: CSSProperties = {
     width: 1200,
@@ -168,13 +163,13 @@ export function SocialDarkGradient({
 
       {/* Content Overlay */}
       <div style={contentStyle}>
-        {/* Logo */}
+        {/* Logo - always white on blue backgrounds */}
         <div style={{
           width: '100%',
           display: 'flex',
           justifyContent: alignment === 'center' ? 'center' : 'flex-start'
         }}>
-          <CorityLogo fill={logoFill} height={37} />
+          <CorityLogo height={37} />
         </div>
 
         {/* Text Content */}
@@ -275,7 +270,7 @@ export function SocialDarkGradient({
               >
                 <span
                   style={{
-                    color: ctaColor,
+                    color: textColor,
                     fontSize: 24,
                     fontWeight: 300,
                     lineHeight: 1,
@@ -283,7 +278,7 @@ export function SocialDarkGradient({
                 >
                   {ctaText}
                 </span>
-                <ArrowIcon color={ctaColor} size={22} />
+                <ArrowIcon size={22} />
               </div>
             ) : (
               <div

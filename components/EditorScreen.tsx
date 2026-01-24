@@ -4,7 +4,9 @@ import { useState, useCallback, useEffect } from 'react'
 import { useStore } from '@/store'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
+import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
+import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
 import { ImageLibraryModal } from './ImageLibraryModal'
@@ -165,7 +167,7 @@ export function EditorScreen() {
 
   // Calculate preview scale for large templates
   const getPreviewScale = () => {
-    if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-grid-detail') {
+    if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-grid-detail') {
       return 0.6 // Scale down 1200px to ~720px
     }
     return 1
@@ -336,7 +338,7 @@ export function EditorScreen() {
         exportParams.gridDetail2Text = gridDetail2Text
         exportParams.gridDetail3Type = gridDetail3Type
         exportParams.gridDetail3Text = gridDetail3Text
-      } else if (currentTemplate === 'social-dark-gradient') {
+      } else if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') {
         exportParams.metadata = metadata
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
@@ -367,6 +369,13 @@ export function EditorScreen() {
         exportParams.gridDetail4Text = gridDetail4Text
         exportParams.showRow3 = showRow3
         exportParams.showRow4 = showRow4
+      } else if (currentTemplate === 'email-image') {
+        exportParams.ctaText = ctaText
+        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/email-image-placeholder.png'
+        exportParams.layout = layout
+        exportParams.showBody = showBody && !!verbatimCopy.body
+        exportParams.showCta = showCta
+        exportParams.showSolutionSet = showSolutionSet
       }
 
       const response = await fetch('/api/export', {
@@ -654,7 +663,8 @@ export function EditorScreen() {
           {/* Template Options */}
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
-              {/* Logo Color - Orange/White for Social, Black/Orange for others */}
+              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), Black/Orange for others */}
+              {currentTemplate !== 'social-blue-gradient' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -707,9 +717,10 @@ export function EditorScreen() {
                   </div>
                 )}
               </div>
+              )}
 
-              {/* Category - Not shown for Social Dark Gradient */}
-              {(currentTemplate !== 'social-dark-gradient') && (
+              {/* Category - Not shown for Social Dark Gradient or Social Blue Gradient */}
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -736,8 +747,8 @@ export function EditorScreen() {
               )}
             </div>
 
-            {/* Social Dark Gradient Variant Controls */}
-            {currentTemplate === 'social-dark-gradient' && (
+            {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
+            {(currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') && (
               <>
                 {/* Color Style */}
                 <div>
@@ -754,7 +765,7 @@ export function EditorScreen() {
                         }`}
                       >
                         <img
-                          src={`/assets/backgrounds/social-dark-gradient-${style}.png`}
+                          src={`/assets/backgrounds/${currentTemplate === 'social-blue-gradient' ? 'social-blue-gradient' : 'social-dark-gradient'}-${style}.png`}
                           alt={`Style ${style}`}
                           className="w-full h-full object-cover"
                         />
@@ -839,8 +850,8 @@ export function EditorScreen() {
               </>
             )}
 
-            {/* Social Image Layout Controls */}
-            {currentTemplate === 'social-image' && (
+            {/* Social Image and Email Image Layout Controls */}
+            {(currentTemplate === 'social-image' || currentTemplate === 'email-image') && (
               <>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Layout</label>
@@ -882,8 +893,8 @@ export function EditorScreen() {
             )}
 
 
-            {/* Image - Website Thumbnail and Social Image */}
-            {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-image') && (
+            {/* Image - Website Thumbnail, Email Image and Social Image */}
+            {(currentTemplate === 'website-thumbnail' || currentTemplate === 'email-image' || currentTemplate === 'social-image') && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
@@ -1001,7 +1012,7 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -1132,8 +1143,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* Social Dark Gradient Content Fields */}
-              {currentTemplate === 'social-dark-gradient' && (
+              {/* Social Dark Gradient and Social Blue Gradient Content Fields */}
+              {(currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') && (
                 <div className="space-y-4">
                   {/* Metadata */}
                   <div>
@@ -1213,6 +1224,31 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Learn More"
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        ${!showCta ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Email Image Content Fields */}
+              {currentTemplate === 'email-image' && (
+                <div className="space-y-4">
+                  {/* CTA Text */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        CTA Text
+                      </label>
+                      <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                    </div>
+                    <input
+                      type="text"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                      placeholder="e.g., Responsive"
                       className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
                         bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
@@ -1620,6 +1656,28 @@ export function EditorScreen() {
                   scale={1}
                 />
               )}
+              {currentTemplate === 'social-blue-gradient' && (
+                <SocialBlueGradient
+                  eyebrow={eyebrow}
+                  headline={verbatimCopy.headline || 'Room for a great headline.'}
+                  subhead={verbatimCopy.subhead}
+                  body={verbatimCopy.body}
+                  metadata={metadata}
+                  ctaText={ctaText}
+                  colorStyle={colorStyle}
+                  headingSize={headingSize}
+                  alignment={alignment}
+                  ctaStyle={ctaStyle}
+                  showEyebrow={showEyebrow}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showMetadata={showMetadata}
+                  showCta={showCta}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
               {currentTemplate === 'social-image' && (
                 <SocialImage
                   headline={verbatimCopy.headline || 'Room for a great headline.'}
@@ -1655,6 +1713,23 @@ export function EditorScreen() {
                   gridDetail2={{ type: 'data', text: gridDetail2Text }}
                   gridDetail3={{ type: gridDetail3Type, text: gridDetail3Text }}
                   gridDetail4={{ type: gridDetail4Type, text: gridDetail4Text }}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-image' && (
+                <EmailImage
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                  ctaText={ctaText}
+                  imageUrl={thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
+                  layout={layout}
+                  solution={solution}
+                  logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
+                  showSolutionSet={showSolutionSet}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

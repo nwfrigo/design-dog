@@ -57,7 +57,9 @@ async function getBrowser() {
 const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'website-thumbnail': { width: 700, height: 434 },
   'email-grid': { width: 640, height: 300 },
+  'email-image': { width: 640, height: 300 },
   'social-dark-gradient': { width: 1200, height: 628 },
+  'social-blue-gradient': { width: 1200, height: 628 },
   'social-image': { width: 1200, height: 628 },
   'social-grid-detail': { width: 1200, height: 628 },
 }

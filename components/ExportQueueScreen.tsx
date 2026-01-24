@@ -5,7 +5,9 @@ import { useStore } from '@/store'
 import type { QueuedAsset, TemplateType } from '@/types'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
+import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
+import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
 import {
@@ -472,7 +474,7 @@ function QueueItem({
       textFields.push({ label: 'Detail 3', value: asset.gridDetail3Text })
     }
   }
-  if (asset.templateType === 'social-dark-gradient') {
+  if (asset.templateType === 'social-dark-gradient' || asset.templateType === 'social-blue-gradient') {
     if (asset.metadata && asset.showMetadata) {
       textFields.push({ label: 'Metadata', value: asset.metadata })
     }
@@ -500,6 +502,11 @@ function QueueItem({
     }
     if (asset.gridDetail4Text && asset.showRow4) {
       textFields.push({ label: 'Row 4', value: asset.gridDetail4Text })
+    }
+  }
+  if (asset.templateType === 'email-image') {
+    if (asset.ctaText && asset.showCta) {
+      textFields.push({ label: 'CTA', value: asset.ctaText })
     }
   }
 
@@ -573,6 +580,23 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'email-image' && (
+                <EmailImage
+                  headline={asset.headline || 'Lightweight header.'}
+                  body={asset.body || 'This is your body copy.'}
+                  ctaText={asset.ctaText || 'Responsive'}
+                  imageUrl={asset.thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
+                  layout={asset.layout || 'even'}
+                  solution={asset.solution}
+                  logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta !== false}
+                  showSolutionSet={asset.showSolutionSet !== false}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
               {asset.templateType === 'social-dark-gradient' && (
                 <SocialDarkGradient
                   eyebrow={asset.eyebrow}
@@ -586,6 +610,28 @@ function QueueItem({
                   alignment={asset.alignment}
                   ctaStyle={asset.ctaStyle}
                   logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showBody={asset.showBody && !!asset.body}
+                  showMetadata={asset.showMetadata}
+                  showCta={asset.showCta}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'social-blue-gradient' && (
+                <SocialBlueGradient
+                  eyebrow={asset.eyebrow}
+                  headline={asset.headline || 'Room for a great headline.'}
+                  subhead={asset.subhead}
+                  body={asset.body}
+                  metadata={asset.metadata}
+                  ctaText={asset.ctaText}
+                  colorStyle={asset.colorStyle}
+                  headingSize={asset.headingSize}
+                  alignment={asset.alignment}
+                  ctaStyle={asset.ctaStyle}
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showBody={asset.showBody && !!asset.body}
@@ -821,6 +867,23 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               scale={1}
             />
           )}
+          {asset.templateType === 'email-image' && (
+            <EmailImage
+              headline={asset.headline || 'Lightweight header.'}
+              body={asset.body || 'This is your body copy.'}
+              ctaText={asset.ctaText || 'Responsive'}
+              imageUrl={asset.thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
+              layout={asset.layout || 'even'}
+              solution={asset.solution}
+              logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta !== false}
+              showSolutionSet={asset.showSolutionSet !== false}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
           {asset.templateType === 'social-dark-gradient' && (
             <SocialDarkGradient
               eyebrow={asset.eyebrow}
@@ -834,6 +897,28 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               alignment={asset.alignment}
               ctaStyle={asset.ctaStyle}
               logoColor={asset.logoColor === 'black' ? 'white' : asset.logoColor}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showBody={asset.showBody && !!asset.body}
+              showMetadata={asset.showMetadata}
+              showCta={asset.showCta}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'social-blue-gradient' && (
+            <SocialBlueGradient
+              eyebrow={asset.eyebrow}
+              headline={asset.headline || 'Room for a great headline.'}
+              subhead={asset.subhead}
+              body={asset.body}
+              metadata={asset.metadata}
+              ctaText={asset.ctaText}
+              colorStyle={asset.colorStyle}
+              headingSize={asset.headingSize}
+              alignment={asset.alignment}
+              ctaStyle={asset.ctaStyle}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
               showBody={asset.showBody && !!asset.body}

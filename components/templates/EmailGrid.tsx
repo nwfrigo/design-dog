@@ -142,7 +142,7 @@ export function EmailGrid({
             <span style={{
               color: '#060015',
               fontSize: 18,
-              fontWeight: 200,
+              fontWeight: 300,
               lineHeight: '18px',
             }}>
               {detail.text}
@@ -159,7 +159,7 @@ export function EmailGrid({
         <span style={{
           color: colors.ui.textPrimary,
           fontSize: 18,
-          fontWeight: 200,
+          fontWeight: 300,
         }}>
           {detail.text}
         </span>
@@ -242,7 +242,7 @@ export function EmailGrid({
             <div style={{
               color: colors.ui.textPrimary,
               fontSize: 38,
-              fontWeight: 200,
+              fontWeight: 300,
               lineHeight: '48px',
             }}>
               {headline || 'Lightweight header.'}
@@ -254,7 +254,7 @@ export function EmailGrid({
             <div style={{
               color: colors.ui.textPrimary,
               fontSize: 20,
-              fontWeight: 200,
+              fontWeight: 300,
               lineHeight: 1.3,
             }}>
               {subheading}
@@ -266,7 +266,7 @@ export function EmailGrid({
             <div style={{
               color: colors.ui.textPrimary,
               fontSize: 18,
-              fontWeight: 200,
+              fontWeight: 300,
             }}>
               {body || 'This is your body copy. Lorem ipsum dolor sit am'}
             </div>

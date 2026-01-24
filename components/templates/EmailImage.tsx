@@ -3,8 +3,8 @@
 import { CSSProperties, useState, useEffect } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
-// Inline SVG logo for export compatibility
-const CorityLogo = ({ fill = '#000000', height = 37 }: { fill?: string; height?: number }) => {
+// Inline SVG logo for export compatibility - scaled for email size
+const CorityLogo = ({ fill = '#000000', height = 23 }: { fill?: string; height?: number }) => {
   const width = Math.round(height * 2.988)
   return (
     <svg
@@ -27,8 +27,8 @@ const CorityLogo = ({ fill = '#000000', height = 37 }: { fill?: string; height?:
   )
 }
 
-// Arrow icon for CTA
-const ArrowIcon = ({ color = '#D35F0B', size = 22 }: { color?: string; size?: number }) => (
+// Arrow icon for CTA - scaled for email
+const ArrowIcon = ({ color = '#060015', size = 16.5 }: { color?: string; size?: number }) => (
   <svg width={size} height={size * 0.8} viewBox="0 0 22 17.5" fill="none">
     <path
       d="M13 1L21 8.75M21 8.75L13 16.5M21 8.75H1"
@@ -42,17 +42,15 @@ const ArrowIcon = ({ color = '#D35F0B', size = 22 }: { color?: string; size?: nu
 
 export type LayoutVariant = 'even' | 'more-image' | 'more-text'
 
-export interface SocialImageProps {
+export interface EmailImageProps {
   headline: string
-  subhead: string
-  metadata: string
+  body: string
   ctaText: string
   imageUrl: string
   layout: LayoutVariant
   solution: string
   logoColor: 'black' | 'orange'
-  showSubhead: boolean
-  showMetadata: boolean
+  showBody: boolean
   showCta: boolean
   showSolutionSet: boolean
   colors: ColorsConfig
@@ -60,36 +58,42 @@ export interface SocialImageProps {
   scale?: number
 }
 
-// Image widths for each layout variant
-const IMAGE_WIDTHS: Record<LayoutVariant, number> = {
-  'even': 488,
-  'more-image': 600,
-  'more-text': 376,
+// Text area widths for each layout variant (image fills the rest)
+const TEXT_WIDTHS: Record<LayoutVariant, number> = {
+  'even': 330,
+  'more-image': 260,
+  'more-text': 400,
 }
 
-export function SocialImage({
+// Image widths for each layout variant
+const IMAGE_WIDTHS: Record<LayoutVariant, number> = {
+  'even': 250,
+  'more-image': 320,
+  'more-text': 180,
+}
+
+export function EmailImage({
   headline,
-  subhead,
-  metadata,
+  body,
   ctaText,
   imageUrl,
   layout,
   solution,
   logoColor,
-  showSubhead,
-  showMetadata,
+  showBody,
   showCta,
   showSolutionSet,
   colors,
   typography,
   scale = 1,
-}: SocialImageProps) {
+}: EmailImageProps) {
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
   const textColor = colors.ui.textPrimary
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
+  const textWidth = TEXT_WIDTHS[layout]
   const imageWidth = IMAGE_WIDTHS[layout]
 
   // State for grayscale image
@@ -118,13 +122,17 @@ export function SocialImage({
   }, [imageUrl])
 
   const containerStyle: CSSProperties = {
-    width: 1200,
-    height: 628,
-    background: '#ffffff',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 64,
-    padding: '64px 0 64px 64px',
+    width: 640,
+    height: 300,
+    background: colors.ui.surface,
+    position: 'relative',
+    display: 'inline-flex',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 24,
+    paddingTop: 32,
+    paddingBottom: 32,
+    paddingLeft: 32,
     overflow: 'hidden',
     fontFamily,
     transform: `scale(${scale})`,
@@ -135,43 +143,49 @@ export function SocialImage({
     <div style={containerStyle}>
       {/* Left content area */}
       <div style={{
-        flex: '1 1 0',
+        width: textWidth,
         alignSelf: 'stretch',
-        display: 'flex',
+        display: 'inline-flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
+        overflow: 'hidden',
       }}>
         {/* Header: Logo + Solution Pill */}
         <div style={{
-          display: 'flex',
+          display: 'inline-flex',
+          justifyContent: 'flex-start',
           alignItems: 'center',
-          gap: 64,
+          gap: 40,
         }}>
-          <CorityLogo fill={logoFill} height={37} />
+          <CorityLogo fill={logoFill} height={23} />
 
           {showSolutionSet && solution !== 'none' && (
             <div style={{
-              padding: '20px 24px',
+              paddingLeft: 15,
+              paddingRight: 15,
+              paddingTop: 12.5,
+              paddingBottom: 12.5,
               background: colors.ui.surface,
-              borderRadius: 10,
-              border: `1.25px solid ${colors.ui.border}`,
+              borderRadius: 6.25,
+              border: `0.79px solid ${colors.ui.border}`,
               display: 'flex',
+              justifyContent: 'center',
               alignItems: 'center',
-              gap: 19,
+              gap: 12,
             }}>
               <div style={{
-                width: 14,
-                height: 14,
+                width: 9,
+                height: 9,
                 background: solutionColor,
-                borderRadius: 3,
+                borderRadius: 2,
               }} />
               <span style={{
                 color: textColor,
-                fontSize: 14,
+                fontSize: 8.85,
                 fontWeight: 500,
                 textTransform: 'uppercase',
-                letterSpacing: '1.54px',
+                letterSpacing: 0.97,
               }}>
                 {solutionLabel}
               </span>
@@ -184,47 +198,30 @@ export function SocialImage({
           alignSelf: 'stretch',
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
           gap: 24,
         }}>
-          {/* Headline + Subhead group */}
+          {/* Headline */}
           <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 36,
+            alignSelf: 'stretch',
+            color: textColor,
+            fontSize: 38.15,
+            fontWeight: 300,
+            lineHeight: '48.19px',
           }}>
-            {/* Headline */}
-            <div style={{
-              color: textColor,
-              fontSize: 84,
-              fontWeight: 300,
-              lineHeight: '96px',
-            }}>
-              {headline || 'Room for a great headline.'}
-            </div>
-
-            {/* Subhead */}
-            {showSubhead && subhead && (
-              <div style={{
-                color: textColor,
-                fontSize: 36,
-                fontWeight: 300,
-                lineHeight: 1.3,
-              }}>
-                {subhead}
-              </div>
-            )}
+            {headline || 'Lightweight header.'}
           </div>
 
-          {/* Metadata */}
-          {showMetadata && metadata && (
+          {/* Body */}
+          {showBody && body && (
             <div style={{
+              alignSelf: 'stretch',
               color: textColor,
-              fontSize: 14,
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '1.54px',
+              fontSize: 18.07,
+              fontWeight: 300,
             }}>
-              {metadata}
+              {body}
             </div>
           )}
         </div>
@@ -232,39 +229,44 @@ export function SocialImage({
         {/* CTA */}
         {showCta && ctaText && (
           <div style={{
-            display: 'flex',
+            display: 'inline-flex',
+            justifyContent: 'flex-start',
             alignItems: 'center',
-            gap: 16,
+            gap: 12,
           }}>
             <span style={{
-              color: textColor,
-              fontSize: 24,
-              fontWeight: 300,
-              lineHeight: 1,
+              textAlign: 'center',
+              color: '#060015',
+              fontSize: 18,
+              fontWeight: 500,
+              lineHeight: '18px',
             }}>
               {ctaText}
             </span>
-            <ArrowIcon color={colors.brand.primary} size={22} />
+            <ArrowIcon color="#060015" size={16.5} />
           </div>
         )}
       </div>
 
-      {/* Right image area */}
+      {/* Right image area - absolutely positioned */}
       <div style={{
         width: imageWidth,
-        height: 628,
-        position: 'relative',
+        height: 300,
+        position: 'absolute',
+        right: 0,
+        top: 0,
         overflow: 'hidden',
-        flexShrink: 0,
-        background: '#ffffff',
       }}>
-        {/* Image */}
+        {/* Image - slightly oversized to allow overflow effect */}
         <img
           src={grayscaleImageUrl || imageUrl}
           alt=""
           style={{
-            width: '100%',
-            height: '100%',
+            width: imageWidth + 60,
+            height: 330,
+            position: 'absolute',
+            left: -30,
+            top: 12,
             objectFit: 'cover',
             filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
           }}
