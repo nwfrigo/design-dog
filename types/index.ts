@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'email-grid' | 'social-dark-gradient'
+export type TemplateType = 'website-thumbnail' | 'email-grid' | 'social-dark-gradient' | 'social-image' | 'social-grid-detail'
 
 export interface CopyContent {
   headline: string
@@ -69,6 +69,11 @@ export interface QueuedAsset {
   gridDetail2Text: string
   gridDetail3Type: 'data' | 'cta'
   gridDetail3Text: string
+  // Social Grid Detail specific (4th row)
+  gridDetail4Type: 'data' | 'cta'
+  gridDetail4Text: string
+  showRow3: boolean
+  showRow4: boolean
   // Social Dark Gradient specific
   metadata: string
   ctaText: string
@@ -78,6 +83,8 @@ export interface QueuedAsset {
   ctaStyle: 'link' | 'button'
   showMetadata: boolean
   showCta: boolean
+  // Social Image specific
+  layout: 'even' | 'more-image' | 'more-text'
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -128,6 +135,12 @@ export interface AppState {
   gridDetail3Type: 'data' | 'cta'
   gridDetail3Text: string
 
+  // Social Grid Detail specific settings
+  gridDetail4Type: 'data' | 'cta'
+  gridDetail4Text: string
+  showRow3: boolean
+  showRow4: boolean
+
   // Social Dark Gradient specific settings
   metadata: string
   ctaText: string
@@ -137,6 +150,9 @@ export interface AppState {
   ctaStyle: 'link' | 'button'
   showMetadata: boolean
   showCta: boolean
+
+  // Social Image specific settings
+  layout: 'even' | 'more-image' | 'more-text'
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -168,6 +184,12 @@ export interface AppState {
   setGridDetail3Type: (type: 'data' | 'cta') => void
   setGridDetail3Text: (text: string) => void
 
+  // Social Grid Detail specific actions
+  setGridDetail4Type: (type: 'data' | 'cta') => void
+  setGridDetail4Text: (text: string) => void
+  setShowRow3: (show: boolean) => void
+  setShowRow4: (show: boolean) => void
+
   // Social Dark Gradient specific actions
   setMetadata: (metadata: string) => void
   setCtaText: (text: string) => void
@@ -177,6 +199,9 @@ export interface AppState {
   setCtaStyle: (style: 'link' | 'button') => void
   setShowMetadata: (show: boolean) => void
   setShowCta: (show: boolean) => void
+
+  // Social Image specific actions
+  setLayout: (layout: 'even' | 'more-image' | 'more-text') => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

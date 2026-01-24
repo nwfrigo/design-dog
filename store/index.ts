@@ -53,6 +53,12 @@ export const useStore = create<AppState>((set, get) => ({
   gridDetail3Type: 'cta',
   gridDetail3Text: 'Responsive',
 
+  // Social Grid Detail specific settings
+  gridDetail4Type: 'cta',
+  gridDetail4Text: 'Join the event',
+  showRow3: true,
+  showRow4: true,
+
   // Social Dark Gradient specific settings
   metadata: 'Day / Month | 00:00',
   ctaText: 'Responsive',
@@ -62,6 +68,9 @@ export const useStore = create<AppState>((set, get) => ({
   ctaStyle: 'link',
   showMetadata: true,
   showCta: true,
+
+  // Social Image specific settings
+  layout: 'even',
 
   // Export queue
   exportQueue: [],
@@ -97,6 +106,12 @@ export const useStore = create<AppState>((set, get) => ({
   setGridDetail3Type: (type: 'data' | 'cta') => set({ gridDetail3Type: type }),
   setGridDetail3Text: (text: string) => set({ gridDetail3Text: text }),
 
+  // Social Grid Detail specific actions
+  setGridDetail4Type: (type: 'data' | 'cta') => set({ gridDetail4Type: type }),
+  setGridDetail4Text: (text: string) => set({ gridDetail4Text: text }),
+  setShowRow3: (show: boolean) => set({ showRow3: show }),
+  setShowRow4: (show: boolean) => set({ showRow4: show }),
+
   // Social Dark Gradient specific actions
   setMetadata: (metadata: string) => set({ metadata }),
   setCtaText: (text: string) => set({ ctaText: text }),
@@ -106,6 +121,9 @@ export const useStore = create<AppState>((set, get) => ({
   setCtaStyle: (style: 'link' | 'button') => set({ ctaStyle: style }),
   setShowMetadata: (show: boolean) => set({ showMetadata: show }),
   setShowCta: (show: boolean) => set({ showCta: show }),
+
+  // Social Image specific actions
+  setLayout: (layout: 'even' | 'more-image' | 'more-text') => set({ layout }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -164,6 +182,11 @@ export const useStore = create<AppState>((set, get) => ({
       gridDetail2Text: state.gridDetail2Text,
       gridDetail3Type: state.gridDetail3Type,
       gridDetail3Text: state.gridDetail3Text,
+      // Social Grid Detail fields
+      gridDetail4Type: state.gridDetail4Type,
+      gridDetail4Text: state.gridDetail4Text,
+      showRow3: state.showRow3,
+      showRow4: state.showRow4,
       // Social Dark Gradient fields
       metadata: state.metadata,
       ctaText: state.ctaText,
@@ -173,6 +196,8 @@ export const useStore = create<AppState>((set, get) => ({
       ctaStyle: state.ctaStyle,
       showMetadata: state.showMetadata,
       showCta: state.showCta,
+      // Social Image fields
+      layout: state.layout,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -220,6 +245,11 @@ export const useStore = create<AppState>((set, get) => ({
       gridDetail2Text: asset.gridDetail2Text,
       gridDetail3Type: asset.gridDetail3Type,
       gridDetail3Text: asset.gridDetail3Text,
+      // Social Grid Detail fields
+      gridDetail4Type: asset.gridDetail4Type,
+      gridDetail4Text: asset.gridDetail4Text,
+      showRow3: asset.showRow3,
+      showRow4: asset.showRow4,
       // Social Dark Gradient fields
       metadata: asset.metadata,
       ctaText: asset.ctaText,
@@ -229,6 +259,8 @@ export const useStore = create<AppState>((set, get) => ({
       ctaStyle: asset.ctaStyle,
       showMetadata: asset.showMetadata,
       showCta: asset.showCta,
+      // Social Image fields
+      layout: asset.layout,
     })
 
     // Remove the asset from queue since it's being edited
@@ -269,6 +301,11 @@ export const useStore = create<AppState>((set, get) => ({
       gridDetail2Text: 'Date: January 1st, 2026',
       gridDetail3Type: 'cta',
       gridDetail3Text: 'Responsive',
+      // Social Grid Detail defaults
+      gridDetail4Type: 'cta',
+      gridDetail4Text: 'Join the event',
+      showRow3: true,
+      showRow4: true,
       // Social Dark Gradient defaults
       metadata: 'Day / Month | 00:00',
       ctaText: 'Responsive',
@@ -278,6 +315,8 @@ export const useStore = create<AppState>((set, get) => ({
       ctaStyle: 'link',
       showMetadata: true,
       showCta: true,
+      // Social Image defaults
+      layout: 'even',
       exportQueue: [],
     }),
 }))

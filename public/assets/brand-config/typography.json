@@ -12,6 +12,14 @@
     "semibold": 600,
     "bold": 700
   },
+  "defaults": {
+    "headline": { "fontWeight": 200 },
+    "subhead": { "fontWeight": 200 },
+    "body": { "fontWeight": 200 },
+    "cta": { "fontWeight": 200 },
+    "eyebrow": { "fontWeight": 500 },
+    "metadata": { "fontWeight": 500 }
+  },
   "templates": {
     "websiteThumbnail": {
       "eyebrow": {

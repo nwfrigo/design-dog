@@ -23,7 +23,7 @@ export const CHANNELS: ChannelConfig[] = [
     templates: [
       {
         type: 'email-grid',
-        label: 'Email Grid',
+        label: 'Email - Grid Details',
         description: 'Email header with grid details',
         dimensions: '640 × 300px',
         width: 640,
@@ -39,6 +39,22 @@ export const CHANNELS: ChannelConfig[] = [
         type: 'social-dark-gradient',
         label: 'Social - Dark Gradient',
         description: 'Dark gradient background with customizable layout',
+        dimensions: '1200 × 628px',
+        width: 1200,
+        height: 628,
+      },
+      {
+        type: 'social-image',
+        label: 'Social - Image',
+        description: 'Light background with grayscale image',
+        dimensions: '1200 × 628px',
+        width: 1200,
+        height: 628,
+      },
+      {
+        type: 'social-grid-detail',
+        label: 'Social - Grid Detail',
+        description: 'Light background with grid details',
         dimensions: '1200 × 628px',
         width: 1200,
         height: 628,

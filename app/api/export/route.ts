@@ -58,6 +58,8 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'website-thumbnail': { width: 700, height: 434 },
   'email-grid': { width: 640, height: 300 },
   'social-dark-gradient': { width: 1200, height: 628 },
+  'social-image': { width: 1200, height: 628 },
+  'social-grid-detail': { width: 1200, height: 628 },
 }
 
 export async function POST(request: NextRequest) {
@@ -100,6 +102,13 @@ export async function POST(request: NextRequest) {
       ctaStyle,
       showMetadata,
       showCta,
+      // Social image specific
+      layout,
+      // Social grid detail specific
+      gridDetail4Type,
+      gridDetail4Text,
+      showRow3,
+      showRow4,
     } = body
 
     // Build query params for render page
@@ -142,6 +151,15 @@ export async function POST(request: NextRequest) {
     if (ctaStyle) params.set('ctaStyle', ctaStyle)
     if (showMetadata !== undefined) params.set('showMetadata', String(showMetadata))
     if (showCta !== undefined) params.set('showCta', String(showCta))
+
+    // Social image specific
+    if (layout) params.set('layout', layout)
+
+    // Social grid detail specific
+    if (gridDetail4Type) params.set('gridDetail4Type', gridDetail4Type)
+    if (gridDetail4Text) params.set('gridDetail4Text', gridDetail4Text)
+    if (showRow3 !== undefined) params.set('showRow3', String(showRow3))
+    if (showRow4 !== undefined) params.set('showRow4', String(showRow4))
 
     // Get the base URL from the request
     const protocol = request.headers.get('x-forwarded-proto') || 'https'

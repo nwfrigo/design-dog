@@ -5,6 +5,8 @@ import { useStore } from '@/store'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
+import { SocialImage } from './templates/SocialImage'
+import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
 import { ImageLibraryModal } from './ImageLibraryModal'
 import {
   fetchColorsConfig,
@@ -114,6 +116,18 @@ export function EditorScreen() {
     setShowMetadata,
     showCta,
     setShowCta,
+    // Social Image specific
+    layout,
+    setLayout,
+    // Social Grid Detail specific
+    gridDetail4Type,
+    setGridDetail4Type,
+    gridDetail4Text,
+    setGridDetail4Text,
+    showRow3,
+    setShowRow3,
+    showRow4,
+    setShowRow4,
     // Queue
     addToQueue,
     exportQueue,
@@ -151,7 +165,7 @@ export function EditorScreen() {
 
   // Calculate preview scale for large templates
   const getPreviewScale = () => {
-    if (currentTemplate === 'social-dark-gradient') {
+    if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-grid-detail') {
       return 0.6 // Scale down 1200px to ~720px
     }
     return 1
@@ -333,6 +347,26 @@ export function EditorScreen() {
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showMetadata = showMetadata
         exportParams.showCta = showCta
+      } else if (currentTemplate === 'social-image') {
+        exportParams.metadata = metadata
+        exportParams.ctaText = ctaText
+        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/social-image-placeholder.png'
+        exportParams.layout = layout
+        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
+        exportParams.showMetadata = showMetadata
+        exportParams.showCta = showCta
+        exportParams.showSolutionSet = showSolutionSet
+      } else if (currentTemplate === 'social-grid-detail') {
+        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
+        exportParams.showSolutionSet = showSolutionSet
+        exportParams.gridDetail1Text = gridDetail1Text
+        exportParams.gridDetail2Text = gridDetail2Text
+        exportParams.gridDetail3Type = gridDetail3Type
+        exportParams.gridDetail3Text = gridDetail3Text
+        exportParams.gridDetail4Type = gridDetail4Type
+        exportParams.gridDetail4Text = gridDetail4Text
+        exportParams.showRow3 = showRow3
+        exportParams.showRow4 = showRow4
       }
 
       const response = await fetch('/api/export', {
@@ -675,19 +709,29 @@ export function EditorScreen() {
               </div>
 
               {/* Category - Not shown for Social Dark Gradient */}
-              {currentTemplate !== 'social-dark-gradient' && (
+              {(currentTemplate !== 'social-dark-gradient') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
-                  <select
-                    value={solution}
-                    onChange={(e) => setSolution(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-                  >
-                    {solutionOptions.map(({ key, label }) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={solution}
+                      onChange={(e) => setSolution(e.target.value)}
+                      className="w-full px-3 py-2 pr-8 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 appearance-none cursor-pointer"
+                    >
+                      {solutionOptions.map(({ key, label }) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
+                    <svg
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
               )}
             </div>
@@ -795,8 +839,51 @@ export function EditorScreen() {
               </>
             )}
 
-            {/* Image - Website Thumbnail only */}
-            {currentTemplate === 'website-thumbnail' && (
+            {/* Social Image Layout Controls */}
+            {currentTemplate === 'social-image' && (
+              <>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Layout</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <button
+                      onClick={() => setLayout('more-text')}
+                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+                        layout === 'more-text'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      More Text
+                    </button>
+                    <button
+                      onClick={() => setLayout('even')}
+                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+                        layout === 'even'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Even
+                    </button>
+                    <button
+                      onClick={() => setLayout('more-image')}
+                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+                        layout === 'more-image'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      More Image
+                    </button>
+                  </div>
+                </div>
+
+              </>
+            )}
+
+
+            {/* Image - Website Thumbnail and Social Image */}
+            {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-image') && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
@@ -914,7 +1001,7 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -1086,6 +1173,169 @@ export function EditorScreen() {
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Social Image Content Fields */}
+              {currentTemplate === 'social-image' && (
+                <div className="space-y-4">
+                  {/* Metadata */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        Metadata
+                      </label>
+                      <EyeIcon visible={showMetadata} onClick={() => setShowMetadata(!showMetadata)} />
+                    </div>
+                    <input
+                      type="text"
+                      value={metadata}
+                      onChange={(e) => setMetadata(e.target.value)}
+                      placeholder="e.g., Day / Month | 00:00"
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        ${!showMetadata ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+
+                  {/* CTA Text */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        CTA Text
+                      </label>
+                      <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                    </div>
+                    <input
+                      type="text"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                      placeholder="e.g., Learn More"
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        ${!showCta ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Social Grid Detail Content Fields */}
+              {currentTemplate === 'social-grid-detail' && (
+                <div className="space-y-4">
+                  {/* Subhead */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        Subhead
+                      </label>
+                      <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
+                    </div>
+                    <textarea
+                      value={verbatimCopy.subhead}
+                      onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
+                      placeholder="This is your subheader or description text..."
+                      rows={2}
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
+                        ${!showSubhead ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+
+                  {/* Grid Details */}
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Grid Details
+                    </label>
+
+                    {/* Row 1 */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Row 1</label>
+                      <input
+                        type="text"
+                        value={gridDetail1Text}
+                        onChange={(e) => setGridDetail1Text(e.target.value)}
+                        placeholder="Date: January 1st, 2026"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Row 2 */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Row 2</label>
+                      <input
+                        type="text"
+                        value={gridDetail2Text}
+                        onChange={(e) => setGridDetail2Text(e.target.value)}
+                        placeholder="Time: Midnight, EST"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Row 3 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs text-gray-400">Row 3</label>
+                          <select
+                            value={gridDetail3Type}
+                            onChange={(e) => setGridDetail3Type(e.target.value as 'data' | 'cta')}
+                            className="text-xs px-1.5 py-0.5 border border-gray-300 dark:border-gray-600 rounded
+                              bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400"
+                          >
+                            <option value="data">Data</option>
+                            <option value="cta">CTA</option>
+                          </select>
+                        </div>
+                        <EyeIcon visible={showRow3} onClick={() => setShowRow3(!showRow3)} />
+                      </div>
+                      <input
+                        type="text"
+                        value={gridDetail3Text}
+                        onChange={(e) => setGridDetail3Text(e.target.value)}
+                        placeholder={gridDetail3Type === 'cta' ? 'Join the event' : 'Place: Wherever'}
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          ${!showRow3 ? 'opacity-50' : ''}`}
+                      />
+                    </div>
+
+                    {/* Row 4 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs text-gray-400">Row 4</label>
+                          <select
+                            value={gridDetail4Type}
+                            onChange={(e) => setGridDetail4Type(e.target.value as 'data' | 'cta')}
+                            className="text-xs px-1.5 py-0.5 border border-gray-300 dark:border-gray-600 rounded
+                              bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400"
+                          >
+                            <option value="data">Data</option>
+                            <option value="cta">CTA</option>
+                          </select>
+                        </div>
+                        <EyeIcon visible={showRow4} onClick={() => setShowRow4(!showRow4)} />
+                      </div>
+                      <input
+                        type="text"
+                        value={gridDetail4Text}
+                        onChange={(e) => setGridDetail4Text(e.target.value)}
+                        placeholder={gridDetail4Type === 'cta' ? 'Join the event' : 'Additional info'}
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          ${!showRow4 ? 'opacity-50' : ''}`}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -1365,6 +1615,46 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showMetadata={showMetadata}
                   showCta={showCta}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'social-image' && (
+                <SocialImage
+                  headline={verbatimCopy.headline || 'Room for a great headline.'}
+                  subhead={verbatimCopy.subhead}
+                  metadata={metadata}
+                  ctaText={ctaText}
+                  imageUrl={thumbnailImageUrl || '/assets/images/social-image-placeholder.png'}
+                  layout={layout}
+                  solution={solution}
+                  logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  showMetadata={showMetadata}
+                  showCta={showCta}
+                  showSolutionSet={showSolutionSet}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'social-grid-detail' && (
+                <SocialGridDetail
+                  headline={verbatimCopy.headline || 'Room for a great headline.'}
+                  subhead={verbatimCopy.subhead || 'This is your subheader or description text. Keep it to two lines if you can.'}
+                  eyebrow={eyebrow || "Don't miss this."}
+                  showEyebrow={showEyebrow}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  showSolutionSet={showSolutionSet}
+                  solution={solution}
+                  logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  showRow3={showRow3}
+                  showRow4={showRow4}
+                  gridDetail1={{ type: 'data', text: gridDetail1Text }}
+                  gridDetail2={{ type: 'data', text: gridDetail2Text }}
+                  gridDetail3={{ type: gridDetail3Type, text: gridDetail3Text }}
+                  gridDetail4={{ type: gridDetail4Type, text: gridDetail4Text }}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

@@ -277,7 +277,7 @@ export function SocialDarkGradient({
                   style={{
                     color: ctaColor,
                     fontSize: 24,
-                    fontWeight: 500,
+                    fontWeight: 200,
                     lineHeight: 1,
                   }}
                 >
@@ -300,7 +300,7 @@ export function SocialDarkGradient({
                   style={{
                     color: '#000000',
                     fontSize: 18,
-                    fontWeight: 500,
+                    fontWeight: 200,
                     lineHeight: 1,
                   }}
                 >

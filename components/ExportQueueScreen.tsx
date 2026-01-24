@@ -6,6 +6,8 @@ import type { QueuedAsset, TemplateType } from '@/types'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
+import { SocialImage } from './templates/SocialImage'
+import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
 import {
   fetchColorsConfig,
   fetchTypographyConfig,
@@ -467,6 +469,28 @@ function QueueItem({
       textFields.push({ label: 'CTA', value: asset.ctaText })
     }
   }
+  if (asset.templateType === 'social-image') {
+    if (asset.metadata && asset.showMetadata) {
+      textFields.push({ label: 'Metadata', value: asset.metadata })
+    }
+    if (asset.ctaText && asset.showCta) {
+      textFields.push({ label: 'CTA', value: asset.ctaText })
+    }
+  }
+  if (asset.templateType === 'social-grid-detail') {
+    if (asset.gridDetail1Text) {
+      textFields.push({ label: 'Row 1', value: asset.gridDetail1Text })
+    }
+    if (asset.gridDetail2Text) {
+      textFields.push({ label: 'Row 2', value: asset.gridDetail2Text })
+    }
+    if (asset.gridDetail3Text && asset.showRow3) {
+      textFields.push({ label: 'Row 3', value: asset.gridDetail3Text })
+    }
+    if (asset.gridDetail4Text && asset.showRow4) {
+      textFields.push({ label: 'Row 4', value: asset.gridDetail4Text })
+    }
+  }
 
   // Build grid details for EmailGrid
   const gridDetail1: GridDetail = { type: 'data', text: asset.gridDetail1Text }
@@ -553,6 +577,46 @@ function QueueItem({
                   showBody={asset.showBody && !!asset.body}
                   showMetadata={asset.showMetadata}
                   showCta={asset.showCta}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'social-image' && (
+                <SocialImage
+                  headline={asset.headline || 'Room for a great headline.'}
+                  subhead={asset.subhead || ''}
+                  metadata={asset.metadata || 'Day / Month | 00:00'}
+                  ctaText={asset.ctaText || 'Learn More'}
+                  imageUrl={asset.thumbnailImageUrl || '/assets/images/social-image-placeholder.png'}
+                  layout={asset.layout || 'even'}
+                  solution={asset.solution}
+                  logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showMetadata={asset.showMetadata !== false}
+                  showCta={asset.showCta !== false}
+                  showSolutionSet={asset.showSolutionSet !== false}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'social-grid-detail' && (
+                <SocialGridDetail
+                  headline={asset.headline || 'Room for a great headline.'}
+                  subhead={asset.subhead || 'This is your subheader or description text.'}
+                  eyebrow={asset.eyebrow || "Don't miss this."}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showSolutionSet={asset.showSolutionSet !== false}
+                  solution={asset.solution}
+                  logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  showRow3={asset.showRow3 !== false}
+                  showRow4={asset.showRow4 !== false}
+                  gridDetail1={{ type: 'data', text: asset.gridDetail1Text || 'Date: January 1st, 2026' }}
+                  gridDetail2={{ type: 'data', text: asset.gridDetail2Text || 'Time: Midnight, EST' }}
+                  gridDetail3={{ type: asset.gridDetail3Type || 'data', text: asset.gridDetail3Text || 'Place: Wherever' }}
+                  gridDetail4={{ type: asset.gridDetail4Type || 'cta', text: asset.gridDetail4Text || 'Join the event' }}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -761,6 +825,46 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showMetadata={asset.showMetadata}
               showCta={asset.showCta}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'social-image' && (
+            <SocialImage
+              headline={asset.headline || 'Room for a great headline.'}
+              subhead={asset.subhead || ''}
+              metadata={asset.metadata || 'Day / Month | 00:00'}
+              ctaText={asset.ctaText || 'Learn More'}
+              imageUrl={asset.thumbnailImageUrl || '/assets/images/social-image-placeholder.png'}
+              layout={asset.layout || 'even'}
+              solution={asset.solution}
+              logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showMetadata={asset.showMetadata !== false}
+              showCta={asset.showCta !== false}
+              showSolutionSet={asset.showSolutionSet !== false}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'social-grid-detail' && (
+            <SocialGridDetail
+              headline={asset.headline || 'Room for a great headline.'}
+              subhead={asset.subhead || 'This is your subheader or description text.'}
+              eyebrow={asset.eyebrow || "Don't miss this."}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showSolutionSet={asset.showSolutionSet !== false}
+              solution={asset.solution}
+              logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              showRow3={asset.showRow3 !== false}
+              showRow4={asset.showRow4 !== false}
+              gridDetail1={{ type: 'data', text: asset.gridDetail1Text || 'Date: January 1st, 2026' }}
+              gridDetail2={{ type: 'data', text: asset.gridDetail2Text || 'Time: Midnight, EST' }}
+              gridDetail3={{ type: asset.gridDetail3Type || 'data', text: asset.gridDetail3Text || 'Place: Wherever' }}
+              gridDetail4={{ type: asset.gridDetail4Type || 'cta', text: asset.gridDetail4Text || 'Join the event' }}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

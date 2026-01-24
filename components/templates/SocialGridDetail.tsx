@@ -4,7 +4,7 @@ import { CSSProperties } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
 // Inline SVG logo for export compatibility
-const CorityLogo = ({ fill = '#000000', height = 23 }: { fill?: string; height?: number }) => {
+const CorityLogo = ({ fill = '#000000', height = 37 }: { fill?: string; height?: number }) => {
   const width = Math.round(height * 2.988)
   return (
     <svg
@@ -27,33 +27,31 @@ const CorityLogo = ({ fill = '#000000', height = 23 }: { fill?: string; height?:
   )
 }
 
-// Arrow icon for CTA
-const ArrowIcon = ({ color = '#060015' }: { color?: string }) => (
-  <svg width="17" height="13" viewBox="0 0 17 13" fill="none">
+// Arrow icon for CTA (cobalt blue)
+const ArrowIcon = ({ color = '#0080FF' }: { color?: string }) => (
+  <svg width="22" height="18" viewBox="0 0 22 18" fill="none">
     <path
-      d="M10 1L16 6.5M16 6.5L10 12M16 6.5H0"
+      d="M13 1L21 9M21 9L13 17M21 9H1"
       stroke={color}
       strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )
 
-export interface GridDetail {
+export interface GridDetailRow {
   type: 'data' | 'cta'
   text: string
 }
 
-export interface EmailGridProps {
+export interface SocialGridDetailProps {
   // Content
   headline: string
-  body: string
+  subhead: string
+  eyebrow: string
   showEyebrow: boolean
-  eyebrow?: string
-  showLightHeader: boolean
-  showHeavyHeader: boolean
-  showSubheading: boolean
-  subheading?: string
-  showBody: boolean
+  showSubhead: boolean
 
   // Solution pill
   showSolutionSet: boolean
@@ -62,11 +60,13 @@ export interface EmailGridProps {
   // Logo
   logoColor: 'black' | 'orange'
 
-  // Grid details (right side)
-  showGridDetail2: boolean // When false, only show 2 rows
-  gridDetail1: GridDetail
-  gridDetail2: GridDetail
-  gridDetail3: GridDetail
+  // Grid details (4 rows)
+  showRow3: boolean
+  showRow4: boolean
+  gridDetail1: GridDetailRow
+  gridDetail2: GridDetailRow
+  gridDetail3: GridDetailRow
+  gridDetail4: GridDetailRow
 
   // Brand config
   colors: ColorsConfig
@@ -74,57 +74,57 @@ export interface EmailGridProps {
   scale?: number
 }
 
-export function EmailGrid({
+export function SocialGridDetail({
   headline,
-  body,
+  subhead,
+  eyebrow,
   showEyebrow,
-  eyebrow = '',
-  showLightHeader,
-  showHeavyHeader,
-  showSubheading,
-  subheading = '',
-  showBody,
+  showSubhead,
   showSolutionSet,
   solution,
   logoColor,
-  showGridDetail2,
+  showRow3,
+  showRow4,
   gridDetail1,
   gridDetail2,
   gridDetail3,
+  gridDetail4,
   colors,
   typography,
   scale = 1,
-}: EmailGridProps) {
+}: SocialGridDetailProps) {
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
   const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const borderColor = colors.ui.borderHighContrast || '#000000'
+  const textColor = colors.ui.textPrimary
 
-  // Determine which grid details to show
-  const visibleGridDetails = showGridDetail2
-    ? [gridDetail1, gridDetail2, gridDetail3]
-    : [gridDetail1, gridDetail3] // Skip detail 2 when hidden
+  // Build visible grid details based on toggle states
+  const visibleGridDetails: GridDetailRow[] = [gridDetail1, gridDetail2]
+  if (showRow3) visibleGridDetails.push(gridDetail3)
+  if (showRow4) visibleGridDetails.push(gridDetail4)
 
   const containerStyle: CSSProperties = {
-    width: 640,
-    height: 300,
-    background: colors.ui.surface,
+    width: 1200,
+    height: 628,
+    background: '#ffffff',
     display: 'flex',
-    alignItems: 'flex-start',
-    gap: 24,
+    alignItems: 'center',
+    gap: 64,
     fontFamily,
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
+    overflow: 'hidden',
   }
 
-  const renderGridDetail = (detail: GridDetail, index: number, isLast: boolean) => {
+  const renderGridDetail = (detail: GridDetailRow, index: number) => {
     const rowStyle: CSSProperties = {
+      width: 360,
       flex: '1 1 0',
-      alignSelf: 'stretch',
       padding: 24,
-      borderBottom: isLast ? 'none' : `0.75px solid ${borderColor}`,
+      borderBottom: `1px solid ${borderColor}`,
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -137,17 +137,18 @@ export function EmailGrid({
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            gap: 16,
           }}>
             <span style={{
-              color: '#060015',
-              fontSize: 18,
-              fontWeight: 200,
-              lineHeight: '18px',
+              color: '#0080FF',
+              fontSize: 24,
+              fontWeight: 500,
+              lineHeight: '24px',
+              textAlign: 'center',
             }}>
-              {detail.text}
+              {detail.text || 'Join the event'}
             </span>
-            <ArrowIcon color="#060015" />
+            <ArrowIcon color="#0080FF" />
           </div>
         </div>
       )
@@ -157,8 +158,8 @@ export function EmailGrid({
     return (
       <div key={index} style={rowStyle}>
         <span style={{
-          color: colors.ui.textPrimary,
-          fontSize: 18,
+          color: textColor,
+          fontSize: 24,
           fontWeight: 200,
         }}>
           {detail.text}
@@ -171,10 +172,11 @@ export function EmailGrid({
     <div style={containerStyle}>
       {/* Left content area */}
       <div style={{
-        width: 360,
+        flex: '1 1 0',
         alignSelf: 'stretch',
-        padding: 32,
-        overflow: 'hidden',
+        paddingTop: 64,
+        paddingBottom: 64,
+        paddingLeft: 64,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -184,32 +186,32 @@ export function EmailGrid({
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 40,
+          gap: 64,
         }}>
-          <CorityLogo fill={logoFill} height={23} />
+          <CorityLogo fill={logoFill} height={37} />
 
           {showSolutionSet && solution !== 'none' && (
             <div style={{
-              padding: '12px 15px',
-              background: colors.ui.surface,
-              borderRadius: 6,
-              border: `0.79px solid ${colors.ui.border}`,
+              padding: '20px 24px',
+              background: '#ffffff',
+              borderRadius: 10,
+              border: `1.25px solid ${colors.ui.border}`,
               display: 'flex',
               alignItems: 'center',
-              gap: 12,
+              gap: 19,
             }}>
               <div style={{
-                width: 9,
-                height: 9,
+                width: 14,
+                height: 14,
                 background: solutionColor,
-                borderRadius: 2,
+                borderRadius: 3,
               }} />
               <span style={{
-                color: colors.ui.textPrimary,
-                fontSize: 9,
+                color: textColor,
+                fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
-                letterSpacing: '0.97px',
+                letterSpacing: '1.54px',
               }}>
                 {solutionLabel}
               </span>
@@ -227,64 +229,62 @@ export function EmailGrid({
           {/* Eyebrow */}
           {showEyebrow && eyebrow && (
             <div style={{
-              color: colors.ui.textPrimary,
-              fontSize: 10,
+              color: textColor,
+              fontSize: 14,
               fontWeight: 500,
               textTransform: 'uppercase',
-              letterSpacing: '1.1px',
+              letterSpacing: '1.54px',
             }}>
               {eyebrow}
             </div>
           )}
 
-          {/* Headline */}
-          {showLightHeader && (
+          {/* Headline + Subhead group */}
+          <div style={{
+            alignSelf: 'stretch',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 36,
+          }}>
+            {/* Headline */}
             <div style={{
-              color: colors.ui.textPrimary,
-              fontSize: 38,
+              alignSelf: 'stretch',
+              color: textColor,
+              fontSize: 84,
               fontWeight: 200,
-              lineHeight: '48px',
+              lineHeight: '96px',
             }}>
-              {headline || 'Lightweight header.'}
+              {headline || 'Room for a great headline.'}
             </div>
-          )}
 
-          {/* Subheading */}
-          {showSubheading && subheading && (
-            <div style={{
-              color: colors.ui.textPrimary,
-              fontSize: 20,
-              fontWeight: 200,
-              lineHeight: 1.3,
-            }}>
-              {subheading}
-            </div>
-          )}
-
-          {/* Body */}
-          {showBody && (
-            <div style={{
-              color: colors.ui.textPrimary,
-              fontSize: 18,
-              fontWeight: 200,
-            }}>
-              {body || 'This is your body copy. Lorem ipsum dolor sit am'}
-            </div>
-          )}
+            {/* Subhead */}
+            {showSubhead && subhead && (
+              <div style={{
+                alignSelf: 'stretch',
+                color: textColor,
+                fontSize: 36,
+                fontWeight: 200,
+                lineHeight: 1.3,
+              }}>
+                {subhead}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Right grid area */}
       <div style={{
-        flex: '1 1 0',
         alignSelf: 'stretch',
-        overflow: 'hidden',
-        borderLeft: `0.75px solid ${borderColor}`,
+        borderLeft: `1px solid ${borderColor}`,
+        borderTop: `1px solid ${borderColor}`,
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
       }}>
         {visibleGridDetails.map((detail, index) =>
-          renderGridDetail(detail, index, index === visibleGridDetails.length - 1)
+          renderGridDetail(detail, index)
         )}
       </div>
     </div>
