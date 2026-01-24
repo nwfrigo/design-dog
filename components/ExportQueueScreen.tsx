@@ -98,6 +98,17 @@ export function ExportQueueScreen() {
           gridDetail2Text: asset.gridDetail2Text,
           gridDetail3Type: asset.gridDetail3Type,
           gridDetail3Text: asset.gridDetail3Text,
+          // Social image specific
+          layout: asset.layout,
+          metadata: asset.metadata,
+          ctaText: asset.ctaText,
+          showMetadata: asset.showMetadata,
+          showCta: asset.showCta,
+          // Social grid detail specific
+          gridDetail4Type: asset.gridDetail4Type,
+          gridDetail4Text: asset.gridDetail4Text,
+          showRow3: asset.showRow3,
+          showRow4: asset.showRow4,
         }),
       })
 
@@ -513,6 +524,9 @@ function QueueItem({
           {colorsConfig && typographyConfig ? (
             <div
               style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
                 transform: `scale(${thumbnailScale})`,
                 transformOrigin: 'top left',
                 width: dimensions.width,

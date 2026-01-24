@@ -149,7 +149,7 @@ export function WebsiteThumbnail({
               padding: '0 14px',
               background: colors.ui.surface,
               borderRadius: 8,
-              border: `1.5px solid ${colors.ui.border}`,
+              border: `1.25px solid ${colors.ui.border}`,
               display: 'flex',
               alignItems: 'center',
               gap: 10,
