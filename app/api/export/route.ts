@@ -59,6 +59,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'email-grid': { width: 640, height: 300 },
   'email-image': { width: 640, height: 300 },
   'email-dark-gradient': { width: 640, height: 300 },
+  'email-speakers': { width: 640, height: 300 },
   'social-dark-gradient': { width: 1200, height: 628 },
   'social-blue-gradient': { width: 1200, height: 628 },
   'social-image': { width: 1200, height: 628 },
@@ -112,6 +113,26 @@ export async function POST(request: NextRequest) {
       gridDetail4Text,
       showRow3,
       showRow4,
+      // Email speakers specific
+      speakerCount,
+      speaker1Name,
+      speaker1Role,
+      speaker1ImageUrl,
+      speaker1ImagePositionX,
+      speaker1ImagePositionY,
+      speaker1ImageZoom,
+      speaker2Name,
+      speaker2Role,
+      speaker2ImageUrl,
+      speaker2ImagePositionX,
+      speaker2ImagePositionY,
+      speaker2ImageZoom,
+      speaker3Name,
+      speaker3Role,
+      speaker3ImageUrl,
+      speaker3ImagePositionX,
+      speaker3ImagePositionY,
+      speaker3ImageZoom,
     } = body
 
     // Build query params for render page
@@ -163,6 +184,27 @@ export async function POST(request: NextRequest) {
     if (gridDetail4Text) params.set('gridDetail4Text', gridDetail4Text)
     if (showRow3 !== undefined) params.set('showRow3', String(showRow3))
     if (showRow4 !== undefined) params.set('showRow4', String(showRow4))
+
+    // Email speakers specific
+    if (speakerCount !== undefined) params.set('speakerCount', String(speakerCount))
+    if (speaker1Name) params.set('speaker1Name', speaker1Name)
+    if (speaker1Role) params.set('speaker1Role', speaker1Role)
+    if (speaker1ImageUrl) params.set('speaker1ImageUrl', speaker1ImageUrl)
+    if (speaker1ImagePositionX !== undefined) params.set('speaker1ImagePositionX', String(speaker1ImagePositionX))
+    if (speaker1ImagePositionY !== undefined) params.set('speaker1ImagePositionY', String(speaker1ImagePositionY))
+    if (speaker1ImageZoom !== undefined) params.set('speaker1ImageZoom', String(speaker1ImageZoom))
+    if (speaker2Name) params.set('speaker2Name', speaker2Name)
+    if (speaker2Role) params.set('speaker2Role', speaker2Role)
+    if (speaker2ImageUrl) params.set('speaker2ImageUrl', speaker2ImageUrl)
+    if (speaker2ImagePositionX !== undefined) params.set('speaker2ImagePositionX', String(speaker2ImagePositionX))
+    if (speaker2ImagePositionY !== undefined) params.set('speaker2ImagePositionY', String(speaker2ImagePositionY))
+    if (speaker2ImageZoom !== undefined) params.set('speaker2ImageZoom', String(speaker2ImageZoom))
+    if (speaker3Name) params.set('speaker3Name', speaker3Name)
+    if (speaker3Role) params.set('speaker3Role', speaker3Role)
+    if (speaker3ImageUrl) params.set('speaker3ImageUrl', speaker3ImageUrl)
+    if (speaker3ImagePositionX !== undefined) params.set('speaker3ImagePositionX', String(speaker3ImagePositionX))
+    if (speaker3ImagePositionY !== undefined) params.set('speaker3ImagePositionY', String(speaker3ImagePositionY))
+    if (speaker3ImageZoom !== undefined) params.set('speaker3ImageZoom', String(speaker3ImageZoom))
 
     // Get the base URL from the request
     const protocol = request.headers.get('x-forwarded-proto') || 'https'

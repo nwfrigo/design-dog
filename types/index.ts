@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail'
+export type TemplateType = 'website-thumbnail' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail'
 
 export interface CopyContent {
   headline: string
@@ -85,6 +85,23 @@ export interface QueuedAsset {
   showCta: boolean
   // Social Image specific
   layout: 'even' | 'more-image' | 'more-text'
+  // Email Speakers specific
+  speakerCount: 1 | 2 | 3
+  speaker1Name: string
+  speaker1Role: string
+  speaker1ImageUrl: string
+  speaker1ImagePosition: { x: number; y: number }
+  speaker1ImageZoom: number
+  speaker2Name: string
+  speaker2Role: string
+  speaker2ImageUrl: string
+  speaker2ImagePosition: { x: number; y: number }
+  speaker2ImageZoom: number
+  speaker3Name: string
+  speaker3Role: string
+  speaker3ImageUrl: string
+  speaker3ImagePosition: { x: number; y: number }
+  speaker3ImageZoom: number
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -154,6 +171,24 @@ export interface AppState {
   // Social Image specific settings
   layout: 'even' | 'more-image' | 'more-text'
 
+  // Email Speakers specific settings
+  speakerCount: 1 | 2 | 3
+  speaker1Name: string
+  speaker1Role: string
+  speaker1ImageUrl: string
+  speaker1ImagePosition: { x: number; y: number }
+  speaker1ImageZoom: number
+  speaker2Name: string
+  speaker2Role: string
+  speaker2ImageUrl: string
+  speaker2ImagePosition: { x: number; y: number }
+  speaker2ImageZoom: number
+  speaker3Name: string
+  speaker3Role: string
+  speaker3ImageUrl: string
+  speaker3ImagePosition: { x: number; y: number }
+  speaker3ImageZoom: number
+
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
   setContentMode: (mode: ContentMode) => void
@@ -202,6 +237,24 @@ export interface AppState {
 
   // Social Image specific actions
   setLayout: (layout: 'even' | 'more-image' | 'more-text') => void
+
+  // Email Speakers specific actions
+  setSpeakerCount: (count: 1 | 2 | 3) => void
+  setSpeaker1Name: (name: string) => void
+  setSpeaker1Role: (role: string) => void
+  setSpeaker1ImageUrl: (url: string) => void
+  setSpeaker1ImagePosition: (position: { x: number; y: number }) => void
+  setSpeaker1ImageZoom: (zoom: number) => void
+  setSpeaker2Name: (name: string) => void
+  setSpeaker2Role: (role: string) => void
+  setSpeaker2ImageUrl: (url: string) => void
+  setSpeaker2ImagePosition: (position: { x: number; y: number }) => void
+  setSpeaker2ImageZoom: (zoom: number) => void
+  setSpeaker3Name: (name: string) => void
+  setSpeaker3Role: (role: string) => void
+  setSpeaker3ImageUrl: (url: string) => void
+  setSpeaker3ImagePosition: (position: { x: number; y: number }) => void
+  setSpeaker3ImageZoom: (zoom: number) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

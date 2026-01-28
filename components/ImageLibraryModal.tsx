@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export interface LibraryImage {
   id: string
@@ -18,6 +18,44 @@ export function ImageLibraryModal({ onSelect, onClose }: ImageLibraryModalProps)
   const [images, setImages] = useState<LibraryImage[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Handle file upload
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      return
+    }
+
+    setIsUploading(true)
+
+    // Convert to data URL for immediate use
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string
+      setIsUploading(false)
+      onSelect(dataUrl)
+    }
+    reader.onerror = () => {
+      setIsUploading(false)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileUpload(file)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const file = e.dataTransfer.files?.[0]
+    if (file) {
+      handleFileUpload(file)
+    }
+  }
 
   // Load library images on mount
   useEffect(() => {
@@ -60,6 +98,38 @@ export function ImageLibraryModal({ onSelect, onClose }: ImageLibraryModalProps)
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+        </div>
+
+        {/* Upload section */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer
+              hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          >
+            {isUploading ? (
+              <span className="text-sm text-gray-500">Uploading...</span>
+            ) : (
+              <>
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-medium text-blue-600 dark:text-blue-400">Upload an image</span>
+                  {' '}or drag and drop
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Category filters */}

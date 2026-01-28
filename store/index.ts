@@ -72,6 +72,24 @@ export const useStore = create<AppState>((set, get) => ({
   // Social Image specific settings
   layout: 'even',
 
+  // Email Speakers specific settings
+  speakerCount: 3,
+  speaker1Name: 'Firstname Lastname',
+  speaker1Role: 'Role, Company',
+  speaker1ImageUrl: '',
+  speaker1ImagePosition: { x: 0, y: 0 },
+  speaker1ImageZoom: 1,
+  speaker2Name: 'Firstname Lastname',
+  speaker2Role: 'Role, Company',
+  speaker2ImageUrl: '',
+  speaker2ImagePosition: { x: 0, y: 0 },
+  speaker2ImageZoom: 1,
+  speaker3Name: 'Firstname Lastname',
+  speaker3Role: 'Role, Company',
+  speaker3ImageUrl: '',
+  speaker3ImagePosition: { x: 0, y: 0 },
+  speaker3ImageZoom: 1,
+
   // Export queue
   exportQueue: [],
 
@@ -124,6 +142,24 @@ export const useStore = create<AppState>((set, get) => ({
 
   // Social Image specific actions
   setLayout: (layout: 'even' | 'more-image' | 'more-text') => set({ layout }),
+
+  // Email Speakers specific actions
+  setSpeakerCount: (speakerCount: 1 | 2 | 3) => set({ speakerCount }),
+  setSpeaker1Name: (speaker1Name: string) => set({ speaker1Name }),
+  setSpeaker1Role: (speaker1Role: string) => set({ speaker1Role }),
+  setSpeaker1ImageUrl: (speaker1ImageUrl: string) => set({ speaker1ImageUrl }),
+  setSpeaker1ImagePosition: (speaker1ImagePosition: { x: number; y: number }) => set({ speaker1ImagePosition }),
+  setSpeaker1ImageZoom: (speaker1ImageZoom: number) => set({ speaker1ImageZoom }),
+  setSpeaker2Name: (speaker2Name: string) => set({ speaker2Name }),
+  setSpeaker2Role: (speaker2Role: string) => set({ speaker2Role }),
+  setSpeaker2ImageUrl: (speaker2ImageUrl: string) => set({ speaker2ImageUrl }),
+  setSpeaker2ImagePosition: (speaker2ImagePosition: { x: number; y: number }) => set({ speaker2ImagePosition }),
+  setSpeaker2ImageZoom: (speaker2ImageZoom: number) => set({ speaker2ImageZoom }),
+  setSpeaker3Name: (speaker3Name: string) => set({ speaker3Name }),
+  setSpeaker3Role: (speaker3Role: string) => set({ speaker3Role }),
+  setSpeaker3ImageUrl: (speaker3ImageUrl: string) => set({ speaker3ImageUrl }),
+  setSpeaker3ImagePosition: (speaker3ImagePosition: { x: number; y: number }) => set({ speaker3ImagePosition }),
+  setSpeaker3ImageZoom: (speaker3ImageZoom: number) => set({ speaker3ImageZoom }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -198,6 +234,23 @@ export const useStore = create<AppState>((set, get) => ({
       showCta: state.showCta,
       // Social Image fields
       layout: state.layout,
+      // Email Speakers fields
+      speakerCount: state.speakerCount,
+      speaker1Name: state.speaker1Name,
+      speaker1Role: state.speaker1Role,
+      speaker1ImageUrl: state.speaker1ImageUrl,
+      speaker1ImagePosition: state.speaker1ImagePosition,
+      speaker1ImageZoom: state.speaker1ImageZoom,
+      speaker2Name: state.speaker2Name,
+      speaker2Role: state.speaker2Role,
+      speaker2ImageUrl: state.speaker2ImageUrl,
+      speaker2ImagePosition: state.speaker2ImagePosition,
+      speaker2ImageZoom: state.speaker2ImageZoom,
+      speaker3Name: state.speaker3Name,
+      speaker3Role: state.speaker3Role,
+      speaker3ImageUrl: state.speaker3ImageUrl,
+      speaker3ImagePosition: state.speaker3ImagePosition,
+      speaker3ImageZoom: state.speaker3ImageZoom,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -261,6 +314,23 @@ export const useStore = create<AppState>((set, get) => ({
       showCta: asset.showCta,
       // Social Image fields
       layout: asset.layout,
+      // Email Speakers fields
+      speakerCount: asset.speakerCount,
+      speaker1Name: asset.speaker1Name,
+      speaker1Role: asset.speaker1Role,
+      speaker1ImageUrl: asset.speaker1ImageUrl,
+      speaker1ImagePosition: asset.speaker1ImagePosition,
+      speaker1ImageZoom: asset.speaker1ImageZoom,
+      speaker2Name: asset.speaker2Name,
+      speaker2Role: asset.speaker2Role,
+      speaker2ImageUrl: asset.speaker2ImageUrl,
+      speaker2ImagePosition: asset.speaker2ImagePosition,
+      speaker2ImageZoom: asset.speaker2ImageZoom,
+      speaker3Name: asset.speaker3Name,
+      speaker3Role: asset.speaker3Role,
+      speaker3ImageUrl: asset.speaker3ImageUrl,
+      speaker3ImagePosition: asset.speaker3ImagePosition,
+      speaker3ImageZoom: asset.speaker3ImageZoom,
     })
 
     // Remove the asset from queue since it's being edited
@@ -317,6 +387,23 @@ export const useStore = create<AppState>((set, get) => ({
       showCta: true,
       // Social Image defaults
       layout: 'even',
+      // Email Speakers defaults
+      speakerCount: 3,
+      speaker1Name: 'Firstname Lastname',
+      speaker1Role: 'Role, Company',
+      speaker1ImageUrl: '',
+      speaker1ImagePosition: { x: 0, y: 0 },
+      speaker1ImageZoom: 1,
+      speaker2Name: 'Firstname Lastname',
+      speaker2Role: 'Role, Company',
+      speaker2ImageUrl: '',
+      speaker2ImagePosition: { x: 0, y: 0 },
+      speaker2ImageZoom: 1,
+      speaker3Name: 'Firstname Lastname',
+      speaker3Role: 'Role, Company',
+      speaker3ImageUrl: '',
+      speaker3ImagePosition: { x: 0, y: 0 },
+      speaker3ImageZoom: 1,
       exportQueue: [],
     }),
 }))

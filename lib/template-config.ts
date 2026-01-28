@@ -41,6 +41,13 @@ export const CHANNELS: ChannelConfig[] = [
         width: 640,
         height: 300,
       },
+      {
+        type: 'email-speakers',
+        label: 'Email - Speakers',
+        dimensions: '640 × 300px',
+        width: 640,
+        height: 300,
+      },
     ],
   },
   {

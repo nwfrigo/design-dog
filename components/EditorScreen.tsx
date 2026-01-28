@@ -7,6 +7,7 @@ import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
+import { EmailSpeakers } from './templates/EmailSpeakers'
 import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
@@ -131,6 +132,39 @@ export function EditorScreen() {
     setShowRow3,
     showRow4,
     setShowRow4,
+    // Email Speakers specific
+    speakerCount,
+    setSpeakerCount,
+    speaker1Name,
+    setSpeaker1Name,
+    speaker1Role,
+    setSpeaker1Role,
+    speaker1ImageUrl,
+    setSpeaker1ImageUrl,
+    speaker1ImagePosition,
+    setSpeaker1ImagePosition,
+    speaker1ImageZoom,
+    setSpeaker1ImageZoom,
+    speaker2Name,
+    setSpeaker2Name,
+    speaker2Role,
+    setSpeaker2Role,
+    speaker2ImageUrl,
+    setSpeaker2ImageUrl,
+    speaker2ImagePosition,
+    setSpeaker2ImagePosition,
+    speaker2ImageZoom,
+    setSpeaker2ImageZoom,
+    speaker3Name,
+    setSpeaker3Name,
+    speaker3Role,
+    setSpeaker3Role,
+    speaker3ImageUrl,
+    setSpeaker3ImageUrl,
+    speaker3ImagePosition,
+    setSpeaker3ImagePosition,
+    speaker3ImageZoom,
+    setSpeaker3ImageZoom,
     // Queue
     addToQueue,
     exportQueue,
@@ -159,6 +193,7 @@ export function EditorScreen() {
 
   // Image library modal state
   const [showImageLibrary, setShowImageLibrary] = useState(false)
+  const [activeSpeakerForImage, setActiveSpeakerForImage] = useState<1 | 2 | 3 | null>(null)
 
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
@@ -386,6 +421,31 @@ export function EditorScreen() {
         exportParams.showSubheading = showSubhead && !!verbatimCopy.subhead
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
+      } else if (currentTemplate === 'email-speakers') {
+        exportParams.ctaText = ctaText
+        exportParams.showEyebrow = showEyebrow && !!eyebrow
+        exportParams.showBody = showBody && !!verbatimCopy.body
+        exportParams.showCta = showCta
+        exportParams.showSolutionSet = showSolutionSet
+        exportParams.speakerCount = speakerCount
+        exportParams.speaker1Name = speaker1Name
+        exportParams.speaker1Role = speaker1Role
+        exportParams.speaker1ImageUrl = speaker1ImageUrl
+        exportParams.speaker1ImagePositionX = speaker1ImagePosition.x
+        exportParams.speaker1ImagePositionY = speaker1ImagePosition.y
+        exportParams.speaker1ImageZoom = speaker1ImageZoom
+        exportParams.speaker2Name = speaker2Name
+        exportParams.speaker2Role = speaker2Role
+        exportParams.speaker2ImageUrl = speaker2ImageUrl
+        exportParams.speaker2ImagePositionX = speaker2ImagePosition.x
+        exportParams.speaker2ImagePositionY = speaker2ImagePosition.y
+        exportParams.speaker2ImageZoom = speaker2ImageZoom
+        exportParams.speaker3Name = speaker3Name
+        exportParams.speaker3Role = speaker3Role
+        exportParams.speaker3ImageUrl = speaker3ImageUrl
+        exportParams.speaker3ImagePositionX = speaker3ImagePosition.x
+        exportParams.speaker3ImagePositionY = speaker3ImagePosition.y
+        exportParams.speaker3ImageZoom = speaker3ImageZoom
       }
 
       const response = await fetch('/api/export', {
@@ -632,10 +692,22 @@ export function EditorScreen() {
       {showImageLibrary && (
         <ImageLibraryModal
           onSelect={(url) => {
-            setThumbnailImageUrl(url)
+            if (activeSpeakerForImage === 1) {
+              setSpeaker1ImageUrl(url)
+            } else if (activeSpeakerForImage === 2) {
+              setSpeaker2ImageUrl(url)
+            } else if (activeSpeakerForImage === 3) {
+              setSpeaker3ImageUrl(url)
+            } else {
+              setThumbnailImageUrl(url)
+            }
             setShowImageLibrary(false)
+            setActiveSpeakerForImage(null)
           }}
-          onClose={() => setShowImageLibrary(false)}
+          onClose={() => {
+            setShowImageLibrary(false)
+            setActiveSpeakerForImage(null)
+          }}
         />
       )}
 
@@ -837,6 +909,31 @@ export function EditorScreen() {
                   </div>
                 </div>
               </>
+            )}
+
+            {/* Email Speakers Controls */}
+            {currentTemplate === 'email-speakers' && (
+              <div className="space-y-3">
+                {/* Speaker Count */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Number of Speakers</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    {([1, 2, 3] as const).map((count) => (
+                      <button
+                        key={count}
+                        onClick={() => setSpeakerCount(count)}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                          speakerCount === count
+                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {count}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
@@ -1375,6 +1472,179 @@ export function EditorScreen() {
                 </div>
               )}
 
+              {/* Email Speakers Content Fields */}
+              {currentTemplate === 'email-speakers' && (
+                <div className="space-y-4">
+                  {/* CTA Text */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        CTA Text
+                      </label>
+                      <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                    </div>
+                    <input
+                      type="text"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                      placeholder="e.g., Responsive"
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        ${!showCta ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+
+                  {/* Speaker 1 */}
+                  <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 1</label>
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden cursor-pointer relative"
+                          onClick={() => { setActiveSpeakerForImage(1); setShowImageLibrary(true) }}
+                          style={{ backgroundImage: speaker1ImageUrl ? `url(${speaker1ImageUrl})` : undefined, backgroundSize: `${speaker1ImageZoom * 100}%`, backgroundPosition: `${50 + speaker1ImagePosition.x}% ${50 + speaker1ImagePosition.y}%` }}
+                        >
+                          {!speaker1ImageUrl && (
+                            <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-xs">+</div>
+                          )}
+                        </div>
+                        {speaker1ImageUrl && (
+                          <div className="mt-1 flex flex-col gap-1">
+                            <input
+                              type="range"
+                              min="1"
+                              max="3"
+                              step="0.1"
+                              value={speaker1ImageZoom}
+                              onChange={(e) => setSpeaker1ImageZoom(parseFloat(e.target.value))}
+                              className="w-12 h-1"
+                              title="Zoom"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <input
+                          type="text"
+                          value={speaker1Name}
+                          onChange={(e) => setSpeaker1Name(e.target.value)}
+                          placeholder="Name"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                        />
+                        <input
+                          type="text"
+                          value={speaker1Role}
+                          onChange={(e) => setSpeaker1Role(e.target.value)}
+                          placeholder="Role, Company"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Speaker 2 */}
+                  {speakerCount >= 2 && (
+                    <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 2</label>
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          <div
+                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden cursor-pointer relative"
+                            onClick={() => { setActiveSpeakerForImage(2); setShowImageLibrary(true) }}
+                            style={{ backgroundImage: speaker2ImageUrl ? `url(${speaker2ImageUrl})` : undefined, backgroundSize: `${speaker2ImageZoom * 100}%`, backgroundPosition: `${50 + speaker2ImagePosition.x}% ${50 + speaker2ImagePosition.y}%` }}
+                          >
+                            {!speaker2ImageUrl && (
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-xs">+</div>
+                            )}
+                          </div>
+                          {speaker2ImageUrl && (
+                            <div className="mt-1 flex flex-col gap-1">
+                              <input
+                                type="range"
+                                min="1"
+                                max="3"
+                                step="0.1"
+                                value={speaker2ImageZoom}
+                                onChange={(e) => setSpeaker2ImageZoom(parseFloat(e.target.value))}
+                                className="w-12 h-1"
+                                title="Zoom"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <input
+                            type="text"
+                            value={speaker2Name}
+                            onChange={(e) => setSpeaker2Name(e.target.value)}
+                            placeholder="Name"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                          />
+                          <input
+                            type="text"
+                            value={speaker2Role}
+                            onChange={(e) => setSpeaker2Role(e.target.value)}
+                            placeholder="Role, Company"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Speaker 3 */}
+                  {speakerCount >= 3 && (
+                    <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 3</label>
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          <div
+                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden cursor-pointer relative"
+                            onClick={() => { setActiveSpeakerForImage(3); setShowImageLibrary(true) }}
+                            style={{ backgroundImage: speaker3ImageUrl ? `url(${speaker3ImageUrl})` : undefined, backgroundSize: `${speaker3ImageZoom * 100}%`, backgroundPosition: `${50 + speaker3ImagePosition.x}% ${50 + speaker3ImagePosition.y}%` }}
+                          >
+                            {!speaker3ImageUrl && (
+                              <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-xs">+</div>
+                            )}
+                          </div>
+                          {speaker3ImageUrl && (
+                            <div className="mt-1 flex flex-col gap-1">
+                              <input
+                                type="range"
+                                min="1"
+                                max="3"
+                                step="0.1"
+                                value={speaker3ImageZoom}
+                                onChange={(e) => setSpeaker3ImageZoom(parseFloat(e.target.value))}
+                                className="w-12 h-1"
+                                title="Zoom"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <input
+                            type="text"
+                            value={speaker3Name}
+                            onChange={(e) => setSpeaker3Name(e.target.value)}
+                            placeholder="Name"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                          />
+                          <input
+                            type="text"
+                            value={speaker3Role}
+                            onChange={(e) => setSpeaker3Role(e.target.value)}
+                            placeholder="Role, Company"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Social Grid Detail Content Fields */}
               {currentTemplate === 'social-grid-detail' && (
                 <div className="space-y-4">
@@ -1866,6 +2136,45 @@ export function EditorScreen() {
                   showSubheading={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-speakers' && (
+                <EmailSpeakers
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  eyebrow={eyebrow}
+                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing'}
+                  ctaText={ctaText}
+                  solution={solution}
+                  logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  showEyebrow={showEyebrow && !!eyebrow}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
+                  showSolutionSet={showSolutionSet}
+                  speakerCount={speakerCount}
+                  speaker1={{
+                    name: speaker1Name,
+                    role: speaker1Role,
+                    imageUrl: speaker1ImageUrl,
+                    imagePosition: speaker1ImagePosition,
+                    imageZoom: speaker1ImageZoom,
+                  }}
+                  speaker2={{
+                    name: speaker2Name,
+                    role: speaker2Role,
+                    imageUrl: speaker2ImageUrl,
+                    imagePosition: speaker2ImagePosition,
+                    imageZoom: speaker2ImageZoom,
+                  }}
+                  speaker3={{
+                    name: speaker3Name,
+                    role: speaker3Role,
+                    imageUrl: speaker3ImageUrl,
+                    imagePosition: speaker3ImagePosition,
+                    imageZoom: speaker3ImageZoom,
+                  }}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
