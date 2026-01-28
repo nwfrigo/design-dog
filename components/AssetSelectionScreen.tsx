@@ -173,9 +173,6 @@ function TemplateRow({ template, isSelected, onToggle }: TemplateRowProps) {
               {template.dimensions}
             </span>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {template.description}
-          </p>
         </div>
       </div>
     </button>

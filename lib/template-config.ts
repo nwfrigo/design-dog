@@ -3,7 +3,6 @@ import type { TemplateType } from '@/types'
 export interface TemplateInfo {
   type: TemplateType
   label: string
-  description: string
   dimensions: string
   width: number
   height: number
@@ -24,7 +23,6 @@ export const CHANNELS: ChannelConfig[] = [
       {
         type: 'email-grid',
         label: 'Email - Grid Details',
-        description: 'Email header with grid details',
         dimensions: '640 × 300px',
         width: 640,
         height: 300,
@@ -32,7 +30,13 @@ export const CHANNELS: ChannelConfig[] = [
       {
         type: 'email-image',
         label: 'Email - Image',
-        description: 'Email header with grayscale image',
+        dimensions: '640 × 300px',
+        width: 640,
+        height: 300,
+      },
+      {
+        type: 'email-dark-gradient',
+        label: 'Email - Dark Gradient',
         dimensions: '640 × 300px',
         width: 640,
         height: 300,
@@ -46,7 +50,6 @@ export const CHANNELS: ChannelConfig[] = [
       {
         type: 'social-dark-gradient',
         label: 'Social - Dark Gradient',
-        description: 'Dark gradient background with customizable layout',
         dimensions: '1200 × 628px',
         width: 1200,
         height: 628,
@@ -54,7 +57,6 @@ export const CHANNELS: ChannelConfig[] = [
       {
         type: 'social-blue-gradient',
         label: 'Social - Blue Gradient',
-        description: 'Blue gradient background with customizable layout',
         dimensions: '1200 × 628px',
         width: 1200,
         height: 628,
@@ -62,7 +64,6 @@ export const CHANNELS: ChannelConfig[] = [
       {
         type: 'social-image',
         label: 'Social - Image',
-        description: 'Light background with grayscale image',
         dimensions: '1200 × 628px',
         width: 1200,
         height: 628,
@@ -70,7 +71,6 @@ export const CHANNELS: ChannelConfig[] = [
       {
         type: 'social-grid-detail',
         label: 'Social - Grid Detail',
-        description: 'Light background with grid details',
         dimensions: '1200 × 628px',
         width: 1200,
         height: 628,
@@ -84,7 +84,6 @@ export const CHANNELS: ChannelConfig[] = [
       {
         type: 'website-thumbnail',
         label: 'Website Thumbnail',
-        description: 'Content download cards, resource thumbnails',
         dimensions: '700 × 434px',
         width: 700,
         height: 434,

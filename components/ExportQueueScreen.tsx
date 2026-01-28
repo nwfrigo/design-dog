@@ -338,7 +338,6 @@ export function ExportQueueScreen() {
                                 <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
                                   {template.label}
                                 </div>
-                                <div className="text-xs text-gray-500 truncate">{template.description}</div>
                               </div>
                               <div className="flex items-center gap-1.5 flex-shrink-0">
                                 <button

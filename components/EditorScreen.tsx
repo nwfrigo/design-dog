@@ -6,6 +6,7 @@ import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
+import { EmailDarkGradient } from './templates/EmailDarkGradient'
 import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
@@ -376,6 +377,15 @@ export function EditorScreen() {
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
+      } else if (currentTemplate === 'email-dark-gradient') {
+        exportParams.ctaText = ctaText
+        exportParams.colorStyle = colorStyle
+        exportParams.alignment = alignment
+        exportParams.ctaStyle = ctaStyle
+        exportParams.showEyebrow = showEyebrow && !!eyebrow
+        exportParams.showSubheading = showSubhead && !!verbatimCopy.subhead
+        exportParams.showBody = showBody && !!verbatimCopy.body
+        exportParams.showCta = showCta
       }
 
       const response = await fetch('/api/export', {
@@ -541,7 +551,6 @@ export function EditorScreen() {
                                 <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
                                   {template.label}
                                 </div>
-                                <div className="text-xs text-gray-500 truncate">{template.description}</div>
                                 {existingCount > 0 && (
                                   <div className="text-xs text-gray-400 mt-0.5">
                                     {existingCount} already in project
@@ -663,8 +672,8 @@ export function EditorScreen() {
           {/* Template Options */}
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
-              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && (
+              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), Black/Orange for others */}
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -719,8 +728,8 @@ export function EditorScreen() {
               </div>
               )}
 
-              {/* Category - Not shown for Social Dark Gradient or Social Blue Gradient */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient') && (
+              {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, or Email Dark Gradient */}
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -746,6 +755,89 @@ export function EditorScreen() {
                 </div>
               )}
             </div>
+
+            {/* Email Dark Gradient Variant Controls */}
+            {currentTemplate === 'email-dark-gradient' && (
+              <>
+                {/* Color Style */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Color Style</label>
+                  <div className="flex gap-2">
+                    {(['1', '2', '3', '4'] as const).map((style) => (
+                      <button
+                        key={style}
+                        onClick={() => setColorStyle(style)}
+                        className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
+                          colorStyle === style
+                            ? 'border-blue-500 ring-2 ring-blue-200'
+                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                        }`}
+                      >
+                        <img
+                          src={`/assets/backgrounds/social-dark-gradient-${style}.png`}
+                          alt={`Style ${style}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Alignment */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Alignment</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <button
+                      onClick={() => setAlignment('left')}
+                      className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                        alignment === 'left'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Left
+                    </button>
+                    <button
+                      onClick={() => setAlignment('center')}
+                      className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                        alignment === 'center'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Center
+                    </button>
+                  </div>
+                </div>
+
+                {/* CTA Style */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <button
+                      onClick={() => setCtaStyle('link')}
+                      className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                        ctaStyle === 'link'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Link
+                    </button>
+                    <button
+                      onClick={() => setCtaStyle('button')}
+                      className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                        ctaStyle === 'button'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Button
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
             {(currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') && (
@@ -1012,7 +1104,7 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -1235,6 +1327,31 @@ export function EditorScreen() {
 
               {/* Email Image Content Fields */}
               {currentTemplate === 'email-image' && (
+                <div className="space-y-4">
+                  {/* CTA Text */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        CTA Text
+                      </label>
+                      <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                    </div>
+                    <input
+                      type="text"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                      placeholder="e.g., Responsive"
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        ${!showCta ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Email Dark Gradient Content Fields */}
+              {currentTemplate === 'email-dark-gradient' && (
                 <div className="space-y-4">
                   {/* CTA Text */}
                   <div>
@@ -1730,6 +1847,25 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-dark-gradient' && (
+                <EmailDarkGradient
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  eyebrow={eyebrow}
+                  subheading={verbatimCopy.subhead}
+                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                  ctaText={ctaText}
+                  colorStyle={colorStyle}
+                  alignment={alignment}
+                  ctaStyle={ctaStyle}
+                  showEyebrow={showEyebrow && !!eyebrow}
+                  showSubheading={showSubhead && !!verbatimCopy.subhead}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
