@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail'
+export type TemplateType = 'website-thumbnail' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-light'
 
 export interface CopyContent {
   headline: string
@@ -85,6 +85,9 @@ export interface QueuedAsset {
   showCta: boolean
   // Social Image specific
   layout: 'even' | 'more-image' | 'more-text'
+  // Newsletter Dark Gradient specific
+  newsletterImageSize: 'none' | 'small' | 'large'
+  newsletterImageUrl: string | null
   // Email Speakers specific
   speakerCount: 1 | 2 | 3
   speaker1Name: string
@@ -171,6 +174,10 @@ export interface AppState {
   // Social Image specific settings
   layout: 'even' | 'more-image' | 'more-text'
 
+  // Newsletter Dark Gradient specific settings
+  newsletterImageSize: 'none' | 'small' | 'large'
+  newsletterImageUrl: string | null
+
   // Email Speakers specific settings
   speakerCount: 1 | 2 | 3
   speaker1Name: string
@@ -237,6 +244,10 @@ export interface AppState {
 
   // Social Image specific actions
   setLayout: (layout: 'even' | 'more-image' | 'more-text') => void
+
+  // Newsletter Dark Gradient specific actions
+  setNewsletterImageSize: (size: 'none' | 'small' | 'large') => void
+  setNewsletterImageUrl: (url: string | null) => void
 
   // Email Speakers specific actions
   setSpeakerCount: (count: 1 | 2 | 3) => void

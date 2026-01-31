@@ -10,6 +10,10 @@ import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
+import { EmailDarkGradient } from './templates/EmailDarkGradient'
+import { EmailSpeakers } from './templates/EmailSpeakers'
+import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
+import { NewsletterLight } from './templates/NewsletterLight'
 import {
   fetchColorsConfig,
   fetchTypographyConfig,
@@ -111,6 +115,33 @@ export function ExportQueueScreen() {
           gridDetail4Text: asset.gridDetail4Text,
           showRow3: asset.showRow3,
           showRow4: asset.showRow4,
+          // Email dark gradient specific
+          colorStyle: asset.colorStyle,
+          alignment: asset.alignment,
+          ctaStyle: asset.ctaStyle,
+          // Newsletter dark gradient specific
+          imageSize: asset.newsletterImageSize,
+          newsletterImageUrl: asset.newsletterImageUrl,
+          // Email speakers specific
+          speakerCount: asset.speakerCount,
+          speaker1Name: asset.speaker1Name,
+          speaker1Role: asset.speaker1Role,
+          speaker1ImageUrl: asset.speaker1ImageUrl,
+          speaker1ImagePositionX: asset.speaker1ImagePosition?.x,
+          speaker1ImagePositionY: asset.speaker1ImagePosition?.y,
+          speaker1ImageZoom: asset.speaker1ImageZoom,
+          speaker2Name: asset.speaker2Name,
+          speaker2Role: asset.speaker2Role,
+          speaker2ImageUrl: asset.speaker2ImageUrl,
+          speaker2ImagePositionX: asset.speaker2ImagePosition?.x,
+          speaker2ImagePositionY: asset.speaker2ImagePosition?.y,
+          speaker2ImageZoom: asset.speaker2ImageZoom,
+          speaker3Name: asset.speaker3Name,
+          speaker3Role: asset.speaker3Role,
+          speaker3ImageUrl: asset.speaker3ImageUrl,
+          speaker3ImagePositionX: asset.speaker3ImagePosition?.x,
+          speaker3ImagePositionY: asset.speaker3ImagePosition?.y,
+          speaker3ImageZoom: asset.speaker3ImageZoom,
         }),
       })
 
@@ -681,6 +712,97 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'email-dark-gradient' && (
+                <EmailDarkGradient
+                  headline={asset.headline || 'Lightweight header.'}
+                  eyebrow={asset.eyebrow}
+                  subheading={asset.subhead}
+                  body={asset.body || 'This is your body copy.'}
+                  ctaText={asset.ctaText || 'Responsive'}
+                  colorStyle={asset.colorStyle || '1'}
+                  alignment={asset.alignment || 'left'}
+                  ctaStyle={asset.ctaStyle || 'link'}
+                  showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+                  showSubheading={asset.showSubhead && !!asset.subhead}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta !== false}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'email-speakers' && (
+                <EmailSpeakers
+                  headline={asset.headline || 'Lightweight header.'}
+                  eyebrow={asset.eyebrow}
+                  body={asset.body || 'This is your body copy.'}
+                  ctaText={asset.ctaText || 'Responsive'}
+                  solution={asset.solution}
+                  logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta !== false}
+                  showSolutionSet={asset.showSolutionSet !== false}
+                  speakerCount={asset.speakerCount || 3}
+                  speaker1={{
+                    name: asset.speaker1Name || 'Firstname Lastname',
+                    role: asset.speaker1Role || 'Role, Company',
+                    imageUrl: asset.speaker1ImageUrl || '',
+                    imagePosition: asset.speaker1ImagePosition || { x: 0, y: 0 },
+                    imageZoom: asset.speaker1ImageZoom || 1,
+                  }}
+                  speaker2={{
+                    name: asset.speaker2Name || 'Firstname Lastname',
+                    role: asset.speaker2Role || 'Role, Company',
+                    imageUrl: asset.speaker2ImageUrl || '',
+                    imagePosition: asset.speaker2ImagePosition || { x: 0, y: 0 },
+                    imageZoom: asset.speaker2ImageZoom || 1,
+                  }}
+                  speaker3={{
+                    name: asset.speaker3Name || 'Firstname Lastname',
+                    role: asset.speaker3Role || 'Role, Company',
+                    imageUrl: asset.speaker3ImageUrl || '',
+                    imagePosition: asset.speaker3ImagePosition || { x: 0, y: 0 },
+                    imageZoom: asset.speaker3ImageZoom || 1,
+                  }}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'newsletter-dark-gradient' && (
+                <NewsletterDarkGradient
+                  eyebrow={asset.eyebrow}
+                  headline={asset.headline || 'Lightweight header.'}
+                  body={asset.body || 'This is your body copy.'}
+                  ctaText={asset.ctaText || 'Responsive'}
+                  colorStyle={asset.colorStyle || '1'}
+                  imageSize={asset.newsletterImageSize || 'none'}
+                  imageUrl={asset.newsletterImageUrl || null}
+                  showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta !== false}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'newsletter-light' && (
+                <NewsletterLight
+                  eyebrow={asset.eyebrow}
+                  headline={asset.headline || 'Lightweight header.'}
+                  body={asset.body || 'This is your body copy.'}
+                  ctaText={asset.ctaText || 'Responsive'}
+                  imageSize={asset.newsletterImageSize || 'none'}
+                  imageUrl={asset.newsletterImageUrl || null}
+                  showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta !== false}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
             </div>
           ) : (
             <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
@@ -963,6 +1085,97 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               gridDetail2={{ type: 'data', text: asset.gridDetail2Text || 'Time: Midnight, EST' }}
               gridDetail3={{ type: asset.gridDetail3Type || 'data', text: asset.gridDetail3Text || 'Place: Wherever' }}
               gridDetail4={{ type: asset.gridDetail4Type || 'cta', text: asset.gridDetail4Text || 'Join the event' }}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'email-dark-gradient' && (
+            <EmailDarkGradient
+              headline={asset.headline || 'Lightweight header.'}
+              eyebrow={asset.eyebrow}
+              subheading={asset.subhead}
+              body={asset.body || 'This is your body copy.'}
+              ctaText={asset.ctaText || 'Responsive'}
+              colorStyle={asset.colorStyle || '1'}
+              alignment={asset.alignment || 'left'}
+              ctaStyle={asset.ctaStyle || 'link'}
+              showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+              showSubheading={asset.showSubhead && !!asset.subhead}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta !== false}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'email-speakers' && (
+            <EmailSpeakers
+              headline={asset.headline || 'Lightweight header.'}
+              eyebrow={asset.eyebrow}
+              body={asset.body || 'This is your body copy.'}
+              ctaText={asset.ctaText || 'Responsive'}
+              solution={asset.solution}
+              logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta !== false}
+              showSolutionSet={asset.showSolutionSet !== false}
+              speakerCount={asset.speakerCount || 3}
+              speaker1={{
+                name: asset.speaker1Name || 'Firstname Lastname',
+                role: asset.speaker1Role || 'Role, Company',
+                imageUrl: asset.speaker1ImageUrl || '',
+                imagePosition: asset.speaker1ImagePosition || { x: 0, y: 0 },
+                imageZoom: asset.speaker1ImageZoom || 1,
+              }}
+              speaker2={{
+                name: asset.speaker2Name || 'Firstname Lastname',
+                role: asset.speaker2Role || 'Role, Company',
+                imageUrl: asset.speaker2ImageUrl || '',
+                imagePosition: asset.speaker2ImagePosition || { x: 0, y: 0 },
+                imageZoom: asset.speaker2ImageZoom || 1,
+              }}
+              speaker3={{
+                name: asset.speaker3Name || 'Firstname Lastname',
+                role: asset.speaker3Role || 'Role, Company',
+                imageUrl: asset.speaker3ImageUrl || '',
+                imagePosition: asset.speaker3ImagePosition || { x: 0, y: 0 },
+                imageZoom: asset.speaker3ImageZoom || 1,
+              }}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'newsletter-dark-gradient' && (
+            <NewsletterDarkGradient
+              eyebrow={asset.eyebrow}
+              headline={asset.headline || 'Lightweight header.'}
+              body={asset.body || 'This is your body copy.'}
+              ctaText={asset.ctaText || 'Responsive'}
+              colorStyle={asset.colorStyle || '1'}
+              imageSize={asset.newsletterImageSize || 'none'}
+              imageUrl={asset.newsletterImageUrl || null}
+              showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta !== false}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'newsletter-light' && (
+            <NewsletterLight
+              eyebrow={asset.eyebrow}
+              headline={asset.headline || 'Lightweight header.'}
+              body={asset.body || 'This is your body copy.'}
+              ctaText={asset.ctaText || 'Responsive'}
+              imageSize={asset.newsletterImageSize || 'none'}
+              imageUrl={asset.newsletterImageUrl || null}
+              showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta !== false}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

@@ -97,6 +97,26 @@ export const CHANNELS: ChannelConfig[] = [
       },
     ],
   },
+  {
+    id: 'newsletter',
+    label: 'Newsletter',
+    templates: [
+      {
+        type: 'newsletter-dark-gradient',
+        label: 'Newsletter - Dark Gradient',
+        dimensions: '640 × 179px',
+        width: 640,
+        height: 179,
+      },
+      {
+        type: 'newsletter-light',
+        label: 'Newsletter - Light',
+        dimensions: '640 × 179px',
+        width: 640,
+        height: 179,
+      },
+    ],
+  },
 ]
 
 // Flat list of all templates (for backwards compatibility)

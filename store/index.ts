@@ -72,6 +72,10 @@ export const useStore = create<AppState>((set, get) => ({
   // Social Image specific settings
   layout: 'even',
 
+  // Newsletter Dark Gradient specific settings
+  newsletterImageSize: 'none',
+  newsletterImageUrl: null,
+
   // Email Speakers specific settings
   speakerCount: 3,
   speaker1Name: 'Firstname Lastname',
@@ -142,6 +146,10 @@ export const useStore = create<AppState>((set, get) => ({
 
   // Social Image specific actions
   setLayout: (layout: 'even' | 'more-image' | 'more-text') => set({ layout }),
+
+  // Newsletter Dark Gradient specific actions
+  setNewsletterImageSize: (newsletterImageSize: 'none' | 'small' | 'large') => set({ newsletterImageSize }),
+  setNewsletterImageUrl: (newsletterImageUrl: string | null) => set({ newsletterImageUrl }),
 
   // Email Speakers specific actions
   setSpeakerCount: (speakerCount: 1 | 2 | 3) => set({ speakerCount }),
@@ -234,6 +242,9 @@ export const useStore = create<AppState>((set, get) => ({
       showCta: state.showCta,
       // Social Image fields
       layout: state.layout,
+      // Newsletter Dark Gradient fields
+      newsletterImageSize: state.newsletterImageSize,
+      newsletterImageUrl: state.newsletterImageUrl,
       // Email Speakers fields
       speakerCount: state.speakerCount,
       speaker1Name: state.speaker1Name,
@@ -314,6 +325,9 @@ export const useStore = create<AppState>((set, get) => ({
       showCta: asset.showCta,
       // Social Image fields
       layout: asset.layout,
+      // Newsletter Dark Gradient fields
+      newsletterImageSize: asset.newsletterImageSize,
+      newsletterImageUrl: asset.newsletterImageUrl,
       // Email Speakers fields
       speakerCount: asset.speakerCount,
       speaker1Name: asset.speaker1Name,
@@ -387,6 +401,9 @@ export const useStore = create<AppState>((set, get) => ({
       showCta: true,
       // Social Image defaults
       layout: 'even',
+      // Newsletter Dark Gradient defaults
+      newsletterImageSize: 'none',
+      newsletterImageUrl: null,
       // Email Speakers defaults
       speakerCount: 3,
       speaker1Name: 'Firstname Lastname',

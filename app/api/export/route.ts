@@ -64,6 +64,8 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'social-blue-gradient': { width: 1200, height: 628 },
   'social-image': { width: 1200, height: 628 },
   'social-grid-detail': { width: 1200, height: 628 },
+  'newsletter-dark-gradient': { width: 640, height: 179 },
+  'newsletter-light': { width: 640, height: 179 },
 }
 
 export async function POST(request: NextRequest) {
@@ -133,6 +135,8 @@ export async function POST(request: NextRequest) {
       speaker3ImagePositionX,
       speaker3ImagePositionY,
       speaker3ImageZoom,
+      // Newsletter specific
+      imageSize,
     } = body
 
     // Build query params for render page
@@ -205,6 +209,9 @@ export async function POST(request: NextRequest) {
     if (speaker3ImagePositionX !== undefined) params.set('speaker3ImagePositionX', String(speaker3ImagePositionX))
     if (speaker3ImagePositionY !== undefined) params.set('speaker3ImagePositionY', String(speaker3ImagePositionY))
     if (speaker3ImageZoom !== undefined) params.set('speaker3ImageZoom', String(speaker3ImageZoom))
+
+    // Newsletter specific
+    if (imageSize) params.set('imageSize', imageSize)
 
     // Get the base URL from the request
     const protocol = request.headers.get('x-forwarded-proto') || 'https'
