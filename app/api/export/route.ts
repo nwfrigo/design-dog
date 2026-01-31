@@ -65,6 +65,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'social-image': { width: 1200, height: 628 },
   'social-grid-detail': { width: 1200, height: 628 },
   'newsletter-dark-gradient': { width: 640, height: 179 },
+  'newsletter-blue-gradient': { width: 640, height: 179 },
   'newsletter-light': { width: 640, height: 179 },
 }
 

@@ -64,11 +64,10 @@
   --background: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground: #ededed;
-    --background: #0a0a0a;
-  }
+/* Class-based dark mode (not system preference) */
+html.dark {
+  --foreground: #ededed;
+  --background: #0a0a0a;
 }
 
 body {

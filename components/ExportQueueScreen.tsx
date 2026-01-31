@@ -13,6 +13,7 @@ import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDeta
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
 import { EmailSpeakers } from './templates/EmailSpeakers'
 import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
+import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
 import {
   fetchColorsConfig,
@@ -787,6 +788,23 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'newsletter-blue-gradient' && (
+                <NewsletterBlueGradient
+                  eyebrow={asset.eyebrow}
+                  headline={asset.headline || 'Lightweight header.'}
+                  body={asset.body || 'This is your body copy.'}
+                  ctaText={asset.ctaText || 'Responsive'}
+                  colorStyle={asset.colorStyle || '1'}
+                  imageSize={asset.newsletterImageSize || 'none'}
+                  imageUrl={asset.newsletterImageUrl || null}
+                  showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta !== false}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
               {asset.templateType === 'newsletter-light' && (
                 <NewsletterLight
                   eyebrow={asset.eyebrow}
@@ -1150,6 +1168,23 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           )}
           {asset.templateType === 'newsletter-dark-gradient' && (
             <NewsletterDarkGradient
+              eyebrow={asset.eyebrow}
+              headline={asset.headline || 'Lightweight header.'}
+              body={asset.body || 'This is your body copy.'}
+              ctaText={asset.ctaText || 'Responsive'}
+              colorStyle={asset.colorStyle || '1'}
+              imageSize={asset.newsletterImageSize || 'none'}
+              imageUrl={asset.newsletterImageUrl || null}
+              showEyebrow={asset.showEyebrow && !!asset.eyebrow}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta !== false}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'newsletter-blue-gradient' && (
+            <NewsletterBlueGradient
               eyebrow={asset.eyebrow}
               headline={asset.headline || 'Lightweight header.'}
               body={asset.body || 'This is your body copy.'}

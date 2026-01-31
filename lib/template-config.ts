@@ -109,6 +109,13 @@ export const CHANNELS: ChannelConfig[] = [
         height: 179,
       },
       {
+        type: 'newsletter-blue-gradient',
+        label: 'Newsletter - Blue Gradient',
+        dimensions: '640 × 179px',
+        width: 640,
+        height: 179,
+      },
+      {
         type: 'newsletter-light',
         label: 'Newsletter - Light',
         dimensions: '640 × 179px',

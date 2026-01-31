@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-light'
+export type TemplateType = 'website-thumbnail' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
 
 export interface CopyContent {
   headline: string

@@ -4,35 +4,24 @@ import { useStore } from '@/store'
 import { AssetSelectionScreen } from '@/components/AssetSelectionScreen'
 import { EditorScreen } from '@/components/EditorScreen'
 import { ExportQueueScreen } from '@/components/ExportQueueScreen'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function Home() {
-  const { currentScreen, exportQueue, goToQueue } = useStore()
+  const { currentScreen } = useStore()
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <main className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <header className="bg-white dark:bg-black">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-xl font-medium text-gray-900 dark:text-gray-100">
             Design Dog
           </h1>
 
-          {/* Export Queue Button */}
-          <button
-            onClick={goToQueue}
-            className={`flex items-center gap-2 px-3 py-1.5 font-medium transition-colors ${
-              currentScreen === 'queue'
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-            }`}
-          >
-            Export Queue
-            {exportQueue.length > 0 && (
-              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                {exportQueue.length}
-              </span>
-            )}
-          </button>
+          {/* Settings Area */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

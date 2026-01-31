@@ -12,6 +12,7 @@ import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
 import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
+import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
 import { ImageLibraryModal } from './ImageLibraryModal'
 import {
@@ -175,6 +176,7 @@ export function EditorScreen() {
     // Queue
     addToQueue,
     exportQueue,
+    goToQueue,
   } = useStore()
 
   // Brand config state
@@ -454,7 +456,7 @@ export function EditorScreen() {
         exportParams.speaker3ImagePositionX = speaker3ImagePosition.x
         exportParams.speaker3ImagePositionY = speaker3ImagePosition.y
         exportParams.speaker3ImageZoom = speaker3ImageZoom
-      } else if (currentTemplate === 'newsletter-dark-gradient') {
+      } else if (currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient') {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
         exportParams.imageSize = newsletterImageSize
@@ -532,31 +534,47 @@ export function EditorScreen() {
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700">
-        {selectedAssets.map((asset, index) => (
-          <button
-            key={`${asset}-${index}`}
-            onClick={() => goToAsset(index)}
-            className={`px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px transition-colors ${
-              index === currentAssetIndex
-                ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-            } ${index > 0 ? '-ml-px' : ''}`}
-          >
-            {getAssetLabel(asset, index)}
-          </button>
-        ))}
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
+        <div className="flex">
+          {selectedAssets.map((asset, index) => (
+            <button
+              key={`${asset}-${index}`}
+              onClick={() => goToAsset(index)}
+              className={`px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px transition-colors ${
+                index === currentAssetIndex
+                  ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+              } ${index > 0 ? '-ml-px' : ''}`}
+            >
+              {getAssetLabel(asset, index)}
+            </button>
+          ))}
 
-        {/* Add Asset Tab */}
+          {/* Add Asset Tab */}
+          <button
+            onClick={() => { setPendingAssets([]); setShowAddAssetModal(true) }}
+            className="px-3 py-2.5 text-sm font-medium border-transparent text-gray-400 hover:text-gray-600
+              dark:text-gray-500 dark:hover:text-gray-400 transition-colors -ml-px"
+            title="Add Asset"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Export Queue Button - Right aligned */}
         <button
-          onClick={() => { setPendingAssets([]); setShowAddAssetModal(true) }}
-          className="px-3 py-2.5 text-sm font-medium border-transparent text-gray-400 hover:text-gray-600
-            dark:text-gray-500 dark:hover:text-gray-400 transition-colors -ml-px"
-          title="Add Asset"
+          onClick={goToQueue}
+          className="ml-auto flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600
+            hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          Export Queue
+          {exportQueue.length > 0 && (
+            <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {exportQueue.length}
+            </span>
+          )}
         </button>
       </div>
 
@@ -772,7 +790,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-light' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -828,7 +846,7 @@ export function EditorScreen() {
               )}
 
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, or Newsletter templates */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-light') && (
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -957,6 +975,119 @@ export function EditorScreen() {
                       >
                         <img
                           src={`/assets/backgrounds/newsletter-dark-gradient-${style}.png`}
+                          alt={`Style ${style}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Image Size */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Image Size</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <button
+                      onClick={() => setNewsletterImageSize('none')}
+                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+                        newsletterImageSize === 'none'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      None
+                    </button>
+                    <button
+                      onClick={() => setNewsletterImageSize('small')}
+                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+                        newsletterImageSize === 'small'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Small
+                    </button>
+                    <button
+                      onClick={() => setNewsletterImageSize('large')}
+                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+                        newsletterImageSize === 'large'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Large
+                    </button>
+                  </div>
+                </div>
+
+                {/* Image Upload - only show when image size is not 'none' */}
+                {newsletterImageSize !== 'none' && (
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Image</label>
+                    <div
+                      className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 hover:border-gray-400 transition-colors cursor-pointer"
+                      onClick={() => {
+                        const input = document.createElement('input')
+                        input.type = 'file'
+                        input.accept = 'image/*'
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0]
+                          if (file) {
+                            const objectUrl = URL.createObjectURL(file)
+                            setNewsletterImageUrl(objectUrl)
+                          }
+                        }
+                        input.click()
+                      }}
+                    >
+                      {newsletterImageUrl ? (
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={newsletterImageUrl}
+                            alt="Preview"
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <span className="text-xs text-gray-500">Click to change</span>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <p className="mt-1 text-xs text-gray-500">Click to upload</p>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
+                      className="mt-2 w-full text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    >
+                      Or choose from library
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Newsletter Blue Gradient Variant Controls */}
+            {currentTemplate === 'newsletter-blue-gradient' && (
+              <>
+                {/* Color Style */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Background</label>
+                  <div className="flex gap-2">
+                    {(['1', '2', '3', '4'] as const).map((style) => (
+                      <button
+                        key={style}
+                        onClick={() => setColorStyle(style)}
+                        className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
+                          colorStyle === style
+                            ? 'border-blue-500 ring-2 ring-blue-200'
+                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                        }`}
+                      >
+                        <img
+                          src={`/assets/backgrounds/newsletter-blue-gradient-${style}.png`}
                           alt={`Style ${style}`}
                           className="w-full h-full object-cover"
                         />
@@ -1726,6 +1857,31 @@ export function EditorScreen() {
                 </div>
               )}
 
+              {/* Newsletter Blue Gradient Content Fields */}
+              {currentTemplate === 'newsletter-blue-gradient' && (
+                <div className="space-y-4">
+                  {/* CTA Text */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        CTA Text
+                      </label>
+                      <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                    </div>
+                    <input
+                      type="text"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                      placeholder="e.g., Responsive"
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        ${!showCta ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Newsletter Light Content Fields */}
               {currentTemplate === 'newsletter-light' && (
                 <div className="space-y-4">
@@ -2422,6 +2578,23 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'newsletter-dark-gradient' && (
                 <NewsletterDarkGradient
+                  eyebrow={eyebrow}
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                  ctaText={ctaText}
+                  colorStyle={colorStyle}
+                  imageSize={newsletterImageSize}
+                  imageUrl={newsletterImageUrl}
+                  showEyebrow={showEyebrow && !!eyebrow}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'newsletter-blue-gradient' && (
+                <NewsletterBlueGradient
                   eyebrow={eyebrow}
                   headline={verbatimCopy.headline || 'Lightweight header.'}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
