@@ -210,7 +210,7 @@ export function EmailImage({
             fontWeight: 300,
             lineHeight: '48.19px',
           }}>
-            {headline || 'Lightweight header.'}
+            {headline || 'Headline'}
           </div>
 
           {/* Body */}

@@ -245,7 +245,7 @@ export function EmailGrid({
               fontWeight: 300,
               lineHeight: '48px',
             }}>
-              {headline || 'Lightweight header.'}
+              {headline || 'Headline'}
             </div>
           )}
 

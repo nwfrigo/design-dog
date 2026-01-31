@@ -219,7 +219,7 @@ export function WebsiteThumbnail({
             lineHeight: typo.headline.lineHeight,
           }}
         >
-          {headline || 'Your headline here'}
+          {headline || 'Headline'}
         </div>
 
         {/* Subhead */}

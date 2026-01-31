@@ -14,7 +14,7 @@ export default function RenderPage({
 }) {
   // Parse params on server
   const eyebrow = (searchParams.eyebrow as string) || 'Eyebrow'
-  const headline = (searchParams.headline as string) || 'Room for a great headline.'
+  const headline = (searchParams.headline as string) || 'Headline'
   const subhead = (searchParams.subhead as string) || ''
   const body = (searchParams.body as string) || ''
   const metadata = (searchParams.metadata as string) || 'Day / Month | 00:00'

@@ -12,7 +12,7 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const headline = (searchParams.headline as string) || 'Room for a great headline.'
+  const headline = (searchParams.headline as string) || 'Headline'
   const subhead = (searchParams.subhead as string) || ''
   const metadata = (searchParams.metadata as string) || 'Day / Month | 00:00'
   const ctaText = (searchParams.ctaText as string) || 'Learn More'

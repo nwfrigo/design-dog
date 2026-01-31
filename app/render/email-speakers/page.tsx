@@ -13,7 +13,7 @@ export default function RenderPage({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   // Parse params on server
-  const headline = (searchParams.headline as string) || 'Lightweight header.'
+  const headline = (searchParams.headline as string) || 'Headline'
   const eyebrow = (searchParams.eyebrow as string) || ''
   const body = (searchParams.body as string) || ''
   const ctaText = (searchParams.ctaText as string) || 'Responsive'

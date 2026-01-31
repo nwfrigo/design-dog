@@ -14,7 +14,7 @@ export default function RenderPage({
 }) {
   // Parse params on server
   const eyebrow = (searchParams.eyebrow as string) || 'EYEBROW'
-  const headline = (searchParams.headline as string) || 'Lightweight header.'
+  const headline = (searchParams.headline as string) || 'Headline'
   const body = (searchParams.body as string) || ''
   const ctaText = (searchParams.ctaText as string) || 'Responsive'
   const colorStyle = ((searchParams.colorStyle as string) || '1') as '1' | '2' | '3' | '4'

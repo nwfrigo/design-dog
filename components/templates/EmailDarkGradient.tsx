@@ -176,7 +176,7 @@ export function EmailDarkGradient({
               lineHeight: 1.26,
             }}
           >
-            {headline || 'Lightweight header.'}
+            {headline || 'Headline'}
           </div>
 
           {/* Subheading */}

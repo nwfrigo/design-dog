@@ -13,7 +13,7 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const headline = (searchParams.headline as string) || 'Room for a great headline.'
+  const headline = (searchParams.headline as string) || 'Headline'
   const subhead = (searchParams.subhead as string) || 'This is your subheader or description text. Keep it to two lines if you can.'
   const eyebrow = (searchParams.eyebrow as string) || "Don't miss this."
   const showEyebrow = searchParams.showEyebrow !== 'false'

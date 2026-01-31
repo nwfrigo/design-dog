@@ -13,7 +13,7 @@ export default function RenderPage({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   const eyebrow = (searchParams.eyebrow as string) || 'Eyebrow'
-  const headline = (searchParams.headline as string) || 'Your headline here'
+  const headline = (searchParams.headline as string) || 'Headline'
   const subhead = (searchParams.subhead as string) || ''
   const body = (searchParams.body as string) || ''
   const solution = (searchParams.solution as string) || 'environmental'

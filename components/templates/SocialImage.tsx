@@ -199,7 +199,7 @@ export function SocialImage({
               fontWeight: 300,
               lineHeight: '96px',
             }}>
-              {headline || 'Room for a great headline.'}
+              {headline || 'Headline'}
             </div>
 
             {/* Subhead */}

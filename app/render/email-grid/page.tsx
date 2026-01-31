@@ -12,7 +12,7 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const headline = (searchParams.headline as string) || 'Lightweight header.'
+  const headline = (searchParams.headline as string) || 'Headline'
   const body = (searchParams.body as string) || 'This is your body copy. Lorem ipsum dolor sit am'
   const eyebrow = (searchParams.eyebrow as string) || ''
   const subheading = (searchParams.subheading as string) || ''

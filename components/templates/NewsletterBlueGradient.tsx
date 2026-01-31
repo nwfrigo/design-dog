@@ -185,7 +185,7 @@ export function NewsletterBlueGradient({
               fontWeight: 350,
               lineHeight: '26px',
             }}>
-              {headline || 'Lightweight header.'}
+              {headline || 'Headline'}
             </div>
 
             {/* Body */}

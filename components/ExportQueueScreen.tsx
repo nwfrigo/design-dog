@@ -613,7 +613,7 @@ function QueueItem({
               )}
               {asset.templateType === 'email-image' && (
                 <EmailImage
-                  headline={asset.headline || 'Lightweight header.'}
+                  headline={asset.headline || 'Headline'}
                   body={asset.body || 'This is your body copy.'}
                   ctaText={asset.ctaText || 'Responsive'}
                   imageUrl={asset.thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
@@ -631,7 +631,7 @@ function QueueItem({
               {asset.templateType === 'social-dark-gradient' && (
                 <SocialDarkGradient
                   eyebrow={asset.eyebrow}
-                  headline={asset.headline || 'Room for a great headline.'}
+                  headline={asset.headline || 'Headline'}
                   subhead={asset.subhead}
                   body={asset.body}
                   metadata={asset.metadata}
@@ -654,7 +654,7 @@ function QueueItem({
               {asset.templateType === 'social-blue-gradient' && (
                 <SocialBlueGradient
                   eyebrow={asset.eyebrow}
-                  headline={asset.headline || 'Room for a great headline.'}
+                  headline={asset.headline || 'Headline'}
                   subhead={asset.subhead}
                   body={asset.body}
                   metadata={asset.metadata}
@@ -675,7 +675,7 @@ function QueueItem({
               )}
               {asset.templateType === 'social-image' && (
                 <SocialImage
-                  headline={asset.headline || 'Room for a great headline.'}
+                  headline={asset.headline || 'Headline'}
                   subhead={asset.subhead || ''}
                   metadata={asset.metadata || 'Day / Month | 00:00'}
                   ctaText={asset.ctaText || 'Learn More'}
@@ -694,7 +694,7 @@ function QueueItem({
               )}
               {asset.templateType === 'social-grid-detail' && (
                 <SocialGridDetail
-                  headline={asset.headline || 'Room for a great headline.'}
+                  headline={asset.headline || 'Headline'}
                   subhead={asset.subhead || 'This is your subheader or description text.'}
                   eyebrow={asset.eyebrow || "Don't miss this."}
                   showEyebrow={asset.showEyebrow}
@@ -715,7 +715,7 @@ function QueueItem({
               )}
               {asset.templateType === 'email-dark-gradient' && (
                 <EmailDarkGradient
-                  headline={asset.headline || 'Lightweight header.'}
+                  headline={asset.headline || 'Headline'}
                   eyebrow={asset.eyebrow}
                   subheading={asset.subhead}
                   body={asset.body || 'This is your body copy.'}
@@ -734,7 +734,7 @@ function QueueItem({
               )}
               {asset.templateType === 'email-speakers' && (
                 <EmailSpeakers
-                  headline={asset.headline || 'Lightweight header.'}
+                  headline={asset.headline || 'Headline'}
                   eyebrow={asset.eyebrow}
                   body={asset.body || 'This is your body copy.'}
                   ctaText={asset.ctaText || 'Responsive'}
@@ -774,7 +774,7 @@ function QueueItem({
               {asset.templateType === 'newsletter-dark-gradient' && (
                 <NewsletterDarkGradient
                   eyebrow={asset.eyebrow}
-                  headline={asset.headline || 'Lightweight header.'}
+                  headline={asset.headline || 'Headline'}
                   body={asset.body || 'This is your body copy.'}
                   ctaText={asset.ctaText || 'Responsive'}
                   colorStyle={asset.colorStyle || '1'}
@@ -791,7 +791,7 @@ function QueueItem({
               {asset.templateType === 'newsletter-blue-gradient' && (
                 <NewsletterBlueGradient
                   eyebrow={asset.eyebrow}
-                  headline={asset.headline || 'Lightweight header.'}
+                  headline={asset.headline || 'Headline'}
                   body={asset.body || 'This is your body copy.'}
                   ctaText={asset.ctaText || 'Responsive'}
                   colorStyle={asset.colorStyle || '1'}
@@ -808,7 +808,7 @@ function QueueItem({
               {asset.templateType === 'newsletter-light' && (
                 <NewsletterLight
                   eyebrow={asset.eyebrow}
-                  headline={asset.headline || 'Lightweight header.'}
+                  headline={asset.headline || 'Headline'}
                   body={asset.body || 'This is your body copy.'}
                   ctaText={asset.ctaText || 'Responsive'}
                   imageSize={asset.newsletterImageSize || 'none'}
@@ -1008,7 +1008,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           )}
           {asset.templateType === 'email-image' && (
             <EmailImage
-              headline={asset.headline || 'Lightweight header.'}
+              headline={asset.headline || 'Headline'}
               body={asset.body || 'This is your body copy.'}
               ctaText={asset.ctaText || 'Responsive'}
               imageUrl={asset.thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
@@ -1026,7 +1026,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           {asset.templateType === 'social-dark-gradient' && (
             <SocialDarkGradient
               eyebrow={asset.eyebrow}
-              headline={asset.headline || 'Room for a great headline.'}
+              headline={asset.headline || 'Headline'}
               subhead={asset.subhead}
               body={asset.body}
               metadata={asset.metadata}
@@ -1049,7 +1049,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           {asset.templateType === 'social-blue-gradient' && (
             <SocialBlueGradient
               eyebrow={asset.eyebrow}
-              headline={asset.headline || 'Room for a great headline.'}
+              headline={asset.headline || 'Headline'}
               subhead={asset.subhead}
               body={asset.body}
               metadata={asset.metadata}
@@ -1070,7 +1070,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           )}
           {asset.templateType === 'social-image' && (
             <SocialImage
-              headline={asset.headline || 'Room for a great headline.'}
+              headline={asset.headline || 'Headline'}
               subhead={asset.subhead || ''}
               metadata={asset.metadata || 'Day / Month | 00:00'}
               ctaText={asset.ctaText || 'Learn More'}
@@ -1089,7 +1089,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           )}
           {asset.templateType === 'social-grid-detail' && (
             <SocialGridDetail
-              headline={asset.headline || 'Room for a great headline.'}
+              headline={asset.headline || 'Headline'}
               subhead={asset.subhead || 'This is your subheader or description text.'}
               eyebrow={asset.eyebrow || "Don't miss this."}
               showEyebrow={asset.showEyebrow}
@@ -1110,7 +1110,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           )}
           {asset.templateType === 'email-dark-gradient' && (
             <EmailDarkGradient
-              headline={asset.headline || 'Lightweight header.'}
+              headline={asset.headline || 'Headline'}
               eyebrow={asset.eyebrow}
               subheading={asset.subhead}
               body={asset.body || 'This is your body copy.'}
@@ -1129,7 +1129,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           )}
           {asset.templateType === 'email-speakers' && (
             <EmailSpeakers
-              headline={asset.headline || 'Lightweight header.'}
+              headline={asset.headline || 'Headline'}
               eyebrow={asset.eyebrow}
               body={asset.body || 'This is your body copy.'}
               ctaText={asset.ctaText || 'Responsive'}
@@ -1169,7 +1169,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           {asset.templateType === 'newsletter-dark-gradient' && (
             <NewsletterDarkGradient
               eyebrow={asset.eyebrow}
-              headline={asset.headline || 'Lightweight header.'}
+              headline={asset.headline || 'Headline'}
               body={asset.body || 'This is your body copy.'}
               ctaText={asset.ctaText || 'Responsive'}
               colorStyle={asset.colorStyle || '1'}
@@ -1186,7 +1186,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           {asset.templateType === 'newsletter-blue-gradient' && (
             <NewsletterBlueGradient
               eyebrow={asset.eyebrow}
-              headline={asset.headline || 'Lightweight header.'}
+              headline={asset.headline || 'Headline'}
               body={asset.body || 'This is your body copy.'}
               ctaText={asset.ctaText || 'Responsive'}
               colorStyle={asset.colorStyle || '1'}
@@ -1203,7 +1203,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           {asset.templateType === 'newsletter-light' && (
             <NewsletterLight
               eyebrow={asset.eyebrow}
-              headline={asset.headline || 'Lightweight header.'}
+              headline={asset.headline || 'Headline'}
               body={asset.body || 'This is your body copy.'}
               ctaText={asset.ctaText || 'Responsive'}
               imageSize={asset.newsletterImageSize || 'none'}

@@ -210,7 +210,7 @@ export function SocialDarkGradient({
                 lineHeight: 1.1,
               }}
             >
-              {headline || 'Room for a great headline.'}
+              {headline || 'Headline'}
             </div>
 
             {/* Subhead */}

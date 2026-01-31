@@ -13,7 +13,7 @@ export default function RenderPage({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   // Parse params on server
-  const headline = (searchParams.headline as string) || 'Lightweight header.'
+  const headline = (searchParams.headline as string) || 'Headline'
   const body = (searchParams.body as string) || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'
   const ctaText = (searchParams.ctaText as string) || 'Responsive'
   const imageUrl = (searchParams.imageUrl as string) || '/assets/images/email-image-placeholder.png'

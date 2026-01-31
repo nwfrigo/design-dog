@@ -264,7 +264,7 @@ export function EmailSpeakers({
             fontWeight: 350,
             lineHeight: '48.19px',
           }}>
-            {headline || 'Lightweight header.'}
+            {headline || 'Headline'}
           </div>
 
           {/* Body */}

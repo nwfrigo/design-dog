@@ -1553,7 +1553,7 @@ export function EditorScreen() {
                   type="text"
                   value={verbatimCopy.headline}
                   onChange={(e) => setVerbatimCopy({ headline: e.target.value })}
-                  placeholder="Your main headline"
+                  placeholder="Headline"
                   className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
                     bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
                     focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -2418,7 +2418,7 @@ export function EditorScreen() {
               {currentTemplate === 'website-thumbnail' && (
                 <WebsiteThumbnail
                   eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Your headline here'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   subhead={verbatimCopy.subhead}
                   body={verbatimCopy.body}
                   solution={solution}
@@ -2434,7 +2434,7 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'email-grid' && (
                 <EmailGrid
-                  headline={verbatimCopy.headline || 'Your headline here'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   body={verbatimCopy.body}
                   eyebrow={eyebrow}
                   subheading={subheading}
@@ -2458,7 +2458,7 @@ export function EditorScreen() {
               {currentTemplate === 'social-dark-gradient' && (
                 <SocialDarkGradient
                   eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Room for a great headline.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   subhead={verbatimCopy.subhead}
                   body={verbatimCopy.body}
                   metadata={metadata}
@@ -2481,7 +2481,7 @@ export function EditorScreen() {
               {currentTemplate === 'social-blue-gradient' && (
                 <SocialBlueGradient
                   eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Room for a great headline.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   subhead={verbatimCopy.subhead}
                   body={verbatimCopy.body}
                   metadata={metadata}
@@ -2502,7 +2502,7 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'social-image' && (
                 <SocialImage
-                  headline={verbatimCopy.headline || 'Room for a great headline.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   subhead={verbatimCopy.subhead}
                   metadata={metadata}
                   ctaText={ctaText}
@@ -2521,7 +2521,7 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'social-grid-detail' && (
                 <SocialGridDetail
-                  headline={verbatimCopy.headline || 'Room for a great headline.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   subhead={verbatimCopy.subhead || 'This is your subheader or description text. Keep it to two lines if you can.'}
                   eyebrow={eyebrow || "Don't miss this."}
                   showEyebrow={showEyebrow}
@@ -2542,7 +2542,7 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'email-image' && (
                 <EmailImage
-                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
                   ctaText={ctaText}
                   imageUrl={thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
@@ -2559,7 +2559,7 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'email-dark-gradient' && (
                 <EmailDarkGradient
-                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   eyebrow={eyebrow}
                   subheading={verbatimCopy.subhead}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
@@ -2579,7 +2579,7 @@ export function EditorScreen() {
               {currentTemplate === 'newsletter-dark-gradient' && (
                 <NewsletterDarkGradient
                   eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
                   ctaText={ctaText}
                   colorStyle={colorStyle}
@@ -2596,7 +2596,7 @@ export function EditorScreen() {
               {currentTemplate === 'newsletter-blue-gradient' && (
                 <NewsletterBlueGradient
                   eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
                   ctaText={ctaText}
                   colorStyle={colorStyle}
@@ -2613,7 +2613,7 @@ export function EditorScreen() {
               {currentTemplate === 'newsletter-light' && (
                 <NewsletterLight
                   eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
                   ctaText={ctaText}
                   imageSize={newsletterImageSize}
@@ -2628,7 +2628,7 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'email-speakers' && (
                 <EmailSpeakers
-                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  headline={verbatimCopy.headline || 'Headline'}
                   eyebrow={eyebrow}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing'}
                   ctaText={ctaText}
