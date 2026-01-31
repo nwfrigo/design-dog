@@ -14,115 +14,193 @@ export interface ChannelConfig {
   templates: TemplateInfo[]
 }
 
-// All templates organized by channel
+// Subchannel within a distribution channel
+export interface SubChannelConfig {
+  id: string
+  label: string
+  icon: 'mail' | 'share' | 'globe' | 'newspaper'
+  templates: TemplateInfo[]
+}
+
+// Distribution channel (top-level grouping)
+export interface DistributionChannel {
+  id: string
+  label: string
+  description: string
+  subChannels: SubChannelConfig[]
+  comingSoon?: boolean
+}
+
+// Template definitions for email
+const EMAIL_TEMPLATES: TemplateInfo[] = [
+  {
+    type: 'email-grid',
+    label: 'Grid Details',
+    dimensions: '640 × 300px',
+    width: 640,
+    height: 300,
+  },
+  {
+    type: 'email-image',
+    label: 'Image Focus',
+    dimensions: '640 × 300px',
+    width: 640,
+    height: 300,
+  },
+  {
+    type: 'email-dark-gradient',
+    label: 'Dark Gradient',
+    dimensions: '640 × 300px',
+    width: 640,
+    height: 300,
+  },
+  {
+    type: 'email-speakers',
+    label: 'Speakers',
+    dimensions: '640 × 300px',
+    width: 640,
+    height: 300,
+  },
+]
+
+// Template definitions for social
+const SOCIAL_TEMPLATES: TemplateInfo[] = [
+  {
+    type: 'social-dark-gradient',
+    label: 'Dark Gradient',
+    dimensions: '1200 × 628px',
+    width: 1200,
+    height: 628,
+  },
+  {
+    type: 'social-blue-gradient',
+    label: 'Blue Gradient',
+    dimensions: '1200 × 628px',
+    width: 1200,
+    height: 628,
+  },
+  {
+    type: 'social-image',
+    label: 'Image Focus',
+    dimensions: '1200 × 628px',
+    width: 1200,
+    height: 628,
+  },
+  {
+    type: 'social-grid-detail',
+    label: 'Grid Detail',
+    dimensions: '1200 × 628px',
+    width: 1200,
+    height: 628,
+  },
+]
+
+// Template definitions for website
+const WEBSITE_TEMPLATES: TemplateInfo[] = [
+  {
+    type: 'website-thumbnail',
+    label: 'Thumbnail',
+    dimensions: '700 × 434px',
+    width: 700,
+    height: 434,
+  },
+]
+
+// Template definitions for newsletter
+const NEWSLETTER_TEMPLATES: TemplateInfo[] = [
+  {
+    type: 'newsletter-dark-gradient',
+    label: 'Dark Gradient',
+    dimensions: '640 × 179px',
+    width: 640,
+    height: 179,
+  },
+  {
+    type: 'newsletter-blue-gradient',
+    label: 'Blue Gradient',
+    dimensions: '640 × 179px',
+    width: 640,
+    height: 179,
+  },
+  {
+    type: 'newsletter-light',
+    label: 'Light',
+    dimensions: '640 × 179px',
+    width: 640,
+    height: 179,
+  },
+]
+
+// New: Distribution channels organized by use case
+export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
+  {
+    id: 'digital',
+    label: 'Digital',
+    description: 'Email campaigns, social media, and web assets',
+    subChannels: [
+      {
+        id: 'email',
+        label: 'Email',
+        icon: 'mail',
+        templates: EMAIL_TEMPLATES,
+      },
+      {
+        id: 'social',
+        label: 'Social',
+        icon: 'share',
+        templates: SOCIAL_TEMPLATES,
+      },
+      {
+        id: 'website',
+        label: 'Website',
+        icon: 'globe',
+        templates: WEBSITE_TEMPLATES,
+      },
+      {
+        id: 'newsletter',
+        label: 'Newsletter',
+        icon: 'newspaper',
+        templates: NEWSLETTER_TEMPLATES,
+      },
+    ],
+  },
+  {
+    id: 'print',
+    label: 'Print',
+    description: 'Brochures, flyers, and printed materials',
+    subChannels: [],
+    comingSoon: true,
+  },
+  {
+    id: 'events',
+    label: 'Events',
+    description: 'Presentations, signage, and event materials',
+    subChannels: [],
+    comingSoon: true,
+  },
+]
+
+// Legacy: All templates organized by channel (for backwards compatibility)
 export const CHANNELS: ChannelConfig[] = [
   {
     id: 'email',
     label: 'Email',
-    templates: [
-      {
-        type: 'email-grid',
-        label: 'Email - Grid Details',
-        dimensions: '640 × 300px',
-        width: 640,
-        height: 300,
-      },
-      {
-        type: 'email-image',
-        label: 'Email - Image',
-        dimensions: '640 × 300px',
-        width: 640,
-        height: 300,
-      },
-      {
-        type: 'email-dark-gradient',
-        label: 'Email - Dark Gradient',
-        dimensions: '640 × 300px',
-        width: 640,
-        height: 300,
-      },
-      {
-        type: 'email-speakers',
-        label: 'Email - Speakers',
-        dimensions: '640 × 300px',
-        width: 640,
-        height: 300,
-      },
-    ],
+    templates: EMAIL_TEMPLATES.map(t => ({ ...t, label: `Email - ${t.label}` })),
   },
   {
     id: 'social',
     label: 'Social',
-    templates: [
-      {
-        type: 'social-dark-gradient',
-        label: 'Social - Dark Gradient',
-        dimensions: '1200 × 628px',
-        width: 1200,
-        height: 628,
-      },
-      {
-        type: 'social-blue-gradient',
-        label: 'Social - Blue Gradient',
-        dimensions: '1200 × 628px',
-        width: 1200,
-        height: 628,
-      },
-      {
-        type: 'social-image',
-        label: 'Social - Image',
-        dimensions: '1200 × 628px',
-        width: 1200,
-        height: 628,
-      },
-      {
-        type: 'social-grid-detail',
-        label: 'Social - Grid Detail',
-        dimensions: '1200 × 628px',
-        width: 1200,
-        height: 628,
-      },
-    ],
+    templates: SOCIAL_TEMPLATES.map(t => ({ ...t, label: `Social - ${t.label}` })),
   },
   {
     id: 'website',
     label: 'Website',
-    templates: [
-      {
-        type: 'website-thumbnail',
-        label: 'Website Thumbnail',
-        dimensions: '700 × 434px',
-        width: 700,
-        height: 434,
-      },
-    ],
+    templates: WEBSITE_TEMPLATES.map(t => ({ ...t, label: `Website ${t.label}` })),
   },
   {
     id: 'newsletter',
     label: 'Newsletter',
-    templates: [
-      {
-        type: 'newsletter-dark-gradient',
-        label: 'Newsletter - Dark Gradient',
-        dimensions: '640 × 179px',
-        width: 640,
-        height: 179,
-      },
-      {
-        type: 'newsletter-blue-gradient',
-        label: 'Newsletter - Blue Gradient',
-        dimensions: '640 × 179px',
-        width: 640,
-        height: 179,
-      },
-      {
-        type: 'newsletter-light',
-        label: 'Newsletter - Light',
-        dimensions: '640 × 179px',
-        width: 640,
-        height: 179,
-      },
-    ],
+    templates: NEWSLETTER_TEMPLATES.map(t => ({ ...t, label: `Newsletter - ${t.label}` })),
   },
 ]
 

@@ -2403,7 +2403,7 @@ export function EditorScreen() {
           )}
 
           {/* Preview */}
-          <div className="flex items-start justify-center flex-1">
+          <div className="flex items-start justify-center flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6">
             <div style={{
               width: dimensions.width * previewScale,
               height: dimensions.height * previewScale,

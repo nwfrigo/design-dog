@@ -2,22 +2,129 @@
 
 import { useState } from 'react'
 import { useStore } from '@/store'
-import { CHANNELS, type TemplateInfo } from '@/lib/template-config'
-import type { TemplateType } from '@/types'
+import { DISTRIBUTION_CHANNELS, type SubChannelConfig, type TemplateInfo } from '@/lib/template-config'
+import { TemplateTile, ComingSoonTile, RequestTemplateTile } from '@/components/TemplateTile'
+
+// Icons for subchannel types
+const SubChannelIcon = ({ icon }: { icon: SubChannelConfig['icon'] }) => {
+  const iconClass = "w-5 h-5"
+
+  switch (icon) {
+    case 'mail':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      )
+    case 'share':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+      )
+    case 'globe':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+        </svg>
+      )
+    case 'newspaper':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+        </svg>
+      )
+    default:
+      return null
+  }
+}
+
+// QuickStart sidebar placeholder
+function QuickStartSidebar() {
+  const examplePrompts = [
+    "Create a webinar promotion for our safety summit",
+    "Design social posts for a product launch",
+    "Make an email banner for the quarterly newsletter"
+  ]
+
+  return (
+    <aside className="w-80 flex-shrink-0 bg-gray-50/50 dark:bg-gray-900/50 border-l border-gray-200 dark:border-gray-800 hidden lg:block">
+      <div className="sticky top-0 p-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Quick Start
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Tell us what you need
+          </p>
+        </div>
+
+        {/* Disabled input area */}
+        <div className="relative mb-4">
+          <textarea
+            disabled
+            placeholder="Describe what you want to create..."
+            className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl resize-none cursor-not-allowed opacity-50"
+          />
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100/50 dark:bg-gray-800/50 backdrop-blur-[1px]">
+            <span className="px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm">
+              Coming soon
+            </span>
+          </div>
+        </div>
+
+        {/* Description */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+          Soon: Describe what you want to create and Design Dog will suggest the right asset types and help you build them faster.
+        </p>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Example prompts</span>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+        </div>
+
+        {/* Example prompts */}
+        <div className="space-y-2">
+          {examplePrompts.map((prompt, index) => (
+            <div
+              key={index}
+              className="p-3 text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-lg opacity-60"
+            >
+              &ldquo;{prompt}&rdquo;
+            </div>
+          ))}
+        </div>
+      </div>
+    </aside>
+  )
+}
 
 export function AssetSelectionScreen() {
   const { selectedAssets, toggleAssetSelection, proceedToEditor } = useStore()
 
-  // Track which channels are expanded (Email open by default)
-  const [expandedChannels, setExpandedChannels] = useState<Set<string>>(new Set(['email']))
+  // Track which subchannels are expanded (all open by default)
+  const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(() => {
+    // Start with all subchannels expanded
+    const allSubChannelIds = new Set<string>()
+    DISTRIBUTION_CHANNELS.forEach(channel => {
+      channel.subChannels.forEach(sub => allSubChannelIds.add(sub.id))
+    })
+    return allSubChannelIds
+  })
 
-  const toggleChannel = (channelId: string) => {
-    setExpandedChannels(prev => {
+  const toggleSubChannel = (subChannelId: string) => {
+    setExpandedSubChannels(prev => {
       const next = new Set(prev)
-      if (next.has(channelId)) {
-        next.delete(channelId)
+      if (next.has(subChannelId)) {
+        next.delete(subChannelId)
       } else {
-        next.add(channelId)
+        next.add(subChannelId)
       }
       return next
     })
@@ -25,156 +132,187 @@ export function AssetSelectionScreen() {
 
   const canProceed = selectedAssets.length > 0
 
+  // Count selected templates in a subchannel
+  const getSelectedCount = (templates: TemplateInfo[]) => {
+    return templates.filter(t => selectedAssets.includes(t.type)).length
+  }
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-          Select Asset Types
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Choose which assets you want to create. You&apos;ll enter content once, then customize each asset.
-        </p>
-      </div>
+    <div className="flex min-h-[calc(100vh-120px)]">
+      {/* Main content area */}
+      <div className="flex-1 pr-0 lg:pr-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            Choose Your Assets
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Select the assets you want to create. You&apos;ll enter content once, then customize each asset.
+          </p>
+        </div>
 
-      <div className="space-y-2">
-        {CHANNELS.map((channel) => {
-          const isExpanded = expandedChannels.has(channel.id)
-          const hasTemplates = channel.templates.length > 0
-          const selectedInChannel = channel.templates.filter(t =>
-            selectedAssets.includes(t.type)
-          ).length
-
-          return (
-            <div key={channel.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-              {/* Channel Header */}
-              <button
-                onClick={() => toggleChannel(channel.id)}
-                disabled={!hasTemplates}
-                className={`w-full px-4 py-3 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50
-                  ${hasTemplates ? 'hover:bg-gray-100 dark:hover:bg-gray-800' : 'cursor-default opacity-60'}
-                  transition-colors`}
-              >
-                <div className="flex items-center gap-3">
-                  {/* Expand/Collapse Icon */}
-                  <svg
-                    className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''} ${!hasTemplates ? 'opacity-0' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-
-                  {/* Folder Icon */}
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                  </svg>
-
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {channel.label}
-                  </span>
-
-                  {!hasTemplates && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      Coming soon
-                    </span>
-                  )}
-                </div>
-
-                {/* Selected count badge */}
-                {selectedInChannel > 0 && (
-                  <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                    {selectedInChannel}
+        {/* Distribution channels */}
+        <div className="space-y-8">
+          {DISTRIBUTION_CHANNELS.map((channel) => (
+            <div key={channel.id}>
+              {/* Channel header */}
+              <div className="flex items-center gap-3 mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  {channel.label}
+                </h3>
+                <span className="text-sm text-gray-400 dark:text-gray-500">
+                  {channel.description}
+                </span>
+                {channel.comingSoon && (
+                  <span className="px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
+                    Coming soon
                   </span>
                 )}
-              </button>
+              </div>
 
-              {/* Templates List */}
-              {isExpanded && hasTemplates && (
-                <div className="border-t border-gray-200 dark:border-gray-700">
-                  {channel.templates.map((template) => (
-                    <TemplateRow
-                      key={template.type}
-                      template={template}
-                      isSelected={selectedAssets.includes(template.type)}
-                      onToggle={() => toggleAssetSelection(template.type)}
-                    />
-                  ))}
+              {/* Subchannels grid */}
+              {channel.comingSoon ? (
+                // Coming soon placeholders
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <ComingSoonTile label="Brochure" />
+                  <ComingSoonTile label="Flyer" />
+                  {channel.id === 'events' && (
+                    <>
+                      <ComingSoonTile label="Signage" />
+                      <ComingSoonTile label="Presentation" />
+                    </>
+                  )}
+                </div>
+              ) : (
+                // Active subchannels
+                <div className="space-y-3">
+                  {channel.subChannels.map((subChannel) => {
+                    const isExpanded = expandedSubChannels.has(subChannel.id)
+                    const selectedCount = getSelectedCount(subChannel.templates)
+
+                    return (
+                      <div
+                        key={subChannel.id}
+                        className={`
+                          border rounded-xl overflow-hidden transition-all duration-300
+                          ${isExpanded
+                            ? 'border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-900/10'
+                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900'
+                          }
+                        `}
+                      >
+                        {/* Subchannel header (clickable) */}
+                        <button
+                          onClick={() => toggleSubChannel(subChannel.id)}
+                          className={`
+                            w-full px-5 py-4 flex items-center justify-between transition-colors
+                            ${isExpanded
+                              ? 'bg-blue-50 dark:bg-blue-900/20'
+                              : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'
+                            }
+                          `}
+                        >
+                          <div className="flex items-center gap-3">
+                            {/* Expand/collapse chevron */}
+                            <svg
+                              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+
+                            {/* Icon */}
+                            <span className={`${isExpanded ? 'text-blue-500' : 'text-gray-400'}`}>
+                              <SubChannelIcon icon={subChannel.icon} />
+                            </span>
+
+                            {/* Label */}
+                            <span className={`font-medium ${
+                              isExpanded
+                                ? 'text-blue-700 dark:text-blue-300'
+                                : 'text-gray-900 dark:text-gray-100'
+                            }`}>
+                              {subChannel.label}
+                            </span>
+
+                            {/* Template count */}
+                            <span className="text-sm text-gray-400 dark:text-gray-500">
+                              {subChannel.templates.length} {subChannel.templates.length === 1 ? 'template' : 'templates'}
+                            </span>
+                          </div>
+
+                          {/* Selected count badge */}
+                          {selectedCount > 0 && (
+                            <span className="bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                              {selectedCount} selected
+                            </span>
+                          )}
+                        </button>
+
+                        {/* Expanded template grid */}
+                        <div
+                          className={`
+                            grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-5 overflow-hidden transition-all duration-300 ease-out
+                            ${isExpanded ? 'py-5 max-h-[1000px] opacity-100' : 'max-h-0 py-0 opacity-0'}
+                          `}
+                        >
+                          {subChannel.templates.map((template) => (
+                            <TemplateTile
+                              key={template.type}
+                              template={template}
+                              isSelected={selectedAssets.includes(template.type)}
+                              onToggle={() => toggleAssetSelection(template.type)}
+                            />
+                          ))}
+                          <RequestTemplateTile channelName={subChannel.label} />
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
-          )
-        })}
-      </div>
-
-      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {selectedAssets.length === 0
-              ? 'No assets selected'
-              : `${selectedAssets.length} asset${selectedAssets.length > 1 ? 's' : ''} selected`}
-          </p>
-          <button
-            onClick={proceedToEditor}
-            disabled={!canProceed}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-              canProceed
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-            }`}
-          >
-            Continue
-          </button>
+          ))}
         </div>
-      </div>
-    </div>
-  )
-}
 
-interface TemplateRowProps {
-  template: TemplateInfo
-  isSelected: boolean
-  onToggle: () => void
-}
-
-function TemplateRow({ template, isSelected, onToggle }: TemplateRowProps) {
-  return (
-    <button
-      onClick={onToggle}
-      className={`w-full p-4 pl-12 text-left transition-all border-b last:border-b-0 border-gray-100 dark:border-gray-800 ${
-        isSelected
-          ? 'bg-blue-50 dark:bg-blue-900/20'
-          : 'hover:bg-gray-50 dark:hover:bg-gray-800/30'
-      }`}
-    >
-      <div className="flex items-start gap-3">
-        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
-          isSelected
-            ? 'border-blue-500 bg-blue-500'
-            : 'border-gray-300 dark:border-gray-600'
-        }`}>
-          {isSelected && (
-            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          )}
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <span className={`font-medium ${
-              isSelected
-                ? 'text-blue-700 dark:text-blue-300'
-                : 'text-gray-900 dark:text-gray-100'
-            }`}>
-              {template.label}
-            </span>
-            <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">
-              {template.dimensions}
-            </span>
+        {/* Footer with selection summary and continue button */}
+        <div className="sticky bottom-0 mt-8 py-4 bg-gradient-to-t from-white dark:from-black via-white dark:via-black to-transparent">
+          <div className="flex items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-5 py-4 shadow-lg">
+            <div className="flex items-center gap-4">
+              {selectedAssets.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400">
+                  No assets selected
+                </p>
+              ) : (
+                <>
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-sm">
+                    {selectedAssets.length}
+                  </span>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">
+                    asset{selectedAssets.length > 1 ? 's' : ''} selected
+                  </span>
+                </>
+              )}
+            </div>
+            <button
+              onClick={proceedToEditor}
+              disabled={!canProceed}
+              className={`px-8 py-2.5 rounded-lg font-medium transition-all ${
+                canProceed
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+              }`}
+            >
+              Continue
+            </button>
           </div>
         </div>
       </div>
-    </button>
+
+      {/* Right sidebar */}
+      <QuickStartSidebar />
+    </div>
   )
 }
