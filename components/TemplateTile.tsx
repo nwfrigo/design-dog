@@ -24,6 +24,7 @@ interface TemplateTileProps {
   template: TemplateInfo
   isSelected: boolean
   onToggle: () => void
+  onNavigateToEditor: () => void
 }
 
 // Placeholder image URLs for previews - matching what users see in editor
@@ -44,8 +45,8 @@ const PREVIEW_CONTENT = {
   eyebrow: 'EYEBROW',
 }
 
-// Render a template with default preview content
-function TemplateRenderer({
+// Render a template with default preview content (exported for reuse in modals)
+export function TemplateRenderer({
   templateType,
   colors,
   typography,
@@ -295,8 +296,8 @@ function TemplateRenderer({
   }
 }
 
-// Preview Modal Component
-function PreviewModal({
+// Preview Modal Component (exported for reuse)
+export function PreviewModal({
   template,
   colors,
   typography,
@@ -355,7 +356,7 @@ function PreviewModal({
   )
 }
 
-export function TemplateTile({ template, isSelected, onToggle }: TemplateTileProps) {
+export function TemplateTile({ template, isSelected, onToggle, onNavigateToEditor }: TemplateTileProps) {
   const [colors, setColors] = useState<ColorsConfig | null>(null)
   const [typography, setTypography] = useState<TypographyConfig | null>(null)
   const [showPreview, setShowPreview] = useState(false)
@@ -377,17 +378,17 @@ export function TemplateTile({ template, isSelected, onToggle }: TemplateTilePro
     <>
       <div
         className={`
-          group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200
-          border-2
+          group relative flex flex-col rounded-lg overflow-hidden transition-all duration-200
+          border-[0.75px]
           ${isSelected
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg'
+            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
           }
         `}
       >
-        {/* Preview area - click to select */}
+        {/* Preview area - click to go to editor */}
         <button
-          onClick={onToggle}
+          onClick={onNavigateToEditor}
           className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50"
           style={{ height: previewHeight + 24, padding: 12 }}
         >
@@ -428,14 +429,27 @@ export function TemplateTile({ template, isSelected, onToggle }: TemplateTilePro
             )}
           </div>
 
-          {/* Selection checkmark */}
-          {isSelected && (
-            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+          {/* Multi-select checkbox in top right corner */}
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle()
+            }}
+            className={`
+              absolute top-3 right-3 w-6 h-6 rounded cursor-pointer transition-all duration-150
+              flex items-center justify-center
+              ${isSelected
+                ? 'bg-blue-500'
+                : 'bg-gray-700/60 hover:bg-gray-600/80'
+              }
+            `}
+          >
+            {isSelected && (
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
-            </div>
-          )}
+            )}
+          </div>
         </button>
 
         {/* Info area */}
@@ -484,7 +498,7 @@ export function TemplateTile({ template, isSelected, onToggle }: TemplateTilePro
 // Coming soon placeholder tile
 export function ComingSoonTile({ label }: { label: string }) {
   return (
-    <div className="flex flex-col rounded-xl overflow-hidden border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 opacity-60">
+    <div className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800/50 opacity-60">
       {/* Preview area placeholder */}
       <div className="h-32 flex items-center justify-center">
         <div className="text-center">
@@ -707,7 +721,7 @@ export function RequestTemplateTile({ channelName }: { channelName: string }) {
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="flex flex-col rounded-xl overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
+        className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
       >
         {/* Preview area */}
         <div className="flex-1 min-h-[136px] flex items-center justify-center p-6">

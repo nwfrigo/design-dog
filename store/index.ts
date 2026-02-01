@@ -201,6 +201,16 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
+  // Navigate directly to editor with a single template (for single-click)
+  goToEditorWithTemplate: (templateType: TemplateType) => {
+    set({
+      currentScreen: 'editor',
+      selectedAssets: [templateType],
+      currentAssetIndex: 0,
+      templateType: templateType,
+    })
+  },
+
   // Export queue actions
   addToQueue: () => {
     const state = get()

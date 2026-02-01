@@ -106,7 +106,7 @@ function QuickStartSidebar() {
 }
 
 export function AssetSelectionScreen() {
-  const { selectedAssets, toggleAssetSelection, proceedToEditor } = useStore()
+  const { selectedAssets, toggleAssetSelection, proceedToEditor, goToEditorWithTemplate } = useStore()
 
   // Track which subchannels are expanded (only Email open by default)
   const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(
@@ -124,8 +124,6 @@ export function AssetSelectionScreen() {
       return next
     })
   }
-
-  const canProceed = selectedAssets.length > 0
 
   // Count selected templates in a subchannel
   const getSelectedCount = (templates: TemplateInfo[]) => {
@@ -261,6 +259,7 @@ export function AssetSelectionScreen() {
                               template={template}
                               isSelected={selectedAssets.includes(template.type)}
                               onToggle={() => toggleAssetSelection(template.type)}
+                              onNavigateToEditor={() => goToEditorWithTemplate(template.type)}
                             />
                           ))}
                           <RequestTemplateTile channelName={subChannel.label} />
@@ -274,38 +273,27 @@ export function AssetSelectionScreen() {
           ))}
         </div>
 
-        {/* Footer with selection summary and continue button */}
-        <div className="sticky bottom-0 mt-8 py-4 bg-gradient-to-t from-white dark:from-black via-white dark:via-black to-transparent">
-          <div className="flex items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-5 py-4 shadow-lg">
-            <div className="flex items-center gap-4">
-              {selectedAssets.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400">
-                  No assets selected
-                </p>
-              ) : (
-                <>
-                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-sm">
-                    {selectedAssets.length}
-                  </span>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">
-                    asset{selectedAssets.length > 1 ? 's' : ''} selected
-                  </span>
-                </>
-              )}
+        {/* Footer with selection summary and continue button - only shown when templates are selected */}
+        {selectedAssets.length > 0 && (
+          <div className="sticky bottom-0 mt-8 py-4 bg-gradient-to-t from-white dark:from-black via-white dark:via-black to-transparent">
+            <div className="flex items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-5 py-4 shadow-lg">
+              <div className="flex items-center gap-4">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-sm">
+                  {selectedAssets.length}
+                </span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                  asset{selectedAssets.length > 1 ? 's' : ''} selected
+                </span>
+              </div>
+              <button
+                onClick={proceedToEditor}
+                className="px-8 py-2.5 rounded-lg font-medium transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg"
+              >
+                Continue
+              </button>
             </div>
-            <button
-              onClick={proceedToEditor}
-              disabled={!canProceed}
-              className={`px-8 py-2.5 rounded-lg font-medium transition-all ${
-                canProceed
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-              }`}
-            >
-              Continue
-            </button>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Right sidebar */}

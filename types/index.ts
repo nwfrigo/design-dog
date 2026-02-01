@@ -281,6 +281,7 @@ export interface AppState {
 
   // Flow actions
   proceedToEditor: () => void
+  goToEditorWithTemplate: (templateType: TemplateType) => void
   goToQueue: () => void
   reset: () => void
 }

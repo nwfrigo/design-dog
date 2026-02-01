@@ -15,6 +15,8 @@ import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
 import { ImageLibraryModal } from './ImageLibraryModal'
+import { TemplateRenderer, PreviewModal } from './TemplateTile'
+import type { TemplateInfo } from '@/lib/template-config'
 import {
   fetchColorsConfig,
   fetchTypographyConfig,
@@ -199,6 +201,7 @@ export function EditorScreen() {
   const [showAddAssetModal, setShowAddAssetModal] = useState(false)
   const [pendingAssets, setPendingAssets] = useState<TemplateType[]>([])
   const [modalExpandedChannels, setModalExpandedChannels] = useState<Set<string>>(new Set(['email']))
+  const [modalPreviewTemplate, setModalPreviewTemplate] = useState<TemplateInfo | null>(null)
 
   // Image library modal state
   const [showImageLibrary, setShowImageLibrary] = useState(false)
@@ -580,132 +583,179 @@ export function EditorScreen() {
 
       {/* Add Asset Modal */}
       {showAddAssetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddAssetModal(false)} />
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 w-[450px] max-w-[90vw] max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add Assets</h3>
-            <div className="space-y-2 mb-6">
-              {CHANNELS.map((channel) => {
-                const isExpanded = modalExpandedChannels.has(channel.id)
-                const hasTemplates = channel.templates.length > 0
-                const pendingInChannel = channel.templates.filter(t =>
-                  pendingAssets.includes(t.type)
-                ).length
+          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Add Assets</h3>
+              <button
+                onClick={() => setShowAddAssetModal(false)}
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-                return (
-                  <div key={channel.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                    {/* Channel Header */}
-                    <button
-                      onClick={() => {
-                        setModalExpandedChannels(prev => {
-                          const next = new Set(prev)
-                          if (next.has(channel.id)) {
-                            next.delete(channel.id)
-                          } else {
-                            next.add(channel.id)
-                          }
-                          return next
-                        })
-                      }}
-                      disabled={!hasTemplates}
-                      className={`w-full px-3 py-2.5 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50
-                        ${hasTemplates ? 'hover:bg-gray-100 dark:hover:bg-gray-800' : 'cursor-default opacity-60'}
-                        transition-colors`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <svg
-                          className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''} ${!hasTemplates ? 'opacity-0' : ''}`}
-                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                        </svg>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {channel.label}
-                        </span>
-                        {!hasTemplates && (
-                          <span className="text-xs text-gray-400">Coming soon</span>
-                        )}
-                      </div>
-                      {pendingInChannel > 0 && (
-                        <span className="bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                          {pendingInChannel}
-                        </span>
-                      )}
-                    </button>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="space-y-6">
+                {CHANNELS.map((channel) => {
+                  const hasTemplates = channel.templates.length > 0
+                  if (!hasTemplates) return null
 
-                    {/* Templates List */}
-                    {isExpanded && hasTemplates && (
-                      <div className="border-t border-gray-200 dark:border-gray-700">
+                  return (
+                    <div key={channel.id}>
+                      {/* Channel label */}
+                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                        {channel.label}
+                      </h4>
+
+                      {/* Template cards grid - 2 columns */}
+                      <div className="grid grid-cols-2 gap-4">
                         {channel.templates.map((template) => {
-                          const countInPending = pendingAssets.filter(t => t === template.type).length
+                          const isSelected = pendingAssets.includes(template.type)
                           const existingCount = selectedAssets.filter(a => a === template.type).length
+                          const targetWidth = 200
+                          const previewScale = targetWidth / template.width
+                          const previewHeight = Math.round(template.height * previewScale)
+
                           return (
                             <div
                               key={template.type}
-                              className="flex items-center gap-3 p-3 pl-10 border-b last:border-b-0 border-gray-100 dark:border-gray-800"
+                              onClick={() => {
+                                if (isSelected) {
+                                  const idx = pendingAssets.indexOf(template.type)
+                                  if (idx !== -1) {
+                                    const newPending = [...pendingAssets]
+                                    newPending.splice(idx, 1)
+                                    setPendingAssets(newPending)
+                                  }
+                                } else {
+                                  setPendingAssets([...pendingAssets, template.type])
+                                }
+                              }}
+                              className={`
+                                group relative flex flex-col rounded-lg overflow-hidden transition-all duration-200 cursor-pointer
+                                border-[0.75px]
+                                ${isSelected
+                                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
+                                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
+                                }
+                              `}
                             >
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                                  {template.label}
-                                </div>
-                                {existingCount > 0 && (
-                                  <div className="text-xs text-gray-400 mt-0.5">
-                                    {existingCount} already in project
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-1.5 flex-shrink-0">
-                                <button
-                                  onClick={() => {
-                                    if (countInPending > 0) {
-                                      const idx = pendingAssets.lastIndexOf(template.type)
-                                      if (idx !== -1) {
-                                        const newPending = [...pendingAssets]
-                                        newPending.splice(idx, 1)
-                                        setPendingAssets(newPending)
-                                      }
-                                    }
+                              {/* Preview area */}
+                              <div
+                                className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50 flex items-center justify-center"
+                                style={{ height: previewHeight + 24, padding: 12 }}
+                              >
+                                {/* Scaled template preview */}
+                                <div
+                                  className="rounded overflow-hidden shadow-sm bg-white"
+                                  style={{
+                                    width: targetWidth,
+                                    height: previewHeight,
+                                    position: 'relative',
+                                    overflow: 'hidden',
                                   }}
-                                  disabled={countInPending === 0}
-                                  className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300
-                                    dark:border-gray-600 text-gray-600 dark:text-gray-400 disabled:opacity-30
-                                    hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                 >
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                  </svg>
-                                </button>
-                                <span className="w-5 text-center text-xs font-medium text-gray-900 dark:text-gray-100">
-                                  {countInPending}
-                                </span>
+                                  {colorsConfig && typographyConfig ? (
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: template.width,
+                                        height: template.height,
+                                        transform: `scale(${previewScale})`,
+                                        transformOrigin: 'top left',
+                                      }}
+                                    >
+                                      <TemplateRenderer
+                                        templateType={template.type}
+                                        colors={colorsConfig}
+                                        typography={typographyConfig}
+                                        scale={1}
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div
+                                      className="bg-gray-200 dark:bg-gray-700 animate-pulse rounded"
+                                      style={{ width: targetWidth, height: previewHeight }}
+                                    />
+                                  )}
+                                </div>
+
+                                {/* Checkbox in top right corner */}
+                                <div
+                                  className={`
+                                    absolute top-3 right-3 w-6 h-6 rounded cursor-pointer transition-all duration-150
+                                    flex items-center justify-center
+                                    ${isSelected
+                                      ? 'bg-blue-500'
+                                      : 'bg-gray-700/60 hover:bg-gray-600/80'
+                                    }
+                                  `}
+                                >
+                                  {isSelected && (
+                                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Info area */}
+                              <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <span className={`text-sm font-medium truncate block ${
+                                    isSelected
+                                      ? 'text-blue-700 dark:text-blue-300'
+                                      : 'text-gray-900 dark:text-gray-100'
+                                  }`}>
+                                    {template.label.replace(/^(Email|Social|Website|Newsletter)\s*-?\s*/, '')}
+                                  </span>
+                                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+                                    {template.dimensions}
+                                  </span>
+                                  {existingCount > 0 && (
+                                    <span className="text-[10px] text-blue-500 ml-2">
+                                      ({existingCount} in project)
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Preview button */}
                                 <button
-                                  onClick={() => setPendingAssets([...pendingAssets, template.type])}
-                                  className="w-6 h-6 flex items-center justify-center rounded-full border border-blue-500
-                                    text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    setModalPreviewTemplate(template)
+                                  }}
+                                  className="flex-shrink-0 px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400
+                                    hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30
+                                    rounded transition-colors"
                                 >
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                  </svg>
+                                  Preview
                                 </button>
                               </div>
                             </div>
                           )
                         })}
                       </div>
-                    )}
-                  </div>
-                )
-              })}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            <div className="flex gap-3">
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex gap-3">
               <button
                 onClick={() => setShowAddAssetModal(false)}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300
-                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300
+                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
                 Cancel
               </button>
@@ -719,14 +769,24 @@ export function EditorScreen() {
                   }
                 }}
                 disabled={pendingAssets.length === 0}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg
-                  hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg
+                  hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
               >
                 Add {pendingAssets.length > 0 ? `(${pendingAssets.length})` : ''}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal Preview for Add Asset Modal */}
+      {modalPreviewTemplate && colorsConfig && typographyConfig && (
+        <PreviewModal
+          template={modalPreviewTemplate}
+          colors={colorsConfig}
+          typography={typographyConfig}
+          onClose={() => setModalPreviewTemplate(null)}
+        />
       )}
 
       {/* Image Library Modal */}
