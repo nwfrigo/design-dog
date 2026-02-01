@@ -1,7 +1,24 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { TemplateInfo } from '@/lib/template-config'
+import type { TemplateType } from '@/types'
+import { TEMPLATE_DIMENSIONS } from '@/lib/template-config'
+import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
+
+// Import all template components
+import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
+import { EmailImage } from '@/components/templates/EmailImage'
+import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
+import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
+import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
+import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
+import { SocialImage } from '@/components/templates/SocialImage'
+import { SocialGridDetail } from '@/components/templates/SocialGridDetail'
+import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
+import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
+import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
+import { NewsletterLight } from '@/components/templates/NewsletterLight'
 
 interface TemplateTileProps {
   template: TemplateInfo
@@ -9,148 +26,458 @@ interface TemplateTileProps {
   onToggle: () => void
 }
 
-// Template preview backgrounds based on template type
-const getPreviewStyle = (templateType: string): { bg: string; text: string } => {
-  if (templateType.includes('dark-gradient')) {
-    return { bg: 'bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900', text: 'text-white' }
-  }
-  if (templateType.includes('blue-gradient')) {
-    return { bg: 'bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400', text: 'text-white' }
-  }
-  if (templateType.includes('light') || templateType.includes('grid') || templateType.includes('image')) {
-    return { bg: 'bg-gradient-to-br from-gray-50 to-gray-100', text: 'text-gray-800' }
-  }
-  if (templateType.includes('speakers')) {
-    return { bg: 'bg-gradient-to-br from-gray-100 to-gray-200', text: 'text-gray-800' }
-  }
-  return { bg: 'bg-gradient-to-br from-gray-100 to-white', text: 'text-gray-800' }
+// Placeholder image URLs for previews - matching what users see in editor
+const PLACEHOLDER_IMAGES = {
+  email: '/assets/images/email-image-placeholder.png',
+  social: '/assets/images/social-image-placeholder.png',
+  speaker1: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+  speaker2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+  speaker3: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop',
 }
 
-// Get a display icon for the template type
-const getTemplateIcon = (templateType: string) => {
-  if (templateType.includes('email')) {
-    return (
-      <svg className="w-6 h-6 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    )
+// Default content for previews
+const PREVIEW_CONTENT = {
+  headline: 'Headline',
+  subhead: 'Subheadline text here',
+  body: 'Body copy goes here.',
+  cta: 'Learn More',
+  eyebrow: 'EYEBROW',
+}
+
+// Render a template with default preview content
+function TemplateRenderer({
+  templateType,
+  colors,
+  typography,
+  scale = 1
+}: {
+  templateType: TemplateType
+  colors: ColorsConfig
+  typography: TypographyConfig
+  scale?: number
+}) {
+  const commonProps = { colors, typography, scale }
+
+  switch (templateType) {
+    case 'email-grid':
+      return (
+        <EmailGrid
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          body={PREVIEW_CONTENT.body}
+          showEyebrow={true}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          showLightHeader={true}
+          showHeavyHeader={false}
+          showSubheading={false}
+          showBody={false}
+          showSolutionSet={true}
+          solution="safety"
+          logoColor="orange"
+          showGridDetail2={true}
+          gridDetail1={{ type: 'data', text: '150+ Sessions' }}
+          gridDetail2={{ type: 'data', text: '50 Speakers' }}
+          gridDetail3={{ type: 'cta', text: 'Register Now' }}
+        />
+      )
+
+    case 'email-image':
+      return (
+        <EmailImage
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          imageUrl={PLACEHOLDER_IMAGES.email}
+          layout="even"
+          solution="safety"
+          logoColor="orange"
+          showBody={false}
+          showCta={true}
+          showSolutionSet={true}
+        />
+      )
+
+    case 'email-dark-gradient':
+      return (
+        <EmailDarkGradient
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          subheading={PREVIEW_CONTENT.subhead}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          colorStyle="1"
+          alignment="left"
+          ctaStyle="link"
+          showEyebrow={true}
+          showSubheading={false}
+          showBody={false}
+          showCta={true}
+        />
+      )
+
+    case 'email-speakers':
+      return (
+        <EmailSpeakers
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          solution="safety"
+          logoColor="orange"
+          showEyebrow={true}
+          showBody={false}
+          showCta={true}
+          showSolutionSet={true}
+          speakerCount={3}
+          speaker1={{ name: 'Jane Smith', role: 'CEO', imageUrl: PLACEHOLDER_IMAGES.speaker1, imagePosition: { x: 50, y: 50 }, imageZoom: 1 }}
+          speaker2={{ name: 'John Doe', role: 'CTO', imageUrl: PLACEHOLDER_IMAGES.speaker2, imagePosition: { x: 50, y: 50 }, imageZoom: 1 }}
+          speaker3={{ name: 'Alex Chen', role: 'VP Safety', imageUrl: PLACEHOLDER_IMAGES.speaker3, imagePosition: { x: 50, y: 50 }, imageZoom: 1 }}
+        />
+      )
+
+    case 'social-dark-gradient':
+      return (
+        <SocialDarkGradient
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          body={PREVIEW_CONTENT.body}
+          metadata=""
+          ctaText={PREVIEW_CONTENT.cta}
+          colorStyle="1"
+          headingSize="M"
+          alignment="left"
+          ctaStyle="link"
+          logoColor="white"
+          showEyebrow={true}
+          showSubhead={true}
+          showBody={false}
+          showMetadata={false}
+          showCta={true}
+        />
+      )
+
+    case 'social-blue-gradient':
+      return (
+        <SocialBlueGradient
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          body={PREVIEW_CONTENT.body}
+          metadata=""
+          ctaText={PREVIEW_CONTENT.cta}
+          colorStyle="1"
+          headingSize="M"
+          alignment="left"
+          ctaStyle="link"
+          showEyebrow={true}
+          showSubhead={true}
+          showBody={false}
+          showMetadata={false}
+          showCta={true}
+        />
+      )
+
+    case 'social-image':
+      return (
+        <SocialImage
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          metadata=""
+          ctaText={PREVIEW_CONTENT.cta}
+          imageUrl={PLACEHOLDER_IMAGES.social}
+          layout="even"
+          solution="safety"
+          logoColor="orange"
+          showSubhead={false}
+          showMetadata={false}
+          showCta={true}
+          showSolutionSet={true}
+        />
+      )
+
+    case 'social-grid-detail':
+      return (
+        <SocialGridDetail
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          showEyebrow={true}
+          showSubhead={false}
+          showSolutionSet={true}
+          solution="safety"
+          logoColor="orange"
+          showRow3={true}
+          showRow4={true}
+          gridDetail1={{ type: 'data', text: '150+ Sessions' }}
+          gridDetail2={{ type: 'data', text: '50 Speakers' }}
+          gridDetail3={{ type: 'data', text: '3 Days' }}
+          gridDetail4={{ type: 'cta', text: 'Register Now' }}
+        />
+      )
+
+    case 'website-thumbnail':
+      return (
+        <WebsiteThumbnail
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          body={PREVIEW_CONTENT.body}
+          solution="safety"
+          imageUrl={PLACEHOLDER_IMAGES.social}
+          showEyebrow={true}
+          showSubhead={false}
+          showBody={false}
+          logoColor="orange"
+        />
+      )
+
+    case 'newsletter-dark-gradient':
+      return (
+        <NewsletterDarkGradient
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          colorStyle="1"
+          imageSize="none"
+          imageUrl={null}
+          showEyebrow={true}
+          showBody={false}
+          showCta={true}
+        />
+      )
+
+    case 'newsletter-blue-gradient':
+      return (
+        <NewsletterBlueGradient
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          colorStyle="1"
+          imageSize="none"
+          imageUrl={null}
+          showEyebrow={true}
+          showBody={false}
+          showCta={true}
+        />
+      )
+
+    case 'newsletter-light':
+      return (
+        <NewsletterLight
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          imageSize="none"
+          imageUrl={null}
+          showEyebrow={true}
+          showBody={false}
+          showCta={true}
+        />
+      )
+
+    default:
+      return null
   }
-  if (templateType.includes('social')) {
-    return (
-      <svg className="w-6 h-6 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-      </svg>
-    )
-  }
-  if (templateType.includes('website')) {
-    return (
-      <svg className="w-6 h-6 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-      </svg>
-    )
-  }
-  if (templateType.includes('newsletter')) {
-    return (
-      <svg className="w-6 h-6 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-      </svg>
-    )
-  }
-  return null
+}
+
+// Preview Modal Component
+function PreviewModal({
+  template,
+  colors,
+  typography,
+  onClose
+}: {
+  template: TemplateInfo
+  colors: ColorsConfig
+  typography: TypographyConfig
+  onClose: () => void
+}) {
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-8">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
+
+      {/* Modal content */}
+      <div className="relative max-w-[90vw] max-h-[90vh] overflow-auto">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-10 right-0 p-2 text-white/80 hover:text-white transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Template name */}
+        <div className="absolute -top-10 left-0 text-white/80 text-sm font-medium">
+          {template.label} <span className="text-white/50">({template.dimensions})</span>
+        </div>
+
+        {/* Template preview at full size */}
+        <div
+          className="rounded-lg overflow-hidden shadow-2xl bg-white"
+          style={{ width: template.width, height: template.height }}
+        >
+          <TemplateRenderer
+            templateType={template.type as TemplateType}
+            colors={colors}
+            typography={typography}
+            scale={1}
+          />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function TemplateTile({ template, isSelected, onToggle }: TemplateTileProps) {
-  // Calculate preview dimensions (maintain aspect ratio, max width 240 for larger cards)
-  const previewDimensions = useMemo(() => {
-    const maxWidth = 240
-    const scale = maxWidth / template.width
-    return {
-      width: maxWidth,
-      height: Math.round(template.height * scale),
-    }
-  }, [template.width, template.height])
+  const [colors, setColors] = useState<ColorsConfig | null>(null)
+  const [typography, setTypography] = useState<TypographyConfig | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
 
-  const { bg, text } = getPreviewStyle(template.type)
+  useEffect(() => {
+    Promise.all([fetchColorsConfig(), fetchTypographyConfig()])
+      .then(([c, t]) => {
+        setColors(c)
+        setTypography(t)
+      })
+  }, [])
+
+  // Calculate preview scale to fit width (target width for tile preview)
+  const targetWidth = 240
+  const previewScale = targetWidth / template.width
+  const previewHeight = Math.round(template.height * previewScale)
 
   return (
-    <button
-      onClick={onToggle}
-      className={`
-        group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200
-        border-2
-        ${isSelected
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg'
-        }
-      `}
-    >
-      {/* Preview area */}
+    <>
       <div
-        className="relative overflow-hidden bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center p-3"
-        style={{ minHeight: previewDimensions.height + 24 }}
+        className={`
+          group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200
+          border-2
+          ${isSelected
+            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
+            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg'
+          }
+        `}
       >
-        {/* Template preview mockup */}
-        <div
-          className={`rounded overflow-hidden shadow-sm flex flex-col ${bg}`}
-          style={{
-            width: previewDimensions.width,
-            height: previewDimensions.height,
-          }}
+        {/* Preview area - click to select */}
+        <button
+          onClick={onToggle}
+          className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50"
+          style={{ height: previewHeight + 24, padding: 12 }}
         >
-          {/* Mini mockup content */}
-          <div className={`flex-1 p-3 flex flex-col justify-between ${text}`}>
-            {/* Top: Logo placeholder */}
-            <div className="flex items-center justify-between">
-              <div className="w-12 h-3 bg-current opacity-20 rounded" />
-              <div className="w-8 h-2 bg-current opacity-10 rounded-full" />
-            </div>
-
-            {/* Middle: Content mockup */}
-            <div className="flex-1 flex flex-col justify-center gap-1.5">
-              <div className="w-3/4 h-2.5 bg-current opacity-25 rounded" />
-              <div className="w-1/2 h-2 bg-current opacity-15 rounded" />
-              {previewDimensions.height > 80 && (
-                <div className="w-2/3 h-1.5 bg-current opacity-10 rounded mt-1" />
-              )}
-            </div>
-
-            {/* Bottom: Icon + CTA mockup */}
-            <div className="flex items-end justify-between">
-              {getTemplateIcon(template.type)}
-              <div className="flex items-center gap-1">
-                <div className="w-8 h-1.5 bg-current opacity-20 rounded" />
-                <div className="w-2 h-2 border border-current opacity-20 rounded-sm" />
+          {/* Scaled template preview */}
+          <div
+            className="rounded overflow-hidden shadow-sm bg-white [&_*]:!text-left"
+            style={{
+              width: targetWidth,
+              height: previewHeight,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {colors && typography ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: template.width,
+                  height: template.height,
+                  transform: `scale(${previewScale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <TemplateRenderer
+                  templateType={template.type as TemplateType}
+                  colors={colors}
+                  typography={typography}
+                  scale={1}
+                />
               </div>
+            ) : (
+              <div
+                className="bg-gray-200 dark:bg-gray-700 animate-pulse rounded"
+                style={{ width: targetWidth, height: previewHeight }}
+              />
+            )}
+          </div>
+
+          {/* Selection checkmark */}
+          {isSelected && (
+            <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-          </div>
-        </div>
+          )}
+        </button>
 
-        {/* Selection checkmark */}
-        {isSelected && (
-          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+        {/* Info area */}
+        <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <span className={`text-sm font-medium truncate block ${
+              isSelected
+                ? 'text-blue-700 dark:text-blue-300'
+                : 'text-gray-900 dark:text-gray-100'
+            }`}>
+              {template.label}
+            </span>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+              {template.dimensions}
+            </span>
           </div>
-        )}
+
+          {/* Preview button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowPreview(true)
+            }}
+            className="flex-shrink-0 px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400
+              hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30
+              rounded transition-colors"
+          >
+            Preview
+          </button>
+        </div>
       </div>
 
-      {/* Info area */}
-      <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800">
-        <div className="flex items-center justify-between gap-2">
-          <span className={`text-sm font-medium truncate ${
-            isSelected
-              ? 'text-blue-700 dark:text-blue-300'
-              : 'text-gray-900 dark:text-gray-100'
-          }`}>
-            {template.label}
-          </span>
-          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono whitespace-nowrap">
-            {template.dimensions}
-          </span>
-        </div>
-      </div>
-    </button>
+      {/* Preview Modal */}
+      {showPreview && colors && typography && (
+        <PreviewModal
+          template={template}
+          colors={colors}
+          typography={typography}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
+    </>
   )
 }
 

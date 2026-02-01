@@ -165,9 +165,9 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
     ],
   },
   {
-    id: 'print',
-    label: 'Print',
-    description: 'Brochures, flyers, and printed materials',
+    id: 'collateral',
+    label: 'Collateral',
+    description: 'Sales and marketing materials',
     subChannels: [],
     comingSoon: true,
   },

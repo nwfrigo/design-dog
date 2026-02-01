@@ -108,15 +108,10 @@ function QuickStartSidebar() {
 export function AssetSelectionScreen() {
   const { selectedAssets, toggleAssetSelection, proceedToEditor } = useStore()
 
-  // Track which subchannels are expanded (all open by default)
-  const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(() => {
-    // Start with all subchannels expanded
-    const allSubChannelIds = new Set<string>()
-    DISTRIBUTION_CHANNELS.forEach(channel => {
-      channel.subChannels.forEach(sub => allSubChannelIds.add(sub.id))
-    })
-    return allSubChannelIds
-  })
+  // Track which subchannels are expanded (only Email open by default)
+  const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(
+    () => new Set(['email'])
+  )
 
   const toggleSubChannel = (subChannelId: string) => {
     setExpandedSubChannels(prev => {
@@ -143,11 +138,8 @@ export function AssetSelectionScreen() {
       <div className="flex-1 pr-0 lg:pr-6">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            Choose Your Assets
-          </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Select the assets you want to create. You&apos;ll enter content once, then customize each asset.
+            Pick any template(s) to get started.
           </p>
         </div>
 
@@ -156,15 +148,12 @@ export function AssetSelectionScreen() {
           {DISTRIBUTION_CHANNELS.map((channel) => (
             <div key={channel.id}>
               {/* Channel header */}
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <div className="flex items-baseline gap-3 mb-4">
+                <h3 className="text-2xl font-light text-gray-400 dark:text-gray-500">
                   {channel.label}
                 </h3>
-                <span className="text-sm text-gray-400 dark:text-gray-500">
-                  {channel.description}
-                </span>
                 {channel.comingSoon && (
-                  <span className="px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
+                  <span className="px-2 py-0.5 text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 rounded-full">
                     Coming soon
                   </span>
                 )}
@@ -174,12 +163,20 @@ export function AssetSelectionScreen() {
               {channel.comingSoon ? (
                 // Coming soon placeholders
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <ComingSoonTile label="Brochure" />
-                  <ComingSoonTile label="Flyer" />
-                  {channel.id === 'events' && (
+                  {channel.id === 'collateral' ? (
+                    <>
+                      <ComingSoonTile label="Solution Overview" />
+                      <ComingSoonTile label="One-Sheeter" />
+                    </>
+                  ) : channel.id === 'events' ? (
                     <>
                       <ComingSoonTile label="Signage" />
                       <ComingSoonTile label="Presentation" />
+                    </>
+                  ) : (
+                    <>
+                      <ComingSoonTile label="Template 1" />
+                      <ComingSoonTile label="Template 2" />
                     </>
                   )}
                 </div>
