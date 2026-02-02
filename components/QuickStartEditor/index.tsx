@@ -159,7 +159,7 @@ export function AutoCreateEditor() {
   }, [verbatimCopy.headline, templateType])
 
   return (
-    <div className="flex h-[calc(100vh-120px)]">
+    <div className="flex gap-6 h-[calc(100vh-120px)]">
       {/* Asset sidebar */}
       <AssetSidebar
         currentAssetId={currentAssetId}

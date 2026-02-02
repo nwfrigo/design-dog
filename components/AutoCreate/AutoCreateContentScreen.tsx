@@ -246,7 +246,7 @@ export function AutoCreateContentScreen() {
           <span className="text-blue-600 dark:text-blue-400 font-medium">{kitConfig?.label || 'Kit'}</span>
         </div>
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-          Add your content
+          Generate Asset Copy with AI
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
           {kitConfig?.contentPrompts.upload || 'Provide content for AI to generate copy from'}
@@ -283,7 +283,7 @@ export function AutoCreateContentScreen() {
               </svg>
             </div>
             <span className="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">
-              Describe it manually
+              Describe with a prompt
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400 text-center">
               I&apos;ll type in the details
@@ -649,12 +649,17 @@ export function AutoCreateContentScreen() {
       {/* Navigation */}
       <div className="flex items-center justify-end mt-10 pt-6 border-t border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-3">
-          <button
-            onClick={handleSkipToAssets}
-            className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-          >
-            Skip ahead to editor
-          </button>
+          <div className="flex flex-col items-end">
+            <button
+              onClick={handleSkipToAssets}
+              className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            >
+              I&apos;ll write it myself
+            </button>
+            <span className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              You can always write with generative AI in the editor, or come back to this stage.
+            </span>
+          </div>
 
           {contentSource.method && (
             <button

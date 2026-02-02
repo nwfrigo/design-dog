@@ -554,7 +554,16 @@ export function EditorScreen() {
               {getAssetLabel(asset, index)}
             </button>
           ))}
-
+          {/* Add Asset Button */}
+          <button
+            onClick={() => setShowAddAssetModal(true)}
+            className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            title="Add asset"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
         </div>
       </div>
 

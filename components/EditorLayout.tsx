@@ -45,8 +45,9 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   const handleLogoClick = () => {
     saveDraft() // Save before leaving
     setShowSaveToast(true)
-    // Navigate after brief delay to show toast
+    // Set screen to select and navigate after brief delay to show toast
     setTimeout(() => {
+      setCurrentScreen('select')
       router.push('/')
     }, 800)
   }
@@ -138,8 +139,10 @@ export function EditorLayout({ children }: EditorLayoutProps) {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto px-6">
-        {children}
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-[1600px] mx-auto px-6 py-6">
+          {children}
+        </div>
       </main>
 
       {/* Save success toast */}

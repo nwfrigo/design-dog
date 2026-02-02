@@ -556,16 +556,36 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
 
   skipToAssetEditor: () => {
-    // Skip content input and go directly to the regular editor flow
+    // Skip content input and go directly to editor with all kit assets
     const state = get()
     const { selectedAssets } = state.autoCreate
     if (selectedAssets.length > 0) {
+      // Create generatedAssets entries so AutoCreateEditor is shown
+      const timestamp = Date.now()
+      const initialAssets: Record<string, GeneratedAsset> = {}
+      selectedAssets.forEach((templateType, i) => {
+        const id = `skip-${timestamp}-${i}`
+        initialAssets[id] = {
+          id,
+          templateType,
+          status: 'complete', // Mark as complete since user will write copy manually
+          error: null,
+          copy: { headline: '', subhead: '', body: '', cta: '' },
+          variations: null,
+          ...getDefaultAssetSettings(),
+        }
+      })
+
       set({
         currentScreen: 'editor',
         selectedAssets: selectedAssets,
         currentAssetIndex: 0,
         templateType: selectedAssets[0],
+        generatedAssets: initialAssets,
       })
+
+      // Save draft so editor page doesn't redirect
+      get().saveDraft()
     }
   },
 
