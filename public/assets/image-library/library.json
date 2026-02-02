@@ -1,10 +1,64 @@
 {
   "images": [
     {
-      "id": "example-1",
-      "url": "/assets/image-library/images/example.jpg",
-      "name": "Example Image",
-      "category": "Nature"
+      "id": "people-01",
+      "url": "/assets/image-library/images/people/01.png",
+      "name": "Person 1",
+      "category": "People"
+    },
+    {
+      "id": "people-02",
+      "url": "/assets/image-library/images/people/02.png",
+      "name": "Person 2",
+      "category": "People"
+    },
+    {
+      "id": "people-03",
+      "url": "/assets/image-library/images/people/03.png",
+      "name": "Person 3",
+      "category": "People"
+    },
+    {
+      "id": "people-04",
+      "url": "/assets/image-library/images/people/04.png",
+      "name": "Person 4",
+      "category": "People"
+    },
+    {
+      "id": "people-05",
+      "url": "/assets/image-library/images/people/05.png",
+      "name": "Person 5",
+      "category": "People"
+    },
+    {
+      "id": "people-06",
+      "url": "/assets/image-library/images/people/06.png",
+      "name": "Person 6",
+      "category": "People"
+    },
+    {
+      "id": "people-07",
+      "url": "/assets/image-library/images/people/07.png",
+      "name": "Person 7",
+      "category": "People"
+    },
+    {
+      "id": "people-08",
+      "url": "/assets/image-library/images/people/08.png",
+      "name": "Person 8",
+      "category": "People"
+    },
+    {
+      "id": "people-09",
+      "url": "/assets/image-library/images/people/09.png",
+      "name": "Person 9",
+      "category": "People"
+    },
+    {
+      "id": "people-10",
+      "url": "/assets/image-library/images/people/10.png",
+      "name": "Person 10",
+      "category": "People"
     }
   ]
 }

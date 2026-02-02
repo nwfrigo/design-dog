@@ -41,7 +41,126 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor'
+
+// Auto-Create Types (formerly Quick Start)
+export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'
+
+// Extracted content from PDF analysis
+export interface ExtractedContent {
+  title?: string
+  mainMessage?: string
+  keyPoints?: string[]
+  targetAudience?: string
+  callToAction?: string
+  dates?: string | null
+  speakers?: string[] | null
+  rawSummary?: string
+}
+
+// User-edited version of extracted content
+export interface EditedContent {
+  title: string
+  mainMessage: string
+  keyPoints: string[]
+  callToAction: string
+}
+
+// Analysis metadata
+export interface AnalysisInfo {
+  fileSizeBytes: number
+  fileSizeMB: string
+  fileFormat: string
+  extracted?: ExtractedContent
+  error?: string
+  errorDetails?: string
+}
+
+export interface ContentSourceState {
+  method: 'upload' | 'manual' | null
+  pdfContent: string | null
+  manualDescription: string
+  manualKeyPoints: string
+  additionalContext: string
+  uploadedFileName: string | null
+  // Persisted analysis state
+  analysisInfo: AnalysisInfo | null
+  editedContent: EditedContent | null
+  editedFields: string[]
+}
+
+export interface AutoCreateState {
+  isWizardOpen: boolean  // Only for modal (kit selection)
+  currentStep: WizardStep
+  selectedKit: import('@/config/kit-configs').KitType | null
+  contentSource: ContentSourceState
+  selectedAssets: TemplateType[]
+  generationProgress: {
+    total: number
+    completed: number
+    failed: string[]
+  }
+}
+
+// Alias for backwards compatibility
+export type QuickStartState = AutoCreateState
+
+export interface GeneratedAsset {
+  id: string
+  templateType: TemplateType
+  status: 'pending' | 'generating' | 'complete' | 'error'
+  error: string | null
+  copy: CopyContent
+  variations: { headlines: string[]; ctas: string[] } | null
+  // Settings from QueuedAsset
+  eyebrow: string
+  solution: string
+  logoColor: 'black' | 'orange' | 'white'
+  showEyebrow: boolean
+  showSubhead: boolean
+  showBody: boolean
+  thumbnailImageUrl: string | null
+  subheading: string
+  showLightHeader: boolean
+  showSubheading: boolean
+  showSolutionSet: boolean
+  showGridDetail2: boolean
+  gridDetail1Text: string
+  gridDetail2Text: string
+  gridDetail3Type: 'data' | 'cta'
+  gridDetail3Text: string
+  gridDetail4Type: 'data' | 'cta'
+  gridDetail4Text: string
+  showRow3: boolean
+  showRow4: boolean
+  metadata: string
+  ctaText: string
+  colorStyle: '1' | '2' | '3' | '4'
+  headingSize: 'S' | 'M' | 'L'
+  alignment: 'left' | 'center'
+  ctaStyle: 'link' | 'button'
+  showMetadata: boolean
+  showCta: boolean
+  layout: 'even' | 'more-image' | 'more-text'
+  newsletterImageSize: 'none' | 'small' | 'large'
+  newsletterImageUrl: string | null
+  speakerCount: 1 | 2 | 3
+  speaker1Name: string
+  speaker1Role: string
+  speaker1ImageUrl: string
+  speaker1ImagePosition: { x: number; y: number }
+  speaker1ImageZoom: number
+  speaker2Name: string
+  speaker2Role: string
+  speaker2ImageUrl: string
+  speaker2ImagePosition: { x: number; y: number }
+  speaker2ImageZoom: number
+  speaker3Name: string
+  speaker3Role: string
+  speaker3ImageUrl: string
+  speaker3ImagePosition: { x: number; y: number }
+  speaker3ImageZoom: number
+}
 
 // Export Queue Types
 export interface QueuedAsset {
@@ -284,4 +403,52 @@ export interface AppState {
   goToEditorWithTemplate: (templateType: TemplateType) => void
   goToQueue: () => void
   reset: () => void
+
+  // Auto-Create state (formerly Quick Start)
+  autoCreate: AutoCreateState
+  generatedAssets: Record<string, GeneratedAsset>
+
+  // Auto-Create wizard actions
+  openAutoCreateWizard: () => void
+  closeAutoCreateWizard: () => void
+  setAutoCreateStep: (step: WizardStep) => void
+  setSelectedKit: (kit: import('@/config/kit-configs').KitType | null) => void
+  setAutoCreateContentSource: (source: Partial<ContentSourceState>) => void
+  setAutoCreateAssets: (assets: TemplateType[]) => void
+  toggleAutoCreateAsset: (asset: TemplateType) => void
+  resetAutoCreate: () => void
+
+  // Auto-Create flow navigation
+  startAutoCreateWithKit: (kit: import('@/config/kit-configs').KitType) => void
+  goToAutoCreateContent: () => void
+  goToAutoCreateAssets: () => void
+  skipToAssetEditor: () => void
+
+  // Auto-Create generation actions
+  startAutoCreateGeneration: () => Promise<void>
+  updateGeneratedAsset: (id: string, updates: Partial<GeneratedAsset>) => void
+  retryFailedAsset: (assetId: string) => Promise<void>
+
+  // Multi-asset editor actions
+  loadGeneratedAssetIntoEditor: (assetId: string) => void
+  saveCurrentAssetState: () => void
+  proceedToAutoCreateEditor: () => void
+  addAllGeneratedToQueue: () => void
+
+  // Backwards compatibility aliases
+  quickStart: AutoCreateState
+  openQuickStartWizard: () => void
+  closeQuickStartWizard: () => void
+  setQuickStartStep: (step: WizardStep) => void
+  setQuickStartContentSource: (source: Partial<ContentSourceState>) => void
+  setQuickStartAssets: (assets: TemplateType[]) => void
+  toggleQuickStartAsset: (asset: TemplateType) => void
+  resetQuickStart: () => void
+  startQuickStartGeneration: () => Promise<void>
+  proceedToQuickStartEditor: () => void
+
+  // Draft persistence
+  saveDraft: () => void
+  loadDraft: () => boolean
+  clearDraft: () => void
 }

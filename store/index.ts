@@ -1,5 +1,9 @@
 import { create } from 'zustand'
-import type { AppState, CopyContent, AppScreen, ContentMode, TemplateType, QueuedAsset } from '@/types'
+import { subscribeWithSelector } from 'zustand/middleware'
+import type { AppState, CopyContent, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset } from '@/types'
+import type { KitType } from '@/config/kit-configs'
+import { KIT_CONFIGS } from '@/config/kit-configs'
+import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
 
 const initialVerbatimCopy: CopyContent = {
   headline: '',
@@ -8,7 +12,82 @@ const initialVerbatimCopy: CopyContent = {
   cta: '',
 }
 
-export const useStore = create<AppState>((set, get) => ({
+const initialContentSource: ContentSourceState = {
+  method: null,
+  pdfContent: null,
+  manualDescription: '',
+  manualKeyPoints: '',
+  additionalContext: '',
+  uploadedFileName: null,
+  analysisInfo: null,
+  editedContent: null,
+  editedFields: [],
+}
+
+const initialAutoCreate: AutoCreateState = {
+  isWizardOpen: false,
+  currentStep: 'kit-selection',
+  selectedKit: null,
+  contentSource: { ...initialContentSource },
+  selectedAssets: [],
+  generationProgress: {
+    total: 0,
+    completed: 0,
+    failed: [],
+  },
+}
+
+const getDefaultAssetSettings = () => ({
+  eyebrow: 'Eyebrow',
+  solution: 'environmental',
+  logoColor: 'black' as const,
+  showEyebrow: true,
+  showSubhead: true,
+  showBody: true,
+  thumbnailImageUrl: null,
+  subheading: '',
+  showLightHeader: true,
+  showSubheading: false,
+  showSolutionSet: true,
+  showGridDetail2: true,
+  gridDetail1Text: 'Date: January 1st, 2026',
+  gridDetail2Text: 'Date: January 1st, 2026',
+  gridDetail3Type: 'cta' as const,
+  gridDetail3Text: 'Responsive',
+  gridDetail4Type: 'cta' as const,
+  gridDetail4Text: 'Join the event',
+  showRow3: true,
+  showRow4: true,
+  metadata: 'Day / Month | 00:00',
+  ctaText: 'Responsive',
+  colorStyle: '1' as const,
+  headingSize: 'L' as const,
+  alignment: 'left' as const,
+  ctaStyle: 'link' as const,
+  showMetadata: true,
+  showCta: true,
+  layout: 'even' as const,
+  newsletterImageSize: 'none' as const,
+  newsletterImageUrl: null,
+  speakerCount: 3 as const,
+  speaker1Name: 'Firstname Lastname',
+  speaker1Role: 'Role, Company',
+  speaker1ImageUrl: '',
+  speaker1ImagePosition: { x: 0, y: 0 },
+  speaker1ImageZoom: 1,
+  speaker2Name: 'Firstname Lastname',
+  speaker2Role: 'Role, Company',
+  speaker2ImageUrl: '',
+  speaker2ImagePosition: { x: 0, y: 0 },
+  speaker2ImageZoom: 1,
+  speaker3Name: 'Firstname Lastname',
+  speaker3Role: 'Role, Company',
+  speaker3ImageUrl: '',
+  speaker3ImagePosition: { x: 0, y: 0 },
+  speaker3ImageZoom: 1,
+})
+
+export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
   // Current screen
   currentScreen: 'select',
 
@@ -96,6 +175,13 @@ export const useStore = create<AppState>((set, get) => ({
 
   // Export queue
   exportQueue: [],
+
+  // Auto-Create state (formerly Quick Start)
+  autoCreate: { ...initialAutoCreate },
+  generatedAssets: {},
+
+  // Backwards compatibility alias
+  get quickStart() { return get().autoCreate },
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => set({ currentScreen: screen }),
@@ -365,6 +451,536 @@ export const useStore = create<AppState>((set, get) => ({
     set({ currentScreen: 'queue' })
   },
 
+  // Auto-Create wizard actions
+  openAutoCreateWizard: () => {
+    set({
+      autoCreate: {
+        ...initialAutoCreate,
+        isWizardOpen: true,
+      },
+    })
+  },
+
+  closeAutoCreateWizard: () => {
+    set((state) => ({
+      autoCreate: {
+        ...state.autoCreate,
+        isWizardOpen: false,
+      },
+    }))
+  },
+
+  setAutoCreateStep: (step: WizardStep) => {
+    set((state) => ({
+      autoCreate: {
+        ...state.autoCreate,
+        currentStep: step,
+      },
+    }))
+  },
+
+  setSelectedKit: (kit: KitType | null) => {
+    const kitConfig = kit ? KIT_CONFIGS[kit] : null
+    set((state) => ({
+      autoCreate: {
+        ...state.autoCreate,
+        selectedKit: kit,
+        selectedAssets: kitConfig?.recommendedAssets || [],
+      },
+    }))
+  },
+
+  setAutoCreateContentSource: (source: Partial<ContentSourceState>) => {
+    set((state) => ({
+      autoCreate: {
+        ...state.autoCreate,
+        contentSource: {
+          ...state.autoCreate.contentSource,
+          ...source,
+        },
+      },
+    }))
+  },
+
+  setAutoCreateAssets: (assets: TemplateType[]) => {
+    set((state) => ({
+      autoCreate: {
+        ...state.autoCreate,
+        selectedAssets: assets,
+      },
+    }))
+  },
+
+  toggleAutoCreateAsset: (asset: TemplateType) => {
+    set((state) => {
+      const { selectedAssets } = state.autoCreate
+      const newAssets = selectedAssets.includes(asset)
+        ? selectedAssets.filter((a) => a !== asset)
+        : [...selectedAssets, asset]
+      return {
+        autoCreate: {
+          ...state.autoCreate,
+          selectedAssets: newAssets,
+        },
+      }
+    })
+  },
+
+  resetAutoCreate: () => {
+    set({
+      autoCreate: { ...initialAutoCreate },
+      generatedAssets: {},
+    })
+  },
+
+  // Auto-Create flow navigation
+  startAutoCreateWithKit: (kit: KitType) => {
+    const kitConfig = KIT_CONFIGS[kit]
+    set({
+      currentScreen: 'auto-create-content',
+      autoCreate: {
+        ...initialAutoCreate,
+        selectedKit: kit,
+        selectedAssets: kitConfig?.recommendedAssets || [],
+        currentStep: 'content-source',
+      },
+    })
+  },
+
+  goToAutoCreateContent: () => {
+    set({ currentScreen: 'auto-create-content' })
+  },
+
+  goToAutoCreateAssets: () => {
+    set({ currentScreen: 'auto-create-assets' })
+  },
+
+  skipToAssetEditor: () => {
+    // Skip content input and go directly to the regular editor flow
+    const state = get()
+    const { selectedAssets } = state.autoCreate
+    if (selectedAssets.length > 0) {
+      set({
+        currentScreen: 'editor',
+        selectedAssets: selectedAssets,
+        currentAssetIndex: 0,
+        templateType: selectedAssets[0],
+      })
+    }
+  },
+
+  // Backwards compatibility aliases
+  openQuickStartWizard: () => get().openAutoCreateWizard(),
+  closeQuickStartWizard: () => get().closeAutoCreateWizard(),
+  setQuickStartStep: (step: WizardStep) => get().setAutoCreateStep(step),
+  setQuickStartContentSource: (source: Partial<ContentSourceState>) => get().setAutoCreateContentSource(source),
+  setQuickStartAssets: (assets: TemplateType[]) => get().setAutoCreateAssets(assets),
+  toggleQuickStartAsset: (asset: TemplateType) => get().toggleAutoCreateAsset(asset),
+  resetQuickStart: () => get().resetAutoCreate(),
+
+  // Auto-Create generation actions
+  startAutoCreateGeneration: async () => {
+    const state = get()
+    const { selectedAssets, contentSource } = state.autoCreate
+
+    if (selectedAssets.length === 0) return
+
+    // Build context from content sources
+    let context = ''
+    if (contentSource.pdfContent) {
+      context += `Document:\n${contentSource.pdfContent}\n\n`
+    }
+    if (contentSource.manualDescription) {
+      context += `Description:\n${contentSource.manualDescription}\n\n`
+    }
+    if (contentSource.manualKeyPoints) {
+      context += `Key points:\n${contentSource.manualKeyPoints}\n\n`
+    }
+    if (contentSource.additionalContext) {
+      context += `Notes:\n${contentSource.additionalContext}\n\n`
+    }
+
+    // Set initial progress
+    set((state) => ({
+      autoCreate: {
+        ...state.autoCreate,
+        currentStep: 'generating',
+        generationProgress: {
+          total: selectedAssets.length,
+          completed: 0,
+          failed: [],
+        },
+      },
+    }))
+
+    // Create initial asset entries
+    const timestamp = Date.now()
+    const assetIds = selectedAssets.map((templateType, i) => `qs-${timestamp}-${i}`)
+
+    const initialAssets: Record<string, GeneratedAsset> = {}
+    selectedAssets.forEach((templateType, i) => {
+      initialAssets[assetIds[i]] = {
+        id: assetIds[i],
+        templateType,
+        status: 'pending',
+        error: null,
+        copy: { headline: '', subhead: '', body: '', cta: '' },
+        variations: null,
+        ...getDefaultAssetSettings(),
+      }
+    })
+    set({ generatedAssets: initialAssets })
+
+    // Fire parallel API calls
+    const results = await Promise.allSettled(
+      selectedAssets.map(async (templateType, i) => {
+        const id = assetIds[i]
+
+        // Mark as generating
+        set((state) => ({
+          generatedAssets: {
+            ...state.generatedAssets,
+            [id]: {
+              ...state.generatedAssets[id],
+              status: 'generating',
+            },
+          },
+        }))
+
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ context }),
+          })
+
+          if (!response.ok) {
+            throw new Error(`Generation failed: ${response.status}`)
+          }
+
+          const data = await response.json()
+
+          // Update asset with generated copy
+          set((state) => ({
+            generatedAssets: {
+              ...state.generatedAssets,
+              [id]: {
+                ...state.generatedAssets[id],
+                status: 'complete',
+                copy: {
+                  headline: data.copy?.headline || '',
+                  subhead: data.copy?.subhead || '',
+                  body: data.copy?.body || '',
+                  cta: data.copy?.cta || '',
+                },
+                variations: data.variations || null,
+              },
+            },
+            quickStart: {
+              ...state.autoCreate,
+              generationProgress: {
+                ...state.autoCreate.generationProgress,
+                completed: state.autoCreate.generationProgress.completed + 1,
+              },
+            },
+          }))
+
+          return { id, success: true }
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+          set((state) => ({
+            generatedAssets: {
+              ...state.generatedAssets,
+              [id]: {
+                ...state.generatedAssets[id],
+                status: 'error',
+                error: errorMessage,
+              },
+            },
+            quickStart: {
+              ...state.autoCreate,
+              generationProgress: {
+                ...state.autoCreate.generationProgress,
+                completed: state.autoCreate.generationProgress.completed + 1,
+                failed: [...state.autoCreate.generationProgress.failed, id],
+              },
+            },
+          }))
+
+          return { id, success: false, error: errorMessage }
+        }
+      })
+    )
+
+    // Mark as complete
+    set((state) => ({
+      autoCreate: {
+        ...state.autoCreate,
+        currentStep: 'complete',
+      },
+    }))
+  },
+
+  updateGeneratedAsset: (id: string, updates: Partial<GeneratedAsset>) => {
+    set((state) => ({
+      generatedAssets: {
+        ...state.generatedAssets,
+        [id]: {
+          ...state.generatedAssets[id],
+          ...updates,
+        },
+      },
+    }))
+  },
+
+  // Multi-asset editor actions
+  loadGeneratedAssetIntoEditor: (assetId: string) => {
+    const state = get()
+    const asset = state.generatedAssets[assetId]
+    if (!asset) return
+
+    set({
+      templateType: asset.templateType,
+      verbatimCopy: { ...asset.copy },
+      eyebrow: asset.eyebrow,
+      solution: asset.solution,
+      logoColor: asset.logoColor,
+      showEyebrow: asset.showEyebrow,
+      showSubhead: asset.showSubhead,
+      showBody: asset.showBody,
+      thumbnailImageUrl: asset.thumbnailImageUrl,
+      subheading: asset.subheading,
+      showLightHeader: asset.showLightHeader,
+      showSubheading: asset.showSubheading,
+      showSolutionSet: asset.showSolutionSet,
+      showGridDetail2: asset.showGridDetail2,
+      gridDetail1Text: asset.gridDetail1Text,
+      gridDetail2Text: asset.gridDetail2Text,
+      gridDetail3Type: asset.gridDetail3Type,
+      gridDetail3Text: asset.gridDetail3Text,
+      gridDetail4Type: asset.gridDetail4Type,
+      gridDetail4Text: asset.gridDetail4Text,
+      showRow3: asset.showRow3,
+      showRow4: asset.showRow4,
+      metadata: asset.metadata,
+      ctaText: asset.ctaText,
+      colorStyle: asset.colorStyle,
+      headingSize: asset.headingSize,
+      alignment: asset.alignment,
+      ctaStyle: asset.ctaStyle,
+      showMetadata: asset.showMetadata,
+      showCta: asset.showCta,
+      layout: asset.layout,
+      newsletterImageSize: asset.newsletterImageSize,
+      newsletterImageUrl: asset.newsletterImageUrl,
+      speakerCount: asset.speakerCount,
+      speaker1Name: asset.speaker1Name,
+      speaker1Role: asset.speaker1Role,
+      speaker1ImageUrl: asset.speaker1ImageUrl,
+      speaker1ImagePosition: asset.speaker1ImagePosition,
+      speaker1ImageZoom: asset.speaker1ImageZoom,
+      speaker2Name: asset.speaker2Name,
+      speaker2Role: asset.speaker2Role,
+      speaker2ImageUrl: asset.speaker2ImageUrl,
+      speaker2ImagePosition: asset.speaker2ImagePosition,
+      speaker2ImageZoom: asset.speaker2ImageZoom,
+      speaker3Name: asset.speaker3Name,
+      speaker3Role: asset.speaker3Role,
+      speaker3ImageUrl: asset.speaker3ImageUrl,
+      speaker3ImagePosition: asset.speaker3ImagePosition,
+      speaker3ImageZoom: asset.speaker3ImageZoom,
+      generatedVariations: asset.variations,
+    })
+  },
+
+  saveCurrentAssetState: () => {
+    // This would be called to save edits back to generatedAssets
+    // Implementation depends on which asset is currently being edited
+  },
+
+  proceedToAutoCreateEditor: () => {
+    const state = get()
+    const assetIds = Object.keys(state.generatedAssets)
+
+    if (assetIds.length > 0) {
+      // Load the first asset into the editor
+      const firstAssetId = assetIds[0]
+      get().loadGeneratedAssetIntoEditor(firstAssetId)
+
+      set({
+        currentScreen: 'auto-create-editor',
+        autoCreate: {
+          ...state.autoCreate,
+          isWizardOpen: false,
+        },
+      })
+    }
+  },
+
+  // Backwards compatibility alias
+  proceedToQuickStartEditor: () => get().proceedToAutoCreateEditor(),
+
+  // Retry a single failed asset
+  retryFailedAsset: async (assetId: string) => {
+    const state = get()
+    const asset = state.generatedAssets[assetId]
+    if (!asset || asset.status !== 'error') return
+
+    const { contentSource } = state.autoCreate
+
+    // Build context
+    let context = ''
+    if (contentSource.pdfContent) {
+      context += `Document:\n${contentSource.pdfContent}\n\n`
+    }
+    if (contentSource.manualDescription) {
+      context += `Description:\n${contentSource.manualDescription}\n\n`
+    }
+    if (contentSource.manualKeyPoints) {
+      context += `Key points:\n${contentSource.manualKeyPoints}\n\n`
+    }
+    if (contentSource.additionalContext) {
+      context += `Notes:\n${contentSource.additionalContext}\n\n`
+    }
+
+    // Mark as generating
+    set((state) => ({
+      generatedAssets: {
+        ...state.generatedAssets,
+        [assetId]: {
+          ...state.generatedAssets[assetId],
+          status: 'generating',
+          error: null,
+        },
+      },
+    }))
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Generation failed: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      // Update asset with generated copy
+      set((state) => ({
+        generatedAssets: {
+          ...state.generatedAssets,
+          [assetId]: {
+            ...state.generatedAssets[assetId],
+            status: 'complete',
+            error: null,
+            copy: {
+              headline: data.copy?.headline || '',
+              subhead: data.copy?.subhead || '',
+              body: data.copy?.body || '',
+              cta: data.copy?.cta || '',
+            },
+            variations: data.variations || null,
+          },
+        },
+        autoCreate: {
+          ...state.autoCreate,
+          generationProgress: {
+            ...state.autoCreate.generationProgress,
+            failed: state.autoCreate.generationProgress.failed.filter(id => id !== assetId),
+          },
+        },
+      }))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      set((state) => ({
+        generatedAssets: {
+          ...state.generatedAssets,
+          [assetId]: {
+            ...state.generatedAssets[assetId],
+            status: 'error',
+            error: errorMessage,
+          },
+        },
+      }))
+    }
+  },
+
+  // Backwards compatibility alias
+  startQuickStartGeneration: async () => get().startAutoCreateGeneration(),
+
+  addAllGeneratedToQueue: () => {
+    const state = get()
+    const newQueueItems: QueuedAsset[] = []
+
+    Object.values(state.generatedAssets).forEach((asset) => {
+      if (asset.status === 'complete') {
+        newQueueItems.push({
+          id: `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          templateType: asset.templateType,
+          headline: asset.copy.headline,
+          subhead: asset.copy.subhead,
+          body: asset.copy.body,
+          eyebrow: asset.eyebrow,
+          solution: asset.solution,
+          logoColor: asset.logoColor,
+          showEyebrow: asset.showEyebrow,
+          showSubhead: asset.showSubhead,
+          showBody: asset.showBody,
+          thumbnailImageUrl: asset.thumbnailImageUrl,
+          subheading: asset.subheading,
+          showLightHeader: asset.showLightHeader,
+          showSubheading: asset.showSubheading,
+          showSolutionSet: asset.showSolutionSet,
+          showGridDetail2: asset.showGridDetail2,
+          gridDetail1Text: asset.gridDetail1Text,
+          gridDetail2Text: asset.gridDetail2Text,
+          gridDetail3Type: asset.gridDetail3Type,
+          gridDetail3Text: asset.gridDetail3Text,
+          gridDetail4Type: asset.gridDetail4Type,
+          gridDetail4Text: asset.gridDetail4Text,
+          showRow3: asset.showRow3,
+          showRow4: asset.showRow4,
+          metadata: asset.metadata,
+          ctaText: asset.ctaText,
+          colorStyle: asset.colorStyle,
+          headingSize: asset.headingSize,
+          alignment: asset.alignment,
+          ctaStyle: asset.ctaStyle,
+          showMetadata: asset.showMetadata,
+          showCta: asset.showCta,
+          layout: asset.layout,
+          newsletterImageSize: asset.newsletterImageSize,
+          newsletterImageUrl: asset.newsletterImageUrl,
+          speakerCount: asset.speakerCount,
+          speaker1Name: asset.speaker1Name,
+          speaker1Role: asset.speaker1Role,
+          speaker1ImageUrl: asset.speaker1ImageUrl,
+          speaker1ImagePosition: asset.speaker1ImagePosition,
+          speaker1ImageZoom: asset.speaker1ImageZoom,
+          speaker2Name: asset.speaker2Name,
+          speaker2Role: asset.speaker2Role,
+          speaker2ImageUrl: asset.speaker2ImageUrl,
+          speaker2ImagePosition: asset.speaker2ImagePosition,
+          speaker2ImageZoom: asset.speaker2ImageZoom,
+          speaker3Name: asset.speaker3Name,
+          speaker3Role: asset.speaker3Role,
+          speaker3ImageUrl: asset.speaker3ImageUrl,
+          speaker3ImagePosition: asset.speaker3ImagePosition,
+          speaker3ImageZoom: asset.speaker3ImageZoom,
+          sourceAssetIndex: 0,
+        })
+      }
+    })
+
+    set((prevState) => ({
+      exportQueue: [...prevState.exportQueue, ...newQueueItems],
+    }))
+  },
+
   reset: () =>
     set({
       currentScreen: 'select',
@@ -432,5 +1048,138 @@ export const useStore = create<AppState>((set, get) => ({
       speaker3ImagePosition: { x: 0, y: 0 },
       speaker3ImageZoom: 1,
       exportQueue: [],
+      // Auto-Create defaults
+      autoCreate: { ...initialAutoCreate },
+      generatedAssets: {},
     }),
-}))
+
+  // Draft persistence actions
+  saveDraft: () => {
+    const state = get()
+    saveDraftToStorage({
+      selectedAssets: state.selectedAssets,
+      currentAssetIndex: state.currentAssetIndex,
+      templateType: state.templateType,
+      verbatimCopy: state.verbatimCopy,
+      generatedAssets: state.generatedAssets,
+      autoCreate: state.autoCreate,
+      exportQueue: state.exportQueue,
+      eyebrow: state.eyebrow,
+      solution: state.solution,
+      logoColor: state.logoColor,
+      showEyebrow: state.showEyebrow,
+      showSubhead: state.showSubhead,
+      showBody: state.showBody,
+      thumbnailImageUrl: state.thumbnailImageUrl,
+      subheading: state.subheading,
+      showLightHeader: state.showLightHeader,
+      showSubheading: state.showSubheading,
+      showSolutionSet: state.showSolutionSet,
+      showGridDetail2: state.showGridDetail2,
+      gridDetail1Text: state.gridDetail1Text,
+      gridDetail2Text: state.gridDetail2Text,
+      gridDetail3Type: state.gridDetail3Type,
+      gridDetail3Text: state.gridDetail3Text,
+      gridDetail4Type: state.gridDetail4Type,
+      gridDetail4Text: state.gridDetail4Text,
+      showRow3: state.showRow3,
+      showRow4: state.showRow4,
+      metadata: state.metadata,
+      ctaText: state.ctaText,
+      colorStyle: state.colorStyle,
+      headingSize: state.headingSize,
+      alignment: state.alignment,
+      ctaStyle: state.ctaStyle,
+      showMetadata: state.showMetadata,
+      showCta: state.showCta,
+      layout: state.layout,
+      newsletterImageSize: state.newsletterImageSize,
+      newsletterImageUrl: state.newsletterImageUrl,
+      speakerCount: state.speakerCount,
+      speaker1Name: state.speaker1Name,
+      speaker1Role: state.speaker1Role,
+      speaker1ImageUrl: state.speaker1ImageUrl,
+      speaker1ImagePosition: state.speaker1ImagePosition,
+      speaker1ImageZoom: state.speaker1ImageZoom,
+      speaker2Name: state.speaker2Name,
+      speaker2Role: state.speaker2Role,
+      speaker2ImageUrl: state.speaker2ImageUrl,
+      speaker2ImagePosition: state.speaker2ImagePosition,
+      speaker2ImageZoom: state.speaker2ImageZoom,
+      speaker3Name: state.speaker3Name,
+      speaker3Role: state.speaker3Role,
+      speaker3ImageUrl: state.speaker3ImageUrl,
+      speaker3ImagePosition: state.speaker3ImagePosition,
+      speaker3ImageZoom: state.speaker3ImageZoom,
+      generatedVariations: state.generatedVariations,
+    })
+  },
+
+  loadDraft: () => {
+    const draft = loadDraftFromStorage()
+    if (!draft) return false
+
+    set({
+      selectedAssets: draft.selectedAssets,
+      currentAssetIndex: draft.currentAssetIndex,
+      templateType: draft.templateType,
+      verbatimCopy: draft.verbatimCopy,
+      generatedAssets: draft.generatedAssets,
+      autoCreate: draft.autoCreate,
+      exportQueue: draft.exportQueue,
+      eyebrow: draft.eyebrow,
+      solution: draft.solution,
+      logoColor: draft.logoColor,
+      showEyebrow: draft.showEyebrow,
+      showSubhead: draft.showSubhead,
+      showBody: draft.showBody,
+      thumbnailImageUrl: draft.thumbnailImageUrl,
+      subheading: draft.subheading,
+      showLightHeader: draft.showLightHeader,
+      showSubheading: draft.showSubheading,
+      showSolutionSet: draft.showSolutionSet,
+      showGridDetail2: draft.showGridDetail2,
+      gridDetail1Text: draft.gridDetail1Text,
+      gridDetail2Text: draft.gridDetail2Text,
+      gridDetail3Type: draft.gridDetail3Type,
+      gridDetail3Text: draft.gridDetail3Text,
+      gridDetail4Type: draft.gridDetail4Type,
+      gridDetail4Text: draft.gridDetail4Text,
+      showRow3: draft.showRow3,
+      showRow4: draft.showRow4,
+      metadata: draft.metadata,
+      ctaText: draft.ctaText,
+      colorStyle: draft.colorStyle,
+      headingSize: draft.headingSize,
+      alignment: draft.alignment,
+      ctaStyle: draft.ctaStyle,
+      showMetadata: draft.showMetadata,
+      showCta: draft.showCta,
+      layout: draft.layout,
+      newsletterImageSize: draft.newsletterImageSize,
+      newsletterImageUrl: draft.newsletterImageUrl,
+      speakerCount: draft.speakerCount,
+      speaker1Name: draft.speaker1Name,
+      speaker1Role: draft.speaker1Role,
+      speaker1ImageUrl: draft.speaker1ImageUrl,
+      speaker1ImagePosition: draft.speaker1ImagePosition,
+      speaker1ImageZoom: draft.speaker1ImageZoom,
+      speaker2Name: draft.speaker2Name,
+      speaker2Role: draft.speaker2Role,
+      speaker2ImageUrl: draft.speaker2ImageUrl,
+      speaker2ImagePosition: draft.speaker2ImagePosition,
+      speaker2ImageZoom: draft.speaker2ImageZoom,
+      speaker3Name: draft.speaker3Name,
+      speaker3Role: draft.speaker3Role,
+      speaker3ImageUrl: draft.speaker3ImageUrl,
+      speaker3ImagePosition: draft.speaker3ImagePosition,
+      speaker3ImageZoom: draft.speaker3ImageZoom,
+      generatedVariations: draft.generatedVariations,
+    })
+    return true
+  },
+
+  clearDraft: () => {
+    clearDraftStorage()
+  },
+})))

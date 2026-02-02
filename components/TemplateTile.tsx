@@ -737,12 +737,6 @@ export function RequestTemplateTile({ channelName }: { channelName: string }) {
           </div>
         </div>
 
-        {/* Info area - matches other tiles */}
-        <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800">
-          <span className="text-sm text-gray-400 dark:text-gray-500">
-            Need something different?
-          </span>
-        </div>
       </button>
 
       {/* Request Modal */}

@@ -69,9 +69,9 @@ export function ExportQueueScreen() {
   const getTemplateName = (type: string) => {
     switch (type) {
       case 'website-thumbnail':
-        return 'Website Thumbnail'
+        return 'Website - eBook Featured Image'
       case 'email-grid':
-        return 'Email Grid'
+        return 'Email - Grid Details'
       default:
         return type
     }
@@ -190,7 +190,7 @@ export function ExportQueueScreen() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-[1600px] mx-auto px-6 py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -200,19 +200,6 @@ export function ExportQueueScreen() {
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {exportQueue.length} {exportQueue.length === 1 ? 'asset' : 'assets'}
           </span>
-
-          {/* New Asset Button - matches breadcrumb style */}
-          <button
-            onClick={() => { setPendingAssets([]); setShowNewAssetModal(true) }}
-            className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-700
-              hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800
-              transition-colors flex items-center gap-1"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Asset
-          </button>
         </div>
 
         {exportQueue.length > 0 && (
@@ -553,7 +540,7 @@ function QueueItem({
         <button
           onClick={onPreview}
           className="relative group flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700
-            hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer"
+            hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer [&_*]:!text-left"
           style={{
             width: dimensions.width * thumbnailScale,
             height: dimensions.height * thumbnailScale

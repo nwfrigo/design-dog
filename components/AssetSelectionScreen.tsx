@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
 import { DISTRIBUTION_CHANNELS, type SubChannelConfig, type TemplateInfo } from '@/lib/template-config'
 import { TemplateTile, ComingSoonTile, RequestTemplateTile } from '@/components/TemplateTile'
+import { QuickStartWizard } from '@/components/QuickStartWizard'
+import { KIT_LIST } from '@/config/kit-configs'
 
 // Icons for subchannel types
 const SubChannelIcon = ({ icon }: { icon: SubChannelConfig['icon'] }) => {
@@ -39,65 +42,94 @@ const SubChannelIcon = ({ icon }: { icon: SubChannelConfig['icon'] }) => {
   }
 }
 
-// QuickStart sidebar placeholder
-function QuickStartSidebar() {
-  const examplePrompts = [
-    "Create a webinar promotion for our safety summit",
-    "Design social posts for a product launch",
-    "Make an email banner for the quarterly newsletter"
-  ]
+// Kit type icons
+function KitIcon({ icon, className }: { icon: string; className?: string }) {
+  const iconClass = className || 'w-5 h-5'
+
+  switch (icon) {
+    case 'video':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      )
+    case 'book':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      )
+    case 'calendar':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    case 'megaphone':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+        </svg>
+      )
+    case 'sparkles':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+        </svg>
+      )
+    default:
+      return null
+  }
+}
+
+// Auto-Create sidebar with kit launcher
+function AutoCreateSidebar() {
+  const { startAutoCreateWithKit } = useStore()
+
+  const handleKitClick = (kitId: string) => {
+    // Go directly to full-page content screen with kit pre-selected
+    startAutoCreateWithKit(kitId as import('@/config/kit-configs').KitType)
+  }
 
   return (
-    <aside className="w-80 flex-shrink-0 bg-gray-50/50 dark:bg-gray-900/50 border-l border-gray-200 dark:border-gray-800 hidden lg:block">
+    <aside className="w-80 flex-shrink-0 border-l border-gray-200 dark:border-gray-800 hidden lg:block">
       <div className="sticky top-0 p-6">
         {/* Header */}
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <h3 className="text-2xl font-light text-gray-900 dark:text-white flex items-center gap-3">
+            <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Quick Start
+            Auto-Create
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Tell us what you need
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Write and design assets for a Promo Kit in just a few clicks
           </p>
         </div>
 
-        {/* Disabled input area */}
-        <div className="relative mb-4">
-          <textarea
-            disabled
-            placeholder="Describe what you want to create..."
-            className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl resize-none cursor-not-allowed opacity-50"
-          />
-          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-gray-100/50 dark:bg-gray-800/50 backdrop-blur-[1px]">
-            <span className="px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm">
-              Coming soon
-            </span>
-          </div>
-        </div>
-
-        {/* Description */}
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
-          Soon: Describe what you want to create and Design Dog will suggest the right asset types and help you build them faster.
-        </p>
-
-        {/* Divider */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
-          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Example prompts</span>
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
-        </div>
-
-        {/* Example prompts */}
+        {/* Kit type quick links */}
         <div className="space-y-2">
-          {examplePrompts.map((prompt, index) => (
-            <div
-              key={index}
-              className="p-3 text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-lg opacity-60"
+          {KIT_LIST.filter(kit => kit.id !== 'custom').map((kit) => (
+            <button
+              key={kit.id}
+              onClick={() => handleKitClick(kit.id)}
+              className="w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-lg hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all group text-left"
             >
-              &ldquo;{prompt}&rdquo;
-            </div>
+              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                <KitIcon icon={kit.icon} className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 block">
+                  {kit.label}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {kit.recommendedAssets.length} assets
+                </span>
+              </div>
+              <svg className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           ))}
         </div>
       </div>
@@ -106,12 +138,25 @@ function QuickStartSidebar() {
 }
 
 export function AssetSelectionScreen() {
-  const { selectedAssets, toggleAssetSelection, proceedToEditor, goToEditorWithTemplate } = useStore()
+  const router = useRouter()
+  const { selectedAssets, toggleAssetSelection, proceedToEditor, goToEditorWithTemplate, saveDraft } = useStore()
 
   // Track which subchannels are expanded (only Email open by default)
   const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(
     () => new Set(['email'])
   )
+
+  const handleNavigateToEditor = (templateType: import('@/types').TemplateType) => {
+    goToEditorWithTemplate(templateType)
+    saveDraft()
+    router.push('/editor')
+  }
+
+  const handleProceedToEditor = () => {
+    proceedToEditor()
+    saveDraft()
+    router.push('/editor')
+  }
 
   const toggleSubChannel = (subChannelId: string) => {
     setExpandedSubChannels(prev => {
@@ -137,7 +182,7 @@ export function AssetSelectionScreen() {
         {/* Header */}
         <div className="mb-8">
           <p className="text-gray-500 dark:text-gray-400">
-            Pick any template(s) to get started.
+            Pick any template(s) to get started, or use Auto-Create to make entire collections at once.
           </p>
         </div>
 
@@ -166,10 +211,10 @@ export function AssetSelectionScreen() {
                       <ComingSoonTile label="Solution Overview" />
                       <ComingSoonTile label="One-Sheeter" />
                     </>
-                  ) : channel.id === 'events' ? (
+                  ) : channel.id === 'community' ? (
                     <>
-                      <ComingSoonTile label="Signage" />
-                      <ComingSoonTile label="Presentation" />
+                      <ComingSoonTile label="User Community Thumbnail" />
+                      <ComingSoonTile label="Academy Video Thumbnail" />
                     </>
                   ) : (
                     <>
@@ -259,7 +304,7 @@ export function AssetSelectionScreen() {
                               template={template}
                               isSelected={selectedAssets.includes(template.type)}
                               onToggle={() => toggleAssetSelection(template.type)}
-                              onNavigateToEditor={() => goToEditorWithTemplate(template.type)}
+                              onNavigateToEditor={() => handleNavigateToEditor(template.type)}
                             />
                           ))}
                           <RequestTemplateTile channelName={subChannel.label} />
@@ -286,7 +331,7 @@ export function AssetSelectionScreen() {
                 </span>
               </div>
               <button
-                onClick={proceedToEditor}
+                onClick={handleProceedToEditor}
                 className="px-8 py-2.5 rounded-lg font-medium transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg"
               >
                 Continue
@@ -297,7 +342,10 @@ export function AssetSelectionScreen() {
       </div>
 
       {/* Right sidebar */}
-      <QuickStartSidebar />
+      <AutoCreateSidebar />
+
+      {/* Auto-Create Wizard Modal */}
+      <QuickStartWizard />
     </div>
   )
 }

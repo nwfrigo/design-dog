@@ -42,21 +42,21 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
   },
   {
     type: 'email-image',
-    label: 'Image Focus',
+    label: 'Image',
     dimensions: '640 × 300px',
     width: 640,
     height: 300,
   },
   {
     type: 'email-dark-gradient',
-    label: 'Dark Gradient',
+    label: 'Dark & Simple',
     dimensions: '640 × 300px',
     width: 640,
     height: 300,
   },
   {
     type: 'email-speakers',
-    label: 'Speakers',
+    label: 'Speakers & Guests',
     dimensions: '640 × 300px',
     width: 640,
     height: 300,
@@ -67,28 +67,28 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
 const SOCIAL_TEMPLATES: TemplateInfo[] = [
   {
     type: 'social-dark-gradient',
-    label: 'Dark Gradient',
+    label: 'Dark & Simple',
     dimensions: '1200 × 628px',
     width: 1200,
     height: 628,
   },
   {
     type: 'social-blue-gradient',
-    label: 'Blue Gradient',
+    label: 'Blue & Colorful',
     dimensions: '1200 × 628px',
     width: 1200,
     height: 628,
   },
   {
     type: 'social-image',
-    label: 'Image Focus',
+    label: 'Image',
     dimensions: '1200 × 628px',
     width: 1200,
     height: 628,
   },
   {
     type: 'social-grid-detail',
-    label: 'Grid Detail',
+    label: 'Grid Details',
     dimensions: '1200 × 628px',
     width: 1200,
     height: 628,
@@ -99,7 +99,7 @@ const SOCIAL_TEMPLATES: TemplateInfo[] = [
 const WEBSITE_TEMPLATES: TemplateInfo[] = [
   {
     type: 'website-thumbnail',
-    label: 'Thumbnail',
+    label: 'eBook Featured Image',
     dimensions: '700 × 434px',
     width: 700,
     height: 434,
@@ -110,21 +110,21 @@ const WEBSITE_TEMPLATES: TemplateInfo[] = [
 const NEWSLETTER_TEMPLATES: TemplateInfo[] = [
   {
     type: 'newsletter-dark-gradient',
-    label: 'Dark Gradient',
+    label: 'Dark & Simple',
     dimensions: '640 × 179px',
     width: 640,
     height: 179,
   },
   {
     type: 'newsletter-blue-gradient',
-    label: 'Blue Gradient',
+    label: 'Blue & Colorful',
     dimensions: '640 × 179px',
     width: 640,
     height: 179,
   },
   {
     type: 'newsletter-light',
-    label: 'Light',
+    label: 'Light & Simple',
     dimensions: '640 × 179px',
     width: 640,
     height: 179,
@@ -140,25 +140,25 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
     subChannels: [
       {
         id: 'email',
-        label: 'Email',
+        label: 'Email Banners',
         icon: 'mail',
         templates: EMAIL_TEMPLATES,
       },
       {
         id: 'social',
-        label: 'Social',
+        label: 'Social Posts',
         icon: 'share',
         templates: SOCIAL_TEMPLATES,
       },
       {
         id: 'website',
-        label: 'Website',
+        label: 'Website Assets',
         icon: 'globe',
         templates: WEBSITE_TEMPLATES,
       },
       {
         id: 'newsletter',
-        label: 'Newsletter',
+        label: 'Newsletter Banners',
         icon: 'newspaper',
         templates: NEWSLETTER_TEMPLATES,
       },
@@ -172,9 +172,9 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
     comingSoon: true,
   },
   {
-    id: 'events',
-    label: 'Events',
-    description: 'Presentations, signage, and event materials',
+    id: 'community',
+    label: 'Community & Academy',
+    description: 'Community engagement and learning materials',
     subChannels: [],
     comingSoon: true,
   },
@@ -184,22 +184,22 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
 export const CHANNELS: ChannelConfig[] = [
   {
     id: 'email',
-    label: 'Email',
+    label: 'Email Banners',
     templates: EMAIL_TEMPLATES.map(t => ({ ...t, label: `Email - ${t.label}` })),
   },
   {
     id: 'social',
-    label: 'Social',
+    label: 'Social Posts',
     templates: SOCIAL_TEMPLATES.map(t => ({ ...t, label: `Social - ${t.label}` })),
   },
   {
     id: 'website',
-    label: 'Website',
-    templates: WEBSITE_TEMPLATES.map(t => ({ ...t, label: `Website ${t.label}` })),
+    label: 'Website Assets',
+    templates: WEBSITE_TEMPLATES.map(t => ({ ...t, label: `Website - ${t.label}` })),
   },
   {
     id: 'newsletter',
-    label: 'Newsletter',
+    label: 'Newsletter Banners',
     templates: NEWSLETTER_TEMPLATES.map(t => ({ ...t, label: `Newsletter - ${t.label}` })),
   },
 ]

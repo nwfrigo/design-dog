@@ -179,6 +179,8 @@ export function EditorScreen() {
     addToQueue,
     exportQueue,
     goToQueue,
+    // Template type fallback
+    templateType,
   } = useStore()
 
   // Brand config state
@@ -211,8 +213,8 @@ export function EditorScreen() {
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
 
-  const currentTemplate = selectedAssets[currentAssetIndex]
-  const dimensions = TEMPLATE_DIMENSIONS[currentTemplate]
+  const currentTemplate = selectedAssets[currentAssetIndex] || templateType
+  const dimensions = TEMPLATE_DIMENSIONS[currentTemplate] || { width: 1200, height: 628 }
 
   // Calculate preview scale for large templates
   const getPreviewScale = () => {
@@ -553,32 +555,7 @@ export function EditorScreen() {
             </button>
           ))}
 
-          {/* Add Asset Tab */}
-          <button
-            onClick={() => { setPendingAssets([]); setShowAddAssetModal(true) }}
-            className="px-3 py-2.5 text-sm font-medium border-transparent text-gray-400 hover:text-gray-600
-              dark:text-gray-500 dark:hover:text-gray-400 transition-colors -ml-px"
-            title="Add Asset"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
         </div>
-
-        {/* Export Queue Button - Right aligned */}
-        <button
-          onClick={goToQueue}
-          className="ml-auto flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600
-            hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-        >
-          Export Queue
-          {exportQueue.length > 0 && (
-            <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-              {exportQueue.length}
-            </span>
-          )}
-        </button>
       </div>
 
       {/* Add Asset Modal */}
