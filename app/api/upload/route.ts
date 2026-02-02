@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     const base64Data = buffer.toString('base64')
 
     // Send PDF to Claude for visual analysis
+    // Note: Using 'as any' because the SDK types don't include 'document' yet, but the API supports it
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
                 media_type: 'application/pdf',
                 data: base64Data,
               },
-            },
+            } as any,
             {
               type: 'text',
               text: `Analyze this PDF document and extract the following information for marketing purposes.
