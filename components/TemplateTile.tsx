@@ -18,6 +18,7 @@ import { SocialGridDetail } from '@/components/templates/SocialGridDetail'
 import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
 import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
+import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
@@ -31,8 +32,8 @@ interface TemplateTileProps {
 
 // Placeholder image URLs for previews - matching what users see in editor
 const PLACEHOLDER_IMAGES = {
-  email: '/assets/images/email-image-placeholder.png',
-  social: '/assets/images/social-image-placeholder.png',
+  default: '/assets/images/default_placeholder_image_1.png',
+  ebook: '/assets/images/safer_is_stronger_sample_page.png',
   speaker1: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
   speaker2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
   speaker3: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop',
@@ -91,7 +92,7 @@ export function TemplateRenderer({
           headline={PREVIEW_CONTENT.headline}
           body={PREVIEW_CONTENT.body}
           ctaText={PREVIEW_CONTENT.cta}
-          imageUrl={PLACEHOLDER_IMAGES.email}
+          imageUrl={PLACEHOLDER_IMAGES.default}
           layout="even"
           solution="safety"
           logoColor="orange"
@@ -194,7 +195,7 @@ export function TemplateRenderer({
           subhead={PREVIEW_CONTENT.subhead}
           metadata=""
           ctaText={PREVIEW_CONTENT.cta}
-          imageUrl={PLACEHOLDER_IMAGES.social}
+          imageUrl={PLACEHOLDER_IMAGES.default}
           layout="even"
           solution="safety"
           logoColor="orange"
@@ -230,15 +231,16 @@ export function TemplateRenderer({
       return (
         <WebsiteThumbnail
           {...commonProps}
-          eyebrow={PREVIEW_CONTENT.eyebrow}
+          eyebrow="EBOOK"
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
-          body={PREVIEW_CONTENT.body}
+          cta="Responsive"
           solution="safety"
-          imageUrl={PLACEHOLDER_IMAGES.social}
+          variant="image"
+          imageUrl={PLACEHOLDER_IMAGES.ebook}
           showEyebrow={true}
           showSubhead={false}
-          showBody={false}
+          showCta={true}
           logoColor="orange"
         />
       )
@@ -253,7 +255,7 @@ export function TemplateRenderer({
           body={PREVIEW_CONTENT.body}
           cta={PREVIEW_CONTENT.cta}
           solution="environmental"
-          imageUrl={PLACEHOLDER_IMAGES.social}
+          imageUrl={PLACEHOLDER_IMAGES.default}
           showEyebrow={true}
           showSubhead={true}
           showBody={true}
@@ -272,16 +274,36 @@ export function TemplateRenderer({
           body={PREVIEW_CONTENT.body}
           cta={PREVIEW_CONTENT.cta}
           solution="safety"
-          variant="image"
-          imageUrl={PLACEHOLDER_IMAGES.social}
+          variant="speakers"
+          imageUrl={PLACEHOLDER_IMAGES.default}
           showEyebrow={true}
           showSubhead={true}
           showBody={true}
           showCta={true}
           speakerCount={3}
-          speaker1={{ name: 'Firstname Lastname', role: 'Role, Company', imageUrl: '', imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
-          speaker2={{ name: 'Firstname Lastname', role: 'Role, Company', imageUrl: '', imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
-          speaker3={{ name: 'Firstname Lastname', role: 'Role, Company', imageUrl: '', imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
+          speaker1={{ name: 'Jane Smith', role: 'CEO, Company', imageUrl: PLACEHOLDER_IMAGES.speaker1, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
+          speaker2={{ name: 'John Doe', role: 'CTO, Company', imageUrl: PLACEHOLDER_IMAGES.speaker2, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
+          speaker3={{ name: 'Alex Chen', role: 'VP Safety', imageUrl: PLACEHOLDER_IMAGES.speaker3, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
+        />
+      )
+
+    case 'website-event-listing':
+      return (
+        <WebsiteEventListing
+          {...commonProps}
+          eyebrow="LIVE EVENT"
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          cta="Join the event"
+          variant="orange"
+          gridDetail1Text="Date: January 15, 2026"
+          gridDetail2Text="Time: 2:00 PM EST"
+          gridDetail3Text="Location: Virtual"
+          gridDetail4Text="Register Now"
+          showRow3={true}
+          showRow4={true}
+          showEyebrow={true}
+          showSubhead={false}
         />
       )
 

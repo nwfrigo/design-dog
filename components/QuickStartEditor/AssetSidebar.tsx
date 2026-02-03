@@ -604,12 +604,13 @@ function AssetPreviewRenderer({
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
           subhead={copy.subhead}
-          body={copy.body}
+          cta={asset.ctaText || 'Responsive'}
           solution={asset.solution}
+          variant={asset.ebookVariant || 'image'}
           imageUrl={asset.thumbnailImageUrl || undefined}
           showEyebrow={asset.showEyebrow}
           showSubhead={asset.showSubhead && !!copy.subhead}
-          showBody={asset.showBody && !!copy.body}
+          showCta={asset.showCta !== false}
           logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
         />
       )
@@ -660,7 +661,7 @@ function AssetPreviewRenderer({
           headline={copy.headline || 'Headline'}
           body={copy.body || 'This is your body copy.'}
           ctaText={asset.ctaText || 'Responsive'}
-          imageUrl={asset.thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
+          imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
           layout={asset.layout || 'even'}
           solution={asset.solution}
           logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
@@ -720,7 +721,7 @@ function AssetPreviewRenderer({
           subhead={copy.subhead || ''}
           metadata={asset.metadata || 'Day / Month | 00:00'}
           ctaText={asset.ctaText || 'Learn More'}
-          imageUrl={asset.thumbnailImageUrl || '/assets/images/social-image-placeholder.png'}
+          imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
           layout={asset.layout || 'even'}
           solution={asset.solution}
           logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}

@@ -5,6 +5,7 @@ import { useStore } from '@/store'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { WebsitePressRelease } from './templates/WebsitePressRelease'
 import { WebsiteWebinar } from './templates/WebsiteWebinar'
+import { WebsiteEventListing } from './templates/WebsiteEventListing'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
@@ -18,6 +19,8 @@ import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
 import { ImageLibraryModal } from './ImageLibraryModal'
 import { TemplateRenderer, PreviewModal } from './TemplateTile'
+import { ZoomableImage } from './ZoomableImage'
+import { ImageCropModal } from './ImageCropModal'
 import type { TemplateInfo } from '@/lib/template-config'
 import {
   fetchColorsConfig,
@@ -79,6 +82,10 @@ export function EditorScreen() {
     // Shared settings
     thumbnailImageUrl,
     setThumbnailImageUrl,
+    // Per-template image settings
+    thumbnailImageSettings,
+    setThumbnailImageSettings,
+    getThumbnailImageSettings,
     eyebrow,
     setEyebrow,
     solution,
@@ -135,6 +142,10 @@ export function EditorScreen() {
     setNewsletterImageSize,
     newsletterImageUrl,
     setNewsletterImageUrl,
+    newsletterImagePosition,
+    setNewsletterImagePosition,
+    newsletterImageZoom,
+    setNewsletterImageZoom,
     // Social Grid Detail specific
     gridDetail4Type,
     setGridDetail4Type,
@@ -186,6 +197,12 @@ export function EditorScreen() {
     setShowSpeaker1,
     setShowSpeaker2,
     setShowSpeaker3,
+    // Website eBook Listing
+    ebookVariant,
+    setEbookVariant,
+    // Website Event Listing
+    eventListingVariant,
+    setEventListingVariant,
     // Queue
     addToQueue,
     exportQueue,
@@ -221,11 +238,20 @@ export function EditorScreen() {
   const [activeSpeakerForImage, setActiveSpeakerForImage] = useState<1 | 2 | 3 | null>(null)
   const [selectingNewsletterImage, setSelectingNewsletterImage] = useState(false)
 
+  // Image crop modal state
+  const [showCropModal, setShowCropModal] = useState(false)
+  const [showNewsletterCropModal, setShowNewsletterCropModal] = useState(false)
+
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
 
   const currentTemplate = selectedAssets[currentAssetIndex] || templateType
   const dimensions = TEMPLATE_DIMENSIONS[currentTemplate] || { width: 1200, height: 628 }
+
+  // Get per-template image settings for the current template
+  const currentImageSettings = getThumbnailImageSettings(currentTemplate)
+  const thumbnailImagePosition = currentImageSettings.position
+  const thumbnailImageZoom = currentImageSettings.zoom
 
   // Calculate preview scale for large templates
   const getPreviewScale = () => {
@@ -303,11 +329,15 @@ export function EditorScreen() {
     if (file) await handleFileUpload(file)
   }, [])
 
-  // Handle image upload for thumbnail
+  // Handle image upload for thumbnail - convert to data URL for export compatibility
   const handleImageUpload = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) return
-    const objectUrl = URL.createObjectURL(file)
-    setThumbnailImageUrl(objectUrl)
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      setThumbnailImageUrl(dataUrl)
+    }
+    reader.readAsDataURL(file)
   }, [setThumbnailImageUrl])
 
   const handleImageDrop = useCallback((e: React.DragEvent) => {
@@ -387,13 +417,31 @@ export function EditorScreen() {
 
       if (currentTemplate === 'website-thumbnail') {
         exportParams.imageUrl = thumbnailImageUrl
+        exportParams.imagePositionX = thumbnailImagePosition.x
+        exportParams.imagePositionY = thumbnailImagePosition.y
+        exportParams.imageZoom = thumbnailImageZoom
+        exportParams.variant = ebookVariant
         exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.showBody = showBody && !!verbatimCopy.body
+        exportParams.showCta = showCta
+        exportParams.ctaText = ctaText
       } else if (currentTemplate === 'website-press-release') {
         exportParams.imageUrl = thumbnailImageUrl
+        exportParams.imagePositionX = thumbnailImagePosition.x
+        exportParams.imagePositionY = thumbnailImagePosition.y
+        exportParams.imageZoom = thumbnailImageZoom
         exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
+        exportParams.ctaText = ctaText
+      } else if (currentTemplate === 'website-event-listing') {
+        exportParams.variant = eventListingVariant
+        exportParams.gridDetail1Text = gridDetail1Text
+        exportParams.gridDetail2Text = gridDetail2Text
+        exportParams.gridDetail3Text = gridDetail3Text
+        exportParams.gridDetail4Text = gridDetail4Text
+        exportParams.showRow3 = showRow3
+        exportParams.showRow4 = showRow4
+        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
         exportParams.ctaText = ctaText
       } else if (currentTemplate === 'email-grid') {
         exportParams.subheading = subheading
@@ -423,7 +471,10 @@ export function EditorScreen() {
       } else if (currentTemplate === 'social-image') {
         exportParams.metadata = metadata
         exportParams.ctaText = ctaText
-        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/social-image-placeholder.png'
+        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'
+        exportParams.imagePositionX = thumbnailImagePosition.x
+        exportParams.imagePositionY = thumbnailImagePosition.y
+        exportParams.imageZoom = thumbnailImageZoom
         exportParams.layout = layout
         exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
         exportParams.showMetadata = showMetadata
@@ -442,7 +493,10 @@ export function EditorScreen() {
         exportParams.showRow4 = showRow4
       } else if (currentTemplate === 'email-image') {
         exportParams.ctaText = ctaText
-        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/email-image-placeholder.png'
+        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'
+        exportParams.imagePositionX = thumbnailImagePosition.x
+        exportParams.imagePositionY = thumbnailImagePosition.y
+        exportParams.imageZoom = thumbnailImageZoom
         exportParams.layout = layout
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
@@ -485,14 +539,20 @@ export function EditorScreen() {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
         exportParams.imageSize = newsletterImageSize
-        exportParams.imageUrl = newsletterImageUrl
+        exportParams.newsletterImageUrl = newsletterImageUrl
+        exportParams.newsletterImagePositionX = newsletterImagePosition.x
+        exportParams.newsletterImagePositionY = newsletterImagePosition.y
+        exportParams.newsletterImageZoom = newsletterImageZoom
         exportParams.showEyebrow = showEyebrow && !!eyebrow
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
       } else if (currentTemplate === 'newsletter-light') {
         exportParams.ctaText = ctaText
         exportParams.imageSize = newsletterImageSize
-        exportParams.imageUrl = newsletterImageUrl
+        exportParams.newsletterImageUrl = newsletterImageUrl
+        exportParams.newsletterImagePositionX = newsletterImagePosition.x
+        exportParams.newsletterImagePositionY = newsletterImagePosition.y
+        exportParams.newsletterImageZoom = newsletterImageZoom
         exportParams.showEyebrow = showEyebrow && !!eyebrow
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
@@ -822,6 +882,56 @@ export function EditorScreen() {
         />
       )}
 
+      {/* Image Crop Modal */}
+      {thumbnailImageUrl && (
+        <ImageCropModal
+          isOpen={showCropModal}
+          onClose={() => setShowCropModal(false)}
+          imageSrc={thumbnailImageUrl}
+          // Frame dimensions based on current template and layout
+          // These match the actual image container dimensions in each template
+          frameWidth={
+            currentTemplate === 'website-thumbnail' ? 320 :
+            currentTemplate === 'email-image' ? (layout === 'even' ? 250 : layout === 'more-image' ? 320 : 180) :
+            currentTemplate === 'social-image' ? (layout === 'even' ? 488 : layout === 'more-image' ? 600 : 376) :
+            currentTemplate === 'website-webinar' ? 333 :
+            currentTemplate === 'website-press-release' ? 545 :
+            320 // default
+          }
+          frameHeight={
+            currentTemplate === 'website-thumbnail' ? 386 :
+            currentTemplate === 'email-image' ? 300 :
+            currentTemplate === 'social-image' ? 628 :
+            currentTemplate === 'website-webinar' ? 450 :
+            currentTemplate === 'website-press-release' ? 343 :
+            300 // default
+          }
+          initialPosition={thumbnailImagePosition}
+          initialZoom={thumbnailImageZoom}
+          onSave={(position, zoom) => {
+            setThumbnailImageSettings(currentTemplate, { position, zoom })
+          }}
+        />
+      )}
+
+      {/* Newsletter Image Crop Modal */}
+      {newsletterImageUrl && (
+        <ImageCropModal
+          isOpen={showNewsletterCropModal}
+          onClose={() => setShowNewsletterCropModal(false)}
+          imageSrc={newsletterImageUrl}
+          // Frame dimensions based on newsletter image size
+          frameWidth={newsletterImageSize === 'small' ? 234 : 317}
+          frameHeight={newsletterImageSize === 'small' ? 132 : 179}
+          initialPosition={newsletterImagePosition}
+          initialZoom={newsletterImageZoom}
+          onSave={(position, zoom) => {
+            setNewsletterImagePosition(position)
+            setNewsletterImageZoom(zoom)
+          }}
+        />
+      )}
+
       <div className="flex gap-8">
         {/* Left: Editor */}
         <div className="w-[340px] flex-shrink-0 space-y-5">
@@ -855,8 +965,8 @@ export function EditorScreen() {
           {/* Template Options */}
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
-              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && (
+              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), Black/Orange for others */}
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -911,8 +1021,8 @@ export function EditorScreen() {
               </div>
               )}
 
-              {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, or Newsletter templates */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light') && (
+              {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, or Website Event Listing */}
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-event-listing') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -1090,46 +1200,86 @@ export function EditorScreen() {
                 {newsletterImageSize !== 'none' && (
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Image</label>
-                    <div
-                      className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 hover:border-gray-400 transition-colors cursor-pointer"
-                      onClick={() => {
-                        const input = document.createElement('input')
-                        input.type = 'file'
-                        input.accept = 'image/*'
-                        input.onchange = (e) => {
-                          const file = (e.target as HTMLInputElement).files?.[0]
-                          if (file) {
-                            const objectUrl = URL.createObjectURL(file)
-                            setNewsletterImageUrl(objectUrl)
-                          }
-                        }
-                        input.click()
-                      }}
-                    >
-                      {newsletterImageUrl ? (
-                        <div className="flex items-center gap-2">
+                    {newsletterImageUrl ? (
+                      <div className="relative">
+                        {/* Image preview - click to adjust */}
+                        <div
+                          onClick={() => setShowNewsletterCropModal(true)}
+                          className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
+                          style={{ width: 240, height: 135 }}
+                        >
                           <img
                             src={newsletterImageUrl}
-                            alt="Preview"
-                            className="w-12 h-12 object-cover rounded"
+                            alt="Selected image"
+                            className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: `${50 - newsletterImagePosition.x}% ${50 - newsletterImagePosition.y}%`,
+                              transform: newsletterImageZoom !== 1 ? `scale(${newsletterImageZoom})` : undefined,
+                            }}
                           />
-                          <span className="text-xs text-gray-500">Click to change</span>
                         </div>
-                      ) : (
-                        <div className="text-center">
-                          <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {/* Adjust button */}
+                        <button
+                          onClick={() => setShowNewsletterCropModal(true)}
+                          className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                        >
+                          Adjust
+                        </button>
+                        {/* Remove button */}
+                        <button
+                          onClick={() => {
+                            setNewsletterImageUrl(null)
+                            setNewsletterImageZoom(1)
+                            setNewsletterImagePosition({ x: 0, y: 0 })
+                          }}
+                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
+                          title="Remove image"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        {/* Upload box */}
+                        <div
+                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                        >
+                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                  const reader = new FileReader()
+                                  reader.onload = () => setNewsletterImageUrl(reader.result as string)
+                                  reader.readAsDataURL(file)
+                                }
+                              }}
+                              className="hidden"
+                            />
+                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Drop or upload
+                          </label>
+                        </div>
+                        {/* Library box */}
+                        <button
+                          onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
+                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
+                            hover:border-gray-400 dark:hover:border-gray-500 transition-colors
+                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                        >
+                          <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <p className="mt-1 text-xs text-gray-500">Click to upload</p>
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                      className="mt-2 w-full text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
-                    >
-                      Or choose from library
-                    </button>
+                          Choose from library
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </>
@@ -1203,46 +1353,86 @@ export function EditorScreen() {
                 {newsletterImageSize !== 'none' && (
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Image</label>
-                    <div
-                      className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 hover:border-gray-400 transition-colors cursor-pointer"
-                      onClick={() => {
-                        const input = document.createElement('input')
-                        input.type = 'file'
-                        input.accept = 'image/*'
-                        input.onchange = (e) => {
-                          const file = (e.target as HTMLInputElement).files?.[0]
-                          if (file) {
-                            const objectUrl = URL.createObjectURL(file)
-                            setNewsletterImageUrl(objectUrl)
-                          }
-                        }
-                        input.click()
-                      }}
-                    >
-                      {newsletterImageUrl ? (
-                        <div className="flex items-center gap-2">
+                    {newsletterImageUrl ? (
+                      <div className="relative">
+                        {/* Image preview - click to adjust */}
+                        <div
+                          onClick={() => setShowNewsletterCropModal(true)}
+                          className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
+                          style={{ width: 240, height: 135 }}
+                        >
                           <img
                             src={newsletterImageUrl}
-                            alt="Preview"
-                            className="w-12 h-12 object-cover rounded"
+                            alt="Selected image"
+                            className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: `${50 - newsletterImagePosition.x}% ${50 - newsletterImagePosition.y}%`,
+                              transform: newsletterImageZoom !== 1 ? `scale(${newsletterImageZoom})` : undefined,
+                            }}
                           />
-                          <span className="text-xs text-gray-500">Click to change</span>
                         </div>
-                      ) : (
-                        <div className="text-center">
-                          <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {/* Adjust button */}
+                        <button
+                          onClick={() => setShowNewsletterCropModal(true)}
+                          className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                        >
+                          Adjust
+                        </button>
+                        {/* Remove button */}
+                        <button
+                          onClick={() => {
+                            setNewsletterImageUrl(null)
+                            setNewsletterImageZoom(1)
+                            setNewsletterImagePosition({ x: 0, y: 0 })
+                          }}
+                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
+                          title="Remove image"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        {/* Upload box */}
+                        <div
+                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                        >
+                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                  const reader = new FileReader()
+                                  reader.onload = () => setNewsletterImageUrl(reader.result as string)
+                                  reader.readAsDataURL(file)
+                                }
+                              }}
+                              className="hidden"
+                            />
+                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Drop or upload
+                          </label>
+                        </div>
+                        {/* Library box */}
+                        <button
+                          onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
+                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
+                            hover:border-gray-400 dark:hover:border-gray-500 transition-colors
+                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                        >
+                          <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <p className="mt-1 text-xs text-gray-500">Click to upload</p>
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                      className="mt-2 w-full text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
-                    >
-                      Or choose from library
-                    </button>
+                          Choose from library
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </>
@@ -1292,46 +1482,86 @@ export function EditorScreen() {
                 {newsletterImageSize !== 'none' && (
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Image</label>
-                    <div
-                      className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 hover:border-gray-400 transition-colors cursor-pointer"
-                      onClick={() => {
-                        const input = document.createElement('input')
-                        input.type = 'file'
-                        input.accept = 'image/*'
-                        input.onchange = (e) => {
-                          const file = (e.target as HTMLInputElement).files?.[0]
-                          if (file) {
-                            const objectUrl = URL.createObjectURL(file)
-                            setNewsletterImageUrl(objectUrl)
-                          }
-                        }
-                        input.click()
-                      }}
-                    >
-                      {newsletterImageUrl ? (
-                        <div className="flex items-center gap-2">
+                    {newsletterImageUrl ? (
+                      <div className="relative">
+                        {/* Image preview - click to adjust */}
+                        <div
+                          onClick={() => setShowNewsletterCropModal(true)}
+                          className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
+                          style={{ width: 240, height: 135 }}
+                        >
                           <img
                             src={newsletterImageUrl}
-                            alt="Preview"
-                            className="w-12 h-12 object-cover rounded"
+                            alt="Selected image"
+                            className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: `${50 - newsletterImagePosition.x}% ${50 - newsletterImagePosition.y}%`,
+                              transform: newsletterImageZoom !== 1 ? `scale(${newsletterImageZoom})` : undefined,
+                            }}
                           />
-                          <span className="text-xs text-gray-500">Click to change</span>
                         </div>
-                      ) : (
-                        <div className="text-center">
-                          <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {/* Adjust button */}
+                        <button
+                          onClick={() => setShowNewsletterCropModal(true)}
+                          className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                        >
+                          Adjust
+                        </button>
+                        {/* Remove button */}
+                        <button
+                          onClick={() => {
+                            setNewsletterImageUrl(null)
+                            setNewsletterImageZoom(1)
+                            setNewsletterImagePosition({ x: 0, y: 0 })
+                          }}
+                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
+                          title="Remove image"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        {/* Upload box */}
+                        <div
+                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                        >
+                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                  const reader = new FileReader()
+                                  reader.onload = () => setNewsletterImageUrl(reader.result as string)
+                                  reader.readAsDataURL(file)
+                                }
+                              }}
+                              className="hidden"
+                            />
+                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Drop or upload
+                          </label>
+                        </div>
+                        {/* Library box */}
+                        <button
+                          onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
+                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
+                            hover:border-gray-400 dark:hover:border-gray-500 transition-colors
+                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                        >
+                          <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <p className="mt-1 text-xs text-gray-500">Click to upload</p>
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                      className="mt-2 w-full text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
-                    >
-                      Or choose from library
-                    </button>
+                          Choose from library
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </>
@@ -1362,6 +1592,31 @@ export function EditorScreen() {
               </div>
             )}
 
+            {/* Website eBook Listing Controls */}
+            {currentTemplate === 'website-thumbnail' && (
+              <div className="space-y-3">
+                {/* Variant */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Layout</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    {(['image', 'none'] as const).map((variant) => (
+                      <button
+                        key={variant}
+                        onClick={() => setEbookVariant(variant)}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                          ebookVariant === variant
+                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {variant === 'image' ? 'Image' : 'None'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Website Webinar Controls */}
             {currentTemplate === 'website-webinar' && (
               <div className="space-y-3">
@@ -1380,6 +1635,31 @@ export function EditorScreen() {
                         }`}
                       >
                         {variant === 'none' ? 'None' : variant === 'image' ? 'Image' : 'Speakers'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Website Event Listing Controls */}
+            {currentTemplate === 'website-event-listing' && (
+              <div className="space-y-3">
+                {/* Variant */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Style</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    {(['orange', 'light', 'dark-gradient'] as const).map((variant) => (
+                      <button
+                        key={variant}
+                        onClick={() => setEventListingVariant(variant)}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                          eventListingVariant === variant
+                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {variant === 'orange' ? 'Orange' : variant === 'light' ? 'Light' : 'Dark'}
                       </button>
                     ))}
                   </div>
@@ -1533,20 +1813,42 @@ export function EditorScreen() {
             )}
 
 
-            {/* Image - Website Thumbnail, Email Image, Social Image, and Website Webinar (image variant) */}
-            {(currentTemplate === 'website-thumbnail' || currentTemplate === 'email-image' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image')) && (
+            {/* Image - Website Thumbnail (image variant), Email Image, Social Image, Website Webinar (image variant), and Website Press Release */}
+            {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release') && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
-                  <div className="relative h-20 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                    <img
-                      src={thumbnailImageUrl}
-                      alt="Selected image"
-                      className="w-full h-full object-cover filter grayscale"
-                    />
+                  <div className="relative">
+                    {/* Image preview - click to adjust */}
+                    <div
+                      onClick={() => setShowCropModal(true)}
+                      className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
+                      style={{ width: 240, height: 135 }}
+                    >
+                      <img
+                        src={thumbnailImageUrl}
+                        alt="Selected image"
+                        className="w-full h-full object-cover"
+                        style={{
+                          objectPosition: `${50 - thumbnailImagePosition.x}% ${50 - thumbnailImagePosition.y}%`,
+                          transform: thumbnailImageZoom !== 1 ? `scale(${thumbnailImageZoom})` : undefined,
+                        }}
+                      />
+                    </div>
+                    {/* Adjust button */}
                     <button
-                      onClick={() => setThumbnailImageUrl(null)}
-                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
+                      onClick={() => setShowCropModal(true)}
+                      className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                    >
+                      Adjust
+                    </button>
+                    {/* Remove button */}
+                    <button
+                      onClick={() => {
+                        setThumbnailImageUrl(null)
+                        setThumbnailImageSettings(currentTemplate, { position: { x: 0, y: 0 }, zoom: 1 })
+                      }}
+                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
                       title="Remove image"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1656,14 +1958,14 @@ export function EditorScreen() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                      {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release') ? 'Subheader' : 'Subhead'}
+                      {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail') ? 'Subheader' : 'Subhead'}
                     </label>
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
                   </div>
                   <textarea
                     value={verbatimCopy.subhead}
                     onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
-                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release') ? 'Subheader text' : 'Supporting subheadline'}
+                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail') ? 'Subheader text' : 'Supporting subheadline'}
                     rows={2}
                     className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
@@ -1694,8 +1996,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* Body - not shown for website-webinar or website-press-release (uses subheader instead) */}
-              {currentTemplate !== 'website-webinar' && currentTemplate !== 'website-press-release' && (
+              {/* Body - not shown for website-webinar, website-press-release, or website-thumbnail (uses subheader instead) */}
+              {currentTemplate !== 'website-webinar' && currentTemplate !== 'website-press-release' && currentTemplate !== 'website-thumbnail' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -1712,6 +2014,28 @@ export function EditorScreen() {
                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                       ${!showBody ? 'opacity-50' : ''}`}
+                  />
+                </div>
+              )}
+
+              {/* CTA Text - Website Webinar and Website Thumbnail (all variants) */}
+              {(currentTemplate === 'website-webinar' || currentTemplate === 'website-thumbnail') && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      CTA Text
+                    </label>
+                    <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                  </div>
+                  <input
+                    type="text"
+                    value={ctaText}
+                    onChange={(e) => setCtaText(e.target.value)}
+                    placeholder="e.g., Responsive"
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                      ${!showCta ? 'opacity-50' : ''}`}
                   />
                 </div>
               )}
@@ -2003,25 +2327,27 @@ export function EditorScreen() {
               {/* Email Speakers and Website Webinar (speakers variant) Content Fields */}
               {(currentTemplate === 'email-speakers' || (currentTemplate === 'website-webinar' && webinarVariant === 'speakers')) && (
                 <div className="space-y-4">
-                  {/* CTA Text */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        CTA Text
-                      </label>
-                      <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                  {/* CTA Text - only for email-speakers (website-webinar has its own CTA section) */}
+                  {currentTemplate === 'email-speakers' && (
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          CTA Text
+                        </label>
+                        <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                      </div>
+                      <input
+                        type="text"
+                        value={ctaText}
+                        onChange={(e) => setCtaText(e.target.value)}
+                        placeholder="e.g., Responsive"
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          ${!showCta ? 'opacity-50' : ''}`}
+                      />
                     </div>
-                    <input
-                      type="text"
-                      value={ctaText}
-                      onChange={(e) => setCtaText(e.target.value)}
-                      placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                        ${!showCta ? 'opacity-50' : ''}`}
-                    />
-                  </div>
+                  )}
 
                   {/* Speaker 1 */}
                   <div className={`p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker1 ? 'opacity-50' : ''}`}>
@@ -2305,6 +2631,102 @@ export function EditorScreen() {
                   </div>
                 </div>
               )}
+
+              {/* Website Event Listing Content Fields */}
+              {currentTemplate === 'website-event-listing' && (
+                <div className="space-y-4">
+                  {/* Subhead */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        Subhead
+                      </label>
+                      <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
+                    </div>
+                    <textarea
+                      value={verbatimCopy.subhead}
+                      onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
+                      placeholder="This is your subheader or description text..."
+                      rows={2}
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
+                        ${!showSubhead ? 'opacity-50' : ''}`}
+                    />
+                  </div>
+
+                  {/* Grid Details */}
+                  <div className="space-y-3">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Grid Details
+                    </label>
+
+                    {/* Row 1 - always visible */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Row 1</label>
+                      <input
+                        type="text"
+                        value={gridDetail1Text}
+                        onChange={(e) => setGridDetail1Text(e.target.value)}
+                        placeholder="Add Details or Hide Me"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Row 2 - hideable */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-gray-400">Row 2</label>
+                        <EyeIcon visible={showRow3} onClick={() => setShowRow3(!showRow3)} />
+                      </div>
+                      <input
+                        type="text"
+                        value={gridDetail2Text}
+                        onChange={(e) => setGridDetail2Text(e.target.value)}
+                        placeholder="Add Details or Hide Me"
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          ${!showRow3 ? 'opacity-50' : ''}`}
+                      />
+                    </div>
+
+                    {/* Row 3 - hideable */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-gray-400">Row 3</label>
+                        <EyeIcon visible={showRow4} onClick={() => setShowRow4(!showRow4)} />
+                      </div>
+                      <input
+                        type="text"
+                        value={gridDetail3Text}
+                        onChange={(e) => setGridDetail3Text(e.target.value)}
+                        placeholder="Add Details or Hide Me"
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          ${!showRow4 ? 'opacity-50' : ''}`}
+                      />
+                    </div>
+
+                    {/* Row 4 (CTA) - always visible */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Row 4 (CTA)</label>
+                      <input
+                        type="text"
+                        value={gridDetail4Text}
+                        onChange={(e) => setGridDetail4Text(e.target.value)}
+                        placeholder="Join the event"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -2529,14 +2951,17 @@ export function EditorScreen() {
               {currentTemplate === 'website-thumbnail' && (
                 <WebsiteThumbnail
                   eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Headline'}
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
                   subhead={verbatimCopy.subhead}
-                  body={verbatimCopy.body}
+                  cta={ctaText || 'Responsive'}
                   solution={solution}
+                  variant={ebookVariant}
                   imageUrl={thumbnailImageUrl || undefined}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
                   showEyebrow={showEyebrow}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
-                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -2552,6 +2977,8 @@ export function EditorScreen() {
                   cta={ctaText || 'Responsive'}
                   solution={solution}
                   imageUrl={thumbnailImageUrl || undefined}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
                   showEyebrow={showEyebrow}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
@@ -2572,6 +2999,8 @@ export function EditorScreen() {
                   solution={solution}
                   variant={webinarVariant}
                   imageUrl={thumbnailImageUrl || undefined}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
                   showEyebrow={showEyebrow}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
@@ -2601,6 +3030,26 @@ export function EditorScreen() {
                   showSpeaker1={showSpeaker1}
                   showSpeaker2={showSpeaker2}
                   showSpeaker3={showSpeaker3}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'website-event-listing' && (
+                <WebsiteEventListing
+                  eyebrow={eyebrow || 'LIVE EVENT'}
+                  headline={verbatimCopy.headline || 'Headline'}
+                  subhead={verbatimCopy.subhead}
+                  cta={ctaText || 'Responsive'}
+                  variant={eventListingVariant}
+                  gridDetail1Text={gridDetail1Text || 'Add Details or Hide Me'}
+                  gridDetail2Text={gridDetail2Text || 'Add Details or Hide Me'}
+                  gridDetail3Text={gridDetail3Text || 'Add Details or Hide Me'}
+                  gridDetail4Text={gridDetail4Text || 'Add Details or Hide Me'}
+                  showRow3={showRow3}
+                  showRow4={showRow4}
+                  showEyebrow={showEyebrow}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -2680,7 +3129,9 @@ export function EditorScreen() {
                   subhead={verbatimCopy.subhead}
                   metadata={metadata}
                   ctaText={ctaText}
-                  imageUrl={thumbnailImageUrl || '/assets/images/social-image-placeholder.png'}
+                  imageUrl={thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
                   layout={layout}
                   solution={solution}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
@@ -2719,7 +3170,9 @@ export function EditorScreen() {
                   headline={verbatimCopy.headline || 'Headline'}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
                   ctaText={ctaText}
-                  imageUrl={thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
+                  imageUrl={thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
                   layout={layout}
                   solution={solution}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
@@ -2759,6 +3212,8 @@ export function EditorScreen() {
                   colorStyle={colorStyle}
                   imageSize={newsletterImageSize}
                   imageUrl={newsletterImageUrl}
+                  imagePosition={newsletterImagePosition}
+                  imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
@@ -2776,6 +3231,8 @@ export function EditorScreen() {
                   colorStyle={colorStyle}
                   imageSize={newsletterImageSize}
                   imageUrl={newsletterImageUrl}
+                  imagePosition={newsletterImagePosition}
+                  imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
@@ -2792,6 +3249,8 @@ export function EditorScreen() {
                   ctaText={ctaText}
                   imageSize={newsletterImageSize}
                   imageUrl={newsletterImageUrl}
+                  imagePosition={newsletterImagePosition}
+                  imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}

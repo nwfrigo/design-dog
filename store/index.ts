@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset } from '@/types'
+import type { AppState, CopyContent, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
@@ -38,22 +38,25 @@ const initialAutoCreate: AutoCreateState = {
 }
 
 const getDefaultAssetSettings = (templateType?: TemplateType) => ({
-  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : 'Eyebrow',
+  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : templateType === 'website-thumbnail' ? 'EBOOK' : templateType === 'website-event-listing' ? 'LIVE EVENT' : 'Eyebrow',
   solution: templateType === 'website-webinar' ? 'safety' : templateType === 'website-press-release' ? 'health' : 'environmental',
   logoColor: templateType === 'website-webinar' ? 'white' as const : 'black' as const,
   showEyebrow: true,
   showSubhead: templateType === 'website-press-release' ? false : true,
   showBody: true,
+  ebookVariant: 'image' as const,
   thumbnailImageUrl: null,
+  thumbnailImagePosition: { x: 0, y: 0 },
+  thumbnailImageZoom: 1,
   subheading: '',
   showLightHeader: true,
   showSubheading: false,
   showSolutionSet: true,
   showGridDetail2: true,
-  gridDetail1Text: 'Date: January 1st, 2026',
-  gridDetail2Text: 'Date: January 1st, 2026',
+  gridDetail1Text: templateType === 'website-event-listing' ? '' : 'Date: January 1st, 2026',
+  gridDetail2Text: templateType === 'website-event-listing' ? '' : 'Date: January 1st, 2026',
   gridDetail3Type: 'cta' as const,
-  gridDetail3Text: 'Responsive',
+  gridDetail3Text: templateType === 'website-event-listing' ? '' : 'Responsive',
   gridDetail4Type: 'cta' as const,
   gridDetail4Text: 'Join the event',
   showRow3: true,
@@ -69,6 +72,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   layout: 'even' as const,
   newsletterImageSize: 'none' as const,
   newsletterImageUrl: null,
+  newsletterImagePosition: { x: 0, y: 0 },
+  newsletterImageZoom: 1,
   speakerCount: 3 as const,
   speaker1Name: 'Firstname Lastname',
   speaker1Role: 'Role, Company',
@@ -90,6 +95,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   showSpeaker1: true,
   showSpeaker2: true,
   showSpeaker3: true,
+  // Website Event Listing specific
+  eventListingVariant: 'orange' as const,
 })
 
 export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
@@ -119,6 +126,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Design settings (shared across assets)
   templateType: 'website-thumbnail',
   thumbnailImageUrl: null,
+  // Per-template image settings (decoupled per template)
+  thumbnailImageSettings: {} as ThumbnailImageSettings,
   eyebrow: 'Eyebrow',
   solution: 'environmental',
   logoColor: 'black',
@@ -159,6 +168,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Newsletter Dark Gradient specific settings
   newsletterImageSize: 'none',
   newsletterImageUrl: null,
+  newsletterImagePosition: { x: 0, y: 0 },
+  newsletterImageZoom: 1,
 
   // Email Speakers specific settings
   speakerCount: 3,
@@ -182,6 +193,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   showSpeaker1: true,
   showSpeaker2: true,
   showSpeaker3: true,
+  // Website eBook Listing specific
+  ebookVariant: 'image',
+  // Website Event Listing specific
+  eventListingVariant: 'orange',
 
   // Export queue
   exportQueue: [],
@@ -206,6 +221,19 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setIsGenerating: (generating: boolean) => set({ isGenerating: generating }),
   setTemplateType: (type: TemplateType) => set({ templateType: type }),
   setThumbnailImageUrl: (url: string | null) => set({ thumbnailImageUrl: url }),
+  // Per-template image settings
+  setThumbnailImageSettings: (templateType: TemplateType, settings: ImageSettings) => {
+    set((state) => ({
+      thumbnailImageSettings: {
+        ...state.thumbnailImageSettings,
+        [templateType]: settings,
+      },
+    }))
+  },
+  getThumbnailImageSettings: (templateType: TemplateType): ImageSettings => {
+    const state = get()
+    return state.thumbnailImageSettings[templateType] ?? { position: { x: 0, y: 0 }, zoom: 1 }
+  },
   setEyebrow: (eyebrow: string) => set({ eyebrow }),
   setSolution: (solution: string) => set({ solution }),
   setLogoColor: (color: 'black' | 'orange' | 'white') => set({ logoColor: color }),
@@ -246,6 +274,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Newsletter Dark Gradient specific actions
   setNewsletterImageSize: (newsletterImageSize: 'none' | 'small' | 'large') => set({ newsletterImageSize }),
   setNewsletterImageUrl: (newsletterImageUrl: string | null) => set({ newsletterImageUrl }),
+  setNewsletterImagePosition: (newsletterImagePosition: { x: number; y: number }) => set({ newsletterImagePosition }),
+  setNewsletterImageZoom: (newsletterImageZoom: number) => set({ newsletterImageZoom }),
 
   // Email Speakers specific actions
   setSpeakerCount: (speakerCount: 1 | 2 | 3) => set({ speakerCount }),
@@ -269,6 +299,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setShowSpeaker1: (showSpeaker1: boolean) => set({ showSpeaker1 }),
   setShowSpeaker2: (showSpeaker2: boolean) => set({ showSpeaker2 }),
   setShowSpeaker3: (showSpeaker3: boolean) => set({ showSpeaker3 }),
+  // Website eBook Listing specific
+  setEbookVariant: (ebookVariant: 'image' | 'none') => set({ ebookVariant }),
+  // Website Event Listing specific
+  setEventListingVariant: (eventListingVariant: 'orange' | 'light' | 'dark-gradient') => set({ eventListingVariant }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -304,17 +338,26 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   // Navigate directly to editor with a single template (for single-click)
   goToEditorWithTemplate: (templateType: TemplateType) => {
+    const defaults = getDefaultAssetSettings(templateType)
     set({
       currentScreen: 'editor',
       selectedAssets: [templateType],
       currentAssetIndex: 0,
       templateType: templateType,
+      // Apply template-specific defaults
+      eyebrow: defaults.eyebrow,
+      gridDetail1Text: defaults.gridDetail1Text,
+      gridDetail2Text: defaults.gridDetail2Text,
+      gridDetail3Text: defaults.gridDetail3Text,
+      gridDetail4Text: defaults.gridDetail4Text,
     })
   },
 
   // Export queue actions
   addToQueue: () => {
     const state = get()
+    // Get per-template image settings
+    const imageSettings = state.thumbnailImageSettings[state.templateType] ?? { position: { x: 0, y: 0 }, zoom: 1 }
     const newAsset: QueuedAsset = {
       id: `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       templateType: state.templateType,
@@ -328,6 +371,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSubhead: state.showSubhead,
       showBody: state.showBody,
       thumbnailImageUrl: state.thumbnailImageUrl,
+      thumbnailImagePosition: imageSettings.position,
+      thumbnailImageZoom: imageSettings.zoom,
       subheading: state.subheading,
       showLightHeader: state.showLightHeader,
       showSubheading: state.showSubheading,
@@ -356,6 +401,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Newsletter Dark Gradient fields
       newsletterImageSize: state.newsletterImageSize,
       newsletterImageUrl: state.newsletterImageUrl,
+      newsletterImagePosition: state.newsletterImagePosition,
+      newsletterImageZoom: state.newsletterImageZoom,
       // Email Speakers fields
       speakerCount: state.speakerCount,
       speaker1Name: state.speaker1Name,
@@ -377,6 +424,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker1: state.showSpeaker1,
       showSpeaker2: state.showSpeaker2,
       showSpeaker3: state.showSpeaker3,
+      ebookVariant: state.ebookVariant,
+      eventListingVariant: state.eventListingVariant,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -392,11 +441,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
 
   editQueuedAsset: (id: string) => {
-    const { exportQueue } = get()
-    const asset = exportQueue.find((a) => a.id === id)
+    const state = get()
+    const asset = state.exportQueue.find((a) => a.id === id)
     if (!asset) return
 
-    // Load the asset's settings into the editor state
+    // Load the asset's settings into the editor state, including per-template image settings
     set({
       currentScreen: 'editor',
       templateType: asset.templateType,
@@ -415,6 +464,14 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSubhead: asset.showSubhead,
       showBody: asset.showBody,
       thumbnailImageUrl: asset.thumbnailImageUrl,
+      // Store per-template image settings
+      thumbnailImageSettings: {
+        ...state.thumbnailImageSettings,
+        [asset.templateType]: {
+          position: asset.thumbnailImagePosition,
+          zoom: asset.thumbnailImageZoom,
+        },
+      },
       subheading: asset.subheading,
       showLightHeader: asset.showLightHeader,
       showSubheading: asset.showSubheading,
@@ -443,6 +500,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Newsletter Dark Gradient fields
       newsletterImageSize: asset.newsletterImageSize,
       newsletterImageUrl: asset.newsletterImageUrl,
+      newsletterImagePosition: asset.newsletterImagePosition,
+      newsletterImageZoom: asset.newsletterImageZoom,
       // Email Speakers fields
       speakerCount: asset.speakerCount,
       speaker1Name: asset.speaker1Name,
@@ -461,10 +520,12 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImagePosition: asset.speaker3ImagePosition,
       speaker3ImageZoom: asset.speaker3ImageZoom,
       webinarVariant: asset.webinarVariant,
+      ebookVariant: asset.ebookVariant,
+      eventListingVariant: asset.eventListingVariant,
     })
 
     // Remove the asset from queue since it's being edited
-    set({ exportQueue: exportQueue.filter((a) => a.id !== id) })
+    set({ exportQueue: state.exportQueue.filter((a) => a.id !== id) })
   },
 
   goToQueue: () => {
@@ -790,6 +851,14 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSubhead: asset.showSubhead,
       showBody: asset.showBody,
       thumbnailImageUrl: asset.thumbnailImageUrl,
+      // Store per-template image settings
+      thumbnailImageSettings: {
+        ...state.thumbnailImageSettings,
+        [asset.templateType]: {
+          position: asset.thumbnailImagePosition,
+          zoom: asset.thumbnailImageZoom,
+        },
+      },
       subheading: asset.subheading,
       showLightHeader: asset.showLightHeader,
       showSubheading: asset.showSubheading,
@@ -814,6 +883,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       layout: asset.layout,
       newsletterImageSize: asset.newsletterImageSize,
       newsletterImageUrl: asset.newsletterImageUrl,
+      newsletterImagePosition: asset.newsletterImagePosition,
+      newsletterImageZoom: asset.newsletterImageZoom,
       speakerCount: asset.speakerCount,
       speaker1Name: asset.speaker1Name,
       speaker1Role: asset.speaker1Role,
@@ -831,6 +902,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImagePosition: asset.speaker3ImagePosition,
       speaker3ImageZoom: asset.speaker3ImageZoom,
       webinarVariant: asset.webinarVariant,
+      ebookVariant: asset.ebookVariant,
+      eventListingVariant: asset.eventListingVariant,
       generatedVariations: asset.variations,
     })
   },
@@ -1072,6 +1145,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           showSubhead: asset.showSubhead,
           showBody: asset.showBody,
           thumbnailImageUrl: asset.thumbnailImageUrl,
+          thumbnailImagePosition: asset.thumbnailImagePosition,
+          thumbnailImageZoom: asset.thumbnailImageZoom,
           subheading: asset.subheading,
           showLightHeader: asset.showLightHeader,
           showSubheading: asset.showSubheading,
@@ -1096,6 +1171,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           layout: asset.layout,
           newsletterImageSize: asset.newsletterImageSize,
           newsletterImageUrl: asset.newsletterImageUrl,
+          newsletterImagePosition: asset.newsletterImagePosition,
+          newsletterImageZoom: asset.newsletterImageZoom,
           speakerCount: asset.speakerCount,
           speaker1Name: asset.speaker1Name,
           speaker1Role: asset.speaker1Role,
@@ -1116,6 +1193,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           showSpeaker1: asset.showSpeaker1,
           showSpeaker2: asset.showSpeaker2,
           showSpeaker3: asset.showSpeaker3,
+          ebookVariant: asset.ebookVariant,
+          eventListingVariant: asset.eventListingVariant,
           sourceAssetIndex: 0,
         })
       }
@@ -1141,6 +1220,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       currentAssetIndex: 0,
       templateType: 'website-thumbnail',
       thumbnailImageUrl: null,
+      thumbnailImageSettings: {},
       eyebrow: 'Eyebrow',
       solution: 'environmental',
       logoColor: 'black',
@@ -1175,6 +1255,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Newsletter Dark Gradient defaults
       newsletterImageSize: 'none',
       newsletterImageUrl: null,
+      newsletterImagePosition: { x: 0, y: 0 },
+      newsletterImageZoom: 1,
       // Email Speakers defaults
       speakerCount: 3,
       speaker1Name: 'Firstname Lastname',
@@ -1196,6 +1278,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker1: true,
       showSpeaker2: true,
       showSpeaker3: true,
+      ebookVariant: 'image',
+      eventListingVariant: 'orange',
       exportQueue: [],
       // Auto-Create defaults
       autoCreate: { ...initialAutoCreate },
@@ -1220,6 +1304,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSubhead: state.showSubhead,
       showBody: state.showBody,
       thumbnailImageUrl: state.thumbnailImageUrl,
+      thumbnailImageSettings: state.thumbnailImageSettings,
       subheading: state.subheading,
       showLightHeader: state.showLightHeader,
       showSubheading: state.showSubheading,
@@ -1244,6 +1329,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       layout: state.layout,
       newsletterImageSize: state.newsletterImageSize,
       newsletterImageUrl: state.newsletterImageUrl,
+      newsletterImagePosition: state.newsletterImagePosition,
+      newsletterImageZoom: state.newsletterImageZoom,
       speakerCount: state.speakerCount,
       speaker1Name: state.speaker1Name,
       speaker1Role: state.speaker1Role,
@@ -1264,6 +1351,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker1: state.showSpeaker1,
       showSpeaker2: state.showSpeaker2,
       showSpeaker3: state.showSpeaker3,
+      ebookVariant: state.ebookVariant,
+      eventListingVariant: state.eventListingVariant,
       generatedVariations: state.generatedVariations,
     })
   },
@@ -1287,6 +1376,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSubhead: draft.showSubhead,
       showBody: draft.showBody,
       thumbnailImageUrl: draft.thumbnailImageUrl,
+      thumbnailImageSettings: draft.thumbnailImageSettings ?? {},
       subheading: draft.subheading,
       showLightHeader: draft.showLightHeader,
       showSubheading: draft.showSubheading,
@@ -1311,6 +1401,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       layout: draft.layout,
       newsletterImageSize: draft.newsletterImageSize,
       newsletterImageUrl: draft.newsletterImageUrl,
+      newsletterImagePosition: draft.newsletterImagePosition,
+      newsletterImageZoom: draft.newsletterImageZoom,
       speakerCount: draft.speakerCount,
       speaker1Name: draft.speaker1Name,
       speaker1Role: draft.speaker1Role,
@@ -1331,6 +1423,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker1: draft.showSpeaker1 ?? true,
       showSpeaker2: draft.showSpeaker2 ?? true,
       showSpeaker3: draft.showSpeaker3 ?? true,
+      ebookVariant: draft.ebookVariant ?? 'image',
+      eventListingVariant: draft.eventListingVariant ?? 'orange',
       generatedVariations: draft.generatedVariations,
     })
     return true

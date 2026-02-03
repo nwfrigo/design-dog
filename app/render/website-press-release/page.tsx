@@ -19,6 +19,9 @@ export default function RenderPage({
   const cta = (searchParams.ctaText as string) || (searchParams.cta as string) || 'Responsive'
   const solution = (searchParams.solution as string) || 'health'
   const imageUrl = (searchParams.imageUrl as string) || '/placeholder-mountain.jpg'
+  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
+  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
+  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
   const showEyebrow = searchParams.showEyebrow !== 'false'
   const showSubhead = searchParams.showSubhead === 'true'
   const showBody = searchParams.showBody === 'true'
@@ -43,6 +46,8 @@ export default function RenderPage({
           cta={cta}
           solution={solution}
           imageUrl={imageUrl}
+          imagePosition={{ x: imagePositionX, y: imagePositionY }}
+          imageZoom={imageZoom}
           showEyebrow={showEyebrow}
           showSubhead={showSubhead}
           showBody={showBody}

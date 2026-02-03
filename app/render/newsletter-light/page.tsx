@@ -19,6 +19,9 @@ export default function RenderPage({
   const ctaText = (searchParams.ctaText as string) || 'Responsive'
   const imageSize = ((searchParams.imageSize as string) || 'none') as 'none' | 'small' | 'large'
   const imageUrl = (searchParams.imageUrl as string) || null
+  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
+  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
+  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
   const showEyebrow = searchParams.showEyebrow !== 'false'
   const showBody = searchParams.showBody !== 'false'
   const showCta = searchParams.showCta !== 'false'
@@ -40,6 +43,8 @@ export default function RenderPage({
           ctaText={ctaText}
           imageSize={imageSize}
           imageUrl={imageUrl}
+          imagePosition={{ x: imagePositionX, y: imagePositionY }}
+          imageZoom={imageZoom}
           showEyebrow={showEyebrow}
           showBody={showBody}
           showCta={showCta}

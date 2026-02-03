@@ -20,6 +20,9 @@ export default function RenderPage({
   const colorStyle = ((searchParams.colorStyle as string) || '1') as '1' | '2' | '3' | '4'
   const imageSize = ((searchParams.imageSize as string) || 'none') as 'none' | 'small' | 'large'
   const imageUrl = (searchParams.imageUrl as string) || null
+  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
+  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
+  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
   const showEyebrow = searchParams.showEyebrow !== 'false'
   const showBody = searchParams.showBody !== 'false'
   const showCta = searchParams.showCta !== 'false'
@@ -42,6 +45,8 @@ export default function RenderPage({
           colorStyle={colorStyle}
           imageSize={imageSize}
           imageUrl={imageUrl}
+          imagePosition={{ x: imagePositionX, y: imagePositionY }}
+          imageZoom={imageZoom}
           showEyebrow={showEyebrow}
           showBody={showBody}
           showCta={showCta}

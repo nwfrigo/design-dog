@@ -12,6 +12,8 @@ interface Props {
   colorStyle: '1' | '2' | '3' | '4'
   imageSize: 'none' | 'small' | 'large'
   imageUrl: string | null
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showBody: boolean
   showCta: boolean
@@ -48,6 +50,8 @@ export function NewsletterDarkGradientRender(props: Props) {
         colorStyle={props.colorStyle}
         imageSize={props.imageSize}
         imageUrl={props.imageUrl}
+        imagePosition={props.imagePosition}
+        imageZoom={props.imageZoom}
         showEyebrow={props.showEyebrow}
         showBody={props.showBody}
         showCta={props.showCta}

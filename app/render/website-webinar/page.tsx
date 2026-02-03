@@ -21,6 +21,9 @@ export default function RenderPage({
   const solution = (searchParams.solution as string) || 'safety'
   const variant = ((searchParams.variant as string) || 'image') as 'none' | 'image' | 'speakers'
   const imageUrl = (searchParams.imageUrl as string) || undefined
+  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
+  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
+  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
   const showEyebrow = searchParams.showEyebrow !== 'false'
   const showSubhead = searchParams.showSubhead === 'true'
   const showBody = searchParams.showBody === 'true'
@@ -75,6 +78,8 @@ export default function RenderPage({
           solution={solution}
           variant={variant}
           imageUrl={imageUrl}
+          imagePosition={{ x: imagePositionX, y: imagePositionY }}
+          imageZoom={imageZoom}
           showEyebrow={showEyebrow}
           showSubhead={showSubhead}
           showBody={showBody}

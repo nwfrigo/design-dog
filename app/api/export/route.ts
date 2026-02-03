@@ -55,7 +55,7 @@ async function getBrowser() {
 
 // Template dimensions
 const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
-  'website-thumbnail': { width: 700, height: 434 },
+  'website-thumbnail': { width: 800, height: 450 },
   'website-press-release': { width: 800, height: 450 },
   'website-webinar': { width: 800, height: 450 },
   'email-grid': { width: 640, height: 300 },
@@ -89,6 +89,10 @@ export async function POST(request: NextRequest) {
       showBody,
       // Website thumbnail specific
       imageUrl,
+      imagePositionX,
+      imagePositionY,
+      imageZoom,
+      ebookVariant,
       // Email grid specific
       subheading,
       showLightHeader,
@@ -157,7 +161,16 @@ export async function POST(request: NextRequest) {
     if (showBody !== undefined) params.set('showBody', String(showBody))
 
     // Website thumbnail specific
-    if (imageUrl) params.set('imageUrl', imageUrl)
+    // Only pass imageUrl via query params if it's a regular URL (not a data URL or blob URL)
+    // Data URLs are too large for query params and will be injected via Puppeteer
+    // Blob URLs are inaccessible to Puppeteer (different browser context)
+    if (imageUrl && !imageUrl.startsWith('data:') && !imageUrl.startsWith('blob:')) {
+      params.set('imageUrl', imageUrl)
+    }
+    if (imagePositionX !== undefined) params.set('imagePositionX', String(imagePositionX))
+    if (imagePositionY !== undefined) params.set('imagePositionY', String(imagePositionY))
+    if (imageZoom !== undefined) params.set('imageZoom', String(imageZoom))
+    if (ebookVariant) params.set('variant', ebookVariant)
 
     // Email grid specific
     if (subheading) params.set('subheading', subheading)
@@ -215,6 +228,13 @@ export async function POST(request: NextRequest) {
 
     // Newsletter specific
     if (imageSize) params.set('imageSize', imageSize)
+    // For newsletter templates, pass newsletterImageUrl as imageUrl (for non-data URLs)
+    if (body.newsletterImageUrl && !body.newsletterImageUrl.startsWith('data:') && !body.newsletterImageUrl.startsWith('blob:')) {
+      params.set('imageUrl', body.newsletterImageUrl)
+    }
+    if (body.newsletterImagePositionX !== undefined) params.set('imagePositionX', String(body.newsletterImagePositionX))
+    if (body.newsletterImagePositionY !== undefined) params.set('imagePositionY', String(body.newsletterImagePositionY))
+    if (body.newsletterImageZoom !== undefined) params.set('imageZoom', String(body.newsletterImageZoom))
 
     // Website webinar specific
     if (body.variant) params.set('variant', body.variant)
@@ -259,6 +279,65 @@ export async function POST(request: NextRequest) {
       const pageContent = await page.content()
       console.error('Page content at timeout:', pageContent.substring(0, 1000))
       throw waitError
+    }
+
+    // Inject image data if provided (data URLs are too large for query params)
+    // Helper function to inject a single image
+    const injectDataUrlImage = async (dataUrl: string, selector: string) => {
+      console.log(`Injecting data URL image for ${selector}, length:`, dataUrl.length)
+      const injected = await page.evaluate((imgSrc: string, sel: string) => {
+        const img = document.querySelector(sel) as HTMLImageElement
+        if (!img) {
+          console.log(`No image found for selector: ${sel}`)
+          return false
+        }
+
+        return new Promise<boolean>((resolve) => {
+          img.onload = () => {
+            console.log(`Image loaded successfully for ${sel}`)
+            resolve(true)
+          }
+          img.onerror = (e) => {
+            console.log(`Image load error for ${sel}:`, e)
+            resolve(false)
+          }
+          img.src = imgSrc
+          // Fallback timeout in case onload doesn't fire (data URLs load synchronously sometimes)
+          setTimeout(() => resolve(true), 500)
+        })
+      }, dataUrl, selector)
+      console.log(`Image injection result for ${selector}:`, injected)
+      return injected
+    }
+
+    // Inject main image (thumbnailImageUrl)
+    if (imageUrl && imageUrl.startsWith('data:')) {
+      await injectDataUrlImage(imageUrl, 'img[data-export-image="true"]')
+    }
+
+    // Inject speaker images
+    if (body.speaker1ImageUrl && body.speaker1ImageUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.speaker1ImageUrl, 'img[data-speaker="1"]')
+    }
+    if (body.speaker2ImageUrl && body.speaker2ImageUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.speaker2ImageUrl, 'img[data-speaker="2"]')
+    }
+    if (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.speaker3ImageUrl, 'img[data-speaker="3"]')
+    }
+
+    // Inject newsletter image
+    if (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.newsletterImageUrl, 'img[data-newsletter-image="true"]')
+    }
+
+    // Additional delay for rendering
+    if ((imageUrl && imageUrl.startsWith('data:')) ||
+        (body.speaker1ImageUrl && body.speaker1ImageUrl.startsWith('data:')) ||
+        (body.speaker2ImageUrl && body.speaker2ImageUrl.startsWith('data:')) ||
+        (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) ||
+        (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:'))) {
+      await new Promise(resolve => setTimeout(resolve, 300))
     }
 
     // Hide any Next.js dev error overlays that might appear

@@ -10,6 +10,8 @@ interface Props {
   metadata: string
   ctaText: string
   imageUrl: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   layout: 'even' | 'more-image' | 'more-text'
   solution: string
   logoColor: 'black' | 'orange'
@@ -48,6 +50,8 @@ export function SocialImageRender(props: Props) {
         metadata={props.metadata}
         ctaText={props.ctaText}
         imageUrl={props.imageUrl}
+        imagePosition={props.imagePosition}
+        imageZoom={props.imageZoom}
         layout={props.layout}
         solution={props.solution}
         logoColor={props.logoColor}

@@ -1,36 +1,28 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { WebsiteWebinar, type WebinarSpeakerInfo, type WebinarVariant } from '@/components/templates/WebsiteWebinar'
+import { WebsiteEventListing, type EventListingVariant } from '@/components/templates/WebsiteEventListing'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
 interface Props {
   eyebrow: string
   headline: string
   subhead: string
-  body: string
   cta: string
-  solution: string
-  variant: WebinarVariant
-  imageUrl?: string
-  imagePosition?: { x: number; y: number }
-  imageZoom?: number
+  variant: EventListingVariant
+  gridDetail1Text: string
+  gridDetail2Text: string
+  gridDetail3Text: string
+  gridDetail4Text: string
+  showRow3: boolean
+  showRow4: boolean
   showEyebrow: boolean
   showSubhead: boolean
-  showBody: boolean
-  showCta: boolean
-  speakerCount: 1 | 2 | 3
-  speaker1: WebinarSpeakerInfo
-  speaker2: WebinarSpeakerInfo
-  speaker3: WebinarSpeakerInfo
-  showSpeaker1: boolean
-  showSpeaker2: boolean
-  showSpeaker3: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
 
-export function WebsiteWebinarRender(props: Props) {
+export function WebsiteEventListingRender(props: Props) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -51,28 +43,20 @@ export function WebsiteWebinarRender(props: Props) {
   return (
     <>
       {ready && <div id="render-ready" style={{ display: 'none' }} />}
-      <WebsiteWebinar
+      <WebsiteEventListing
         eyebrow={props.eyebrow}
         headline={props.headline}
         subhead={props.subhead}
-        body={props.body}
         cta={props.cta}
-        solution={props.solution}
         variant={props.variant}
-        imageUrl={props.imageUrl}
-        imagePosition={props.imagePosition}
-        imageZoom={props.imageZoom}
+        gridDetail1Text={props.gridDetail1Text}
+        gridDetail2Text={props.gridDetail2Text}
+        gridDetail3Text={props.gridDetail3Text}
+        gridDetail4Text={props.gridDetail4Text}
+        showRow3={props.showRow3}
+        showRow4={props.showRow4}
         showEyebrow={props.showEyebrow}
         showSubhead={props.showSubhead}
-        showBody={props.showBody}
-        showCta={props.showCta}
-        speakerCount={props.speakerCount}
-        speaker1={props.speaker1}
-        speaker2={props.speaker2}
-        speaker3={props.speaker3}
-        showSpeaker1={props.showSpeaker1}
-        showSpeaker2={props.showSpeaker2}
-        showSpeaker3={props.showSpeaker3}
         colors={props.colors}
         typography={props.typography}
         scale={1}

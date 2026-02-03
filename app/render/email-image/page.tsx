@@ -16,7 +16,10 @@ export default function RenderPage({
   const headline = (searchParams.headline as string) || 'Headline'
   const body = (searchParams.body as string) || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'
   const ctaText = (searchParams.ctaText as string) || 'Responsive'
-  const imageUrl = (searchParams.imageUrl as string) || '/assets/images/email-image-placeholder.png'
+  const imageUrl = (searchParams.imageUrl as string) || '/assets/images/default_placeholder_image_1.png'
+  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
+  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
+  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
   const layout = ((searchParams.layout as string) || 'even') as 'even' | 'more-image' | 'more-text'
   const solution = (searchParams.solution as string) || 'environmental'
   const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
@@ -39,6 +42,8 @@ export default function RenderPage({
           body={body}
           ctaText={ctaText}
           imageUrl={imageUrl}
+          imagePosition={{ x: imagePositionX, y: imagePositionY }}
+          imageZoom={imageZoom}
           layout={layout}
           solution={solution}
           logoColor={logoColor}

@@ -48,6 +48,8 @@ export interface SocialImageProps {
   metadata: string
   ctaText: string
   imageUrl: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   layout: LayoutVariant
   solution: string
   logoColor: 'black' | 'orange'
@@ -73,6 +75,8 @@ export function SocialImage({
   metadata,
   ctaText,
   imageUrl,
+  imagePosition = { x: 0, y: 0 },
+  imageZoom = 1,
   layout,
   solution,
   logoColor,
@@ -262,10 +266,16 @@ export function SocialImage({
         <img
           src={grayscaleImageUrl || imageUrl}
           alt=""
+          data-export-image="true"
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+            transform: imageZoom !== 1
+              ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
+              : undefined,
+            transformOrigin: 'center',
             filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
           }}
         />

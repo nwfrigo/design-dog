@@ -1,13 +1,11 @@
 'use client'
 
-import { CSSProperties, useState, useEffect } from 'react'
+import { CSSProperties } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
 // Inline SVG logo for export compatibility
-// Using explicit width/height attributes (not just style) for html2canvas compatibility
 const CorityLogo = ({ fill = '#000000', height = 28 }: { fill?: string; height?: number }) => {
-  // Calculate width based on aspect ratio (383.8 / 128.41 ≈ 2.988)
-  const width = Math.round(height * 2.988)
+  const width = Math.round(height * 3.062)
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -29,16 +27,75 @@ const CorityLogo = ({ fill = '#000000', height = 28 }: { fill?: string; height?:
   )
 }
 
+// Arrow icon for CTA
+const ArrowIcon = ({ color = '#060015' }: { color?: string }) => (
+  <svg width="17" height="14" viewBox="0 0 17 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 1L16 7M16 7L10 13M16 7H1" stroke={color} strokeWidth="1.17" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+// Simple zoom/pan image component
+function ZoomPanImage({
+  src,
+  containerWidth,
+  containerHeight,
+  position,
+  zoom,
+}: {
+  src: string
+  containerWidth: number
+  containerHeight: number
+  position: { x: number; y: number }
+  zoom: number
+}) {
+  return (
+    <div
+      style={{
+        width: containerWidth,
+        height: containerHeight,
+        borderRadius: 10,
+        border: '1px solid #D9D8D6',
+        overflow: 'hidden',
+      }}
+    >
+      <img
+        src={src}
+        alt=""
+        data-export-image="true"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          // object-position: 0% = left/top edge, 50% = center, 100% = right/bottom edge
+          objectPosition: `${50 - position.x}% ${50 - position.y}%`,
+          // When zoomed: scale + translate to maintain the same visible content
+          // After scale from center, content shifts away from center
+          // Translate in SAME direction as position to compensate
+          transform: zoom !== 1
+            ? `scale(${zoom}) translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%)`
+            : undefined,
+          transformOrigin: 'center',
+        }}
+      />
+    </div>
+  )
+}
+
+export type EbookVariant = 'image' | 'none'
+
 export interface WebsiteThumbnailProps {
   eyebrow: string
   headline: string
   subhead: string
-  body: string
+  cta: string
   solution: string
+  variant: EbookVariant
   imageUrl?: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showSubhead: boolean
-  showBody: boolean
+  showCta: boolean
   logoColor: 'black' | 'orange'
   colors: ColorsConfig
   typography: TypographyConfig
@@ -49,12 +106,15 @@ export function WebsiteThumbnail({
   eyebrow,
   headline,
   subhead,
-  body,
+  cta,
   solution,
-  imageUrl = '/placeholder-mountain.jpg',
+  variant = 'image',
+  imageUrl = '/assets/images/safer_is_stronger_sample_page.png',
+  imagePosition = { x: 0, y: 0 },
+  imageZoom = 1,
   showEyebrow,
   showSubhead,
-  showBody,
+  showCta,
   logoColor,
   colors,
   typography,
@@ -65,191 +125,197 @@ export function WebsiteThumbnail({
   const solutionLabel = solutionConfig.label
   const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
 
-  const typo = typography.templates.websiteThumbnail
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
-  // State for grayscale image (for export compatibility)
-  const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!imageUrl) return
-
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width = img.width
-      canvas.height = img.height
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.drawImage(img, 0, 0)
-        ctx.globalCompositeOperation = 'saturation'
-        ctx.fillStyle = 'hsl(0, 0%, 50%)'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-        setGrayscaleImageUrl(canvas.toDataURL('image/jpeg', 0.9))
-      }
-    }
-    img.onerror = () => setGrayscaleImageUrl(null)
-    img.src = imageUrl
-  }, [imageUrl])
+  // Text sizes change based on variant
+  const headlineSize = variant === 'none' ? 54 : 35
+  const headlineLineHeight = variant === 'none' ? '48.19px' : '48.19px'
+  const headlineSubheadGap = variant === 'none' ? 8 : 4
 
   const containerStyle: CSSProperties = {
-    width: 700,
-    height: 434,
+    width: 800,
+    height: 450,
+    padding: 32,
     position: 'relative',
-    background: colors.ui.surface,
+    background: '#F9F9F9',
     overflow: 'hidden',
     fontFamily,
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 20,
   }
 
   return (
     <div style={containerStyle}>
-      {/* Right side image */}
+      {/* Left content area */}
       <div
         style={{
-          width: 257,
-          height: 434,
-          position: 'absolute',
-          right: 0,
-          top: 0,
-          background: colors.ui.surfaceSecondary,
-        }}
-      >
-        <img
-          src={grayscaleImageUrl || imageUrl}
-          alt=""
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
-          }}
-        />
-      </div>
-
-      {/* Header: Logo + Pill - positioned at top */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 32,
-          top: 32,
+          width: variant === 'image' ? 396 : undefined,
+          flex: variant === 'none' ? '1 1 0' : undefined,
+          alignSelf: 'stretch',
+          overflow: 'hidden',
           display: 'flex',
-          alignItems: 'center',
-          gap: 32,
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
         }}
       >
-        <CorityLogo fill={logoFill} height={28} />
+        {/* Header: Logo + Solution Pill */}
+        <div
+          style={{
+            display: 'inline-flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: 47.71,
+          }}
+        >
+          <CorityLogo fill={logoFill} height={28} />
 
-        {/* Solution Pill - hidden when solution is 'none' */}
-        {solution !== 'none' && (
+          {/* Solution Pill - white fill with subtle border */}
+          {solution !== 'none' && (
+            <div
+              style={{
+                paddingLeft: 18.08,
+                paddingRight: 18.08,
+                paddingTop: 14.96,
+                paddingBottom: 14.96,
+                background: '#FFFFFF',
+                borderRadius: 7.48,
+                border: '1px solid #D9D8D6',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 14.39,
+              }}
+            >
+              <div
+                style={{
+                  width: 10.93,
+                  height: 10.93,
+                  background: solutionColor,
+                  borderRadius: 2.30,
+                }}
+              />
+              <span
+                style={{
+                  color: colors.ui.textPrimary,
+                  fontSize: 10.59,
+                  fontWeight: 500,
+                  textTransform: 'uppercase',
+                  letterSpacing: 1.17,
+                }}
+              >
+                {solutionLabel}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Content area */}
+        <div
+          style={{
+            width: variant === 'none' ? 574 : undefined,
+            alignSelf: variant === 'image' ? 'stretch' : undefined,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            gap: 24.09,
+          }}
+        >
+          {/* Eyebrow */}
+          {showEyebrow && eyebrow && (
+            <div
+              style={{
+                alignSelf: 'stretch',
+                color: colors.ui.textPrimary,
+                fontSize: 12,
+                fontWeight: 500,
+                textTransform: 'uppercase',
+                letterSpacing: 1.32,
+              }}
+            >
+              {eyebrow}
+            </div>
+          )}
+
+          {/* Headline + Subhead */}
           <div
             style={{
-              padding: '0 14px',
-              background: colors.ui.surface,
-              borderRadius: 8,
-              border: `1.25px solid ${colors.ui.border}`,
+              alignSelf: 'stretch',
               display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              height: 36,
-              boxSizing: 'border-box',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              gap: headlineSubheadGap,
             }}
           >
             <div
               style={{
-                width: 10,
-                height: 10,
-                background: solutionColor,
-                borderRadius: 2,
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
+                alignSelf: 'stretch',
                 color: colors.ui.textPrimary,
-                fontSize: typo.pill.fontSize,
-                fontWeight: typo.pill.fontWeight,
-                textTransform: typo.pill.textTransform as 'uppercase',
-                letterSpacing: typo.pill.letterSpacing,
-                lineHeight: 1,
+                fontSize: headlineSize,
+                fontWeight: 350,
+                lineHeight: headlineLineHeight,
               }}
             >
-              {solutionLabel}
-            </span>
-          </div>
-        )}
-      </div>
+              {headline || 'Lightweight header.'}
+            </div>
 
-      {/* Text Content - positioned at bottom with padding */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 32,
-          bottom: 32,
-          width: 385,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-        }}
-      >
-        {/* Eyebrow */}
-        {showEyebrow && eyebrow && (
-          <div
-            style={{
-              color: colors.ui.textPrimary,
-              fontSize: typo.eyebrow.fontSize,
-              fontWeight: typo.eyebrow.fontWeight,
-              textTransform: typo.eyebrow.textTransform as 'uppercase',
-              letterSpacing: typo.eyebrow.letterSpacing,
-              lineHeight: 1,
-            }}
-          >
-            {eyebrow}
+            {showSubhead && subhead && (
+              <div
+                style={{
+                  alignSelf: 'stretch',
+                  color: colors.ui.textPrimary,
+                  fontSize: 20,
+                  fontWeight: 350,
+                }}
+              >
+                {subhead}
+              </div>
+            )}
           </div>
-        )}
-
-        {/* Headline */}
-        <div
-          style={{
-            color: colors.ui.textPrimary,
-            fontSize: typo.headline.fontSize,
-            fontWeight: typo.headline.fontWeightLight,
-            lineHeight: typo.headline.lineHeight,
-          }}
-        >
-          {headline || 'Headline'}
         </div>
 
-        {/* Subhead */}
-        {showSubhead && subhead && (
+        {/* CTA Link */}
+        {showCta && cta && (
           <div
             style={{
-              color: colors.ui.textPrimary,
-              fontSize: typo.subhead.fontSize,
-              fontWeight: typo.subhead.fontWeight,
-              lineHeight: typo.subhead.lineHeight,
+              display: 'inline-flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: 12.50,
             }}
           >
-            {subhead}
-          </div>
-        )}
-
-        {/* Body */}
-        {showBody && body && (
-          <div
-            style={{
-              color: colors.ui.textPrimary,
-              fontSize: typo.body.fontSize,
-              fontWeight: typo.body.fontWeight,
-              lineHeight: typo.body.lineHeight,
-            }}
-          >
-            {body}
+            <span
+              style={{
+                textAlign: 'center',
+                color: '#060015',
+                fontSize: 18.75,
+                fontWeight: 500,
+                lineHeight: '18.75px',
+              }}
+            >
+              {cta}
+            </span>
+            <ArrowIcon color="#060015" />
           </div>
         )}
       </div>
+
+      {/* Image - only shown for image variant */}
+      {variant === 'image' && (
+        <ZoomPanImage
+          src={imageUrl}
+          containerWidth={320}
+          containerHeight={386}
+          position={imagePosition}
+          zoom={imageZoom}
+        />
+      )}
     </div>
   )
 }

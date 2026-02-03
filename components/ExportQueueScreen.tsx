@@ -100,6 +100,11 @@ export function ExportQueueScreen() {
           showSubhead: asset.showSubhead,
           showBody: asset.showBody,
           imageUrl: asset.thumbnailImageUrl,
+          imagePositionX: asset.thumbnailImagePosition?.x,
+          imagePositionY: asset.thumbnailImagePosition?.y,
+          imageZoom: asset.thumbnailImageZoom,
+          // Website thumbnail specific
+          ebookVariant: asset.ebookVariant,
           subheading: asset.subheading,
           showLightHeader: asset.showLightHeader,
           showSubheading: asset.showSubheading,
@@ -127,6 +132,9 @@ export function ExportQueueScreen() {
           // Newsletter dark gradient specific
           imageSize: asset.newsletterImageSize,
           newsletterImageUrl: asset.newsletterImageUrl,
+          newsletterImagePositionX: asset.newsletterImagePosition?.x,
+          newsletterImagePositionY: asset.newsletterImagePosition?.y,
+          newsletterImageZoom: asset.newsletterImageZoom,
           // Website webinar specific
           variant: asset.webinarVariant,
           // Email speakers and website webinar specific
@@ -570,14 +578,15 @@ function QueueItem({
               {asset.templateType === 'website-thumbnail' && (
                 <WebsiteThumbnail
                   eyebrow={asset.eyebrow}
-                  headline={asset.headline || 'Headline'}
+                  headline={asset.headline || 'Lightweight header.'}
                   subhead={asset.subhead}
-                  body={asset.body}
+                  cta={asset.ctaText || 'Responsive'}
                   solution={asset.solution}
+                  variant={asset.ebookVariant}
                   imageUrl={asset.thumbnailImageUrl || undefined}
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
-                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -675,7 +684,7 @@ function QueueItem({
                   headline={asset.headline || 'Headline'}
                   body={asset.body || 'This is your body copy.'}
                   ctaText={asset.ctaText || 'Responsive'}
-                  imageUrl={asset.thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
+                  imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
                   layout={asset.layout || 'even'}
                   solution={asset.solution}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
@@ -738,7 +747,7 @@ function QueueItem({
                   subhead={asset.subhead || ''}
                   metadata={asset.metadata || 'Day / Month | 00:00'}
                   ctaText={asset.ctaText || 'Learn More'}
-                  imageUrl={asset.thumbnailImageUrl || '/assets/images/social-image-placeholder.png'}
+                  imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
                   layout={asset.layout || 'even'}
                   solution={asset.solution}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
@@ -839,6 +848,8 @@ function QueueItem({
                   colorStyle={asset.colorStyle || '1'}
                   imageSize={asset.newsletterImageSize || 'none'}
                   imageUrl={asset.newsletterImageUrl || null}
+                  imagePosition={asset.newsletterImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.newsletterImageZoom || 1}
                   showEyebrow={asset.showEyebrow && !!asset.eyebrow}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
@@ -856,6 +867,8 @@ function QueueItem({
                   colorStyle={asset.colorStyle || '1'}
                   imageSize={asset.newsletterImageSize || 'none'}
                   imageUrl={asset.newsletterImageUrl || null}
+                  imagePosition={asset.newsletterImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.newsletterImageZoom || 1}
                   showEyebrow={asset.showEyebrow && !!asset.eyebrow}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
@@ -872,6 +885,8 @@ function QueueItem({
                   ctaText={asset.ctaText || 'Responsive'}
                   imageSize={asset.newsletterImageSize || 'none'}
                   imageUrl={asset.newsletterImageUrl || null}
+                  imagePosition={asset.newsletterImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.newsletterImageZoom || 1}
                   showEyebrow={asset.showEyebrow && !!asset.eyebrow}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
@@ -1028,14 +1043,15 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
           {asset.templateType === 'website-thumbnail' && (
             <WebsiteThumbnail
               eyebrow={asset.eyebrow}
-              headline={asset.headline || 'Headline'}
+              headline={asset.headline || 'Lightweight header.'}
               subhead={asset.subhead}
-              body={asset.body}
+              cta={asset.ctaText || 'Responsive'}
               solution={asset.solution}
+              variant={asset.ebookVariant}
               imageUrl={asset.thumbnailImageUrl || undefined}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
-              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
               colors={colorsConfig}
               typography={typographyConfig}
@@ -1133,7 +1149,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               headline={asset.headline || 'Headline'}
               body={asset.body || 'This is your body copy.'}
               ctaText={asset.ctaText || 'Responsive'}
-              imageUrl={asset.thumbnailImageUrl || '/assets/images/email-image-placeholder.png'}
+              imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
               layout={asset.layout || 'even'}
               solution={asset.solution}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
@@ -1196,7 +1212,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               subhead={asset.subhead || ''}
               metadata={asset.metadata || 'Day / Month | 00:00'}
               ctaText={asset.ctaText || 'Learn More'}
-              imageUrl={asset.thumbnailImageUrl || '/assets/images/social-image-placeholder.png'}
+              imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
               layout={asset.layout || 'even'}
               solution={asset.solution}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
@@ -1297,6 +1313,8 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               colorStyle={asset.colorStyle || '1'}
               imageSize={asset.newsletterImageSize || 'none'}
               imageUrl={asset.newsletterImageUrl || null}
+              imagePosition={asset.newsletterImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.newsletterImageZoom || 1}
               showEyebrow={asset.showEyebrow && !!asset.eyebrow}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
@@ -1314,6 +1332,8 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               colorStyle={asset.colorStyle || '1'}
               imageSize={asset.newsletterImageSize || 'none'}
               imageUrl={asset.newsletterImageUrl || null}
+              imagePosition={asset.newsletterImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.newsletterImageZoom || 1}
               showEyebrow={asset.showEyebrow && !!asset.eyebrow}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
@@ -1330,6 +1350,8 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               ctaText={asset.ctaText || 'Responsive'}
               imageSize={asset.newsletterImageSize || 'none'}
               imageUrl={asset.newsletterImageUrl || null}
+              imagePosition={asset.newsletterImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.newsletterImageZoom || 1}
               showEyebrow={asset.showEyebrow && !!asset.eyebrow}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}

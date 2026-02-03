@@ -100,9 +100,9 @@ const WEBSITE_TEMPLATES: TemplateInfo[] = [
   {
     type: 'website-thumbnail',
     label: 'eBook Featured Image',
-    dimensions: '700 × 434px',
-    width: 700,
-    height: 434,
+    dimensions: '800 × 450px',
+    width: 800,
+    height: 450,
   },
   {
     type: 'website-press-release',
@@ -114,6 +114,13 @@ const WEBSITE_TEMPLATES: TemplateInfo[] = [
   {
     type: 'website-webinar',
     label: 'Webinar Featured Image',
+    dimensions: '800 × 450px',
+    width: 800,
+    height: 450,
+  },
+  {
+    type: 'website-event-listing',
+    label: 'Event Listing Featured Image',
     dimensions: '800 × 450px',
     width: 800,
     height: 450,

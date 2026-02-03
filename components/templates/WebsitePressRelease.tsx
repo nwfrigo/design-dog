@@ -42,6 +42,8 @@ export interface WebsitePressReleaseProps {
   cta: string
   solution: string
   imageUrl?: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showSubhead: boolean
   showBody: boolean
@@ -60,6 +62,8 @@ export function WebsitePressRelease({
   cta,
   solution,
   imageUrl = '/placeholder-mountain.jpg',
+  imagePosition = { x: 0, y: 0 },
+  imageZoom = 1,
   showEyebrow,
   showSubhead,
   showBody,
@@ -133,10 +137,16 @@ export function WebsitePressRelease({
         <img
           src={grayscaleImageUrl || imageUrl}
           alt=""
+          data-export-image="true"
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+            transform: imageZoom !== 1
+              ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
+              : undefined,
+            transformOrigin: 'center',
             filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
           }}
         />

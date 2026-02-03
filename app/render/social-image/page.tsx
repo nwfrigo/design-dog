@@ -16,7 +16,10 @@ export default function RenderPage({
   const subhead = (searchParams.subhead as string) || ''
   const metadata = (searchParams.metadata as string) || 'Day / Month | 00:00'
   const ctaText = (searchParams.ctaText as string) || 'Learn More'
-  const imageUrl = (searchParams.imageUrl as string) || '/assets/images/social-image-placeholder.png'
+  const imageUrl = (searchParams.imageUrl as string) || '/assets/images/default_placeholder_image_1.png'
+  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
+  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
+  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
   const layout = ((searchParams.layout as string) || 'even') as 'even' | 'more-image' | 'more-text'
   const solution = (searchParams.solution as string) || 'environmental'
   const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
@@ -41,6 +44,8 @@ export default function RenderPage({
           metadata={metadata}
           ctaText={ctaText}
           imageUrl={imageUrl}
+          imagePosition={{ x: imagePositionX, y: imagePositionY }}
+          imageZoom={imageZoom}
           layout={layout}
           solution={solution}
           logoColor={logoColor}

@@ -1,19 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
+import { WebsiteThumbnail, type EbookVariant } from '@/components/templates/WebsiteThumbnail'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
 interface Props {
   eyebrow: string
   headline: string
   subhead: string
-  body: string
+  cta: string
   solution: string
-  imageUrl: string
+  variant: EbookVariant
+  imageUrl?: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showSubhead: boolean
-  showBody: boolean
+  showCta: boolean
   logoColor: 'black' | 'orange'
   colors: ColorsConfig
   typography: TypographyConfig
@@ -44,12 +47,15 @@ export function WebsiteThumbnailRender(props: Props) {
         eyebrow={props.eyebrow}
         headline={props.headline}
         subhead={props.subhead}
-        body={props.body}
+        cta={props.cta}
         solution={props.solution}
+        variant={props.variant}
         imageUrl={props.imageUrl}
+        imagePosition={props.imagePosition}
+        imageZoom={props.imageZoom}
         showEyebrow={props.showEyebrow}
         showSubhead={props.showSubhead}
-        showBody={props.showBody}
+        showCta={props.showCta}
         logoColor={props.logoColor}
         colors={props.colors}
         typography={props.typography}

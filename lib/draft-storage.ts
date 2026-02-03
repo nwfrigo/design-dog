@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, GeneratedAsset, AutoCreateState, QueuedAsset } from '@/types'
+import type { TemplateType, CopyContent, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -25,6 +25,8 @@ export interface DraftState {
   showSubhead: boolean
   showBody: boolean
   thumbnailImageUrl: string | null
+  // Per-template image settings (decoupled per template)
+  thumbnailImageSettings: ThumbnailImageSettings
   subheading: string
   showLightHeader: boolean
   showSubheading: boolean
@@ -49,6 +51,8 @@ export interface DraftState {
   layout: 'even' | 'more-image' | 'more-text'
   newsletterImageSize: 'none' | 'small' | 'large'
   newsletterImageUrl: string | null
+  newsletterImagePosition: { x: number; y: number }
+  newsletterImageZoom: number
   speakerCount: 1 | 2 | 3
   speaker1Name: string
   speaker1Role: string
@@ -70,6 +74,10 @@ export interface DraftState {
   showSpeaker1: boolean
   showSpeaker2: boolean
   showSpeaker3: boolean
+  // Website eBook Listing specific
+  ebookVariant: 'image' | 'none'
+  // Website Event Listing specific
+  eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   generatedVariations: { headlines: string[]; ctas: string[] } | null
 }
 
@@ -106,24 +114,25 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
         generationProgress: { total: 0, completed: 0, failed: [] },
       },
       exportQueue: state.exportQueue || [],
-      eyebrow: state.eyebrow || 'Eyebrow',
+      eyebrow: state.eyebrow ?? 'Eyebrow',
       solution: state.solution || 'environmental',
       logoColor: state.logoColor || 'black',
       showEyebrow: state.showEyebrow ?? true,
       showSubhead: state.showSubhead ?? true,
       showBody: state.showBody ?? true,
       thumbnailImageUrl: state.thumbnailImageUrl || null,
-      subheading: state.subheading || '',
+      thumbnailImageSettings: state.thumbnailImageSettings || {},
+      subheading: state.subheading ?? '',
       showLightHeader: state.showLightHeader ?? true,
       showSubheading: state.showSubheading ?? false,
       showSolutionSet: state.showSolutionSet ?? true,
       showGridDetail2: state.showGridDetail2 ?? true,
-      gridDetail1Text: state.gridDetail1Text || 'Date: January 1st, 2026',
-      gridDetail2Text: state.gridDetail2Text || 'Date: January 1st, 2026',
+      gridDetail1Text: state.gridDetail1Text ?? 'Date: January 1st, 2026',
+      gridDetail2Text: state.gridDetail2Text ?? 'Date: January 1st, 2026',
       gridDetail3Type: state.gridDetail3Type || 'cta',
-      gridDetail3Text: state.gridDetail3Text || 'Responsive',
+      gridDetail3Text: state.gridDetail3Text ?? 'Responsive',
       gridDetail4Type: state.gridDetail4Type || 'cta',
-      gridDetail4Text: state.gridDetail4Text || 'Join the event',
+      gridDetail4Text: state.gridDetail4Text ?? 'Join the event',
       showRow3: state.showRow3 ?? true,
       showRow4: state.showRow4 ?? true,
       metadata: state.metadata || 'Day / Month | 00:00',
@@ -137,6 +146,8 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       layout: state.layout || 'even',
       newsletterImageSize: state.newsletterImageSize || 'none',
       newsletterImageUrl: state.newsletterImageUrl || null,
+      newsletterImagePosition: state.newsletterImagePosition || { x: 0, y: 0 },
+      newsletterImageZoom: state.newsletterImageZoom ?? 1,
       speakerCount: state.speakerCount || 3,
       speaker1Name: state.speaker1Name || 'Firstname Lastname',
       speaker1Role: state.speaker1Role || 'Role, Company',
@@ -157,6 +168,8 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       showSpeaker1: state.showSpeaker1 ?? true,
       showSpeaker2: state.showSpeaker2 ?? true,
       showSpeaker3: state.showSpeaker3 ?? true,
+      ebookVariant: state.ebookVariant || 'image',
+      eventListingVariant: state.eventListingVariant || 'orange',
       generatedVariations: state.generatedVariations || null,
     }
 

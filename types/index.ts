@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
 
 export interface CopyContent {
   headline: string
@@ -120,6 +120,8 @@ export interface GeneratedAsset {
   showSubhead: boolean
   showBody: boolean
   thumbnailImageUrl: string | null
+  thumbnailImagePosition: { x: number; y: number }
+  thumbnailImageZoom: number
   subheading: string
   showLightHeader: boolean
   showSubheading: boolean
@@ -144,6 +146,8 @@ export interface GeneratedAsset {
   layout: 'even' | 'more-image' | 'more-text'
   newsletterImageSize: 'none' | 'small' | 'large'
   newsletterImageUrl: string | null
+  newsletterImagePosition: { x: number; y: number }
+  newsletterImageZoom: number
   speakerCount: 1 | 2 | 3
   speaker1Name: string
   speaker1Role: string
@@ -165,7 +169,19 @@ export interface GeneratedAsset {
   showSpeaker1: boolean
   showSpeaker2: boolean
   showSpeaker3: boolean
+  // Website eBook Listing specific
+  ebookVariant: 'image' | 'none'
+  // Website Event Listing specific
+  eventListingVariant: 'orange' | 'light' | 'dark-gradient'
 }
+
+// Per-template image settings for decoupled zoom/pan
+export interface ImageSettings {
+  position: { x: number; y: number }
+  zoom: number
+}
+
+export type ThumbnailImageSettings = Partial<Record<TemplateType, ImageSettings>>
 
 // Export Queue Types
 export interface QueuedAsset {
@@ -183,6 +199,8 @@ export interface QueuedAsset {
   showSubhead: boolean
   showBody: boolean
   thumbnailImageUrl: string | null
+  thumbnailImagePosition: { x: number; y: number }
+  thumbnailImageZoom: number
   // Email Grid specific
   subheading: string
   showLightHeader: boolean
@@ -212,6 +230,8 @@ export interface QueuedAsset {
   // Newsletter Dark Gradient specific
   newsletterImageSize: 'none' | 'small' | 'large'
   newsletterImageUrl: string | null
+  newsletterImagePosition: { x: number; y: number }
+  newsletterImageZoom: number
   // Email Speakers specific
   speakerCount: 1 | 2 | 3
   speaker1Name: string
@@ -234,6 +254,10 @@ export interface QueuedAsset {
   showSpeaker1: boolean
   showSpeaker2: boolean
   showSpeaker3: boolean
+  // Website eBook Listing specific
+  ebookVariant: 'image' | 'none'
+  // Website Event Listing specific
+  eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -266,6 +290,8 @@ export interface AppState {
   // Design settings (per-asset, changes when switching assets)
   templateType: TemplateType
   thumbnailImageUrl: string | null
+  // Per-template image position/zoom settings (decoupled per template)
+  thumbnailImageSettings: ThumbnailImageSettings
   eyebrow: string
   solution: string
   logoColor: 'black' | 'orange' | 'white'
@@ -306,6 +332,8 @@ export interface AppState {
   // Newsletter Dark Gradient specific settings
   newsletterImageSize: 'none' | 'small' | 'large'
   newsletterImageUrl: string | null
+  newsletterImagePosition: { x: number; y: number }
+  newsletterImageZoom: number
 
   // Email Speakers specific settings
   speakerCount: 1 | 2 | 3
@@ -329,6 +357,10 @@ export interface AppState {
   showSpeaker1: boolean
   showSpeaker2: boolean
   showSpeaker3: boolean
+  // Website eBook Listing specific
+  ebookVariant: 'image' | 'none'
+  // Website Event Listing specific
+  eventListingVariant: 'orange' | 'light' | 'dark-gradient'
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -342,6 +374,9 @@ export interface AppState {
   setIsGenerating: (generating: boolean) => void
   setTemplateType: (type: TemplateType) => void
   setThumbnailImageUrl: (url: string | null) => void
+  // Per-template image settings (uses current templateType as key)
+  setThumbnailImageSettings: (templateType: TemplateType, settings: ImageSettings) => void
+  getThumbnailImageSettings: (templateType: TemplateType) => ImageSettings
   setEyebrow: (eyebrow: string) => void
   setSolution: (solution: string) => void
   setLogoColor: (color: 'black' | 'orange' | 'white') => void
@@ -382,6 +417,8 @@ export interface AppState {
   // Newsletter Dark Gradient specific actions
   setNewsletterImageSize: (size: 'none' | 'small' | 'large') => void
   setNewsletterImageUrl: (url: string | null) => void
+  setNewsletterImagePosition: (position: { x: number; y: number }) => void
+  setNewsletterImageZoom: (zoom: number) => void
 
   // Email Speakers specific actions
   setSpeakerCount: (count: 1 | 2 | 3) => void
@@ -405,6 +442,10 @@ export interface AppState {
   setShowSpeaker1: (show: boolean) => void
   setShowSpeaker2: (show: boolean) => void
   setShowSpeaker3: (show: boolean) => void
+  // Website eBook Listing specific
+  setEbookVariant: (variant: 'image' | 'none') => void
+  // Website Event Listing specific
+  setEventListingVariant: (variant: 'orange' | 'light' | 'dark-gradient') => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

@@ -9,6 +9,8 @@ interface Props {
   body: string
   ctaText: string
   imageUrl: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   layout: 'even' | 'more-image' | 'more-text'
   solution: string
   logoColor: 'black' | 'orange'
@@ -45,6 +47,8 @@ export function EmailImageRender(props: Props) {
         body={props.body}
         ctaText={props.ctaText}
         imageUrl={props.imageUrl}
+        imagePosition={props.imagePosition}
+        imageZoom={props.imageZoom}
         layout={props.layout}
         solution={props.solution}
         logoColor={props.logoColor}

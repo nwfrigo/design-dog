@@ -47,6 +47,8 @@ export interface EmailImageProps {
   body: string
   ctaText: string
   imageUrl: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   layout: LayoutVariant
   solution: string
   logoColor: 'black' | 'orange'
@@ -77,6 +79,8 @@ export function EmailImage({
   body,
   ctaText,
   imageUrl,
+  imagePosition = { x: 0, y: 0 },
+  imageZoom = 1,
   layout,
   solution,
   logoColor,
@@ -261,6 +265,7 @@ export function EmailImage({
         <img
           src={grayscaleImageUrl || imageUrl}
           alt=""
+          data-export-image="true"
           style={{
             width: imageWidth + 60,
             height: 330,
@@ -268,6 +273,11 @@ export function EmailImage({
             left: -30,
             top: 12,
             objectFit: 'cover',
+            objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+            transform: imageZoom !== 1
+              ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
+              : undefined,
+            transformOrigin: 'center',
             filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
           }}
         />

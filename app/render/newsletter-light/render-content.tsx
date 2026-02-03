@@ -11,6 +11,8 @@ interface Props {
   ctaText: string
   imageSize: 'none' | 'small' | 'large'
   imageUrl: string | null
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showBody: boolean
   showCta: boolean
@@ -46,6 +48,8 @@ export function NewsletterLightRender(props: Props) {
         ctaText={props.ctaText}
         imageSize={props.imageSize}
         imageUrl={props.imageUrl}
+        imagePosition={props.imagePosition}
+        imageZoom={props.imageZoom}
         showEyebrow={props.showEyebrow}
         showBody={props.showBody}
         showCta={props.showCta}

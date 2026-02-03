@@ -73,12 +73,14 @@ function SpeakerAvatar({
   imageUrl,
   position,
   zoom,
-  size = 48
+  size = 48,
+  speakerIndex,
 }: {
   imageUrl: string
   position: { x: number; y: number }
   zoom: number
   size?: number
+  speakerIndex: number
 }) {
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
@@ -134,6 +136,8 @@ function SpeakerAvatar({
       <img
         src={grayscaleImageUrl || imageUrl}
         alt=""
+        data-export-image="true"
+        data-speaker={speakerIndex}
         style={imageStyle}
       />
     </div>
@@ -329,6 +333,7 @@ export function EmailSpeakers({
               position={speaker.imagePosition}
               zoom={speaker.imageZoom}
               size={48}
+              speakerIndex={index + 1}
             />
             <div style={{
               width: 161,

@@ -27,6 +27,8 @@ export interface NewsletterBlueGradientProps {
   colorStyle: ColorStyle
   imageSize: ImageSize
   imageUrl: string | null
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showBody: boolean
   showCta: boolean
@@ -64,6 +66,8 @@ export function NewsletterBlueGradient({
   colorStyle,
   imageSize,
   imageUrl,
+  imagePosition = { x: 0, y: 0 },
+  imageZoom = 1,
   showEyebrow,
   showBody,
   showCta,
@@ -241,10 +245,17 @@ export function NewsletterBlueGradient({
               <img
                 src={grayscaleImageUrl || imageUrl}
                 alt=""
+                data-export-image="true"
+                data-newsletter-image="true"
                 style={{
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
+                  objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+                  transform: imageZoom !== 1
+                    ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
+                    : undefined,
+                  transformOrigin: 'center',
                   filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
                 }}
               />

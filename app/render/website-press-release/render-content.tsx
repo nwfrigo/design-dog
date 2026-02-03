@@ -12,6 +12,8 @@ interface Props {
   cta: string
   solution: string
   imageUrl?: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showSubhead: boolean
   showBody: boolean
@@ -50,6 +52,8 @@ export function WebsitePressReleaseRender(props: Props) {
         cta={props.cta}
         solution={props.solution}
         imageUrl={props.imageUrl}
+        imagePosition={props.imagePosition}
+        imageZoom={props.imageZoom}
         showEyebrow={props.showEyebrow}
         showSubhead={props.showSubhead}
         showBody={props.showBody}

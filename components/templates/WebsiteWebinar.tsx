@@ -53,6 +53,8 @@ export interface WebsiteWebinarProps {
   solution: string
   variant: WebinarVariant
   imageUrl?: string
+  imagePosition?: { x: number; y: number }
+  imageZoom?: number
   showEyebrow: boolean
   showSubhead: boolean
   showBody: boolean
@@ -74,12 +76,14 @@ function SpeakerAvatar({
   imageUrl,
   position,
   zoom,
-  size = 48
+  size = 48,
+  speakerIndex,
 }: {
   imageUrl: string
   position: { x: number; y: number }
   zoom: number
   size?: number
+  speakerIndex: number
 }) {
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
@@ -135,6 +139,8 @@ function SpeakerAvatar({
       <img
         src={grayscaleImageUrl || imageUrl}
         alt=""
+        data-export-image="true"
+        data-speaker={speakerIndex}
         style={imageStyle}
       />
     </div>
@@ -150,6 +156,8 @@ export function WebsiteWebinar({
   solution,
   variant = 'image',
   imageUrl = '/placeholder-mountain.jpg',
+  imagePosition = { x: 0, y: 0 },
+  imageZoom = 1,
   showEyebrow,
   showSubhead,
   showBody,
@@ -220,10 +228,10 @@ export function WebsiteWebinar({
   }
 
   // Build speakers array based on visibility
-  const speakers: WebinarSpeakerInfo[] = []
-  if (showSpeaker1) speakers.push(speaker1)
-  if (showSpeaker2) speakers.push(speaker2)
-  if (showSpeaker3) speakers.push(speaker3)
+  const speakers: (WebinarSpeakerInfo & { speakerIndex: number })[] = []
+  if (showSpeaker1) speakers.push({ ...speaker1, speakerIndex: 1 })
+  if (showSpeaker2) speakers.push({ ...speaker2, speakerIndex: 2 })
+  if (showSpeaker3) speakers.push({ ...speaker3, speakerIndex: 3 })
 
   return (
     <div style={containerStyle}>
@@ -242,10 +250,16 @@ export function WebsiteWebinar({
           <img
             src={grayscaleImageUrl || imageUrl}
             alt=""
+            data-export-image="true"
             style={{
               width: '100%',
               height: '100%',
               objectFit: 'cover',
+              objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+              transform: imageZoom !== 1
+                ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
+                : undefined,
+              transformOrigin: 'center',
               filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
             }}
           />
@@ -458,6 +472,7 @@ export function WebsiteWebinar({
                 position={speaker.imagePosition}
                 zoom={speaker.imageZoom}
                 size={48}
+                speakerIndex={speaker.speakerIndex}
               />
               <div
                 style={{

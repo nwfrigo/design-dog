@@ -141,9 +141,9 @@ export function AssetSelectionScreen() {
   const router = useRouter()
   const { selectedAssets, toggleAssetSelection, proceedToEditor, goToEditorWithTemplate, saveDraft } = useStore()
 
-  // Track which subchannels are expanded (only Email open by default)
+  // Track which subchannels are expanded (all open by default)
   const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(
-    () => new Set(['email'])
+    () => new Set(['email', 'social', 'website', 'newsletter'])
   )
 
   const handleNavigateToEditor = (templateType: import('@/types').TemplateType) => {
