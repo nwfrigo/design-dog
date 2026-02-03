@@ -104,6 +104,20 @@ const WEBSITE_TEMPLATES: TemplateInfo[] = [
     width: 700,
     height: 434,
   },
+  {
+    type: 'website-press-release',
+    label: 'Press Release Featured Image',
+    dimensions: '800 × 450px',
+    width: 800,
+    height: 450,
+  },
+  {
+    type: 'website-webinar',
+    label: 'Webinar Featured Image',
+    dimensions: '800 × 450px',
+    width: 800,
+    height: 450,
+  },
 ]
 
 // Template definitions for newsletter

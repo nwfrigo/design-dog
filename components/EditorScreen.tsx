@@ -3,6 +3,8 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useStore } from '@/store'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
+import { WebsitePressRelease } from './templates/WebsitePressRelease'
+import { WebsiteWebinar } from './templates/WebsiteWebinar'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
@@ -175,6 +177,15 @@ export function EditorScreen() {
     setSpeaker3ImagePosition,
     speaker3ImageZoom,
     setSpeaker3ImageZoom,
+    // Website Webinar
+    webinarVariant,
+    setWebinarVariant,
+    showSpeaker1,
+    showSpeaker2,
+    showSpeaker3,
+    setShowSpeaker1,
+    setShowSpeaker2,
+    setShowSpeaker3,
     // Queue
     addToQueue,
     exportQueue,
@@ -320,11 +331,14 @@ export function EditorScreen() {
       fullContext += `Document content:\n${pdfContent}`
     }
 
+    // Get the current template type for copy constraints
+    const templateType = selectedAssets[currentAssetIndex]
+
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context: fullContext }),
+        body: JSON.stringify({ context: fullContext, templateType }),
       })
 
       const data = await response.json()
@@ -375,6 +389,12 @@ export function EditorScreen() {
         exportParams.imageUrl = thumbnailImageUrl
         exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
         exportParams.showBody = showBody && !!verbatimCopy.body
+      } else if (currentTemplate === 'website-press-release') {
+        exportParams.imageUrl = thumbnailImageUrl
+        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
+        exportParams.showBody = showBody && !!verbatimCopy.body
+        exportParams.showCta = showCta
+        exportParams.ctaText = ctaText
       } else if (currentTemplate === 'email-grid') {
         exportParams.subheading = subheading
         exportParams.showLightHeader = showLightHeader
@@ -835,8 +855,8 @@ export function EditorScreen() {
           {/* Template Options */}
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
-              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && (
+              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), Black/Orange for others */}
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1342,6 +1362,31 @@ export function EditorScreen() {
               </div>
             )}
 
+            {/* Website Webinar Controls */}
+            {currentTemplate === 'website-webinar' && (
+              <div className="space-y-3">
+                {/* Variant */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Right Side Content</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    {(['none', 'image', 'speakers'] as const).map((variant) => (
+                      <button
+                        key={variant}
+                        onClick={() => setWebinarVariant(variant)}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                          webinarVariant === variant
+                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {variant === 'none' ? 'None' : variant === 'image' ? 'Image' : 'Speakers'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
             {(currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') && (
               <>
@@ -1488,8 +1533,8 @@ export function EditorScreen() {
             )}
 
 
-            {/* Image - Website Thumbnail, Email Image and Social Image */}
-            {(currentTemplate === 'website-thumbnail' || currentTemplate === 'email-image' || currentTemplate === 'social-image') && (
+            {/* Image - Website Thumbnail, Email Image, Social Image, and Website Webinar (image variant) */}
+            {(currentTemplate === 'website-thumbnail' || currentTemplate === 'email-image' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image')) && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
@@ -1607,18 +1652,18 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                      Subhead
+                      {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release') ? 'Subheader' : 'Subhead'}
                     </label>
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
                   </div>
                   <textarea
                     value={verbatimCopy.subhead}
                     onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
-                    placeholder="Supporting subheadline"
+                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release') ? 'Subheader text' : 'Supporting subheadline'}
                     rows={2}
                     className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
@@ -1649,25 +1694,27 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* Body */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    Body Copy
-                  </label>
-                  <EyeIcon visible={showBody} onClick={() => setShowBody(!showBody)} />
+              {/* Body - not shown for website-webinar or website-press-release (uses subheader instead) */}
+              {currentTemplate !== 'website-webinar' && currentTemplate !== 'website-press-release' && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Body Copy
+                    </label>
+                    <EyeIcon visible={showBody} onClick={() => setShowBody(!showBody)} />
+                  </div>
+                  <textarea
+                    value={verbatimCopy.body}
+                    onChange={(e) => setVerbatimCopy({ body: e.target.value })}
+                    placeholder="Body text"
+                    rows={3}
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
+                      ${!showBody ? 'opacity-50' : ''}`}
+                  />
                 </div>
-                <textarea
-                  value={verbatimCopy.body}
-                  onChange={(e) => setVerbatimCopy({ body: e.target.value })}
-                  placeholder="Body text"
-                  rows={3}
-                  className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                    bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                    focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
-                    ${!showBody ? 'opacity-50' : ''}`}
-                />
-              </div>
+              )}
 
               {/* Solution Pill - Email Grid only */}
               {currentTemplate === 'email-grid' && (
@@ -1953,8 +2000,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* Email Speakers Content Fields */}
-              {currentTemplate === 'email-speakers' && (
+              {/* Email Speakers and Website Webinar (speakers variant) Content Fields */}
+              {(currentTemplate === 'email-speakers' || (currentTemplate === 'website-webinar' && webinarVariant === 'speakers')) && (
                 <div className="space-y-4">
                   {/* CTA Text */}
                   <div>
@@ -1977,8 +2024,13 @@ export function EditorScreen() {
                   </div>
 
                   {/* Speaker 1 */}
-                  <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 1</label>
+                  <div className={`p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker1 ? 'opacity-50' : ''}`}>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 1</label>
+                      {currentTemplate === 'website-webinar' && (
+                        <EyeIcon visible={showSpeaker1} onClick={() => setShowSpeaker1(!showSpeaker1)} />
+                      )}
+                    </div>
                     <div className="flex gap-3">
                       <div className="flex-shrink-0">
                         <div
@@ -2025,9 +2077,14 @@ export function EditorScreen() {
                   </div>
 
                   {/* Speaker 2 */}
-                  {speakerCount >= 2 && (
-                    <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 2</label>
+                  {(currentTemplate === 'website-webinar' || speakerCount >= 2) && (
+                    <div className={`p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker2 ? 'opacity-50' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 2</label>
+                        {currentTemplate === 'website-webinar' && (
+                          <EyeIcon visible={showSpeaker2} onClick={() => setShowSpeaker2(!showSpeaker2)} />
+                        )}
+                      </div>
                       <div className="flex gap-3">
                         <div className="flex-shrink-0">
                           <div
@@ -2075,9 +2132,14 @@ export function EditorScreen() {
                   )}
 
                   {/* Speaker 3 */}
-                  {speakerCount >= 3 && (
-                    <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 3</label>
+                  {(currentTemplate === 'website-webinar' || speakerCount >= 3) && (
+                    <div className={`p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker3 ? 'opacity-50' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 3</label>
+                        {currentTemplate === 'website-webinar' && (
+                          <EyeIcon visible={showSpeaker3} onClick={() => setShowSpeaker3(!showSpeaker3)} />
+                        )}
+                      </div>
                       <div className="flex gap-3">
                         <div className="flex-shrink-0">
                           <div
@@ -2450,11 +2512,14 @@ export function EditorScreen() {
 
           {/* Preview */}
           <div className="flex items-start justify-center flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6">
-            <div style={{
-              width: dimensions.width * previewScale,
-              height: dimensions.height * previewScale,
-              overflow: 'hidden',
-            }}>
+            <div
+              className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm"
+              style={{
+                width: dimensions.width * previewScale,
+                height: dimensions.height * previewScale,
+                overflow: 'hidden',
+              }}
+            >
               <div style={{
                 transform: `scale(${previewScale})`,
                 transformOrigin: 'top left',
@@ -2473,6 +2538,69 @@ export function EditorScreen() {
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'website-press-release' && (
+                <WebsitePressRelease
+                  eyebrow={eyebrow}
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  subhead={verbatimCopy.subhead}
+                  body={verbatimCopy.body}
+                  cta={ctaText || 'Responsive'}
+                  solution={solution}
+                  imageUrl={thumbnailImageUrl || undefined}
+                  showEyebrow={showEyebrow}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
+                  logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'website-webinar' && (
+                <WebsiteWebinar
+                  eyebrow={eyebrow || 'Webinar'}
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  subhead={verbatimCopy.subhead}
+                  body={verbatimCopy.body}
+                  cta={ctaText || 'Responsive'}
+                  solution={solution}
+                  variant={webinarVariant}
+                  imageUrl={thumbnailImageUrl || undefined}
+                  showEyebrow={showEyebrow}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
+                  speakerCount={speakerCount}
+                  speaker1={{
+                    name: speaker1Name,
+                    role: speaker1Role,
+                    imageUrl: speaker1ImageUrl,
+                    imagePosition: speaker1ImagePosition,
+                    imageZoom: speaker1ImageZoom,
+                  }}
+                  speaker2={{
+                    name: speaker2Name,
+                    role: speaker2Role,
+                    imageUrl: speaker2ImageUrl,
+                    imagePosition: speaker2ImagePosition,
+                    imageZoom: speaker2ImageZoom,
+                  }}
+                  speaker3={{
+                    name: speaker3Name,
+                    role: speaker3Role,
+                    imageUrl: speaker3ImageUrl,
+                    imagePosition: speaker3ImagePosition,
+                    imageZoom: speaker3ImageZoom,
+                  }}
+                  showSpeaker1={showSpeaker1}
+                  showSpeaker2={showSpeaker2}
+                  showSpeaker3={showSpeaker3}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

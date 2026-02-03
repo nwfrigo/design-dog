@@ -37,12 +37,12 @@ const initialAutoCreate: AutoCreateState = {
   },
 }
 
-const getDefaultAssetSettings = () => ({
-  eyebrow: 'Eyebrow',
-  solution: 'environmental',
-  logoColor: 'black' as const,
+const getDefaultAssetSettings = (templateType?: TemplateType) => ({
+  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : 'Eyebrow',
+  solution: templateType === 'website-webinar' ? 'safety' : templateType === 'website-press-release' ? 'health' : 'environmental',
+  logoColor: templateType === 'website-webinar' ? 'white' as const : 'black' as const,
   showEyebrow: true,
-  showSubhead: true,
+  showSubhead: templateType === 'website-press-release' ? false : true,
   showBody: true,
   thumbnailImageUrl: null,
   subheading: '',
@@ -85,6 +85,11 @@ const getDefaultAssetSettings = () => ({
   speaker3ImageUrl: '',
   speaker3ImagePosition: { x: 0, y: 0 },
   speaker3ImageZoom: 1,
+  // Website Webinar specific
+  webinarVariant: 'image' as const,
+  showSpeaker1: true,
+  showSpeaker2: true,
+  showSpeaker3: true,
 })
 
 export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
@@ -172,6 +177,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   speaker3ImageUrl: '',
   speaker3ImagePosition: { x: 0, y: 0 },
   speaker3ImageZoom: 1,
+  // Website Webinar specific
+  webinarVariant: 'image',
+  showSpeaker1: true,
+  showSpeaker2: true,
+  showSpeaker3: true,
 
   // Export queue
   exportQueue: [],
@@ -254,6 +264,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setSpeaker3ImageUrl: (speaker3ImageUrl: string) => set({ speaker3ImageUrl }),
   setSpeaker3ImagePosition: (speaker3ImagePosition: { x: number; y: number }) => set({ speaker3ImagePosition }),
   setSpeaker3ImageZoom: (speaker3ImageZoom: number) => set({ speaker3ImageZoom }),
+  // Website Webinar specific
+  setWebinarVariant: (webinarVariant: 'none' | 'image' | 'speakers') => set({ webinarVariant }),
+  setShowSpeaker1: (showSpeaker1: boolean) => set({ showSpeaker1 }),
+  setShowSpeaker2: (showSpeaker2: boolean) => set({ showSpeaker2 }),
+  setShowSpeaker3: (showSpeaker3: boolean) => set({ showSpeaker3 }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -358,6 +373,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageUrl: state.speaker3ImageUrl,
       speaker3ImagePosition: state.speaker3ImagePosition,
       speaker3ImageZoom: state.speaker3ImageZoom,
+      webinarVariant: state.webinarVariant,
+      showSpeaker1: state.showSpeaker1,
+      showSpeaker2: state.showSpeaker2,
+      showSpeaker3: state.showSpeaker3,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -441,6 +460,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageUrl: asset.speaker3ImageUrl,
       speaker3ImagePosition: asset.speaker3ImagePosition,
       speaker3ImageZoom: asset.speaker3ImageZoom,
+      webinarVariant: asset.webinarVariant,
     })
 
     // Remove the asset from queue since it's being edited
@@ -572,7 +592,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           error: null,
           copy: { headline: '', subhead: '', body: '', cta: '' },
           variations: null,
-          ...getDefaultAssetSettings(),
+          ...getDefaultAssetSettings(templateType),
         }
       })
 
@@ -646,7 +666,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         error: null,
         copy: { headline: '', subhead: '', body: '', cta: '' },
         variations: null,
-        ...getDefaultAssetSettings(),
+        ...getDefaultAssetSettings(templateType),
       }
     })
     set({ generatedAssets: initialAssets })
@@ -671,7 +691,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ context }),
+            body: JSON.stringify({ context, templateType }),
           })
 
           if (!response.ok) {
@@ -696,7 +716,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
                 variations: data.variations || null,
               },
             },
-            quickStart: {
+            autoCreate: {
               ...state.autoCreate,
               generationProgress: {
                 ...state.autoCreate.generationProgress,
@@ -718,7 +738,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
                 error: errorMessage,
               },
             },
-            quickStart: {
+            autoCreate: {
               ...state.autoCreate,
               generationProgress: {
                 ...state.autoCreate.generationProgress,
@@ -810,6 +830,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageUrl: asset.speaker3ImageUrl,
       speaker3ImagePosition: asset.speaker3ImagePosition,
       speaker3ImageZoom: asset.speaker3ImageZoom,
+      webinarVariant: asset.webinarVariant,
       generatedVariations: asset.variations,
     })
   },
@@ -880,7 +901,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context }),
+        body: JSON.stringify({ context, templateType: asset.templateType }),
       })
 
       if (!response.ok) {
@@ -927,6 +948,106 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         },
       }))
     }
+  },
+
+  // Add new assets and generate copy for them using stored content source
+  addAndGenerateAssets: async (templateTypes: TemplateType[]) => {
+    if (templateTypes.length === 0) return []
+
+    const state = get()
+    const { contentSource } = state.autoCreate
+
+    // Build context from stored content source
+    let context = ''
+    if (contentSource.pdfContent) {
+      context += `Document:\n${contentSource.pdfContent}\n\n`
+    }
+    if (contentSource.manualDescription) {
+      context += `Description:\n${contentSource.manualDescription}\n\n`
+    }
+    if (contentSource.manualKeyPoints) {
+      context += `Key points:\n${contentSource.manualKeyPoints}\n\n`
+    }
+    if (contentSource.additionalContext) {
+      context += `Notes:\n${contentSource.additionalContext}\n\n`
+    }
+
+    // Create initial assets with 'generating' status
+    const timestamp = Date.now()
+    const newAssetIds: string[] = []
+    const initialAssets: Record<string, GeneratedAsset> = {}
+
+    templateTypes.forEach((templateType, i) => {
+      const id = `new-${timestamp}-${i}`
+      newAssetIds.push(id)
+      initialAssets[id] = {
+        id,
+        templateType,
+        status: 'generating',
+        error: null,
+        copy: { headline: '', subhead: '', body: '', cta: '' },
+        variations: null,
+        ...getDefaultAssetSettings(templateType),
+      }
+    })
+
+    // Add to existing generated assets
+    set((state) => ({
+      generatedAssets: { ...state.generatedAssets, ...initialAssets }
+    }))
+
+    // Fire parallel API calls to generate copy
+    await Promise.allSettled(
+      templateTypes.map(async (templateType, i) => {
+        const id = newAssetIds[i]
+
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ context, templateType }),
+          })
+
+          if (!response.ok) {
+            throw new Error(`Generation failed: ${response.status}`)
+          }
+
+          const data = await response.json()
+
+          // Update asset with generated copy
+          set((state) => ({
+            generatedAssets: {
+              ...state.generatedAssets,
+              [id]: {
+                ...state.generatedAssets[id],
+                status: 'complete',
+                copy: {
+                  headline: data.copy?.headline || '',
+                  subhead: data.copy?.subhead || '',
+                  body: data.copy?.body || '',
+                  cta: data.copy?.cta || '',
+                },
+                variations: data.copy?.variations || null,
+              },
+            },
+          }))
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          set((state) => ({
+            generatedAssets: {
+              ...state.generatedAssets,
+              [id]: {
+                ...state.generatedAssets[id],
+                status: 'error',
+                error: errorMessage,
+              },
+            },
+          }))
+        }
+      })
+    )
+
+    return newAssetIds
   },
 
   // Backwards compatibility alias
@@ -991,6 +1112,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           speaker3ImageUrl: asset.speaker3ImageUrl,
           speaker3ImagePosition: asset.speaker3ImagePosition,
           speaker3ImageZoom: asset.speaker3ImageZoom,
+          webinarVariant: asset.webinarVariant,
+          showSpeaker1: asset.showSpeaker1,
+          showSpeaker2: asset.showSpeaker2,
+          showSpeaker3: asset.showSpeaker3,
           sourceAssetIndex: 0,
         })
       }
@@ -1067,6 +1192,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageUrl: '',
       speaker3ImagePosition: { x: 0, y: 0 },
       speaker3ImageZoom: 1,
+      webinarVariant: 'image',
+      showSpeaker1: true,
+      showSpeaker2: true,
+      showSpeaker3: true,
       exportQueue: [],
       // Auto-Create defaults
       autoCreate: { ...initialAutoCreate },
@@ -1131,6 +1260,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageUrl: state.speaker3ImageUrl,
       speaker3ImagePosition: state.speaker3ImagePosition,
       speaker3ImageZoom: state.speaker3ImageZoom,
+      webinarVariant: state.webinarVariant,
+      showSpeaker1: state.showSpeaker1,
+      showSpeaker2: state.showSpeaker2,
+      showSpeaker3: state.showSpeaker3,
       generatedVariations: state.generatedVariations,
     })
   },
@@ -1194,6 +1327,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageUrl: draft.speaker3ImageUrl,
       speaker3ImagePosition: draft.speaker3ImagePosition,
       speaker3ImageZoom: draft.speaker3ImageZoom,
+      webinarVariant: draft.webinarVariant,
+      showSpeaker1: draft.showSpeaker1 ?? true,
+      showSpeaker2: draft.showSpeaker2 ?? true,
+      showSpeaker3: draft.showSpeaker3 ?? true,
       generatedVariations: draft.generatedVariations,
     })
     return true

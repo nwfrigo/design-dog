@@ -15,6 +15,7 @@ import {
 
 // Import all template components
 import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
+import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { EmailGrid } from '@/components/templates/EmailGrid'
 import { EmailImage } from '@/components/templates/EmailImage'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
@@ -26,6 +27,7 @@ import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
+import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 
 interface AssetSidebarProps {
   currentAssetId: string | null
@@ -40,11 +42,13 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
     exportQueue,
     retryFailedAsset,
     autoCreate,
+    addAndGenerateAssets,
   } = useStore()
 
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [showAddAssetModal, setShowAddAssetModal] = useState(false)
   const [pendingAssets, setPendingAssets] = useState<TemplateType[]>([])
+  const [isAddingAssets, setIsAddingAssets] = useState(false)
   const [colorsConfig, setColorsConfig] = useState<ColorsConfig | null>(null)
   const [typographyConfig, setTypographyConfig] = useState<TypographyConfig | null>(null)
 
@@ -90,84 +94,21 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
     setShowAddAssetModal(true)
   }
 
-  const handleAddAssets = () => {
+  const handleAddAssets = async () => {
     if (pendingAssets.length === 0) return
 
-    // Create new generated assets for each pending template
-    const timestamp = Date.now()
-    const newAssets: Record<string, GeneratedAsset> = {}
-
-    pendingAssets.forEach((templateType, i) => {
-      const id = `new-${timestamp}-${i}`
-      newAssets[id] = {
-        id,
-        templateType,
-        status: 'complete',
-        error: null,
-        copy: { headline: '', subhead: '', body: '', cta: '' },
-        variations: null,
-        eyebrow: 'Eyebrow',
-        solution: 'environmental',
-        logoColor: 'black',
-        showEyebrow: true,
-        showSubhead: true,
-        showBody: true,
-        thumbnailImageUrl: null,
-        subheading: '',
-        showLightHeader: true,
-        showSubheading: false,
-        showSolutionSet: true,
-        showGridDetail2: true,
-        gridDetail1Text: 'Date: January 1st, 2026',
-        gridDetail2Text: 'Date: January 1st, 2026',
-        gridDetail3Type: 'cta',
-        gridDetail3Text: 'Responsive',
-        gridDetail4Type: 'cta',
-        gridDetail4Text: 'Join the event',
-        showRow3: true,
-        showRow4: true,
-        metadata: 'Day / Month | 00:00',
-        ctaText: 'Responsive',
-        colorStyle: '1',
-        headingSize: 'L',
-        alignment: 'left',
-        ctaStyle: 'link',
-        showMetadata: true,
-        showCta: true,
-        layout: 'even',
-        newsletterImageSize: 'none',
-        newsletterImageUrl: null,
-        speakerCount: 3,
-        speaker1Name: 'Firstname Lastname',
-        speaker1Role: 'Role, Company',
-        speaker1ImageUrl: '',
-        speaker1ImagePosition: { x: 0, y: 0 },
-        speaker1ImageZoom: 1,
-        speaker2Name: 'Firstname Lastname',
-        speaker2Role: 'Role, Company',
-        speaker2ImageUrl: '',
-        speaker2ImagePosition: { x: 0, y: 0 },
-        speaker2ImageZoom: 1,
-        speaker3Name: 'Firstname Lastname',
-        speaker3Role: 'Role, Company',
-        speaker3ImageUrl: '',
-        speaker3ImagePosition: { x: 0, y: 0 },
-        speaker3ImageZoom: 1,
-      }
-    })
-
-    // Add to existing generated assets
-    useStore.setState({
-      generatedAssets: { ...generatedAssets, ...newAssets }
-    })
-
+    setIsAddingAssets(true)
     setShowAddAssetModal(false)
+
+    // Add assets and generate copy for them using the stored content context
+    const newAssetIds = await addAndGenerateAssets(pendingAssets)
+
+    setIsAddingAssets(false)
     setPendingAssets([])
 
     // Select the first newly added asset
-    const firstNewId = Object.keys(newAssets)[0]
-    if (firstNewId) {
-      onSelectAsset(firstNewId)
+    if (newAssetIds.length > 0) {
+      onSelectAsset(newAssetIds[0])
     }
   }
 
@@ -672,6 +613,24 @@ function AssetPreviewRenderer({
           logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
         />
       )
+    case 'website-press-release':
+      return (
+        <WebsitePressRelease
+          {...commonProps}
+          eyebrow={asset.eyebrow}
+          headline={copy.headline || 'Lightweight header.'}
+          subhead={copy.subhead}
+          body={copy.body}
+          cta={asset.ctaText || 'Responsive'}
+          solution={asset.solution}
+          imageUrl={asset.thumbnailImageUrl || undefined}
+          showEyebrow={asset.showEyebrow}
+          showSubhead={asset.showSubhead && !!copy.subhead}
+          showBody={asset.showBody && !!copy.body}
+          showCta={asset.showCta}
+          logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+        />
+      )
     case 'email-grid':
       return (
         <EmailGrid
@@ -892,6 +851,46 @@ function AssetPreviewRenderer({
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
           showBody={asset.showBody && !!copy.body}
           showCta={asset.showCta !== false}
+        />
+      )
+    case 'website-webinar':
+      return (
+        <WebsiteWebinar
+          {...commonProps}
+          eyebrow={asset.eyebrow || 'Webinar'}
+          headline={copy.headline || 'Lightweight header.'}
+          subhead={copy.subhead || ''}
+          body={copy.body || ''}
+          cta={asset.ctaText || 'Responsive'}
+          solution={asset.solution}
+          variant={asset.webinarVariant || 'image'}
+          imageUrl={asset.thumbnailImageUrl || undefined}
+          showEyebrow={asset.showEyebrow}
+          showSubhead={asset.showSubhead && !!copy.subhead}
+          showBody={asset.showBody && !!copy.body}
+          showCta={asset.showCta !== false}
+          speakerCount={asset.speakerCount || 3}
+          speaker1={{
+            name: asset.speaker1Name || 'Firstname Lastname',
+            role: asset.speaker1Role || 'Role, Company',
+            imageUrl: asset.speaker1ImageUrl || '',
+            imagePosition: asset.speaker1ImagePosition || { x: 0, y: 0 },
+            imageZoom: asset.speaker1ImageZoom || 1,
+          }}
+          speaker2={{
+            name: asset.speaker2Name || 'Firstname Lastname',
+            role: asset.speaker2Role || 'Role, Company',
+            imageUrl: asset.speaker2ImageUrl || '',
+            imagePosition: asset.speaker2ImagePosition || { x: 0, y: 0 },
+            imageZoom: asset.speaker2ImageZoom || 1,
+          }}
+          speaker3={{
+            name: asset.speaker3Name || 'Firstname Lastname',
+            role: asset.speaker3Role || 'Role, Company',
+            imageUrl: asset.speaker3ImageUrl || '',
+            imagePosition: asset.speaker3ImagePosition || { x: 0, y: 0 },
+            imageZoom: asset.speaker3ImageZoom || 1,
+          }}
         />
       )
     default:

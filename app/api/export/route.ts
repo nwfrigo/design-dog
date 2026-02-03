@@ -56,6 +56,8 @@ async function getBrowser() {
 // Template dimensions
 const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'website-thumbnail': { width: 700, height: 434 },
+  'website-press-release': { width: 800, height: 450 },
+  'website-webinar': { width: 800, height: 450 },
   'email-grid': { width: 640, height: 300 },
   'email-image': { width: 640, height: 300 },
   'email-dark-gradient': { width: 640, height: 300 },
@@ -213,6 +215,12 @@ export async function POST(request: NextRequest) {
 
     // Newsletter specific
     if (imageSize) params.set('imageSize', imageSize)
+
+    // Website webinar specific
+    if (body.variant) params.set('variant', body.variant)
+    if (body.showSpeaker1 !== undefined) params.set('showSpeaker1', String(body.showSpeaker1))
+    if (body.showSpeaker2 !== undefined) params.set('showSpeaker2', String(body.showSpeaker2))
+    if (body.showSpeaker3 !== undefined) params.set('showSpeaker3', String(body.showSpeaker3))
 
     // Get the base URL from the request
     const protocol = request.headers.get('x-forwarded-proto') || 'https'

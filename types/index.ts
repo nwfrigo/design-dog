@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
 
 export interface CopyContent {
   headline: string
@@ -160,6 +160,11 @@ export interface GeneratedAsset {
   speaker3ImageUrl: string
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
+  // Website Webinar specific
+  webinarVariant: 'none' | 'image' | 'speakers'
+  showSpeaker1: boolean
+  showSpeaker2: boolean
+  showSpeaker3: boolean
 }
 
 // Export Queue Types
@@ -224,6 +229,11 @@ export interface QueuedAsset {
   speaker3ImageUrl: string
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
+  // Website Webinar specific
+  webinarVariant: 'none' | 'image' | 'speakers'
+  showSpeaker1: boolean
+  showSpeaker2: boolean
+  showSpeaker3: boolean
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -314,6 +324,11 @@ export interface AppState {
   speaker3ImageUrl: string
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
+  // Website Webinar specific
+  webinarVariant: 'none' | 'image' | 'speakers'
+  showSpeaker1: boolean
+  showSpeaker2: boolean
+  showSpeaker3: boolean
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -385,6 +400,11 @@ export interface AppState {
   setSpeaker3ImageUrl: (url: string) => void
   setSpeaker3ImagePosition: (position: { x: number; y: number }) => void
   setSpeaker3ImageZoom: (zoom: number) => void
+  // Website Webinar specific
+  setWebinarVariant: (variant: 'none' | 'image' | 'speakers') => void
+  setShowSpeaker1: (show: boolean) => void
+  setShowSpeaker2: (show: boolean) => void
+  setShowSpeaker3: (show: boolean) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void
@@ -428,6 +448,7 @@ export interface AppState {
   startAutoCreateGeneration: () => Promise<void>
   updateGeneratedAsset: (id: string, updates: Partial<GeneratedAsset>) => void
   retryFailedAsset: (assetId: string) => Promise<void>
+  addAndGenerateAssets: (templateTypes: TemplateType[]) => Promise<string[]>
 
   // Multi-asset editor actions
   loadGeneratedAssetIntoEditor: (assetId: string) => void

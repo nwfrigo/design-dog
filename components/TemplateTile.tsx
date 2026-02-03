@@ -16,6 +16,8 @@ import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
 import { SocialGridDetail } from '@/components/templates/SocialGridDetail'
 import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
+import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
+import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
@@ -238,6 +240,48 @@ export function TemplateRenderer({
           showSubhead={false}
           showBody={false}
           logoColor="orange"
+        />
+      )
+
+    case 'website-press-release':
+      return (
+        <WebsitePressRelease
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          body={PREVIEW_CONTENT.body}
+          cta={PREVIEW_CONTENT.cta}
+          solution="environmental"
+          imageUrl={PLACEHOLDER_IMAGES.social}
+          showEyebrow={true}
+          showSubhead={true}
+          showBody={true}
+          showCta={true}
+          logoColor="black"
+        />
+      )
+
+    case 'website-webinar':
+      return (
+        <WebsiteWebinar
+          {...commonProps}
+          eyebrow="Webinar"
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          body={PREVIEW_CONTENT.body}
+          cta={PREVIEW_CONTENT.cta}
+          solution="safety"
+          variant="image"
+          imageUrl={PLACEHOLDER_IMAGES.social}
+          showEyebrow={true}
+          showSubhead={true}
+          showBody={true}
+          showCta={true}
+          speakerCount={3}
+          speaker1={{ name: 'Firstname Lastname', role: 'Role, Company', imageUrl: '', imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
+          speaker2={{ name: 'Firstname Lastname', role: 'Role, Company', imageUrl: '', imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
+          speaker3={{ name: 'Firstname Lastname', role: 'Role, Company', imageUrl: '', imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
         />
       )
 

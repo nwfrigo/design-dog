@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useStore } from '@/store'
 import type { QueuedAsset, TemplateType } from '@/types'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
+import { WebsitePressRelease } from './templates/WebsitePressRelease'
+import { WebsiteWebinar } from './templates/WebsiteWebinar'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
@@ -70,6 +72,8 @@ export function ExportQueueScreen() {
     switch (type) {
       case 'website-thumbnail':
         return 'Website - eBook Featured Image'
+      case 'website-press-release':
+        return 'Website - Press Release Featured Image'
       case 'email-grid':
         return 'Email - Grid Details'
       default:
@@ -123,7 +127,9 @@ export function ExportQueueScreen() {
           // Newsletter dark gradient specific
           imageSize: asset.newsletterImageSize,
           newsletterImageUrl: asset.newsletterImageUrl,
-          // Email speakers specific
+          // Website webinar specific
+          variant: asset.webinarVariant,
+          // Email speakers and website webinar specific
           speakerCount: asset.speakerCount,
           speaker1Name: asset.speaker1Name,
           speaker1Role: asset.speaker1Role,
@@ -143,6 +149,9 @@ export function ExportQueueScreen() {
           speaker3ImagePositionX: asset.speaker3ImagePosition?.x,
           speaker3ImagePositionY: asset.speaker3ImagePosition?.y,
           speaker3ImageZoom: asset.speaker3ImageZoom,
+          showSpeaker1: asset.showSpeaker1,
+          showSpeaker2: asset.showSpeaker2,
+          showSpeaker3: asset.showSpeaker3,
         }),
       })
 
@@ -575,6 +584,69 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'website-press-release' && (
+                <WebsitePressRelease
+                  eyebrow={asset.eyebrow}
+                  headline={asset.headline || 'Lightweight header.'}
+                  subhead={asset.subhead}
+                  body={asset.body}
+                  cta={asset.ctaText || 'Responsive'}
+                  solution={asset.solution}
+                  imageUrl={asset.thumbnailImageUrl || undefined}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta}
+                  logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'website-webinar' && (
+                <WebsiteWebinar
+                  eyebrow={asset.eyebrow || 'Webinar'}
+                  headline={asset.headline || 'Lightweight header.'}
+                  subhead={asset.subhead}
+                  body={asset.body}
+                  cta={asset.ctaText || 'Responsive'}
+                  solution={asset.solution}
+                  variant={asset.webinarVariant}
+                  imageUrl={asset.thumbnailImageUrl || undefined}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showBody={asset.showBody && !!asset.body}
+                  showCta={asset.showCta}
+                  speakerCount={asset.speakerCount}
+                  speaker1={{
+                    name: asset.speaker1Name,
+                    role: asset.speaker1Role,
+                    imageUrl: asset.speaker1ImageUrl,
+                    imagePosition: asset.speaker1ImagePosition,
+                    imageZoom: asset.speaker1ImageZoom,
+                  }}
+                  speaker2={{
+                    name: asset.speaker2Name,
+                    role: asset.speaker2Role,
+                    imageUrl: asset.speaker2ImageUrl,
+                    imagePosition: asset.speaker2ImagePosition,
+                    imageZoom: asset.speaker2ImageZoom,
+                  }}
+                  speaker3={{
+                    name: asset.speaker3Name,
+                    role: asset.speaker3Role,
+                    imageUrl: asset.speaker3ImageUrl,
+                    imagePosition: asset.speaker3ImagePosition,
+                    imageZoom: asset.speaker3ImageZoom,
+                  }}
+                  showSpeaker1={asset.showSpeaker1}
+                  showSpeaker2={asset.showSpeaker2}
+                  showSpeaker3={asset.showSpeaker3}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
               {asset.templateType === 'email-grid' && (
                 <EmailGrid
                   headline={asset.headline || 'Headline'}
@@ -965,6 +1037,69 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showSubhead={asset.showSubhead && !!asset.subhead}
               showBody={asset.showBody && !!asset.body}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'website-press-release' && (
+            <WebsitePressRelease
+              eyebrow={asset.eyebrow}
+              headline={asset.headline || 'Lightweight header.'}
+              subhead={asset.subhead}
+              body={asset.body}
+              cta={asset.ctaText || 'Responsive'}
+              solution={asset.solution}
+              imageUrl={asset.thumbnailImageUrl || undefined}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta}
+              logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'website-webinar' && (
+            <WebsiteWebinar
+              eyebrow={asset.eyebrow || 'Webinar'}
+              headline={asset.headline || 'Lightweight header.'}
+              subhead={asset.subhead}
+              body={asset.body}
+              cta={asset.ctaText || 'Responsive'}
+              solution={asset.solution}
+              variant={asset.webinarVariant}
+              imageUrl={asset.thumbnailImageUrl || undefined}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showBody={asset.showBody && !!asset.body}
+              showCta={asset.showCta}
+              speakerCount={asset.speakerCount}
+              speaker1={{
+                name: asset.speaker1Name,
+                role: asset.speaker1Role,
+                imageUrl: asset.speaker1ImageUrl,
+                imagePosition: asset.speaker1ImagePosition,
+                imageZoom: asset.speaker1ImageZoom,
+              }}
+              speaker2={{
+                name: asset.speaker2Name,
+                role: asset.speaker2Role,
+                imageUrl: asset.speaker2ImageUrl,
+                imagePosition: asset.speaker2ImagePosition,
+                imageZoom: asset.speaker2ImageZoom,
+              }}
+              speaker3={{
+                name: asset.speaker3Name,
+                role: asset.speaker3Role,
+                imageUrl: asset.speaker3ImageUrl,
+                imagePosition: asset.speaker3ImagePosition,
+                imageZoom: asset.speaker3ImageZoom,
+              }}
+              showSpeaker1={asset.showSpeaker1}
+              showSpeaker2={asset.showSpeaker2}
+              showSpeaker3={asset.showSpeaker3}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

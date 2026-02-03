@@ -65,6 +65,11 @@ export interface DraftState {
   speaker3ImageUrl: string
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
+  // Website Webinar specific
+  webinarVariant: 'none' | 'image' | 'speakers'
+  showSpeaker1: boolean
+  showSpeaker2: boolean
+  showSpeaker3: boolean
   generatedVariations: { headlines: string[]; ctas: string[] } | null
 }
 
@@ -148,6 +153,10 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       speaker3ImageUrl: state.speaker3ImageUrl || '',
       speaker3ImagePosition: state.speaker3ImagePosition || { x: 0, y: 0 },
       speaker3ImageZoom: state.speaker3ImageZoom || 1,
+      webinarVariant: state.webinarVariant || 'image',
+      showSpeaker1: state.showSpeaker1 ?? true,
+      showSpeaker2: state.showSpeaker2 ?? true,
+      showSpeaker3: state.showSpeaker3 ?? true,
       generatedVariations: state.generatedVariations || null,
     }
 
