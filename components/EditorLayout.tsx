@@ -97,14 +97,25 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   return (
     <div className="min-h-screen bg-white dark:bg-black flex flex-col">
       {/* Header */}
-      <header className="bg-white dark:bg-black border-b border-gray-100 dark:border-gray-900 flex-shrink-0">
-        <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
+      <header className="bg-white dark:bg-black border-b border-gray-100 dark:border-gray-900 flex-shrink-0 h-[100px]">
+        <div className="max-w-[1600px] mx-auto px-6 h-full flex items-center justify-between">
           {/* Logo */}
           <button
             onClick={handleLogoClick}
-            className="text-xl font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="hover:opacity-80 transition-opacity"
           >
-            Design Dog
+            {/* Light mode logo */}
+            <img
+              src="/assets/brand/design-dog-logo-color-light-cority.svg"
+              alt="Design Dog"
+              className="h-8 dark:hidden"
+            />
+            {/* Dark mode logo */}
+            <img
+              src="/assets/brand/design-dog-logo-color-cority.svg"
+              alt="Design Dog"
+              className="h-8 hidden dark:block"
+            />
           </button>
 
           {/* Center - Navigation */}
