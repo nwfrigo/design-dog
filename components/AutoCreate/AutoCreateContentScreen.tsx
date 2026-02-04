@@ -143,8 +143,22 @@ export function AutoCreateContentScreen() {
       })
 
       if (!uploadResponse.ok) {
-        const uploadError = await uploadResponse.json()
-        throw new Error(uploadError.error || 'Failed to upload file')
+        // Try to parse JSON error, fall back to text
+        let errorMessage = 'Failed to upload file'
+        try {
+          const uploadError = await uploadResponse.json()
+          errorMessage = uploadError.error || errorMessage
+        } catch {
+          const text = await uploadResponse.text()
+          if (text.includes('BLOB_READ_WRITE_TOKEN')) {
+            errorMessage = 'Blob storage not configured. Please contact support.'
+          } else if (uploadResponse.status === 413) {
+            errorMessage = 'File too large for upload.'
+          } else {
+            errorMessage = `Upload failed: ${text.slice(0, 100)}`
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       const uploadData = await uploadResponse.json()
