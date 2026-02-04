@@ -1925,25 +1925,27 @@ export function EditorScreen() {
           {/* Direct Edit Mode */}
           {contentMode === 'verbatim' && (
             <div className="space-y-4">
-              {/* Eyebrow */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    Eyebrow
-                  </label>
-                  <EyeIcon visible={showEyebrow} onClick={() => setShowEyebrow(!showEyebrow)} />
+              {/* Eyebrow - not shown for email-image, social-image (they don't use it) */}
+              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Eyebrow
+                    </label>
+                    <EyeIcon visible={showEyebrow} onClick={() => setShowEyebrow(!showEyebrow)} />
+                  </div>
+                  <input
+                    type="text"
+                    value={eyebrow}
+                    onChange={(e) => setEyebrow(e.target.value)}
+                    placeholder="e.g., EBOOK, WEBINAR"
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                      ${!showEyebrow ? 'opacity-50' : ''}`}
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={eyebrow}
-                  onChange={(e) => setEyebrow(e.target.value)}
-                  placeholder="e.g., EBOOK, WEBINAR"
-                  className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                    bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                    ${!showEyebrow ? 'opacity-50' : ''}`}
-                />
-              </div>
+              )}
 
               {/* Light Header - Email Grid only */}
               {currentTemplate === 'email-grid' && (
@@ -1961,7 +1963,7 @@ export function EditorScreen() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    Headline <span className="text-red-500">*</span>
+                    Headline
                   </label>
                 </div>
                 <input
@@ -1976,7 +1978,7 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'social-grid-detail' || currentTemplate === 'website-event-listing') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2018,8 +2020,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* Body - not shown for website-webinar, website-press-release, or website-thumbnail (uses subheader instead) */}
-              {currentTemplate !== 'website-webinar' && currentTemplate !== 'website-press-release' && currentTemplate !== 'website-thumbnail' && (
+              {/* Body - not shown for templates that don't use it */}
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2059,18 +2061,6 @@ export function EditorScreen() {
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showCta ? 'opacity-50' : ''}`}
                   />
-                </div>
-              )}
-
-              {/* Solution Pill - Email Grid only */}
-              {currentTemplate === 'email-grid' && (
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                      Solution Pill
-                    </label>
-                    <EyeIcon visible={showSolutionSet} onClick={() => setShowSolutionSet(!showSolutionSet)} />
-                  </div>
                 </div>
               )}
 
@@ -2881,7 +2871,7 @@ export function EditorScreen() {
               {/* Export Button */}
               <button
                 onClick={handleExport}
-                disabled={isExporting || !verbatimCopy.headline}
+                disabled={isExporting}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white
                   bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
               >
@@ -2907,10 +2897,9 @@ export function EditorScreen() {
                     setShowQueuedFeedback(true)
                     setTimeout(() => setShowQueuedFeedback(false), 2000)
                   }}
-                  disabled={!verbatimCopy.headline}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
                     text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
-                    hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors
+                    hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
                     border border-gray-200 dark:border-gray-700"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3339,9 +3328,8 @@ export function EditorScreen() {
               </button>
               <button
                 onClick={saveQueuedAssetEdit}
-                disabled={!verbatimCopy.headline}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg
-                  hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
+                  hover:bg-blue-600 transition-colors"
               >
                 Save & Return to Queue
               </button>
