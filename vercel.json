@@ -3,6 +3,14 @@
     "app/api/export/route.ts": {
       "memory": 1024,
       "maxDuration": 60
+    },
+    "app/api/upload-pdf/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "app/api/parse-pdf/route.ts": {
+      "memory": 1024,
+      "maxDuration": 120
     }
   }
 }

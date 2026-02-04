@@ -112,8 +112,8 @@ export function AutoCreateContentScreen() {
       return
     }
 
-    // Check file size before uploading (3.4MB limit due to base64 overhead + Vercel's 4.5MB body limit)
-    const maxFileSizeMB = 3.4
+    // Check file size (25MB limit for Claude's document API)
+    const maxFileSizeMB = 25
     const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024
     if (file.size > maxFileSizeBytes) {
       const actualSizeMB = (file.size / 1024 / 1024).toFixed(1)
@@ -133,90 +133,81 @@ export function AutoCreateContentScreen() {
     setAutoCreateContentSource({ analysisInfo: null })
 
     try {
-      const reader = new FileReader()
-      reader.onload = async () => {
-        const base64 = reader.result as string
+      // Step 1: Upload PDF to blob storage
+      const formData = new FormData()
+      formData.append('file', file)
 
-        try {
-          const response = await fetch('/api/parse-pdf', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pdf: base64 }),
-          })
+      const uploadResponse = await fetch('/api/upload-pdf', {
+        method: 'POST',
+        body: formData,
+      })
 
-          const data = await response.json()
-
-          if (response.ok) {
-            setAutoCreateContentSource({
-              method: 'upload',
-              pdfContent: data.text || '',
-              uploadedFileName: file.name,
-            })
-
-            const info: AnalysisInfo = {
-              fileSizeBytes: data.debug?.fileSizeBytes || 0,
-              fileSizeMB: data.debug?.fileSizeMB || '0',
-              fileFormat: 'PDF',
-              extracted: data.extracted,
-            }
-            setAutoCreateContentSource({ analysisInfo: info })
-
-            if (data.extracted) {
-              initializeEditedContent(data.extracted)
-            }
-            setAnalysisExpanded(true)
-          } else {
-            // Handle specific error codes
-            let errorMessage = data.error || 'Unknown error analyzing PDF'
-            if (response.status === 413) {
-              errorMessage = 'File too large for server. Try compressing your PDF or provide key details manually.'
-            }
-
-            setAutoCreateContentSource({
-              method: 'upload',
-              uploadedFileName: file.name,
-              pdfContent: `[Uploaded PDF: ${file.name}]`,
-              analysisInfo: {
-                fileSizeBytes: file.size,
-                fileSizeMB: (file.size / 1024 / 1024).toFixed(2),
-                fileFormat: 'PDF',
-                error: errorMessage,
-                errorDetails: data.debug?.errorDetails,
-              },
-            })
-            setAnalysisExpanded(true)
-          }
-        } catch (err) {
-          setAutoCreateContentSource({
-            method: 'upload',
-            uploadedFileName: file.name,
-            pdfContent: `[Uploaded PDF: ${file.name}]`,
-            analysisInfo: {
-              fileSizeBytes: 0,
-              fileSizeMB: '0',
-              fileFormat: 'PDF',
-              error: 'Network error or failed to connect to analysis service',
-              errorDetails: err instanceof Error ? err.message : String(err),
-            },
-          })
-          setAnalysisExpanded(true)
-        }
-
-        setIsUploading(false)
+      if (!uploadResponse.ok) {
+        const uploadError = await uploadResponse.json()
+        throw new Error(uploadError.error || 'Failed to upload file')
       }
-      reader.readAsDataURL(file)
-    } catch (error) {
-      console.error('Error uploading file:', error)
-      setAutoCreateContentSource({
-        analysisInfo: {
-          fileSizeBytes: 0,
-          fileSizeMB: '0',
+
+      const uploadData = await uploadResponse.json()
+
+      // Step 2: Analyze PDF using the blob URL
+      const response = await fetch('/api/parse-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pdfUrl: uploadData.url, fileSize: file.size }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setAutoCreateContentSource({
+          method: 'upload',
+          pdfContent: data.text || '',
+          uploadedFileName: file.name,
+        })
+
+        const info: AnalysisInfo = {
+          fileSizeBytes: file.size,
+          fileSizeMB: (file.size / 1024 / 1024).toFixed(2),
           fileFormat: 'PDF',
-          error: 'Failed to read file',
-          errorDetails: error instanceof Error ? error.message : String(error),
+          extracted: data.extracted,
+        }
+        setAutoCreateContentSource({ analysisInfo: info })
+
+        if (data.extracted) {
+          initializeEditedContent(data.extracted)
+        }
+        setAnalysisExpanded(true)
+      } else {
+        setAutoCreateContentSource({
+          method: 'upload',
+          uploadedFileName: file.name,
+          pdfContent: `[Uploaded PDF: ${file.name}]`,
+          analysisInfo: {
+            fileSizeBytes: file.size,
+            fileSizeMB: (file.size / 1024 / 1024).toFixed(2),
+            fileFormat: 'PDF',
+            error: data.error || 'Unknown error analyzing PDF',
+            errorDetails: data.debug?.errorDetails,
+          },
+        })
+        setAnalysisExpanded(true)
+      }
+    } catch (err) {
+      console.error('Error uploading file:', err)
+      setAutoCreateContentSource({
+        method: 'upload',
+        uploadedFileName: file.name,
+        pdfContent: `[Uploaded PDF: ${file.name}]`,
+        analysisInfo: {
+          fileSizeBytes: file.size,
+          fileSizeMB: (file.size / 1024 / 1024).toFixed(2),
+          fileFormat: 'PDF',
+          error: err instanceof Error ? err.message : 'Failed to upload or analyze file',
+          errorDetails: err instanceof Error ? err.stack : String(err),
         },
       })
       setAnalysisExpanded(true)
+    } finally {
       setIsUploading(false)
     }
   }

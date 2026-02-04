@@ -8,11 +8,11 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { pdf } = body
+    const { pdfUrl, fileSize } = body
 
-    if (!pdf) {
+    if (!pdfUrl) {
       return NextResponse.json(
-        { error: 'No PDF data provided' },
+        { error: 'No PDF URL provided' },
         { status: 400 }
       )
     }
@@ -24,36 +24,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Extract base64 data from data URL
-    const base64Match = pdf.match(/^data:application\/pdf;base64,(.+)$/)
-    if (!base64Match) {
-      return NextResponse.json(
-        { error: 'Invalid PDF data format. Expected base64 data URL.' },
-        { status: 400 }
-      )
-    }
-
-    const base64Data = base64Match[1]
-
-    // Check file size (max 25MB)
-    const buffer = Buffer.from(base64Data, 'base64')
-    const maxSize = 25 * 1024 * 1024
-    if (buffer.length > maxSize) {
-      return NextResponse.json(
-        {
-          error: 'File too large. Maximum size is 25MB. Try a smaller PDF or provide key details in the text field instead.',
-          debug: {
-            fileSize: buffer.length,
-            maxSize: maxSize,
-            fileSizeMB: (buffer.length / 1024 / 1024).toFixed(2),
-          }
-        },
-        { status: 400 }
-      )
-    }
-
-    // Send PDF to Claude for visual analysis
-    // Note: Using 'as any' because the SDK types don't include 'document' yet, but the API supports it
+    // Send PDF to Claude for visual analysis using URL
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
@@ -64,9 +35,8 @@ export async function POST(request: NextRequest) {
             {
               type: 'document',
               source: {
-                type: 'base64',
-                media_type: 'application/pdf',
-                data: base64Data,
+                type: 'url',
+                url: pdfUrl,
               },
             } as any,
             {
@@ -143,10 +113,10 @@ Respond in JSON format only, no markdown code blocks:
       text: textForGeneration,
       extracted: extractedContent,
       debug: {
-        method: 'claude-vision',
+        method: 'claude-url',
         model: 'claude-sonnet-4-20250514',
-        fileSizeBytes: buffer.length,
-        fileSizeMB: (buffer.length / 1024 / 1024).toFixed(2),
+        fileSizeBytes: fileSize || 0,
+        fileSizeMB: fileSize ? (fileSize / 1024 / 1024).toFixed(2) : '0',
         extractedFields: Object.keys(extractedContent).filter(k => extractedContent[k] !== null),
         rawResponse: textContent.text,
       },

@@ -12,6 +12,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.0",
     "@sparticuz/chromium-min": "^143.0.4",
+    "@vercel/blob": "^2.1.0",
     "html2canvas": "^1.4.1",
     "next": "^14.2.0",
     "pdf-parse": "^1.1.1",
