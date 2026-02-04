@@ -207,6 +207,10 @@ export function EditorScreen() {
     addToQueue,
     exportQueue,
     goToQueue,
+    // Edit from queue
+    editingQueueItemId,
+    saveQueuedAssetEdit,
+    cancelQueueEdit,
     // Template type fallback
     templateType,
     // Generated assets (for auto-create mode detection)
@@ -215,6 +219,9 @@ export function EditorScreen() {
 
   // Check if we're in auto-create mode (sidebar handles navigation, not tabs)
   const isAutoCreateMode = Object.keys(generatedAssets).length > 0
+
+  // Check if we're editing an item from the queue
+  const isEditingFromQueue = !!editingQueueItemId
 
   // Brand config state
   const [colorsConfig, setColorsConfig] = useState<ColorsConfig | null>(null)
@@ -249,6 +256,9 @@ export function EditorScreen() {
 
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
+
+  // Cancel confirmation modal state (for edit-from-queue mode)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   // In auto-create mode, use templateType directly (sidebar handles selection)
   // In regular mode, use selectedAssets array with tabs
@@ -2889,28 +2899,30 @@ export function EditorScreen() {
                 Export
               </button>
 
-              {/* Add to Queue Button */}
-              <button
-                onClick={() => {
-                  addToQueue()
-                  setShowQueuedFeedback(true)
-                  setTimeout(() => setShowQueuedFeedback(false), 2000)
-                }}
-                disabled={!verbatimCopy.headline}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                  text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
-                  hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors
-                  border border-gray-200 dark:border-gray-700"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Queue
-              </button>
+              {/* Add to Queue Button - hide when editing from queue */}
+              {!isEditingFromQueue && (
+                <button
+                  onClick={() => {
+                    addToQueue()
+                    setShowQueuedFeedback(true)
+                    setTimeout(() => setShowQueuedFeedback(false), 2000)
+                  }}
+                  disabled={!verbatimCopy.headline}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                    text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
+                    hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors
+                    border border-gray-200 dark:border-gray-700"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Queue
+                </button>
+              )}
             </div>
 
-            {/* Delete Asset Button */}
-            {selectedAssets.length > 1 && (
+            {/* Delete Asset Button - hide when editing from queue */}
+            {selectedAssets.length > 1 && !isEditingFromQueue && (
               <button
                 onClick={() => {
                   const newAssets = selectedAssets.filter((_, i) => i !== currentAssetIndex)
@@ -3313,6 +3325,63 @@ export function EditorScreen() {
               </div>
             </div>
           </div>
+
+          {/* Save & Cancel buttons when editing from queue */}
+          {isEditingFromQueue && (
+            <div className="mt-4 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setShowCancelConfirm(true)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
+                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
+                  border border-gray-200 dark:border-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveQueuedAssetEdit}
+                disabled={!verbatimCopy.headline}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg
+                  hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
+              >
+                Save & Return to Queue
+              </button>
+            </div>
+          )}
+
+          {/* Cancel confirmation modal */}
+          {showCancelConfirm && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/50" onClick={() => setShowCancelConfirm(false)} />
+              <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-sm w-full">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  Discard changes?
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                  Your changes will not be saved. The original asset will remain in the queue.
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <button
+                    onClick={() => setShowCancelConfirm(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
+                      bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
+                      border border-gray-200 dark:border-gray-700 transition-colors"
+                  >
+                    Keep Editing
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowCancelConfirm(false)
+                      cancelQueueEdit()
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg
+                      hover:bg-red-600 transition-colors"
+                  >
+                    Discard Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

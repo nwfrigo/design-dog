@@ -200,6 +200,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   // Export queue
   exportQueue: [],
+  editingQueueItemId: null as string | null,
 
   // Auto-Create state (formerly Quick Start)
   autoCreate: { ...initialAutoCreate },
@@ -522,10 +523,105 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       webinarVariant: asset.webinarVariant,
       ebookVariant: asset.ebookVariant,
       eventListingVariant: asset.eventListingVariant,
+      // Track that we're editing from queue
+      editingQueueItemId: id,
     })
+  },
 
-    // Remove the asset from queue since it's being edited
-    set({ exportQueue: state.exportQueue.filter((a) => a.id !== id) })
+  saveQueuedAssetEdit: () => {
+    const state = get()
+    const editingId = state.editingQueueItemId
+    if (!editingId) return
+
+    // Get the original queue item to preserve its sourceAssetIndex
+    const originalItem = state.exportQueue.find(item => item.id === editingId)
+    if (!originalItem) return
+
+    // Get current image settings for this template
+    const imageSettings = state.thumbnailImageSettings[state.templateType] || { position: { x: 0, y: 0 }, zoom: 1 }
+
+    // Build updated asset from current editor state
+    const updatedAsset: QueuedAsset = {
+      id: editingId,
+      sourceAssetIndex: originalItem.sourceAssetIndex,
+      templateType: state.templateType,
+      headline: state.verbatimCopy.headline,
+      subhead: state.verbatimCopy.subhead,
+      body: state.verbatimCopy.body,
+      eyebrow: state.eyebrow,
+      solution: state.solution,
+      logoColor: state.logoColor,
+      showEyebrow: state.showEyebrow,
+      showSubhead: state.showSubhead,
+      showBody: state.showBody,
+      thumbnailImageUrl: state.thumbnailImageUrl,
+      thumbnailImagePosition: imageSettings.position,
+      thumbnailImageZoom: imageSettings.zoom,
+      subheading: state.subheading,
+      showLightHeader: state.showLightHeader,
+      showSubheading: state.showSubheading,
+      showSolutionSet: state.showSolutionSet,
+      showGridDetail2: state.showGridDetail2,
+      gridDetail1Text: state.gridDetail1Text,
+      gridDetail2Text: state.gridDetail2Text,
+      gridDetail3Type: state.gridDetail3Type,
+      gridDetail3Text: state.gridDetail3Text,
+      gridDetail4Type: state.gridDetail4Type,
+      gridDetail4Text: state.gridDetail4Text,
+      showRow3: state.showRow3,
+      showRow4: state.showRow4,
+      metadata: state.metadata,
+      ctaText: state.ctaText,
+      colorStyle: state.colorStyle,
+      headingSize: state.headingSize,
+      alignment: state.alignment,
+      ctaStyle: state.ctaStyle,
+      showMetadata: state.showMetadata,
+      showCta: state.showCta,
+      layout: state.layout,
+      newsletterImageSize: state.newsletterImageSize,
+      newsletterImageUrl: state.newsletterImageUrl,
+      newsletterImagePosition: state.newsletterImagePosition,
+      newsletterImageZoom: state.newsletterImageZoom,
+      speakerCount: state.speakerCount,
+      speaker1Name: state.speaker1Name,
+      speaker1Role: state.speaker1Role,
+      speaker1ImageUrl: state.speaker1ImageUrl,
+      speaker1ImagePosition: state.speaker1ImagePosition,
+      speaker1ImageZoom: state.speaker1ImageZoom,
+      speaker2Name: state.speaker2Name,
+      speaker2Role: state.speaker2Role,
+      speaker2ImageUrl: state.speaker2ImageUrl,
+      speaker2ImagePosition: state.speaker2ImagePosition,
+      speaker2ImageZoom: state.speaker2ImageZoom,
+      speaker3Name: state.speaker3Name,
+      speaker3Role: state.speaker3Role,
+      speaker3ImageUrl: state.speaker3ImageUrl,
+      speaker3ImagePosition: state.speaker3ImagePosition,
+      speaker3ImageZoom: state.speaker3ImageZoom,
+      webinarVariant: state.webinarVariant,
+      showSpeaker1: state.showSpeaker1,
+      showSpeaker2: state.showSpeaker2,
+      showSpeaker3: state.showSpeaker3,
+      ebookVariant: state.ebookVariant,
+      eventListingVariant: state.eventListingVariant,
+    }
+
+    // Update the queue item and return to queue
+    set({
+      exportQueue: state.exportQueue.map(item =>
+        item.id === editingId ? updatedAsset : item
+      ),
+      editingQueueItemId: null,
+      currentScreen: 'queue',
+    })
+  },
+
+  cancelQueueEdit: () => {
+    set({
+      editingQueueItemId: null,
+      currentScreen: 'queue',
+    })
   },
 
   goToQueue: () => {

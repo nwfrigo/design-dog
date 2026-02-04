@@ -458,6 +458,9 @@ export interface AppState {
   removeFromQueue: (id: string) => void
   clearQueue: () => void
   editQueuedAsset: (id: string) => void
+  editingQueueItemId: string | null
+  saveQueuedAssetEdit: () => void
+  cancelQueueEdit: () => void
 
   // Flow actions
   proceedToEditor: () => void

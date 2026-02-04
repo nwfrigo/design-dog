@@ -13,6 +13,7 @@ export function AutoCreateEditor() {
     updateGeneratedAsset,
     templateType,
     verbatimCopy,
+    editingQueueItemId,
     eyebrow,
     solution,
     logoColor,
@@ -158,13 +159,18 @@ export function AutoCreateEditor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [verbatimCopy.headline, templateType])
 
+  // Check if we're editing from queue - hide sidebar in this mode
+  const isEditingFromQueue = !!editingQueueItemId
+
   return (
     <div className="flex gap-6 h-[calc(100vh-120px)]">
-      {/* Asset sidebar */}
-      <AssetSidebar
-        currentAssetId={currentAssetId}
-        onSelectAsset={handleSelectAsset}
-      />
+      {/* Asset sidebar - hide when editing from queue */}
+      {!isEditingFromQueue && (
+        <AssetSidebar
+          currentAssetId={currentAssetId}
+          onSelectAsset={handleSelectAsset}
+        />
+      )}
 
       {/* Main editor area */}
       <div className="flex-1 overflow-auto">
