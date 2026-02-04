@@ -112,6 +112,23 @@ export function AutoCreateContentScreen() {
       return
     }
 
+    // Check file size before uploading (3.4MB limit due to base64 overhead + Vercel's 4.5MB body limit)
+    const maxFileSizeMB = 3.4
+    const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024
+    if (file.size > maxFileSizeBytes) {
+      const actualSizeMB = (file.size / 1024 / 1024).toFixed(1)
+      setAutoCreateContentSource({
+        analysisInfo: {
+          fileSizeBytes: file.size,
+          fileSizeMB: actualSizeMB,
+          fileFormat: 'PDF',
+          error: `File too large (${actualSizeMB}MB). Maximum size is ${maxFileSizeMB}MB. Try compressing your PDF or provide key details manually.`,
+        },
+      })
+      setAnalysisExpanded(true)
+      return
+    }
+
     setIsUploading(true)
     setAutoCreateContentSource({ analysisInfo: null })
 
@@ -149,15 +166,21 @@ export function AutoCreateContentScreen() {
             }
             setAnalysisExpanded(true)
           } else {
+            // Handle specific error codes
+            let errorMessage = data.error || 'Unknown error analyzing PDF'
+            if (response.status === 413) {
+              errorMessage = 'File too large for server. Try compressing your PDF or provide key details manually.'
+            }
+
             setAutoCreateContentSource({
               method: 'upload',
               uploadedFileName: file.name,
               pdfContent: `[Uploaded PDF: ${file.name}]`,
               analysisInfo: {
-                fileSizeBytes: 0,
-                fileSizeMB: '0',
+                fileSizeBytes: file.size,
+                fileSizeMB: (file.size / 1024 / 1024).toFixed(2),
                 fileFormat: 'PDF',
-                error: data.error || 'Unknown error analyzing PDF',
+                error: errorMessage,
                 errorDetails: data.debug?.errorDetails,
               },
             })
