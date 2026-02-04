@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Design Dog',
   description: 'AI-powered creative automation for brand copy',
+  icons: {
+    icon: '/assets/brand/design_dog_favicon_1.svg',
+  },
 }
 
 // Script to set theme before React hydrates (prevents flash)
