@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { upload } from '@vercel/blob/client'
 import { useStore } from '@/store'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import type { AnalysisInfo, EditedContent, ExtractedContent } from '@/types'
@@ -133,41 +134,17 @@ export function AutoCreateContentScreen() {
     setAutoCreateContentSource({ analysisInfo: null })
 
     try {
-      // Step 1: Upload PDF to blob storage
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const uploadResponse = await fetch('/api/upload-pdf', {
-        method: 'POST',
-        body: formData,
+      // Step 1: Upload PDF directly to Vercel Blob (bypasses serverless function body limit)
+      const blob = await upload(`pdfs/${Date.now()}-${file.name}`, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-pdf',
       })
-
-      if (!uploadResponse.ok) {
-        // Try to parse JSON error, fall back to text
-        let errorMessage = 'Failed to upload file'
-        try {
-          const uploadError = await uploadResponse.json()
-          errorMessage = uploadError.error || errorMessage
-        } catch {
-          const text = await uploadResponse.text()
-          if (text.includes('BLOB_READ_WRITE_TOKEN')) {
-            errorMessage = 'Blob storage not configured. Please contact support.'
-          } else if (uploadResponse.status === 413) {
-            errorMessage = 'File too large for upload.'
-          } else {
-            errorMessage = `Upload failed: ${text.slice(0, 100)}`
-          }
-        }
-        throw new Error(errorMessage)
-      }
-
-      const uploadData = await uploadResponse.json()
 
       // Step 2: Analyze PDF using the blob URL
       const response = await fetch('/api/parse-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pdfUrl: uploadData.url, fileSize: file.size }),
+        body: JSON.stringify({ pdfUrl: blob.url, fileSize: file.size }),
       })
 
       const data = await response.json()

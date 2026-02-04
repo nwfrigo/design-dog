@@ -1,49 +1,37 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { put } from '@vercel/blob'
+import { NextResponse } from 'next/server'
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client'
 
-export async function POST(request: NextRequest) {
+// This endpoint handles the client-side upload token request
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = (await request.json()) as HandleUploadBody
+
   try {
-    // Check if blob storage is configured
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return NextResponse.json(
-        { error: 'Blob storage not configured. Please set up Vercel Blob in your project settings.' },
-        { status: 500 }
-      )
-    }
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (pathname) => {
+        // Validate that it's a PDF upload
+        if (!pathname.endsWith('.pdf')) {
+          throw new Error('Only PDF files are allowed')
+        }
 
-    const formData = await request.formData()
-    const file = formData.get('file') as File | null
-
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      )
-    }
-
-    if (!file.type.includes('pdf')) {
-      return NextResponse.json(
-        { error: 'Only PDF files are supported' },
-        { status: 400 }
-      )
-    }
-
-    // Upload to Vercel Blob
-    const blob = await put(`pdfs/${Date.now()}-${file.name}`, file, {
-      access: 'public',
-      contentType: 'application/pdf',
+        return {
+          allowedContentTypes: ['application/pdf'],
+          maximumSizeInBytes: 30 * 1024 * 1024, // 30MB max
+        }
+      },
+      onUploadCompleted: async ({ blob }) => {
+        // Could log or track uploads here if needed
+        console.log('PDF uploaded:', blob.url)
+      },
     })
 
-    return NextResponse.json({
-      url: blob.url,
-      size: file.size,
-      name: file.name,
-    })
+    return NextResponse.json(jsonResponse)
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Upload failed' },
-      { status: 500 }
+      { status: 400 }
     )
   }
 }
