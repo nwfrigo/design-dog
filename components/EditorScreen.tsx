@@ -209,7 +209,12 @@ export function EditorScreen() {
     goToQueue,
     // Template type fallback
     templateType,
+    // Generated assets (for auto-create mode detection)
+    generatedAssets,
   } = useStore()
+
+  // Check if we're in auto-create mode (sidebar handles navigation, not tabs)
+  const isAutoCreateMode = Object.keys(generatedAssets).length > 0
 
   // Brand config state
   const [colorsConfig, setColorsConfig] = useState<ColorsConfig | null>(null)
@@ -245,7 +250,9 @@ export function EditorScreen() {
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
 
-  const currentTemplate = selectedAssets[currentAssetIndex] || templateType
+  // In auto-create mode, use templateType directly (sidebar handles selection)
+  // In regular mode, use selectedAssets array with tabs
+  const currentTemplate = isAutoCreateMode ? templateType : (selectedAssets[currentAssetIndex] || templateType)
   const dimensions = TEMPLATE_DIMENSIONS[currentTemplate] || { width: 1200, height: 628 }
 
   // Get per-template image settings for the current template
@@ -618,37 +625,39 @@ export function EditorScreen() {
 
   return (
     <div className="space-y-6">
-      {/* Tab Navigation */}
-      <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
-        <div className="flex">
-          {selectedAssets.map((asset, index) => (
+      {/* Tab Navigation - only show in regular mode, not auto-create mode */}
+      {!isAutoCreateMode && (
+        <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
+          <div className="flex">
+            {selectedAssets.map((asset, index) => (
+              <button
+                key={`${asset}-${index}`}
+                onClick={() => goToAsset(index)}
+                className={`px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px transition-colors ${
+                  index === currentAssetIndex
+                    ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                } ${index > 0 ? '-ml-px' : ''}`}
+              >
+                {getAssetLabel(asset, index)}
+              </button>
+            ))}
+            {/* Add Asset Button */}
             <button
-              key={`${asset}-${index}`}
-              onClick={() => goToAsset(index)}
-              className={`px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px transition-colors ${
-                index === currentAssetIndex
-                  ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-              } ${index > 0 ? '-ml-px' : ''}`}
+              onClick={() => {
+                setPendingAssets([])
+                setShowAddAssetModal(true)
+              }}
+              className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              title="Add asset"
             >
-              {getAssetLabel(asset, index)}
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
             </button>
-          ))}
-          {/* Add Asset Button */}
-          <button
-            onClick={() => {
-              setPendingAssets([])
-              setShowAddAssetModal(true)
-            }}
-            className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-            title="Add asset"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Add Asset Modal */}
       {showAddAssetModal && (
