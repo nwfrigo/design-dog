@@ -94,15 +94,21 @@ function AutoCreateSidebar() {
   return (
     <aside className="w-80 flex-shrink-0 border-l border-gray-200 dark:border-gray-800 hidden lg:block">
       <div className="sticky top-0 p-6">
+        {/* Spacer to align with main content */}
+        <div className="mb-8">
+          <p className="text-sm text-gray-500 dark:text-gray-400 invisible">
+            Spacer
+          </p>
+        </div>
         {/* Header */}
-        <div className="mb-6">
-          <h3 className="text-2xl font-light text-gray-900 dark:text-white flex items-center gap-3">
+        <div className="mb-4">
+          <h3 className="text-2xl font-light text-gray-900 dark:text-white flex items-center gap-3 mb-2">
             <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             Auto-Create
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Write and design assets for a Promo Kit in just a few clicks
           </p>
         </div>
@@ -236,7 +242,7 @@ export function AssetSelectionScreen() {
                         className={`
                           border rounded-xl overflow-hidden transition-all duration-300
                           ${isExpanded
-                            ? 'border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-900/10'
+                            ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-black'
                             : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900'
                           }
                         `}
@@ -247,7 +253,7 @@ export function AssetSelectionScreen() {
                           className={`
                             w-full px-5 py-4 flex items-center justify-between transition-colors
                             ${isExpanded
-                              ? 'bg-blue-50 dark:bg-blue-900/20'
+                              ? 'bg-gray-50 dark:bg-gray-800/50'
                               : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'
                             }
                           `}
@@ -264,14 +270,14 @@ export function AssetSelectionScreen() {
                             </svg>
 
                             {/* Icon */}
-                            <span className={`${isExpanded ? 'text-blue-500' : 'text-gray-400'}`}>
+                            <span className={`${isExpanded ? 'text-gray-600 dark:text-gray-300' : 'text-gray-400'}`}>
                               <SubChannelIcon icon={subChannel.icon} />
                             </span>
 
                             {/* Label */}
                             <span className={`font-medium ${
                               isExpanded
-                                ? 'text-blue-700 dark:text-blue-300'
+                                ? 'text-gray-900 dark:text-gray-100'
                                 : 'text-gray-900 dark:text-gray-100'
                             }`}>
                               {subChannel.label}
