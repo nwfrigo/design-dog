@@ -636,7 +636,10 @@ export function EditorScreen() {
           ))}
           {/* Add Asset Button */}
           <button
-            onClick={() => setShowAddAssetModal(true)}
+            onClick={() => {
+              setPendingAssets([])
+              setShowAddAssetModal(true)
+            }}
             className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             title="Add asset"
           >

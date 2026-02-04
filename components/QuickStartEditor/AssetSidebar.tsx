@@ -47,6 +47,7 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
 
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [showAddAssetModal, setShowAddAssetModal] = useState(false)
+  const [addAssetModalKey, setAddAssetModalKey] = useState(0)
   const [pendingAssets, setPendingAssets] = useState<TemplateType[]>([])
   const [isAddingAssets, setIsAddingAssets] = useState(false)
   const [colorsConfig, setColorsConfig] = useState<ColorsConfig | null>(null)
@@ -91,6 +92,7 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
 
   const handleAddNewAsset = () => {
     setPendingAssets([])
+    setAddAssetModalKey(k => k + 1)
     setShowAddAssetModal(true)
   }
 
@@ -177,6 +179,7 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
       {/* Add Asset Modal */}
       {showAddAssetModal && (
         <AddAssetModal
+          key={addAssetModalKey}
           pendingAssets={pendingAssets}
           setPendingAssets={setPendingAssets}
           onAdd={handleAddAssets}

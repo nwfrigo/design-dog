@@ -39,9 +39,10 @@ export function AutoCreateContentScreen() {
   }, [])
 
   // Sync edited content to pdfContent for generation
+  // Include rawSummary from original extraction to preserve document context
   useEffect(() => {
     if (analysisInfo?.extracted && !analysisInfo.error && contentSource.editedContent) {
-      const content = buildContextFromEdited(contentSource.editedContent)
+      const content = buildContextFromEdited(contentSource.editedContent, analysisInfo.extracted)
       if (content && contentSource.method === 'upload') {
         setAutoCreateContentSource({ pdfContent: content })
       }
@@ -236,15 +237,8 @@ export function AutoCreateContentScreen() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Header with breadcrumb */}
+      {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-          <span>Auto-Create</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <span className="text-blue-600 dark:text-blue-400 font-medium">{kitConfig?.label || 'Kit'}</span>
-        </div>
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Generate Asset Copy with AI
         </h1>
@@ -683,7 +677,8 @@ export function AutoCreateContentScreen() {
 }
 
 // Build context string from edited content for asset generation
-function buildContextFromEdited(edited: EditedContent): string {
+// Include additional fields from original extraction (rawSummary, targetAudience, etc.)
+function buildContextFromEdited(edited: EditedContent, extracted?: ExtractedContent): string {
   const parts: string[] = []
 
   if (edited.title) {
@@ -700,6 +695,22 @@ function buildContextFromEdited(edited: EditedContent): string {
   }
   if (edited.callToAction) {
     parts.push(`Call to Action: ${edited.callToAction}`)
+  }
+
+  // Include additional context from original extraction
+  if (extracted) {
+    if (extracted.targetAudience) {
+      parts.push(`Target Audience: ${extracted.targetAudience}`)
+    }
+    if (extracted.dates) {
+      parts.push(`Important Dates: ${extracted.dates}`)
+    }
+    if (extracted.speakers && extracted.speakers.length > 0) {
+      parts.push(`Speakers/Authors: ${extracted.speakers.join(', ')}`)
+    }
+    if (extracted.rawSummary) {
+      parts.push(`\nDocument Summary:\n${extracted.rawSummary}`)
+    }
   }
 
   return parts.join('\n\n')

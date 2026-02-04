@@ -48,21 +48,6 @@ export function AutoCreateGeneratingScreen() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header with breadcrumb */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-          <span>Auto-Create</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <span>{kitConfig?.label || 'Kit'}</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <span className="text-blue-600 dark:text-blue-400 font-medium">Generating</span>
-        </div>
-      </div>
-
       {/* Status header */}
       <div className="text-center mb-10">
         {isComplete ? (
