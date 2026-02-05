@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
@@ -132,6 +132,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   currentAssetIndex: 0,
   // Per-asset copy for manual mode (keyed by index)
   manualAssetCopies: {} as Record<number, CopyContent>,
+  // Per-asset settings for manual mode (eyebrow, ctaText, grid details, images)
+  manualAssetSettings: {} as Record<number, ManualAssetSettings>,
 
   // Design settings (shared across assets)
   templateType: 'website-thumbnail',
@@ -345,22 +347,129 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom } = state
     if (index >= 0 && index < selectedAssets.length) {
+      // Get current image position/zoom from per-template settings
+      const currentImageSettings = thumbnailImageSettings[templateType] || { position: { x: 0, y: 0 }, zoom: 1 }
+
       // Save current asset's copy before switching
       const updatedCopies = {
         ...manualAssetCopies,
         [currentAssetIndex]: { ...verbatimCopy },
       }
 
-      // Load target asset's copy (or keep current if new asset)
+      // Save current asset's settings before switching
+      const currentSettings: ManualAssetSettings = {
+        eyebrow,
+        ctaText,
+        gridDetail1Text,
+        gridDetail2Text,
+        gridDetail3Text,
+        gridDetail4Text,
+        thumbnailImageUrl,
+        thumbnailImagePosition: { ...currentImageSettings.position },
+        thumbnailImageZoom: currentImageSettings.zoom,
+        showBody,
+        metadata,
+        speaker1Name,
+        speaker1Role,
+        speaker1ImageUrl,
+        speaker1ImagePosition: { ...speaker1ImagePosition },
+        speaker1ImageZoom,
+        speaker2Name,
+        speaker2Role,
+        speaker2ImageUrl,
+        speaker2ImagePosition: { ...speaker2ImagePosition },
+        speaker2ImageZoom,
+        speaker3Name,
+        speaker3Role,
+        speaker3ImageUrl,
+        speaker3ImagePosition: { ...speaker3ImagePosition },
+        speaker3ImageZoom,
+      }
+      const updatedSettings = {
+        ...manualAssetSettings,
+        [currentAssetIndex]: currentSettings,
+      }
+
+      // Load target asset's copy (or keep current copy for text fields - helpful starting point)
       const targetCopy = updatedCopies[index] || verbatimCopy
+
+      // Load target asset's settings (or use defaults for new assets)
+      // Note: Images default to placeholder for new assets, not copied from previous
+      const defaultSettings: ManualAssetSettings = {
+        eyebrow: verbatimCopy.headline ? eyebrow : 'Eyebrow', // Keep eyebrow if has content, else default
+        ctaText: 'Responsive',
+        gridDetail1Text: 'Date: January 1st, 2026',
+        gridDetail2Text: 'Date: January 1st, 2026',
+        gridDetail3Text: 'Responsive',
+        gridDetail4Text: 'Join the event',
+        thumbnailImageUrl: null, // Always default placeholder for new assets
+        thumbnailImagePosition: { x: 0, y: 0 },
+        thumbnailImageZoom: 1,
+        showBody: true,
+        metadata: 'Day / Month | 00:00',
+        speaker1Name: 'Firstname Lastname',
+        speaker1Role: 'Role, Company',
+        speaker1ImageUrl: '',
+        speaker1ImagePosition: { x: 0, y: 0 },
+        speaker1ImageZoom: 1,
+        speaker2Name: 'Firstname Lastname',
+        speaker2Role: 'Role, Company',
+        speaker2ImageUrl: '',
+        speaker2ImagePosition: { x: 0, y: 0 },
+        speaker2ImageZoom: 1,
+        speaker3Name: 'Firstname Lastname',
+        speaker3Role: 'Role, Company',
+        speaker3ImageUrl: '',
+        speaker3ImagePosition: { x: 0, y: 0 },
+        speaker3ImageZoom: 1,
+      }
+      const targetSettings = updatedSettings[index] || defaultSettings
+
+      // Get target template type
+      const targetTemplateType = selectedAssets[index]
+
+      // Build updated thumbnailImageSettings with target asset's image position/zoom
+      const updatedThumbnailImageSettings = {
+        ...thumbnailImageSettings,
+        [targetTemplateType]: {
+          position: { ...targetSettings.thumbnailImagePosition },
+          zoom: targetSettings.thumbnailImageZoom,
+        },
+      }
 
       set({
         currentAssetIndex: index,
-        templateType: selectedAssets[index],
+        templateType: targetTemplateType,
         manualAssetCopies: updatedCopies,
+        manualAssetSettings: updatedSettings,
         verbatimCopy: { ...targetCopy },
+        eyebrow: targetSettings.eyebrow,
+        ctaText: targetSettings.ctaText,
+        gridDetail1Text: targetSettings.gridDetail1Text,
+        gridDetail2Text: targetSettings.gridDetail2Text,
+        gridDetail3Text: targetSettings.gridDetail3Text,
+        gridDetail4Text: targetSettings.gridDetail4Text,
+        thumbnailImageUrl: targetSettings.thumbnailImageUrl,
+        thumbnailImageSettings: updatedThumbnailImageSettings,
+        showBody: targetSettings.showBody,
+        metadata: targetSettings.metadata,
+        speaker1Name: targetSettings.speaker1Name,
+        speaker1Role: targetSettings.speaker1Role,
+        speaker1ImageUrl: targetSettings.speaker1ImageUrl,
+        speaker1ImagePosition: { ...targetSettings.speaker1ImagePosition },
+        speaker1ImageZoom: targetSettings.speaker1ImageZoom,
+        speaker2Name: targetSettings.speaker2Name,
+        speaker2Role: targetSettings.speaker2Role,
+        speaker2ImageUrl: targetSettings.speaker2ImageUrl,
+        speaker2ImagePosition: { ...targetSettings.speaker2ImagePosition },
+        speaker2ImageZoom: targetSettings.speaker2ImageZoom,
+        speaker3Name: targetSettings.speaker3Name,
+        speaker3Role: targetSettings.speaker3Role,
+        speaker3ImageUrl: targetSettings.speaker3ImageUrl,
+        speaker3ImagePosition: { ...targetSettings.speaker3ImagePosition },
+        speaker3ImageZoom: targetSettings.speaker3ImageZoom,
       })
     }
   },
@@ -1380,6 +1489,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       selectedAssets: [],
       currentAssetIndex: 0,
       manualAssetCopies: {},
+      manualAssetSettings: {},
       templateType: 'website-thumbnail',
       thumbnailImageUrl: null,
       thumbnailImageSettings: {},
@@ -1460,6 +1570,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       selectedAssets: state.selectedAssets,
       currentAssetIndex: state.currentAssetIndex,
       manualAssetCopies: state.manualAssetCopies,
+      manualAssetSettings: state.manualAssetSettings,
       templateType: state.templateType,
       verbatimCopy: state.verbatimCopy,
       generatedAssets: state.generatedAssets,
@@ -1538,6 +1649,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       selectedAssets: draft.selectedAssets,
       currentAssetIndex: draft.currentAssetIndex,
       manualAssetCopies: draft.manualAssetCopies || {},
+      manualAssetSettings: draft.manualAssetSettings || {},
       templateType: draft.templateType,
       verbatimCopy: draft.verbatimCopy,
       generatedAssets: draft.generatedAssets,

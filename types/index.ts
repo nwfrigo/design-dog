@@ -32,6 +32,39 @@ export interface CopyContent {
   cta: string
 }
 
+// Per-asset settings for manual mode (fields that should be independent per asset)
+export interface ManualAssetSettings {
+  eyebrow: string
+  ctaText: string
+  gridDetail1Text: string
+  gridDetail2Text: string
+  gridDetail3Text: string
+  gridDetail4Text: string
+  thumbnailImageUrl: string | null
+  thumbnailImagePosition: { x: number; y: number }
+  thumbnailImageZoom: number
+  // Toggle states
+  showBody: boolean
+  // Social metadata
+  metadata: string
+  // Speaker details
+  speaker1Name: string
+  speaker1Role: string
+  speaker1ImageUrl: string
+  speaker1ImagePosition: { x: number; y: number }
+  speaker1ImageZoom: number
+  speaker2Name: string
+  speaker2Role: string
+  speaker2ImageUrl: string
+  speaker2ImagePosition: { x: number; y: number }
+  speaker2ImageZoom: number
+  speaker3Name: string
+  speaker3Role: string
+  speaker3ImageUrl: string
+  speaker3ImagePosition: { x: number; y: number }
+  speaker3ImageZoom: number
+}
+
 export interface GeneratedCopy extends CopyContent {
   variations?: {
     headlines: string[]
@@ -306,6 +339,8 @@ export interface AppState {
   currentAssetIndex: number
   // Per-asset copy for manual mode (keyed by index)
   manualAssetCopies: Record<number, CopyContent>
+  // Per-asset settings for manual mode (eyebrow, ctaText, grid details, images)
+  manualAssetSettings: Record<number, ManualAssetSettings>
 
   // Design settings (per-asset, changes when switching assets)
   templateType: TemplateType

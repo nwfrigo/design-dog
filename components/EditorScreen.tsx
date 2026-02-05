@@ -2172,7 +2172,7 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'social-grid-detail' || currentTemplate === 'website-event-listing' || currentTemplate === 'website-report') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2236,8 +2236,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* CTA Text - Website Webinar, Website Thumbnail, Website Report (with show/hide toggle) */}
-              {(currentTemplate === 'website-webinar' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report') && (
+              {/* CTA Text - Website Webinar, Website Thumbnail, Website Press Release, Website Report (with show/hide toggle) */}
+              {(currentTemplate === 'website-webinar' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">

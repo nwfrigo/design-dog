@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -11,6 +11,7 @@ export interface DraftState {
   selectedAssets: TemplateType[]
   currentAssetIndex: number
   manualAssetCopies: Record<number, CopyContent>
+  manualAssetSettings: Record<number, ManualAssetSettings>
   templateType: TemplateType
   verbatimCopy: CopyContent
   // Generated assets (for auto-create flow)
@@ -103,6 +104,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       selectedAssets: state.selectedAssets || [],
       currentAssetIndex: state.currentAssetIndex || 0,
       manualAssetCopies: state.manualAssetCopies || {},
+      manualAssetSettings: state.manualAssetSettings || {},
       templateType: state.templateType || 'website-thumbnail',
       verbatimCopy: state.verbatimCopy || { headline: '', subhead: '', body: '', cta: '' },
       generatedAssets: state.generatedAssets || {},

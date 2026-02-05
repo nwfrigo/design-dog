@@ -180,7 +180,7 @@ export function WebsitePressRelease({
         >
           <CorityLogo fill={logoFill} height={29} />
 
-          {/* Solution Pill - white fill with subtle border */}
+          {/* Solution Pill - white fill with border matching other templates */}
           {solution !== 'none' && (
             <div
               style={{
@@ -190,7 +190,7 @@ export function WebsitePressRelease({
                 paddingBottom: 15.58,
                 background: '#FFFFFF',
                 borderRadius: 7.79,
-                border: '1px solid rgba(0, 0, 0, 0.08)',
+                border: '1px solid #D9D8D6',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
