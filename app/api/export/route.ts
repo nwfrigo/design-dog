@@ -232,15 +232,16 @@ export async function POST(request: NextRequest) {
     if (speaker3ImagePositionY !== undefined) params.set('speaker3ImagePositionY', String(speaker3ImagePositionY))
     if (speaker3ImageZoom !== undefined) params.set('speaker3ImageZoom', String(speaker3ImageZoom))
 
-    // Newsletter specific
+    // Newsletter specific - only override image params for newsletter templates
+    const isNewsletterTemplate = template.startsWith('newsletter-')
     if (imageSize) params.set('imageSize', imageSize)
     // For newsletter templates, pass newsletterImageUrl as imageUrl (for non-data URLs)
-    if (body.newsletterImageUrl && !body.newsletterImageUrl.startsWith('data:') && !body.newsletterImageUrl.startsWith('blob:')) {
+    if (isNewsletterTemplate && body.newsletterImageUrl && !body.newsletterImageUrl.startsWith('data:') && !body.newsletterImageUrl.startsWith('blob:')) {
       params.set('imageUrl', body.newsletterImageUrl)
     }
-    if (body.newsletterImagePositionX !== undefined) params.set('imagePositionX', String(body.newsletterImagePositionX))
-    if (body.newsletterImagePositionY !== undefined) params.set('imagePositionY', String(body.newsletterImagePositionY))
-    if (body.newsletterImageZoom !== undefined) params.set('imageZoom', String(body.newsletterImageZoom))
+    if (isNewsletterTemplate && body.newsletterImagePositionX !== undefined) params.set('imagePositionX', String(body.newsletterImagePositionX))
+    if (isNewsletterTemplate && body.newsletterImagePositionY !== undefined) params.set('imagePositionY', String(body.newsletterImagePositionY))
+    if (isNewsletterTemplate && body.newsletterImageZoom !== undefined) params.set('imageZoom', String(body.newsletterImageZoom))
 
     // Website webinar specific
     if (body.variant) params.set('variant', body.variant)
@@ -325,6 +326,16 @@ export async function POST(request: NextRequest) {
     // Inject main image (thumbnailImageUrl)
     if (imageUrl && imageUrl.startsWith('data:')) {
       await injectDataUrlImage(imageUrl, 'img[data-export-image="true"]')
+
+      // Apply grayscale filter directly if enabled (canvas conversion won't work on injected images)
+      if (grayscale) {
+        await page.evaluate(() => {
+          const img = document.querySelector('img[data-export-image="true"]') as HTMLImageElement
+          if (img) {
+            img.style.filter = 'grayscale(100%)'
+          }
+        })
+      }
     }
 
     // Inject speaker images
@@ -350,6 +361,11 @@ export async function POST(request: NextRequest) {
         (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) ||
         (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:'))) {
       await new Promise(resolve => setTimeout(resolve, 300))
+    }
+
+    // Extra delay for grayscale canvas conversion
+    if (grayscale) {
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
 
     // Hide any Next.js dev error overlays that might appear

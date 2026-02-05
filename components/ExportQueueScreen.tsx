@@ -100,9 +100,9 @@ export function ExportQueueScreen() {
           eyebrow: asset.eyebrow,
           solution: asset.solution,
           logoColor: asset.logoColor,
-          showEyebrow: asset.showEyebrow,
-          showSubhead: asset.showSubhead,
-          showBody: asset.showBody,
+          showEyebrow: asset.showEyebrow && !!asset.eyebrow,
+          showSubhead: asset.showSubhead && !!asset.subhead,
+          showBody: asset.showBody && !!asset.body,
           imageUrl: asset.thumbnailImageUrl,
           imagePositionX: asset.thumbnailImagePosition?.x,
           imagePositionY: asset.thumbnailImagePosition?.y,
@@ -171,6 +171,8 @@ export function ExportQueueScreen() {
           showSpeaker3: asset.showSpeaker3,
           // Website floating banner mobile specific
           arrowType: asset.floatingBannerMobileArrowType,
+          // Image effects
+          grayscale: asset.grayscale,
         }),
       })
 
@@ -595,10 +597,13 @@ function QueueItem({
                   solution={asset.solution}
                   variant={asset.ebookVariant}
                   imageUrl={asset.thumbnailImageUrl || undefined}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showCta={asset.showCta}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -613,11 +618,14 @@ function QueueItem({
                   cta={asset.ctaText || 'Responsive'}
                   solution={asset.solution}
                   imageUrl={asset.thumbnailImageUrl || undefined}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -633,6 +641,8 @@ function QueueItem({
                   solution={asset.solution}
                   variant={asset.webinarVariant}
                   imageUrl={asset.thumbnailImageUrl || undefined}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showBody={asset.showBody && !!asset.body}
@@ -662,6 +672,7 @@ function QueueItem({
                   showSpeaker1={asset.showSpeaker1}
                   showSpeaker2={asset.showSpeaker2}
                   showSpeaker3={asset.showSpeaker3}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -696,12 +707,15 @@ function QueueItem({
                   body={asset.body || 'This is your body copy.'}
                   ctaText={asset.ctaText || 'Responsive'}
                   imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
                   layout={asset.layout || 'even'}
                   solution={asset.solution}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
                   showSolutionSet={asset.showSolutionSet !== false}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -759,6 +773,8 @@ function QueueItem({
                   metadata={asset.metadata || 'Day / Month | 00:00'}
                   ctaText={asset.ctaText || 'Learn More'}
                   imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
                   layout={asset.layout || 'even'}
                   solution={asset.solution}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
@@ -766,6 +782,7 @@ function QueueItem({
                   showMetadata={asset.showMetadata !== false}
                   showCta={asset.showCta !== false}
                   showSolutionSet={asset.showSolutionSet !== false}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -845,6 +862,7 @@ function QueueItem({
                     imagePosition: asset.speaker3ImagePosition || { x: 0, y: 0 },
                     imageZoom: asset.speaker3ImageZoom || 1,
                   }}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -864,6 +882,7 @@ function QueueItem({
                   showEyebrow={asset.showEyebrow && !!asset.eyebrow}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -883,6 +902,7 @@ function QueueItem({
                   showEyebrow={asset.showEyebrow && !!asset.eyebrow}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -901,6 +921,7 @@ function QueueItem({
                   showEyebrow={asset.showEyebrow && !!asset.eyebrow}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
+                  grayscale={asset.grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -1125,10 +1146,13 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               solution={asset.solution}
               variant={asset.ebookVariant}
               imageUrl={asset.thumbnailImageUrl || undefined}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
               showCta={asset.showCta}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1143,11 +1167,14 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               cta={asset.ctaText || 'Responsive'}
               solution={asset.solution}
               imageUrl={asset.thumbnailImageUrl || undefined}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1163,6 +1190,8 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               solution={asset.solution}
               variant={asset.webinarVariant}
               imageUrl={asset.thumbnailImageUrl || undefined}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
               showBody={asset.showBody && !!asset.body}
@@ -1192,6 +1221,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showSpeaker1={asset.showSpeaker1}
               showSpeaker2={asset.showSpeaker2}
               showSpeaker3={asset.showSpeaker3}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1226,12 +1256,15 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               body={asset.body || 'This is your body copy.'}
               ctaText={asset.ctaText || 'Responsive'}
               imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
               layout={asset.layout || 'even'}
               solution={asset.solution}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
               showSolutionSet={asset.showSolutionSet !== false}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1289,6 +1322,8 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               metadata={asset.metadata || 'Day / Month | 00:00'}
               ctaText={asset.ctaText || 'Learn More'}
               imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
               layout={asset.layout || 'even'}
               solution={asset.solution}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
@@ -1296,6 +1331,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showMetadata={asset.showMetadata !== false}
               showCta={asset.showCta !== false}
               showSolutionSet={asset.showSolutionSet !== false}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1375,6 +1411,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
                 imagePosition: asset.speaker3ImagePosition || { x: 0, y: 0 },
                 imageZoom: asset.speaker3ImageZoom || 1,
               }}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1394,6 +1431,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showEyebrow={asset.showEyebrow && !!asset.eyebrow}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1413,6 +1451,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showEyebrow={asset.showEyebrow && !!asset.eyebrow}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1431,6 +1470,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showEyebrow={asset.showEyebrow && !!asset.eyebrow}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
+              grayscale={asset.grayscale}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

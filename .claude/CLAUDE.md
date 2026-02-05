@@ -214,6 +214,47 @@ style={{
 
 Import from `components/ZoomableImage`. Use for all image upload areas in the editor.
 
+### Image Settings: Editor ↔ Queue ↔ Export Consistency
+
+**The Core Rule:** Image settings (position, zoom, grayscale) must flow through **four locations** to ensure editor preview, queue preview, and exported PNG all match:
+
+1. **`addToQueue`** (store/index.ts) — captures settings when asset is queued
+2. **`handleExportSingle`** (ExportQueueScreen.tsx) — sends settings to export API
+3. **Queue thumbnail** (ExportQueueScreen.tsx) — displays preview in queue list
+4. **Queue preview modal** (ExportQueueScreen.tsx) — displays full-size preview
+
+If any location is missing props, you'll see discrepancies between what the user sees and what exports.
+
+**Common Gotchas:**
+
+1. **Newsletter params can override main image params** — The export API has a newsletter-specific section that sets `imagePositionX/Y` and `imageZoom`. Without a template type check, these override the main image values:
+   ```tsx
+   const isNewsletterTemplate = template.startsWith('newsletter-')
+   if (isNewsletterTemplate && body.newsletterImagePositionX !== undefined) {
+     params.set('imagePositionX', ...)
+   }
+   ```
+
+2. **Show toggles need content checks** — Render pages have default placeholder text. To prevent it from appearing when a field is empty:
+   ```tsx
+   // ✅ Only show when toggle is on AND content exists
+   showBody: asset.showBody && !!asset.body,
+   ```
+
+3. **Per-template image settings use template key, not `templateType`** — In manual mode, `templateType` may not match the current asset. Always use:
+   ```tsx
+   const currentTemplate = selectedAssets[currentAssetIndex]
+   const imageSettings = thumbnailImageSettings[currentTemplate]
+   ```
+
+**Checklist for adding/modifying image support:**
+- [ ] `addToQueue` captures the image settings
+- [ ] `handleExportSingle` passes them to the export API
+- [ ] Queue thumbnail component receives `imagePosition`, `imageZoom`, `grayscale`
+- [ ] Queue preview modal receives the same props
+
+Test by: uploading an image → adjusting zoom/pan/grayscale → adding to queue → verify thumbnail matches → export from queue → verify PNG matches.
+
 ---
 
 ## Solution Pill Implementation

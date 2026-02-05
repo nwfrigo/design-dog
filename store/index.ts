@@ -350,7 +350,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
-      const currentImageSettings = thumbnailImageSettings[templateType] || { position: { x: 0, y: 0 }, zoom: 1 }
+      // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
+      const currentTemplateType = selectedAssets[currentAssetIndex]
+      const currentImageSettings = thumbnailImageSettings[currentTemplateType] || { position: { x: 0, y: 0 }, zoom: 1 }
 
       // Save current asset's copy before switching
       const updatedCopies = {
@@ -517,6 +519,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       : (state.selectedAssets[state.currentAssetIndex] || state.templateType)
     // Get per-template image settings using the correct template
     const imageSettings = state.thumbnailImageSettings[currentTemplate] ?? { position: { x: 0, y: 0 }, zoom: 1 }
+
     const newAsset: QueuedAsset = {
       id: `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       templateType: currentTemplate,
