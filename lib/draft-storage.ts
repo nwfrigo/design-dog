@@ -80,6 +80,8 @@ export interface DraftState {
   reportVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Website Floating Banner specific
+  floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   // Image effects
   grayscale: boolean
   generatedVariations: { headlines: string[]; ctas: string[] } | null
@@ -175,6 +177,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       ebookVariant: state.ebookVariant || 'image',
       reportVariant: state.reportVariant || 'image',
       eventListingVariant: state.eventListingVariant || 'orange',
+      floatingBannerVariant: state.floatingBannerVariant || 'dark',
       grayscale: state.grayscale ?? false,
       generatedVariations: state.generatedVariations || null,
     }

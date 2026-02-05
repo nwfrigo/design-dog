@@ -59,6 +59,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'website-press-release': { width: 800, height: 450 },
   'website-webinar': { width: 800, height: 450 },
   'website-report': { width: 800, height: 450 },
+  'website-floating-banner': { width: 2256, height: 100 },
   'email-grid': { width: 640, height: 300 },
   'email-image': { width: 640, height: 300 },
   'email-dark-gradient': { width: 640, height: 300 },
@@ -244,6 +245,9 @@ export async function POST(request: NextRequest) {
     if (body.showSpeaker1 !== undefined) params.set('showSpeaker1', String(body.showSpeaker1))
     if (body.showSpeaker2 !== undefined) params.set('showSpeaker2', String(body.showSpeaker2))
     if (body.showSpeaker3 !== undefined) params.set('showSpeaker3', String(body.showSpeaker3))
+
+    // Website floating banner specific
+    if (body.cta) params.set('cta', body.cta)
 
     // Image effects
     if (grayscale !== undefined) params.set('grayscale', String(grayscale))

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useStore } from '@/store'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { WebsitePressRelease } from './templates/WebsitePressRelease'
@@ -18,6 +18,7 @@ import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
 import { WebsiteReport } from './templates/WebsiteReport'
+import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
 import { ImageLibraryModal } from './ImageLibraryModal'
 import { TemplateRenderer, PreviewModal } from './TemplateTile'
 import { ZoomableImage } from './ZoomableImage'
@@ -207,6 +208,9 @@ export function EditorScreen() {
     // Website Event Listing
     eventListingVariant,
     setEventListingVariant,
+    // Website Floating Banner
+    floatingBannerVariant,
+    setFloatingBannerVariant,
     // Image effects
     grayscale,
     setGrayscale,
@@ -267,6 +271,10 @@ export function EditorScreen() {
   // Cancel confirmation modal state (for edit-from-queue mode)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
+  // Floating banner preview container ref and width for responsive scaling
+  const floatingBannerContainerRef = useRef<HTMLDivElement>(null)
+  const [floatingBannerContainerWidth, setFloatingBannerContainerWidth] = useState(0)
+
   // In auto-create mode, use templateType directly (sidebar handles selection)
   // In regular mode, use selectedAssets array with tabs
   const currentTemplate = isAutoCreateMode ? templateType : (selectedAssets[currentAssetIndex] || templateType)
@@ -281,6 +289,14 @@ export function EditorScreen() {
   const getPreviewScale = () => {
     if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-grid-detail') {
       return 0.6 // Scale down 1200px to ~720px
+    }
+    if (currentTemplate === 'website-floating-banner') {
+      // Use responsive scale based on measured container width (minus padding)
+      if (floatingBannerContainerWidth > 0) {
+        const availableWidth = floatingBannerContainerWidth - 48 // Account for p-6 padding (24px * 2)
+        return availableWidth / 2256
+      }
+      return 0.28 // Fallback scale
     }
     return 1
   }
@@ -313,6 +329,30 @@ export function EditorScreen() {
       return () => document.removeEventListener('click', handleClickOutside)
     }
   }, [showScaleDropdown])
+
+  // Measure floating banner container width for responsive scaling
+  // useLayoutEffect ensures measurement happens before paint
+  useLayoutEffect(() => {
+    if (currentTemplate !== 'website-floating-banner') return
+
+    const container = floatingBannerContainerRef.current
+    if (!container) return
+
+    const updateWidth = () => {
+      const width = container.clientWidth
+      console.log('Floating banner container width:', width)
+      setFloatingBannerContainerWidth(width)
+    }
+
+    // Initial measurement
+    updateWidth()
+
+    // Observe resize
+    const resizeObserver = new ResizeObserver(updateWidth)
+    resizeObserver.observe(container)
+
+    return () => resizeObserver.disconnect()
+  }, [currentTemplate])
 
   // Handle file upload for context
   const handleFileUpload = async (file: File) => {
@@ -597,6 +637,9 @@ export function EditorScreen() {
         exportParams.showCta = showCta
         exportParams.ctaText = ctaText
         exportParams.grayscale = grayscale
+      } else if (currentTemplate === 'website-floating-banner') {
+        exportParams.variant = floatingBannerVariant
+        exportParams.cta = ctaText
       }
 
       const response = await fetch('/api/export', {
@@ -1013,8 +1056,8 @@ export function EditorScreen() {
           {/* Template Options */}
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
-              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && (
+              {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1069,8 +1112,8 @@ export function EditorScreen() {
               </div>
               )}
 
-              {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, or Website Event Listing */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-event-listing') && (
+              {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, or Website Floating Banner */}
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -1740,6 +1783,29 @@ export function EditorScreen() {
               </div>
             )}
 
+            {/* Website Floating Banner Variant Controls */}
+            {currentTemplate === 'website-floating-banner' && (
+              <div className="space-y-3">
+                {/* Variant */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Style</label>
+                  <select
+                    value={floatingBannerVariant}
+                    onChange={(e) => setFloatingBannerVariant(e.target.value as typeof floatingBannerVariant)}
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="white">White</option>
+                    <option value="orange">Orange</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue-gradient-1">Blue Gradient 1</option>
+                    <option value="blue-gradient-2">Blue Gradient 2</option>
+                    <option value="dark-gradient-1">Dark Gradient 1</option>
+                    <option value="dark-gradient-2">Dark Gradient 2</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
             {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
             {(currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') && (
               <>
@@ -2090,7 +2156,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2111,7 +2177,7 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* CTA Text - Website Webinar, Website Thumbnail, and Website Report (all variants) */}
+              {/* CTA Text - Website Webinar, Website Thumbnail, Website Report (with show/hide toggle) */}
               {(currentTemplate === 'website-webinar' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -2129,6 +2195,24 @@ export function EditorScreen() {
                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showCta ? 'opacity-50' : ''}`}
+                  />
+                </div>
+              )}
+
+              {/* CTA Text - Website Floating Banner (no show/hide toggle) */}
+              {currentTemplate === 'website-floating-banner' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    CTA Text
+                  </label>
+                  <input
+                    type="text"
+                    value={ctaText}
+                    onChange={(e) => setCtaText(e.target.value)}
+                    placeholder="e.g., Learn More"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               )}
@@ -3015,7 +3099,48 @@ export function EditorScreen() {
           )}
 
           {/* Preview */}
-          <div className="flex items-start justify-center flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6">
+          <div
+            className={`flex items-start flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6 ${
+              currentTemplate === 'website-floating-banner' ? 'justify-start' : 'justify-center'
+            }`}
+          >
+            {/* Floating banner uses a special responsive container */}
+            {currentTemplate === 'website-floating-banner' ? (
+              <div
+                ref={floatingBannerContainerRef}
+                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm w-full"
+                style={{
+                  position: 'relative',
+                  height: floatingBannerContainerWidth > 0
+                    ? Math.round(floatingBannerContainerWidth * (100 / 2256))
+                    : 50,
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: 2256,
+                  height: 100,
+                  transform: floatingBannerContainerWidth > 0
+                    ? `scale(${floatingBannerContainerWidth / 2256})`
+                    : 'scale(0.5)',
+                  transformOrigin: 'top left',
+                }}>
+                  <WebsiteFloatingBanner
+                    eyebrow={eyebrow}
+                    headline={verbatimCopy.headline || 'Headline'}
+                    cta={ctaText || 'Learn More'}
+                    showEyebrow={showEyebrow}
+                    variant={floatingBannerVariant}
+                    colors={colorsConfig}
+                    typography={typographyConfig}
+                    scale={1}
+                  />
+                </div>
+              </div>
+            ) : (
             <div className="flex flex-col">
               <div
                 className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm"
@@ -3411,28 +3536,29 @@ export function EditorScreen() {
               )}
               </div>
               </div>
-
-              {/* Save & Cancel buttons when editing from queue */}
-              {isEditingFromQueue && (
-                <div className="mt-3 flex items-center justify-end gap-3">
-                  <button
-                    onClick={() => setShowCancelConfirm(true)}
-                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
-                      bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
-                      border border-gray-200 dark:border-gray-700 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={saveQueuedAssetEdit}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg
-                      hover:bg-blue-600 transition-colors"
-                  >
-                    Save & Return to Queue
-                  </button>
-                </div>
-              )}
             </div>
+            )}
+
+            {/* Save & Cancel buttons when editing from queue */}
+            {isEditingFromQueue && (
+              <div className="mt-3 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setShowCancelConfirm(true)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
+                    bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
+                    border border-gray-200 dark:border-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveQueuedAssetEdit}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg
+                    hover:bg-blue-600 transition-colors"
+                >
+                  Save & Return to Queue
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Cancel confirmation modal */}

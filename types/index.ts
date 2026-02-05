@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
 
 export interface CopyContent {
   headline: string
@@ -175,6 +175,8 @@ export interface GeneratedAsset {
   reportVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Website Floating Banner specific
+  floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   // Image effects
   grayscale: boolean
 }
@@ -264,6 +266,8 @@ export interface QueuedAsset {
   reportVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Website Floating Banner specific
+  floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   // Image effects
   grayscale: boolean
   // For editing - track which asset index this came from
@@ -371,6 +375,8 @@ export interface AppState {
   reportVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Website Floating Banner specific
+  floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   // Image effects
   grayscale: boolean
 
@@ -460,6 +466,8 @@ export interface AppState {
   setReportVariant: (variant: 'image' | 'none') => void
   // Website Event Listing specific
   setEventListingVariant: (variant: 'orange' | 'light' | 'dark-gradient') => void
+  // Website Floating Banner specific
+  setFloatingBannerVariant: (variant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => void
   // Image effects
   setGrayscale: (grayscale: boolean) => void
 

@@ -98,6 +98,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   showSpeaker3: true,
   // Website Event Listing specific
   eventListingVariant: 'orange' as const,
+  // Website Floating Banner specific
+  floatingBannerVariant: 'dark' as const,
   // Image effects
   grayscale: false,
 })
@@ -202,6 +204,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   reportVariant: 'image',
   // Website Event Listing specific
   eventListingVariant: 'orange',
+  // Website Floating Banner specific
+  floatingBannerVariant: 'dark',
   // Image effects
   grayscale: false,
 
@@ -313,6 +317,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setReportVariant: (reportVariant: 'image' | 'none') => set({ reportVariant }),
   // Website Event Listing specific
   setEventListingVariant: (eventListingVariant: 'orange' | 'light' | 'dark-gradient') => set({ eventListingVariant }),
+  // Website Floating Banner specific
+  setFloatingBannerVariant: (floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => set({ floatingBannerVariant }),
   // Image effects
   setGrayscale: (grayscale: boolean) => set({ grayscale }),
 
@@ -439,6 +445,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ebookVariant: state.ebookVariant,
       reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
+      floatingBannerVariant: state.floatingBannerVariant,
       grayscale: state.grayscale,
       sourceAssetIndex: state.currentAssetIndex,
     }
@@ -537,6 +544,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ebookVariant: asset.ebookVariant,
       reportVariant: asset.reportVariant,
       eventListingVariant: asset.eventListingVariant,
+      floatingBannerVariant: asset.floatingBannerVariant,
       grayscale: asset.grayscale,
       // Track that we're editing from queue
       editingQueueItemId: id,
@@ -621,6 +629,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ebookVariant: state.ebookVariant,
       reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
+      floatingBannerVariant: state.floatingBannerVariant,
       grayscale: state.grayscale,
     }
 
@@ -1018,6 +1027,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ebookVariant: asset.ebookVariant,
       reportVariant: asset.reportVariant,
       eventListingVariant: asset.eventListingVariant,
+      floatingBannerVariant: asset.floatingBannerVariant,
       grayscale: asset.grayscale,
       generatedVariations: asset.variations,
     })
@@ -1311,6 +1321,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           ebookVariant: asset.ebookVariant,
           eventListingVariant: asset.eventListingVariant,
           reportVariant: asset.reportVariant,
+          floatingBannerVariant: asset.floatingBannerVariant,
           grayscale: asset.grayscale,
           sourceAssetIndex: 0,
         })
@@ -1398,6 +1409,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ebookVariant: 'image',
       reportVariant: 'image',
       eventListingVariant: 'orange',
+      floatingBannerVariant: 'dark',
       grayscale: false,
       exportQueue: [],
       // Auto-Create defaults
@@ -1473,6 +1485,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ebookVariant: state.ebookVariant,
       reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
+      floatingBannerVariant: state.floatingBannerVariant,
       grayscale: state.grayscale,
       generatedVariations: state.generatedVariations,
     })
@@ -1547,6 +1560,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ebookVariant: draft.ebookVariant ?? 'image',
       reportVariant: draft.reportVariant ?? 'image',
       eventListingVariant: draft.eventListingVariant ?? 'orange',
+      floatingBannerVariant: draft.floatingBannerVariant ?? 'dark',
       grayscale: draft.grayscale ?? false,
       generatedVariations: draft.generatedVariations,
     })
