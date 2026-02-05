@@ -71,7 +71,7 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   showMetadata: true,
   showCta: true,
   layout: 'even' as const,
-  newsletterImageSize: 'none' as const,
+  newsletterImageSize: 'small' as const,
   newsletterImageUrl: null,
   newsletterImagePosition: { x: 0, y: 0 },
   newsletterImageZoom: 1,
@@ -92,7 +92,7 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   speaker3ImagePosition: { x: 0, y: 0 },
   speaker3ImageZoom: 1,
   // Website Webinar specific
-  webinarVariant: 'image' as const,
+  webinarVariant: 'speakers' as const,
   showSpeaker1: true,
   showSpeaker2: true,
   showSpeaker3: true,
@@ -178,7 +178,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   layout: 'even',
 
   // Newsletter Dark Gradient specific settings
-  newsletterImageSize: 'none',
+  newsletterImageSize: 'small',
   newsletterImageUrl: null,
   newsletterImagePosition: { x: 0, y: 0 },
   newsletterImageZoom: 1,
@@ -201,7 +201,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   speaker3ImagePosition: { x: 0, y: 0 },
   speaker3ImageZoom: 1,
   // Website Webinar specific
-  webinarVariant: 'image',
+  webinarVariant: 'speakers',
   showSpeaker1: true,
   showSpeaker2: true,
   showSpeaker3: true,
@@ -1537,7 +1537,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Social Image defaults
       layout: 'even',
       // Newsletter Dark Gradient defaults
-      newsletterImageSize: 'none',
+      newsletterImageSize: 'small',
       newsletterImageUrl: null,
       newsletterImagePosition: { x: 0, y: 0 },
       newsletterImageZoom: 1,
@@ -1558,7 +1558,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageUrl: '',
       speaker3ImagePosition: { x: 0, y: 0 },
       speaker3ImageZoom: 1,
-      webinarVariant: 'image',
+      webinarVariant: 'speakers',
       showSpeaker1: true,
       showSpeaker2: true,
       showSpeaker3: true,

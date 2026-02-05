@@ -1,12 +1,12 @@
 import type { TemplateType } from '@/types'
 
-export type KitType = 'webinar' | 'ebook' | 'live-event' | 'product-announcement' | 'custom'
+export type KitType = 'webinar' | 'ebook' | 'live-event' | 'custom'
 
 export interface KitConfig {
   id: KitType
   label: string
   description: string
-  icon: 'video' | 'book' | 'calendar' | 'megaphone' | 'sparkles'
+  icon: 'video' | 'book' | 'calendar' | 'sparkles'
   recommendedAssets: TemplateType[]
   contentPrompts: {
     upload: string
@@ -20,7 +20,7 @@ export const KIT_CONFIGS: Record<KitType, KitConfig> = {
     label: 'Webinar',
     description: 'Promote an upcoming webinar or virtual event',
     icon: 'video',
-    recommendedAssets: ['email-grid', 'social-dark-gradient', 'website-thumbnail', 'newsletter-dark-gradient'],
+    recommendedAssets: ['email-speakers', 'website-webinar', 'newsletter-dark-gradient', 'social-grid-detail'],
     contentPrompts: {
       upload: 'Upload your webinar details, agenda, or speaker information',
       manual: 'Describe your webinar topic, speakers, and key takeaways',
@@ -31,7 +31,7 @@ export const KIT_CONFIGS: Record<KitType, KitConfig> = {
     label: 'eBook',
     description: 'Promote a downloadable eBook or whitepaper',
     icon: 'book',
-    recommendedAssets: ['email-image', 'social-blue-gradient', 'website-thumbnail', 'social-image'],
+    recommendedAssets: ['email-image', 'social-image', 'website-thumbnail', 'newsletter-light'],
     contentPrompts: {
       upload: 'Upload your eBook PDF or content outline',
       manual: 'Describe the eBook topic, key insights, and target audience',
@@ -42,21 +42,10 @@ export const KIT_CONFIGS: Record<KitType, KitConfig> = {
     label: 'Live Event',
     description: 'Promote an in-person conference or event',
     icon: 'calendar',
-    recommendedAssets: ['email-grid', 'social-grid-detail', 'website-thumbnail', 'email-speakers'],
+    recommendedAssets: ['email-grid', 'website-event-listing', 'website-floating-banner', 'website-floating-banner-mobile', 'social-image'],
     contentPrompts: {
       upload: 'Upload event details, schedule, or speaker bios',
       manual: 'Describe the event, location, agenda, and speakers',
-    },
-  },
-  'product-announcement': {
-    id: 'product-announcement',
-    label: 'Product Announcement',
-    description: 'Announce a new product or feature launch',
-    icon: 'megaphone',
-    recommendedAssets: ['email-dark-gradient', 'social-dark-gradient', 'website-thumbnail', 'newsletter-blue-gradient'],
-    contentPrompts: {
-      upload: 'Upload product specs, release notes, or announcement draft',
-      manual: 'Describe the product/feature, benefits, and target audience',
     },
   },
   custom: {
