@@ -144,6 +144,8 @@ export async function POST(request: NextRequest) {
       speaker3ImageZoom,
       // Newsletter specific
       imageSize,
+      // Image effects
+      grayscale,
     } = body
 
     // Build query params for render page
@@ -241,6 +243,9 @@ export async function POST(request: NextRequest) {
     if (body.showSpeaker1 !== undefined) params.set('showSpeaker1', String(body.showSpeaker1))
     if (body.showSpeaker2 !== undefined) params.set('showSpeaker2', String(body.showSpeaker2))
     if (body.showSpeaker3 !== undefined) params.set('showSpeaker3', String(body.showSpeaker3))
+
+    // Image effects
+    if (grayscale !== undefined) params.set('grayscale', String(grayscale))
 
     // Get the base URL from the request
     const protocol = request.headers.get('x-forwarded-proto') || 'https'

@@ -138,6 +138,14 @@ function AutoCreateSidebar() {
             </button>
           ))}
         </div>
+
+        {/* About blurb */}
+        <p className="mt-8 text-xs font-mono text-gray-400 dark:text-gray-500 leading-relaxed">
+          designdog is a homemade app that makes marketing assets for Cority. The possibilities are endless, and there&apos;s always room for improvement. If you see any, let Nick know!{' '}
+          <a href="mailto:nicholas.frigo@cority.com" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">
+            nicholas.frigo@cority.com
+          </a>
+        </p>
       </div>
     </aside>
   )

@@ -32,6 +32,7 @@ export interface NewsletterBlueGradientProps {
   showEyebrow: boolean
   showBody: boolean
   showCta: boolean
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -71,6 +72,7 @@ export function NewsletterBlueGradient({
   showEyebrow,
   showBody,
   showCta,
+  grayscale = false,
   colors,
   typography,
   scale = 1,
@@ -79,11 +81,14 @@ export function NewsletterBlueGradient({
   const textColor = '#FFFFFF'
   const ctaColor = '#0080FF' // Cobalt blue for arrow
 
-  // State for grayscale image
+  // State for grayscale image (only used when grayscale is enabled)
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!imageUrl || imageSize === 'none') return
+    if (!imageUrl || imageSize === 'none' || !grayscale) {
+      setGrayscaleImageUrl(null)
+      return
+    }
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -102,7 +107,7 @@ export function NewsletterBlueGradient({
     }
     img.onerror = () => setGrayscaleImageUrl(null)
     img.src = imageUrl
-  }, [imageUrl, imageSize])
+  }, [imageUrl, imageSize, grayscale])
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -256,7 +261,7 @@ export function NewsletterBlueGradient({
                     ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
                     : undefined,
                   transformOrigin: 'center',
-                  filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
+                  filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
                 }}
               />
             )}

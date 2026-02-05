@@ -17,6 +17,7 @@ interface Props {
   showBody: boolean
   showCta: boolean
   showSolutionSet: boolean
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -55,6 +56,7 @@ export function EmailImageRender(props: Props) {
         showBody={props.showBody}
         showCta={props.showCta}
         showSolutionSet={props.showSolutionSet}
+        grayscale={props.grayscale}
         colors={props.colors}
         typography={props.typography}
         scale={1}

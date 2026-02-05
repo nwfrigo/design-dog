@@ -57,6 +57,7 @@ export interface SocialImageProps {
   showMetadata: boolean
   showCta: boolean
   showSolutionSet: boolean
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -84,6 +85,7 @@ export function SocialImage({
   showMetadata,
   showCta,
   showSolutionSet,
+  grayscale = false,
   colors,
   typography,
   scale = 1,
@@ -96,11 +98,14 @@ export function SocialImage({
   const solutionLabel = solutionConfig.label
   const imageWidth = IMAGE_WIDTHS[layout]
 
-  // State for grayscale image
+  // State for grayscale image (only used when grayscale is enabled)
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!imageUrl) return
+    if (!imageUrl || !grayscale) {
+      setGrayscaleImageUrl(null)
+      return
+    }
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -119,7 +124,7 @@ export function SocialImage({
     }
     img.onerror = () => setGrayscaleImageUrl(null)
     img.src = imageUrl
-  }, [imageUrl])
+  }, [imageUrl, grayscale])
 
   const containerStyle: CSSProperties = {
     width: 1200,
@@ -276,7 +281,7 @@ export function SocialImage({
               ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
               : undefined,
             transformOrigin: 'center',
-            filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
+            filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
           }}
         />
 

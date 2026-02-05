@@ -78,6 +78,8 @@ export interface DraftState {
   ebookVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Image effects
+  grayscale: boolean
   generatedVariations: { headlines: string[]; ctas: string[] } | null
 }
 
@@ -170,6 +172,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       showSpeaker3: state.showSpeaker3 ?? true,
       ebookVariant: state.ebookVariant || 'image',
       eventListingVariant: state.eventListingVariant || 'orange',
+      grayscale: state.grayscale ?? false,
       generatedVariations: state.generatedVariations || null,
     }
 

@@ -19,6 +19,7 @@ interface Props {
   showMetadata: boolean
   showCta: boolean
   showSolutionSet: boolean
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -59,6 +60,7 @@ export function SocialImageRender(props: Props) {
         showMetadata={props.showMetadata}
         showCta={props.showCta}
         showSolutionSet={props.showSolutionSet}
+        grayscale={props.grayscale}
         colors={props.colors}
         typography={props.typography}
         scale={1}

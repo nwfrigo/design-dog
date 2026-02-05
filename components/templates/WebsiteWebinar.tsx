@@ -59,6 +59,7 @@ export interface WebsiteWebinarProps {
   showSubhead: boolean
   showBody: boolean
   showCta: boolean
+  grayscale?: boolean
   speakerCount: 1 | 2 | 3
   speaker1: WebinarSpeakerInfo
   speaker2: WebinarSpeakerInfo
@@ -71,24 +72,29 @@ export interface WebsiteWebinarProps {
   scale?: number
 }
 
-// Component to render a circular speaker avatar with grayscale
+// Component to render a circular speaker avatar with optional grayscale
 function SpeakerAvatar({
   imageUrl,
   position,
   zoom,
   size = 48,
   speakerIndex,
+  grayscale = false,
 }: {
   imageUrl: string
   position: { x: number; y: number }
   zoom: number
   size?: number
   speakerIndex: number
+  grayscale?: boolean
 }) {
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!imageUrl) return
+    if (!imageUrl || !grayscale) {
+      setGrayscaleImageUrl(null)
+      return
+    }
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -107,7 +113,7 @@ function SpeakerAvatar({
     }
     img.onerror = () => setGrayscaleImageUrl(null)
     img.src = imageUrl
-  }, [imageUrl])
+  }, [imageUrl, grayscale])
 
   const containerStyle: CSSProperties = {
     width: size,
@@ -127,7 +133,7 @@ function SpeakerAvatar({
     left: `${50 + position.x}%`,
     top: `${50 + position.y}%`,
     transform: 'translate(-50%, -50%)',
-    filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
+    filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
   }
 
   if (!imageUrl) {
@@ -162,6 +168,7 @@ export function WebsiteWebinar({
   showSubhead,
   showBody,
   showCta,
+  grayscale = false,
   speakerCount = 3,
   speaker1,
   speaker2,
@@ -179,11 +186,14 @@ export function WebsiteWebinar({
 
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
-  // State for grayscale image (for export compatibility)
+  // State for grayscale image (only used when grayscale is enabled)
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!imageUrl || variant !== 'image') return
+    if (!imageUrl || variant !== 'image' || !grayscale) {
+      setGrayscaleImageUrl(null)
+      return
+    }
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -202,7 +212,7 @@ export function WebsiteWebinar({
     }
     img.onerror = () => setGrayscaleImageUrl(null)
     img.src = imageUrl
-  }, [imageUrl, variant])
+  }, [imageUrl, variant, grayscale])
 
   // Font sizes differ based on variant
   const headlineFontSize = variant === 'none' ? 54 : 35.42
@@ -260,7 +270,7 @@ export function WebsiteWebinar({
                 ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
                 : undefined,
               transformOrigin: 'center',
-              filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
+              filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
             }}
           />
         </div>
@@ -473,6 +483,7 @@ export function WebsiteWebinar({
                 zoom={speaker.imageZoom}
                 size={48}
                 speakerIndex={speaker.speakerIndex}
+                grayscale={grayscale}
               />
               <div
                 style={{

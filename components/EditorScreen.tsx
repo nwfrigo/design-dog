@@ -203,6 +203,9 @@ export function EditorScreen() {
     // Website Event Listing
     eventListingVariant,
     setEventListingVariant,
+    // Image effects
+    grayscale,
+    setGrayscale,
     // Queue
     addToQueue,
     exportQueue,
@@ -1918,6 +1921,24 @@ export function EditorScreen() {
                     </button>
                   </div>
                 )}
+                {/* Grayscale toggle - only show when image is selected */}
+                {thumbnailImageUrl && (
+                  <div className="flex items-center justify-between mt-3">
+                    <label className="text-xs text-gray-500">Grayscale</label>
+                    <button
+                      onClick={() => setGrayscale(!grayscale)}
+                      className={`relative w-9 h-5 rounded-full transition-colors ${
+                        grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                          grayscale ? 'translate-x-4' : ''
+                        }`}
+                      />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -2996,6 +3017,7 @@ export function EditorScreen() {
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
+                  grayscale={grayscale}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -3043,6 +3065,7 @@ export function EditorScreen() {
                   showSpeaker1={showSpeaker1}
                   showSpeaker2={showSpeaker2}
                   showSpeaker3={showSpeaker3}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3152,6 +3175,7 @@ export function EditorScreen() {
                   showMetadata={showMetadata}
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3192,6 +3216,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3230,6 +3255,7 @@ export function EditorScreen() {
                   showEyebrow={showEyebrow && !!eyebrow}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3249,6 +3275,7 @@ export function EditorScreen() {
                   showEyebrow={showEyebrow && !!eyebrow}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3267,6 +3294,7 @@ export function EditorScreen() {
                   showEyebrow={showEyebrow && !!eyebrow}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3306,6 +3334,7 @@ export function EditorScreen() {
                     imagePosition: speaker3ImagePosition,
                     imageZoom: speaker3ImageZoom,
                   }}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

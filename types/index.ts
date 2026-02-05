@@ -173,6 +173,8 @@ export interface GeneratedAsset {
   ebookVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Image effects
+  grayscale: boolean
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -258,6 +260,8 @@ export interface QueuedAsset {
   ebookVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Image effects
+  grayscale: boolean
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -361,6 +365,8 @@ export interface AppState {
   ebookVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  // Image effects
+  grayscale: boolean
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -446,6 +452,8 @@ export interface AppState {
   setEbookVariant: (variant: 'image' | 'none') => void
   // Website Event Listing specific
   setEventListingVariant: (variant: 'orange' | 'light' | 'dark-gradient') => void
+  // Image effects
+  setGrayscale: (grayscale: boolean) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

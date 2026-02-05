@@ -27,6 +27,7 @@ export default function RenderPage({
   const showMetadata = searchParams.showMetadata !== 'false'
   const showCta = searchParams.showCta !== 'false'
   const showSolutionSet = searchParams.showSolutionSet !== 'false'
+  const grayscale = searchParams.grayscale === 'true'
 
   return (
     <div style={{
@@ -53,6 +54,7 @@ export default function RenderPage({
           showMetadata={showMetadata}
           showCta={showCta}
           showSolutionSet={showSolutionSet}
+          grayscale={grayscale}
           colors={colorsConfig}
           typography={typographyConfig}
         />

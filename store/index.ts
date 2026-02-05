@@ -97,6 +97,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   showSpeaker3: true,
   // Website Event Listing specific
   eventListingVariant: 'orange' as const,
+  // Image effects
+  grayscale: false,
 })
 
 export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
@@ -197,6 +199,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   ebookVariant: 'image',
   // Website Event Listing specific
   eventListingVariant: 'orange',
+  // Image effects
+  grayscale: false,
 
   // Export queue
   exportQueue: [],
@@ -304,6 +308,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setEbookVariant: (ebookVariant: 'image' | 'none') => set({ ebookVariant }),
   // Website Event Listing specific
   setEventListingVariant: (eventListingVariant: 'orange' | 'light' | 'dark-gradient') => set({ eventListingVariant }),
+  // Image effects
+  setGrayscale: (grayscale: boolean) => set({ grayscale }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -427,6 +433,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker3: state.showSpeaker3,
       ebookVariant: state.ebookVariant,
       eventListingVariant: state.eventListingVariant,
+      grayscale: state.grayscale,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -523,6 +530,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       webinarVariant: asset.webinarVariant,
       ebookVariant: asset.ebookVariant,
       eventListingVariant: asset.eventListingVariant,
+      grayscale: asset.grayscale,
       // Track that we're editing from queue
       editingQueueItemId: id,
     })
@@ -605,6 +613,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker3: state.showSpeaker3,
       ebookVariant: state.ebookVariant,
       eventListingVariant: state.eventListingVariant,
+      grayscale: state.grayscale,
     }
 
     // Update the queue item and return to queue
@@ -1000,6 +1009,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       webinarVariant: asset.webinarVariant,
       ebookVariant: asset.ebookVariant,
       eventListingVariant: asset.eventListingVariant,
+      grayscale: asset.grayscale,
       generatedVariations: asset.variations,
     })
   },
@@ -1291,6 +1301,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           showSpeaker3: asset.showSpeaker3,
           ebookVariant: asset.ebookVariant,
           eventListingVariant: asset.eventListingVariant,
+          grayscale: asset.grayscale,
           sourceAssetIndex: 0,
         })
       }
@@ -1376,6 +1387,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker3: true,
       ebookVariant: 'image',
       eventListingVariant: 'orange',
+      grayscale: false,
       exportQueue: [],
       // Auto-Create defaults
       autoCreate: { ...initialAutoCreate },
@@ -1449,6 +1461,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker3: state.showSpeaker3,
       ebookVariant: state.ebookVariant,
       eventListingVariant: state.eventListingVariant,
+      grayscale: state.grayscale,
       generatedVariations: state.generatedVariations,
     })
   },
@@ -1521,6 +1534,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker3: draft.showSpeaker3 ?? true,
       ebookVariant: draft.ebookVariant ?? 'image',
       eventListingVariant: draft.eventListingVariant ?? 'orange',
+      grayscale: draft.grayscale ?? false,
       generatedVariations: draft.generatedVariations,
     })
     return true

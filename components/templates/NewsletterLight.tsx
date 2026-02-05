@@ -30,6 +30,7 @@ export interface NewsletterLightProps {
   showEyebrow: boolean
   showBody: boolean
   showCta: boolean
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -61,6 +62,7 @@ export function NewsletterLight({
   showEyebrow,
   showBody,
   showCta,
+  grayscale = false,
   colors,
   typography,
   scale = 1,
@@ -70,11 +72,14 @@ export function NewsletterLight({
   const ctaColor = '#0080FF' // Cobalt blue for arrow
   const backgroundColor = '#FFFFFF'
 
-  // State for grayscale image
+  // State for grayscale image (only used when grayscale is enabled)
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!imageUrl || imageSize === 'none') return
+    if (!imageUrl || imageSize === 'none' || !grayscale) {
+      setGrayscaleImageUrl(null)
+      return
+    }
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -93,7 +98,7 @@ export function NewsletterLight({
     }
     img.onerror = () => setGrayscaleImageUrl(null)
     img.src = imageUrl
-  }, [imageUrl, imageSize])
+  }, [imageUrl, imageSize, grayscale])
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -232,7 +237,7 @@ export function NewsletterLight({
                         ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
                         : undefined,
                       transformOrigin: 'center',
-                      filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
+                      filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
                     }}
                   />
                 )}
@@ -264,7 +269,7 @@ export function NewsletterLight({
                         ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
                         : undefined,
                       transformOrigin: 'center',
-                      filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
+                      filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
                     }}
                   />
                 )}

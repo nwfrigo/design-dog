@@ -59,6 +59,7 @@ export interface EmailSpeakersProps {
   showBody: boolean
   showCta: boolean
   showSolutionSet: boolean
+  grayscale?: boolean
   speakerCount: 1 | 2 | 3
   speaker1: SpeakerInfo
   speaker2: SpeakerInfo
@@ -68,24 +69,29 @@ export interface EmailSpeakersProps {
   scale?: number
 }
 
-// Component to render a circular speaker avatar with grayscale
+// Component to render a circular speaker avatar with optional grayscale
 function SpeakerAvatar({
   imageUrl,
   position,
   zoom,
   size = 48,
   speakerIndex,
+  grayscale = false,
 }: {
   imageUrl: string
   position: { x: number; y: number }
   zoom: number
   size?: number
   speakerIndex: number
+  grayscale?: boolean
 }) {
   const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!imageUrl) return
+    if (!imageUrl || !grayscale) {
+      setGrayscaleImageUrl(null)
+      return
+    }
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -104,7 +110,7 @@ function SpeakerAvatar({
     }
     img.onerror = () => setGrayscaleImageUrl(null)
     img.src = imageUrl
-  }, [imageUrl])
+  }, [imageUrl, grayscale])
 
   const containerStyle: CSSProperties = {
     width: size,
@@ -124,7 +130,7 @@ function SpeakerAvatar({
     left: `${50 + position.x}%`,
     top: `${50 + position.y}%`,
     transform: 'translate(-50%, -50%)',
-    filter: grayscaleImageUrl ? 'none' : 'grayscale(100%)',
+    filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
   }
 
   if (!imageUrl) {
@@ -155,6 +161,7 @@ export function EmailSpeakers({
   showBody,
   showCta,
   showSolutionSet,
+  grayscale = false,
   speakerCount,
   speaker1,
   speaker2,
@@ -334,6 +341,7 @@ export function EmailSpeakers({
               zoom={speaker.imageZoom}
               size={48}
               speakerIndex={index + 1}
+              grayscale={grayscale}
             />
             <div style={{
               width: 161,
