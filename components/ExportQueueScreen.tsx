@@ -6,6 +6,8 @@ import type { QueuedAsset, TemplateType } from '@/types'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { WebsitePressRelease } from './templates/WebsitePressRelease'
 import { WebsiteWebinar } from './templates/WebsiteWebinar'
+import { WebsiteReport } from './templates/WebsiteReport'
+import { WebsiteEventListing } from './templates/WebsiteEventListing'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
@@ -895,6 +897,46 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'website-report' && (
+                <WebsiteReport
+                  eyebrow={asset.eyebrow || 'REPORT'}
+                  headline={asset.headline || 'Lightweight header.'}
+                  subhead={asset.subhead}
+                  cta={asset.ctaText || 'Responsive'}
+                  solution={asset.solution}
+                  variant={asset.reportVariant}
+                  imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_report.png'}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showCta={asset.showCta}
+                  grayscale={asset.grayscale}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'website-event-listing' && (
+                <WebsiteEventListing
+                  eyebrow={asset.eyebrow || 'LIVE EVENT'}
+                  headline={asset.headline || 'Headline'}
+                  subhead={asset.subhead}
+                  cta={asset.ctaText || 'Responsive'}
+                  variant={asset.eventListingVariant}
+                  gridDetail1Text={asset.gridDetail1Text || 'Add Details or Hide Me'}
+                  gridDetail2Text={asset.gridDetail2Text || 'Add Details or Hide Me'}
+                  gridDetail3Text={asset.gridDetail3Text || 'Add Details or Hide Me'}
+                  gridDetail4Text={asset.gridDetail4Text || 'Add Details or Hide Me'}
+                  showRow3={asset.showRow3}
+                  showRow4={asset.showRow4}
+                  showEyebrow={asset.showEyebrow}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
             </div>
           ) : (
             <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
@@ -1355,6 +1397,46 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showEyebrow={asset.showEyebrow && !!asset.eyebrow}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'website-report' && (
+            <WebsiteReport
+              eyebrow={asset.eyebrow || 'REPORT'}
+              headline={asset.headline || 'Lightweight header.'}
+              subhead={asset.subhead}
+              cta={asset.ctaText || 'Responsive'}
+              solution={asset.solution}
+              variant={asset.reportVariant}
+              imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_report.png'}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showCta={asset.showCta}
+              grayscale={asset.grayscale}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'website-event-listing' && (
+            <WebsiteEventListing
+              eyebrow={asset.eyebrow || 'LIVE EVENT'}
+              headline={asset.headline || 'Headline'}
+              subhead={asset.subhead}
+              cta={asset.ctaText || 'Responsive'}
+              variant={asset.eventListingVariant}
+              gridDetail1Text={asset.gridDetail1Text || 'Add Details or Hide Me'}
+              gridDetail2Text={asset.gridDetail2Text || 'Add Details or Hide Me'}
+              gridDetail3Text={asset.gridDetail3Text || 'Add Details or Hide Me'}
+              gridDetail4Text={asset.gridDetail4Text || 'Add Details or Hide Me'}
+              showRow3={asset.showRow3}
+              showRow4={asset.showRow4}
+              showEyebrow={asset.showEyebrow}
+              showSubhead={asset.showSubhead && !!asset.subhead}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

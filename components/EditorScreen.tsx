@@ -17,6 +17,7 @@ import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDeta
 import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
+import { WebsiteReport } from './templates/WebsiteReport'
 import { ImageLibraryModal } from './ImageLibraryModal'
 import { TemplateRenderer, PreviewModal } from './TemplateTile'
 import { ZoomableImage } from './ZoomableImage'
@@ -200,6 +201,9 @@ export function EditorScreen() {
     // Website eBook Listing
     ebookVariant,
     setEbookVariant,
+    // Website Report
+    reportVariant,
+    setReportVariant,
     // Website Event Listing
     eventListingVariant,
     setEventListingVariant,
@@ -583,6 +587,16 @@ export function EditorScreen() {
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
         exportParams.grayscale = grayscale
+      } else if (currentTemplate === 'website-report') {
+        exportParams.imageUrl = thumbnailImageUrl
+        exportParams.imagePositionX = thumbnailImagePosition.x
+        exportParams.imagePositionY = thumbnailImagePosition.y
+        exportParams.imageZoom = thumbnailImageZoom
+        exportParams.variant = reportVariant
+        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
+        exportParams.showCta = showCta
+        exportParams.ctaText = ctaText
+        exportParams.grayscale = grayscale
       }
 
       const response = await fetch('/api/export', {
@@ -928,6 +942,7 @@ export function EditorScreen() {
             currentTemplate === 'social-image' ? (layout === 'even' ? 488 : layout === 'more-image' ? 600 : 376) :
             currentTemplate === 'website-webinar' ? 333 :
             currentTemplate === 'website-press-release' ? 545 :
+            currentTemplate === 'website-report' ? 320 :
             320 // default
           }
           frameHeight={
@@ -936,6 +951,7 @@ export function EditorScreen() {
             currentTemplate === 'social-image' ? 628 :
             currentTemplate === 'website-webinar' ? 450 :
             currentTemplate === 'website-press-release' ? 343 :
+            currentTemplate === 'website-report' ? 386 :
             300 // default
           }
           initialPosition={thumbnailImagePosition}
@@ -998,7 +1014,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1699,6 +1715,31 @@ export function EditorScreen() {
               </div>
             )}
 
+            {/* Website Report Controls */}
+            {currentTemplate === 'website-report' && (
+              <div className="space-y-3">
+                {/* Variant */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Layout</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    {(['image', 'none'] as const).map((variant) => (
+                      <button
+                        key={variant}
+                        onClick={() => setReportVariant(variant)}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                          reportVariant === variant
+                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {variant === 'image' ? 'Image' : 'None'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
             {(currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') && (
               <>
@@ -1845,8 +1886,8 @@ export function EditorScreen() {
             )}
 
 
-            {/* Image - Website Thumbnail (image variant), Email Image, Social Image, Website Webinar (image variant), and Website Press Release */}
-            {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release') && (
+            {/* Image - Website Thumbnail (image variant), Email Image, Social Image, Website Webinar (image variant), Website Press Release, and Website Report (image variant) */}
+            {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release' || (currentTemplate === 'website-report' && reportVariant === 'image')) && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
@@ -2006,18 +2047,18 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'social-grid-detail' || currentTemplate === 'website-event-listing') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'social-grid-detail' || currentTemplate === 'website-event-listing' || currentTemplate === 'website-report') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                      {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail') ? 'Subheader' : 'Subhead'}
+                      {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report') ? 'Subheader' : 'Subhead'}
                     </label>
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
                   </div>
                   <textarea
                     value={verbatimCopy.subhead}
                     onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
-                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail') ? 'Subheader text' : 'Supporting subheadline'}
+                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report') ? 'Subheader text' : 'Supporting subheadline'}
                     rows={2}
                     className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
@@ -2070,8 +2111,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* CTA Text - Website Webinar and Website Thumbnail (all variants) */}
-              {(currentTemplate === 'website-webinar' || currentTemplate === 'website-thumbnail') && (
+              {/* CTA Text - Website Webinar, Website Thumbnail, and Website Report (all variants) */}
+              {(currentTemplate === 'website-webinar' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2975,14 +3016,15 @@ export function EditorScreen() {
 
           {/* Preview */}
           <div className="flex items-start justify-center flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6">
-            <div
-              className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm"
-              style={{
-                width: dimensions.width * previewScale,
-                height: dimensions.height * previewScale,
-                overflow: 'hidden',
-              }}
-            >
+            <div className="flex flex-col">
+              <div
+                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm"
+                style={{
+                  width: dimensions.width * previewScale,
+                  height: dimensions.height * previewScale,
+                  overflow: 'hidden',
+                }}
+              >
               <div style={{
                 transform: `scale(${previewScale})`,
                 transformOrigin: 'top left',
@@ -3093,6 +3135,26 @@ export function EditorScreen() {
                   showRow4={showRow4}
                   showEyebrow={showEyebrow}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'website-report' && (
+                <WebsiteReport
+                  eyebrow={eyebrow || 'REPORT'}
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  subhead={verbatimCopy.subhead}
+                  cta={ctaText || 'Responsive'}
+                  solution={solution}
+                  variant={reportVariant}
+                  imageUrl={thumbnailImageUrl || undefined}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
+                  showEyebrow={showEyebrow}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  showCta={showCta}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3348,29 +3410,30 @@ export function EditorScreen() {
                 />
               )}
               </div>
+              </div>
+
+              {/* Save & Cancel buttons when editing from queue */}
+              {isEditingFromQueue && (
+                <div className="mt-3 flex items-center justify-end gap-3">
+                  <button
+                    onClick={() => setShowCancelConfirm(true)}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
+                      bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
+                      border border-gray-200 dark:border-gray-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={saveQueuedAssetEdit}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg
+                      hover:bg-blue-600 transition-colors"
+                  >
+                    Save & Return to Queue
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Save & Cancel buttons when editing from queue */}
-          {isEditingFromQueue && (
-            <div className="mt-4 flex items-center justify-end gap-3">
-              <button
-                onClick={() => setShowCancelConfirm(true)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
-                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
-                  border border-gray-200 dark:border-gray-700 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveQueuedAssetEdit}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg
-                  hover:bg-blue-600 transition-colors"
-              >
-                Save & Return to Queue
-              </button>
-            </div>
-          )}
 
           {/* Cancel confirmation modal */}
           {showCancelConfirm && (

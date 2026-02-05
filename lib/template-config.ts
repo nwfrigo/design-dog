@@ -125,6 +125,13 @@ const WEBSITE_TEMPLATES: TemplateInfo[] = [
     width: 800,
     height: 450,
   },
+  {
+    type: 'website-report',
+    label: 'Report Featured Image',
+    dimensions: '800 × 450px',
+    width: 800,
+    height: 450,
+  },
 ]
 
 // Template definitions for newsletter

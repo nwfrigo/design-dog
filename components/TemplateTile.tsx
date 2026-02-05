@@ -19,6 +19,7 @@ import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
 import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
+import { WebsiteReport } from '@/components/templates/WebsiteReport'
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
@@ -34,6 +35,7 @@ interface TemplateTileProps {
 const PLACEHOLDER_IMAGES = {
   default: '/assets/images/default_placeholder_image_1.png',
   ebook: '/assets/images/safer_is_stronger_sample_page.png',
+  report: '/assets/images/default_placeholder_image_report.png',
   speaker1: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
   speaker2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
   speaker3: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop',
@@ -304,6 +306,23 @@ export function TemplateRenderer({
           showRow4={true}
           showEyebrow={true}
           showSubhead={false}
+        />
+      )
+
+    case 'website-report':
+      return (
+        <WebsiteReport
+          {...commonProps}
+          eyebrow="REPORT"
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          cta="Responsive"
+          solution="environmental"
+          variant="image"
+          imageUrl={PLACEHOLDER_IMAGES.report}
+          showEyebrow={true}
+          showSubhead={false}
+          showCta={true}
         />
       )
 

@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
 
 export interface CopyContent {
   headline: string
@@ -171,6 +171,8 @@ export interface GeneratedAsset {
   showSpeaker3: boolean
   // Website eBook Listing specific
   ebookVariant: 'image' | 'none'
+  // Website Report specific
+  reportVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // Image effects
@@ -258,6 +260,8 @@ export interface QueuedAsset {
   showSpeaker3: boolean
   // Website eBook Listing specific
   ebookVariant: 'image' | 'none'
+  // Website Report specific
+  reportVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // Image effects
@@ -363,6 +367,8 @@ export interface AppState {
   showSpeaker3: boolean
   // Website eBook Listing specific
   ebookVariant: 'image' | 'none'
+  // Website Report specific
+  reportVariant: 'image' | 'none'
   // Website Event Listing specific
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // Image effects
@@ -450,6 +456,8 @@ export interface AppState {
   setShowSpeaker3: (show: boolean) => void
   // Website eBook Listing specific
   setEbookVariant: (variant: 'image' | 'none') => void
+  // Website Report specific
+  setReportVariant: (variant: 'image' | 'none') => void
   // Website Event Listing specific
   setEventListingVariant: (variant: 'orange' | 'light' | 'dark-gradient') => void
   // Image effects

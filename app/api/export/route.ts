@@ -58,6 +58,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'website-thumbnail': { width: 800, height: 450 },
   'website-press-release': { width: 800, height: 450 },
   'website-webinar': { width: 800, height: 450 },
+  'website-report': { width: 800, height: 450 },
   'email-grid': { width: 640, height: 300 },
   'email-image': { width: 640, height: 300 },
   'email-dark-gradient': { width: 640, height: 300 },

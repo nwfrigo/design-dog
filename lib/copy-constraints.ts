@@ -178,6 +178,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'website-press-release': 'website',
   'website-webinar': 'website',
   'website-event-listing': 'website',
+  'website-report': 'website',
   'email-grid': 'email',
   'email-image': 'email',
   'email-dark-gradient': 'email',

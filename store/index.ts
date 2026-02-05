@@ -38,13 +38,14 @@ const initialAutoCreate: AutoCreateState = {
 }
 
 const getDefaultAssetSettings = (templateType?: TemplateType) => ({
-  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : templateType === 'website-thumbnail' ? 'EBOOK' : templateType === 'website-event-listing' ? 'LIVE EVENT' : 'Eyebrow',
+  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : templateType === 'website-thumbnail' ? 'EBOOK' : templateType === 'website-event-listing' ? 'LIVE EVENT' : templateType === 'website-report' ? 'REPORT' : 'Eyebrow',
   solution: templateType === 'website-webinar' ? 'safety' : templateType === 'website-press-release' ? 'health' : 'environmental',
-  logoColor: templateType === 'website-webinar' ? 'white' as const : 'black' as const,
+  logoColor: templateType === 'website-webinar' || templateType === 'website-report' ? 'white' as const : 'black' as const,
   showEyebrow: true,
   showSubhead: templateType === 'website-press-release' ? false : true,
   showBody: true,
   ebookVariant: 'image' as const,
+  reportVariant: 'image' as const,
   thumbnailImageUrl: null,
   thumbnailImagePosition: { x: 0, y: 0 },
   thumbnailImageZoom: 1,
@@ -197,6 +198,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   showSpeaker3: true,
   // Website eBook Listing specific
   ebookVariant: 'image',
+  // Website Report specific
+  reportVariant: 'image',
   // Website Event Listing specific
   eventListingVariant: 'orange',
   // Image effects
@@ -306,6 +309,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setShowSpeaker3: (showSpeaker3: boolean) => set({ showSpeaker3 }),
   // Website eBook Listing specific
   setEbookVariant: (ebookVariant: 'image' | 'none') => set({ ebookVariant }),
+  // Website Report specific
+  setReportVariant: (reportVariant: 'image' | 'none') => set({ reportVariant }),
   // Website Event Listing specific
   setEventListingVariant: (eventListingVariant: 'orange' | 'light' | 'dark-gradient') => set({ eventListingVariant }),
   // Image effects
@@ -432,6 +437,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker2: state.showSpeaker2,
       showSpeaker3: state.showSpeaker3,
       ebookVariant: state.ebookVariant,
+      reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
       grayscale: state.grayscale,
       sourceAssetIndex: state.currentAssetIndex,
@@ -529,6 +535,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageZoom: asset.speaker3ImageZoom,
       webinarVariant: asset.webinarVariant,
       ebookVariant: asset.ebookVariant,
+      reportVariant: asset.reportVariant,
       eventListingVariant: asset.eventListingVariant,
       grayscale: asset.grayscale,
       // Track that we're editing from queue
@@ -612,6 +619,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker2: state.showSpeaker2,
       showSpeaker3: state.showSpeaker3,
       ebookVariant: state.ebookVariant,
+      reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
       grayscale: state.grayscale,
     }
@@ -1008,6 +1016,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       speaker3ImageZoom: asset.speaker3ImageZoom,
       webinarVariant: asset.webinarVariant,
       ebookVariant: asset.ebookVariant,
+      reportVariant: asset.reportVariant,
       eventListingVariant: asset.eventListingVariant,
       grayscale: asset.grayscale,
       generatedVariations: asset.variations,
@@ -1301,6 +1310,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           showSpeaker3: asset.showSpeaker3,
           ebookVariant: asset.ebookVariant,
           eventListingVariant: asset.eventListingVariant,
+          reportVariant: asset.reportVariant,
           grayscale: asset.grayscale,
           sourceAssetIndex: 0,
         })
@@ -1386,6 +1396,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker2: true,
       showSpeaker3: true,
       ebookVariant: 'image',
+      reportVariant: 'image',
       eventListingVariant: 'orange',
       grayscale: false,
       exportQueue: [],
@@ -1460,6 +1471,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker2: state.showSpeaker2,
       showSpeaker3: state.showSpeaker3,
       ebookVariant: state.ebookVariant,
+      reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
       grayscale: state.grayscale,
       generatedVariations: state.generatedVariations,
@@ -1533,6 +1545,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSpeaker2: draft.showSpeaker2 ?? true,
       showSpeaker3: draft.showSpeaker3 ?? true,
       ebookVariant: draft.ebookVariant ?? 'image',
+      reportVariant: draft.reportVariant ?? 'image',
       eventListingVariant: draft.eventListingVariant ?? 'orange',
       grayscale: draft.grayscale ?? false,
       generatedVariations: draft.generatedVariations,
