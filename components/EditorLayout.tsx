@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Header } from '@/components/Header'
 
 interface EditorLayoutProps {
   children: React.ReactNode
@@ -11,6 +12,7 @@ interface EditorLayoutProps {
 
 export function EditorLayout({ children }: EditorLayoutProps) {
   const router = useRouter()
+  const mainRef = useRef<HTMLElement>(null)
   const {
     saveDraft,
     generatedAssets,
@@ -94,76 +96,57 @@ export function EditorLayout({ children }: EditorLayoutProps) {
 
   const isQueueScreen = currentScreen === 'queue'
 
+  const centerContent = isQueueScreen ? (
+    <button
+      onClick={handleBackToEditor}
+      className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Editor
+    </button>
+  ) : null
+
+  const rightContent = (
+    <>
+      {exportQueue.length > 0 && !isQueueScreen && (
+        <button
+          onClick={handleViewQueue}
+          className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
+        >
+          View Queue ({exportQueue.length})
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      )}
+      {Object.keys(generatedAssets).length > 0 && !isQueueScreen && !isEditingFromQueue && (
+        <button
+          onClick={handleExportAll}
+          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Export All
+        </button>
+      )}
+      <ThemeToggle />
+    </>
+  )
+
   return (
     <div className="min-h-screen bg-white dark:bg-black flex flex-col">
-      {/* Header */}
-      <header className="bg-white dark:bg-black border-b border-gray-100 dark:border-gray-900 flex-shrink-0 h-[100px]">
-        <div className="max-w-[1600px] mx-auto px-6 h-full flex items-center justify-between">
-          {/* Logo */}
-          <button
-            onClick={handleLogoClick}
-            className="hover:opacity-80 transition-opacity"
-          >
-            {/* Light mode logo */}
-            <img
-              src="/assets/brand/design-dog-logo-color-light-cority.svg"
-              alt="Design Dog"
-              className="h-8 dark:hidden"
-            />
-            {/* Dark mode logo */}
-            <img
-              src="/assets/brand/design-dog-logo-color-cority.svg"
-              alt="Design Dog"
-              className="h-8 hidden dark:block"
-            />
-          </button>
-
-          {/* Center - Navigation */}
-          <div className="flex items-center gap-4">
-            {isQueueScreen && (
-              <button
-                onClick={handleBackToEditor}
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Editor
-              </button>
-            )}
-          </div>
-
-          {/* Right side actions */}
-          <div className="flex items-center gap-3">
-            {exportQueue.length > 0 && !isQueueScreen && (
-              <button
-                onClick={handleViewQueue}
-                className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
-              >
-                View Queue ({exportQueue.length})
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            )}
-            {Object.keys(generatedAssets).length > 0 && !isQueueScreen && !isEditingFromQueue && (
-              <button
-                onClick={handleExportAll}
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export All
-              </button>
-            )}
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <Header
+        onLogoClick={handleLogoClick}
+        centerContent={centerContent}
+        rightContent={rightContent}
+        scrollContainerRef={mainRef}
+      />
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">
+      <main ref={mainRef} className="flex-1 overflow-auto">
         <div className="max-w-[1600px] mx-auto px-6 py-6">
           {children}
         </div>

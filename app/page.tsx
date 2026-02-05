@@ -7,6 +7,7 @@ import { AssetSelectionScreen } from '@/components/AssetSelectionScreen'
 import { AutoCreateContentScreen, AutoCreateAssetsScreen, AutoCreateGeneratingScreen } from '@/components/AutoCreate'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { DraftBanner } from '@/components/DraftBanner'
+import { Header } from '@/components/Header'
 
 function HomeContent() {
   const router = useRouter()
@@ -27,6 +28,10 @@ function HomeContent() {
   const isAutoCreateFlow = currentScreen === 'auto-create-content' || currentScreen === 'auto-create-assets' || currentScreen === 'auto-create-generating'
   const isSelectScreen = currentScreen === 'select'
 
+  const handleLogoClick = () => {
+    setCurrentScreen('select')
+  }
+
   return (
     <main className="min-h-screen bg-white dark:bg-black">
       {/* Draft Banner */}
@@ -46,33 +51,11 @@ function HomeContent() {
         </div>
       )}
 
-      {/* Header */}
-      <header className="bg-white dark:bg-black border-b border-gray-100 dark:border-gray-900 h-[100px]">
-        <div className={`${isSelectScreen ? 'max-w-[1600px]' : 'max-w-5xl'} mx-auto px-6 h-full flex items-center justify-between`}>
-          <button
-            onClick={() => setCurrentScreen('select')}
-            className="hover:opacity-80 transition-opacity"
-          >
-            {/* Light mode logo */}
-            <img
-              src="/assets/brand/design-dog-logo-color-light-cority.svg"
-              alt="Design Dog"
-              className="h-8 dark:hidden"
-            />
-            {/* Dark mode logo */}
-            <img
-              src="/assets/brand/design-dog-logo-color-cority.svg"
-              alt="Design Dog"
-              className="h-8 hidden dark:block"
-            />
-          </button>
-
-          {/* Settings Area */}
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <Header
+        onLogoClick={handleLogoClick}
+        rightContent={<ThemeToggle />}
+        maxWidth={isSelectScreen ? 'max-w-[1600px]' : 'max-w-5xl'}
+      />
 
       {/* Main content */}
       <div className={`${isSelectScreen ? 'max-w-[1600px]' : 'max-w-5xl'} mx-auto px-6 py-8`}>
