@@ -3271,6 +3271,7 @@ export function EditorScreen() {
                   showEyebrow={showEyebrow}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
+                  grayscale={grayscale}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
