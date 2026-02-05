@@ -58,6 +58,7 @@ export default function RenderPage({
   const showSpeaker1 = searchParams.showSpeaker1 !== 'false'
   const showSpeaker2 = searchParams.showSpeaker2 !== 'false'
   const showSpeaker3 = searchParams.showSpeaker3 !== 'false'
+  const grayscale = searchParams.grayscale === 'true'
 
   return (
     <div style={{
@@ -109,6 +110,7 @@ export default function RenderPage({
           showSpeaker1={showSpeaker1}
           showSpeaker2={showSpeaker2}
           showSpeaker3={showSpeaker3}
+          grayscale={grayscale}
           colors={colorsConfig}
           typography={typographyConfig}
         />

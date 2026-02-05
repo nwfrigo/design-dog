@@ -19,6 +19,7 @@ interface Props {
   speaker1: SpeakerInfo
   speaker2: SpeakerInfo
   speaker3: SpeakerInfo
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -59,6 +60,7 @@ export function EmailSpeakersRender(props: Props) {
         speaker1={props.speaker1}
         speaker2={props.speaker2}
         speaker3={props.speaker3}
+        grayscale={props.grayscale}
         colors={props.colors}
         typography={props.typography}
         scale={1}

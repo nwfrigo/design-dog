@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, useState, useEffect } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
 // Inline SVG logo for export compatibility
@@ -41,12 +41,16 @@ function ZoomPanImage({
   containerHeight,
   position,
   zoom,
+  grayscale = false,
+  grayscaleImageUrl,
 }: {
   src: string
   containerWidth: number
   containerHeight: number
   position: { x: number; y: number }
   zoom: number
+  grayscale?: boolean
+  grayscaleImageUrl?: string | null
 }) {
   return (
     <div
@@ -59,7 +63,7 @@ function ZoomPanImage({
       }}
     >
       <img
-        src={src}
+        src={grayscale && grayscaleImageUrl ? grayscaleImageUrl : src}
         alt=""
         data-export-image="true"
         style={{
@@ -75,6 +79,7 @@ function ZoomPanImage({
             ? `scale(${zoom}) translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%)`
             : undefined,
           transformOrigin: 'center',
+          filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
         }}
       />
     </div>
@@ -97,6 +102,7 @@ export interface WebsiteThumbnailProps {
   showSubhead: boolean
   showCta: boolean
   logoColor: 'black' | 'orange'
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -116,10 +122,39 @@ export function WebsiteThumbnail({
   showSubhead,
   showCta,
   logoColor,
+  grayscale = false,
   colors,
   typography,
   scale = 1,
 }: WebsiteThumbnailProps) {
+  // State for grayscale image (only used when grayscale is enabled)
+  const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!imageUrl || !grayscale) {
+      setGrayscaleImageUrl(null)
+      return
+    }
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(img, 0, 0)
+        ctx.globalCompositeOperation = 'saturation'
+        ctx.fillStyle = 'hsl(0, 0%, 50%)'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        setGrayscaleImageUrl(canvas.toDataURL('image/jpeg', 0.9))
+      }
+    }
+    img.onerror = () => setGrayscaleImageUrl(null)
+    img.src = imageUrl
+  }, [imageUrl, grayscale])
+
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
@@ -314,6 +349,8 @@ export function WebsiteThumbnail({
           containerHeight={386}
           position={imagePosition}
           zoom={imageZoom}
+          grayscale={grayscale}
+          grayscaleImageUrl={grayscaleImageUrl}
         />
       )}
     </div>

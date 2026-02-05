@@ -18,6 +18,7 @@ interface Props {
   showSubhead: boolean
   showCta: boolean
   logoColor: 'black' | 'orange'
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -57,6 +58,7 @@ export function WebsiteThumbnailRender(props: Props) {
         showSubhead={props.showSubhead}
         showCta={props.showCta}
         logoColor={props.logoColor}
+        grayscale={props.grayscale}
         colors={props.colors}
         typography={props.typography}
         scale={1}

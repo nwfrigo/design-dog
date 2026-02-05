@@ -28,6 +28,7 @@ export default function RenderPage({
   const showSubhead = searchParams.showSubhead === 'true'
   const showCta = searchParams.showCta !== 'false'
   const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
+  const grayscale = searchParams.grayscale === 'true'
 
   return (
     <div style={{
@@ -53,6 +54,7 @@ export default function RenderPage({
           showSubhead={showSubhead}
           showCta={showCta}
           logoColor={logoColor}
+          grayscale={grayscale}
           colors={colorsConfig}
           typography={typographyConfig}
         />

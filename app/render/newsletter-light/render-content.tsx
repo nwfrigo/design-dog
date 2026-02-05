@@ -16,6 +16,7 @@ interface Props {
   showEyebrow: boolean
   showBody: boolean
   showCta: boolean
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -53,6 +54,7 @@ export function NewsletterLightRender(props: Props) {
         showEyebrow={props.showEyebrow}
         showBody={props.showBody}
         showCta={props.showCta}
+        grayscale={props.grayscale}
         colors={props.colors}
         typography={props.typography}
         scale={1}

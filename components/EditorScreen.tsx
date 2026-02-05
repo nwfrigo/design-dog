@@ -444,6 +444,7 @@ export function EditorScreen() {
         exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
         exportParams.showCta = showCta
         exportParams.ctaText = ctaText
+        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'website-press-release') {
         exportParams.imageUrl = thumbnailImageUrl
         exportParams.imagePositionX = thumbnailImagePosition.x
@@ -453,6 +454,7 @@ export function EditorScreen() {
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
         exportParams.ctaText = ctaText
+        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'website-event-listing') {
         exportParams.variant = eventListingVariant
         exportParams.gridDetail1Text = gridDetail1Text
@@ -500,6 +502,7 @@ export function EditorScreen() {
         exportParams.showMetadata = showMetadata
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
+        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'social-grid-detail') {
         exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
         exportParams.showSolutionSet = showSolutionSet
@@ -521,6 +524,7 @@ export function EditorScreen() {
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
+        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'email-dark-gradient') {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
@@ -555,6 +559,7 @@ export function EditorScreen() {
         exportParams.speaker3ImagePositionX = speaker3ImagePosition.x
         exportParams.speaker3ImagePositionY = speaker3ImagePosition.y
         exportParams.speaker3ImageZoom = speaker3ImageZoom
+        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient') {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
@@ -566,6 +571,7 @@ export function EditorScreen() {
         exportParams.showEyebrow = showEyebrow && !!eyebrow
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
+        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'newsletter-light') {
         exportParams.ctaText = ctaText
         exportParams.imageSize = newsletterImageSize
@@ -576,6 +582,7 @@ export function EditorScreen() {
         exportParams.showEyebrow = showEyebrow && !!eyebrow
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
+        exportParams.grayscale = grayscale
       }
 
       const response = await fetch('/api/export', {

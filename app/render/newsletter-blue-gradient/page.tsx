@@ -26,6 +26,7 @@ export default function RenderPage({
   const showEyebrow = searchParams.showEyebrow !== 'false'
   const showBody = searchParams.showBody !== 'false'
   const showCta = searchParams.showCta !== 'false'
+  const grayscale = searchParams.grayscale === 'true'
 
   return (
     <div style={{
@@ -50,6 +51,7 @@ export default function RenderPage({
           showEyebrow={showEyebrow}
           showBody={showBody}
           showCta={showCta}
+          grayscale={grayscale}
           colors={colorsConfig}
           typography={typographyConfig}
         />
