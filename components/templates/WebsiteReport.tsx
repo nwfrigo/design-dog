@@ -151,7 +151,7 @@ export function WebsiteReport({
               objectFit: 'cover',
               objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
               transform: imageZoom !== 1
-                ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
+                ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
                 : undefined,
               transformOrigin: 'center',
               filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',

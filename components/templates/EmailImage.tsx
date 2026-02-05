@@ -266,27 +266,22 @@ export function EmailImage({
         top: 0,
         overflow: 'hidden',
       }}>
-        {/* Image - slightly oversized to allow overflow effect */}
         <img
           src={grayscaleImageUrl || imageUrl}
           alt=""
           data-export-image="true"
           style={{
-            width: imageWidth + 60,
-            height: 330,
-            position: 'absolute',
-            left: -30,
-            top: 12,
+            width: '100%',
+            height: '100%',
             objectFit: 'cover',
             objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
             transform: imageZoom !== 1
-              ? `scale(${imageZoom}) translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%)`
+              ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
               : undefined,
             transformOrigin: 'center',
             filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
           }}
         />
-
       </div>
     </div>
   )

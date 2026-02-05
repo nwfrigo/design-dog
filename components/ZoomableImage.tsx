@@ -204,11 +204,10 @@ export function ZoomableImage({
             objectFit: 'cover',
             // object-position: 0% = left/top edge, 50% = center, 100% = right/bottom edge
             objectPosition: `${50 - position.x}% ${50 - position.y}%`,
-            // When zoomed: scale + translate to maintain the same visible content
-            // After scale from center, content shifts away from center
-            // Translate in SAME direction as position to compensate
+            // When zoomed: translate then scale (CSS applies right-to-left)
+            // So this means: scale from center first, then translate to compensate
             transform: zoom !== 1
-              ? `scale(${zoom}) translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%)`
+              ? `translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%) scale(${zoom})`
               : undefined,
             transformOrigin: 'center',
             transition: isDragging ? 'none' : 'all 0.15s ease-out',

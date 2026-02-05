@@ -76,7 +76,7 @@ function ZoomPanImage({
           // After scale from center, content shifts away from center
           // Translate in SAME direction as position to compensate
           transform: zoom !== 1
-            ? `scale(${zoom}) translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%)`
+            ? `translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%) scale(${zoom})`
             : undefined,
           transformOrigin: 'center',
           filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
