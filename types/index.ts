@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
 
 export interface CopyContent {
   headline: string
@@ -177,6 +177,9 @@ export interface GeneratedAsset {
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // Website Floating Banner specific
   floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  // Website Floating Banner Mobile specific
+  floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  floatingBannerMobileArrowType: 'text' | 'arrow'
   // Image effects
   grayscale: boolean
 }
@@ -268,6 +271,9 @@ export interface QueuedAsset {
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // Website Floating Banner specific
   floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  // Website Floating Banner Mobile specific
+  floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  floatingBannerMobileArrowType: 'text' | 'arrow'
   // Image effects
   grayscale: boolean
   // For editing - track which asset index this came from
@@ -298,6 +304,8 @@ export interface AppState {
   // Multi-asset selection
   selectedAssets: TemplateType[]
   currentAssetIndex: number
+  // Per-asset copy for manual mode (keyed by index)
+  manualAssetCopies: Record<number, CopyContent>
 
   // Design settings (per-asset, changes when switching assets)
   templateType: TemplateType
@@ -377,6 +385,9 @@ export interface AppState {
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // Website Floating Banner specific
   floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  // Website Floating Banner Mobile specific
+  floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  floatingBannerMobileArrowType: 'text' | 'arrow'
   // Image effects
   grayscale: boolean
 
@@ -468,6 +479,9 @@ export interface AppState {
   setEventListingVariant: (variant: 'orange' | 'light' | 'dark-gradient') => void
   // Website Floating Banner specific
   setFloatingBannerVariant: (variant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => void
+  // Website Floating Banner Mobile specific
+  setFloatingBannerMobileVariant: (variant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => void
+  setFloatingBannerMobileArrowType: (arrowType: 'text' | 'arrow') => void
   // Image effects
   setGrayscale: (grayscale: boolean) => void
 

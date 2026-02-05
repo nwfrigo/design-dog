@@ -99,7 +99,7 @@ export function WebsiteEventListing({
         return {
           background: '#060015',
           textColor: 'white',
-          borderColor: 'white',
+          borderColor: '#0080FF',
           logoFill: 'white',
           gridBackground: '#060015',
         }
@@ -137,30 +137,6 @@ export function WebsiteEventListing({
 
   return (
     <div style={containerStyle}>
-      {/* Dark gradient background effect */}
-      {variant === 'dark-gradient' && (
-        <div
-          style={{
-            width: 800,
-            height: 450,
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            overflow: 'hidden',
-          }}
-        >
-          <img
-            src="/assets/backgrounds/website_event_listing_dark_background.png"
-            alt=""
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-        </div>
-      )}
-
       {/* Left content area */}
       <div
         style={{

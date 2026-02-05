@@ -10,6 +10,7 @@ export interface DraftState {
   // Editor state
   selectedAssets: TemplateType[]
   currentAssetIndex: number
+  manualAssetCopies: Record<number, CopyContent>
   templateType: TemplateType
   verbatimCopy: CopyContent
   // Generated assets (for auto-create flow)
@@ -82,6 +83,9 @@ export interface DraftState {
   eventListingVariant: 'orange' | 'light' | 'dark-gradient'
   // Website Floating Banner specific
   floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  // Website Floating Banner Mobile specific
+  floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  floatingBannerMobileArrowType: 'text' | 'arrow'
   // Image effects
   grayscale: boolean
   generatedVariations: { headlines: string[]; ctas: string[] } | null
@@ -98,6 +102,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       savedAt: Date.now(),
       selectedAssets: state.selectedAssets || [],
       currentAssetIndex: state.currentAssetIndex || 0,
+      manualAssetCopies: state.manualAssetCopies || {},
       templateType: state.templateType || 'website-thumbnail',
       verbatimCopy: state.verbatimCopy || { headline: '', subhead: '', body: '', cta: '' },
       generatedAssets: state.generatedAssets || {},
@@ -178,6 +183,8 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       reportVariant: state.reportVariant || 'image',
       eventListingVariant: state.eventListingVariant || 'orange',
       floatingBannerVariant: state.floatingBannerVariant || 'dark',
+      floatingBannerMobileVariant: state.floatingBannerMobileVariant || 'light',
+      floatingBannerMobileArrowType: state.floatingBannerMobileArrowType || 'text',
       grayscale: state.grayscale ?? false,
       generatedVariations: state.generatedVariations || null,
     }

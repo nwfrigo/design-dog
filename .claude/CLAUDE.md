@@ -469,6 +469,7 @@ npm run dev
 - `website-webinar` — WebsiteWebinar (variants: image/none, up to 3 speakers)
 - `website-event-listing` — WebsiteEventListing (variants via toggle)
 - `website-report` — WebsiteReport (variants: image/none, image on LEFT)
+- `website-floating-banner` — WebsiteFloatingBanner (2256×100px, 7 style variants)
 
 ### Newsletter
 - `newsletter-dark-gradient` — NewsletterDarkGradient (has image + grayscale)
@@ -506,3 +507,39 @@ npm run dev
 - **Two state systems:** Auto-create uses `generatedAssets` + `templateType`; manual mode uses `selectedAssets` + `currentAssetIndex`. Don't mix them.
 - **Modal state persistence:** Use React `key` prop or `useEffect` cleanup to reset modal state on mount.
 - **Local PDF uploads:** Require `BLOB_READ_WRITE_TOKEN` in `.env.local`.
+
+### Scaling Large Templates in Preview (CSS Transform Gotcha)
+
+**Problem:** When a template is much wider than the editor viewport (e.g., 2256px floating banner), using `transform: scale()` to visually shrink it doesn't change the element's layout box size. The inner div still pushes containers and backgrounds off-screen, even with `overflow: hidden`.
+
+**Solution:** Use `position: absolute` on the inner scaled content to take it out of the document flow:
+
+```tsx
+// Outer container - fills available width naturally
+<div
+  ref={containerRef}
+  className="w-full"
+  style={{
+    position: 'relative',
+    height: containerWidth > 0 ? Math.round(containerWidth * (100 / 2256)) : 50,
+    overflow: 'hidden',
+  }}
+>
+  {/* Inner content - absolutely positioned so it doesn't affect layout */}
+  <div style={{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 2256,
+    height: 100,
+    transform: `scale(${containerWidth / 2256})`,
+    transformOrigin: 'top left',
+  }}>
+    <TemplateComponent ... />
+  </div>
+</div>
+```
+
+**Key insight:** `transform: scale()` only visually scales — the element still occupies its original dimensions in layout. Absolute positioning removes it from flow so the parent container sizes correctly.
+
+**Measuring container width:** Use `useLayoutEffect` + `ResizeObserver` to measure the container's `clientWidth` synchronously, then calculate scale dynamically.

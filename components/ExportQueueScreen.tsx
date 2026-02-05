@@ -8,6 +8,8 @@ import { WebsitePressRelease } from './templates/WebsitePressRelease'
 import { WebsiteWebinar } from './templates/WebsiteWebinar'
 import { WebsiteReport } from './templates/WebsiteReport'
 import { WebsiteEventListing } from './templates/WebsiteEventListing'
+import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
+import { WebsiteFloatingBannerMobile } from './templates/WebsiteFloatingBannerMobile'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
@@ -137,8 +139,13 @@ export function ExportQueueScreen() {
           newsletterImagePositionX: asset.newsletterImagePosition?.x,
           newsletterImagePositionY: asset.newsletterImagePosition?.y,
           newsletterImageZoom: asset.newsletterImageZoom,
-          // Website webinar specific
-          variant: asset.webinarVariant,
+          // Template variant (determined by template type)
+          variant: asset.templateType === 'website-floating-banner' ? asset.floatingBannerVariant
+            : asset.templateType === 'website-floating-banner-mobile' ? asset.floatingBannerMobileVariant
+            : asset.templateType === 'website-event-listing' ? asset.eventListingVariant
+            : asset.templateType === 'website-report' ? asset.reportVariant
+            : asset.templateType === 'website-thumbnail' ? asset.ebookVariant
+            : asset.webinarVariant,
           // Email speakers and website webinar specific
           speakerCount: asset.speakerCount,
           speaker1Name: asset.speaker1Name,
@@ -162,6 +169,8 @@ export function ExportQueueScreen() {
           showSpeaker1: asset.showSpeaker1,
           showSpeaker2: asset.showSpeaker2,
           showSpeaker3: asset.showSpeaker3,
+          // Website floating banner mobile specific
+          arrowType: asset.floatingBannerMobileArrowType,
         }),
       })
 
@@ -937,6 +946,31 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'website-floating-banner' && (
+                <WebsiteFloatingBanner
+                  eyebrow={asset.eyebrow || 'EYEBROW'}
+                  headline={asset.headline || 'Headline'}
+                  cta={asset.ctaText || 'Learn More'}
+                  showEyebrow={asset.showEyebrow}
+                  variant={asset.floatingBannerVariant || 'dark'}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'website-floating-banner-mobile' && (
+                <WebsiteFloatingBannerMobile
+                  eyebrow={asset.eyebrow || 'EYEBROW'}
+                  headline={asset.headline || 'Headline'}
+                  cta={asset.ctaText || 'Learn More'}
+                  showEyebrow={asset.showEyebrow}
+                  variant={asset.floatingBannerMobileVariant || 'light'}
+                  arrowType={asset.floatingBannerMobileArrowType || 'text'}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
             </div>
           ) : (
             <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
@@ -1437,6 +1471,31 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showRow4={asset.showRow4}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'website-floating-banner' && (
+            <WebsiteFloatingBanner
+              eyebrow={asset.eyebrow || 'EYEBROW'}
+              headline={asset.headline || 'Headline'}
+              cta={asset.ctaText || 'Learn More'}
+              showEyebrow={asset.showEyebrow}
+              variant={asset.floatingBannerVariant || 'dark'}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'website-floating-banner-mobile' && (
+            <WebsiteFloatingBannerMobile
+              eyebrow={asset.eyebrow || 'EYEBROW'}
+              headline={asset.headline || 'Headline'}
+              cta={asset.ctaText || 'Learn More'}
+              showEyebrow={asset.showEyebrow}
+              variant={asset.floatingBannerMobileVariant || 'light'}
+              arrowType={asset.floatingBannerMobileArrowType || 'text'}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

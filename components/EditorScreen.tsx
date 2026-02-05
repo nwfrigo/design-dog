@@ -19,6 +19,7 @@ import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
 import { WebsiteReport } from './templates/WebsiteReport'
 import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
+import { WebsiteFloatingBannerMobile } from './templates/WebsiteFloatingBannerMobile'
 import { ImageLibraryModal } from './ImageLibraryModal'
 import { TemplateRenderer, PreviewModal } from './TemplateTile'
 import { ZoomableImage } from './ZoomableImage'
@@ -211,6 +212,11 @@ export function EditorScreen() {
     // Website Floating Banner
     floatingBannerVariant,
     setFloatingBannerVariant,
+    // Website Floating Banner Mobile
+    floatingBannerMobileVariant,
+    setFloatingBannerMobileVariant,
+    floatingBannerMobileArrowType,
+    setFloatingBannerMobileArrowType,
     // Image effects
     grayscale,
     setGrayscale,
@@ -640,6 +646,10 @@ export function EditorScreen() {
       } else if (currentTemplate === 'website-floating-banner') {
         exportParams.variant = floatingBannerVariant
         exportParams.cta = ctaText
+      } else if (currentTemplate === 'website-floating-banner-mobile') {
+        exportParams.variant = floatingBannerMobileVariant
+        exportParams.arrowType = floatingBannerMobileArrowType
+        exportParams.cta = ctaText
       }
 
       const response = await fetch('/api/export', {
@@ -1057,7 +1067,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1113,7 +1123,7 @@ export function EditorScreen() {
               )}
 
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, or Website Floating Banner */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner') && (
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -1806,6 +1816,55 @@ export function EditorScreen() {
               </div>
             )}
 
+            {/* Website Floating Banner Mobile Variant Controls */}
+            {currentTemplate === 'website-floating-banner-mobile' && (
+              <div className="space-y-3">
+                {/* Variant */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Style</label>
+                  <select
+                    value={floatingBannerMobileVariant}
+                    onChange={(e) => setFloatingBannerMobileVariant(e.target.value as typeof floatingBannerMobileVariant)}
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="light">Light</option>
+                    <option value="orange">Orange</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue-gradient-1">Blue Gradient 1</option>
+                    <option value="blue-gradient-2">Blue Gradient 2</option>
+                    <option value="dark-gradient-1">Dark Gradient 1</option>
+                    <option value="dark-gradient-2">Dark Gradient 2</option>
+                  </select>
+                </div>
+                {/* Arrow Type */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <button
+                      onClick={() => setFloatingBannerMobileArrowType('text')}
+                      className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                        floatingBannerMobileArrowType === 'text'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Text + Arrow
+                    </button>
+                    <button
+                      onClick={() => setFloatingBannerMobileArrowType('arrow')}
+                      className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                        floatingBannerMobileArrowType === 'arrow'
+                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Arrow Only
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
             {(currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') && (
               <>
@@ -2156,7 +2215,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2200,7 +2259,7 @@ export function EditorScreen() {
               )}
 
               {/* CTA Text - Website Floating Banner (no show/hide toggle) */}
-              {currentTemplate === 'website-floating-banner' && (
+              {(currentTemplate === 'website-floating-banner' || currentTemplate === 'website-floating-banner-mobile') && (
                 <div>
                   <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                     CTA Text
@@ -3101,10 +3160,10 @@ export function EditorScreen() {
           {/* Preview */}
           <div
             className={`flex items-start flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6 ${
-              currentTemplate === 'website-floating-banner' ? 'justify-start' : 'justify-center'
+              currentTemplate === 'website-floating-banner' || currentTemplate === 'website-floating-banner-mobile' ? 'justify-start' : 'justify-center'
             }`}
           >
-            {/* Floating banner uses a special responsive container */}
+            {/* Floating banner (desktop) uses a special responsive container */}
             {currentTemplate === 'website-floating-banner' ? (
               <div
                 ref={floatingBannerContainerRef}
@@ -3529,6 +3588,19 @@ export function EditorScreen() {
                     imageZoom: speaker3ImageZoom,
                   }}
                   grayscale={grayscale}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'website-floating-banner-mobile' && (
+                <WebsiteFloatingBannerMobile
+                  eyebrow={eyebrow}
+                  headline={verbatimCopy.headline || 'Headline'}
+                  cta={ctaText || 'Learn More'}
+                  showEyebrow={showEyebrow}
+                  variant={floatingBannerMobileVariant}
+                  arrowType={floatingBannerMobileArrowType}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

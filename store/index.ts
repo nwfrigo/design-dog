@@ -100,6 +100,9 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   eventListingVariant: 'orange' as const,
   // Website Floating Banner specific
   floatingBannerVariant: 'dark' as const,
+  // Website Floating Banner Mobile specific
+  floatingBannerMobileVariant: 'light' as const,
+  floatingBannerMobileArrowType: 'text' as const,
   // Image effects
   grayscale: false,
 })
@@ -127,6 +130,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Multi-asset selection
   selectedAssets: [],
   currentAssetIndex: 0,
+  // Per-asset copy for manual mode (keyed by index)
+  manualAssetCopies: {} as Record<number, CopyContent>,
 
   // Design settings (shared across assets)
   templateType: 'website-thumbnail',
@@ -206,6 +211,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   eventListingVariant: 'orange',
   // Website Floating Banner specific
   floatingBannerVariant: 'dark',
+  // Website Floating Banner Mobile specific
+  floatingBannerMobileVariant: 'light',
+  floatingBannerMobileArrowType: 'text',
   // Image effects
   grayscale: false,
 
@@ -319,6 +327,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setEventListingVariant: (eventListingVariant: 'orange' | 'light' | 'dark-gradient') => set({ eventListingVariant }),
   // Website Floating Banner specific
   setFloatingBannerVariant: (floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => set({ floatingBannerVariant }),
+  // Website Floating Banner Mobile specific
+  setFloatingBannerMobileVariant: (floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => set({ floatingBannerMobileVariant }),
+  setFloatingBannerMobileArrowType: (floatingBannerMobileArrowType: 'text' | 'arrow') => set({ floatingBannerMobileArrowType }),
   // Image effects
   setGrayscale: (grayscale: boolean) => set({ grayscale }),
 
@@ -333,11 +344,23 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     }
   },
   goToAsset: (index: number) => {
-    const { selectedAssets } = get()
+    const state = get()
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies } = state
     if (index >= 0 && index < selectedAssets.length) {
+      // Save current asset's copy before switching
+      const updatedCopies = {
+        ...manualAssetCopies,
+        [currentAssetIndex]: { ...verbatimCopy },
+      }
+
+      // Load target asset's copy (or keep current if new asset)
+      const targetCopy = updatedCopies[index] || verbatimCopy
+
       set({
         currentAssetIndex: index,
         templateType: selectedAssets[index],
+        manualAssetCopies: updatedCopies,
+        verbatimCopy: { ...targetCopy },
       })
     }
   },
@@ -446,6 +469,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
       floatingBannerVariant: state.floatingBannerVariant,
+      floatingBannerMobileVariant: state.floatingBannerMobileVariant,
+      floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       grayscale: state.grayscale,
       sourceAssetIndex: state.currentAssetIndex,
     }
@@ -545,6 +570,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       reportVariant: asset.reportVariant,
       eventListingVariant: asset.eventListingVariant,
       floatingBannerVariant: asset.floatingBannerVariant,
+      floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
+      floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
       grayscale: asset.grayscale,
       // Track that we're editing from queue
       editingQueueItemId: id,
@@ -630,6 +657,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
       floatingBannerVariant: state.floatingBannerVariant,
+      floatingBannerMobileVariant: state.floatingBannerMobileVariant,
+      floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       grayscale: state.grayscale,
     }
 
@@ -1028,6 +1057,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       reportVariant: asset.reportVariant,
       eventListingVariant: asset.eventListingVariant,
       floatingBannerVariant: asset.floatingBannerVariant,
+      floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
+      floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
       grayscale: asset.grayscale,
       generatedVariations: asset.variations,
     })
@@ -1322,6 +1353,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           eventListingVariant: asset.eventListingVariant,
           reportVariant: asset.reportVariant,
           floatingBannerVariant: asset.floatingBannerVariant,
+          floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
+          floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
           grayscale: asset.grayscale,
           sourceAssetIndex: 0,
         })
@@ -1346,6 +1379,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       isGenerating: false,
       selectedAssets: [],
       currentAssetIndex: 0,
+      manualAssetCopies: {},
       templateType: 'website-thumbnail',
       thumbnailImageUrl: null,
       thumbnailImageSettings: {},
@@ -1410,6 +1444,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       reportVariant: 'image',
       eventListingVariant: 'orange',
       floatingBannerVariant: 'dark',
+      floatingBannerMobileVariant: 'light',
+      floatingBannerMobileArrowType: 'text',
       grayscale: false,
       exportQueue: [],
       // Auto-Create defaults
@@ -1423,6 +1459,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     saveDraftToStorage({
       selectedAssets: state.selectedAssets,
       currentAssetIndex: state.currentAssetIndex,
+      manualAssetCopies: state.manualAssetCopies,
       templateType: state.templateType,
       verbatimCopy: state.verbatimCopy,
       generatedAssets: state.generatedAssets,
@@ -1486,6 +1523,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       reportVariant: state.reportVariant,
       eventListingVariant: state.eventListingVariant,
       floatingBannerVariant: state.floatingBannerVariant,
+      floatingBannerMobileVariant: state.floatingBannerMobileVariant,
+      floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       grayscale: state.grayscale,
       generatedVariations: state.generatedVariations,
     })
@@ -1498,6 +1537,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     set({
       selectedAssets: draft.selectedAssets,
       currentAssetIndex: draft.currentAssetIndex,
+      manualAssetCopies: draft.manualAssetCopies || {},
       templateType: draft.templateType,
       verbatimCopy: draft.verbatimCopy,
       generatedAssets: draft.generatedAssets,
@@ -1561,6 +1601,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       reportVariant: draft.reportVariant ?? 'image',
       eventListingVariant: draft.eventListingVariant ?? 'orange',
       floatingBannerVariant: draft.floatingBannerVariant ?? 'dark',
+      floatingBannerMobileVariant: draft.floatingBannerMobileVariant ?? 'light',
+      floatingBannerMobileArrowType: draft.floatingBannerMobileArrowType ?? 'text',
       grayscale: draft.grayscale ?? false,
       generatedVariations: draft.generatedVariations,
     })

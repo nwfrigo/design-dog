@@ -139,6 +139,13 @@ const WEBSITE_TEMPLATES: TemplateInfo[] = [
     width: 2256,
     height: 100,
   },
+  {
+    type: 'website-floating-banner-mobile',
+    label: 'Floating Banner (Mobile)',
+    dimensions: '580 × 80px',
+    width: 580,
+    height: 80,
+  },
 ]
 
 // Template definitions for newsletter

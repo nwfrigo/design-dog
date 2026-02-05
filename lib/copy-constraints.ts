@@ -180,6 +180,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'website-event-listing': 'website',
   'website-report': 'website',
   'website-floating-banner': 'website',
+  'website-floating-banner-mobile': 'website',
   'email-grid': 'email',
   'email-image': 'email',
   'email-dark-gradient': 'email',

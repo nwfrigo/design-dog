@@ -20,6 +20,8 @@ import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
 import { WebsiteReport } from '@/components/templates/WebsiteReport'
+import { WebsiteFloatingBanner } from '@/components/templates/WebsiteFloatingBanner'
+import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloatingBannerMobile'
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
@@ -323,6 +325,31 @@ export function TemplateRenderer({
           showEyebrow={true}
           showSubhead={false}
           showCta={true}
+        />
+      )
+
+    case 'website-floating-banner':
+      return (
+        <WebsiteFloatingBanner
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          cta="Learn More"
+          showEyebrow={true}
+          variant="dark"
+        />
+      )
+
+    case 'website-floating-banner-mobile':
+      return (
+        <WebsiteFloatingBannerMobile
+          {...commonProps}
+          eyebrow={PREVIEW_CONTENT.eyebrow}
+          headline={PREVIEW_CONTENT.headline}
+          cta="Learn More"
+          showEyebrow={true}
+          variant="light"
+          arrowType="text"
         />
       )
 
