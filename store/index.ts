@@ -470,6 +470,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         speaker3ImageUrl: targetSettings.speaker3ImageUrl,
         speaker3ImagePosition: { ...targetSettings.speaker3ImagePosition },
         speaker3ImageZoom: targetSettings.speaker3ImageZoom,
+        // Reset generation state when switching assets - each asset has its own generation context
+        pdfContent: null,
+        generationContext: '',
+        contextFile: null,
       })
     }
   },

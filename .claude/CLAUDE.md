@@ -347,20 +347,88 @@ Headline is NOT required. No red asterisks. All buttons (export, queue, save) wo
 
 ## PDF Upload & Parsing
 
-- Large PDFs upload via **Vercel Blob storage** (bypasses 4.5MB serverless limit)
-- Client-side upload using `@vercel/blob/client`
-- Token endpoint: `/api/upload-pdf`
-- Parse endpoint: `/api/parse-pdf` accepts blob URL
-- Claude Vision API reads PDFs visually (handles scanned/designed PDFs)
-- Local dev requires `BLOB_READ_WRITE_TOKEN` in `.env.local` (or use manual text input)
+### Architecture (Critical)
+
+PDF uploads use a **two-step flow** to bypass Vercel's 4.5MB serverless function body limit:
+
+1. **Client uploads PDF to Vercel Blob** via `@vercel/blob/client`
+2. **Server analyzes PDF via URL** using Claude's document API
+
+This architecture is used in BOTH:
+- **Auto-create flow** (`AutoCreateContentScreen.tsx`)
+- **Single-asset editor** (`EditorScreen.tsx`)
+
+Both flows MUST use the same pattern. Do NOT use direct base64 uploads to serverless functions.
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `/api/upload-pdf` | Token endpoint for Vercel Blob client uploads |
+| `/api/parse-pdf` | Sends blob URL to Claude for analysis |
+| `@vercel/blob/client` | Client-side upload library |
+
+### Upload Flow (Both Modes)
+
+```tsx
+// Step 1: Upload to Vercel Blob
+import { upload } from '@vercel/blob/client'
+
+const blob = await upload(`pdfs/${Date.now()}-${file.name}`, file, {
+  access: 'public',
+  handleUploadUrl: '/api/upload-pdf',
+})
+
+// Step 2: Send blob URL to Claude for analysis
+const response = await fetch('/api/parse-pdf', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ pdfUrl: blob.url, fileSize: file.size }),
+})
+```
 
 ### Content Source Flow
 
-1. PDF uploaded → stored in Vercel Blob
-2. PDF URL sent to parse-pdf API
-3. Claude extracts: title, main message, key points, CTA, raw summary
+1. PDF uploaded → stored in Vercel Blob (public URL)
+2. Blob URL sent to `/api/parse-pdf`
+3. Claude fetches PDF from URL and extracts: title, main message, key points, CTA, raw summary
 4. User reviews/edits extracted content
 5. Edited content feeds into AI copy generation
+
+### Local Development
+
+**Required:** `BLOB_READ_WRITE_TOKEN` in `.env.local`
+
+Get token from: Vercel Dashboard → Project → Storage → Blob Store → Tokens
+
+```bash
+# .env.local
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxxxx
+```
+
+**Common error:** `Vercel Blob: Failed to retrieve the client token`
+- Cause: Token missing or commented out (check for `#` prefix)
+- Fix: Add/uncomment token, restart dev server
+
+### PDF Analysis Errors
+
+Claude may fail to process certain PDFs with "Could not process PDF" error:
+
+**Common causes:**
+- Scanned PDFs with no OCR text
+- Password-protected PDFs
+- Corrupted PDF files
+- Very large PDFs (>25MB)
+
+**User-facing behavior:** Error message suggests using text input instead. Upload still "succeeds" in that user can proceed with manual text entry.
+
+### Gotchas
+
+1. **Don't use `/api/upload` for PDFs** — hits 4.5MB limit. Always use Blob flow.
+2. **Both editor modes must stay aligned** — if changing PDF upload logic, update BOTH `EditorScreen.tsx` AND `AutoCreateContentScreen.tsx`
+3. **Blob URLs are public** — PDFs are publicly accessible (needed for Claude to fetch them)
+4. **Token must not be commented** — `# BLOB_READ_WRITE_TOKEN` won't work
+5. **Restart dev server** after adding env vars
 
 ---
 

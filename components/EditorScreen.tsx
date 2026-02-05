@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { upload } from '@vercel/blob/client'
 import { useStore } from '@/store'
 import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { WebsitePressRelease } from './templates/WebsitePressRelease'
@@ -253,6 +254,7 @@ export function EditorScreen() {
   // Upload state
   const [isDragging, setIsDragging] = useState(false)
   const [isImageDragging, setIsImageDragging] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [generationError, setGenerationError] = useState<string | null>(null)
 
@@ -360,35 +362,67 @@ export function EditorScreen() {
     return () => resizeObserver.disconnect()
   }, [currentTemplate])
 
-  // Handle file upload for context
+  // Handle file upload for context - uses Vercel Blob to bypass serverless size limits
   const handleFileUpload = async (file: File) => {
-    if (file.type !== 'application/pdf') {
+    if (!file.type.includes('pdf')) {
       setUploadError('Only PDF files are supported')
       return
     }
 
+    // Check file size (25MB limit for Claude's document API)
+    const maxFileSizeMB = 25
+    const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024
+    if (file.size > maxFileSizeBytes) {
+      const actualSizeMB = (file.size / 1024 / 1024).toFixed(1)
+      setUploadError(`File too large (${actualSizeMB}MB). Maximum size is ${maxFileSizeMB}MB. Try compressing your PDF or provide key details manually.`)
+      return
+    }
+
     setUploadError(null)
+    setIsUploading(true)
     setContextFile(file)
 
     try {
-      const formData = new FormData()
-      formData.append('file', file)
+      // Step 1: Upload PDF directly to Vercel Blob (bypasses serverless function body limit)
+      const blob = await upload(`pdfs/${Date.now()}-${file.name}`, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-pdf',
+      })
 
-      const response = await fetch('/api/upload', {
+      // Step 2: Analyze PDF using the blob URL
+      const response = await fetch('/api/parse-pdf', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pdfUrl: blob.url, fileSize: file.size }),
       })
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Upload failed')
+      if (response.ok) {
+        // Build context string from extracted content
+        const extracted = data.extracted
+        if (extracted) {
+          let contextParts = []
+          if (extracted.title) contextParts.push(`Title: ${extracted.title}`)
+          if (extracted.mainMessage) contextParts.push(`Main Message: ${extracted.mainMessage}`)
+          if (extracted.keyPoints?.length > 0) contextParts.push(`Key Points:\n- ${extracted.keyPoints.join('\n- ')}`)
+          if (extracted.callToAction) contextParts.push(`Call to Action: ${extracted.callToAction}`)
+          if (extracted.rawSummary) contextParts.push(`\nDocument Summary:\n${extracted.rawSummary}`)
+          setPdfContent(contextParts.join('\n\n'))
+        } else {
+          setPdfContent(data.text || `[Uploaded PDF: ${file.name}]`)
+        }
+      } else {
+        throw new Error(data.error || 'Failed to analyze PDF')
       }
-
-      setPdfContent(data.content)
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : 'Upload failed')
+      console.error('Error uploading file:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed'
+      setUploadError(errorMessage)
       setContextFile(null)
+      setPdfContent(null)
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -2983,7 +3017,15 @@ export function EditorScreen() {
                     : 'border-gray-300 dark:border-gray-600'
                 }`}
               >
-                {contextFile ? (
+                {isUploading ? (
+                  <div className="flex items-center justify-center gap-2 text-blue-600">
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Analyzing PDF...</span>
+                  </div>
+                ) : contextFile ? (
                   <div className="flex flex-col items-center gap-1">
                     <div className="flex items-center gap-2">
                       <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3020,7 +3062,7 @@ export function EditorScreen() {
 
               <button
                 onClick={handleGenerate}
-                disabled={(!generationContext.trim() && !pdfContent) || isGenerating}
+                disabled={(!generationContext.trim() && !pdfContent) || isGenerating || isUploading}
                 className="w-full py-3 px-4 text-sm font-medium text-white bg-blue-600 rounded-lg
                   hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors
                   flex items-center justify-center gap-2"

@@ -126,19 +126,29 @@ Respond in JSON format only, no markdown code blocks:
 
     // Check for specific Anthropic errors
     const errorMessage = error instanceof Error ? error.message : 'Failed to analyze PDF'
+    const errorStr = String(error)
+
     const isRateLimited = errorMessage.includes('rate') || errorMessage.includes('429')
-    const isInvalidPdf = errorMessage.includes('document') || errorMessage.includes('parse')
+    const isInvalidPdf = errorMessage.includes('Could not process') ||
+                         errorMessage.includes('document') ||
+                         errorMessage.includes('parse') ||
+                         errorStr.includes('Could not process')
+
+    let userMessage: string
+    if (isRateLimited) {
+      userMessage = 'API rate limited. Please wait a moment and try again.'
+    } else if (isInvalidPdf) {
+      userMessage = 'Could not read this PDF. It may be scanned, corrupted, or password-protected. Try a different PDF or provide details in the text field instead.'
+    } else {
+      userMessage = 'Failed to analyze PDF. Try a different file or provide details in the text field instead.'
+    }
 
     return NextResponse.json(
       {
-        error: isRateLimited
-          ? 'API rate limited. Please wait a moment and try again.'
-          : isInvalidPdf
-          ? 'Could not read this PDF. It may be corrupted or password-protected. Try providing details in the text field instead.'
-          : errorMessage,
+        error: userMessage,
         debug: {
           errorType: error instanceof Error ? error.constructor.name : 'Unknown',
-          errorDetails: error instanceof Error ? error.stack : String(error),
+          errorDetails: errorMessage,
         }
       },
       { status: 500 }
