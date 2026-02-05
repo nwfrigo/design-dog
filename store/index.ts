@@ -510,11 +510,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Export queue actions
   addToQueue: () => {
     const state = get()
-    // Get per-template image settings
-    const imageSettings = state.thumbnailImageSettings[state.templateType] ?? { position: { x: 0, y: 0 }, zoom: 1 }
+    // Determine current template: in auto-create mode use templateType, in manual mode use selectedAssets
+    const isAutoCreateMode = Object.keys(state.generatedAssets).length > 0
+    const currentTemplate = isAutoCreateMode
+      ? state.templateType
+      : (state.selectedAssets[state.currentAssetIndex] || state.templateType)
+    // Get per-template image settings using the correct template
+    const imageSettings = state.thumbnailImageSettings[currentTemplate] ?? { position: { x: 0, y: 0 }, zoom: 1 }
     const newAsset: QueuedAsset = {
       id: `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      templateType: state.templateType,
+      templateType: currentTemplate,
       headline: state.verbatimCopy.headline,
       subhead: state.verbatimCopy.subhead,
       body: state.verbatimCopy.body,
