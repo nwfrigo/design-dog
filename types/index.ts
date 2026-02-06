@@ -63,6 +63,19 @@ export interface ManualAssetSettings {
   speaker3ImageUrl: string
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
+  // Template variant settings (must persist when switching assets)
+  ebookVariant: 'image' | 'none'
+  reportVariant: 'image' | 'none'
+  webinarVariant: 'none' | 'image' | 'speakers'
+  eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  floatingBannerMobileArrowType: 'text' | 'arrow'
+  newsletterTopBannerVariant: 'dark' | 'light'
+  showSpeaker1: boolean
+  showSpeaker2: boolean
+  showSpeaker3: boolean
+  grayscale: boolean
 }
 
 export interface GeneratedCopy extends CopyContent {

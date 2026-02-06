@@ -353,7 +353,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -394,6 +394,19 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         speaker3ImageUrl,
         speaker3ImagePosition: { ...speaker3ImagePosition },
         speaker3ImageZoom,
+        // Template variants
+        ebookVariant,
+        reportVariant,
+        webinarVariant,
+        eventListingVariant,
+        floatingBannerVariant,
+        floatingBannerMobileVariant,
+        floatingBannerMobileArrowType,
+        newsletterTopBannerVariant,
+        showSpeaker1,
+        showSpeaker2,
+        showSpeaker3,
+        grayscale,
       }
       const updatedSettings = {
         ...manualAssetSettings,
@@ -405,6 +418,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
       // Load target asset's settings (or use defaults for new assets)
       // Note: Images default to placeholder for new assets, not copied from previous
+      const targetTemplateDefaults = getDefaultAssetSettings(selectedAssets[index])
       const defaultSettings: ManualAssetSettings = {
         eyebrow: verbatimCopy.headline ? eyebrow : 'Eyebrow', // Keep eyebrow if has content, else default
         ctaText: 'Responsive',
@@ -432,6 +446,19 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         speaker3ImageUrl: '',
         speaker3ImagePosition: { x: 0, y: 0 },
         speaker3ImageZoom: 1,
+        // Template variants - use template-specific defaults
+        ebookVariant: targetTemplateDefaults.ebookVariant,
+        reportVariant: targetTemplateDefaults.reportVariant,
+        webinarVariant: targetTemplateDefaults.webinarVariant,
+        eventListingVariant: targetTemplateDefaults.eventListingVariant,
+        floatingBannerVariant: targetTemplateDefaults.floatingBannerVariant,
+        floatingBannerMobileVariant: targetTemplateDefaults.floatingBannerMobileVariant,
+        floatingBannerMobileArrowType: targetTemplateDefaults.floatingBannerMobileArrowType,
+        newsletterTopBannerVariant: targetTemplateDefaults.newsletterTopBannerVariant,
+        showSpeaker1: targetTemplateDefaults.showSpeaker1,
+        showSpeaker2: targetTemplateDefaults.showSpeaker2,
+        showSpeaker3: targetTemplateDefaults.showSpeaker3,
+        grayscale: targetTemplateDefaults.grayscale,
       }
       const targetSettings = updatedSettings[index] || defaultSettings
 
@@ -478,6 +505,19 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         speaker3ImageUrl: targetSettings.speaker3ImageUrl,
         speaker3ImagePosition: { ...targetSettings.speaker3ImagePosition },
         speaker3ImageZoom: targetSettings.speaker3ImageZoom,
+        // Template variants
+        ebookVariant: targetSettings.ebookVariant,
+        reportVariant: targetSettings.reportVariant,
+        webinarVariant: targetSettings.webinarVariant,
+        eventListingVariant: targetSettings.eventListingVariant,
+        floatingBannerVariant: targetSettings.floatingBannerVariant,
+        floatingBannerMobileVariant: targetSettings.floatingBannerMobileVariant,
+        floatingBannerMobileArrowType: targetSettings.floatingBannerMobileArrowType,
+        newsletterTopBannerVariant: targetSettings.newsletterTopBannerVariant,
+        showSpeaker1: targetSettings.showSpeaker1,
+        showSpeaker2: targetSettings.showSpeaker2,
+        showSpeaker3: targetSettings.showSpeaker3,
+        grayscale: targetSettings.grayscale,
         // Reset generation state when switching assets - each asset has its own generation context
         pdfContent: null,
         generationContext: '',

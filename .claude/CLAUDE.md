@@ -599,10 +599,12 @@ npm run dev
 8. [ ] Add export params in `handleExport`
 9. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
 10. [ ] Add template-specific state to store if needed (variants, etc.)
-11. [ ] Add to image upload condition if template has images
-12. [ ] Pass grayscale prop if template has images
-13. [ ] Test export works end-to-end
-14. [ ] Build check: `npm run build`
+11. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence below)
+12. [ ] Add to image upload condition if template has images
+13. [ ] Pass grayscale prop if template has images
+14. [ ] Test export works end-to-end
+15. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
+16. [ ] Build check: `npm run build`
 
 ---
 
@@ -616,6 +618,28 @@ npm run dev
 - **Two state systems:** Auto-create uses `generatedAssets` + `templateType`; manual mode uses `selectedAssets` + `currentAssetIndex`. Don't mix them.
 - **Modal state persistence:** Use React `key` prop or `useEffect` cleanup to reset modal state on mount.
 - **Local PDF uploads:** Require `BLOB_READ_WRITE_TOKEN` in `.env.local`.
+
+### Variant Persistence (Critical for New Templates)
+
+**Problem:** When users switch between assets in the editor (clicking tabs), variant settings (like background style) must persist. Without proper setup, variants revert to defaults when navigating away and back.
+
+**How it works:** The `goToAsset` function in `store/index.ts` saves the current asset's settings before loading the next asset. Settings are stored in `manualAssetSettings` (keyed by asset index).
+
+**When adding a template with variants, you MUST:**
+
+1. Add variant fields to `ManualAssetSettings` interface in `types/index.ts`:
+   ```typescript
+   myTemplateVariant: 'option1' | 'option2' | 'option3'
+   ```
+
+2. Update `goToAsset` in `store/index.ts` in THREE places:
+   - **Extract** the variant from state (add to destructure at top of function)
+   - **Save** the variant to `currentSettings` object
+   - **Restore** the variant in the `set()` call at the end
+
+3. Add default value to `getDefaultAssetSettings()` function in `store/index.ts`
+
+**Reference:** The queue system (`addToQueue`, `editQueuedAsset`) already handles all variants correctly — follow that pattern.
 
 ### Scaling Large Templates in Preview (CSS Transform Gotcha)
 
