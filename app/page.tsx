@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useStore } from '@/store'
 import { AssetSelectionScreen } from '@/components/AssetSelectionScreen'
@@ -8,11 +8,13 @@ import { AutoCreateContentScreen, AutoCreateAssetsScreen, AutoCreateGeneratingSc
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { DraftBanner } from '@/components/DraftBanner'
 import { Header } from '@/components/Header'
+import { ReportBugModal, ReportBugLink } from '@/components/ReportBugModal'
 
 function HomeContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { currentScreen, setCurrentScreen } = useStore()
+  const [showBugModal, setShowBugModal] = useState(false)
 
   // Handle redirect message
   const message = searchParams.get('message')
@@ -27,6 +29,17 @@ function HomeContent() {
   // Auto-create flow screens use medium width
   const isAutoCreateFlow = currentScreen === 'auto-create-content' || currentScreen === 'auto-create-assets' || currentScreen === 'auto-create-generating'
   const isSelectScreen = currentScreen === 'select'
+
+  // Derive screen name for bug reports
+  const getScreenName = () => {
+    switch (currentScreen) {
+      case 'select': return 'Homepage'
+      case 'auto-create-content': return 'Content Source'
+      case 'auto-create-assets': return 'Asset Selection'
+      case 'auto-create-generating': return 'Generating Assets'
+      default: return 'Homepage'
+    }
+  }
 
   const handleLogoClick = () => {
     setCurrentScreen('select')
@@ -53,9 +66,22 @@ function HomeContent() {
 
       <Header
         onLogoClick={handleLogoClick}
-        rightContent={<ThemeToggle />}
+        rightContent={
+          <div className="flex items-center gap-3">
+            <ReportBugLink onClick={() => setShowBugModal(true)} />
+            <ThemeToggle />
+          </div>
+        }
         maxWidth={isSelectScreen ? 'max-w-[1600px]' : 'max-w-5xl'}
       />
+
+      {/* Bug Report Modal */}
+      {showBugModal && (
+        <ReportBugModal
+          screenName={getScreenName()}
+          onClose={() => setShowBugModal(false)}
+        />
+      )}
 
       {/* Main content */}
       <div className={`${isSelectScreen ? 'max-w-[1600px]' : 'max-w-5xl'} mx-auto px-6 py-8`}>

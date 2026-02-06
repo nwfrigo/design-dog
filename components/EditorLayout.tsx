@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Header } from '@/components/Header'
+import { ReportBugModal, ReportBugLink } from '@/components/ReportBugModal'
 
 interface EditorLayoutProps {
   children: React.ReactNode
@@ -35,6 +36,14 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   const [showSaveToast, setShowSaveToast] = useState(false)
+  const [showBugModal, setShowBugModal] = useState(false)
+
+  // Derive screen name for bug reports
+  const getScreenName = () => {
+    if (currentScreen === 'queue') return 'Export Queue'
+    const hasGeneratedAssets = Object.keys(generatedAssets).length > 0
+    return hasGeneratedAssets ? 'Editor (Auto-Create)' : 'Editor'
+  }
 
   // Auto-save on changes (using key state values as proxy for all changes)
   useEffect(() => {
@@ -132,6 +141,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
           Export All
         </button>
       )}
+      <ReportBugLink onClick={() => setShowBugModal(true)} />
       <ThemeToggle />
     </>
   )
@@ -201,6 +211,14 @@ export function EditorLayout({ children }: EditorLayoutProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Bug Report Modal */}
+      {showBugModal && (
+        <ReportBugModal
+          screenName={getScreenName()}
+          onClose={() => setShowBugModal(false)}
+        />
       )}
     </div>
   )
