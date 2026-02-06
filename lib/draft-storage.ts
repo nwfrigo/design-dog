@@ -264,7 +264,9 @@ export function getDraftAssetCount(): number {
     const selectedCount = draft.selectedAssets.length
     const queueCount = draft.exportQueue.length
 
-    return Math.max(generatedCount, selectedCount) + queueCount
+    // If queue has items, show queue count only (selectedAssets is stale context)
+    // Otherwise show the active editing count
+    return queueCount > 0 ? queueCount : Math.max(generatedCount, selectedCount)
   } catch {
     return 0
   }

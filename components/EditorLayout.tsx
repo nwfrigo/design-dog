@@ -18,6 +18,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     saveDraft,
     generatedAssets,
     selectedAssets,
+    setSelectedAssets,
     exportQueue,
     currentScreen,
     setCurrentScreen,
@@ -66,6 +67,8 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     setShowSaveToast(true)
     // Set screen to select and navigate after brief delay to show toast
     setTimeout(() => {
+      // Clear selectedAssets when returning home - user unlikely to want same selection
+      setSelectedAssets([])
       setCurrentScreen('select')
       router.push('/')
     }, 800)
