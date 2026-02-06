@@ -62,6 +62,7 @@ export function AutoCreateEditor() {
     speaker3ImagePosition,
     speaker3ImageZoom,
     generatedVariations,
+    grayscale,
   } = useStore()
 
   // Track current asset ID
@@ -133,6 +134,7 @@ export function AutoCreateEditor() {
       speaker3ImagePosition,
       speaker3ImageZoom,
       variations: generatedVariations,
+      grayscale,
     })
   }
 
