@@ -1069,7 +1069,7 @@ export function EditorScreen() {
             currentTemplate === 'email-image' ? (layout === 'even' ? 250 : layout === 'more-image' ? 320 : 180) :
             currentTemplate === 'social-image' ? (layout === 'even' ? 488 : layout === 'more-image' ? 600 : 376) :
             currentTemplate === 'website-webinar' ? 333 :
-            currentTemplate === 'website-press-release' ? 545 :
+            currentTemplate === 'website-press-release' ? 338 :
             currentTemplate === 'website-report' ? 320 :
             320 // default
           }
@@ -1078,7 +1078,7 @@ export function EditorScreen() {
             currentTemplate === 'email-image' ? 300 :
             currentTemplate === 'social-image' ? 628 :
             currentTemplate === 'website-webinar' ? 450 :
-            currentTemplate === 'website-press-release' ? 343 :
+            currentTemplate === 'website-press-release' ? 450 :
             currentTemplate === 'website-report' ? 386 :
             300 // default
           }
