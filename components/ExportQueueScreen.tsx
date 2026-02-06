@@ -21,6 +21,7 @@ import { EmailSpeakers } from './templates/EmailSpeakers'
 import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
+import { NewsletterTopBanner } from './templates/NewsletterTopBanner'
 import {
   fetchColorsConfig,
   fetchTypographyConfig,
@@ -145,6 +146,7 @@ export function ExportQueueScreen() {
             : asset.templateType === 'website-event-listing' ? asset.eventListingVariant
             : asset.templateType === 'website-report' ? asset.reportVariant
             : asset.templateType === 'website-thumbnail' ? asset.ebookVariant
+            : asset.templateType === 'newsletter-top-banner' ? asset.newsletterTopBannerVariant
             : asset.webinarVariant,
           // Email speakers and website webinar specific
           speakerCount: asset.speakerCount,
@@ -927,6 +929,18 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'newsletter-top-banner' && (
+                <NewsletterTopBanner
+                  eyebrow={asset.eyebrow || 'Month | Year'}
+                  headline={asset.headline || 'EHS+ Newsletter'}
+                  subhead={asset.subhead || ''}
+                  variant={asset.newsletterTopBannerVariant || 'dark'}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
               {asset.templateType === 'website-report' && (
                 <WebsiteReport
                   eyebrow={asset.eyebrow || 'REPORT'}
@@ -1471,6 +1485,18 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
               grayscale={asset.grayscale}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'newsletter-top-banner' && (
+            <NewsletterTopBanner
+              eyebrow={asset.eyebrow || 'Month | Year'}
+              headline={asset.headline || 'EHS+ Newsletter'}
+              subhead={asset.subhead || ''}
+              variant={asset.newsletterTopBannerVariant || 'dark'}
+              showSubhead={asset.showSubhead && !!asset.subhead}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

@@ -103,6 +103,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   // Website Floating Banner Mobile specific
   floatingBannerMobileVariant: 'light' as const,
   floatingBannerMobileArrowType: 'text' as const,
+  // Newsletter Top Banner specific
+  newsletterTopBannerVariant: 'dark' as const,
   // Image effects
   grayscale: false,
 })
@@ -216,6 +218,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Website Floating Banner Mobile specific
   floatingBannerMobileVariant: 'light',
   floatingBannerMobileArrowType: 'text',
+  // Newsletter Top Banner specific
+  newsletterTopBannerVariant: 'dark',
   // Image effects
   grayscale: false,
 
@@ -332,6 +336,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Website Floating Banner Mobile specific
   setFloatingBannerMobileVariant: (floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => set({ floatingBannerMobileVariant }),
   setFloatingBannerMobileArrowType: (floatingBannerMobileArrowType: 'text' | 'arrow') => set({ floatingBannerMobileArrowType }),
+  // Newsletter Top Banner specific
+  setNewsletterTopBannerVariant: (newsletterTopBannerVariant: 'dark' | 'light') => set({ newsletterTopBannerVariant }),
   // Image effects
   setGrayscale: (grayscale: boolean) => set({ grayscale }),
 
@@ -592,6 +598,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerVariant: state.floatingBannerVariant,
       floatingBannerMobileVariant: state.floatingBannerMobileVariant,
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
+      newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
       sourceAssetIndex: state.currentAssetIndex,
     }
@@ -693,6 +700,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerVariant: asset.floatingBannerVariant,
       floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
       floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
+      newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
       grayscale: asset.grayscale,
       // Track that we're editing from queue
       editingQueueItemId: id,
@@ -780,6 +788,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerVariant: state.floatingBannerVariant,
       floatingBannerMobileVariant: state.floatingBannerMobileVariant,
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
+      newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
     }
 
@@ -1180,6 +1189,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerVariant: asset.floatingBannerVariant,
       floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
       floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
+      newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
       grayscale: asset.grayscale,
       generatedVariations: asset.variations,
     })
@@ -1476,6 +1486,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           floatingBannerVariant: asset.floatingBannerVariant,
           floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
           floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
+          newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
           grayscale: asset.grayscale,
           sourceAssetIndex: 0,
         })
@@ -1568,6 +1579,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerVariant: 'dark',
       floatingBannerMobileVariant: 'light',
       floatingBannerMobileArrowType: 'text',
+      newsletterTopBannerVariant: 'dark',
       grayscale: false,
       exportQueue: [],
       // Auto-Create defaults
@@ -1648,6 +1660,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerVariant: state.floatingBannerVariant,
       floatingBannerMobileVariant: state.floatingBannerMobileVariant,
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
+      newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
       generatedVariations: state.generatedVariations,
     })

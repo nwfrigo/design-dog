@@ -87,6 +87,8 @@ export interface DraftState {
   // Website Floating Banner Mobile specific
   floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   floatingBannerMobileArrowType: 'text' | 'arrow'
+  // Newsletter Top Banner specific
+  newsletterTopBannerVariant: 'dark' | 'light'
   // Image effects
   grayscale: boolean
   generatedVariations: { headlines: string[]; ctas: string[] } | null
@@ -187,6 +189,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       floatingBannerVariant: state.floatingBannerVariant || 'dark',
       floatingBannerMobileVariant: state.floatingBannerMobileVariant || 'light',
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType || 'text',
+      newsletterTopBannerVariant: state.newsletterTopBannerVariant || 'dark',
       grayscale: state.grayscale ?? false,
       generatedVariations: state.generatedVariations || null,
     }

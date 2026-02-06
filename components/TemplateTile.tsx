@@ -25,6 +25,7 @@ import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloat
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
+import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 
 interface TemplateTileProps {
   template: TemplateInfo
@@ -400,6 +401,18 @@ export function TemplateRenderer({
           showEyebrow={true}
           showBody={false}
           showCta={true}
+        />
+      )
+
+    case 'newsletter-top-banner':
+      return (
+        <NewsletterTopBanner
+          {...commonProps}
+          eyebrow="Month | Year"
+          headline="EHS+ Newsletter"
+          subhead=""
+          variant="dark"
+          showSubhead={false}
         />
       )
 

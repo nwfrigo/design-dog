@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner'
 
 export interface CopyContent {
   headline: string
@@ -213,6 +213,8 @@ export interface GeneratedAsset {
   // Website Floating Banner Mobile specific
   floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   floatingBannerMobileArrowType: 'text' | 'arrow'
+  // Newsletter Top Banner specific
+  newsletterTopBannerVariant: 'dark' | 'light'
   // Image effects
   grayscale: boolean
 }
@@ -307,6 +309,8 @@ export interface QueuedAsset {
   // Website Floating Banner Mobile specific
   floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   floatingBannerMobileArrowType: 'text' | 'arrow'
+  // Newsletter Top Banner specific
+  newsletterTopBannerVariant: 'dark' | 'light'
   // Image effects
   grayscale: boolean
   // For editing - track which asset index this came from
@@ -423,6 +427,8 @@ export interface AppState {
   // Website Floating Banner Mobile specific
   floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
   floatingBannerMobileArrowType: 'text' | 'arrow'
+  // Newsletter Top Banner specific
+  newsletterTopBannerVariant: 'dark' | 'light'
   // Image effects
   grayscale: boolean
 
@@ -517,6 +523,8 @@ export interface AppState {
   // Website Floating Banner Mobile specific
   setFloatingBannerMobileVariant: (variant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => void
   setFloatingBannerMobileArrowType: (arrowType: 'text' | 'arrow') => void
+  // Newsletter Top Banner specific
+  setNewsletterTopBannerVariant: (variant: 'dark' | 'light') => void
   // Image effects
   setGrayscale: (grayscale: boolean) => void
 

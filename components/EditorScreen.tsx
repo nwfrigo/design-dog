@@ -18,6 +18,7 @@ import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDeta
 import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
+import { NewsletterTopBanner } from './templates/NewsletterTopBanner'
 import { WebsiteReport } from './templates/WebsiteReport'
 import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from './templates/WebsiteFloatingBannerMobile'
@@ -218,6 +219,9 @@ export function EditorScreen() {
     setFloatingBannerMobileVariant,
     floatingBannerMobileArrowType,
     setFloatingBannerMobileArrowType,
+    // Newsletter Top Banner
+    newsletterTopBannerVariant,
+    setNewsletterTopBannerVariant,
     // Image effects
     grayscale,
     setGrayscale,
@@ -667,6 +671,9 @@ export function EditorScreen() {
         exportParams.showBody = showBody && !!verbatimCopy.body
         exportParams.showCta = showCta
         exportParams.grayscale = grayscale
+      } else if (currentTemplate === 'newsletter-top-banner') {
+        exportParams.variant = newsletterTopBannerVariant
+        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
       } else if (currentTemplate === 'website-report') {
         exportParams.imageUrl = thumbnailImageUrl
         exportParams.imagePositionX = thumbnailImagePosition.x
@@ -1135,7 +1142,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1191,7 +1198,7 @@ export function EditorScreen() {
               )}
 
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, or Website Floating Banner */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile') && (
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -1736,6 +1743,35 @@ export function EditorScreen() {
               </>
             )}
 
+            {/* Newsletter Top Banner Variant Controls */}
+            {currentTemplate === 'newsletter-top-banner' && (
+              <>
+                {/* Dark/Light Variant */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Theme</label>
+                  <div className="flex gap-2">
+                    {(['dark', 'light'] as const).map((variant) => (
+                      <button
+                        key={variant}
+                        onClick={() => setNewsletterTopBannerVariant(variant)}
+                        className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
+                          newsletterTopBannerVariant === variant
+                            ? 'border-blue-500 ring-2 ring-blue-200'
+                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                        }`}
+                      >
+                        <img
+                          src={`/assets/backgrounds/newsletter_header_background_${variant}.png`}
+                          alt={`${variant} theme`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
             {/* Email Speakers Controls */}
             {currentTemplate === 'email-speakers' && (
               <div className="space-y-3">
@@ -2240,18 +2276,18 @@ export function EditorScreen() {
               </div>
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                      {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report') ? 'Subheader' : 'Subhead'}
+                      {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') ? 'Subheader' : 'Subhead'}
                     </label>
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
                   </div>
                   <textarea
                     value={verbatimCopy.subhead}
                     onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
-                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report') ? 'Subheader text' : 'Supporting subheadline'}
+                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') ? 'Subheader text' : 'Supporting subheadline'}
                     rows={2}
                     className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
@@ -2283,7 +2319,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -3625,6 +3661,18 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'newsletter-top-banner' && (
+                <NewsletterTopBanner
+                  eyebrow={eyebrow || 'Month | Year'}
+                  headline={verbatimCopy.headline || 'EHS+ Newsletter'}
+                  subhead={verbatimCopy.subhead || ''}
+                  variant={newsletterTopBannerVariant}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

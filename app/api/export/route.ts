@@ -73,6 +73,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'newsletter-dark-gradient': { width: 640, height: 179 },
   'newsletter-blue-gradient': { width: 640, height: 179 },
   'newsletter-light': { width: 640, height: 179 },
+  'newsletter-top-banner': { width: 600, height: 240 },
 }
 
 export async function POST(request: NextRequest) {

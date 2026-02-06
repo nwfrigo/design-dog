@@ -171,6 +171,13 @@ const NEWSLETTER_TEMPLATES: TemplateInfo[] = [
     width: 640,
     height: 179,
   },
+  {
+    type: 'newsletter-top-banner',
+    label: 'Top Banner',
+    dimensions: '600 × 240px',
+    width: 600,
+    height: 240,
+  },
 ]
 
 // New: Distribution channels organized by use case
