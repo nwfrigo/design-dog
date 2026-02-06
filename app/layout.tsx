@@ -3,9 +3,20 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Design Dog',
-  description: 'AI-powered creative automation for brand copy',
+  description: 'good assets, fast',
   icons: {
     icon: '/assets/brand/design_dog_favicon_1.svg',
+  },
+  openGraph: {
+    title: 'Design Dog',
+    description: 'good assets, fast',
+    images: ['/assets/brand/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Design Dog',
+    description: 'good assets, fast',
+    images: ['/assets/brand/og-image.png'],
   },
 }
 

@@ -204,23 +204,14 @@ export function AutoCreateGeneratingScreen() {
           <button
             onClick={handleContinue}
             className={`
-              px-8 py-3 rounded-lg text-sm font-medium transition-all flex items-center gap-2
+              px-8 py-3 rounded-lg text-sm font-medium transition-all
               ${successCount > 0
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg'
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-gray-600 text-white hover:bg-gray-700'
               }
             `}
           >
-            {successCount > 0 ? (
-              <>
-                Continue to Editor
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </>
-            ) : (
-              'Back to Templates'
-            )}
+            {successCount > 0 ? 'Edit and Export Assets >' : 'Back to Templates'}
           </button>
         </div>
       )}

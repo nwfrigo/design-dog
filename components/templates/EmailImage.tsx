@@ -209,7 +209,7 @@ export function EmailImage({
           flexDirection: 'column',
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
-          gap: 24,
+          gap: 17,
         }}>
           {/* Headline */}
           <div style={{
