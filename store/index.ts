@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
@@ -107,6 +107,39 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   newsletterTopBannerVariant: 'dark' as const,
   // Image effects
   grayscale: false,
+  // Solution Overview PDF specific - Page 1
+  solutionOverviewSolution: 'health' as const,
+  solutionOverviewSolutionName: 'Employee Health Essentials',
+  solutionOverviewTagline: 'Built for Healthcare. Ready for You.',
+  solutionOverviewCurrentPage: 1 as const,
+  // Solution Overview PDF specific - Page 2
+  solutionOverviewHeroImageId: 'placeholder',
+  solutionOverviewHeroImageUrl: null,
+  solutionOverviewHeroImagePosition: { x: 0, y: 0 },
+  solutionOverviewHeroImageZoom: 1,
+  solutionOverviewSectionHeader: 'Streamline Employee Health.\nStrengthen Compliance.',
+  solutionOverviewIntroParagraph: 'Employee Health Essentials offers a streamlined, configurable solution for managing employee health across onboarding, clinic visits, compliance, and exposure tracking.\n\nFor faster deployment, lower admin burden, and stronger compliance — all in one package built for healthcare employee health teams.',
+  solutionOverviewKeySolutions: ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking', 'Lab & Drug Test Management', 'Dashboards & Reporting'] as [string, string, string, string, string, string],
+  solutionOverviewQuoteText: '"Cority\'s self-scheduling tool has transformed our hiring process. It has provided a more efficient way for candidates and employees to schedule appointments at their convenience, reducing administrative workload and improving overall efficiency."',
+  solutionOverviewQuoteName: 'Mimi Alexander',
+  solutionOverviewQuoteTitle: 'RN, Director of Employee Health Services',
+  solutionOverviewQuoteCompany: 'Texas Health Resources',
+  // Solution Overview PDF specific - Page 3
+  solutionOverviewBenefits: [
+    { icon: 'streamline', title: 'Streamlined Operations', description: 'Reduce administrative burden with automated workflows and self-service scheduling.' },
+    { icon: 'compliance', title: 'Enhanced Compliance', description: 'Stay ahead of regulatory requirements with built-in compliance tracking and reporting.' },
+    { icon: 'visibility', title: 'Complete Visibility', description: 'Real-time dashboards and analytics provide insights into employee health trends.' },
+  ],
+  solutionOverviewFeatures: [
+    { title: 'Self-Service Scheduling', description: 'Employees book appointments at their convenience.' },
+    { title: 'Automated Reminders', description: 'Reduce no-shows with email and SMS notifications.' },
+    { title: 'Compliance Dashboards', description: 'Track vaccination and screening compliance in real-time.' },
+    { title: 'Integration Ready', description: 'Connect with your existing HR and payroll systems.' },
+  ],
+  solutionOverviewScreenshotUrl: null,
+  solutionOverviewScreenshotPosition: { x: 0, y: 0 },
+  solutionOverviewScreenshotZoom: 1,
+  solutionOverviewCtaOption: 'demo' as const,
 })
 
 export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
@@ -222,6 +255,39 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   newsletterTopBannerVariant: 'dark',
   // Image effects
   grayscale: false,
+  // Solution Overview PDF specific - Page 1
+  solutionOverviewSolution: 'health' as const,
+  solutionOverviewSolutionName: 'Employee Health Essentials',
+  solutionOverviewTagline: 'Built for Healthcare. Ready for You.',
+  solutionOverviewCurrentPage: 1 as const,
+  // Solution Overview PDF specific - Page 2
+  solutionOverviewHeroImageId: 'placeholder',
+  solutionOverviewHeroImageUrl: null,
+  solutionOverviewHeroImagePosition: { x: 0, y: 0 },
+  solutionOverviewHeroImageZoom: 1,
+  solutionOverviewSectionHeader: 'Streamline Employee Health.\nStrengthen Compliance.',
+  solutionOverviewIntroParagraph: 'Employee Health Essentials offers a streamlined, configurable solution for managing employee health across onboarding, clinic visits, compliance, and exposure tracking.\n\nFor faster deployment, lower admin burden, and stronger compliance — all in one package built for healthcare employee health teams.',
+  solutionOverviewKeySolutions: ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking', 'Lab & Drug Test Management', 'Dashboards & Reporting'] as [string, string, string, string, string, string],
+  solutionOverviewQuoteText: '"Cority\'s self-scheduling tool has transformed our hiring process. It has provided a more efficient way for candidates and employees to schedule appointments at their convenience, reducing administrative workload and improving overall efficiency."',
+  solutionOverviewQuoteName: 'Mimi Alexander',
+  solutionOverviewQuoteTitle: 'RN, Director of Employee Health Services',
+  solutionOverviewQuoteCompany: 'Texas Health Resources',
+  // Solution Overview PDF specific - Page 3
+  solutionOverviewBenefits: [
+    { icon: 'streamline', title: 'Streamlined Operations', description: 'Reduce administrative burden with automated workflows and self-service scheduling.' },
+    { icon: 'compliance', title: 'Enhanced Compliance', description: 'Stay ahead of regulatory requirements with built-in compliance tracking and reporting.' },
+    { icon: 'visibility', title: 'Complete Visibility', description: 'Real-time dashboards and analytics provide insights into employee health trends.' },
+  ],
+  solutionOverviewFeatures: [
+    { title: 'Self-Service Scheduling', description: 'Employees book appointments at their convenience.' },
+    { title: 'Automated Reminders', description: 'Reduce no-shows with email and SMS notifications.' },
+    { title: 'Compliance Dashboards', description: 'Track vaccination and screening compliance in real-time.' },
+    { title: 'Integration Ready', description: 'Connect with your existing HR and payroll systems.' },
+  ],
+  solutionOverviewScreenshotUrl: null as string | null,
+  solutionOverviewScreenshotPosition: { x: 0, y: 0 },
+  solutionOverviewScreenshotZoom: 1,
+  solutionOverviewCtaOption: 'demo' as 'demo' | 'learn' | 'start' | 'contact',
 
   // Export queue
   exportQueue: [],
@@ -341,6 +407,85 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Image effects
   setGrayscale: (grayscale: boolean) => set({ grayscale }),
 
+  // Solution Overview PDF specific - Page 1
+  setSolutionOverviewSolution: (solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability') => set({ solutionOverviewSolution }),
+  setSolutionOverviewSolutionName: (solutionOverviewSolutionName: string) => set({ solutionOverviewSolutionName }),
+  setSolutionOverviewTagline: (solutionOverviewTagline: string) => set({ solutionOverviewTagline }),
+  setSolutionOverviewCurrentPage: (solutionOverviewCurrentPage: 1 | 2 | 3) => set({ solutionOverviewCurrentPage }),
+  // Solution Overview PDF specific - Page 2
+  setSolutionOverviewHeroImageId: (solutionOverviewHeroImageId: string) => set({ solutionOverviewHeroImageId }),
+  setSolutionOverviewHeroImageUrl: (solutionOverviewHeroImageUrl: string | null) => set({ solutionOverviewHeroImageUrl }),
+  setSolutionOverviewHeroImagePosition: (solutionOverviewHeroImagePosition: { x: number; y: number }) => set({ solutionOverviewHeroImagePosition }),
+  setSolutionOverviewHeroImageZoom: (solutionOverviewHeroImageZoom: number) => set({ solutionOverviewHeroImageZoom }),
+  setSolutionOverviewSectionHeader: (solutionOverviewSectionHeader: string) => set({ solutionOverviewSectionHeader }),
+  setSolutionOverviewIntroParagraph: (solutionOverviewIntroParagraph: string) => set({ solutionOverviewIntroParagraph }),
+  setSolutionOverviewKeySolutions: (solutionOverviewKeySolutions: [string, string, string, string, string, string]) => set({ solutionOverviewKeySolutions }),
+  setSolutionOverviewKeySolution: (index: number, value: string) => {
+    const { solutionOverviewKeySolutions } = get()
+    const newSolutions = [...solutionOverviewKeySolutions] as [string, string, string, string, string, string]
+    newSolutions[index] = value
+    set({ solutionOverviewKeySolutions: newSolutions })
+  },
+  setSolutionOverviewQuoteText: (solutionOverviewQuoteText: string) => set({ solutionOverviewQuoteText }),
+  setSolutionOverviewQuoteName: (solutionOverviewQuoteName: string) => set({ solutionOverviewQuoteName }),
+  setSolutionOverviewQuoteTitle: (solutionOverviewQuoteTitle: string) => set({ solutionOverviewQuoteTitle }),
+  setSolutionOverviewQuoteCompany: (solutionOverviewQuoteCompany: string) => set({ solutionOverviewQuoteCompany }),
+  // Solution Overview PDF specific - Page 3
+  setSolutionOverviewBenefits: (solutionOverviewBenefits) => set({ solutionOverviewBenefits }),
+  setSolutionOverviewBenefit: (index: number, benefit) => {
+    const { solutionOverviewBenefits } = get()
+    const newBenefits = [...solutionOverviewBenefits]
+    newBenefits[index] = benefit
+    set({ solutionOverviewBenefits: newBenefits })
+  },
+  addSolutionOverviewBenefit: () => {
+    const { solutionOverviewBenefits } = get()
+    if (solutionOverviewBenefits.length < 7) {
+      set({
+        solutionOverviewBenefits: [
+          ...solutionOverviewBenefits,
+          { icon: 'new', title: 'New Benefit', description: 'Description of the benefit.' }
+        ]
+      })
+    }
+  },
+  removeSolutionOverviewBenefit: (index: number) => {
+    const { solutionOverviewBenefits } = get()
+    if (solutionOverviewBenefits.length > 3) {
+      set({
+        solutionOverviewBenefits: solutionOverviewBenefits.filter((_, i) => i !== index)
+      })
+    }
+  },
+  setSolutionOverviewFeatures: (solutionOverviewFeatures) => set({ solutionOverviewFeatures }),
+  setSolutionOverviewFeature: (index: number, feature) => {
+    const { solutionOverviewFeatures } = get()
+    const newFeatures = [...solutionOverviewFeatures]
+    newFeatures[index] = feature
+    set({ solutionOverviewFeatures: newFeatures })
+  },
+  addSolutionOverviewFeature: () => {
+    const { solutionOverviewFeatures } = get()
+    set({
+      solutionOverviewFeatures: [
+        ...solutionOverviewFeatures,
+        { title: 'New Feature', description: 'Description of the feature.' }
+      ]
+    })
+  },
+  removeSolutionOverviewFeature: (index: number) => {
+    const { solutionOverviewFeatures } = get()
+    if (solutionOverviewFeatures.length > 1) {
+      set({
+        solutionOverviewFeatures: solutionOverviewFeatures.filter((_, i) => i !== index)
+      })
+    }
+  },
+  setSolutionOverviewScreenshotUrl: (solutionOverviewScreenshotUrl: string | null) => set({ solutionOverviewScreenshotUrl }),
+  setSolutionOverviewScreenshotPosition: (solutionOverviewScreenshotPosition: { x: number; y: number }) => set({ solutionOverviewScreenshotPosition }),
+  setSolutionOverviewScreenshotZoom: (solutionOverviewScreenshotZoom: number) => set({ solutionOverviewScreenshotZoom }),
+  setSolutionOverviewCtaOption: (solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact') => set({ solutionOverviewCtaOption }),
+
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
   toggleAssetSelection: (asset: TemplateType) => {
@@ -353,7 +498,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewCtaOption } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -407,6 +552,30 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         showSpeaker2,
         showSpeaker3,
         grayscale,
+        // Solution Overview PDF specific - Page 1
+        solutionOverviewSolution,
+        solutionOverviewSolutionName,
+        solutionOverviewTagline,
+        solutionOverviewCurrentPage,
+        // Solution Overview PDF specific - Page 2
+        solutionOverviewHeroImageId,
+        solutionOverviewHeroImageUrl,
+        solutionOverviewHeroImagePosition,
+        solutionOverviewHeroImageZoom,
+        solutionOverviewSectionHeader,
+        solutionOverviewIntroParagraph,
+        solutionOverviewKeySolutions,
+        solutionOverviewQuoteText,
+        solutionOverviewQuoteName,
+        solutionOverviewQuoteTitle,
+        solutionOverviewQuoteCompany,
+        // Solution Overview PDF specific - Page 3
+        solutionOverviewBenefits,
+        solutionOverviewFeatures,
+        solutionOverviewScreenshotUrl,
+        solutionOverviewScreenshotPosition,
+        solutionOverviewScreenshotZoom,
+        solutionOverviewCtaOption,
       }
       const updatedSettings = {
         ...manualAssetSettings,
@@ -459,6 +628,30 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         showSpeaker2: targetTemplateDefaults.showSpeaker2,
         showSpeaker3: targetTemplateDefaults.showSpeaker3,
         grayscale: targetTemplateDefaults.grayscale,
+        // Solution Overview PDF specific - Page 1
+        solutionOverviewSolution: targetTemplateDefaults.solutionOverviewSolution,
+        solutionOverviewSolutionName: targetTemplateDefaults.solutionOverviewSolutionName,
+        solutionOverviewTagline: targetTemplateDefaults.solutionOverviewTagline,
+        solutionOverviewCurrentPage: targetTemplateDefaults.solutionOverviewCurrentPage,
+        // Solution Overview PDF specific - Page 2
+        solutionOverviewHeroImageId: targetTemplateDefaults.solutionOverviewHeroImageId,
+        solutionOverviewHeroImageUrl: targetTemplateDefaults.solutionOverviewHeroImageUrl,
+        solutionOverviewHeroImagePosition: targetTemplateDefaults.solutionOverviewHeroImagePosition,
+        solutionOverviewHeroImageZoom: targetTemplateDefaults.solutionOverviewHeroImageZoom,
+        solutionOverviewSectionHeader: targetTemplateDefaults.solutionOverviewSectionHeader,
+        solutionOverviewIntroParagraph: targetTemplateDefaults.solutionOverviewIntroParagraph,
+        solutionOverviewKeySolutions: targetTemplateDefaults.solutionOverviewKeySolutions,
+        solutionOverviewQuoteText: targetTemplateDefaults.solutionOverviewQuoteText,
+        solutionOverviewQuoteName: targetTemplateDefaults.solutionOverviewQuoteName,
+        solutionOverviewQuoteTitle: targetTemplateDefaults.solutionOverviewQuoteTitle,
+        solutionOverviewQuoteCompany: targetTemplateDefaults.solutionOverviewQuoteCompany,
+        // Solution Overview PDF specific - Page 3
+        solutionOverviewBenefits: targetTemplateDefaults.solutionOverviewBenefits,
+        solutionOverviewFeatures: targetTemplateDefaults.solutionOverviewFeatures,
+        solutionOverviewScreenshotUrl: targetTemplateDefaults.solutionOverviewScreenshotUrl,
+        solutionOverviewScreenshotPosition: targetTemplateDefaults.solutionOverviewScreenshotPosition,
+        solutionOverviewScreenshotZoom: targetTemplateDefaults.solutionOverviewScreenshotZoom,
+        solutionOverviewCtaOption: targetTemplateDefaults.solutionOverviewCtaOption,
       }
       const targetSettings = updatedSettings[index] || defaultSettings
 
@@ -518,6 +711,30 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         showSpeaker2: targetSettings.showSpeaker2,
         showSpeaker3: targetSettings.showSpeaker3,
         grayscale: targetSettings.grayscale,
+        // Solution Overview PDF specific - Page 1
+        solutionOverviewSolution: targetSettings.solutionOverviewSolution,
+        solutionOverviewSolutionName: targetSettings.solutionOverviewSolutionName,
+        solutionOverviewTagline: targetSettings.solutionOverviewTagline,
+        solutionOverviewCurrentPage: targetSettings.solutionOverviewCurrentPage,
+        // Solution Overview PDF specific - Page 2
+        solutionOverviewHeroImageId: targetSettings.solutionOverviewHeroImageId,
+        solutionOverviewHeroImageUrl: targetSettings.solutionOverviewHeroImageUrl,
+        solutionOverviewHeroImagePosition: targetSettings.solutionOverviewHeroImagePosition,
+        solutionOverviewHeroImageZoom: targetSettings.solutionOverviewHeroImageZoom,
+        solutionOverviewSectionHeader: targetSettings.solutionOverviewSectionHeader,
+        solutionOverviewIntroParagraph: targetSettings.solutionOverviewIntroParagraph,
+        solutionOverviewKeySolutions: targetSettings.solutionOverviewKeySolutions,
+        solutionOverviewQuoteText: targetSettings.solutionOverviewQuoteText,
+        solutionOverviewQuoteName: targetSettings.solutionOverviewQuoteName,
+        solutionOverviewQuoteTitle: targetSettings.solutionOverviewQuoteTitle,
+        solutionOverviewQuoteCompany: targetSettings.solutionOverviewQuoteCompany,
+        // Solution Overview PDF specific - Page 3
+        solutionOverviewBenefits: targetSettings.solutionOverviewBenefits,
+        solutionOverviewFeatures: targetSettings.solutionOverviewFeatures,
+        solutionOverviewScreenshotUrl: targetSettings.solutionOverviewScreenshotUrl,
+        solutionOverviewScreenshotPosition: targetSettings.solutionOverviewScreenshotPosition,
+        solutionOverviewScreenshotZoom: targetSettings.solutionOverviewScreenshotZoom,
+        solutionOverviewCtaOption: targetSettings.solutionOverviewCtaOption,
         // Reset generation state when switching assets - each asset has its own generation context
         pdfContent: null,
         generationContext: '',
@@ -640,6 +857,29 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
+      // Solution Overview PDF specific - Page 1
+      solutionOverviewSolution: state.solutionOverviewSolution,
+      solutionOverviewSolutionName: state.solutionOverviewSolutionName,
+      solutionOverviewTagline: state.solutionOverviewTagline,
+      // Solution Overview PDF specific - Page 2
+      solutionOverviewHeroImageId: state.solutionOverviewHeroImageId,
+      solutionOverviewHeroImageUrl: state.solutionOverviewHeroImageUrl,
+      solutionOverviewHeroImagePosition: state.solutionOverviewHeroImagePosition,
+      solutionOverviewHeroImageZoom: state.solutionOverviewHeroImageZoom,
+      solutionOverviewSectionHeader: state.solutionOverviewSectionHeader,
+      solutionOverviewIntroParagraph: state.solutionOverviewIntroParagraph,
+      solutionOverviewKeySolutions: state.solutionOverviewKeySolutions,
+      solutionOverviewQuoteText: state.solutionOverviewQuoteText,
+      solutionOverviewQuoteName: state.solutionOverviewQuoteName,
+      solutionOverviewQuoteTitle: state.solutionOverviewQuoteTitle,
+      solutionOverviewQuoteCompany: state.solutionOverviewQuoteCompany,
+      // Solution Overview PDF specific - Page 3
+      solutionOverviewBenefits: state.solutionOverviewBenefits,
+      solutionOverviewFeatures: state.solutionOverviewFeatures,
+      solutionOverviewScreenshotUrl: state.solutionOverviewScreenshotUrl,
+      solutionOverviewScreenshotPosition: state.solutionOverviewScreenshotPosition,
+      solutionOverviewScreenshotZoom: state.solutionOverviewScreenshotZoom,
+      solutionOverviewCtaOption: state.solutionOverviewCtaOption,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -830,6 +1070,29 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
+      // Solution Overview PDF specific - Page 1
+      solutionOverviewSolution: state.solutionOverviewSolution,
+      solutionOverviewSolutionName: state.solutionOverviewSolutionName,
+      solutionOverviewTagline: state.solutionOverviewTagline,
+      // Solution Overview PDF specific - Page 2
+      solutionOverviewHeroImageId: state.solutionOverviewHeroImageId,
+      solutionOverviewHeroImageUrl: state.solutionOverviewHeroImageUrl,
+      solutionOverviewHeroImagePosition: state.solutionOverviewHeroImagePosition,
+      solutionOverviewHeroImageZoom: state.solutionOverviewHeroImageZoom,
+      solutionOverviewSectionHeader: state.solutionOverviewSectionHeader,
+      solutionOverviewIntroParagraph: state.solutionOverviewIntroParagraph,
+      solutionOverviewKeySolutions: state.solutionOverviewKeySolutions,
+      solutionOverviewQuoteText: state.solutionOverviewQuoteText,
+      solutionOverviewQuoteName: state.solutionOverviewQuoteName,
+      solutionOverviewQuoteTitle: state.solutionOverviewQuoteTitle,
+      solutionOverviewQuoteCompany: state.solutionOverviewQuoteCompany,
+      // Solution Overview PDF specific - Page 3
+      solutionOverviewBenefits: state.solutionOverviewBenefits,
+      solutionOverviewFeatures: state.solutionOverviewFeatures,
+      solutionOverviewScreenshotUrl: state.solutionOverviewScreenshotUrl,
+      solutionOverviewScreenshotPosition: state.solutionOverviewScreenshotPosition,
+      solutionOverviewScreenshotZoom: state.solutionOverviewScreenshotZoom,
+      solutionOverviewCtaOption: state.solutionOverviewCtaOption,
     }
 
     // Update the queue item and return to queue
@@ -1528,6 +1791,29 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
           newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
           grayscale: asset.grayscale,
+          // Solution Overview PDF specific - Page 1
+          solutionOverviewSolution: asset.solutionOverviewSolution,
+          solutionOverviewSolutionName: asset.solutionOverviewSolutionName,
+          solutionOverviewTagline: asset.solutionOverviewTagline,
+          // Solution Overview PDF specific - Page 2
+          solutionOverviewHeroImageId: asset.solutionOverviewHeroImageId,
+          solutionOverviewHeroImageUrl: asset.solutionOverviewHeroImageUrl,
+          solutionOverviewHeroImagePosition: asset.solutionOverviewHeroImagePosition,
+          solutionOverviewHeroImageZoom: asset.solutionOverviewHeroImageZoom,
+          solutionOverviewSectionHeader: asset.solutionOverviewSectionHeader,
+          solutionOverviewIntroParagraph: asset.solutionOverviewIntroParagraph,
+          solutionOverviewKeySolutions: asset.solutionOverviewKeySolutions,
+          solutionOverviewQuoteText: asset.solutionOverviewQuoteText,
+          solutionOverviewQuoteName: asset.solutionOverviewQuoteName,
+          solutionOverviewQuoteTitle: asset.solutionOverviewQuoteTitle,
+          solutionOverviewQuoteCompany: asset.solutionOverviewQuoteCompany,
+          // Solution Overview PDF specific - Page 3
+          solutionOverviewBenefits: asset.solutionOverviewBenefits,
+          solutionOverviewFeatures: asset.solutionOverviewFeatures,
+          solutionOverviewScreenshotUrl: asset.solutionOverviewScreenshotUrl,
+          solutionOverviewScreenshotPosition: asset.solutionOverviewScreenshotPosition,
+          solutionOverviewScreenshotZoom: asset.solutionOverviewScreenshotZoom,
+          solutionOverviewCtaOption: asset.solutionOverviewCtaOption,
           sourceAssetIndex: 0,
         })
       }

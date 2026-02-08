@@ -217,8 +217,22 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
     id: 'collateral',
     label: 'Collateral',
     description: 'Sales and marketing materials',
-    subChannels: [],
-    comingSoon: true,
+    subChannels: [
+      {
+        id: 'collateral-pdf',
+        label: 'PDF Documents',
+        icon: 'globe',
+        templates: [
+          {
+            type: 'solution-overview-pdf',
+            label: 'Solution Overview',
+            dimensions: 'Letter (8.5" × 11") • 3 pages',
+            width: 612,
+            height: 792,
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'community',

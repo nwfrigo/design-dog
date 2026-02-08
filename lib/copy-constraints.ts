@@ -193,6 +193,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'newsletter-blue-gradient': 'newsletter',
   'newsletter-light': 'newsletter',
   'newsletter-top-banner': 'newsletter',
+  'solution-overview-pdf': 'collateral',
 }
 
 /**

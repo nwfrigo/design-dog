@@ -23,7 +23,21 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf'
+
+// Solution Overview PDF Types
+export type SolutionCategory = 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+
+export interface SolutionOverviewBenefit {
+  icon: string  // icon ID from config
+  title: string
+  description: string
+}
+
+export interface SolutionOverviewFeature {
+  title: string
+  description: string
+}
 
 export interface CopyContent {
   headline: string
@@ -76,6 +90,30 @@ export interface ManualAssetSettings {
   showSpeaker2: boolean
   showSpeaker3: boolean
   grayscale: boolean
+  // Solution Overview PDF specific - Page 1
+  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolutionName: string
+  solutionOverviewTagline: string
+  solutionOverviewCurrentPage: 1 | 2 | 3
+  // Solution Overview PDF specific - Page 2
+  solutionOverviewHeroImageId: string
+  solutionOverviewHeroImageUrl: string | null
+  solutionOverviewHeroImagePosition: { x: number; y: number }
+  solutionOverviewHeroImageZoom: number
+  solutionOverviewSectionHeader: string
+  solutionOverviewIntroParagraph: string
+  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewQuoteText: string
+  solutionOverviewQuoteName: string
+  solutionOverviewQuoteTitle: string
+  solutionOverviewQuoteCompany: string
+  // Solution Overview PDF specific - Page 3
+  solutionOverviewBenefits: SolutionOverviewBenefit[]
+  solutionOverviewFeatures: SolutionOverviewFeature[]
+  solutionOverviewScreenshotUrl: string | null
+  solutionOverviewScreenshotPosition: { x: number; y: number }
+  solutionOverviewScreenshotZoom: number
+  solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
 }
 
 export interface GeneratedCopy extends CopyContent {
@@ -230,6 +268,30 @@ export interface GeneratedAsset {
   newsletterTopBannerVariant: 'dark' | 'light'
   // Image effects
   grayscale: boolean
+  // Solution Overview PDF specific - Page 1
+  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolutionName: string
+  solutionOverviewTagline: string
+  solutionOverviewCurrentPage: 1 | 2 | 3
+  // Solution Overview PDF specific - Page 2
+  solutionOverviewHeroImageId: string
+  solutionOverviewHeroImageUrl: string | null
+  solutionOverviewHeroImagePosition: { x: number; y: number }
+  solutionOverviewHeroImageZoom: number
+  solutionOverviewSectionHeader: string
+  solutionOverviewIntroParagraph: string
+  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewQuoteText: string
+  solutionOverviewQuoteName: string
+  solutionOverviewQuoteTitle: string
+  solutionOverviewQuoteCompany: string
+  // Solution Overview PDF specific - Page 3
+  solutionOverviewBenefits: SolutionOverviewBenefit[]
+  solutionOverviewFeatures: SolutionOverviewFeature[]
+  solutionOverviewScreenshotUrl: string | null
+  solutionOverviewScreenshotPosition: { x: number; y: number }
+  solutionOverviewScreenshotZoom: number
+  solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -326,6 +388,29 @@ export interface QueuedAsset {
   newsletterTopBannerVariant: 'dark' | 'light'
   // Image effects
   grayscale: boolean
+  // Solution Overview PDF specific - Page 1
+  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolutionName: string
+  solutionOverviewTagline: string
+  // Solution Overview PDF specific - Page 2
+  solutionOverviewHeroImageId: string
+  solutionOverviewHeroImageUrl: string | null
+  solutionOverviewHeroImagePosition: { x: number; y: number }
+  solutionOverviewHeroImageZoom: number
+  solutionOverviewSectionHeader: string
+  solutionOverviewIntroParagraph: string
+  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewQuoteText: string
+  solutionOverviewQuoteName: string
+  solutionOverviewQuoteTitle: string
+  solutionOverviewQuoteCompany: string
+  // Solution Overview PDF specific - Page 3
+  solutionOverviewBenefits: SolutionOverviewBenefit[]
+  solutionOverviewFeatures: SolutionOverviewFeature[]
+  solutionOverviewScreenshotUrl: string | null
+  solutionOverviewScreenshotPosition: { x: number; y: number }
+  solutionOverviewScreenshotZoom: number
+  solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -444,6 +529,30 @@ export interface AppState {
   newsletterTopBannerVariant: 'dark' | 'light'
   // Image effects
   grayscale: boolean
+  // Solution Overview PDF specific - Page 1
+  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolutionName: string
+  solutionOverviewTagline: string
+  solutionOverviewCurrentPage: 1 | 2 | 3
+  // Solution Overview PDF specific - Page 2
+  solutionOverviewHeroImageId: string
+  solutionOverviewHeroImageUrl: string | null
+  solutionOverviewHeroImagePosition: { x: number; y: number }
+  solutionOverviewHeroImageZoom: number
+  solutionOverviewSectionHeader: string
+  solutionOverviewIntroParagraph: string
+  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewQuoteText: string
+  solutionOverviewQuoteName: string
+  solutionOverviewQuoteTitle: string
+  solutionOverviewQuoteCompany: string
+  // Solution Overview PDF specific - Page 3
+  solutionOverviewBenefits: SolutionOverviewBenefit[]
+  solutionOverviewFeatures: SolutionOverviewFeature[]
+  solutionOverviewScreenshotUrl: string | null
+  solutionOverviewScreenshotPosition: { x: number; y: number }
+  solutionOverviewScreenshotZoom: number
+  solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -540,6 +649,37 @@ export interface AppState {
   setNewsletterTopBannerVariant: (variant: 'dark' | 'light') => void
   // Image effects
   setGrayscale: (grayscale: boolean) => void
+  // Solution Overview PDF specific - Page 1
+  setSolutionOverviewSolution: (solution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability') => void
+  setSolutionOverviewSolutionName: (name: string) => void
+  setSolutionOverviewTagline: (tagline: string) => void
+  setSolutionOverviewCurrentPage: (page: 1 | 2 | 3) => void
+  // Solution Overview PDF specific - Page 2
+  setSolutionOverviewHeroImageId: (id: string) => void
+  setSolutionOverviewHeroImageUrl: (url: string | null) => void
+  setSolutionOverviewHeroImagePosition: (position: { x: number; y: number }) => void
+  setSolutionOverviewHeroImageZoom: (zoom: number) => void
+  setSolutionOverviewSectionHeader: (header: string) => void
+  setSolutionOverviewIntroParagraph: (paragraph: string) => void
+  setSolutionOverviewKeySolutions: (solutions: [string, string, string, string, string, string]) => void
+  setSolutionOverviewKeySolution: (index: number, value: string) => void
+  setSolutionOverviewQuoteText: (text: string) => void
+  setSolutionOverviewQuoteName: (name: string) => void
+  setSolutionOverviewQuoteTitle: (title: string) => void
+  setSolutionOverviewQuoteCompany: (company: string) => void
+  // Solution Overview PDF specific - Page 3
+  setSolutionOverviewBenefits: (benefits: SolutionOverviewBenefit[]) => void
+  setSolutionOverviewBenefit: (index: number, benefit: SolutionOverviewBenefit) => void
+  addSolutionOverviewBenefit: () => void
+  removeSolutionOverviewBenefit: (index: number) => void
+  setSolutionOverviewFeatures: (features: SolutionOverviewFeature[]) => void
+  setSolutionOverviewFeature: (index: number, feature: SolutionOverviewFeature) => void
+  addSolutionOverviewFeature: () => void
+  removeSolutionOverviewFeature: (index: number) => void
+  setSolutionOverviewScreenshotUrl: (url: string | null) => void
+  setSolutionOverviewScreenshotPosition: (position: { x: number; y: number }) => void
+  setSolutionOverviewScreenshotZoom: (zoom: number) => void
+  setSolutionOverviewCtaOption: (option: 'demo' | 'learn' | 'start' | 'contact') => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

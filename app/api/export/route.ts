@@ -74,6 +74,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'newsletter-blue-gradient': { width: 640, height: 179 },
   'newsletter-light': { width: 640, height: 179 },
   'newsletter-top-banner': { width: 600, height: 240 },
+  'solution-overview-pdf': { width: 612, height: 792 },
 }
 
 export async function POST(request: NextRequest) {
@@ -255,6 +256,32 @@ export async function POST(request: NextRequest) {
 
     // Image effects
     if (grayscale !== undefined) params.set('grayscale', String(grayscale))
+
+    // Solution Overview PDF specific - Page 1
+    if (body.solutionName) params.set('solutionName', body.solutionName)
+    if (body.tagline) params.set('tagline', body.tagline)
+    if (body.page) params.set('page', body.page)
+    // Solution Overview PDF specific - Page 2
+    if (body.heroImageId) params.set('heroImageId', body.heroImageId)
+    if (body.heroImageUrl) params.set('heroImageUrl', body.heroImageUrl)
+    if (body.heroImagePositionX !== undefined) params.set('heroImagePositionX', String(body.heroImagePositionX))
+    if (body.heroImagePositionY !== undefined) params.set('heroImagePositionY', String(body.heroImagePositionY))
+    if (body.heroImageZoom !== undefined) params.set('heroImageZoom', String(body.heroImageZoom))
+    if (body.sectionHeader) params.set('sectionHeader', body.sectionHeader)
+    if (body.introParagraph) params.set('introParagraph', body.introParagraph)
+    if (body.keySolutions) params.set('keySolutions', JSON.stringify(body.keySolutions))
+    if (body.quoteText) params.set('quoteText', body.quoteText)
+    if (body.quoteName) params.set('quoteName', body.quoteName)
+    if (body.quoteTitle) params.set('quoteTitle', body.quoteTitle)
+    if (body.quoteCompany) params.set('quoteCompany', body.quoteCompany)
+    // Solution Overview PDF specific - Page 3
+    if (body.benefits) params.set('benefits', JSON.stringify(body.benefits))
+    if (body.features) params.set('features', JSON.stringify(body.features))
+    if (body.screenshotUrl) params.set('screenshotUrl', body.screenshotUrl)
+    if (body.screenshotPositionX !== undefined) params.set('screenshotPositionX', String(body.screenshotPositionX))
+    if (body.screenshotPositionY !== undefined) params.set('screenshotPositionY', String(body.screenshotPositionY))
+    if (body.screenshotZoom !== undefined) params.set('screenshotZoom', String(body.screenshotZoom))
+    if (body.ctaOption) params.set('ctaOption', body.ctaOption)
 
     // Get the base URL from the request
     const protocol = request.headers.get('x-forwarded-proto') || 'https'
