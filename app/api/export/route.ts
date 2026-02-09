@@ -263,7 +263,10 @@ export async function POST(request: NextRequest) {
     if (body.page) params.set('page', body.page)
     // Solution Overview PDF specific - Page 2
     if (body.heroImageId) params.set('heroImageId', body.heroImageId)
-    if (body.heroImageUrl) params.set('heroImageUrl', body.heroImageUrl)
+    // Skip data URLs for hero image - they'll be injected via page.evaluate()
+    if (body.heroImageUrl && !body.heroImageUrl.startsWith('data:') && !body.heroImageUrl.startsWith('blob:')) {
+      params.set('heroImageUrl', body.heroImageUrl)
+    }
     if (body.heroImagePositionX !== undefined) params.set('heroImagePositionX', String(body.heroImagePositionX))
     if (body.heroImagePositionY !== undefined) params.set('heroImagePositionY', String(body.heroImagePositionY))
     if (body.heroImageZoom !== undefined) params.set('heroImageZoom', String(body.heroImageZoom))
@@ -278,7 +281,10 @@ export async function POST(request: NextRequest) {
     // Solution Overview PDF specific - Page 3
     if (body.benefits) params.set('benefits', JSON.stringify(body.benefits))
     if (body.features) params.set('features', JSON.stringify(body.features))
-    if (body.screenshotUrl) params.set('screenshotUrl', body.screenshotUrl)
+    // Skip data URLs for screenshot - they'll be injected via page.evaluate()
+    if (body.screenshotUrl && !body.screenshotUrl.startsWith('data:') && !body.screenshotUrl.startsWith('blob:')) {
+      params.set('screenshotUrl', body.screenshotUrl)
+    }
     if (body.screenshotPositionX !== undefined) params.set('screenshotPositionX', String(body.screenshotPositionX))
     if (body.screenshotPositionY !== undefined) params.set('screenshotPositionY', String(body.screenshotPositionY))
     if (body.screenshotZoom !== undefined) params.set('screenshotZoom', String(body.screenshotZoom))
@@ -345,6 +351,18 @@ export async function POST(request: NextRequest) {
         return new Promise<boolean>((resolve) => {
           img.onload = () => {
             console.log(`Image loaded successfully for ${sel}`)
+            // Show the image (it may be hidden with display:none when no URL was provided)
+            img.style.display = 'block'
+            // Hide any sibling placeholder divs
+            const parent = img.parentElement
+            if (parent) {
+              const siblings = parent.querySelectorAll('div')
+              siblings.forEach(sib => {
+                if (sib.textContent?.includes('Screenshot') || sib.textContent?.includes('Product')) {
+                  sib.style.display = 'none'
+                }
+              })
+            }
             resolve(true)
           }
           img.onerror = (e) => {
@@ -353,7 +371,10 @@ export async function POST(request: NextRequest) {
           }
           img.src = imgSrc
           // Fallback timeout in case onload doesn't fire (data URLs load synchronously sometimes)
-          setTimeout(() => resolve(true), 500)
+          setTimeout(() => {
+            img.style.display = 'block'
+            resolve(true)
+          }, 500)
         })
       }, dataUrl, selector)
       console.log(`Image injection result for ${selector}:`, injected)
@@ -391,12 +412,22 @@ export async function POST(request: NextRequest) {
       await injectDataUrlImage(body.newsletterImageUrl, 'img[data-newsletter-image="true"]')
     }
 
+    // Inject Solution Overview images
+    if (body.heroImageUrl && body.heroImageUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.heroImageUrl, 'img[data-so-hero-image="true"]')
+    }
+    if (body.screenshotUrl && body.screenshotUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.screenshotUrl, 'img[data-so-screenshot="true"]')
+    }
+
     // Additional delay for rendering
     if ((imageUrl && imageUrl.startsWith('data:')) ||
         (body.speaker1ImageUrl && body.speaker1ImageUrl.startsWith('data:')) ||
         (body.speaker2ImageUrl && body.speaker2ImageUrl.startsWith('data:')) ||
         (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) ||
-        (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:'))) {
+        (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:')) ||
+        (body.heroImageUrl && body.heroImageUrl.startsWith('data:')) ||
+        (body.screenshotUrl && body.screenshotUrl.startsWith('data:'))) {
       await new Promise(resolve => setTimeout(resolve, 300))
     }
 

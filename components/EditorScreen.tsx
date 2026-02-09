@@ -345,6 +345,8 @@ export function EditorScreen() {
   // Image crop modal state
   const [showCropModal, setShowCropModal] = useState(false)
   const [showNewsletterCropModal, setShowNewsletterCropModal] = useState(false)
+  const [showSOHeroCropModal, setShowSOHeroCropModal] = useState(false)
+  const [showSOScreenshotCropModal, setShowSOScreenshotCropModal] = useState(false)
 
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
@@ -1258,6 +1260,40 @@ export function EditorScreen() {
           onSave={(position, zoom) => {
             setNewsletterImagePosition(position)
             setNewsletterImageZoom(zoom)
+          }}
+        />
+      )}
+
+      {/* Solution Overview Hero Image Crop Modal */}
+      {solutionOverviewHeroImageUrl && (
+        <ImageCropModal
+          isOpen={showSOHeroCropModal}
+          onClose={() => setShowSOHeroCropModal(false)}
+          imageSrc={solutionOverviewHeroImageUrl}
+          frameWidth={382}
+          frameHeight={180}
+          initialPosition={solutionOverviewHeroImagePosition}
+          initialZoom={solutionOverviewHeroImageZoom}
+          onSave={(position, zoom) => {
+            setSolutionOverviewHeroImagePosition(position)
+            setSolutionOverviewHeroImageZoom(zoom)
+          }}
+        />
+      )}
+
+      {/* Solution Overview Screenshot Crop Modal */}
+      {solutionOverviewScreenshotUrl && (
+        <ImageCropModal
+          isOpen={showSOScreenshotCropModal}
+          onClose={() => setShowSOScreenshotCropModal(false)}
+          imageSrc={solutionOverviewScreenshotUrl}
+          frameWidth={230}
+          frameHeight={230}
+          initialPosition={solutionOverviewScreenshotPosition}
+          initialZoom={solutionOverviewScreenshotZoom}
+          onSave={(position, zoom) => {
+            setSolutionOverviewScreenshotPosition(position)
+            setSolutionOverviewScreenshotZoom(zoom)
           }}
         />
       )}
@@ -2228,21 +2264,31 @@ export function EditorScreen() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {/* ZoomableImage with pan support */}
-                          <ZoomableImage
-                            src={solutionOverviewHeroImageUrl}
-                            alt="Hero image"
-                            containerWidth={280}
-                            containerHeight={132}
-                            zoom={solutionOverviewHeroImageZoom}
-                            position={solutionOverviewHeroImagePosition}
-                            onZoomChange={setSolutionOverviewHeroImageZoom}
-                            onPositionChange={setSolutionOverviewHeroImagePosition}
-                            borderRadius={8}
-                            showControls={true}
-                            targetContainerWidth={382}
-                            targetContainerHeight={180}
-                          />
+                          {/* Image preview - click to adjust */}
+                          <div className="relative">
+                            <div
+                              onClick={() => setShowSOHeroCropModal(true)}
+                              className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
+                              style={{ width: 280, height: 132 }}
+                            >
+                              <img
+                                src={solutionOverviewHeroImageUrl}
+                                alt="Hero image"
+                                className="w-full h-full object-cover"
+                                style={{
+                                  objectPosition: `${50 - solutionOverviewHeroImagePosition.x}% ${50 - solutionOverviewHeroImagePosition.y}%`,
+                                  transform: solutionOverviewHeroImageZoom !== 1 ? `scale(${solutionOverviewHeroImageZoom})` : undefined,
+                                }}
+                              />
+                            </div>
+                            {/* Adjust button */}
+                            <button
+                              onClick={() => setShowSOHeroCropModal(true)}
+                              className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                            >
+                              Adjust
+                            </button>
+                          </div>
                           {/* Grayscale toggle */}
                           <div className="flex items-center justify-between">
                             <label className="text-xs text-gray-500">Grayscale</label>
@@ -2541,24 +2587,49 @@ export function EditorScreen() {
                           </div>
                         </label>
                       ) : (
-                        <div className="relative">
-                          {/* ZoomableImage with pan support */}
-                          <ZoomableImage
-                            src={solutionOverviewScreenshotUrl}
-                            alt="Product image"
-                            containerWidth={280}
-                            containerHeight={168}
-                            zoom={solutionOverviewScreenshotZoom}
-                            position={solutionOverviewScreenshotPosition}
-                            onZoomChange={setSolutionOverviewScreenshotZoom}
-                            onPositionChange={setSolutionOverviewScreenshotPosition}
-                            borderRadius={8}
-                            showControls={true}
-                            targetContainerWidth={200}
-                            targetContainerHeight={120}
-                          />
+                        <div className="space-y-3">
+                          {/* Image preview - click to adjust */}
+                          <div className="relative">
+                            <div
+                              onClick={() => setShowSOScreenshotCropModal(true)}
+                              className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
+                              style={{ width: 168, height: 168 }}
+                            >
+                              <img
+                                src={solutionOverviewScreenshotUrl}
+                                alt="Product image"
+                                className="w-full h-full object-cover"
+                                style={{
+                                  objectPosition: `${50 - solutionOverviewScreenshotPosition.x}% ${50 - solutionOverviewScreenshotPosition.y}%`,
+                                  transform: solutionOverviewScreenshotZoom !== 1 ? `scale(${solutionOverviewScreenshotZoom})` : undefined,
+                                }}
+                              />
+                            </div>
+                            {/* Adjust button */}
+                            <button
+                              onClick={() => setShowSOScreenshotCropModal(true)}
+                              className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                            >
+                              Adjust
+                            </button>
+                            {/* Remove button */}
+                            <button
+                              onClick={() => {
+                                setSolutionOverviewScreenshotUrl(null)
+                                setSolutionOverviewScreenshotPosition({ x: 0, y: 0 })
+                                setSolutionOverviewScreenshotZoom(1)
+                                setSolutionOverviewScreenshotGrayscale(false)
+                              }}
+                              className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
+                              title="Remove image"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
                           {/* Grayscale toggle */}
-                          <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center justify-between">
                             <label className="text-xs text-gray-500">Grayscale</label>
                             <button
                               onClick={() => setSolutionOverviewScreenshotGrayscale(!solutionOverviewScreenshotGrayscale)}
@@ -2573,21 +2644,6 @@ export function EditorScreen() {
                               />
                             </button>
                           </div>
-                          {/* Remove button */}
-                          <button
-                            onClick={() => {
-                              setSolutionOverviewScreenshotUrl(null)
-                              setSolutionOverviewScreenshotPosition({ x: 0, y: 0 })
-                              setSolutionOverviewScreenshotZoom(1)
-                              setSolutionOverviewScreenshotGrayscale(false)
-                            }}
-                            className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
-                            title="Remove image"
-                          >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
                         </div>
                       )}
                     </div>

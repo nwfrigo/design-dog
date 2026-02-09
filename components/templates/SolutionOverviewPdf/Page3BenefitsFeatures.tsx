@@ -161,6 +161,7 @@ export function Page3BenefitsFeatures({
           width: 1,
           height: pageHeight,
           background: '#89888B',
+          zIndex: 10,
         }}
       />
 
@@ -294,6 +295,7 @@ export function Page3BenefitsFeatures({
             minWidth: 230,
             height: 230,
             minHeight: 230,
+            marginTop: -32, // Offset to align with column top edge
             marginLeft: -24, // Offset to align with column left edge
             marginRight: -40, // Offset to align with column right edge
             marginBottom: 12,
@@ -304,13 +306,26 @@ export function Page3BenefitsFeatures({
             background: screenshotUrl
               ? undefined
               : 'linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 100%)',
-            backgroundImage: screenshotUrl ? `url(${screenshotUrl})` : undefined,
-            backgroundSize: `${screenshotZoom * 100}%`,
-            backgroundPosition: `${50 + screenshotPosition.x}% ${50 + screenshotPosition.y}%`,
-            backgroundRepeat: 'no-repeat',
-            filter: screenshotGrayscale ? 'grayscale(100%)' : undefined,
           }}
         >
+          {/* Always render img element so data URLs can be injected for export */}
+          <img
+            src={screenshotUrl || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
+            alt=""
+            data-so-screenshot="true"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: `${50 - screenshotPosition.x}% ${50 - screenshotPosition.y}%`,
+              transform: screenshotZoom !== 1
+                ? `translate(${screenshotPosition.x * (screenshotZoom - 1)}%, ${screenshotPosition.y * (screenshotZoom - 1)}%) scale(${screenshotZoom})`
+                : undefined,
+              transformOrigin: 'center',
+              filter: screenshotGrayscale ? 'grayscale(100%)' : undefined,
+              display: screenshotUrl ? 'block' : 'none',
+            }}
+          />
           {!screenshotUrl && (
             <div
               style={{

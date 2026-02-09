@@ -124,16 +124,31 @@ export function Page2Body({
           style={{
             width: 382,
             height: '100%',
+            overflow: 'hidden',
             background: heroImageUrl
               ? undefined
               : 'linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 100%)',
-            backgroundImage: heroImageUrl ? `url(${heroImageUrl})` : undefined,
-            backgroundSize: `${heroImageZoom * 100}%`,
-            backgroundPosition: `${50 + heroImagePosition.x}% ${50 + heroImagePosition.y}%`,
-            backgroundRepeat: 'no-repeat',
-            filter: heroImageGrayscale ? 'grayscale(100%)' : undefined,
           }}
-        />
+        >
+          {/* Always render img element so data URLs can be injected for export */}
+          <img
+            src={heroImageUrl || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
+            alt=""
+            data-so-hero-image="true"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: `${50 - heroImagePosition.x}% ${50 - heroImagePosition.y}%`,
+              transform: heroImageZoom !== 1
+                ? `translate(${heroImagePosition.x * (heroImageZoom - 1)}%, ${heroImagePosition.y * (heroImageZoom - 1)}%) scale(${heroImageZoom})`
+                : undefined,
+              transformOrigin: 'center',
+              filter: heroImageGrayscale ? 'grayscale(100%)' : undefined,
+              display: heroImageUrl ? 'block' : 'none',
+            }}
+          />
+        </div>
       </div>
 
       {/* Vertical divider - extends from header band to bottom of Key Solutions */}
