@@ -19,6 +19,8 @@ export default function SolutionOverviewPdfRenderPage({
   const heroImagePositionX = parseFloat((searchParams.heroImagePositionX as string) || '0')
   const heroImagePositionY = parseFloat((searchParams.heroImagePositionY as string) || '0')
   const heroImageZoom = parseFloat((searchParams.heroImageZoom as string) || '1')
+  const heroImageGrayscale = (searchParams.heroImageGrayscale as string) === 'true'
+  const page2Header = (searchParams.page2Header as string) || 'Employee Health Essentials'
   const sectionHeader = (searchParams.sectionHeader as string) || 'Streamline Employee Health.\nStrengthen Compliance.'
   const introParagraph = (searchParams.introParagraph as string) || 'Employee Health Essentials offers a streamlined, configurable solution for managing employee health across onboarding, clinic visits, compliance, and exposure tracking.\n\nFor faster deployment, lower admin burden, and stronger compliance — all in one package built for healthcare employee health teams.'
 
@@ -66,7 +68,9 @@ export default function SolutionOverviewPdfRenderPage({
   const screenshotPositionX = parseFloat((searchParams.screenshotPositionX as string) || '0')
   const screenshotPositionY = parseFloat((searchParams.screenshotPositionY as string) || '0')
   const screenshotZoom = parseFloat((searchParams.screenshotZoom as string) || '1')
+  const screenshotGrayscale = (searchParams.screenshotGrayscale as string) === 'true'
   const ctaOption = (searchParams.ctaOption as 'demo' | 'learn' | 'start' | 'contact') || 'demo'
+  const ctaUrl = (searchParams.ctaUrl as string) || ''
 
   return (
     <div
@@ -88,6 +92,8 @@ export default function SolutionOverviewPdfRenderPage({
           heroImageUrl={heroImageUrl}
           heroImagePosition={{ x: heroImagePositionX, y: heroImagePositionY }}
           heroImageZoom={heroImageZoom}
+          heroImageGrayscale={heroImageGrayscale}
+          page2Header={page2Header}
           sectionHeader={sectionHeader}
           introParagraph={introParagraph}
           keySolutions={keySolutions}
@@ -100,7 +106,9 @@ export default function SolutionOverviewPdfRenderPage({
           screenshotUrl={screenshotUrl}
           screenshotPosition={{ x: screenshotPositionX, y: screenshotPositionY }}
           screenshotZoom={screenshotZoom}
+          screenshotGrayscale={screenshotGrayscale}
           ctaOption={ctaOption}
+          ctaUrl={ctaUrl}
         />
       </Suspense>
     </div>

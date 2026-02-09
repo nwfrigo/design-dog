@@ -267,6 +267,7 @@ export async function POST(request: NextRequest) {
     if (body.heroImagePositionX !== undefined) params.set('heroImagePositionX', String(body.heroImagePositionX))
     if (body.heroImagePositionY !== undefined) params.set('heroImagePositionY', String(body.heroImagePositionY))
     if (body.heroImageZoom !== undefined) params.set('heroImageZoom', String(body.heroImageZoom))
+    if (body.page2Header) params.set('page2Header', body.page2Header)
     if (body.sectionHeader) params.set('sectionHeader', body.sectionHeader)
     if (body.introParagraph) params.set('introParagraph', body.introParagraph)
     if (body.keySolutions) params.set('keySolutions', JSON.stringify(body.keySolutions))
@@ -282,10 +283,13 @@ export async function POST(request: NextRequest) {
     if (body.screenshotPositionY !== undefined) params.set('screenshotPositionY', String(body.screenshotPositionY))
     if (body.screenshotZoom !== undefined) params.set('screenshotZoom', String(body.screenshotZoom))
     if (body.ctaOption) params.set('ctaOption', body.ctaOption)
+    if (body.ctaUrl) params.set('ctaUrl', body.ctaUrl)
 
     // Get the base URL from the request
-    const protocol = request.headers.get('x-forwarded-proto') || 'https'
     const host = request.headers.get('host') || 'localhost:3000'
+    // Use http for localhost, otherwise check x-forwarded-proto or default to https
+    const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1')
+    const protocol = isLocalhost ? 'http' : (request.headers.get('x-forwarded-proto') || 'https')
     const baseUrl = `${protocol}://${host}`
     const renderUrl = `${baseUrl}/render/${template}?${params.toString()}`
     console.log('Base URL:', baseUrl)
@@ -299,9 +303,14 @@ export async function POST(request: NextRequest) {
     // Set viewport to template dimensions
     const dimensions = TEMPLATE_DIMENSIONS[template] || TEMPLATE_DIMENSIONS['website-thumbnail']
     const { width, height } = dimensions
+
+    // For Solution Overview PDF with page=all, use taller viewport to render all pages
+    const isPdfExport = template === 'solution-overview-pdf' && body.page === 'all'
+    const viewportHeight = isPdfExport ? height * 3 : height
+
     await page.setViewport({
       width,
-      height,
+      height: viewportHeight,
       deviceScaleFactor: scale,
     })
 
@@ -413,7 +422,28 @@ export async function POST(request: NextRequest) {
     // Small delay after hiding overlays
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    // Take screenshot
+    // For Solution Overview PDF with page=all, generate a PDF instead of PNG
+    if (template === 'solution-overview-pdf' && body.page === 'all') {
+      // Generate PDF using Puppeteer's PDF feature
+      // Note: scale must be 1 for PDFs to maintain proper page dimensions
+      // (scale=2 is for PNG retina quality, but would double PDF content size)
+      const pdfBuffer = await page.pdf({
+        width: `${width}px`,
+        height: `${height}px`,
+        printBackground: true,
+      })
+
+      await browser.close()
+
+      return new NextResponse(Buffer.from(pdfBuffer), {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="solution-overview.pdf"`,
+        },
+      })
+    }
+
+    // Take screenshot for other templates
     const screenshot = await page.screenshot({
       type: 'png',
       clip: {

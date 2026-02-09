@@ -1,12 +1,15 @@
 // Page 3: Benefits & Features - Solution Overview PDF Template
-// Layout: Left column with benefits, right column with screenshot and features, footer with CTA
+// Layout: Left column with benefits, right column (230px) with screenshot and features
+// Full-height vertical divider at 230px from right edge
+// Two-box footer with CTA and logo stacked in right box
 
 import { solutionCategories, footerContactInfo, ctaOptions, type SolutionCategory } from '@/config/solution-overview-assets'
+import { getIconByName } from '@/components/IconPickerModal'
 
 // Inline SVG for Cority logo (black version for footer)
 function CorityLogoBlack() {
   return (
-    <svg width="70" height="23" viewBox="0 0 383.8 128.41" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="50" height="16" viewBox="0 0 383.8 128.41" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M278.36,86.3c-4.39,0-6.9-3.61-6.9-8.32V43.78h13l-6.78-17.41h-6.26V0H251.38V83.31c0,13.5,7.53,20.71,21.49,20.71,8.29,0,13.61-2.18,16.6-4.84L284,85A12.73,12.73,0,0,1,278.36,86.3Z" fill="black"/>
       <path d="M112.31,24.18c-24.94,0-40,18.19-40,39.69s15.06,39.84,40,39.84c25.1,0,40.16-18.2,40.16-39.84S137.41,24.18,112.31,24.18Zm0,61.8C99.92,86,93,75.79,93,63.87c0-11.77,6.9-22,19.29-22s19.46,10.2,19.46,22C131.77,75.79,124.71,86,112.31,86Z" fill="black"/>
       <path d="M41.1,41.9c6.9,0,12.39,2.83,16,8.16l.5-.47a53.22,53.22,0,0,1,7.54-17.11c-5.49-4.66-13.59-8.3-25-8.3C16.78,24.18,0,40.65,0,63.87s16.78,39.84,40.16,39.84c11.39,0,19.48-3.64,25-8.36a53.25,53.25,0,0,1-7.49-17l-.54-.49A19.12,19.12,0,0,1,41.1,86C29,86,20.55,77,20.55,63.87S29,41.9,41.1,41.9Z" fill="black"/>
@@ -20,27 +23,32 @@ function CorityLogoBlack() {
   )
 }
 
-// Simple placeholder icons (will be replaced with real icons later)
-function BenefitIcon({ iconId, color }: { iconId: string; color: string }) {
-  // Simple circle with first letter as placeholder
-  const letter = iconId.charAt(0).toUpperCase()
+// Render Lucide icon in a styled container (17x17 white background, no border)
+function BenefitIcon({ iconId }: { iconId: string }) {
+  const IconComponent = getIconByName(iconId)
+
   return (
     <div
       style={{
         width: 17,
         height: 17,
-        borderRadius: 3,
-        background: color,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white',
-        fontSize: 9,
-        fontWeight: 600,
-        fontFamily: 'Fakt Pro, sans-serif',
       }}
     >
-      {letter}
+      {IconComponent ? (
+        <IconComponent
+          size={17}
+          strokeWidth={1.5}
+          color="#37393D"
+        />
+      ) : (
+        // Fallback circle icon
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+          <circle cx="8.5" cy="8.5" r="5" stroke="#37393D" strokeWidth="1.5"/>
+        </svg>
+      )}
     </div>
   )
 }
@@ -64,7 +72,9 @@ export interface Page3BenefitsFeaturesProps {
   screenshotUrl: string | null
   screenshotPosition: { x: number; y: number }
   screenshotZoom: number
+  screenshotGrayscale?: boolean
   ctaOption: 'demo' | 'learn' | 'start' | 'contact'
+  ctaUrl?: string
   scale?: number
 }
 
@@ -76,18 +86,65 @@ export function Page3BenefitsFeatures({
   screenshotUrl,
   screenshotPosition,
   screenshotZoom,
+  screenshotGrayscale = false,
   ctaOption,
+  ctaUrl,
   scale = 1,
 }: Page3BenefitsFeaturesProps) {
   const solutionConfig = solutionCategories[solution]
   const solutionColor = solutionConfig.color
   const ctaLabel = ctaOptions.find(opt => opt.id === ctaOption)?.label || 'Request a demo'
 
+  // Layout constants
+  const pageWidth = 612
+  const pageHeight = 792
+  const verticalLineX = pageWidth - 230 // 382px from left
+  const footerHeight = 146
+  const footerDividerX = verticalLineX / 2 // 191px - halfway between vertical line and left edge
+
+  // CTA button component (supports hyperlink)
+  const CTAButton = () => {
+    const buttonStyle: React.CSSProperties = {
+      padding: '12px 20px 10px 20px',
+      background: '#D35F0B',
+      borderRadius: 9999, // Pill shape
+      color: 'white',
+      fontSize: 11,
+      fontFamily: 'Fakt Pro, sans-serif',
+      fontWeight: 500,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 8,
+      textDecoration: 'none',
+      lineHeight: 1,
+    }
+
+    const content = (
+      <>
+        {ctaLabel}
+        {/* Arrow */}
+        <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+          <path d="M7 1L11 5M11 5L7 9M11 5H1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </>
+    )
+
+    if (ctaUrl) {
+      return (
+        <a href={ctaUrl} style={buttonStyle} target="_blank" rel="noopener noreferrer">
+          {content}
+        </a>
+      )
+    }
+
+    return <div style={buttonStyle}>{content}</div>
+  }
+
   return (
     <div
       style={{
-        width: 612,
-        height: 792,
+        width: pageWidth,
+        height: pageHeight,
         position: 'relative',
         background: 'white',
         overflow: 'hidden',
@@ -95,275 +152,293 @@ export function Page3BenefitsFeatures({
         transformOrigin: 'top left',
       }}
     >
-      {/* Main Content Area */}
+      {/* Full-height vertical divider - 230px from right edge */}
       <div
         style={{
-          width: '100%',
-          height: 646, // 792 - 146 footer
-          display: 'flex',
+          position: 'absolute',
+          top: 0,
+          left: verticalLineX,
+          width: 1,
+          height: pageHeight,
+          background: '#89888B',
+        }}
+      />
+
+      {/* Horizontal footer divider - only extends to vertical line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: pageHeight - footerHeight,
+          left: 0,
+          width: verticalLineX + 0.5, // Goes up to and includes the vertical line
+          height: 1,
+          background: '#89888B',
+        }}
+      />
+
+      {/* Footer vertical divider - halfway between main vertical and left edge */}
+      <div
+        style={{
+          position: 'absolute',
+          top: pageHeight - footerHeight,
+          left: footerDividerX,
+          width: 1,
+          height: footerHeight,
+          background: '#89888B',
+        }}
+      />
+
+
+      {/* Left Column - Benefits (width: 382px minus padding) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: verticalLineX,
+          height: pageHeight - footerHeight,
           padding: '32px 40px',
         }}
       >
-        {/* Left Column - Benefits */}
+        {/* Eyebrow */}
         <div
           style={{
-            width: 331,
-            paddingRight: 24,
+            fontSize: 8,
+            fontFamily: 'Fakt Pro, sans-serif',
+            fontWeight: 500,
+            color: solutionColor,
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+            marginBottom: 8,
           }}
         >
-          {/* Eyebrow */}
-          <div
-            style={{
-              fontSize: 8,
-              fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 500,
-              color: solutionColor,
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-              marginBottom: 8,
-            }}
-          >
-            {solutionName}
-          </div>
-
-          {/* Key Benefits Heading */}
-          <div
-            style={{
-              fontSize: 16,
-              fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 500,
-              color: '#060015',
-              marginBottom: 16,
-            }}
-          >
-            Key Benefits
-          </div>
-
-          {/* Benefits List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {benefits.map((benefit, index) => (
-              <div
-                key={index}
-                style={{
-                  display: 'flex',
-                  gap: 10,
-                }}
-              >
-                {/* Icon */}
-                <div style={{ flexShrink: 0, marginTop: 2 }}>
-                  <BenefitIcon iconId={benefit.icon} color={solutionColor} />
-                </div>
-                {/* Content */}
-                <div>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontFamily: 'Fakt Pro, sans-serif',
-                      fontWeight: 500,
-                      color: '#060015',
-                      marginBottom: 3,
-                    }}
-                  >
-                    {benefit.title}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontFamily: 'Fakt Pro, sans-serif',
-                      fontWeight: 400,
-                      color: '#37393D',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {benefit.description}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {solutionName}
         </div>
 
-        {/* Right Column - Screenshot and Features */}
+        {/* Key Benefits Heading - matches H2 (18pt blonde) */}
         <div
           style={{
-            width: 200,
-            paddingLeft: 24,
-            borderLeft: '0.5px solid #89888B',
-            display: 'flex',
-            flexDirection: 'column',
+            fontSize: 18,
+            fontFamily: 'Fakt Pro, sans-serif',
+            fontWeight: 350,
+            color: '#060015',
+            marginBottom: 20,
           }}
         >
-          {/* Product Screenshot */}
-          <div
-            style={{
-              width: '100%',
-              height: 120,
-              marginBottom: 16,
-              borderRadius: 4,
-              overflow: 'hidden',
-              background: screenshotUrl
-                ? undefined
-                : 'linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 100%)',
-              backgroundImage: screenshotUrl ? `url(${screenshotUrl})` : undefined,
-              backgroundSize: `${screenshotZoom * 100}%`,
-              backgroundPosition: `${50 + screenshotPosition.x}% ${50 + screenshotPosition.y}%`,
-              backgroundRepeat: 'no-repeat',
-            }}
-          >
-            {!screenshotUrl && (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#666',
-                  fontSize: 9,
-                  fontFamily: 'Fakt Pro, sans-serif',
-                }}
-              >
-                Product Screenshot
-              </div>
-            )}
-          </div>
+          Key Benefits
+        </div>
 
-          {/* Powerful Features Heading */}
-          <div
-            style={{
-              fontSize: 12,
-              fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 500,
-              color: '#060015',
-              marginBottom: 12,
-            }}
-          >
-            Powerful Features
-          </div>
-
-          {/* Features List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {features.map((feature, index) => (
-              <div key={index}>
+        {/* Benefits List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {benefits.map((benefit, index) => (
+            <div
+              key={index}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+              }}
+            >
+              {/* Header row: Icon + Title */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {/* Icon - dark over white */}
+                <div style={{ flexShrink: 0 }}>
+                  <BenefitIcon iconId={benefit.icon} />
+                </div>
+                {/* Title - 12pt semibold */}
                 <div
                   style={{
-                    fontSize: 9,
+                    fontSize: 12,
                     fontFamily: 'Fakt Pro, sans-serif',
                     fontWeight: 500,
-                    color: solutionColor,
-                    marginBottom: 2,
+                    color: '#060015',
                   }}
                 >
-                  {feature.title}
-                </div>
-                <div
-                  style={{
-                    fontSize: 8,
-                    fontFamily: 'Fakt Pro, sans-serif',
-                    fontWeight: 400,
-                    color: '#37393D',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {feature.description}
+                  {benefit.title}
                 </div>
               </div>
-            ))}
-          </div>
+              {/* Description - 12pt blonde, left-aligned with icon edge */}
+              <div
+                style={{
+                  fontSize: 12,
+                  fontFamily: 'Fakt Pro, sans-serif',
+                  fontWeight: 350,
+                  color: '#37393D',
+                  lineHeight: 1.5,
+                }}
+              >
+                {benefit.description}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Right Column - Screenshot and Features (230px wide) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: 230,
+          height: pageHeight - footerHeight,
+          padding: '32px 40px 32px 24px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Product Screenshot - 230x230px */}
+        <div
+          style={{
+            width: 230,
+            minWidth: 230,
+            height: 230,
+            minHeight: 230,
+            marginLeft: -24, // Offset to align with column left edge
+            marginRight: -40, // Offset to align with column right edge
+            marginBottom: 12,
+            flexShrink: 0,
+            borderRadius: 0,
+            borderBottom: '1px solid #89888B',
+            overflow: 'hidden',
+            background: screenshotUrl
+              ? undefined
+              : 'linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 100%)',
+            backgroundImage: screenshotUrl ? `url(${screenshotUrl})` : undefined,
+            backgroundSize: `${screenshotZoom * 100}%`,
+            backgroundPosition: `${50 + screenshotPosition.x}% ${50 + screenshotPosition.y}%`,
+            backgroundRepeat: 'no-repeat',
+            filter: screenshotGrayscale ? 'grayscale(100%)' : undefined,
+          }}
+        >
+          {!screenshotUrl && (
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#666',
+                fontSize: 9,
+                fontFamily: 'Fakt Pro, sans-serif',
+              }}
+            >
+              Product Screenshot
+            </div>
+          )}
+        </div>
+
+        {/* Powerful Features Heading - matches H2 (18pt blonde) */}
+        <div
+          style={{
+            fontSize: 18,
+            fontFamily: 'Fakt Pro, sans-serif',
+            fontWeight: 350,
+            color: '#060015',
+            marginBottom: 16,
+          }}
+        >
+          Powerful Features
+        </div>
+
+        {/* Features List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {features.map((feature, index) => (
+            <div key={index}>
+              {/* Title - 9pt semibold, solution color */}
+              <div
+                style={{
+                  fontSize: 9,
+                  fontFamily: 'Fakt Pro, sans-serif',
+                  fontWeight: 500,
+                  color: solutionColor,
+                  marginBottom: 3,
+                }}
+              >
+                {feature.title}
+              </div>
+              {/* Description - 9pt blonde */}
+              <div
+                style={{
+                  fontSize: 9,
+                  fontFamily: 'Fakt Pro, sans-serif',
+                  fontWeight: 350,
+                  color: '#37393D',
+                  lineHeight: 1.5,
+                }}
+              >
+                {feature.description}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer - Left Box (Contact Info) */}
       <div
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
-          right: 0,
-          height: 146,
-          borderTop: '0.5px solid #89888B',
-          display: 'flex',
+          width: footerDividerX,
+          height: footerHeight,
           padding: '0 40px',
-          background: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 6,
         }}
       >
-        {/* Left Half - Contact Info */}
         <div
           style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            gap: 6,
+            fontSize: 9,
+            fontFamily: 'Fakt Pro, sans-serif',
+            fontWeight: 400,
+            color: '#37393D',
           }}
         >
-          <div
-            style={{
-              fontSize: 9,
-              fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 400,
-              color: '#37393D',
-            }}
-          >
-            {footerContactInfo.phone}
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 400,
-              color: '#37393D',
-            }}
-          >
-            {footerContactInfo.email}
-          </div>
-          <div
-            style={{
-              fontSize: 9,
-              fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 400,
-              color: solutionColor,
-            }}
-          >
-            {footerContactInfo.website}
-          </div>
+          {footerContactInfo.phone}
         </div>
-
-        {/* Right Half - CTA and Logo */}
         <div
           style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            gap: 24,
+            fontSize: 9,
+            fontFamily: 'Fakt Pro, sans-serif',
+            fontWeight: 400,
+            color: '#37393D',
           }}
         >
-          {/* CTA Button */}
-          <div
-            style={{
-              padding: '10px 20px',
-              background: '#FF6B00',
-              borderRadius: 4,
-              color: 'white',
-              fontSize: 11,
-              fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            {ctaLabel}
-            {/* Arrow */}
-            <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-              <path d="M7 1L11 5M11 5L7 9M11 5H1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-
-          {/* Cority Logo */}
-          <CorityLogoBlack />
+          {footerContactInfo.email}
         </div>
+        <div
+          style={{
+            fontSize: 9,
+            fontFamily: 'Fakt Pro, sans-serif',
+            fontWeight: 400,
+            color: solutionColor,
+          }}
+        >
+          {footerContactInfo.website}
+        </div>
+      </div>
+
+      {/* Footer - Right Box (CTA and Logo stacked vertically) */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: footerDividerX,
+          width: verticalLineX - footerDividerX, // From footer divider to main vertical line
+          height: footerHeight,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 16,
+        }}
+      >
+        <CTAButton />
+        <CorityLogoBlack />
       </div>
     </div>
   )

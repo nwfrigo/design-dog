@@ -1,38 +1,44 @@
 // Solution Overview PDF Asset Configuration
 // Central config for all picklist assets used in the solution overview template
 
-export type SolutionCategory = 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+export type SolutionCategory = 'environmental' | 'health' | 'safety' | 'quality' | 'sustainability' | 'converged'
 
 // Solution category configuration (colors, labels, backgrounds)
+// ORDER MATTERS: environmental, health, safety, quality, sustainability, converged
 export const solutionCategories: Record<SolutionCategory, {
   label: string
   color: string
   background: string
 }> = {
+  environmental: {
+    label: 'Environmental',
+    color: '#49763E',
+    background: '/assets/backgrounds/so-backgrounds/environmental_so_background_2.png',
+  },
   health: {
     label: 'Health',
     color: '#00767F',
-    background: '/assets/backgrounds/health_so_background_1.png',
+    background: '/assets/backgrounds/so-backgrounds/health_so_background_2.png',
   },
   safety: {
     label: 'Safety',
-    color: '#FF6B00',
-    background: '/assets/solution-overview/bg-safety.png',
-  },
-  environmental: {
-    label: 'Environmental',
-    color: '#4CAF50',
-    background: '/assets/solution-overview/bg-environmental.png',
+    color: '#C3B01E',
+    background: '/assets/backgrounds/so-backgrounds/safety_so_background_2.png',
   },
   quality: {
     label: 'Quality',
-    color: '#9C27B0',
-    background: '/assets/solution-overview/bg-quality.png',
+    color: '#006FA3',
+    background: '/assets/backgrounds/so-backgrounds/quality_so_background_2.png',
   },
   sustainability: {
     label: 'Sustainability',
-    color: '#2196F3',
-    background: '/assets/solution-overview/bg-sustainability.png',
+    color: '#A61F67',
+    background: '/assets/backgrounds/so-backgrounds/sustainability_so_background_2.png',
+  },
+  converged: {
+    label: 'Converged',
+    color: '#D35F0B',
+    background: '/assets/backgrounds/so-backgrounds/converged_so_background_2.png',
   },
 }
 
@@ -45,7 +51,7 @@ export interface HeroImage {
 }
 
 export const heroImages: HeroImage[] = [
-  { id: 'placeholder', label: 'Placeholder image', src: '/assets/images/solution_overview_placeholder_hero_1.png' },
+  { id: 'placeholder', label: 'Placeholder image', src: '/assets/solution-overview/hero-images/sustainability_so__3.png' },
 ]
 
 // CTA button options for Page 3
@@ -61,34 +67,21 @@ export const ctaOptions: CtaOption[] = [
   { id: 'contact', label: 'Contact us' },
 ]
 
-// Placeholder icons for benefits (swap for real icon library later)
-// Each icon is referenced by ID and rendered via IconPicker component
-export interface BenefitIcon {
+// Benefit icons for Page 3
+// Each icon is referenced by ID and rendered via BenefitIcon component in Page3BenefitsFeatures
+export interface BenefitIconOption {
   id: string
   label: string
 }
 
-export const benefitIcons: BenefitIcon[] = [
-  { id: 'pricing', label: 'Pricing' },
-  { id: 'workflow', label: 'Workflow' },
-  { id: 'admin', label: 'Admin' },
+export const benefitIcons: BenefitIconOption[] = [
+  { id: 'streamline', label: 'Streamline' },
   { id: 'compliance', label: 'Compliance' },
-  { id: 'reporting', label: 'Reporting' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'shield', label: 'Shield' },
-  { id: 'chart', label: 'Chart' },
-  { id: 'users', label: 'Users' },
-  { id: 'settings', label: 'Settings' },
-  { id: 'check', label: 'Checkmark' },
-  { id: 'clock', label: 'Clock' },
-  { id: 'document', label: 'Document' },
-  { id: 'folder', label: 'Folder' },
-  { id: 'globe', label: 'Globe' },
-  { id: 'heart', label: 'Heart' },
-  { id: 'lightbulb', label: 'Lightbulb' },
-  { id: 'lock', label: 'Lock' },
-  { id: 'mail', label: 'Mail' },
-  { id: 'mobile', label: 'Mobile' },
+  { id: 'visibility', label: 'Visibility' },
+  { id: 'security', label: 'Security' },
+  { id: 'time', label: 'Time' },
+  { id: 'growth', label: 'Growth' },
+  { id: 'integration', label: 'Integration' },
 ]
 
 // Footer contact info (locked - not editable by users)
@@ -101,73 +94,78 @@ export const footerContactInfo = {
 // Default content for new solution overviews
 export const defaultSolutionOverviewContent = {
   // Page 1
-  solutionName: 'Employee Health Essentials',
-  tagline: 'Built for Healthcare. Ready for You.',
+  solutionName: 'Solution Name Goes Here',
+  tagline: 'Subheader Goes Here',
 
   // Page 2
-  sectionHeader: 'Streamline Employee Health.\nStrengthen Compliance.',
-  introParagraph: 'Employee Health Essentials offers a streamlined, configurable solution for managing employee health across onboarding, clinic visits, compliance, and exposure tracking.\n\nFor faster deployment, lower admin burden, and stronger compliance — all in one package built for healthcare employee health teams.',
+  page2Header: 'Heading 1',
+  sectionHeader: 'Heading 2',
+  introParagraph: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque porta tincidunt tellus, nec tincidunt diam pretium aliquet. Fusce sit amet orci iaculis justo dictum bibendum at venenatis justo. Aenean ac sodales tellus.\n\nAenean nulla augue, posuere in libero in, accumsan tempor erat. Phasellus aliquet diam dui, ac fermentum',
   keySolutions: [
-    'Clinic Visit Management',
-    'Candidate Onboarding',
-    'Exposure & Case Management',
-    'Immunity & Compliance Tracking',
-    'Lab & Drug Test Management',
-    'Dashboards & Reporting',
+    'Solution Name',
+    'Solution Name',
+    'Solution Name',
+    'Solution Name',
+    'Solution Name',
+    'Solution Name',
   ] as [string, string, string, string, string, string],
-  quoteText: '"Cority\'s self-scheduling tool has transformed our hiring process. It has provided a more efficient way for candidates and employees to schedule appointments at their convenience, reducing administrative workload and improving overall efficiency."',
-  quoteName: 'Mimi Alexander',
-  quoteTitle: 'RN, Director of Employee Health Services',
-  quoteCompany: 'Texas Health Resources',
+  quoteText: '"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque porta tincidunt tellus, nec tincidunt, Phasellus aliquet diam dui, ac fermentum"',
+  quoteName: 'Firstname Lastname',
+  quoteTitle: 'Job title',
+  quoteCompany: 'Organization',
 
-  // Page 3
+  // Page 3 - icons are Lucide icon names
   benefits: [
     {
-      icon: 'pricing',
-      title: 'Affordable, Right-Sized Pricing',
-      description: 'Designed to fit mid-market budgets, the Employee Health Essentials Package delivers core health capabilities without the enterprise price tag — making adoption realistic for hospitals under cost pressure.',
+      icon: 'zap',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus. Vestibulum vel tristique orci. Donec ornare in velit id ornare.',
     },
     {
-      icon: 'workflow',
-      title: 'Pre-Configured, Ready-to-Use Workflows',
-      description: 'Out-of-the-box workflows for exposures, pre-employment, and immunizations help hospitals go live quickly. Limited but flexible customization options keep costs down while allowing teams to adapt to their specific needs.',
+      icon: 'clipboard-check',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus. Vestibulum vel tristique orci. Donec ornare in velit id ornare.',
     },
     {
-      icon: 'admin',
-      title: 'Reduced Administrative Burden',
-      description: 'By replacing paper charts and disconnected EHR add-ons, the solution automates scheduling, surveillance, and record-keeping — freeing clinical staff to focus on care instead of clerical work.',
+      icon: 'eye',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus. Vestibulum vel tristique orci. Donec ornare in velit id ornare.',
     },
     {
-      icon: 'compliance',
-      title: 'Built-In Compliance Support',
-      description: 'Compliance with OSHA, NHSN, and Joint Commission is embedded into the workflows, reducing the risk of errors, fines, or failed audits while saving teams the hassle of manual tracking.',
+      icon: 'shield-check',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus. Vestibulum vel tristique orci. Donec ornare in velit id ornare.',
     },
     {
-      icon: 'reporting',
-      title: 'Actionable Reporting & Dashboards',
-      description: 'Standardized dashboards and configurable reports give clinicians and executives the visibility they need to track workforce health, demonstrate compliance, and prove ROI.',
+      icon: 'clock',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus. Vestibulum vel tristique orci. Donec ornare in velit id ornare.',
     },
   ],
   features: [
     {
-      title: 'Clinic Visit',
-      description: 'Efficiently manage clinic visits with automated scheduling and documentation workflows - reducing administrative burden while supporting key evaluations like pre-employment, surveillance, wellness, and return-to-work.',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus.',
     },
     {
-      title: 'Exposure & Case Management',
-      description: 'Automate exposure tracking and case management with standard workflows and questionnaires to improve response time and compliance.',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus.',
     },
     {
-      title: 'Immunity & Compliance Tracking',
-      description: 'Track and manage employee immunity and compliance with built-in workflows for vaccinations, surveillance, and regulatory protocols — helping teams stay audit-ready while reducing manual tracking.',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus.',
     },
     {
-      title: 'Business Intelligence & Analytics',
-      description: 'Accurately track metrics and uncover key insights to help you make the best decisions to manage health risks.',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus.',
     },
     {
-      title: 'Mobile Solutions',
-      description: 'Drive better workforce engagement with mobile enabled self-scheduling and access to wellness indicators.',
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus.',
+    },
+    {
+      title: 'Item Header Goes Here',
+      description: 'Maecenas nec ultricies nibh. Fusce non dui nec erat commodo aliquet quis id quam. Donec et venenatis metus.',
     },
   ],
 }

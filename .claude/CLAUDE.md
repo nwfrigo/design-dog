@@ -470,6 +470,7 @@ Claude may fail to process certain PDFs with "Could not process PDF" error:
 3. **Blob URLs are public** — PDFs are publicly accessible (needed for Claude to fetch them)
 4. **Token must not be commented** — `# BLOB_READ_WRITE_TOKEN` won't work
 5. **Restart dev server** after adding env vars
+6. **Word docs use different endpoint** — `/api/upload-doc` for .docx files, NOT `/api/upload-pdf` (which validates for PDF only)
 
 ---
 
@@ -539,8 +540,15 @@ npm run dev
 - Primary dark background: `#060015`
 - Solution pill background: `#060621`
 - Solution pill border: `#0080FF`
-- Brand purple: `#8A38F5`
-- Solution dot colors vary by solution type
+- Brand orange (primary): `#D35F0B`
+
+### Solution Category Colors
+- Environmental: `#49763E`
+- Health: `#00767F`
+- Safety: `#C3B01E`
+- Quality: `#006FA3`
+- Sustainability: `#A61F67`
+- Converged: Uses brand orange `#D35F0B`
 
 ### Typography
 - Primary font: Fakt Pro
@@ -554,7 +562,8 @@ npm run dev
 - Email templates: 640×300px (varies by type)
 - Social templates: 1200×628px (varies by type)
 - Newsletter templates: 600×338px (varies by type)
-- All have 32px internal padding
+- Collateral PDFs: 612×792px (Letter size, 8.5"×11")
+- All have 32px internal padding (except multi-page PDFs which follow print standards)
 
 ---
 
@@ -584,6 +593,157 @@ npm run dev
 - `newsletter-dark-gradient` — NewsletterDarkGradient (has image + grayscale)
 - `newsletter-blue-gradient` — NewsletterBlueGradient (has image + grayscale)
 - `newsletter-light` — NewsletterLight (has image + grayscale)
+
+### Collateral (Multi-Page PDFs)
+- `solution-overview-pdf` — SolutionOverviewPdf (3-page Letter PDF, 612×792px per page)
+
+---
+
+## Multi-Page Collateral Templates
+
+Multi-page collateral assets (like Solution Overview PDFs) differ from single-page banner templates in architecture and workflow.
+
+### Architecture Differences
+
+| Aspect | Single-Page Templates | Multi-Page Collateral |
+|--------|----------------------|----------------------|
+| Component | Single `TemplateComponent.tsx` | Multiple page components in subfolder |
+| Dimensions | Various (640×300, 1200×628, etc.) | Standard paper (Letter: 612×792) |
+| Export | PNG via Puppeteer screenshot | Multi-page PDF export |
+| Content source | AI copy generation from PDF | Verbatim extraction from Word doc |
+| Editor | Standard EditorScreen | Custom export screen |
+
+### File Structure: Solution Overview PDF
+
+```
+components/templates/SolutionOverviewPdf/
+├── Page1Cover.tsx          # Cover page with solution name, tagline
+├── Page2Body.tsx           # Key solutions, customer quote
+├── Page3BenefitsFeatures.tsx  # Benefits grid, features list
+└── index.tsx               # Composite export (all pages)
+
+components/
+├── SolutionOverviewSetupScreen.tsx   # Setup flow (category, doc upload)
+├── SolutionOverviewExportScreen.tsx  # Editor with page navigation
+
+app/api/
+├── upload-doc/route.ts     # Blob upload for Word docs (.doc, .docx)
+└── parse-solution-overview/route.ts  # Claude extraction to template fields
+```
+
+### Word Document Upload (Different from PDF!)
+
+**Critical:** Word doc uploads use a different pattern from PDF uploads. Content is extracted verbatim — NO AI rewriting.
+
+| Endpoint | File Types | Purpose |
+|----------|------------|---------|
+| `/api/upload-pdf` | `.pdf` only | PDF blob upload token |
+| `/api/upload-doc` | `.doc`, `.docx` | Word doc blob upload token |
+| `/api/parse-pdf` | PDFs | AI extraction + summarization |
+| `/api/parse-solution-overview` | Word docs | Verbatim field mapping |
+
+```tsx
+// Word doc upload flow (SolutionOverviewSetupScreen.tsx)
+import { upload } from '@vercel/blob/client'
+
+// Step 1: Upload to Vercel Blob (different endpoint!)
+const blob = await upload(`docs/${Date.now()}-${file.name}`, file, {
+  access: 'public',
+  handleUploadUrl: '/api/upload-doc',  // NOT upload-pdf!
+})
+
+// Step 2: Parse with mammoth + Claude (no rewriting)
+const response = await fetch('/api/parse-solution-overview', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ docUrl: blob.url }),
+})
+```
+
+### Content Extraction vs AI Generation
+
+**Solution Overview (verbatim extraction):**
+- User uploads Word doc following a template
+- Claude extracts exact text to specific fields
+- NO rewriting, summarizing, or AI generation
+- Fields: solutionName, tagline, keySolutions[6], benefits[5], features[5-6], quote, etc.
+
+**Standard templates (AI generation):**
+- User uploads PDF source material
+- Claude summarizes key points
+- AI generates marketing copy based on template type
+- Eyebrows, headlines, CTAs are AI-generated
+
+### Setup Screen Pattern
+
+Multi-page collateral uses a dedicated setup screen before the editor:
+
+1. **Category Selection** — Vertical stack of solution categories
+2. **Solution Name** — Large input matching header styling
+3. **Document Upload** — Drag-drop or click to upload Word doc
+4. **Parse & Navigate** — On success, auto-navigate to editor
+
+**Theme-aware styling for setup screens:**
+```tsx
+// Detect dark mode
+const [isDark, setIsDark] = useState(false)
+
+useEffect(() => {
+  const checkTheme = () => {
+    setIsDark(document.documentElement.classList.contains('dark'))
+  }
+  checkTheme()
+
+  const observer = new MutationObserver(checkTheme)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+  return () => observer.disconnect()
+}, [])
+
+// Theme-aware colors
+const unselectedColor = isDark ? '#37393D' : '#dddddd'
+```
+
+### Lucide Icon Picker
+
+Multi-page templates may include icon selection (e.g., Benefits section icons).
+
+**Key files:**
+- `components/IconPickerModal.tsx` — Reusable modal with 1500+ Lucide icons
+- `getIconByName(name)` — Convert kebab-case name to Lucide component
+
+```tsx
+import { getIconByName } from '@/components/IconPickerModal'
+
+// In template component
+const IconComponent = getIconByName(iconId)  // 'clipboard-check' → ClipboardCheck
+if (IconComponent) {
+  return <IconComponent size={17} strokeWidth={1.5} color="#37393D" />
+}
+```
+
+**Default benefit icons:** `'zap'`, `'clipboard-check'`, `'eye'`, `'shield-check'`, `'clock'`
+
+### Page Navigation in Editor
+
+Multi-page editors show page tabs instead of template tabs:
+
+```tsx
+// soCurrentPage state in store (1, 2, or 3)
+const pages = [
+  { page: 1, label: 'Cover' },
+  { page: 2, label: 'Key Solutions' },
+  { page: 3, label: 'Benefits & Features' },
+]
+```
+
+### Export Differences
+
+Single-page templates export as PNG. Multi-page collateral exports as PDF:
+
+```tsx
+// In export route for solution-overview-pdf
+// Render all 3 pages and combine into single PDF
+```
 
 ---
 

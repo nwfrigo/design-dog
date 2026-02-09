@@ -31,10 +31,11 @@ const statsData = [
 
 export interface Page2BodyProps {
   solution: SolutionCategory
-  solutionName: string
+  page2Header: string
   heroImageUrl?: string
   heroImagePosition?: { x: number; y: number }
   heroImageZoom?: number
+  heroImageGrayscale?: boolean
   sectionHeader: string
   introParagraph: string
   keySolutions: [string, string, string, string, string, string]
@@ -47,10 +48,11 @@ export interface Page2BodyProps {
 
 export function Page2Body({
   solution,
-  solutionName,
+  page2Header,
   heroImageUrl,
   heroImagePosition = { x: 0, y: 0 },
   heroImageZoom = 1,
+  heroImageGrayscale = false,
   sectionHeader,
   introParagraph,
   keySolutions,
@@ -91,7 +93,7 @@ export function Page2Body({
           width: '100%',
           height: 180,
           display: 'flex',
-          borderBottom: '0.5px solid #89888B',
+          borderBottom: '1px solid #89888B',
         }}
       >
         {/* Left side - Solution name H1 */}
@@ -102,7 +104,6 @@ export function Page2Body({
             display: 'flex',
             alignItems: 'center',
             padding: '0 40px',
-            background: '#F5F5F5',
           }}
         >
           <div
@@ -114,7 +115,7 @@ export function Page2Body({
               lineHeight: 1.2,
             }}
           >
-            {solutionName}
+            {page2Header}
           </div>
         </div>
 
@@ -130,9 +131,22 @@ export function Page2Body({
             backgroundSize: `${heroImageZoom * 100}%`,
             backgroundPosition: `${50 + heroImagePosition.x}% ${50 + heroImagePosition.y}%`,
             backgroundRepeat: 'no-repeat',
+            filter: heroImageGrayscale ? 'grayscale(100%)' : undefined,
           }}
         />
       </div>
+
+      {/* Vertical divider - extends from header band to bottom of Key Solutions */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 180,
+          left: 371,
+          width: 1,
+          height: 170,
+          background: '#89888B',
+        }}
+      />
 
       {/* Main Content Area */}
       <div
@@ -166,9 +180,9 @@ export function Page2Body({
           {/* Intro Paragraph */}
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 400,
+              fontWeight: 350,
               color: '#37393D',
               lineHeight: 1.5,
             }}
@@ -182,7 +196,6 @@ export function Page2Body({
           style={{
             width: 200,
             paddingLeft: 24,
-            borderLeft: '0.5px solid #89888B',
           }}
         >
           {/* Key Solutions Label */}
@@ -225,9 +238,9 @@ export function Page2Body({
                 {/* Solution text */}
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: 9,
                     fontFamily: 'Fakt Pro, sans-serif',
-                    fontWeight: 400,
+                    fontWeight: 350,
                     color: '#37393D',
                     lineHeight: 1.4,
                   }}
@@ -247,15 +260,15 @@ export function Page2Body({
           padding: '24px 40px',
         }}
       >
-        {/* Quote Text */}
+        {/* Quote Text - matches section header styling: 18pt, light weight, italic */}
         <div
           style={{
-            fontSize: 12,
+            fontSize: 18,
             fontFamily: 'Fakt Pro, sans-serif',
-            fontWeight: 400,
+            fontWeight: 350,
             fontStyle: 'italic',
-            color: '#37393D',
-            lineHeight: 1.6,
+            color: '#060015',
+            lineHeight: 1.3,
             marginBottom: 16,
           }}
         >
@@ -264,35 +277,36 @@ export function Page2Body({
 
         {/* Attribution */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Name - matches KEY SOLUTIONS label styling */}
           <div
             style={{
-              fontSize: 10,
+              fontSize: 8,
               fontFamily: 'Fakt Pro, sans-serif',
               fontWeight: 500,
-              color: '#060015',
+              color: '#37393D',
               textTransform: 'uppercase',
-              letterSpacing: 0.5,
+              letterSpacing: 1,
             }}
           >
             {quoteName}
           </div>
+          {/* Title - matches company name styling: solution color, light weight, title case */}
           <div
             style={{
               fontSize: 10,
               fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 500,
-              color: '#060015',
-              textTransform: 'uppercase',
-              letterSpacing: 0.5,
+              fontWeight: 350,
+              color: solutionColor,
             }}
           >
             {quoteTitle}
           </div>
+          {/* Company - solution color, light weight */}
           <div
             style={{
               fontSize: 10,
               fontFamily: 'Fakt Pro, sans-serif',
-              fontWeight: 400,
+              fontWeight: 350,
               color: solutionColor,
             }}
           >
@@ -309,7 +323,7 @@ export function Page2Body({
           left: 0,
           right: 0,
           height: 146,
-          borderTop: '0.5px solid #89888B',
+          borderTop: '1px solid #89888B',
           background: 'white',
           padding: '24px 40px',
         }}
@@ -339,8 +353,8 @@ export function Page2Body({
               {/* Vertical line */}
               <div
                 style={{
-                  width: 2,
-                  background: solutionColor,
+                  width: 1,
+                  background: '#89888B',
                   marginRight: 12,
                   alignSelf: 'stretch',
                 }}

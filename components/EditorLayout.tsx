@@ -107,6 +107,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   )
 
   const isQueueScreen = currentScreen === 'queue'
+  const isSolutionOverviewExport = currentScreen === 'solution-overview-export'
 
   const centerContent = isQueueScreen ? (
     <button
@@ -122,7 +123,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
 
   const rightContent = (
     <>
-      {exportQueue.length > 0 && !isQueueScreen && (
+      {exportQueue.length > 0 && !isQueueScreen && !isSolutionOverviewExport && (
         <button
           onClick={handleViewQueue}
           className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
@@ -133,7 +134,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
           </svg>
         </button>
       )}
-      {Object.keys(generatedAssets).length > 0 && !isQueueScreen && !isEditingFromQueue && (
+      {Object.keys(generatedAssets).length > 0 && !isQueueScreen && !isEditingFromQueue && !isSolutionOverviewExport && (
         <button
           onClick={handleExportAll}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"

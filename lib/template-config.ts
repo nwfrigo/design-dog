@@ -220,7 +220,7 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
     subChannels: [
       {
         id: 'collateral-pdf',
-        label: 'PDF Documents',
+        label: 'Sales & Product Marketing',
         icon: 'globe',
         templates: [
           {

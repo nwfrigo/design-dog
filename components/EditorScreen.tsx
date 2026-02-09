@@ -23,8 +23,10 @@ import { WebsiteReport } from './templates/WebsiteReport'
 import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from './templates/WebsiteFloatingBannerMobile'
 import { Page1Cover, Page2Body, Page3BenefitsFeatures } from './templates/SolutionOverviewPdf'
-import { solutionCategories, heroImages, ctaOptions, type SolutionCategory } from '@/config/solution-overview-assets'
+import { solutionCategories, heroImages, ctaOptions, benefitIcons, type SolutionCategory } from '@/config/solution-overview-assets'
 import { ImageLibraryModal } from './ImageLibraryModal'
+import { SolutionOverviewImageLibraryModal } from './SolutionOverviewImageLibraryModal'
+import { IconPickerModal, getIconByName } from './IconPickerModal'
 import { TemplateRenderer, PreviewModal } from './TemplateTile'
 import { ZoomableImage } from './ZoomableImage'
 import { ImageCropModal } from './ImageCropModal'
@@ -70,6 +72,7 @@ export function EditorScreen() {
     currentAssetIndex,
     goToAsset,
     reset,
+    setCurrentScreen,
     // Content
     contentMode,
     setContentMode,
@@ -245,6 +248,10 @@ export function EditorScreen() {
     setSolutionOverviewHeroImagePosition,
     solutionOverviewHeroImageZoom,
     setSolutionOverviewHeroImageZoom,
+    solutionOverviewHeroImageGrayscale,
+    setSolutionOverviewHeroImageGrayscale,
+    solutionOverviewPage2Header,
+    setSolutionOverviewPage2Header,
     solutionOverviewSectionHeader,
     setSolutionOverviewSectionHeader,
     solutionOverviewIntroParagraph,
@@ -274,8 +281,12 @@ export function EditorScreen() {
     setSolutionOverviewScreenshotPosition,
     solutionOverviewScreenshotZoom,
     setSolutionOverviewScreenshotZoom,
+    solutionOverviewScreenshotGrayscale,
+    setSolutionOverviewScreenshotGrayscale,
     solutionOverviewCtaOption,
     setSolutionOverviewCtaOption,
+    solutionOverviewCtaUrl,
+    setSolutionOverviewCtaUrl,
     // Queue
     addToQueue,
     exportQueue,
@@ -324,6 +335,13 @@ export function EditorScreen() {
   const [activeSpeakerForImage, setActiveSpeakerForImage] = useState<1 | 2 | 3 | null>(null)
   const [selectingNewsletterImage, setSelectingNewsletterImage] = useState(false)
 
+  // Solution Overview hero image library modal state
+  const [showHeroImageLibrary, setShowHeroImageLibrary] = useState(false)
+
+  // Icon library modal state for benefit icons
+  const [showIconLibrary, setShowIconLibrary] = useState(false)
+  const [activeBenefitForIcon, setActiveBenefitForIcon] = useState<number | null>(null)
+
   // Image crop modal state
   const [showCropModal, setShowCropModal] = useState(false)
   const [showNewsletterCropModal, setShowNewsletterCropModal] = useState(false)
@@ -335,8 +353,9 @@ export function EditorScreen() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   // PDF preview zoom and fullscreen state
-  const [pdfPreviewZoom, setPdfPreviewZoom] = useState(100)
+  const [pdfPreviewZoom, setPdfPreviewZoom] = useState(150)
   const [showPdfFullscreen, setShowPdfFullscreen] = useState(false)
+  const [showPdfAllPagesPreview, setShowPdfAllPagesPreview] = useState(false)
 
   // Floating banner preview container ref and width for responsive scaling
   const floatingBannerContainerRef = useRef<HTMLDivElement>(null)
@@ -421,16 +440,17 @@ export function EditorScreen() {
     return () => resizeObserver.disconnect()
   }, [currentTemplate])
 
-  // ESC key handler for PDF fullscreen mode
+  // ESC key handler for PDF fullscreen/preview modes
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && showPdfFullscreen) {
-        setShowPdfFullscreen(false)
+      if (e.key === 'Escape') {
+        if (showPdfFullscreen) setShowPdfFullscreen(false)
+        if (showPdfAllPagesPreview) setShowPdfAllPagesPreview(false)
       }
     }
     window.addEventListener('keydown', handleEscKey)
     return () => window.removeEventListener('keydown', handleEscKey)
-  }, [showPdfFullscreen])
+  }, [showPdfFullscreen, showPdfAllPagesPreview])
 
   // Handle file upload for context - uses Vercel Blob to bypass serverless size limits
   const handleFileUpload = async (file: File) => {
@@ -803,6 +823,7 @@ export function EditorScreen() {
         exportParams.heroImagePositionX = solutionOverviewHeroImagePosition.x
         exportParams.heroImagePositionY = solutionOverviewHeroImagePosition.y
         exportParams.heroImageZoom = solutionOverviewHeroImageZoom
+        exportParams.page2Header = solutionOverviewPage2Header
         exportParams.sectionHeader = solutionOverviewSectionHeader
         exportParams.introParagraph = solutionOverviewIntroParagraph
         exportParams.keySolutions = solutionOverviewKeySolutions
@@ -866,6 +887,11 @@ export function EditorScreen() {
 
   // Helper to get display label with numbering for duplicates
   const getAssetLabel = (assetType: TemplateType, index: number) => {
+    // Special case for Solution Overview PDF - show dynamic name
+    if (assetType === 'solution-overview-pdf') {
+      return `Solution Overview - ${solutionOverviewSolutionName || 'Untitled'}`
+    }
+
     const baseLabel = TEMPLATE_LABELS[assetType]
     const sameTypeCount = selectedAssets.filter(a => a === assetType).length
     if (sameTypeCount <= 1) return baseLabel
@@ -897,19 +923,21 @@ export function EditorScreen() {
                 {getAssetLabel(asset, index)}
               </button>
             ))}
-            {/* Add Asset Button */}
-            <button
-              onClick={() => {
-                setPendingAssets([])
-                setShowAddAssetModal(true)
-              }}
-              className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-              title="Add asset"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
+            {/* Add Asset Button - hide for solution-overview-pdf */}
+            {currentTemplate !== 'solution-overview-pdf' && (
+              <button
+                onClick={() => {
+                  setPendingAssets([])
+                  setShowAddAssetModal(true)
+                }}
+                className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                title="Add asset"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -1149,6 +1177,39 @@ export function EditorScreen() {
         />
       )}
 
+      {/* Solution Overview Hero Image Library Modal */}
+      {showHeroImageLibrary && (
+        <SolutionOverviewImageLibraryModal
+          solution={solutionOverviewSolution}
+          onSelect={(url) => {
+            setSolutionOverviewHeroImageUrl(url)
+            setShowHeroImageLibrary(false)
+          }}
+          onClose={() => setShowHeroImageLibrary(false)}
+        />
+      )}
+
+      {/* Icon Picker Modal for benefit icons */}
+      {showIconLibrary && (
+        <IconPickerModal
+          value={activeBenefitForIcon !== null ? solutionOverviewBenefits[activeBenefitForIcon]?.icon : undefined}
+          onChange={(iconName) => {
+            if (activeBenefitForIcon !== null) {
+              const benefit = solutionOverviewBenefits[activeBenefitForIcon]
+              if (benefit) {
+                setSolutionOverviewBenefit(activeBenefitForIcon, { ...benefit, icon: iconName })
+              }
+            }
+            setShowIconLibrary(false)
+            setActiveBenefitForIcon(null)
+          }}
+          onClose={() => {
+            setShowIconLibrary(false)
+            setActiveBenefitForIcon(null)
+          }}
+        />
+      )}
+
       {/* Image Crop Modal */}
       {thumbnailImageUrl && (
         <ImageCropModal
@@ -1204,32 +1265,34 @@ export function EditorScreen() {
       <div className="flex gap-8">
         {/* Left: Editor */}
         <div className="w-[340px] flex-shrink-0 space-y-5">
-          {/* Mode Toggle */}
-          <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <button
-              onClick={() => setContentMode('verbatim')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                contentMode === 'verbatim'
-                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-              }`}
-            >
-              Direct Edit
-            </button>
-            <button
-              onClick={() => setContentMode('generate')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
-                contentMode === 'generate'
-                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-              }`}
-            >
-              <svg className="w-4 h-4" viewBox="0 0 18 17" fill="none">
-                <path d="M9 0C9 0 9.25863 4.53698 11.2274 6.39636C13.1961 8.25574 18 8.5 18 8.5C18 8.5 13.1961 8.74426 11.2274 10.6036C9.25863 12.463 9 17 9 17C9 17 8.74137 12.463 6.77261 10.6036C4.80386 8.74426 0 8.5 0 8.5C0 8.5 4.80386 8.25574 6.77261 6.39636C8.74137 4.53698 9 0 9 0Z" fill="#D35F0B"/>
-              </svg>
-              Generate
-            </button>
-          </div>
+          {/* Mode Toggle - hidden for solution-overview-pdf */}
+          {currentTemplate !== 'solution-overview-pdf' && (
+            <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <button
+                onClick={() => setContentMode('verbatim')}
+                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  contentMode === 'verbatim'
+                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+                }`}
+              >
+                Direct Edit
+              </button>
+              <button
+                onClick={() => setContentMode('generate')}
+                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
+                  contentMode === 'generate'
+                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+                }`}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 18 17" fill="none">
+                  <path d="M9 0C9 0 9.25863 4.53698 11.2274 6.39636C13.1961 8.25574 18 8.5 18 8.5C18 8.5 13.1961 8.74426 11.2274 10.6036C9.25863 12.463 9 17 9 17C9 17 8.74137 12.463 6.77261 10.6036C4.80386 8.74426 0 8.5 0 8.5C0 8.5 4.80386 8.25574 6.77261 6.39636C8.74137 4.53698 9 0 9 0Z" fill="#D35F0B"/>
+                </svg>
+                Generate
+              </button>
+            </div>
+          )}
 
           {/* Template Options */}
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
@@ -2065,49 +2128,9 @@ export function EditorScreen() {
             {/* Solution Overview PDF Controls */}
             {currentTemplate === 'solution-overview-pdf' && (
               <div className="space-y-4">
-                {/* Page Navigation */}
-                <div>
-                  <label className="block text-xs text-gray-500 mb-2">Page</label>
-                  <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                    <button
-                      onClick={() => setSolutionOverviewCurrentPage(Math.max(1, solutionOverviewCurrentPage - 1) as 1 | 2 | 3)}
-                      disabled={solutionOverviewCurrentPage === 1}
-                      className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                    <div className="flex gap-1">
-                      {([1, 2, 3] as const).map((page) => (
-                        <button
-                          key={page}
-                          onClick={() => setSolutionOverviewCurrentPage(page)}
-                          className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
-                            solutionOverviewCurrentPage === page
-                              ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => setSolutionOverviewCurrentPage(Math.min(3, solutionOverviewCurrentPage + 1) as 1 | 2 | 3)}
-                      disabled={solutionOverviewCurrentPage === 3}
-                      className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
                 {/* Page 1 Controls (Cover) */}
                 {solutionOverviewCurrentPage === 1 && (
-                  <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <div className="space-y-4">
                     <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Cover Page</h4>
 
                     {/* Solution Category */}
@@ -2158,21 +2181,155 @@ export function EditorScreen() {
 
                 {/* Page 2 Controls (Body) */}
                 {solutionOverviewCurrentPage === 2 && (
-                  <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <div className="space-y-4">
                     <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Body Page</h4>
 
-                    {/* Hero Image Picker */}
+                    {/* Hero Image Upload */}
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">Hero Image</label>
-                      <select
-                        value={solutionOverviewHeroImageId}
-                        onChange={(e) => setSolutionOverviewHeroImageId(e.target.value)}
+                      {!solutionOverviewHeroImageUrl ? (
+                        <div className="flex gap-2">
+                          {/* Upload box */}
+                          <div className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+                            <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file && file.type.startsWith('image/')) {
+                                    const reader = new FileReader()
+                                    reader.onload = () => {
+                                      setSolutionOverviewHeroImageUrl(reader.result as string)
+                                    }
+                                    reader.readAsDataURL(file)
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                              <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                              </svg>
+                              Drop or upload
+                            </label>
+                          </div>
+                          {/* Library box */}
+                          <button
+                            onClick={() => setShowHeroImageLibrary(true)}
+                            className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
+                              hover:border-gray-400 dark:hover:border-gray-500 transition-colors
+                              flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                          >
+                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Choose from library
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {/* ZoomableImage with pan support */}
+                          <ZoomableImage
+                            src={solutionOverviewHeroImageUrl}
+                            alt="Hero image"
+                            containerWidth={280}
+                            containerHeight={132}
+                            zoom={solutionOverviewHeroImageZoom}
+                            position={solutionOverviewHeroImagePosition}
+                            onZoomChange={setSolutionOverviewHeroImageZoom}
+                            onPositionChange={setSolutionOverviewHeroImagePosition}
+                            borderRadius={8}
+                            showControls={true}
+                            targetContainerWidth={382}
+                            targetContainerHeight={180}
+                          />
+                          {/* Grayscale toggle */}
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs text-gray-500">Grayscale</label>
+                            <button
+                              onClick={() => setSolutionOverviewHeroImageGrayscale(!solutionOverviewHeroImageGrayscale)}
+                              className={`relative w-9 h-5 rounded-full transition-colors ${
+                                solutionOverviewHeroImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                              }`}
+                            >
+                              <span
+                                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                                  solutionOverviewHeroImageGrayscale ? 'translate-x-4' : ''
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          {/* Replace/Remove buttons */}
+                          <div className="flex gap-2">
+                            {/* Replace with upload */}
+                            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                              <label className="flex items-center justify-center gap-1 h-8 cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file && file.type.startsWith('image/')) {
+                                      const reader = new FileReader()
+                                      reader.onload = () => {
+                                        setSolutionOverviewHeroImageUrl(reader.result as string)
+                                        setSolutionOverviewHeroImagePosition({ x: 0, y: 0 })
+                                        setSolutionOverviewHeroImageZoom(1)
+                                      }
+                                      reader.readAsDataURL(file)
+                                    }
+                                  }}
+                                  className="hidden"
+                                />
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Upload new
+                              </label>
+                            </div>
+                            {/* Replace from library */}
+                            <button
+                              onClick={() => setShowHeroImageLibrary(true)}
+                              className="flex-1 flex items-center justify-center gap-1 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              From library
+                            </button>
+                            {/* Remove button */}
+                            <button
+                              onClick={() => {
+                                setSolutionOverviewHeroImageUrl(null)
+                                setSolutionOverviewHeroImagePosition({ x: 0, y: 0 })
+                                setSolutionOverviewHeroImageZoom(1)
+                                setSolutionOverviewHeroImageGrayscale(false)
+                              }}
+                              className="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors"
+                              title="Remove image"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Page 2 Header (H1 in header band) */}
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Page Header</label>
+                      <input
+                        type="text"
+                        value={solutionOverviewPage2Header}
+                        onChange={(e) => setSolutionOverviewPage2Header(e.target.value)}
+                        placeholder="Employee Health Essentials"
                         className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {heroImages.map((img) => (
-                          <option key={img.id} value={img.id}>{img.label}</option>
-                        ))}
-                      </select>
+                      />
+                      <div className="mt-1 text-xs text-gray-400 text-right">
+                        {solutionOverviewPage2Header.length}/60
+                      </div>
                     </div>
 
                     {/* Section Header */}
@@ -2197,7 +2354,7 @@ export function EditorScreen() {
                         value={solutionOverviewIntroParagraph}
                         onChange={(e) => setSolutionOverviewIntroParagraph(e.target.value)}
                         placeholder="Enter introduction text..."
-                        rows={5}
+                        rows={7}
                         className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
                       />
                       <div className={`mt-1 text-xs text-right ${solutionOverviewIntroParagraph.length > 500 ? 'text-orange-500' : 'text-gray-400'}`}>
@@ -2233,7 +2390,7 @@ export function EditorScreen() {
                           value={solutionOverviewQuoteText}
                           onChange={(e) => setSolutionOverviewQuoteText(e.target.value)}
                           placeholder="Enter customer quote..."
-                          rows={3}
+                          rows={4}
                           className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
                         />
                         <div className={`mt-1 text-xs text-right ${solutionOverviewQuoteText.length > 350 ? 'text-orange-500' : 'text-gray-400'}`}>
@@ -2241,8 +2398,8 @@ export function EditorScreen() {
                         </div>
                       </div>
 
-                      {/* Quote Attribution */}
-                      <div className="grid grid-cols-2 gap-2">
+                      {/* Quote Attribution - vertical stack */}
+                      <div className="space-y-2">
                         <div>
                           <label className="block text-xs text-gray-400 mb-1">Name</label>
                           <input
@@ -2254,7 +2411,17 @@ export function EditorScreen() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-400 mb-1">Company</label>
+                          <label className="block text-xs text-gray-400 mb-1">Title</label>
+                          <input
+                            type="text"
+                            value={solutionOverviewQuoteTitle}
+                            onChange={(e) => setSolutionOverviewQuoteTitle(e.target.value)}
+                            placeholder="Job Title"
+                            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Organization</label>
                           <input
                             type="text"
                             value={solutionOverviewQuoteCompany}
@@ -2264,23 +2431,13 @@ export function EditorScreen() {
                           />
                         </div>
                       </div>
-                      <div className="mt-2">
-                        <label className="block text-xs text-gray-400 mb-1">Title</label>
-                        <input
-                          type="text"
-                          value={solutionOverviewQuoteTitle}
-                          onChange={(e) => setSolutionOverviewQuoteTitle(e.target.value)}
-                          placeholder="Job Title"
-                          className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Page 3 Controls (Benefits & Features) */}
                 {solutionOverviewCurrentPage === 3 && (
-                  <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <div className="space-y-4">
                     {/* Key Benefits Section */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -2289,28 +2446,44 @@ export function EditorScreen() {
                       </div>
                       <div className="space-y-3">
                         {solutionOverviewBenefits.map((benefit, index) => (
-                          <div key={index} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <div className="flex items-start gap-2">
-                              <div className="flex-1 space-y-2">
-                                <input
-                                  type="text"
-                                  value={benefit.title}
-                                  onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, title: e.target.value })}
-                                  placeholder="Benefit title"
-                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                                <textarea
-                                  value={benefit.description}
-                                  onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, description: e.target.value })}
-                                  placeholder="Description"
-                                  rows={2}
-                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                                />
-                              </div>
+                          <div key={index} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-2">
+                            {/* Row 1: Icon picker + Title + X button */}
+                            <div className="flex items-center gap-2">
+                              {/* Icon Picker - same height as input */}
+                              {(() => {
+                                const IconComponent = benefit.icon ? getIconByName(benefit.icon) : null
+                                return (
+                                  <button
+                                    onClick={() => {
+                                      setActiveBenefitForIcon(index)
+                                      setShowIconLibrary(true)
+                                    }}
+                                    className="flex-shrink-0 w-8 h-8 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded flex items-center justify-center hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
+                                    title={benefit.icon ? `Icon: ${benefit.icon.replace(/-/g, ' ')}` : 'Select icon'}
+                                  >
+                                    {IconComponent ? (
+                                      <IconComponent className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                    ) : (
+                                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                                      </svg>
+                                    )}
+                                  </button>
+                                )
+                              })()}
+                              {/* Title input */}
+                              <input
+                                type="text"
+                                value={benefit.title}
+                                onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, title: e.target.value })}
+                                placeholder="Benefit title"
+                                className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                              {/* X button - only show when more than 3 benefits */}
                               {solutionOverviewBenefits.length > 3 && (
                                 <button
                                   onClick={() => removeSolutionOverviewBenefit(index)}
-                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                  className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
                                   title="Remove benefit"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -2319,6 +2492,14 @@ export function EditorScreen() {
                                 </button>
                               )}
                             </div>
+                            {/* Row 2: Description - full width */}
+                            <textarea
+                              value={benefit.description}
+                              onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, description: e.target.value })}
+                              placeholder="Description"
+                              rows={4}
+                              className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                            />
                           </div>
                         ))}
                       </div>
@@ -2329,6 +2510,85 @@ export function EditorScreen() {
                         >
                           + Add Benefit
                         </button>
+                      )}
+                    </div>
+
+                    {/* Product Image */}
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Image</h4>
+                      {!solutionOverviewScreenshotUrl ? (
+                        <label className="block w-full aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file && file.type.startsWith('image/')) {
+                                const reader = new FileReader()
+                                reader.onload = () => {
+                                  setSolutionOverviewScreenshotUrl(reader.result as string)
+                                }
+                                reader.readAsDataURL(file)
+                              }
+                            }}
+                          />
+                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span className="text-sm">Upload Product Image</span>
+                          </div>
+                        </label>
+                      ) : (
+                        <div className="relative">
+                          {/* ZoomableImage with pan support */}
+                          <ZoomableImage
+                            src={solutionOverviewScreenshotUrl}
+                            alt="Product image"
+                            containerWidth={280}
+                            containerHeight={168}
+                            zoom={solutionOverviewScreenshotZoom}
+                            position={solutionOverviewScreenshotPosition}
+                            onZoomChange={setSolutionOverviewScreenshotZoom}
+                            onPositionChange={setSolutionOverviewScreenshotPosition}
+                            borderRadius={8}
+                            showControls={true}
+                            targetContainerWidth={200}
+                            targetContainerHeight={120}
+                          />
+                          {/* Grayscale toggle */}
+                          <div className="flex items-center justify-between mt-3">
+                            <label className="text-xs text-gray-500">Grayscale</label>
+                            <button
+                              onClick={() => setSolutionOverviewScreenshotGrayscale(!solutionOverviewScreenshotGrayscale)}
+                              className={`relative w-9 h-5 rounded-full transition-colors ${
+                                solutionOverviewScreenshotGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                              }`}
+                            >
+                              <span
+                                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                                  solutionOverviewScreenshotGrayscale ? 'translate-x-4' : ''
+                                }`}
+                              />
+                            </button>
+                          </div>
+                          {/* Remove button */}
+                          <button
+                            onClick={() => {
+                              setSolutionOverviewScreenshotUrl(null)
+                              setSolutionOverviewScreenshotPosition({ x: 0, y: 0 })
+                              setSolutionOverviewScreenshotZoom(1)
+                              setSolutionOverviewScreenshotGrayscale(false)
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
+                            title="Remove image"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
                       )}
                     </div>
 
@@ -2354,7 +2614,7 @@ export function EditorScreen() {
                                   value={feature.description}
                                   onChange={(e) => setSolutionOverviewFeature(index, { ...feature, description: e.target.value })}
                                   placeholder="Description"
-                                  rows={2}
+                                  rows={3}
                                   className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                                 />
                               </div>
@@ -2381,78 +2641,9 @@ export function EditorScreen() {
                       </button>
                     </div>
 
-                    {/* Product Screenshot */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Screenshot</h4>
-                      {!solutionOverviewScreenshotUrl ? (
-                        <label className="block w-full aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition-colors">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file && file.type.startsWith('image/')) {
-                                const reader = new FileReader()
-                                reader.onload = () => {
-                                  setSolutionOverviewScreenshotUrl(reader.result as string)
-                                }
-                                reader.readAsDataURL(file)
-                              }
-                            }}
-                          />
-                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span className="text-sm">Upload Screenshot</span>
-                          </div>
-                        </label>
-                      ) : (
-                        <div className="relative">
-                          <div
-                            className="w-full aspect-[200/120] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800"
-                            style={{
-                              backgroundImage: `url(${solutionOverviewScreenshotUrl})`,
-                              backgroundSize: `${solutionOverviewScreenshotZoom * 100}%`,
-                              backgroundPosition: `${50 + solutionOverviewScreenshotPosition.x}% ${50 + solutionOverviewScreenshotPosition.y}%`,
-                              backgroundRepeat: 'no-repeat',
-                            }}
-                          />
-                          {/* Zoom slider */}
-                          <div className="mt-2 flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Zoom</span>
-                            <input
-                              type="range"
-                              min="1"
-                              max="3"
-                              step="0.1"
-                              value={solutionOverviewScreenshotZoom}
-                              onChange={(e) => setSolutionOverviewScreenshotZoom(parseFloat(e.target.value))}
-                              className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                            />
-                          </div>
-                          {/* Remove button */}
-                          <button
-                            onClick={() => {
-                              setSolutionOverviewScreenshotUrl(null)
-                              setSolutionOverviewScreenshotPosition({ x: 0, y: 0 })
-                              setSolutionOverviewScreenshotZoom(1)
-                            }}
-                            className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
-                            title="Remove screenshot"
-                          >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
                     {/* CTA Option */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Call to Action</h4>
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Call to Action</h4>
                       <select
                         value={solutionOverviewCtaOption}
                         onChange={(e) => setSolutionOverviewCtaOption(e.target.value as 'demo' | 'learn' | 'start' | 'contact')}
@@ -2462,6 +2653,17 @@ export function EditorScreen() {
                           <option key={option.id} value={option.id}>{option.label}</option>
                         ))}
                       </select>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">CTA Link URL</label>
+                        <input
+                          type="url"
+                          value={solutionOverviewCtaUrl}
+                          onChange={(e) => setSolutionOverviewCtaUrl(e.target.value)}
+                          placeholder="https://cority.com/request-demo"
+                          className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                        />
+                        <p className="mt-1 text-xs text-gray-400">This link will be clickable in the exported PDF</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -3658,64 +3860,68 @@ export function EditorScreen() {
         </div>
 
         {/* Right: Preview with Actions */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col sticky top-0 self-start">
           {/* Action Bar - above preview */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              {/* Scale Selector */}
-              <div className="relative">
+              {/* Scale Selector - hide for solution-overview-pdf */}
+              {currentTemplate !== 'solution-overview-pdf' && (
+                <div className="relative">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowScaleDropdown(!showScaleDropdown) }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400
+                      bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md
+                      hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    {exportScale}x
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showScaleDropdown && (
+                    <div className="absolute left-0 mt-1 w-16 bg-white dark:bg-gray-800 border border-gray-200
+                      dark:border-gray-700 rounded-md shadow-lg overflow-hidden z-10">
+                      {[1, 2, 3].map((scale) => (
+                        <button
+                          key={scale}
+                          onClick={(e) => { e.stopPropagation(); setExportScale(scale); setShowScaleDropdown(false) }}
+                          className={`w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700
+                            ${exportScale === scale ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-gray-600 dark:text-gray-400'}`}
+                        >
+                          {scale}x
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Export Button - hide for solution-overview-pdf */}
+              {currentTemplate !== 'solution-overview-pdf' && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); setShowScaleDropdown(!showScaleDropdown) }}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400
-                    bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md
-                    hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  onClick={handleExport}
+                  disabled={isExporting}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white
+                    bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
                 >
-                  {exportScale}x
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  {isExporting ? (
+                    <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  )}
+                  Export
                 </button>
+              )}
 
-                {showScaleDropdown && (
-                  <div className="absolute left-0 mt-1 w-16 bg-white dark:bg-gray-800 border border-gray-200
-                    dark:border-gray-700 rounded-md shadow-lg overflow-hidden z-10">
-                    {[1, 2, 3].map((scale) => (
-                      <button
-                        key={scale}
-                        onClick={(e) => { e.stopPropagation(); setExportScale(scale); setShowScaleDropdown(false) }}
-                        className={`w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700
-                          ${exportScale === scale ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-gray-600 dark:text-gray-400'}`}
-                      >
-                        {scale}x
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Export Button */}
-              <button
-                onClick={handleExport}
-                disabled={isExporting}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white
-                  bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
-              >
-                {isExporting ? (
-                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                ) : (
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                )}
-                Export
-              </button>
-
-              {/* Add to Queue Button - hide when editing from queue */}
-              {!isEditingFromQueue && (
+              {/* Add to Queue Button - hide when editing from queue, hide for solution-overview-pdf */}
+              {!isEditingFromQueue && currentTemplate !== 'solution-overview-pdf' && (
                 <button
                   onClick={() => {
                     addToQueue()
@@ -3734,47 +3940,107 @@ export function EditorScreen() {
                 </button>
               )}
 
-              {/* PDF Zoom Controls - only for solution-overview-pdf */}
+              {/* PDF Preview and Export buttons - only for solution-overview-pdf */}
               {currentTemplate === 'solution-overview-pdf' && (
-                <div className="flex items-center gap-1 ml-2">
+                <>
                   <button
-                    onClick={() => setPdfPreviewZoom(Math.max(50, pdfPreviewZoom - 25))}
-                    disabled={pdfPreviewZoom <= 50}
-                    className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-l bg-white dark:bg-gray-800"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                  </button>
-                  <select
-                    value={pdfPreviewZoom}
-                    onChange={(e) => setPdfPreviewZoom(Number(e.target.value))}
-                    className="h-7 px-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 focus:outline-none cursor-pointer"
-                  >
-                    <option value={50}>50%</option>
-                    <option value={75}>75%</option>
-                    <option value={100}>100%</option>
-                    <option value={125}>125%</option>
-                    <option value={150}>150%</option>
-                  </select>
-                  <button
-                    onClick={() => setPdfPreviewZoom(Math.min(150, pdfPreviewZoom + 25))}
-                    disabled={pdfPreviewZoom >= 150}
-                    className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setShowPdfFullscreen(true)}
-                    className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800 ml-1"
-                    title="Fullscreen preview (ESC to exit)"
+                    onClick={() => setShowPdfAllPagesPreview(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                      text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
+                      hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
+                      border border-gray-200 dark:border-gray-700"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Preview
+                  </button>
+                  <button
+                    onClick={() => setCurrentScreen('solution-overview-export')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white
+                      bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+                  >
+                    Review & Export
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
+                </>
+              )}
+
+              {/* PDF Page Picker and Zoom Controls - only for solution-overview-pdf */}
+              {currentTemplate === 'solution-overview-pdf' && (
+                <div className="flex items-center gap-3 ml-2">
+                  {/* Page Picker */}
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">Page</span>
+                    <div className="flex">
+                      {([1, 2, 3] as const).map((page, idx) => (
+                        <button
+                          key={page}
+                          onClick={() => setSolutionOverviewCurrentPage(page)}
+                          className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 ${
+                            idx === 0 ? 'rounded-l' : ''
+                          } ${idx === 2 ? 'rounded-r' : ''} ${idx > 0 ? '-ml-px' : ''} ${
+                            solutionOverviewCurrentPage === page
+                              ? 'bg-blue-500 text-white border-blue-500 z-10 relative'
+                              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-px h-5 bg-gray-300 dark:bg-gray-600" />
+
+                  {/* Zoom Controls */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setPdfPreviewZoom(Math.max(75, pdfPreviewZoom - 25))}
+                      disabled={pdfPreviewZoom <= 75}
+                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-l bg-white dark:bg-gray-800"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    </button>
+                    <select
+                      value={pdfPreviewZoom}
+                      onChange={(e) => setPdfPreviewZoom(Number(e.target.value))}
+                      className="h-7 px-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 focus:outline-none cursor-pointer"
+                    >
+                      <option value={200}>200%</option>
+                      <option value={175}>175%</option>
+                      <option value={150}>150%</option>
+                      <option value={125}>125%</option>
+                      <option value={100}>100%</option>
+                      <option value={75}>75%</option>
+                    </select>
+                    <button
+                      onClick={() => setPdfPreviewZoom(Math.min(200, pdfPreviewZoom + 25))}
+                      disabled={pdfPreviewZoom >= 200}
+                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setShowPdfFullscreen(true)}
+                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800 ml-1"
+                      title="Fullscreen preview (ESC to exit)"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -3857,22 +4123,25 @@ export function EditorScreen() {
                 </div>
               </div>
             ) : currentTemplate === 'solution-overview-pdf' ? (
-            <div className="flex flex-col">
-              {/* PDF Preview Container */}
+              /* PDF Preview - simple container matching page dimensions */
               <div
-                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm"
+                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
                 style={{
-                  width: dimensions.width * (pdfPreviewZoom / 100),
-                  maxHeight: 'calc(100vh - 250px)',
-                  overflow: 'auto',
+                  width: 612 * (pdfPreviewZoom / 100),
+                  height: 792 * (pdfPreviewZoom / 100),
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
               >
-              <div style={{
-                transform: `scale(${pdfPreviewZoom / 100})`,
-                transformOrigin: 'top left',
-                width: dimensions.width,
-                height: dimensions.height,
-              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: 612,
+                  height: 792,
+                  transform: `scale(${pdfPreviewZoom / 100})`,
+                  transformOrigin: 'top left',
+                }}>
               {solutionOverviewCurrentPage === 1 && (
                 <Page1Cover
                   solution={solutionOverviewSolution}
@@ -3884,10 +4153,11 @@ export function EditorScreen() {
               {solutionOverviewCurrentPage === 2 && (
                 <Page2Body
                   solution={solutionOverviewSolution}
-                  solutionName={solutionOverviewSolutionName}
+                  page2Header={solutionOverviewPage2Header}
                   heroImageUrl={solutionOverviewHeroImageUrl || heroImages.find(img => img.id === solutionOverviewHeroImageId)?.src}
                   heroImagePosition={solutionOverviewHeroImagePosition}
                   heroImageZoom={solutionOverviewHeroImageZoom}
+                  heroImageGrayscale={solutionOverviewHeroImageGrayscale}
                   sectionHeader={solutionOverviewSectionHeader}
                   introParagraph={solutionOverviewIntroParagraph}
                   keySolutions={solutionOverviewKeySolutions}
@@ -3907,13 +4177,14 @@ export function EditorScreen() {
                   screenshotUrl={solutionOverviewScreenshotUrl}
                   screenshotPosition={solutionOverviewScreenshotPosition}
                   screenshotZoom={solutionOverviewScreenshotZoom}
+                  screenshotGrayscale={solutionOverviewScreenshotGrayscale}
                   ctaOption={solutionOverviewCtaOption}
+                  ctaUrl={solutionOverviewCtaUrl}
                   scale={1}
                 />
               )}
+                </div>
               </div>
-              </div>
-            </div>
             ) : (
             <div className="flex flex-col">
               <div
@@ -4396,7 +4667,7 @@ export function EditorScreen() {
             </div>
           )}
 
-          {/* PDF Fullscreen Preview Modal */}
+          {/* PDF Fullscreen Preview Modal (single page) */}
           {showPdfFullscreen && currentTemplate === 'solution-overview-pdf' && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
               {/* Close button */}
@@ -4429,10 +4700,11 @@ export function EditorScreen() {
                 {solutionOverviewCurrentPage === 2 && (
                   <Page2Body
                     solution={solutionOverviewSolution}
-                    solutionName={solutionOverviewSolutionName}
+                    page2Header={solutionOverviewPage2Header}
                     heroImageUrl={solutionOverviewHeroImageUrl || heroImages.find(img => img.id === solutionOverviewHeroImageId)?.src}
                     heroImagePosition={solutionOverviewHeroImagePosition}
                     heroImageZoom={solutionOverviewHeroImageZoom}
+                    heroImageGrayscale={solutionOverviewHeroImageGrayscale}
                     sectionHeader={solutionOverviewSectionHeader}
                     introParagraph={solutionOverviewIntroParagraph}
                     keySolutions={solutionOverviewKeySolutions}
@@ -4452,10 +4724,84 @@ export function EditorScreen() {
                     screenshotUrl={solutionOverviewScreenshotUrl}
                     screenshotPosition={solutionOverviewScreenshotPosition}
                     screenshotZoom={solutionOverviewScreenshotZoom}
+                    screenshotGrayscale={solutionOverviewScreenshotGrayscale}
                     ctaOption={solutionOverviewCtaOption}
+                    ctaUrl={solutionOverviewCtaUrl}
                     scale={1}
                   />
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* PDF All Pages Preview Modal (3-page scrollable) */}
+          {showPdfAllPagesPreview && currentTemplate === 'solution-overview-pdf' && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
+              {/* Close button */}
+              <button
+                onClick={() => setShowPdfAllPagesPreview(false)}
+                className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors z-10"
+                title="Close (ESC)"
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              {/* ESC hint */}
+              <div className="absolute top-4 left-4 text-white/50 text-sm z-10">
+                Press ESC to exit
+              </div>
+              {/* All 3 pages - scrollable */}
+              <div
+                className="max-h-[90vh] overflow-auto rounded-lg shadow-2xl"
+                style={{ maxWidth: '90vw' }}
+              >
+                <div className="flex flex-col gap-4 p-4">
+                  {/* Page 1 */}
+                  <div className="rounded-lg overflow-hidden shadow-lg">
+                    <Page1Cover
+                      solution={solutionOverviewSolution}
+                      solutionName={solutionOverviewSolutionName}
+                      tagline={solutionOverviewTagline}
+                      scale={1}
+                    />
+                  </div>
+                  {/* Page 2 */}
+                  <div className="rounded-lg overflow-hidden shadow-lg">
+                    <Page2Body
+                      solution={solutionOverviewSolution}
+                      page2Header={solutionOverviewPage2Header}
+                      heroImageUrl={solutionOverviewHeroImageUrl || heroImages.find(img => img.id === solutionOverviewHeroImageId)?.src}
+                      heroImagePosition={solutionOverviewHeroImagePosition}
+                      heroImageZoom={solutionOverviewHeroImageZoom}
+                      heroImageGrayscale={solutionOverviewHeroImageGrayscale}
+                      sectionHeader={solutionOverviewSectionHeader}
+                      introParagraph={solutionOverviewIntroParagraph}
+                      keySolutions={solutionOverviewKeySolutions}
+                      quoteText={solutionOverviewQuoteText}
+                      quoteName={solutionOverviewQuoteName}
+                      quoteTitle={solutionOverviewQuoteTitle}
+                      quoteCompany={solutionOverviewQuoteCompany}
+                      scale={1}
+                    />
+                  </div>
+                  {/* Page 3 */}
+                  <div className="rounded-lg overflow-hidden shadow-lg">
+                    <Page3BenefitsFeatures
+                      solution={solutionOverviewSolution}
+                      solutionName={solutionOverviewSolutionName}
+                      benefits={solutionOverviewBenefits}
+                      features={solutionOverviewFeatures}
+                      screenshotUrl={solutionOverviewScreenshotUrl}
+                      screenshotPosition={solutionOverviewScreenshotPosition}
+                      screenshotZoom={solutionOverviewScreenshotZoom}
+                      screenshotGrayscale={solutionOverviewScreenshotGrayscale}
+                      ctaOption={solutionOverviewCtaOption}
+                      ctaUrl={solutionOverviewCtaUrl}
+                      scale={1}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}

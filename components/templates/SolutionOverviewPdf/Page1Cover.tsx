@@ -94,18 +94,23 @@ export function Page1Cover({
           top: 159,
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'flex-start',
           gap: 10,
         }}
       >
         {allCategories.map((category) => {
-          const isActive = category === solution
+          // For 'converged', all chips are active; otherwise only the matching one
+          const isActive = solution === 'converged' || category === solution
           const config = solutionCategories[category]
 
           return (
             <div
               key={category}
               style={{
-                padding: 10.55,
+                paddingTop: 10.55,
+                paddingBottom: 10.55,
+                paddingLeft: 10.55,
+                paddingRight: 10.55,
                 background: isActive ? 'rgba(0, 127, 255, 0.10)' : 'transparent',
                 borderRadius: 4.39,
                 border: isActive ? '0.44px solid #0080FF' : '0.44px solid #37393D',
@@ -121,6 +126,7 @@ export function Page1Cover({
                   height: 10.55,
                   background: isActive ? config.color : '#37393D',
                   borderRadius: 1.76,
+                  flexShrink: 0,
                 }}
               />
               <span
@@ -130,6 +136,7 @@ export function Page1Cover({
                   fontWeight: 500,
                   textTransform: 'uppercase',
                   letterSpacing: 0.88,
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {config.label}
@@ -144,7 +151,7 @@ export function Page1Cover({
         style={{
           position: 'absolute',
           left: 54,
-          top: 594,
+          top: 500,
           width: 474,
           color: 'white',
           fontSize: 36,
@@ -160,7 +167,7 @@ export function Page1Cover({
         style={{
           position: 'absolute',
           left: 54,
-          top: 650,
+          top: 560,
           width: 295,
           color: 'white',
           fontSize: 12,

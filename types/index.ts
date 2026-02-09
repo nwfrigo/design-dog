@@ -26,10 +26,11 @@ export interface BrandVoiceConfig {
 export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf'
 
 // Solution Overview PDF Types
-export type SolutionCategory = 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+// ORDER: environmental, health, safety, quality, sustainability, converged
+export type SolutionCategory = 'environmental' | 'health' | 'safety' | 'quality' | 'sustainability' | 'converged'
 
 export interface SolutionOverviewBenefit {
-  icon: string  // icon ID from config
+  icon: string  // Lucide icon name (e.g., 'shield', 'clock', 'zap')
   title: string
   description: string
 }
@@ -91,7 +92,7 @@ export interface ManualAssetSettings {
   showSpeaker3: boolean
   grayscale: boolean
   // Solution Overview PDF specific - Page 1
-  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolution: SolutionCategory
   solutionOverviewSolutionName: string
   solutionOverviewTagline: string
   solutionOverviewCurrentPage: 1 | 2 | 3
@@ -100,6 +101,8 @@ export interface ManualAssetSettings {
   solutionOverviewHeroImageUrl: string | null
   solutionOverviewHeroImagePosition: { x: number; y: number }
   solutionOverviewHeroImageZoom: number
+  solutionOverviewHeroImageGrayscale: boolean
+  solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
   solutionOverviewKeySolutions: [string, string, string, string, string, string]
@@ -113,7 +116,9 @@ export interface ManualAssetSettings {
   solutionOverviewScreenshotUrl: string | null
   solutionOverviewScreenshotPosition: { x: number; y: number }
   solutionOverviewScreenshotZoom: number
+  solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
+  solutionOverviewCtaUrl: string
 }
 
 export interface GeneratedCopy extends CopyContent {
@@ -125,7 +130,7 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup'
 
 // Auto-Create Types (formerly Quick Start)
 export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'
@@ -269,7 +274,7 @@ export interface GeneratedAsset {
   // Image effects
   grayscale: boolean
   // Solution Overview PDF specific - Page 1
-  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolution: SolutionCategory
   solutionOverviewSolutionName: string
   solutionOverviewTagline: string
   solutionOverviewCurrentPage: 1 | 2 | 3
@@ -278,6 +283,8 @@ export interface GeneratedAsset {
   solutionOverviewHeroImageUrl: string | null
   solutionOverviewHeroImagePosition: { x: number; y: number }
   solutionOverviewHeroImageZoom: number
+  solutionOverviewHeroImageGrayscale: boolean
+  solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
   solutionOverviewKeySolutions: [string, string, string, string, string, string]
@@ -291,7 +298,9 @@ export interface GeneratedAsset {
   solutionOverviewScreenshotUrl: string | null
   solutionOverviewScreenshotPosition: { x: number; y: number }
   solutionOverviewScreenshotZoom: number
+  solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
+  solutionOverviewCtaUrl: string
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -389,7 +398,7 @@ export interface QueuedAsset {
   // Image effects
   grayscale: boolean
   // Solution Overview PDF specific - Page 1
-  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolution: SolutionCategory
   solutionOverviewSolutionName: string
   solutionOverviewTagline: string
   // Solution Overview PDF specific - Page 2
@@ -397,6 +406,8 @@ export interface QueuedAsset {
   solutionOverviewHeroImageUrl: string | null
   solutionOverviewHeroImagePosition: { x: number; y: number }
   solutionOverviewHeroImageZoom: number
+  solutionOverviewHeroImageGrayscale: boolean
+  solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
   solutionOverviewKeySolutions: [string, string, string, string, string, string]
@@ -410,7 +421,9 @@ export interface QueuedAsset {
   solutionOverviewScreenshotUrl: string | null
   solutionOverviewScreenshotPosition: { x: number; y: number }
   solutionOverviewScreenshotZoom: number
+  solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
+  solutionOverviewCtaUrl: string
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -530,7 +543,7 @@ export interface AppState {
   // Image effects
   grayscale: boolean
   // Solution Overview PDF specific - Page 1
-  solutionOverviewSolution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability'
+  solutionOverviewSolution: SolutionCategory
   solutionOverviewSolutionName: string
   solutionOverviewTagline: string
   solutionOverviewCurrentPage: 1 | 2 | 3
@@ -539,6 +552,8 @@ export interface AppState {
   solutionOverviewHeroImageUrl: string | null
   solutionOverviewHeroImagePosition: { x: number; y: number }
   solutionOverviewHeroImageZoom: number
+  solutionOverviewHeroImageGrayscale: boolean
+  solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
   solutionOverviewKeySolutions: [string, string, string, string, string, string]
@@ -552,7 +567,9 @@ export interface AppState {
   solutionOverviewScreenshotUrl: string | null
   solutionOverviewScreenshotPosition: { x: number; y: number }
   solutionOverviewScreenshotZoom: number
+  solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
+  solutionOverviewCtaUrl: string
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -650,7 +667,7 @@ export interface AppState {
   // Image effects
   setGrayscale: (grayscale: boolean) => void
   // Solution Overview PDF specific - Page 1
-  setSolutionOverviewSolution: (solution: 'health' | 'safety' | 'environmental' | 'quality' | 'sustainability') => void
+  setSolutionOverviewSolution: (solution: SolutionCategory) => void
   setSolutionOverviewSolutionName: (name: string) => void
   setSolutionOverviewTagline: (tagline: string) => void
   setSolutionOverviewCurrentPage: (page: 1 | 2 | 3) => void
@@ -659,6 +676,8 @@ export interface AppState {
   setSolutionOverviewHeroImageUrl: (url: string | null) => void
   setSolutionOverviewHeroImagePosition: (position: { x: number; y: number }) => void
   setSolutionOverviewHeroImageZoom: (zoom: number) => void
+  setSolutionOverviewHeroImageGrayscale: (grayscale: boolean) => void
+  setSolutionOverviewPage2Header: (header: string) => void
   setSolutionOverviewSectionHeader: (header: string) => void
   setSolutionOverviewIntroParagraph: (paragraph: string) => void
   setSolutionOverviewKeySolutions: (solutions: [string, string, string, string, string, string]) => void
@@ -679,7 +698,9 @@ export interface AppState {
   setSolutionOverviewScreenshotUrl: (url: string | null) => void
   setSolutionOverviewScreenshotPosition: (position: { x: number; y: number }) => void
   setSolutionOverviewScreenshotZoom: (zoom: number) => void
+  setSolutionOverviewScreenshotGrayscale: (grayscale: boolean) => void
   setSolutionOverviewCtaOption: (option: 'demo' | 'learn' | 'start' | 'contact') => void
+  setSolutionOverviewCtaUrl: (url: string) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

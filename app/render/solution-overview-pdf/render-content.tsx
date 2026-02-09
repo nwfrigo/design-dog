@@ -19,6 +19,8 @@ export interface SolutionOverviewPdfRenderProps {
   heroImageUrl: string | null
   heroImagePosition: { x: number; y: number }
   heroImageZoom: number
+  heroImageGrayscale: boolean
+  page2Header: string
   sectionHeader: string
   introParagraph: string
   keySolutions: [string, string, string, string, string, string]
@@ -33,7 +35,9 @@ export interface SolutionOverviewPdfRenderProps {
   screenshotUrl: string | null
   screenshotPosition: { x: number; y: number }
   screenshotZoom: number
+  screenshotGrayscale: boolean
   ctaOption: 'demo' | 'learn' | 'start' | 'contact'
+  ctaUrl?: string
 }
 
 export function SolutionOverviewPdfRender(props: SolutionOverviewPdfRenderProps) {
@@ -46,6 +50,8 @@ export function SolutionOverviewPdfRender(props: SolutionOverviewPdfRenderProps)
     heroImageUrl: customHeroImageUrl,
     heroImagePosition,
     heroImageZoom,
+    heroImageGrayscale,
+    page2Header,
     sectionHeader,
     introParagraph,
     keySolutions,
@@ -58,7 +64,9 @@ export function SolutionOverviewPdfRender(props: SolutionOverviewPdfRenderProps)
     screenshotUrl,
     screenshotPosition,
     screenshotZoom,
+    screenshotGrayscale,
     ctaOption,
+    ctaUrl,
   } = props
   const [ready, setReady] = useState(false)
 
@@ -90,10 +98,11 @@ export function SolutionOverviewPdfRender(props: SolutionOverviewPdfRenderProps)
   const renderPage2 = () => (
     <Page2Body
       solution={solution}
-      solutionName={solutionName}
+      page2Header={page2Header}
       heroImageUrl={heroImageUrl}
       heroImagePosition={heroImagePosition}
       heroImageZoom={heroImageZoom}
+      heroImageGrayscale={heroImageGrayscale}
       sectionHeader={sectionHeader}
       introParagraph={introParagraph}
       keySolutions={keySolutions}
@@ -114,7 +123,9 @@ export function SolutionOverviewPdfRender(props: SolutionOverviewPdfRenderProps)
       screenshotUrl={screenshotUrl}
       screenshotPosition={screenshotPosition}
       screenshotZoom={screenshotZoom}
+      screenshotGrayscale={screenshotGrayscale}
       ctaOption={ctaOption}
+      ctaUrl={ctaUrl}
       scale={1}
     />
   )

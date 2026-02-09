@@ -26,6 +26,7 @@ import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGra
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
 import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
+import { Page1Cover } from '@/components/templates/SolutionOverviewPdf/Page1Cover'
 
 interface TemplateTileProps {
   template: TemplateInfo
@@ -413,6 +414,16 @@ export function TemplateRenderer({
           subhead=""
           variant="dark"
           showSubhead={false}
+        />
+      )
+
+    case 'solution-overview-pdf':
+      return (
+        <Page1Cover
+          solution="safety"
+          solutionName="Solution Name Goes Here"
+          tagline="Subheader Goes Here"
+          scale={scale}
         />
       )
 

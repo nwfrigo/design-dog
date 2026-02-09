@@ -8,6 +8,8 @@ import { EditorLayout } from '@/components/EditorLayout'
 import { EditorScreen } from '@/components/EditorScreen'
 import { AutoCreateEditor } from '@/components/QuickStartEditor'
 import { ExportQueueScreen } from '@/components/ExportQueueScreen'
+import { SolutionOverviewExportScreen } from '@/components/SolutionOverviewExportScreen'
+import { SolutionOverviewSetupScreen } from '@/components/SolutionOverviewSetupScreen'
 
 export default function EditorPage() {
   const router = useRouter()
@@ -52,10 +54,19 @@ export default function EditorPage() {
   // Determine which editor view to show based on state
   const hasGeneratedAssets = Object.keys(generatedAssets).length > 0
   const isQueueScreen = currentScreen === 'queue'
+  const isSolutionOverviewExport = currentScreen === 'solution-overview-export'
+  const isSolutionOverviewSetup = currentScreen === 'solution-overview-setup'
+
+  // Solution Overview Setup screen has its own layout (no EditorLayout wrapper)
+  if (isSolutionOverviewSetup) {
+    return <SolutionOverviewSetupScreen />
+  }
 
   return (
     <EditorLayout>
-      {isQueueScreen ? (
+      {isSolutionOverviewExport ? (
+        <SolutionOverviewExportScreen />
+      ) : isQueueScreen ? (
         <ExportQueueScreen />
       ) : hasGeneratedAssets ? (
         <AutoCreateEditor />

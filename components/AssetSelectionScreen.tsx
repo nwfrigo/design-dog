@@ -153,14 +153,24 @@ function AutoCreateSidebar() {
 
 export function AssetSelectionScreen() {
   const router = useRouter()
-  const { selectedAssets, toggleAssetSelection, proceedToEditor, goToEditorWithTemplate, saveDraft } = useStore()
+  const { selectedAssets, toggleAssetSelection, proceedToEditor, goToEditorWithTemplate, saveDraft, setCurrentScreen } = useStore()
 
-  // Track which subchannels are expanded (all open by default)
+  // Track which subchannels are expanded (all closed by default)
   const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(
-    () => new Set(['email', 'social', 'website', 'newsletter'])
+    () => new Set()
   )
 
   const handleNavigateToEditor = (templateType: import('@/types').TemplateType) => {
+    // Solution Overview PDF has a special setup screen
+    if (templateType === 'solution-overview-pdf') {
+      // Set template so draft is valid, but go to setup screen first
+      goToEditorWithTemplate(templateType)
+      setCurrentScreen('solution-overview-setup')
+      saveDraft()
+      router.push('/editor')
+      return
+    }
+
     goToEditorWithTemplate(templateType)
     saveDraft()
     router.push('/editor')
