@@ -24,7 +24,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Send PDF to Claude for visual analysis using URL
+    // Fetch PDF from Blob URL and convert to base64
+    // This is more reliable than having Claude fetch the URL directly
+    const pdfResponse = await fetch(pdfUrl)
+    if (!pdfResponse.ok) {
+      return NextResponse.json(
+        { error: 'Failed to fetch PDF from storage' },
+        { status: 500 }
+      )
+    }
+    const pdfBuffer = await pdfResponse.arrayBuffer()
+    const pdfBase64 = Buffer.from(pdfBuffer).toString('base64')
+
+    // Send PDF to Claude for visual analysis using base64
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
@@ -35,8 +47,9 @@ export async function POST(request: NextRequest) {
             {
               type: 'document',
               source: {
-                type: 'url',
-                url: pdfUrl,
+                type: 'base64',
+                media_type: 'application/pdf',
+                data: pdfBase64,
               },
             } as any,
             {
@@ -113,10 +126,10 @@ Respond in JSON format only, no markdown code blocks:
       text: textForGeneration,
       extracted: extractedContent,
       debug: {
-        method: 'claude-url',
+        method: 'claude-base64',
         model: 'claude-sonnet-4-20250514',
-        fileSizeBytes: fileSize || 0,
-        fileSizeMB: fileSize ? (fileSize / 1024 / 1024).toFixed(2) : '0',
+        fileSizeBytes: pdfBuffer.byteLength,
+        fileSizeMB: (pdfBuffer.byteLength / 1024 / 1024).toFixed(2),
         extractedFields: Object.keys(extractedContent).filter(k => extractedContent[k] !== null),
         rawResponse: textContent.text,
       },

@@ -390,29 +390,34 @@ Headline is NOT required. No red asterisks. All buttons (export, queue, save) wo
 
 ### Architecture (Critical)
 
-PDF uploads use a **two-step flow** to bypass Vercel's 4.5MB serverless function body limit:
+PDF uploads use a **three-step flow** to handle large files reliably:
 
-1. **Client uploads PDF to Vercel Blob** via `@vercel/blob/client`
-2. **Server analyzes PDF via URL** using Claude's document API
+1. **Client uploads PDF to Vercel Blob** via `@vercel/blob/client` (bypasses 4.5MB function body limit)
+2. **Server fetches PDF from Blob URL** and converts to base64
+3. **Server sends base64 to Claude** for analysis
+
+**Why base64 instead of URL?** Claude's API can accept PDFs via URL (`source.type: 'url'`), but this is unreliable — Anthropic's servers sometimes fail to fetch from Vercel Blob URLs, returning "Could not process PDF" errors. Sending the actual PDF content as base64 (`source.type: 'base64'`) is how Claude's native apps work and is much more reliable.
+
+**Why Blob first?** Vercel serverless functions have a 4.5MB incoming request body limit. By uploading to Blob first (client-side), then having the server fetch from Blob (outgoing request, no limit), we support large PDFs while staying within Vercel's constraints.
 
 This architecture is used in BOTH:
 - **Auto-create flow** (`AutoCreateContentScreen.tsx`)
 - **Single-asset editor** (`EditorScreen.tsx`)
 
-Both flows MUST use the same pattern. Do NOT use direct base64 uploads to serverless functions.
+Both flows MUST use the same pattern.
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
 | `/api/upload-pdf` | Token endpoint for Vercel Blob client uploads |
-| `/api/parse-pdf` | Sends blob URL to Claude for analysis |
+| `/api/parse-pdf` | Fetches PDF from Blob, sends base64 to Claude |
 | `@vercel/blob/client` | Client-side upload library |
 
 ### Upload Flow (Both Modes)
 
 ```tsx
-// Step 1: Upload to Vercel Blob
+// Step 1: Upload to Vercel Blob (client-side, bypasses body limit)
 import { upload } from '@vercel/blob/client'
 
 const blob = await upload(`pdfs/${Date.now()}-${file.name}`, file, {
@@ -420,21 +425,27 @@ const blob = await upload(`pdfs/${Date.now()}-${file.name}`, file, {
   handleUploadUrl: '/api/upload-pdf',
 })
 
-// Step 2: Send blob URL to Claude for analysis
+// Step 2: Send blob URL to server for analysis
 const response = await fetch('/api/parse-pdf', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ pdfUrl: blob.url, fileSize: file.size }),
 })
+
+// Server-side (in /api/parse-pdf):
+// 1. Fetches PDF from blob.url
+// 2. Converts to base64
+// 3. Sends base64 to Claude API
 ```
 
 ### Content Source Flow
 
 1. PDF uploaded → stored in Vercel Blob (public URL)
 2. Blob URL sent to `/api/parse-pdf`
-3. Claude fetches PDF from URL and extracts: title, main message, key points, CTA, raw summary
-4. User reviews/edits extracted content
-5. Edited content feeds into AI copy generation
+3. Server fetches PDF from Blob, converts to base64, sends to Claude
+4. Claude extracts: title, main message, key points, CTA, raw summary
+5. User reviews/edits extracted content
+6. Edited content feeds into AI copy generation
 
 ### Local Development
 
