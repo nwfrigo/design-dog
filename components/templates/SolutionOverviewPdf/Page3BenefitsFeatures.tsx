@@ -158,7 +158,7 @@ export function Page3BenefitsFeatures({
           position: 'absolute',
           top: 0,
           left: verticalLineX,
-          width: 1,
+          width: 0.5,
           height: pageHeight,
           background: '#89888B',
           zIndex: 10,
@@ -172,7 +172,7 @@ export function Page3BenefitsFeatures({
           top: pageHeight - footerHeight,
           left: 0,
           width: verticalLineX + 0.5, // Goes up to and includes the vertical line
-          height: 1,
+          height: 0.5,
           background: '#89888B',
         }}
       />
@@ -183,7 +183,7 @@ export function Page3BenefitsFeatures({
           position: 'absolute',
           top: pageHeight - footerHeight,
           left: footerDividerX,
-          width: 1,
+          width: 0.5,
           height: footerHeight,
           background: '#89888B',
         }}
@@ -301,7 +301,7 @@ export function Page3BenefitsFeatures({
             marginBottom: 12,
             flexShrink: 0,
             borderRadius: 0,
-            borderBottom: '1px solid #89888B',
+            borderBottom: '0.5px solid #89888B',
             overflow: 'hidden',
             background: screenshotUrl
               ? undefined

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium-min'
+import { trackExport } from '@/lib/usage-tracking'
 
 // Remote Chromium binary for Vercel serverless (official Sparticuz release)
 // Must match the @sparticuz/chromium-min version (v143.0.4)
@@ -466,6 +467,9 @@ export async function POST(request: NextRequest) {
 
       await browser.close()
 
+      // Track export (fire-and-forget)
+      trackExport(template)
+
       return new NextResponse(Buffer.from(pdfBuffer), {
         headers: {
           'Content-Type': 'application/pdf',
@@ -486,6 +490,9 @@ export async function POST(request: NextRequest) {
     })
 
     await browser.close()
+
+    // Track export (fire-and-forget)
+    trackExport(template)
 
     // Return the image
     return new NextResponse(Buffer.from(screenshot), {
