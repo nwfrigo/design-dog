@@ -146,37 +146,44 @@ export function Page1Cover({
         })}
       </div>
 
-      {/* Solution Name - bottom left */}
+      {/* Solution Name + Tagline - bottom left, flex container */}
       <div
         style={{
           position: 'absolute',
           left: 54,
           top: 500,
-          width: 474,
-          color: 'white',
-          fontSize: 36,
-          fontWeight: 350,
-          wordWrap: 'break-word',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
         }}
       >
-        {solutionName || 'Solution Name'}
-      </div>
+        {/* Solution Name */}
+        <div
+          style={{
+            width: 474,
+            color: 'white',
+            fontSize: 36,
+            fontWeight: 350,
+            wordWrap: 'break-word',
+            lineHeight: 1.2,
+          }}
+        >
+          {solutionName || 'Solution Name'}
+        </div>
 
-      {/* Tagline - below solution name */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 54,
-          top: 560,
-          width: 295,
-          color: 'white',
-          fontSize: 12,
-          fontWeight: 350,
-          lineHeight: '16px',
-          wordWrap: 'break-word',
-        }}
-      >
-        {tagline || 'Built for Healthcare. Ready for You.'}
+        {/* Tagline */}
+        <div
+          style={{
+            width: 295,
+            color: 'white',
+            fontSize: 12,
+            fontWeight: 350,
+            lineHeight: '16px',
+            wordWrap: 'break-word',
+          }}
+        >
+          {tagline || 'Built for Healthcare. Ready for You.'}
+        </div>
       </div>
     </div>
   )
