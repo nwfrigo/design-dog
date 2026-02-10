@@ -25,14 +25,14 @@ export default function SolutionOverviewPdfRenderPage({
   const introParagraph = (searchParams.introParagraph as string) || 'Employee Health Essentials offers a streamlined, configurable solution for managing employee health across onboarding, clinic visits, compliance, and exposure tracking.\n\nFor faster deployment, lower admin burden, and stronger compliance — all in one package built for healthcare employee health teams.'
 
   // Parse key solutions - JSON array or default values
-  let keySolutions: [string, string, string, string, string, string]
+  let keySolutions: string[]
   try {
     const parsed = JSON.parse((searchParams.keySolutions as string) || '[]')
-    keySolutions = Array.isArray(parsed) && parsed.length === 6
-      ? parsed as [string, string, string, string, string, string]
-      : ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking', 'Lab & Drug Test Management', 'Dashboards & Reporting']
+    keySolutions = Array.isArray(parsed) && parsed.length > 0
+      ? parsed as string[]
+      : ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking']
   } catch {
-    keySolutions = ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking', 'Lab & Drug Test Management', 'Dashboards & Reporting']
+    keySolutions = ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking']
   }
 
   const quoteText = (searchParams.quoteText as string) || '"Cority\'s self-scheduling tool has transformed our hiring process. It has provided a more efficient way for candidates and employees to schedule appointments at their convenience, reducing administrative workload and improving overall efficiency."'

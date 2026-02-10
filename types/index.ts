@@ -105,7 +105,7 @@ export interface ManualAssetSettings {
   solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
-  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewKeySolutions: string[]
   solutionOverviewQuoteText: string
   solutionOverviewQuoteName: string
   solutionOverviewQuoteTitle: string
@@ -287,7 +287,7 @@ export interface GeneratedAsset {
   solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
-  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewKeySolutions: string[]
   solutionOverviewQuoteText: string
   solutionOverviewQuoteName: string
   solutionOverviewQuoteTitle: string
@@ -410,7 +410,7 @@ export interface QueuedAsset {
   solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
-  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewKeySolutions: string[]
   solutionOverviewQuoteText: string
   solutionOverviewQuoteName: string
   solutionOverviewQuoteTitle: string
@@ -556,7 +556,7 @@ export interface AppState {
   solutionOverviewPage2Header: string
   solutionOverviewSectionHeader: string
   solutionOverviewIntroParagraph: string
-  solutionOverviewKeySolutions: [string, string, string, string, string, string]
+  solutionOverviewKeySolutions: string[]
   solutionOverviewQuoteText: string
   solutionOverviewQuoteName: string
   solutionOverviewQuoteTitle: string
@@ -680,8 +680,10 @@ export interface AppState {
   setSolutionOverviewPage2Header: (header: string) => void
   setSolutionOverviewSectionHeader: (header: string) => void
   setSolutionOverviewIntroParagraph: (paragraph: string) => void
-  setSolutionOverviewKeySolutions: (solutions: [string, string, string, string, string, string]) => void
+  setSolutionOverviewKeySolutions: (solutions: string[]) => void
   setSolutionOverviewKeySolution: (index: number, value: string) => void
+  addSolutionOverviewKeySolution: () => void
+  removeSolutionOverviewKeySolution: (index: number) => void
   setSolutionOverviewQuoteText: (text: string) => void
   setSolutionOverviewQuoteName: (name: string) => void
   setSolutionOverviewQuoteTitle: (title: string) => void

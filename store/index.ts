@@ -121,7 +121,7 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   solutionOverviewPage2Header: 'Heading 1',
   solutionOverviewSectionHeader: 'Heading 2',
   solutionOverviewIntroParagraph: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque porta tincidunt tellus, nec tincidunt diam pretium aliquet. Fusce sit amet orci iaculis justo dictum bibendum at venenatis justo. Aenean ac sodales tellus.\n\nAenean nulla augue, posuere in libero in, accumsan tempor erat. Phasellus aliquet diam dui, ac fermentum',
-  solutionOverviewKeySolutions: ['Solution Name', 'Solution Name', 'Solution Name', 'Solution Name', 'Solution Name', 'Solution Name'] as [string, string, string, string, string, string],
+  solutionOverviewKeySolutions: ['Solution Name', 'Solution Name', 'Solution Name', 'Solution Name'],
   solutionOverviewQuoteText: '"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque porta tincidunt tellus, nec tincidunt, Phasellus aliquet diam dui, ac fermentum"',
   solutionOverviewQuoteName: 'Firstname Lastname',
   solutionOverviewQuoteTitle: 'Job title',
@@ -277,7 +277,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   solutionOverviewPage2Header: 'Heading 1',
   solutionOverviewSectionHeader: 'Heading 2',
   solutionOverviewIntroParagraph: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque porta tincidunt tellus, nec tincidunt diam pretium aliquet. Fusce sit amet orci iaculis justo dictum bibendum at venenatis justo. Aenean ac sodales tellus.\n\nAenean nulla augue, posuere in libero in, accumsan tempor erat. Phasellus aliquet diam dui, ac fermentum',
-  solutionOverviewKeySolutions: ['Solution Name', 'Solution Name', 'Solution Name', 'Solution Name', 'Solution Name', 'Solution Name'] as [string, string, string, string, string, string],
+  solutionOverviewKeySolutions: ['Solution Name', 'Solution Name', 'Solution Name', 'Solution Name'],
   solutionOverviewQuoteText: '"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque porta tincidunt tellus, nec tincidunt, Phasellus aliquet diam dui, ac fermentum"',
   solutionOverviewQuoteName: 'Firstname Lastname',
   solutionOverviewQuoteTitle: 'Job title',
@@ -437,11 +437,20 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setSolutionOverviewPage2Header: (solutionOverviewPage2Header: string) => set({ solutionOverviewPage2Header }),
   setSolutionOverviewSectionHeader: (solutionOverviewSectionHeader: string) => set({ solutionOverviewSectionHeader }),
   setSolutionOverviewIntroParagraph: (solutionOverviewIntroParagraph: string) => set({ solutionOverviewIntroParagraph }),
-  setSolutionOverviewKeySolutions: (solutionOverviewKeySolutions: [string, string, string, string, string, string]) => set({ solutionOverviewKeySolutions }),
+  setSolutionOverviewKeySolutions: (solutionOverviewKeySolutions: string[]) => set({ solutionOverviewKeySolutions }),
   setSolutionOverviewKeySolution: (index: number, value: string) => {
     const { solutionOverviewKeySolutions } = get()
-    const newSolutions = [...solutionOverviewKeySolutions] as [string, string, string, string, string, string]
+    const newSolutions = [...solutionOverviewKeySolutions]
     newSolutions[index] = value
+    set({ solutionOverviewKeySolutions: newSolutions })
+  },
+  addSolutionOverviewKeySolution: () => {
+    const { solutionOverviewKeySolutions } = get()
+    set({ solutionOverviewKeySolutions: [...solutionOverviewKeySolutions, 'Solution Name'] })
+  },
+  removeSolutionOverviewKeySolution: (index: number) => {
+    const { solutionOverviewKeySolutions } = get()
+    const newSolutions = solutionOverviewKeySolutions.filter((_, i) => i !== index)
     set({ solutionOverviewKeySolutions: newSolutions })
   },
   setSolutionOverviewQuoteText: (solutionOverviewQuoteText: string) => set({ solutionOverviewQuoteText }),

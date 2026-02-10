@@ -666,7 +666,7 @@ const response = await fetch('/api/parse-solution-overview', {
 - User uploads Word doc following a template
 - Claude extracts exact text to specific fields
 - NO rewriting, summarizing, or AI generation
-- Fields: solutionName, tagline, keySolutions[6], benefits[5], features[5-6], quote, etc.
+- Fields: solutionName, tagline, keySolutions[1-7], benefits[5], features[5-6], quote, etc.
 
 **Standard templates (AI generation):**
 - User uploads PDF source material

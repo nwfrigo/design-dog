@@ -258,6 +258,8 @@ export function EditorScreen() {
     setSolutionOverviewIntroParagraph,
     solutionOverviewKeySolutions,
     setSolutionOverviewKeySolution,
+    addSolutionOverviewKeySolution,
+    removeSolutionOverviewKeySolution,
     solutionOverviewQuoteText,
     setSolutionOverviewQuoteText,
     solutionOverviewQuoteName,
@@ -2410,19 +2412,42 @@ export function EditorScreen() {
 
                     {/* Key Solutions */}
                     <div>
-                      <label className="block text-xs text-gray-500 mb-2">Key Solutions (6 items)</label>
+                      <label className="block text-xs text-gray-500 mb-2">Key Solutions ({solutionOverviewKeySolutions.length} items)</label>
                       <div className="space-y-2">
                         {solutionOverviewKeySolutions.map((solution, index) => (
-                          <input
-                            key={index}
-                            type="text"
-                            value={solution}
-                            onChange={(e) => setSolutionOverviewKeySolution(index, e.target.value)}
-                            placeholder={`Solution ${index + 1}`}
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
+                          <div key={index} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={solution}
+                              onChange={(e) => setSolutionOverviewKeySolution(index, e.target.value)}
+                              placeholder={`Solution ${index + 1}`}
+                              className="flex-1 px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            {solutionOverviewKeySolutions.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeSolutionOverviewKeySolution(index)}
+                                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                title="Remove solution"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
                         ))}
                       </div>
+                      <button
+                        type="button"
+                        onClick={addSolutionOverviewKeySolution}
+                        className="mt-2 flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 transition-colors"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Key Solution
+                      </button>
                     </div>
 
                     {/* Quote Section */}

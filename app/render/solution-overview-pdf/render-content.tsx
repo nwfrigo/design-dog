@@ -23,7 +23,7 @@ export interface SolutionOverviewPdfRenderProps {
   page2Header: string
   sectionHeader: string
   introParagraph: string
-  keySolutions: [string, string, string, string, string, string]
+  keySolutions: string[]
   quoteText: string
   quoteName: string
   quoteTitle: string

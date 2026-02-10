@@ -38,7 +38,7 @@ export interface Page2BodyProps {
   heroImageGrayscale?: boolean
   sectionHeader: string
   introParagraph: string
-  keySolutions: [string, string, string, string, string, string]
+  keySolutions: string[]
   quoteText: string
   quoteName: string
   quoteTitle: string
@@ -93,7 +93,7 @@ export function Page2Body({
           width: '100%',
           height: 180,
           display: 'flex',
-          borderBottom: '1px solid #89888B',
+          borderBottom: '0.5px solid #89888B',
         }}
       >
         {/* Left side - Solution name H1 */}
@@ -152,14 +152,15 @@ export function Page2Body({
       </div>
 
       {/* Vertical divider - extends from header band to bottom of Key Solutions */}
+      {/* Vertical divider - fades to white at bottom */}
       <div
         style={{
           position: 'absolute',
           top: 180,
           left: 371,
-          width: 1,
+          width: 0.5,
           height: 170,
-          background: '#89888B',
+          background: 'linear-gradient(to bottom, #89888B 0%, #89888B 85%, #ffffff 100%)',
         }}
       />
 
@@ -338,7 +339,7 @@ export function Page2Body({
           left: 0,
           right: 0,
           height: 146,
-          borderTop: '1px solid #89888B',
+          borderTop: '0.5px solid #89888B',
           background: 'white',
           padding: '24px 40px',
         }}
@@ -368,7 +369,7 @@ export function Page2Body({
               {/* Vertical line */}
               <div
                 style={{
-                  width: 1,
+                  width: 0.5,
                   background: '#89888B',
                   marginRight: 12,
                   alignSelf: 'stretch',
