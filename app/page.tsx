@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Analytics } from '@vercel/analytics/react'
 import { useStore } from '@/store'
 import { AssetSelectionScreen } from '@/components/AssetSelectionScreen'
 import { AutoCreateContentScreen, AutoCreateAssetsScreen, AutoCreateGeneratingScreen } from '@/components/AutoCreate'
@@ -90,6 +91,9 @@ function HomeContent() {
         {currentScreen === 'auto-create-assets' && <AutoCreateAssetsScreen />}
         {currentScreen === 'auto-create-generating' && <AutoCreateGeneratingScreen />}
       </div>
+
+      {/* Analytics - only on homepage */}
+      <Analytics />
     </main>
   )
 }
