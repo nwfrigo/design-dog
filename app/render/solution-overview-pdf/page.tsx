@@ -52,10 +52,17 @@ export default function SolutionOverviewPdfRenderPage({
   const stat5Value = (searchParams.stat5Value as string) || '1.2K'
   const stat5Label = (searchParams.stat5Label as string) || 'Clients'
 
-  // Page 3 params
+  // Page 3 params - benefits array or defaults
   let benefits
   try {
-    benefits = JSON.parse((searchParams.benefits as string) || '[]')
+    const parsedBenefits = JSON.parse((searchParams.benefits as string) || '[]')
+    benefits = Array.isArray(parsedBenefits) && parsedBenefits.length > 0
+      ? parsedBenefits
+      : [
+          { icon: 'streamline', title: 'Streamlined Operations', description: 'Reduce administrative burden with automated workflows and self-service scheduling.' },
+          { icon: 'compliance', title: 'Enhanced Compliance', description: 'Stay ahead of regulatory requirements with built-in compliance tracking and reporting.' },
+          { icon: 'visibility', title: 'Complete Visibility', description: 'Real-time dashboards and analytics provide insights into employee health trends.' },
+        ]
   } catch {
     benefits = [
       { icon: 'streamline', title: 'Streamlined Operations', description: 'Reduce administrative burden with automated workflows and self-service scheduling.' },
@@ -64,9 +71,18 @@ export default function SolutionOverviewPdfRenderPage({
     ]
   }
 
+  // Page 3 params - features array or defaults
   let features
   try {
-    features = JSON.parse((searchParams.features as string) || '[]')
+    const parsedFeatures = JSON.parse((searchParams.features as string) || '[]')
+    features = Array.isArray(parsedFeatures) && parsedFeatures.length > 0
+      ? parsedFeatures
+      : [
+          { title: 'Self-Service Scheduling', description: 'Employees book appointments at their convenience.' },
+          { title: 'Automated Reminders', description: 'Reduce no-shows with email and SMS notifications.' },
+          { title: 'Compliance Dashboards', description: 'Track vaccination and screening compliance in real-time.' },
+          { title: 'Integration Ready', description: 'Connect with your existing HR and payroll systems.' },
+        ]
   } catch {
     features = [
       { title: 'Self-Service Scheduling', description: 'Employees book appointments at their convenience.' },
