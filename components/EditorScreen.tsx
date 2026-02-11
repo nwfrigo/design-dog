@@ -268,6 +268,27 @@ export function EditorScreen() {
     setSolutionOverviewQuoteTitle,
     solutionOverviewQuoteCompany,
     setSolutionOverviewQuoteCompany,
+    // Solution Overview PDF specific - Page 2 Stats
+    solutionOverviewStat1Value,
+    setSolutionOverviewStat1Value,
+    solutionOverviewStat1Label,
+    setSolutionOverviewStat1Label,
+    solutionOverviewStat2Value,
+    setSolutionOverviewStat2Value,
+    solutionOverviewStat2Label,
+    setSolutionOverviewStat2Label,
+    solutionOverviewStat3Value,
+    setSolutionOverviewStat3Value,
+    solutionOverviewStat3Label,
+    setSolutionOverviewStat3Label,
+    solutionOverviewStat4Value,
+    setSolutionOverviewStat4Value,
+    solutionOverviewStat4Label,
+    setSolutionOverviewStat4Label,
+    solutionOverviewStat5Value,
+    setSolutionOverviewStat5Value,
+    solutionOverviewStat5Label,
+    setSolutionOverviewStat5Label,
     // Solution Overview PDF specific - Page 3
     solutionOverviewBenefits,
     setSolutionOverviewBenefit,
@@ -835,6 +856,17 @@ export function EditorScreen() {
         exportParams.quoteName = solutionOverviewQuoteName
         exportParams.quoteTitle = solutionOverviewQuoteTitle
         exportParams.quoteCompany = solutionOverviewQuoteCompany
+        // Page 2 Stats
+        exportParams.stat1Value = solutionOverviewStat1Value
+        exportParams.stat1Label = solutionOverviewStat1Label
+        exportParams.stat2Value = solutionOverviewStat2Value
+        exportParams.stat2Label = solutionOverviewStat2Label
+        exportParams.stat3Value = solutionOverviewStat3Value
+        exportParams.stat3Label = solutionOverviewStat3Label
+        exportParams.stat4Value = solutionOverviewStat4Value
+        exportParams.stat4Label = solutionOverviewStat4Label
+        exportParams.stat5Value = solutionOverviewStat5Value
+        exportParams.stat5Label = solutionOverviewStat5Label
         // Page 3 params
         exportParams.benefits = solutionOverviewBenefits
         exportParams.features = solutionOverviewFeatures
@@ -2499,6 +2531,98 @@ export function EditorScreen() {
                             onChange={(e) => setSolutionOverviewQuoteCompany(e.target.value)}
                             placeholder="Company Name"
                             className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Stats Section */}
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Footer Stats</h4>
+                      <div className="grid grid-cols-5 gap-2">
+                        {/* Stat 1 */}
+                        <div className="space-y-1">
+                          <input
+                            type="text"
+                            value={solutionOverviewStat1Value}
+                            onChange={(e) => setSolutionOverviewStat1Value(e.target.value)}
+                            placeholder="20+"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                          <input
+                            type="text"
+                            value={solutionOverviewStat1Label}
+                            onChange={(e) => setSolutionOverviewStat1Label(e.target.value)}
+                            placeholder="Awards"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                        </div>
+                        {/* Stat 2 */}
+                        <div className="space-y-1">
+                          <input
+                            type="text"
+                            value={solutionOverviewStat2Value}
+                            onChange={(e) => setSolutionOverviewStat2Value(e.target.value)}
+                            placeholder="350+"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                          <input
+                            type="text"
+                            value={solutionOverviewStat2Label}
+                            onChange={(e) => setSolutionOverviewStat2Label(e.target.value)}
+                            placeholder="Experts"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                        </div>
+                        {/* Stat 3 */}
+                        <div className="space-y-1">
+                          <input
+                            type="text"
+                            value={solutionOverviewStat3Value}
+                            onChange={(e) => setSolutionOverviewStat3Value(e.target.value)}
+                            placeholder="100%"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                          <input
+                            type="text"
+                            value={solutionOverviewStat3Label}
+                            onChange={(e) => setSolutionOverviewStat3Label(e.target.value)}
+                            placeholder="Deployment"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                        </div>
+                        {/* Stat 4 */}
+                        <div className="space-y-1">
+                          <input
+                            type="text"
+                            value={solutionOverviewStat4Value}
+                            onChange={(e) => setSolutionOverviewStat4Value(e.target.value)}
+                            placeholder="2M+"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                          <input
+                            type="text"
+                            value={solutionOverviewStat4Label}
+                            onChange={(e) => setSolutionOverviewStat4Label(e.target.value)}
+                            placeholder="End Users"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                        </div>
+                        {/* Stat 5 */}
+                        <div className="space-y-1">
+                          <input
+                            type="text"
+                            value={solutionOverviewStat5Value}
+                            onChange={(e) => setSolutionOverviewStat5Value(e.target.value)}
+                            placeholder="1.2K"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                          />
+                          <input
+                            type="text"
+                            value={solutionOverviewStat5Label}
+                            onChange={(e) => setSolutionOverviewStat5Label(e.target.value)}
+                            placeholder="Clients"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                         </div>
                       </div>
@@ -4246,6 +4370,16 @@ export function EditorScreen() {
                   quoteName={solutionOverviewQuoteName}
                   quoteTitle={solutionOverviewQuoteTitle}
                   quoteCompany={solutionOverviewQuoteCompany}
+                  stat1Value={solutionOverviewStat1Value}
+                  stat1Label={solutionOverviewStat1Label}
+                  stat2Value={solutionOverviewStat2Value}
+                  stat2Label={solutionOverviewStat2Label}
+                  stat3Value={solutionOverviewStat3Value}
+                  stat3Label={solutionOverviewStat3Label}
+                  stat4Value={solutionOverviewStat4Value}
+                  stat4Label={solutionOverviewStat4Label}
+                  stat5Value={solutionOverviewStat5Value}
+                  stat5Label={solutionOverviewStat5Label}
                   scale={1}
                 />
               )}
@@ -4793,6 +4927,16 @@ export function EditorScreen() {
                     quoteName={solutionOverviewQuoteName}
                     quoteTitle={solutionOverviewQuoteTitle}
                     quoteCompany={solutionOverviewQuoteCompany}
+                    stat1Value={solutionOverviewStat1Value}
+                    stat1Label={solutionOverviewStat1Label}
+                    stat2Value={solutionOverviewStat2Value}
+                    stat2Label={solutionOverviewStat2Label}
+                    stat3Value={solutionOverviewStat3Value}
+                    stat3Label={solutionOverviewStat3Label}
+                    stat4Value={solutionOverviewStat4Value}
+                    stat4Label={solutionOverviewStat4Label}
+                    stat5Value={solutionOverviewStat5Value}
+                    stat5Label={solutionOverviewStat5Label}
                     scale={1}
                   />
                 )}
@@ -4863,6 +5007,16 @@ export function EditorScreen() {
                       quoteName={solutionOverviewQuoteName}
                       quoteTitle={solutionOverviewQuoteTitle}
                       quoteCompany={solutionOverviewQuoteCompany}
+                      stat1Value={solutionOverviewStat1Value}
+                      stat1Label={solutionOverviewStat1Label}
+                      stat2Value={solutionOverviewStat2Value}
+                      stat2Label={solutionOverviewStat2Label}
+                      stat3Value={solutionOverviewStat3Value}
+                      stat3Label={solutionOverviewStat3Label}
+                      stat4Value={solutionOverviewStat4Value}
+                      stat4Label={solutionOverviewStat4Label}
+                      stat5Value={solutionOverviewStat5Value}
+                      stat5Label={solutionOverviewStat5Label}
                       scale={1}
                     />
                   </div>

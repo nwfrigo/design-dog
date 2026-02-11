@@ -1,12 +1,12 @@
 // Page 2: Body - Solution Overview PDF Template
-// Layout: Header band with hero image, main content with intro and key solutions, quote section, stats bar
+// Layout: Header band with hero image, main content with intro and key solutions, quote section, stats/about footer
 
 import { solutionCategories, type SolutionCategory } from '@/config/solution-overview-assets'
 
-// Inline SVG for Cority logo (black version)
+// Inline SVG for Cority logo (black version, 40px wide)
 function CorityLogoBlack() {
   return (
-    <svg width="34" height="11" viewBox="0 0 383.8 128.41" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="40" height="13" viewBox="0 0 383.8 128.41" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M278.36,86.3c-4.39,0-6.9-3.61-6.9-8.32V43.78h13l-6.78-17.41h-6.26V0H251.38V83.31c0,13.5,7.53,20.71,21.49,20.71,8.29,0,13.61-2.18,16.6-4.84L284,85A12.73,12.73,0,0,1,278.36,86.3Z" fill="black"/>
       <path d="M112.31,24.18c-24.94,0-40,18.19-40,39.69s15.06,39.84,40,39.84c25.1,0,40.16-18.2,40.16-39.84S137.41,24.18,112.31,24.18Zm0,61.8C99.92,86,93,75.79,93,63.87c0-11.77,6.9-22,19.29-22s19.46,10.2,19.46,22C131.77,75.79,124.71,86,112.31,86Z" fill="black"/>
       <path d="M41.1,41.9c6.9,0,12.39,2.83,16,8.16l.5-.47a53.22,53.22,0,0,1,7.54-17.11c-5.49-4.66-13.59-8.3-25-8.3C16.78,24.18,0,40.65,0,63.87s16.78,39.84,40.16,39.84c11.39,0,19.48-3.64,25-8.36a53.25,53.25,0,0,1-7.49-17l-.54-.49A19.12,19.12,0,0,1,41.1,86C29,86,20.55,77,20.55,63.87S29,41.9,41.1,41.9Z" fill="black"/>
@@ -14,20 +14,9 @@ function CorityLogoBlack() {
       <rect x="217.71" y="26.06" width="19.92" height="75.77" fill="black"/>
       <path d="M347.67,26.06l-20,52.09L308.14,26.06H286.81l31.1,77.52-9.54,24.83h9.52a15.71,15.71,0,0,0,14.6-9.91l36.67-92.44Z" fill="black"/>
       <rect x="217.71" width="19.92" height="16.98" fill="black"/>
-      <path d="M379,35.66a4.65,4.65,0,0,1-1.88-.38,4.73,4.73,0,0,1-1.54-1,4.82,4.82,0,0,1-1-1.54,4.91,4.91,0,0,1-.38-1.89,4.82,4.82,0,0,1,.38-1.88,4.88,4.88,0,0,1,2.58-2.58A4.82,4.82,0,0,1,379,26a4.91,4.91,0,0,1,1.89.38,4.67,4.67,0,0,1,1.53,1,4.82,4.82,0,0,1,1.42,3.42,4.73,4.73,0,0,1-.38,1.89,4.85,4.85,0,0,1-2.57,2.57A4.73,4.73,0,0,1,379,35.66Zm0-8.76a3.92,3.92,0,1,0,3.92,3.92A3.93,3.93,0,0,0,379,26.9Z" fill="black"/>
-      <path d="M380.66,32.86a7.57,7.57,0,0,0-.6-1.4A1.87,1.87,0,0,0,379,28H377v5.62h1.12V31.76h.79a4.21,4.21,0,0,1,.73,1.47,3.73,3.73,0,0,0,.14.4H381A5.08,5.08,0,0,1,380.66,32.86ZM379,30.64h-1v-1.5h1a.75.75,0,0,1,0,1.5Z" fill="black"/>
     </svg>
   )
 }
-
-// Static stats data (locked - not editable)
-const statsData = [
-  { value: '20', suffix: '+', label: 'Awards' },
-  { value: '350', suffix: '+', label: 'Experts' },
-  { value: '100', suffix: '%', label: 'Deployment' },
-  { value: '2M', suffix: '+', label: 'End Users' },
-  { value: '1.2K', suffix: '+', label: 'Clients' },
-]
 
 export interface Page2BodyProps {
   solution: SolutionCategory
@@ -43,6 +32,17 @@ export interface Page2BodyProps {
   quoteName: string
   quoteTitle: string
   quoteCompany: string
+  // Footer stats (editable)
+  stat1Value?: string
+  stat1Label?: string
+  stat2Value?: string
+  stat2Label?: string
+  stat3Value?: string
+  stat3Label?: string
+  stat4Value?: string
+  stat4Label?: string
+  stat5Value?: string
+  stat5Label?: string
   scale?: number
 }
 
@@ -60,6 +60,17 @@ export function Page2Body({
   quoteName,
   quoteTitle,
   quoteCompany,
+  // Footer stats with defaults
+  stat1Value = '20+',
+  stat1Label = 'Awards',
+  stat2Value = '350+',
+  stat2Label = 'Experts',
+  stat3Value = '100%',
+  stat3Label = 'Deployment',
+  stat4Value = '2M+',
+  stat4Label = 'End Users',
+  stat5Value = '1.2K',
+  stat5Label = 'Clients',
   scale = 1,
 }: Page2BodyProps) {
   const solutionConfig = solutionCategories[solution]
@@ -331,104 +342,102 @@ export function Page2Body({
         </div>
       </div>
 
-      {/* Stats Section - Fixed at bottom */}
+      {/* Footer Section - Fixed at bottom, 162px tall */}
       <div
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          height: 146,
+          height: 162,
           borderTop: '0.5px solid #89888B',
           background: 'white',
-          padding: '24px 40px',
+          padding: '0 40px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 38,
         }}
       >
-        {/* Cority Logo */}
-        <div style={{ marginBottom: 20 }}>
-          <CorityLogoBlack />
-        </div>
-
-        {/* Stats Row */}
+        {/* Left: 3x2 Grid (Logo + 5 Stats) - 222px wide */}
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            gap: 0,
+            width: 222,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            columnGap: 40,
+            rowGap: 18,
+            flexShrink: 0,
+            alignSelf: 'center',
           }}
         >
-          {statsData.map((stat, index) => (
-            <div
-              key={index}
-              style={{
-                display: 'flex',
-                alignItems: 'stretch',
-                paddingRight: 40,
-              }}
-            >
-              {/* Vertical line */}
-              <div
-                style={{
-                  width: 0.5,
-                  background: '#89888B',
-                  marginRight: 12,
-                  alignSelf: 'stretch',
-                }}
-              />
-              {/* Stat content */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                }}
-              >
-                {/* Number with suffix */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 32,
-                      fontFamily: 'Fakt Pro, sans-serif',
-                      fontWeight: 350,
-                      color: 'black',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {stat.value}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 16,
-                      fontFamily: 'Fakt Pro, sans-serif',
-                      fontWeight: 300,
-                      color: 'black',
-                      lineHeight: 1,
-                      marginTop: 2,
-                    }}
-                  >
-                    {stat.suffix}
-                  </span>
-                </div>
-                {/* Label */}
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontFamily: 'Fakt Pro, sans-serif',
-                    fontWeight: 350,
-                    color: 'black',
-                    marginTop: 4,
-                  }}
-                >
-                  {stat.label}
-                </div>
-              </div>
+          {/* Row 1, Col 1: Cority Logo - center aligned with stats */}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <CorityLogoBlack />
+          </div>
+
+          {/* Row 1, Col 2: Stat 1 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+            <div style={{ fontSize: 20, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', lineHeight: 1 }}>
+              {stat1Value}
             </div>
-          ))}
+            <div style={{ fontSize: 8, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', marginTop: 2 }}>
+              {stat1Label}
+            </div>
+          </div>
+
+          {/* Row 1, Col 3: Stat 2 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+            <div style={{ fontSize: 20, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', lineHeight: 1 }}>
+              {stat2Value}
+            </div>
+            <div style={{ fontSize: 8, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', marginTop: 2 }}>
+              {stat2Label}
+            </div>
+          </div>
+
+          {/* Row 2, Col 1: Stat 3 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+            <div style={{ fontSize: 20, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', lineHeight: 1 }}>
+              {stat3Value}
+            </div>
+            <div style={{ fontSize: 8, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', marginTop: 2 }}>
+              {stat3Label}
+            </div>
+          </div>
+
+          {/* Row 2, Col 2: Stat 4 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+            <div style={{ fontSize: 20, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', lineHeight: 1 }}>
+              {stat4Value}
+            </div>
+            <div style={{ fontSize: 8, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', marginTop: 2 }}>
+              {stat4Label}
+            </div>
+          </div>
+
+          {/* Row 2, Col 3: Stat 5 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
+            <div style={{ fontSize: 20, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', lineHeight: 1 }}>
+              {stat5Value}
+            </div>
+            <div style={{ fontSize: 8, fontFamily: 'Fakt Pro, sans-serif', fontWeight: 350, color: '#37393D', marginTop: 2 }}>
+              {stat5Label}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: About Paragraph (Static) */}
+        <div
+          style={{
+            flex: 1,
+            fontSize: 9,
+            fontFamily: 'Fakt Pro, sans-serif',
+            fontWeight: 350,
+            color: '#37393D',
+            lineHeight: 1.5,
+          }}
+        >
+          Cority helps customers see and prevent risks across their operations, in real time. Our EHS+ platform converges people, data, and AI agents to stay ahead of the biggest operating risks across environmental management, employee health, safety, quality, and sustainability.<br /><br />For 40 years, Cority has been the market leader in EHS+, recognized by top analysts and trusted by more than 1,500 of the most complex organizations worldwide.
         </div>
       </div>
     </div>

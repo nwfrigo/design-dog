@@ -148,6 +148,17 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   solutionOverviewScreenshotGrayscale: false,
   solutionOverviewCtaOption: 'demo' as const,
   solutionOverviewCtaUrl: '',
+  // Solution Overview PDF - Page 2 Stats
+  solutionOverviewStat1Value: '20+',
+  solutionOverviewStat1Label: 'Awards',
+  solutionOverviewStat2Value: '350+',
+  solutionOverviewStat2Label: 'Experts',
+  solutionOverviewStat3Value: '100%',
+  solutionOverviewStat3Label: 'Deployment',
+  solutionOverviewStat4Value: '2M+',
+  solutionOverviewStat4Label: 'End Users',
+  solutionOverviewStat5Value: '1.2K',
+  solutionOverviewStat5Label: 'Clients',
 })
 
 export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
@@ -304,6 +315,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   solutionOverviewScreenshotGrayscale: false,
   solutionOverviewCtaOption: 'demo' as 'demo' | 'learn' | 'start' | 'contact',
   solutionOverviewCtaUrl: '',
+  // Solution Overview PDF - Page 2 Stats
+  solutionOverviewStat1Value: '20+',
+  solutionOverviewStat1Label: 'Awards',
+  solutionOverviewStat2Value: '350+',
+  solutionOverviewStat2Label: 'Experts',
+  solutionOverviewStat3Value: '100%',
+  solutionOverviewStat3Label: 'Deployment',
+  solutionOverviewStat4Value: '2M+',
+  solutionOverviewStat4Label: 'End Users',
+  solutionOverviewStat5Value: '1.2K',
+  solutionOverviewStat5Label: 'Clients',
 
   // Export queue
   exportQueue: [],
@@ -514,6 +536,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setSolutionOverviewScreenshotGrayscale: (solutionOverviewScreenshotGrayscale: boolean) => set({ solutionOverviewScreenshotGrayscale }),
   setSolutionOverviewCtaOption: (solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact') => set({ solutionOverviewCtaOption }),
   setSolutionOverviewCtaUrl: (solutionOverviewCtaUrl: string) => set({ solutionOverviewCtaUrl }),
+  // Solution Overview PDF - Page 2 Stats setters
+  setSolutionOverviewStat1Value: (solutionOverviewStat1Value: string) => set({ solutionOverviewStat1Value }),
+  setSolutionOverviewStat1Label: (solutionOverviewStat1Label: string) => set({ solutionOverviewStat1Label }),
+  setSolutionOverviewStat2Value: (solutionOverviewStat2Value: string) => set({ solutionOverviewStat2Value }),
+  setSolutionOverviewStat2Label: (solutionOverviewStat2Label: string) => set({ solutionOverviewStat2Label }),
+  setSolutionOverviewStat3Value: (solutionOverviewStat3Value: string) => set({ solutionOverviewStat3Value }),
+  setSolutionOverviewStat3Label: (solutionOverviewStat3Label: string) => set({ solutionOverviewStat3Label }),
+  setSolutionOverviewStat4Value: (solutionOverviewStat4Value: string) => set({ solutionOverviewStat4Value }),
+  setSolutionOverviewStat4Label: (solutionOverviewStat4Label: string) => set({ solutionOverviewStat4Label }),
+  setSolutionOverviewStat5Value: (solutionOverviewStat5Value: string) => set({ solutionOverviewStat5Value }),
+  setSolutionOverviewStat5Label: (solutionOverviewStat5Label: string) => set({ solutionOverviewStat5Label }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -527,7 +560,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -609,6 +642,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         solutionOverviewScreenshotGrayscale,
         solutionOverviewCtaOption,
         solutionOverviewCtaUrl,
+        // Solution Overview PDF specific - Page 2 Stats
+        solutionOverviewStat1Value,
+        solutionOverviewStat1Label,
+        solutionOverviewStat2Value,
+        solutionOverviewStat2Label,
+        solutionOverviewStat3Value,
+        solutionOverviewStat3Label,
+        solutionOverviewStat4Value,
+        solutionOverviewStat4Label,
+        solutionOverviewStat5Value,
+        solutionOverviewStat5Label,
       }
       const updatedSettings = {
         ...manualAssetSettings,
@@ -689,6 +733,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         solutionOverviewScreenshotGrayscale: targetTemplateDefaults.solutionOverviewScreenshotGrayscale,
         solutionOverviewCtaOption: targetTemplateDefaults.solutionOverviewCtaOption,
         solutionOverviewCtaUrl: targetTemplateDefaults.solutionOverviewCtaUrl,
+        solutionOverviewStat1Value: targetTemplateDefaults.solutionOverviewStat1Value,
+        solutionOverviewStat1Label: targetTemplateDefaults.solutionOverviewStat1Label,
+        solutionOverviewStat2Value: targetTemplateDefaults.solutionOverviewStat2Value,
+        solutionOverviewStat2Label: targetTemplateDefaults.solutionOverviewStat2Label,
+        solutionOverviewStat3Value: targetTemplateDefaults.solutionOverviewStat3Value,
+        solutionOverviewStat3Label: targetTemplateDefaults.solutionOverviewStat3Label,
+        solutionOverviewStat4Value: targetTemplateDefaults.solutionOverviewStat4Value,
+        solutionOverviewStat4Label: targetTemplateDefaults.solutionOverviewStat4Label,
+        solutionOverviewStat5Value: targetTemplateDefaults.solutionOverviewStat5Value,
+        solutionOverviewStat5Label: targetTemplateDefaults.solutionOverviewStat5Label,
       }
       const targetSettings = updatedSettings[index] || defaultSettings
 
@@ -776,6 +830,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         solutionOverviewScreenshotGrayscale: targetSettings.solutionOverviewScreenshotGrayscale,
         solutionOverviewCtaOption: targetSettings.solutionOverviewCtaOption,
         solutionOverviewCtaUrl: targetSettings.solutionOverviewCtaUrl,
+        // Solution Overview PDF specific - Page 2 Stats
+        solutionOverviewStat1Value: targetSettings.solutionOverviewStat1Value,
+        solutionOverviewStat1Label: targetSettings.solutionOverviewStat1Label,
+        solutionOverviewStat2Value: targetSettings.solutionOverviewStat2Value,
+        solutionOverviewStat2Label: targetSettings.solutionOverviewStat2Label,
+        solutionOverviewStat3Value: targetSettings.solutionOverviewStat3Value,
+        solutionOverviewStat3Label: targetSettings.solutionOverviewStat3Label,
+        solutionOverviewStat4Value: targetSettings.solutionOverviewStat4Value,
+        solutionOverviewStat4Label: targetSettings.solutionOverviewStat4Label,
+        solutionOverviewStat5Value: targetSettings.solutionOverviewStat5Value,
+        solutionOverviewStat5Label: targetSettings.solutionOverviewStat5Label,
         // Reset generation state when switching assets - each asset has its own generation context
         pdfContent: null,
         generationContext: '',
@@ -925,6 +990,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewScreenshotGrayscale: state.solutionOverviewScreenshotGrayscale,
       solutionOverviewCtaOption: state.solutionOverviewCtaOption,
       solutionOverviewCtaUrl: state.solutionOverviewCtaUrl,
+      // Solution Overview PDF specific - Page 2 Stats
+      solutionOverviewStat1Value: state.solutionOverviewStat1Value,
+      solutionOverviewStat1Label: state.solutionOverviewStat1Label,
+      solutionOverviewStat2Value: state.solutionOverviewStat2Value,
+      solutionOverviewStat2Label: state.solutionOverviewStat2Label,
+      solutionOverviewStat3Value: state.solutionOverviewStat3Value,
+      solutionOverviewStat3Label: state.solutionOverviewStat3Label,
+      solutionOverviewStat4Value: state.solutionOverviewStat4Value,
+      solutionOverviewStat4Label: state.solutionOverviewStat4Label,
+      solutionOverviewStat5Value: state.solutionOverviewStat5Value,
+      solutionOverviewStat5Label: state.solutionOverviewStat5Label,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -1142,6 +1218,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewScreenshotGrayscale: state.solutionOverviewScreenshotGrayscale,
       solutionOverviewCtaOption: state.solutionOverviewCtaOption,
       solutionOverviewCtaUrl: state.solutionOverviewCtaUrl,
+      // Solution Overview PDF specific - Page 2 Stats
+      solutionOverviewStat1Value: state.solutionOverviewStat1Value,
+      solutionOverviewStat1Label: state.solutionOverviewStat1Label,
+      solutionOverviewStat2Value: state.solutionOverviewStat2Value,
+      solutionOverviewStat2Label: state.solutionOverviewStat2Label,
+      solutionOverviewStat3Value: state.solutionOverviewStat3Value,
+      solutionOverviewStat3Label: state.solutionOverviewStat3Label,
+      solutionOverviewStat4Value: state.solutionOverviewStat4Value,
+      solutionOverviewStat4Label: state.solutionOverviewStat4Label,
+      solutionOverviewStat5Value: state.solutionOverviewStat5Value,
+      solutionOverviewStat5Label: state.solutionOverviewStat5Label,
     }
 
     // Update the queue item and return to queue
@@ -1867,6 +1954,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           solutionOverviewScreenshotGrayscale: asset.solutionOverviewScreenshotGrayscale,
           solutionOverviewCtaOption: asset.solutionOverviewCtaOption,
           solutionOverviewCtaUrl: asset.solutionOverviewCtaUrl || '',
+          // Solution Overview PDF specific - Page 2 Stats
+          solutionOverviewStat1Value: asset.solutionOverviewStat1Value,
+          solutionOverviewStat1Label: asset.solutionOverviewStat1Label,
+          solutionOverviewStat2Value: asset.solutionOverviewStat2Value,
+          solutionOverviewStat2Label: asset.solutionOverviewStat2Label,
+          solutionOverviewStat3Value: asset.solutionOverviewStat3Value,
+          solutionOverviewStat3Label: asset.solutionOverviewStat3Label,
+          solutionOverviewStat4Value: asset.solutionOverviewStat4Value,
+          solutionOverviewStat4Label: asset.solutionOverviewStat4Label,
+          solutionOverviewStat5Value: asset.solutionOverviewStat5Value,
+          solutionOverviewStat5Label: asset.solutionOverviewStat5Label,
           sourceAssetIndex: 0,
         })
       }

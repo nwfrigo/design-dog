@@ -33,6 +33,17 @@ export function SolutionOverviewExportScreen() {
     solutionOverviewScreenshotGrayscale,
     solutionOverviewCtaOption,
     solutionOverviewCtaUrl,
+    // Footer stats
+    solutionOverviewStat1Value,
+    solutionOverviewStat1Label,
+    solutionOverviewStat2Value,
+    solutionOverviewStat2Label,
+    solutionOverviewStat3Value,
+    solutionOverviewStat3Label,
+    solutionOverviewStat4Value,
+    solutionOverviewStat4Label,
+    solutionOverviewStat5Value,
+    solutionOverviewStat5Label,
   } = useStore()
 
   // Local state for export
@@ -94,6 +105,17 @@ export function SolutionOverviewExportScreen() {
         screenshotGrayscale: solutionOverviewScreenshotGrayscale,
         ctaOption: solutionOverviewCtaOption,
         ctaUrl: solutionOverviewCtaUrl || undefined,
+        // Footer stats
+        stat1Value: solutionOverviewStat1Value,
+        stat1Label: solutionOverviewStat1Label,
+        stat2Value: solutionOverviewStat2Value,
+        stat2Label: solutionOverviewStat2Label,
+        stat3Value: solutionOverviewStat3Value,
+        stat3Label: solutionOverviewStat3Label,
+        stat4Value: solutionOverviewStat4Value,
+        stat4Label: solutionOverviewStat4Label,
+        stat5Value: solutionOverviewStat5Value,
+        stat5Label: solutionOverviewStat5Label,
       }
 
       const response = await fetch('/api/export', {
@@ -249,6 +271,16 @@ export function SolutionOverviewExportScreen() {
                   quoteName={solutionOverviewQuoteName}
                   quoteTitle={solutionOverviewQuoteTitle}
                   quoteCompany={solutionOverviewQuoteCompany}
+                  stat1Value={solutionOverviewStat1Value}
+                  stat1Label={solutionOverviewStat1Label}
+                  stat2Value={solutionOverviewStat2Value}
+                  stat2Label={solutionOverviewStat2Label}
+                  stat3Value={solutionOverviewStat3Value}
+                  stat3Label={solutionOverviewStat3Label}
+                  stat4Value={solutionOverviewStat4Value}
+                  stat4Label={solutionOverviewStat4Label}
+                  stat5Value={solutionOverviewStat5Value}
+                  stat5Label={solutionOverviewStat5Label}
                   scale={1}
                 />
               </div>

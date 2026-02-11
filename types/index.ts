@@ -119,6 +119,17 @@ export interface ManualAssetSettings {
   solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
   solutionOverviewCtaUrl: string
+  // Solution Overview PDF - Page 2 Stats (editable)
+  solutionOverviewStat1Value: string
+  solutionOverviewStat1Label: string
+  solutionOverviewStat2Value: string
+  solutionOverviewStat2Label: string
+  solutionOverviewStat3Value: string
+  solutionOverviewStat3Label: string
+  solutionOverviewStat4Value: string
+  solutionOverviewStat4Label: string
+  solutionOverviewStat5Value: string
+  solutionOverviewStat5Label: string
 }
 
 export interface GeneratedCopy extends CopyContent {
@@ -301,6 +312,17 @@ export interface GeneratedAsset {
   solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
   solutionOverviewCtaUrl: string
+  // Solution Overview PDF - Page 2 Stats (editable)
+  solutionOverviewStat1Value: string
+  solutionOverviewStat1Label: string
+  solutionOverviewStat2Value: string
+  solutionOverviewStat2Label: string
+  solutionOverviewStat3Value: string
+  solutionOverviewStat3Label: string
+  solutionOverviewStat4Value: string
+  solutionOverviewStat4Label: string
+  solutionOverviewStat5Value: string
+  solutionOverviewStat5Label: string
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -424,6 +446,17 @@ export interface QueuedAsset {
   solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
   solutionOverviewCtaUrl: string
+  // Solution Overview PDF - Page 2 Stats (editable)
+  solutionOverviewStat1Value: string
+  solutionOverviewStat1Label: string
+  solutionOverviewStat2Value: string
+  solutionOverviewStat2Label: string
+  solutionOverviewStat3Value: string
+  solutionOverviewStat3Label: string
+  solutionOverviewStat4Value: string
+  solutionOverviewStat4Label: string
+  solutionOverviewStat5Value: string
+  solutionOverviewStat5Label: string
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -570,6 +603,17 @@ export interface AppState {
   solutionOverviewScreenshotGrayscale: boolean
   solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
   solutionOverviewCtaUrl: string
+  // Solution Overview PDF - Page 2 Stats (editable)
+  solutionOverviewStat1Value: string
+  solutionOverviewStat1Label: string
+  solutionOverviewStat2Value: string
+  solutionOverviewStat2Label: string
+  solutionOverviewStat3Value: string
+  solutionOverviewStat3Label: string
+  solutionOverviewStat4Value: string
+  solutionOverviewStat4Label: string
+  solutionOverviewStat5Value: string
+  solutionOverviewStat5Label: string
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -703,6 +747,17 @@ export interface AppState {
   setSolutionOverviewScreenshotGrayscale: (grayscale: boolean) => void
   setSolutionOverviewCtaOption: (option: 'demo' | 'learn' | 'start' | 'contact') => void
   setSolutionOverviewCtaUrl: (url: string) => void
+  // Solution Overview PDF - Page 2 Stats setters
+  setSolutionOverviewStat1Value: (value: string) => void
+  setSolutionOverviewStat1Label: (label: string) => void
+  setSolutionOverviewStat2Value: (value: string) => void
+  setSolutionOverviewStat2Label: (label: string) => void
+  setSolutionOverviewStat3Value: (value: string) => void
+  setSolutionOverviewStat3Label: (label: string) => void
+  setSolutionOverviewStat4Value: (value: string) => void
+  setSolutionOverviewStat4Label: (label: string) => void
+  setSolutionOverviewStat5Value: (value: string) => void
+  setSolutionOverviewStat5Label: (label: string) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

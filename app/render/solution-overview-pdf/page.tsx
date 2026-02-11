@@ -40,6 +40,18 @@ export default function SolutionOverviewPdfRenderPage({
   const quoteTitle = (searchParams.quoteTitle as string) || 'RN, Director of Employee Health Services'
   const quoteCompany = (searchParams.quoteCompany as string) || 'Texas Health Resources'
 
+  // Page 2 footer stats
+  const stat1Value = (searchParams.stat1Value as string) || '20+'
+  const stat1Label = (searchParams.stat1Label as string) || 'Awards'
+  const stat2Value = (searchParams.stat2Value as string) || '350+'
+  const stat2Label = (searchParams.stat2Label as string) || 'Experts'
+  const stat3Value = (searchParams.stat3Value as string) || '100%'
+  const stat3Label = (searchParams.stat3Label as string) || 'Deployment'
+  const stat4Value = (searchParams.stat4Value as string) || '2M+'
+  const stat4Label = (searchParams.stat4Label as string) || 'End Users'
+  const stat5Value = (searchParams.stat5Value as string) || '1.2K'
+  const stat5Label = (searchParams.stat5Label as string) || 'Clients'
+
   // Page 3 params
   let benefits
   try {
@@ -101,6 +113,16 @@ export default function SolutionOverviewPdfRenderPage({
           quoteName={quoteName}
           quoteTitle={quoteTitle}
           quoteCompany={quoteCompany}
+          stat1Value={stat1Value}
+          stat1Label={stat1Label}
+          stat2Value={stat2Value}
+          stat2Label={stat2Label}
+          stat3Value={stat3Value}
+          stat3Label={stat3Label}
+          stat4Value={stat4Value}
+          stat4Label={stat4Label}
+          stat5Value={stat5Value}
+          stat5Label={stat5Label}
           benefits={benefits}
           features={features}
           screenshotUrl={screenshotUrl}

@@ -28,6 +28,17 @@ export interface SolutionOverviewPdfRenderProps {
   quoteName: string
   quoteTitle: string
   quoteCompany: string
+  // Page 2: Footer Stats
+  stat1Value?: string
+  stat1Label?: string
+  stat2Value?: string
+  stat2Label?: string
+  stat3Value?: string
+  stat3Label?: string
+  stat4Value?: string
+  stat4Label?: string
+  stat5Value?: string
+  stat5Label?: string
 
   // Page 3: Benefits & Features
   benefits: SolutionOverviewBenefit[]
@@ -59,6 +70,16 @@ export function SolutionOverviewPdfRender(props: SolutionOverviewPdfRenderProps)
     quoteName,
     quoteTitle,
     quoteCompany,
+    stat1Value,
+    stat1Label,
+    stat2Value,
+    stat2Label,
+    stat3Value,
+    stat3Label,
+    stat4Value,
+    stat4Label,
+    stat5Value,
+    stat5Label,
     benefits,
     features,
     screenshotUrl,
@@ -110,6 +131,16 @@ export function SolutionOverviewPdfRender(props: SolutionOverviewPdfRenderProps)
       quoteName={quoteName}
       quoteTitle={quoteTitle}
       quoteCompany={quoteCompany}
+      stat1Value={stat1Value}
+      stat1Label={stat1Label}
+      stat2Value={stat2Value}
+      stat2Label={stat2Label}
+      stat3Value={stat3Value}
+      stat3Label={stat3Label}
+      stat4Value={stat4Value}
+      stat4Label={stat4Label}
+      stat5Value={stat5Value}
+      stat5Label={stat5Label}
       scale={1}
     />
   )
