@@ -13,7 +13,6 @@
     "@anthropic-ai/sdk": "^0.24.0",
     "@sparticuz/chromium-min": "^143.0.4",
     "@upstash/redis": "^1.36.2",
-    "@vercel/analytics": "^1.6.1",
     "@vercel/blob": "^2.1.0",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.563.0",
