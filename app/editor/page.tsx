@@ -10,6 +10,7 @@ import { AutoCreateEditor } from '@/components/QuickStartEditor'
 import { ExportQueueScreen } from '@/components/ExportQueueScreen'
 import { SolutionOverviewExportScreen } from '@/components/SolutionOverviewExportScreen'
 import { SolutionOverviewSetupScreen } from '@/components/SolutionOverviewSetupScreen'
+import { FaqEditorScreen } from '@/components/FaqEditorScreen'
 
 export default function EditorPage() {
   const router = useRouter()
@@ -56,10 +57,16 @@ export default function EditorPage() {
   const isQueueScreen = currentScreen === 'queue'
   const isSolutionOverviewExport = currentScreen === 'solution-overview-export'
   const isSolutionOverviewSetup = currentScreen === 'solution-overview-setup'
+  const isFaqEditor = currentScreen === 'faq-editor'
 
   // Solution Overview Setup screen has its own layout (no EditorLayout wrapper)
   if (isSolutionOverviewSetup) {
     return <SolutionOverviewSetupScreen />
+  }
+
+  // FAQ Editor has its own layout
+  if (isFaqEditor) {
+    return <FaqEditorScreen />
   }
 
   return (

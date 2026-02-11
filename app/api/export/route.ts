@@ -76,6 +76,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'newsletter-light': { width: 640, height: 179 },
   'newsletter-top-banner': { width: 600, height: 240 },
   'solution-overview-pdf': { width: 612, height: 792 },
+  'faq-pdf': { width: 612, height: 792 },
 }
 
 export async function POST(request: NextRequest) {
@@ -306,6 +307,10 @@ export async function POST(request: NextRequest) {
     if (body.heroImageGrayscale !== undefined) params.set('heroImageGrayscale', String(body.heroImageGrayscale))
     if (body.screenshotGrayscale !== undefined) params.set('screenshotGrayscale', String(body.screenshotGrayscale))
 
+    // FAQ PDF specific
+    if (body.title) params.set('title', body.title)
+    if (body.pages) params.set('pages', encodeURIComponent(JSON.stringify(body.pages)))
+
     // Get the base URL from the request
     const host = request.headers.get('host') || 'localhost:3000'
     // Use http for localhost, otherwise check x-forwarded-proto or default to https
@@ -325,9 +330,13 @@ export async function POST(request: NextRequest) {
     const dimensions = TEMPLATE_DIMENSIONS[template] || TEMPLATE_DIMENSIONS['website-thumbnail']
     const { width, height } = dimensions
 
-    // For Solution Overview PDF with page=all, use taller viewport to render all pages
-    const isPdfExport = template === 'solution-overview-pdf' && body.page === 'all'
-    const viewportHeight = isPdfExport ? height * 3 : height
+    // For PDF exports with page=all, use taller viewport to render all pages
+    const isSolutionOverviewPdf = template === 'solution-overview-pdf' && body.page === 'all'
+    const isFaqPdf = template === 'faq-pdf' && body.page === 'all'
+    const isPdfExport = isSolutionOverviewPdf || isFaqPdf
+    // For FAQ PDF, calculate pages from the pages array; for SO PDF, fixed at 3 pages
+    const numPages = isFaqPdf ? (body.numPages || 1) : 3
+    const viewportHeight = isPdfExport ? height * numPages : height
 
     await page.setViewport({
       width,
@@ -468,8 +477,8 @@ export async function POST(request: NextRequest) {
     // Small delay after hiding overlays
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    // For Solution Overview PDF with page=all, generate a PDF instead of PNG
-    if (template === 'solution-overview-pdf' && body.page === 'all') {
+    // For PDF exports with page=all, generate a PDF instead of PNG
+    if (isPdfExport) {
       // Generate PDF using Puppeteer's PDF feature
       // Note: scale must be 1 for PDFs to maintain proper page dimensions
       // (scale=2 is for PNG retina quality, but would double PDF content size)
@@ -484,10 +493,11 @@ export async function POST(request: NextRequest) {
       // Track export (fire-and-forget)
       trackExport(template)
 
+      const filename = isFaqPdf ? 'faq.pdf' : 'solution-overview.pdf'
       return new NextResponse(Buffer.from(pdfBuffer), {
         headers: {
           'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="solution-overview.pdf"`,
+          'Content-Disposition': `attachment; filename="${filename}"`,
         },
       })
     }

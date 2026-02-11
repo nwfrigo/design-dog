@@ -230,6 +230,13 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
             width: 612,
             height: 792,
           },
+          {
+            type: 'faq-pdf',
+            label: 'FAQs',
+            dimensions: 'Letter (8.5" × 11") • Multi-page',
+            width: 612,
+            height: 792,
+          },
         ],
       },
     ],

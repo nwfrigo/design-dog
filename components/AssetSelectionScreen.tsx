@@ -171,6 +171,15 @@ export function AssetSelectionScreen() {
       return
     }
 
+    // FAQ PDF goes directly to its editor screen
+    if (templateType === 'faq-pdf') {
+      goToEditorWithTemplate(templateType)
+      setCurrentScreen('faq-editor')
+      saveDraft()
+      router.push('/editor')
+      return
+    }
+
     goToEditorWithTemplate(templateType)
     saveDraft()
     router.push('/editor')

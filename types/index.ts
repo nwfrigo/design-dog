@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf'
 
 // Solution Overview PDF Types
 // ORDER: environmental, health, safety, quality, sustainability, converged
@@ -38,6 +38,37 @@ export interface SolutionOverviewBenefit {
 export interface SolutionOverviewFeature {
   title: string
   description: string
+}
+
+// FAQ PDF Types
+export type FaqContentBlockType = 'heading' | 'qa' | 'table'
+
+export interface FaqHeadingBlock {
+  type: 'heading'
+  id: string
+  text: string
+}
+
+export interface FaqQABlock {
+  type: 'qa'
+  id: string
+  question: string
+  answer: string  // HTML string for rich text
+}
+
+export interface FaqTableBlock {
+  type: 'table'
+  id: string
+  rows: number
+  cols: number
+  data: string[][]
+}
+
+export type FaqContentBlock = FaqHeadingBlock | FaqQABlock | FaqTableBlock
+
+export interface FaqPage {
+  id: string
+  blocks: FaqContentBlock[]
 }
 
 export interface CopyContent {
@@ -141,7 +172,7 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-editor' | 'faq-export'
 
 // Auto-Create Types (formerly Quick Start)
 export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'
