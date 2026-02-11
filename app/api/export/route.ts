@@ -291,6 +291,20 @@ export async function POST(request: NextRequest) {
     if (body.screenshotZoom !== undefined) params.set('screenshotZoom', String(body.screenshotZoom))
     if (body.ctaOption) params.set('ctaOption', body.ctaOption)
     if (body.ctaUrl) params.set('ctaUrl', body.ctaUrl)
+    // Solution Overview PDF - Page 2 footer stats
+    if (body.stat1Value) params.set('stat1Value', body.stat1Value)
+    if (body.stat1Label) params.set('stat1Label', body.stat1Label)
+    if (body.stat2Value) params.set('stat2Value', body.stat2Value)
+    if (body.stat2Label) params.set('stat2Label', body.stat2Label)
+    if (body.stat3Value) params.set('stat3Value', body.stat3Value)
+    if (body.stat3Label) params.set('stat3Label', body.stat3Label)
+    if (body.stat4Value) params.set('stat4Value', body.stat4Value)
+    if (body.stat4Label) params.set('stat4Label', body.stat4Label)
+    if (body.stat5Value) params.set('stat5Value', body.stat5Value)
+    if (body.stat5Label) params.set('stat5Label', body.stat5Label)
+    // Solution Overview PDF - grayscale settings
+    if (body.heroImageGrayscale !== undefined) params.set('heroImageGrayscale', String(body.heroImageGrayscale))
+    if (body.screenshotGrayscale !== undefined) params.set('screenshotGrayscale', String(body.screenshotGrayscale))
 
     // Get the base URL from the request
     const host = request.headers.get('host') || 'localhost:3000'
