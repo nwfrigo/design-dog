@@ -975,9 +975,9 @@ export function FaqEditorScreen() {
       </div>
 
       {/* Main Editor Layout */}
-      <div className="flex gap-6">
+      <div className="flex gap-6 h-[calc(100vh-180px)]">
         {/* Left: Editor Sidebar */}
-        <div className="w-[420px] flex-shrink-0">
+        <div className="w-[420px] flex-shrink-0 overflow-y-auto">
           <div className="bg-gray-100 dark:bg-[#0d0d1a] rounded-xl p-5 space-y-5">
             {/* Page Header */}
             <div>
@@ -1342,7 +1342,7 @@ export function FaqEditorScreen() {
         </div>
 
         {/* Right: Preview with Actions */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-y-auto">
           {/* Toolbar - matches SO editor pattern */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">

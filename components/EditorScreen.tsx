@@ -1332,9 +1332,9 @@ export function EditorScreen() {
         />
       )}
 
-      <div className="flex gap-8">
+      <div className="flex gap-8 h-[calc(100vh-180px)]">
         {/* Left: Editor */}
-        <div className="w-[340px] flex-shrink-0 space-y-5">
+        <div className="w-[340px] flex-shrink-0 space-y-5 overflow-y-auto">
           {/* Mode Toggle - hidden for solution-overview-pdf */}
           {currentTemplate !== 'solution-overview-pdf' && (
             <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -4065,7 +4065,7 @@ export function EditorScreen() {
         </div>
 
         {/* Right: Preview with Actions */}
-        <div className="flex-1 flex flex-col sticky top-0 self-start">
+        <div className="flex-1 flex flex-col overflow-y-auto">
           {/* Action Bar - above preview */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
