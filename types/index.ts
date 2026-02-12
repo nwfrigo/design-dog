@@ -646,6 +646,15 @@ export interface AppState {
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
 
+  // FAQ PDF state
+  faqTitle: string
+  faqPages: FaqPage[]
+  faqCoverSolution: SolutionCategory | 'none'
+  faqCoverImageUrl: string | null
+  faqCoverImagePosition: { x: number; y: number }
+  faqCoverImageZoom: number
+  faqCoverImageGrayscale: boolean
+
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
   setContentMode: (mode: ContentMode) => void
@@ -789,6 +798,16 @@ export interface AppState {
   setSolutionOverviewStat4Label: (label: string) => void
   setSolutionOverviewStat5Value: (value: string) => void
   setSolutionOverviewStat5Label: (label: string) => void
+
+  // FAQ PDF actions
+  setFaqTitle: (title: string) => void
+  setFaqPages: (pages: FaqPage[]) => void
+  setFaqCoverSolution: (solution: SolutionCategory | 'none') => void
+  setFaqCoverImageUrl: (url: string | null) => void
+  setFaqCoverImagePosition: (position: { x: number; y: number }) => void
+  setFaqCoverImageZoom: (zoom: number) => void
+  setFaqCoverImageGrayscale: (grayscale: boolean) => void
+  resetFaqToDefaults: () => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

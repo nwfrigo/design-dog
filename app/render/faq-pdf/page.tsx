@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { FaqPdfRender } from './render-content'
 import type { FaqContentBlock } from '@/types'
+import type { SolutionCategory } from '@/config/solution-overview-assets'
 
 interface FaqPage {
   id: string
@@ -58,6 +59,14 @@ export default function FaqPdfRenderPage({
     }]
   }
 
+  // Parse cover page params
+  const coverSolution = (searchParams.coverSolution as string) as SolutionCategory | 'none' || 'safety'
+  const coverImageUrl = searchParams.coverImageUrl as string | undefined
+  const coverImagePositionX = parseFloat(searchParams.coverImagePositionX as string) || 0
+  const coverImagePositionY = parseFloat(searchParams.coverImagePositionY as string) || 0
+  const coverImageZoom = parseFloat(searchParams.coverImageZoom as string) || 1
+  const coverImageGrayscale = searchParams.coverImageGrayscale === 'true'
+
   return (
     <div
       style={{
@@ -73,6 +82,11 @@ export default function FaqPdfRenderPage({
           title={title}
           pages={pages}
           pageIndex={pageIndex}
+          coverSolution={coverSolution}
+          coverImageUrl={coverImageUrl}
+          coverImagePosition={{ x: coverImagePositionX, y: coverImagePositionY }}
+          coverImageZoom={coverImageZoom}
+          coverImageGrayscale={coverImageGrayscale}
         />
       </Suspense>
     </div>

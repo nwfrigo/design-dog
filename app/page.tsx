@@ -21,7 +21,7 @@ function HomeContent() {
 
   // Redirect to /editor for editor screens
   useEffect(() => {
-    if (currentScreen === 'editor' || currentScreen === 'queue' || currentScreen === 'auto-create-editor') {
+    if (currentScreen === 'editor' || currentScreen === 'queue' || currentScreen === 'auto-create-editor' || currentScreen === 'faq-editor' || currentScreen === 'faq-export') {
       router.push('/editor')
     }
   }, [currentScreen, router])

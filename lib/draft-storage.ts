@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -92,6 +92,14 @@ export interface DraftState {
   // Image effects
   grayscale: boolean
   generatedVariations: { headlines: string[]; ctas: string[] } | null
+  // FAQ PDF
+  faqTitle: string
+  faqPages: FaqPage[]
+  faqCoverSolution: SolutionCategory | 'none'
+  faqCoverImageUrl: string | null
+  faqCoverImagePosition: { x: number; y: number }
+  faqCoverImageZoom: number
+  faqCoverImageGrayscale: boolean
 }
 
 const CURRENT_VERSION = 1
@@ -192,6 +200,14 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       newsletterTopBannerVariant: state.newsletterTopBannerVariant || 'dark',
       grayscale: state.grayscale ?? false,
       generatedVariations: state.generatedVariations || null,
+      // FAQ PDF
+      faqTitle: state.faqTitle || 'Title Goes Here',
+      faqPages: state.faqPages || [],
+      faqCoverSolution: state.faqCoverSolution || 'safety',
+      faqCoverImageUrl: state.faqCoverImageUrl || null,
+      faqCoverImagePosition: state.faqCoverImagePosition || { x: 0, y: 0 },
+      faqCoverImageZoom: state.faqCoverImageZoom ?? 1,
+      faqCoverImageGrayscale: state.faqCoverImageGrayscale ?? false,
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
@@ -245,8 +261,10 @@ export function hasDraft(): boolean {
     const hasAssets = draft.selectedAssets.length > 0 || Object.keys(draft.generatedAssets).length > 0
     const hasQueue = draft.exportQueue.length > 0
     const hasContent = draft.verbatimCopy.headline.length > 0 || draft.verbatimCopy.body.length > 0
+    // Check for FAQ content (has pages with blocks)
+    const hasFaqContent = draft.faqPages && draft.faqPages.length > 0 && draft.faqPages.some(p => p.blocks.length > 0)
 
-    return hasAssets || hasQueue || hasContent
+    return hasAssets || hasQueue || hasContent || hasFaqContent
   } catch {
     return false
   }

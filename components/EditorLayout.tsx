@@ -28,6 +28,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     eyebrow,
     editingQueueItemId,
     cancelQueueEdit,
+    // FAQ fields for auto-save
+    faqTitle,
+    faqPages,
+    faqCoverSolution,
+    faqCoverImageUrl,
   } = useStore()
 
   // Check if we're editing from queue
@@ -60,6 +65,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     verbatimCopy,
     templateType,
     eyebrow,
+    // FAQ fields
+    faqTitle,
+    faqPages,
+    faqCoverSolution,
+    faqCoverImageUrl,
   ])
 
   const handleLogoClick = () => {

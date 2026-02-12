@@ -2,9 +2,13 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
-import { ContentPage, type FaqContentBlock } from './templates/FaqPdf'
+import { ContentPage, CoverPage } from './templates/FaqPdf'
+import type { FaqContentBlock, FaqPage } from '@/types'
 import { RichTextEditor } from './RichTextEditor'
 import { TableGridPicker } from './TableGridPicker'
+import { ZoomableImage } from './ZoomableImage'
+import { FaqCoverImageLibraryModal } from './FaqCoverImageLibraryModal'
+import { solutionCategories, type SolutionCategory } from '@/config/solution-overview-assets'
 import {
   DndContext,
   closestCenter,
@@ -53,9 +57,175 @@ const DEFAULT_QA_BLOCKS: FaqContentBlock[] = [
   },
 ]
 
-interface FaqPage {
-  id: string
+// Page layout constants (matches ContentPage.tsx)
+const PAGE_CONTENT_HEIGHT = 660 // Available height for content (792 - 96 top - 36 bottom)
+const BLOCK_MARGIN_BOTTOM = 24 // Each block has marginBottom: 24
+
+// Component to measure block heights in an offscreen container
+function BlockMeasurer({
+  blocks,
+  onMeasured,
+}: {
   blocks: FaqContentBlock[]
+  onMeasured: (heights: Map<string, number>) => void
+}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    // Wait for fonts and rendering
+    const measure = async () => {
+      await document.fonts.ready
+      // Small delay to ensure render is complete
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      const heights = new Map<string, number>()
+      const blockElements = containerRef.current?.querySelectorAll('[data-block-id]')
+
+      blockElements?.forEach(el => {
+        const blockId = el.getAttribute('data-block-id')
+        if (blockId) {
+          heights.set(blockId, el.getBoundingClientRect().height + BLOCK_MARGIN_BOTTOM)
+        }
+      })
+
+      onMeasured(heights)
+    }
+
+    measure()
+  }, [blocks, onMeasured])
+
+  // Render blocks in the same style as ContentPage for accurate measurement
+  const renderBlock = (block: FaqContentBlock) => {
+    switch (block.type) {
+      case 'heading':
+        return (
+          <div
+            key={block.id}
+            data-block-id={block.id}
+            style={{
+              color: 'black',
+              fontSize: 18,
+              fontFamily: 'Fakt Pro, sans-serif',
+              fontWeight: 350,
+              wordWrap: 'break-word',
+              marginBottom: 24,
+            }}
+          >
+            {block.text}
+          </div>
+        )
+
+      case 'qa':
+        return (
+          <div
+            key={block.id}
+            data-block-id={block.id}
+            style={{
+              width: 492,
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              gap: 12,
+              display: 'flex',
+              marginBottom: 24,
+            }}
+          >
+            <div
+              style={{
+                alignSelf: 'stretch',
+                color: 'black',
+                fontSize: 12,
+                fontFamily: 'Fakt Pro, sans-serif',
+                fontWeight: 500,
+                lineHeight: '16px',
+                wordWrap: 'break-word',
+              }}
+            >
+              {block.question}
+            </div>
+            <div
+              style={{
+                alignSelf: 'stretch',
+                color: 'black',
+                fontSize: 12,
+                fontFamily: 'Fakt Pro, sans-serif',
+                fontWeight: 350,
+                lineHeight: '16px',
+                wordWrap: 'break-word',
+              }}
+              dangerouslySetInnerHTML={{ __html: block.answer }}
+            />
+          </div>
+        )
+
+      case 'table':
+        return (
+          <div
+            key={block.id}
+            data-block-id={block.id}
+            style={{
+              width: 492,
+              marginBottom: 24,
+            }}
+          >
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                tableLayout: 'fixed',
+                fontSize: 12,
+                fontFamily: 'Fakt Pro, sans-serif',
+                fontWeight: 350,
+                lineHeight: '16px',
+              }}
+            >
+              <tbody>
+                {block.data.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <td
+                        key={cellIndex}
+                        style={{
+                          border: '0.5px solid #89888B',
+                          padding: 8,
+                          verticalAlign: 'top',
+                          color: 'black',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                        }}
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'absolute',
+        left: -9999,
+        top: -9999,
+        width: 492, // Same as ContentPage content width
+        visibility: 'hidden',
+        pointerEvents: 'none',
+      }}
+    >
+      {blocks.map(renderBlock)}
+    </div>
+  )
 }
 
 // Sortable Block Item Component
@@ -67,6 +237,7 @@ function SortableBlockItem({
   onUpdate,
   onDelete,
   updateTableCell,
+  onRequestFullscreen,
 }: {
   block: FaqContentBlock
   blockIndex: number
@@ -75,6 +246,7 @@ function SortableBlockItem({
   onUpdate: (updates: Partial<FaqContentBlock>) => void
   onDelete: () => void
   updateTableCell: (rowIndex: number, colIndex: number, value: string) => void
+  onRequestFullscreen?: () => void
 }) {
   const {
     attributes,
@@ -102,34 +274,34 @@ function SortableBlockItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-[#1a1a2e] rounded-lg overflow-hidden ${
+      className={`bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-transparent rounded-lg overflow-hidden ${
         isDragging ? 'shadow-lg' : ''
       }`}
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-[#252540] transition-colors"
+        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
         onClick={onToggleExpand}
       >
         {/* Drag Handle */}
         <button
           {...attributes}
           {...listeners}
-          className="p-1 text-gray-500 hover:text-gray-300 cursor-grab active:cursor-grabbing"
+          className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
           onClick={(e) => e.stopPropagation()}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
         {/* Block Type Badge */}
-        <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide w-12">
-          {block.type === 'heading' ? 'HEAD' : block.type === 'qa' ? 'Q&A' : 'TABLE'}
+        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide w-14">
+          {block.type === 'heading' ? 'Header' : block.type === 'qa' ? 'Q&A' : 'Table'}
         </span>
 
         {/* Block Preview Text */}
-        <span className="flex-1 text-sm text-gray-300 truncate">
+        <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
           {getBlockLabel()}
         </span>
 
@@ -159,13 +331,13 @@ function SortableBlockItem({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 pt-1 border-t border-gray-700/50">
+        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-gray-700/50">
           {block.type === 'heading' && (
             <input
               type="text"
               value={block.text}
               onChange={(e) => onUpdate({ text: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-[#0d0d1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
               placeholder="Enter heading text"
             />
           )}
@@ -173,29 +345,39 @@ function SortableBlockItem({
           {block.type === 'qa' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Question</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Question</label>
                 <input
                   type="text"
                   value={block.question}
                   onChange={(e) => onUpdate({ question: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-[#0d0d1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="Enter question"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Answer</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Answer</label>
                 <RichTextEditor
                   content={block.answer}
                   onChange={(html) => onUpdate({ answer: html })}
                   placeholder="Enter answer with formatting..."
+                  onRequestFullscreen={onRequestFullscreen}
                 />
+              </div>
+              {/* Done button to collapse block */}
+              <div className="flex justify-end pt-1">
+                <button
+                  onClick={onToggleExpand}
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Done
+                </button>
               </div>
             </div>
           )}
 
           {block.type === 'table' && (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-xs text-gray-500">
+              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
                 <span>{block.rows} × {block.cols} table</span>
                 <button
                   type="button"
@@ -204,7 +386,7 @@ function SortableBlockItem({
                     const newData = [...block.data, Array(block.cols).fill('')]
                     onUpdate({ rows: newRows, data: newData })
                   }}
-                  className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
+                  className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
                 >
                   + Row
                 </button>
@@ -215,7 +397,7 @@ function SortableBlockItem({
                     const newData = block.data.map(row => [...row, ''])
                     onUpdate({ cols: newCols, data: newData })
                   }}
-                  className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
+                  className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
                 >
                   + Col
                 </button>
@@ -227,7 +409,7 @@ function SortableBlockItem({
                       const newData = block.data.slice(0, -1)
                       onUpdate({ rows: newRows, data: newData })
                     }}
-                    className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
+                    className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
                   >
                     - Row
                   </button>
@@ -240,25 +422,25 @@ function SortableBlockItem({
                       const newData = block.data.map(row => row.slice(0, -1))
                       onUpdate({ cols: newCols, data: newData })
                     }}
-                    className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
+                    className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
                   >
                     - Col
                   </button>
                 )}
               </div>
 
-              <div className="border border-gray-700 rounded-lg overflow-hidden">
+              <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
                 <table className="w-full">
                   <tbody>
                     {block.data.map((row, rowIndex) => (
                       <tr key={rowIndex}>
                         {row.map((cell, colIndex) => (
-                          <td key={colIndex} className="border border-gray-700 p-0">
+                          <td key={colIndex} className="border border-gray-300 dark:border-gray-700 p-0">
                             <input
                               type="text"
                               value={cell}
                               onChange={(e) => updateTableCell(rowIndex, colIndex, e.target.value)}
-                              className="w-full px-2 py-1.5 text-xs bg-[#0d0d1a] text-gray-100 border-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
+                              className="w-full px-2 py-1.5 text-xs bg-gray-100 dark:bg-[#0d0d1a] text-gray-900 dark:text-gray-100 border-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
                               placeholder="..."
                             />
                           </td>
@@ -322,33 +504,243 @@ function DeleteConfirmModal({
 }
 
 export function FaqEditorScreen() {
-  const { setCurrentScreen } = useStore()
+  const {
+    setCurrentScreen,
+    // FAQ state from Zustand store (persisted)
+    faqTitle: title,
+    setFaqTitle: setTitle,
+    faqPages: pages,
+    setFaqPages: setPages,
+    faqCoverSolution: coverSolution,
+    setFaqCoverSolution: setCoverSolution,
+    faqCoverImageUrl: coverImageUrl,
+    setFaqCoverImageUrl: setCoverImageUrl,
+    faqCoverImagePosition: coverImagePosition,
+    setFaqCoverImagePosition: setCoverImagePosition,
+    faqCoverImageZoom: coverImageZoom,
+    setFaqCoverImageZoom: setCoverImageZoom,
+    faqCoverImageGrayscale: coverImageGrayscale,
+    setFaqCoverImageGrayscale: setCoverImageGrayscale,
+  } = useStore()
 
-  // FAQ document state
-  const [title, setTitle] = useState('Title goes here')
-  const [pages, setPages] = useState<FaqPage[]>([
-    { id: generateId(), blocks: DEFAULT_QA_BLOCKS },
-  ])
+  // Local UI state (not persisted)
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
-
-  // UI state
   const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set())
   const [showTablePicker, setShowTablePicker] = useState(false)
   const [deleteBlockConfirm, setDeleteBlockConfirm] = useState<{ blockId: string; blockType: string } | null>(null)
   const [deletePageConfirm, setDeletePageConfirm] = useState<number | null>(null)
+  const [fullscreenEditBlock, setFullscreenEditBlock] = useState<{ blockId: string; question: string; answer: string } | null>(null)
 
   // Preview state (matching SO editor pattern)
   const [pdfPreviewZoom, setPdfPreviewZoom] = useState(150)
   const [showPdfFullscreen, setShowPdfFullscreen] = useState(false)
   const [showPdfAllPagesPreview, setShowPdfAllPagesPreview] = useState(false)
 
+  // Auto-pagination state
+  const [blockHeights, setBlockHeights] = useState<Map<string, number>>(new Map())
+  const isRedistributing = useRef(false)
+
+  // Overflow toast state
+  const [showOverflowToast, setShowOverflowToast] = useState(false)
+  const [toastExiting, setToastExiting] = useState(false)
+  const overflowToastTimeout = useRef<NodeJS.Timeout | null>(null)
+  const lastOverflowState = useRef(false)
+
+  // Content moved toast state (when auto-redistribution moves content)
+  const [showMovedToast, setShowMovedToast] = useState(false)
+  const [movedToastExiting, setMovedToastExiting] = useState(false)
+  const movedToastTimeout = useRef<NodeJS.Timeout | null>(null)
+
   // Scroll-based page detection
   const pageRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const previewContainerRef = useRef<HTMLDivElement>(null)
   const isUserScrolling = useRef(true)
 
+  // Cover image modals
+  const [showCoverImageLibrary, setShowCoverImageLibrary] = useState(false)
+  const [showCoverImageCropModal, setShowCoverImageCropModal] = useState(false)
+
+  // Track if we're viewing the cover page (index -1) or content pages (0+)
+  // Cover is always page 1, content pages start at page 2
+  const [viewingCover, setViewingCover] = useState(true)
+
+  // Get all blocks from all pages for measurement
+  const allBlocks = pages.flatMap(page => page.blocks)
+
+  // Handle block height measurements and redistribute if needed
+  const handleBlocksMeasured = useCallback((heights: Map<string, number>) => {
+    setBlockHeights(heights)
+
+    // Don't redistribute if already in progress
+    if (isRedistributing.current) return
+
+    // Check if redistribution is needed
+    const needsRedistribution = pages.some(page => {
+      let pageHeight = 0
+      for (const block of page.blocks) {
+        const blockHeight = heights.get(block.id) || 0
+        pageHeight += blockHeight
+        if (pageHeight > PAGE_CONTENT_HEIGHT) {
+          return true
+        }
+      }
+      return false
+    })
+
+    if (needsRedistribution) {
+      isRedistributing.current = true
+
+      // Collect all blocks in order
+      const allBlocksOrdered = pages.flatMap(p => p.blocks)
+
+      // Redistribute blocks across pages
+      const newPages: FaqPage[] = []
+      let currentPageBlocks: FaqContentBlock[] = []
+      let currentPageHeight = 0
+
+      for (const block of allBlocksOrdered) {
+        const blockHeight = heights.get(block.id) || 0
+
+        // Check if this block fits on current page
+        if (currentPageHeight + blockHeight > PAGE_CONTENT_HEIGHT && currentPageBlocks.length > 0) {
+          // Current page is full, start a new page
+          newPages.push({
+            id: newPages.length === 0 && pages[0] ? pages[0].id : generateId(),
+            blocks: currentPageBlocks,
+          })
+          currentPageBlocks = []
+          currentPageHeight = 0
+        }
+
+        currentPageBlocks.push(block)
+        currentPageHeight += blockHeight
+      }
+
+      // Don't forget the last page
+      if (currentPageBlocks.length > 0) {
+        newPages.push({
+          id: newPages.length < pages.length ? pages[newPages.length].id : generateId(),
+          blocks: currentPageBlocks,
+        })
+      }
+
+      // Update pages if redistribution changed anything
+      if (newPages.length !== pages.length ||
+          newPages.some((p, i) => p.blocks.length !== pages[i]?.blocks.length)) {
+        setPages(newPages)
+
+        // Show content moved toast
+        if (movedToastTimeout.current) {
+          clearTimeout(movedToastTimeout.current)
+          movedToastTimeout.current = null
+        }
+        setShowMovedToast(true)
+        setMovedToastExiting(false)
+
+        movedToastTimeout.current = setTimeout(() => {
+          setMovedToastExiting(true)
+          setTimeout(() => {
+            setShowMovedToast(false)
+            setMovedToastExiting(false)
+          }, 500)
+        }, 4000)
+
+        // Adjust current page index if needed
+        if (currentPageIndex >= newPages.length) {
+          setCurrentPageIndex(newPages.length - 1)
+        }
+      }
+
+      // Reset flag after a short delay to allow state to settle
+      setTimeout(() => {
+        isRedistributing.current = false
+      }, 100)
+    }
+  }, [pages, currentPageIndex])
+
   // Get current page
   const currentPage = pages[currentPageIndex]
+
+  // Calculate overflow info for a block based on its position
+  const getBlockOverflowInfo = useCallback((blockIndex: number): { isOverflowing: boolean; overflowAmount: number } => {
+    if (!currentPage || blockHeights.size === 0) {
+      return { isOverflowing: false, overflowAmount: 0 }
+    }
+
+    // Calculate height used by blocks before this one
+    let heightUsedBefore = 0
+    for (let i = 0; i < blockIndex; i++) {
+      const block = currentPage.blocks[i]
+      if (block) {
+        heightUsedBefore += blockHeights.get(block.id) || 0
+      }
+    }
+
+    // Get this block's height
+    const thisBlock = currentPage.blocks[blockIndex]
+    const thisBlockHeight = thisBlock ? (blockHeights.get(thisBlock.id) || 0) : 0
+
+    // Calculate available space and overflow
+    const availableSpace = PAGE_CONTENT_HEIGHT - heightUsedBefore
+    const overflowAmount = thisBlockHeight - availableSpace
+
+    // Add a small buffer (20px) to prevent flickering at the boundary
+    const isOverflowing = overflowAmount > 20
+
+    return { isOverflowing, overflowAmount: Math.max(0, overflowAmount) }
+  }, [currentPage, blockHeights])
+
+  // Check if any block on current page is overflowing and show toast
+  useEffect(() => {
+    if (!currentPage || blockHeights.size === 0) return
+
+    // Check if any block is overflowing
+    let hasOverflow = false
+    for (let i = 0; i < currentPage.blocks.length; i++) {
+      const { isOverflowing } = getBlockOverflowInfo(i)
+      if (isOverflowing) {
+        hasOverflow = true
+        break
+      }
+    }
+
+    // Only show toast when overflow state changes from false to true
+    if (hasOverflow && !lastOverflowState.current) {
+      // Clear any existing timeout
+      if (overflowToastTimeout.current) {
+        clearTimeout(overflowToastTimeout.current)
+        overflowToastTimeout.current = null
+      }
+
+      setShowOverflowToast(true)
+      setToastExiting(false)
+
+      // Start exit animation after 4 seconds
+      overflowToastTimeout.current = setTimeout(() => {
+        setToastExiting(true)
+        // Remove toast after animation completes (500ms)
+        setTimeout(() => {
+          setShowOverflowToast(false)
+          setToastExiting(false)
+        }, 500)
+      }, 4000)
+    }
+
+    lastOverflowState.current = hasOverflow
+    // Note: Don't clear timeout in cleanup - let it run to completion
+  }, [currentPage, blockHeights, getBlockOverflowInfo])
+
+  // Cleanup timeouts only on unmount
+  useEffect(() => {
+    return () => {
+      if (overflowToastTimeout.current) {
+        clearTimeout(overflowToastTimeout.current)
+      }
+      if (movedToastTimeout.current) {
+        clearTimeout(movedToastTimeout.current)
+      }
+    }
+  }, [])
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -391,18 +783,6 @@ export function FaqEditorScreen() {
     return () => observer.disconnect()
   }, [pages, currentPageIndex])
 
-  // Handle ESC key for fullscreen
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (showPdfFullscreen) setShowPdfFullscreen(false)
-        if (showPdfAllPagesPreview) setShowPdfAllPagesPreview(false)
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showPdfFullscreen, showPdfAllPagesPreview])
-
   // Toggle block expansion
   const toggleBlockExpand = (blockId: string) => {
     setExpandedBlocks(prev => {
@@ -418,7 +798,7 @@ export function FaqEditorScreen() {
 
   // Block management
   const updateBlock = useCallback((blockId: string, updates: Partial<FaqContentBlock>) => {
-    setPages(prev => prev.map((page, idx) => {
+    setPages(pages.map((page, idx) => {
       if (idx !== currentPageIndex) return page
       return {
         ...page,
@@ -427,7 +807,27 @@ export function FaqEditorScreen() {
         ),
       }
     }))
-  }, [currentPageIndex])
+  }, [currentPageIndex, pages, setPages])
+
+  // Handle ESC key for fullscreen modals (must be after updateBlock is defined)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (fullscreenEditBlock) {
+          // Save changes when pressing ESC in fullscreen editor
+          updateBlock(fullscreenEditBlock.blockId, {
+            question: fullscreenEditBlock.question,
+            answer: fullscreenEditBlock.answer,
+          })
+          setFullscreenEditBlock(null)
+        }
+        if (showPdfFullscreen) setShowPdfFullscreen(false)
+        if (showPdfAllPagesPreview) setShowPdfAllPagesPreview(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showPdfFullscreen, showPdfAllPagesPreview, fullscreenEditBlock, updateBlock])
 
   const addBlock = useCallback((type: 'heading' | 'qa' | 'table', tableSize?: { rows: number; cols: number }) => {
     const newBlock: FaqContentBlock = type === 'heading'
@@ -442,17 +842,17 @@ export function FaqEditorScreen() {
             data: Array(tableSize?.rows || 3).fill(null).map(() => Array(tableSize?.cols || 3).fill(''))
           }
 
-    setPages(prev => prev.map((page, idx) => {
+    setPages(pages.map((page, idx) => {
       if (idx !== currentPageIndex) return page
       return { ...page, blocks: [...page.blocks, newBlock] }
     }))
 
     // Auto-expand the new block
     setExpandedBlocks(prev => new Set(prev).add(newBlock.id))
-  }, [currentPageIndex])
+  }, [currentPageIndex, pages, setPages])
 
   const removeBlock = useCallback((blockId: string) => {
-    setPages(prev => prev.map((page, idx) => {
+    setPages(pages.map((page, idx) => {
       if (idx !== currentPageIndex) return page
       return {
         ...page,
@@ -460,12 +860,12 @@ export function FaqEditorScreen() {
       }
     }))
     setDeleteBlockConfirm(null)
-  }, [currentPageIndex])
+  }, [currentPageIndex, pages, setPages])
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      setPages(prev => prev.map((page, idx) => {
+      setPages(pages.map((page, idx) => {
         if (idx !== currentPageIndex) return page
         const oldIndex = page.blocks.findIndex(b => b.id === active.id)
         const newIndex = page.blocks.findIndex(b => b.id === over.id)
@@ -479,7 +879,7 @@ export function FaqEditorScreen() {
 
   // Update table cell
   const updateTableCell = useCallback((blockId: string, rowIndex: number, colIndex: number, value: string) => {
-    setPages(prev => prev.map((page, idx) => {
+    setPages(pages.map((page, idx) => {
       if (idx !== currentPageIndex) return page
       return {
         ...page,
@@ -494,35 +894,75 @@ export function FaqEditorScreen() {
         }),
       }
     }))
-  }, [currentPageIndex])
+  }, [currentPageIndex, pages, setPages])
 
   // Page management
   const addPage = useCallback(() => {
-    setPages(prev => [...prev, { id: generateId(), blocks: [] }])
+    setPages([...pages, { id: generateId(), blocks: [] }])
     setCurrentPageIndex(pages.length)
-  }, [pages.length])
+  }, [pages, setPages])
 
   const removePage = useCallback((pageIndex: number) => {
     if (pages.length <= 1) return
-    setPages(prev => prev.filter((_, idx) => idx !== pageIndex))
+    setPages(pages.filter((_, idx) => idx !== pageIndex))
     if (currentPageIndex >= pageIndex && currentPageIndex > 0) {
       setCurrentPageIndex(currentPageIndex - 1)
     }
     setDeletePageConfirm(null)
-  }, [pages.length, currentPageIndex])
+  }, [pages, setPages, currentPageIndex])
 
   // Navigate to Review & Export screen
+  // FAQ data is already in Zustand store, no need to save to sessionStorage
   const handleReviewExport = () => {
-    // Store FAQ data in sessionStorage for the export screen
-    sessionStorage.setItem('faq-export-data', JSON.stringify({
-      title,
-      pages,
-    }))
     setCurrentScreen('faq-export')
   }
 
   return (
     <div className="space-y-6">
+      {/* Overflow Toast Notification */}
+      {showOverflowToast && (
+        <div
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
+            toastExiting
+              ? 'opacity-0 -translate-y-4'
+              : 'opacity-100 translate-y-0'
+          }`}
+        >
+          <div className="flex items-center gap-3 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-lg shadow-lg backdrop-blur-sm">
+            <svg className="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span className="text-sm font-medium text-amber-400">
+              Content exceeds page height. Consider splitting into multiple blocks.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Content Moved Toast Notification */}
+      {showMovedToast && (
+        <div
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
+            movedToastExiting
+              ? 'opacity-0 -translate-y-4'
+              : 'opacity-100 translate-y-0'
+          }`}
+          style={{ marginTop: showOverflowToast ? '60px' : '0' }}
+        >
+          <div className="flex items-center gap-3 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-lg shadow-lg backdrop-blur-sm">
+            <svg className="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span className="text-sm font-medium text-amber-400">
+              Your content exceeded the page height and has been moved to a new page.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden block measurer for auto-pagination */}
+      <BlockMeasurer blocks={allBlocks} onMeasured={handleBlocksMeasured} />
+
       {/* Title Tab - matches SO editor pattern */}
       <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
         <div className="flex">
@@ -536,153 +976,351 @@ export function FaqEditorScreen() {
       <div className="flex gap-6">
         {/* Left: Editor Sidebar */}
         <div className="w-[420px] flex-shrink-0">
-          <div className="bg-[#0d0d1a] rounded-xl p-5 space-y-5">
+          <div className="bg-gray-100 dark:bg-[#0d0d1a] rounded-xl p-5 space-y-5">
             {/* Page Header */}
             <div>
-              <h2 className="text-sm font-medium text-gray-100 mb-4">
-                Page {currentPageIndex + 1}
+              <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">
+                {viewingCover ? 'Cover' : `Page ${currentPageIndex + 2}`}
               </h2>
-
-              {/* Document Title */}
-              <div className="mb-4">
-                <label className="block text-xs text-gray-500 mb-1.5">
-                  Document Title
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-[#1a1a2e] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
-                  placeholder="Enter document title"
-                />
-                <div className="text-right text-xs text-gray-500 mt-1">{title.length}/60</div>
-              </div>
 
               {/* Page Navigation */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs text-gray-500">
-                    Pages ({pages.length})
+                  <label className="block text-xs text-gray-500 dark:text-gray-500">
+                    Pages ({pages.length + 1})
                   </label>
                   <button
-                    onClick={addPage}
+                    onClick={() => {
+                      addPage()
+                      setViewingCover(false)
+                    }}
                     className="text-xs text-blue-400 hover:text-blue-300 font-medium"
                   >
                     + Add Page
                   </button>
                 </div>
                 <div className="flex gap-2 flex-wrap">
+                  {/* Cover page button */}
+                  <button
+                    onClick={() => setViewingCover(true)}
+                    className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                      viewingCover
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white dark:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#252540] hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-transparent'
+                    }`}
+                  >
+                    Cover
+                  </button>
+                  {/* Content page buttons */}
                   {pages.map((page, idx) => (
                     <button
                       key={page.id}
-                      onClick={() => setCurrentPageIndex(idx)}
+                      onClick={() => {
+                        setViewingCover(false)
+                        setCurrentPageIndex(idx)
+                      }}
                       className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                        idx === currentPageIndex
+                        !viewingCover && idx === currentPageIndex
                           ? 'bg-blue-600 text-white'
-                          : 'bg-[#1a1a2e] text-gray-400 hover:bg-[#252540] hover:text-gray-200'
+                          : 'bg-white dark:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#252540] hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-transparent'
                       }`}
                     >
-                      Page {idx + 1}
+                      Page {idx + 2}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Add Content Buttons */}
-            <div>
-              <label className="block text-xs text-gray-500 mb-1.5">
-                Add Content
-              </label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => addBlock('heading')}
-                  className="flex-1 px-3 py-2 text-xs bg-[#1a1a2e] text-gray-300 rounded-lg hover:bg-[#252540] transition-colors"
-                >
-                  + Heading
-                </button>
-                <button
-                  onClick={() => addBlock('qa')}
-                  className="flex-1 px-3 py-2 text-xs bg-[#1a1a2e] text-gray-300 rounded-lg hover:bg-[#252540] transition-colors"
-                >
-                  + Q&A
-                </button>
-                <div className="relative flex-1">
-                  <button
-                    onClick={() => setShowTablePicker(!showTablePicker)}
-                    className="w-full px-3 py-2 text-xs bg-[#1a1a2e] text-gray-300 rounded-lg hover:bg-[#252540] transition-colors"
+            {/* Cover Page Controls */}
+            {viewingCover && (
+              <div className="space-y-4">
+                {/* Document Title (shared between cover and content pages) */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                    Document Title
+                  </label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    placeholder="Enter document title"
+                  />
+                  <div className="text-right text-xs text-gray-500 dark:text-gray-500 mt-1">{title.length}/60</div>
+                </div>
+
+                {/* Solution Category */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                    Solution Category
+                  </label>
+                  <select
+                    value={coverSolution}
+                    onChange={(e) => setCoverSolution(e.target.value as SolutionCategory | 'none')}
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   >
-                    + Table
-                  </button>
-                  {showTablePicker && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
-                      <div className="absolute left-0 top-full mt-1 z-50">
-                        <TableGridPicker
-                          onSelect={(rows, cols) => {
-                            addBlock('table', { rows, cols })
-                            setShowTablePicker(false)
-                          }}
-                        />
+                    <option value="none">None</option>
+                    {Object.entries(solutionCategories)
+                      .filter(([key]) => key !== 'converged')
+                      .map(([key, config]) => (
+                        <option key={key} value={key}>
+                          {config.label}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                {/* Cover Image */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">Cover Image</label>
+                  {!coverImageUrl ? (
+                    <div className="flex gap-2">
+                      {/* Upload box */}
+                      <div className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+                        <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file && file.type.startsWith('image/')) {
+                                const reader = new FileReader()
+                                reader.onload = () => {
+                                  setCoverImageUrl(reader.result as string)
+                                }
+                                reader.readAsDataURL(file)
+                              }
+                            }}
+                            className="hidden"
+                          />
+                          <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          Drop or upload
+                        </label>
                       </div>
-                    </>
+                      {/* Library box */}
+                      <button
+                        onClick={() => setShowCoverImageLibrary(true)}
+                        className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
+                          hover:border-gray-400 dark:hover:border-gray-500 transition-colors
+                          flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                      >
+                        <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Choose from library
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Image preview - click to adjust */}
+                      <div className="relative">
+                        <div
+                          onClick={() => setShowCoverImageCropModal(true)}
+                          className="cursor-pointer overflow-hidden rounded-lg border border-gray-600 hover:border-blue-400 transition-colors"
+                          style={{ width: '100%', height: 200 }}
+                        >
+                          <img
+                            src={coverImageUrl}
+                            alt="Cover image"
+                            className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: `${50 - coverImagePosition.x}% ${50 - coverImagePosition.y}%`,
+                              transform: coverImageZoom !== 1 ? `scale(${coverImageZoom})` : undefined,
+                              filter: coverImageGrayscale ? 'grayscale(100%)' : undefined,
+                            }}
+                          />
+                        </div>
+                        {/* Adjust button */}
+                        <button
+                          onClick={() => setShowCoverImageCropModal(true)}
+                          className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                        >
+                          Adjust
+                        </button>
+                      </div>
+                      {/* Grayscale toggle */}
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs text-gray-500 dark:text-gray-500">Grayscale</label>
+                        <button
+                          onClick={() => setCoverImageGrayscale(!coverImageGrayscale)}
+                          className={`relative w-9 h-5 rounded-full transition-colors ${
+                            coverImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                              coverImageGrayscale ? 'translate-x-4' : ''
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      {/* Replace/Remove buttons */}
+                      <div className="flex gap-2">
+                        {/* Replace with upload */}
+                        <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                          <label className="flex items-center justify-center gap-1 h-8 cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file && file.type.startsWith('image/')) {
+                                  const reader = new FileReader()
+                                  reader.onload = () => {
+                                    setCoverImageUrl(reader.result as string)
+                                    setCoverImagePosition({ x: 0, y: 0 })
+                                    setCoverImageZoom(1)
+                                  }
+                                  reader.readAsDataURL(file)
+                                }
+                              }}
+                              className="hidden"
+                            />
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Upload new
+                          </label>
+                        </div>
+                        {/* Replace from library */}
+                        <button
+                          onClick={() => setShowCoverImageLibrary(true)}
+                          className="flex-1 flex items-center justify-center gap-1 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          From library
+                        </button>
+                        {/* Remove button */}
+                        <button
+                          onClick={() => {
+                            setCoverImageUrl(null)
+                            setCoverImagePosition({ x: 0, y: 0 })
+                            setCoverImageZoom(1)
+                            setCoverImageGrayscale(false)
+                          }}
+                          className="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:text-red-500 hover:border-red-500/50 transition-colors"
+                          title="Remove image"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Content Blocks - Draggable */}
-            <div>
-              <label className="block text-xs text-gray-500 mb-1.5">
-                Page {currentPageIndex + 1} Content ({currentPage.blocks.length} items)
-              </label>
-
-              {currentPage.blocks.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 text-sm border border-dashed border-gray-700 rounded-lg">
-                  No content yet. Add a heading, Q&A, or table above.
-                </div>
-              ) : (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={currentPage.blocks.map(b => b.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-2">
-                      {currentPage.blocks.map((block, blockIndex) => (
-                        <SortableBlockItem
-                          key={block.id}
-                          block={block}
-                          blockIndex={blockIndex}
-                          isExpanded={expandedBlocks.has(block.id)}
-                          onToggleExpand={() => toggleBlockExpand(block.id)}
-                          onUpdate={(updates) => updateBlock(block.id, updates)}
-                          onDelete={() => setDeleteBlockConfirm({
-                            blockId: block.id,
-                            blockType: block.type === 'heading' ? 'Heading' : block.type === 'qa' ? 'Q&A' : 'Table'
-                          })}
-                          updateTableCell={(rowIndex, colIndex, value) =>
-                            updateTableCell(block.id, rowIndex, colIndex, value)
-                          }
-                        />
-                      ))}
+            {/* Content Page Controls */}
+            {!viewingCover && (
+              <>
+                {/* Add Content Buttons */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                    Add Content
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => addBlock('heading')}
+                      className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
+                    >
+                      + Heading
+                    </button>
+                    <button
+                      onClick={() => addBlock('qa')}
+                      className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
+                    >
+                      + Q&A
+                    </button>
+                    <div className="relative flex-1">
+                      <button
+                        onClick={() => setShowTablePicker(!showTablePicker)}
+                        className="w-full px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
+                      >
+                        + Table
+                      </button>
+                      {showTablePicker && (
+                        <>
+                          <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
+                          <div className="absolute left-0 top-full mt-1 z-50">
+                            <TableGridPicker
+                              onSelect={(rows, cols) => {
+                                addBlock('table', { rows, cols })
+                                setShowTablePicker(false)
+                              }}
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
-                  </SortableContext>
-                </DndContext>
-              )}
-            </div>
+                  </div>
+                </div>
 
-            {/* Delete Page Button */}
-            {pages.length > 1 && (
-              <button
-                onClick={() => setDeletePageConfirm(currentPageIndex)}
-                className="w-full px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors"
-              >
-                Delete Page {currentPageIndex + 1}
-              </button>
+                {/* Content Blocks - Draggable */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                    Page {currentPageIndex + 2} Content ({currentPage?.blocks.length || 0} items)
+                  </label>
+
+                  {!currentPage || currentPage.blocks.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-500 text-sm border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                      No content yet. Add a heading, Q&A, or table above.
+                    </div>
+                  ) : (
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={currentPage.blocks.map(b => b.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-2">
+                          {currentPage.blocks.map((block, blockIndex) => (
+                            <SortableBlockItem
+                              key={block.id}
+                              block={block}
+                              blockIndex={blockIndex}
+                              isExpanded={expandedBlocks.has(block.id)}
+                              onToggleExpand={() => toggleBlockExpand(block.id)}
+                              onUpdate={(updates) => updateBlock(block.id, updates)}
+                              onDelete={() => setDeleteBlockConfirm({
+                                blockId: block.id,
+                                blockType: block.type === 'heading' ? 'Heading' : block.type === 'qa' ? 'Q&A' : 'Table'
+                              })}
+                              updateTableCell={(rowIndex, colIndex, value) =>
+                                updateTableCell(block.id, rowIndex, colIndex, value)
+                              }
+                              onRequestFullscreen={block.type === 'qa' ? () => setFullscreenEditBlock({
+                                blockId: block.id,
+                                question: block.question,
+                                answer: block.answer,
+                              }) : undefined}
+                            />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
+                  )}
+                </div>
+
+                {/* Delete Page Button */}
+                {pages.length > 1 && (
+                  <button
+                    onClick={() => setDeletePageConfirm(currentPageIndex)}
+                    className="w-full px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors"
+                  >
+                    Delete Page {currentPageIndex + 2}
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -725,19 +1363,34 @@ export function FaqEditorScreen() {
               <div className="flex items-center gap-1 ml-2">
                 <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">Page</span>
                 <div className="flex">
+                  {/* Cover page button */}
+                  <button
+                    onClick={() => setViewingCover(true)}
+                    className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 rounded-l ${
+                      viewingCover
+                        ? 'bg-blue-500 text-white border-blue-500 z-10 relative'
+                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    1
+                  </button>
+                  {/* Content page buttons */}
                   {pages.map((page, idx) => (
                     <button
                       key={page.id}
-                      onClick={() => setCurrentPageIndex(idx)}
-                      className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 ${
-                        idx === 0 ? 'rounded-l' : ''
-                      } ${idx === pages.length - 1 ? 'rounded-r' : ''} ${idx > 0 ? '-ml-px' : ''} ${
-                        currentPageIndex === idx
+                      onClick={() => {
+                        setViewingCover(false)
+                        setCurrentPageIndex(idx)
+                      }}
+                      className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 -ml-px ${
+                        idx === pages.length - 1 ? 'rounded-r' : ''
+                      } ${
+                        !viewingCover && currentPageIndex === idx
                           ? 'bg-blue-500 text-white border-blue-500 z-10 relative'
                           : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
-                      {idx + 1}
+                      {idx + 2}
                     </button>
                   ))}
                 </div>
@@ -811,12 +1464,24 @@ export function FaqEditorScreen() {
                 transform: `scale(${pdfPreviewZoom / 100})`,
                 transformOrigin: 'top left',
               }}>
-                <ContentPage
-                  title={title}
-                  blocks={currentPage.blocks}
-                  pageNumber={currentPageIndex + 1}
-                  scale={1}
-                />
+                {viewingCover ? (
+                  <CoverPage
+                    title={title}
+                    solution={coverSolution}
+                    coverImageUrl={coverImageUrl || undefined}
+                    coverImagePosition={coverImagePosition}
+                    coverImageZoom={coverImageZoom}
+                    coverImageGrayscale={coverImageGrayscale}
+                    scale={1}
+                  />
+                ) : (
+                  <ContentPage
+                    title={title}
+                    blocks={currentPage?.blocks || []}
+                    pageNumber={currentPageIndex + 2}
+                    scale={1}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -852,12 +1517,24 @@ export function FaqEditorScreen() {
             </svg>
           </button>
           <div className="max-h-full overflow-auto">
-            <ContentPage
-              title={title}
-              blocks={currentPage.blocks}
-              pageNumber={currentPageIndex + 1}
-              scale={1}
-            />
+            {viewingCover ? (
+              <CoverPage
+                title={title}
+                solution={coverSolution}
+                coverImageUrl={coverImageUrl || undefined}
+                coverImagePosition={coverImagePosition}
+                coverImageZoom={coverImageZoom}
+                coverImageGrayscale={coverImageGrayscale}
+                scale={1}
+              />
+            ) : (
+              <ContentPage
+                title={title}
+                blocks={currentPage?.blocks || []}
+                pageNumber={currentPageIndex + 2}
+                scale={1}
+              />
+            )}
           </div>
         </div>
       )}
@@ -867,7 +1544,7 @@ export function FaqEditorScreen() {
         <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
             <h3 className="text-lg font-medium text-white">
-              All Pages Preview ({pages.length} page{pages.length !== 1 ? 's' : ''})
+              All Pages Preview ({pages.length + 1} page{pages.length !== 0 ? 's' : ''})
             </h3>
             <button
               onClick={() => setShowPdfAllPagesPreview(false)}
@@ -883,6 +1560,34 @@ export function FaqEditorScreen() {
             className="flex-1 overflow-auto p-8"
           >
             <div className="max-w-[612px] mx-auto space-y-6">
+              {/* Cover Page */}
+              <div>
+                <div className="text-xs text-gray-400 text-center mb-2">
+                  Page 1 (Cover)
+                </div>
+                <div
+                  className={`rounded-lg overflow-hidden shadow-lg cursor-pointer transition-all ${
+                    viewingCover ? 'ring-2 ring-blue-500' : 'ring-1 ring-gray-700'
+                  }`}
+                  onClick={() => {
+                    isUserScrolling.current = false
+                    setViewingCover(true)
+                    setTimeout(() => { isUserScrolling.current = true }, 100)
+                  }}
+                >
+                  <CoverPage
+                    title={title}
+                    solution={coverSolution}
+                    coverImageUrl={coverImageUrl || undefined}
+                    coverImagePosition={coverImagePosition}
+                    coverImageZoom={coverImageZoom}
+                    coverImageGrayscale={coverImageGrayscale}
+                    scale={1}
+                  />
+                </div>
+              </div>
+
+              {/* Content Pages */}
               {pages.map((page, idx) => (
                 <div
                   key={page.id}
@@ -896,14 +1601,15 @@ export function FaqEditorScreen() {
                   }}
                 >
                   <div className="text-xs text-gray-400 text-center mb-2">
-                    Page {idx + 1}
+                    Page {idx + 2}
                   </div>
                   <div
                     className={`rounded-lg overflow-hidden shadow-lg cursor-pointer transition-all ${
-                      idx === currentPageIndex ? 'ring-2 ring-blue-500' : 'ring-1 ring-gray-700'
+                      !viewingCover && idx === currentPageIndex ? 'ring-2 ring-blue-500' : 'ring-1 ring-gray-700'
                     }`}
                     onClick={() => {
                       isUserScrolling.current = false
+                      setViewingCover(false)
                       setCurrentPageIndex(idx)
                       setTimeout(() => { isUserScrolling.current = true }, 100)
                     }}
@@ -911,12 +1617,138 @@ export function FaqEditorScreen() {
                     <ContentPage
                       title={title}
                       blocks={page.blocks}
-                      pageNumber={idx + 1}
+                      pageNumber={idx + 2}
                       scale={1}
                     />
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Rich Text Editor Modal */}
+      {fullscreenEditBlock && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex-1 mr-4">
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Question</label>
+                <input
+                  type="text"
+                  value={fullscreenEditBlock.question}
+                  onChange={(e) => setFullscreenEditBlock(prev => prev ? { ...prev, question: e.target.value } : null)}
+                  className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  placeholder="Enter question"
+                />
+              </div>
+            </div>
+
+            {/* Modal Body - Rich Text Editor */}
+            <div className="flex-1 p-6 overflow-auto">
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">Answer</label>
+              <div className="h-[400px]">
+                <RichTextEditor
+                  content={fullscreenEditBlock.answer}
+                  onChange={(html) => setFullscreenEditBlock(prev => prev ? { ...prev, answer: html } : null)}
+                  placeholder="Enter answer with formatting..."
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setFullscreenEditBlock(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Save changes back to the block
+                  if (fullscreenEditBlock) {
+                    updateBlock(fullscreenEditBlock.blockId, {
+                      question: fullscreenEditBlock.question,
+                      answer: fullscreenEditBlock.answer,
+                    })
+                  }
+                  setFullscreenEditBlock(null)
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Save & Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cover Image Library Modal */}
+      {showCoverImageLibrary && (
+        <FaqCoverImageLibraryModal
+          solution={coverSolution === 'none' ? 'converged' : coverSolution}
+          onSelect={(url) => {
+            setCoverImageUrl(url)
+            setCoverImagePosition({ x: 0, y: 0 })
+            setCoverImageZoom(1)
+            setShowCoverImageLibrary(false)
+          }}
+          onClose={() => setShowCoverImageLibrary(false)}
+        />
+      )}
+
+      {/* Cover Image Crop/Adjust Modal */}
+      {showCoverImageCropModal && coverImageUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowCoverImageCropModal(false)} />
+          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-xl w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Adjust Cover Image
+              </h3>
+              <button
+                onClick={() => setShowCoverImageCropModal(false)}
+                className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex justify-center mb-4">
+              <ZoomableImage
+                src={coverImageUrl}
+                containerWidth={204}
+                containerHeight={400}
+                zoom={coverImageZoom}
+                position={coverImagePosition}
+                onZoomChange={setCoverImageZoom}
+                onPositionChange={setCoverImagePosition}
+                borderRadius={8}
+                border="1px solid #e5e7eb"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setCoverImagePosition({ x: 0, y: 0 })
+                  setCoverImageZoom(1)
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setShowCoverImageCropModal(false)}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>

@@ -1,43 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useStore } from '@/store'
-import { ContentPage, type FaqContentBlock } from './templates/FaqPdf'
-
-interface FaqPage {
-  id: string
-  blocks: FaqContentBlock[]
-}
-
-interface FaqExportData {
-  title: string
-  pages: FaqPage[]
-}
+import { ContentPage, CoverPage } from './templates/FaqPdf'
 
 export function FaqExportScreen() {
-  const { setCurrentScreen } = useStore()
+  const {
+    setCurrentScreen,
+    // FAQ state from Zustand store
+    faqTitle,
+    faqPages,
+    faqCoverSolution,
+    faqCoverImageUrl,
+    faqCoverImagePosition,
+    faqCoverImageZoom,
+    faqCoverImageGrayscale,
+  } = useStore()
 
-  // Load FAQ data from sessionStorage
-  const [faqData, setFaqData] = useState<FaqExportData | null>(null)
-  const [filename, setFilename] = useState('')
+  // Local UI state
+  const [filename, setFilename] = useState(sanitizeFilename(faqTitle) || 'faq')
   const [exportScale, setExportScale] = useState<1 | 2>(2)
   const [isExporting, setIsExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const [exportSuccess, setExportSuccess] = useState(false)
-
-  // Load data on mount
-  useEffect(() => {
-    const stored = sessionStorage.getItem('faq-export-data')
-    if (stored) {
-      try {
-        const data = JSON.parse(stored) as FaqExportData
-        setFaqData(data)
-        setFilename(sanitizeFilename(data.title) || 'faq')
-      } catch (e) {
-        console.error('Failed to parse FAQ export data:', e)
-      }
-    }
-  }, [])
 
   // Sanitize filename - remove special characters, replace spaces with hyphens
   function sanitizeFilename(name: string): string {
@@ -53,8 +38,6 @@ export function FaqExportScreen() {
   }
 
   const handleExport = async () => {
-    if (!faqData) return
-
     setIsExporting(true)
     setExportError(null)
     setExportSuccess(false)
@@ -63,10 +46,16 @@ export function FaqExportScreen() {
       const exportParams = {
         template: 'faq-pdf',
         page: 'all',
-        title: faqData.title,
-        pages: faqData.pages,
-        numPages: faqData.pages.length,
+        title: faqTitle,
+        pages: faqPages,
+        numPages: faqPages.length + 1, // +1 for cover
         scale: exportScale,
+        // Cover page data
+        coverSolution: faqCoverSolution,
+        coverImageUrl: faqCoverImageUrl,
+        coverImagePosition: faqCoverImagePosition,
+        coverImageZoom: faqCoverImageZoom,
+        coverImageGrayscale: faqCoverImageGrayscale,
       }
 
       const response = await fetch('/api/export', {
@@ -98,15 +87,6 @@ export function FaqExportScreen() {
     } finally {
       setIsExporting(false)
     }
-  }
-
-  // Show loading state if data not yet loaded
-  if (!faqData) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    )
   }
 
   return (
@@ -202,17 +182,34 @@ export function FaqExportScreen() {
         <div className="flex-1">
           <div className="bg-gray-100 dark:bg-gray-800/50 rounded-xl p-6">
             <div className="max-w-[612px] mx-auto space-y-4">
-              {/* Render all pages */}
-              {faqData.pages.map((page, idx) => (
+              {/* Cover Page */}
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
+                  Page 1 (Cover)
+                </div>
+                <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700">
+                  <CoverPage
+                    title={faqTitle}
+                    solution={faqCoverSolution || 'safety'}
+                    coverImageUrl={faqCoverImageUrl || undefined}
+                    coverImagePosition={faqCoverImagePosition || { x: 0, y: 0 }}
+                    coverImageZoom={faqCoverImageZoom || 1}
+                    coverImageGrayscale={faqCoverImageGrayscale || false}
+                    scale={1}
+                  />
+                </div>
+              </div>
+              {/* Render content pages */}
+              {faqPages.map((page, idx) => (
                 <div key={page.id}>
                   <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
-                    Page {idx + 1}
+                    Page {idx + 2}
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700">
                     <ContentPage
-                      title={faqData.title}
+                      title={faqTitle}
                       blocks={page.blocks}
-                      pageNumber={idx + 1}
+                      pageNumber={idx + 2}
                       scale={1}
                     />
                   </div>
@@ -237,7 +234,7 @@ export function FaqExportScreen() {
                     Title
                   </label>
                   <div className="text-sm text-gray-900 dark:text-gray-100">
-                    {faqData.title}
+                    {faqTitle}
                   </div>
                 </div>
 
@@ -246,7 +243,7 @@ export function FaqExportScreen() {
                     Pages
                   </label>
                   <div className="text-sm text-gray-900 dark:text-gray-100">
-                    {faqData.pages.length} page{faqData.pages.length !== 1 ? 's' : ''}
+                    {faqPages.length + 1} page{faqPages.length !== 0 ? 's' : ''} (1 cover + {faqPages.length} content)
                   </div>
                 </div>
 

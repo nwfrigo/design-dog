@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, FaqPage, FaqContentBlock } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
@@ -11,6 +11,39 @@ const initialVerbatimCopy: CopyContent = {
   body: '',
   cta: '',
 }
+
+// Generate unique IDs for FAQ blocks
+const generateFaqId = () => Math.random().toString(36).substring(2, 9)
+
+// Default FAQ content
+const createDefaultFaqPages = (): FaqPage[] => [{
+  id: generateFaqId(),
+  blocks: [
+    {
+      type: 'heading',
+      id: generateFaqId(),
+      text: 'Page headings look like this',
+    },
+    {
+      type: 'qa',
+      id: generateFaqId(),
+      question: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sed mi sit amet?',
+      answer: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sed mi sit amet odio viverra eleifend. Interdum et malesuada fames ac ante ipsum primis in faucibus.',
+    },
+    {
+      type: 'qa',
+      id: generateFaqId(),
+      question: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
+      answer: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+<ul>
+<li>ipsum primis in faucibus. Morbi sed</li>
+<li>ipsum primis in faucibus. Morbi sed</li>
+<li>ipsum primis in faucibus. Morbi sed</li>
+</ul>
+<p>Amet, consectetur adipiscing elit. Ut sed mi sit <a href="#">hyperlink</a> viverra eleifend.</p>`,
+    },
+  ] as FaqContentBlock[],
+}]
 
 const initialContentSource: ContentSourceState = {
   method: null,
@@ -159,6 +192,14 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   solutionOverviewStat4Label: 'End Users',
   solutionOverviewStat5Value: '1.2K',
   solutionOverviewStat5Label: 'Clients',
+  // FAQ PDF specific
+  faqTitle: 'Title Goes Here',
+  faqPages: createDefaultFaqPages(),
+  faqCoverSolution: 'safety' as SolutionCategory | 'none',
+  faqCoverImageUrl: null as string | null,
+  faqCoverImagePosition: { x: 0, y: 0 },
+  faqCoverImageZoom: 1,
+  faqCoverImageGrayscale: false,
 })
 
 export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
@@ -326,6 +367,15 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   solutionOverviewStat4Label: 'End Users',
   solutionOverviewStat5Value: '1.2K',
   solutionOverviewStat5Label: 'Clients',
+
+  // FAQ PDF specific
+  faqTitle: 'Title Goes Here',
+  faqPages: createDefaultFaqPages(),
+  faqCoverSolution: 'safety' as SolutionCategory | 'none',
+  faqCoverImageUrl: null as string | null,
+  faqCoverImagePosition: { x: 0, y: 0 },
+  faqCoverImageZoom: 1,
+  faqCoverImageGrayscale: false,
 
   // Export queue
   exportQueue: [],
@@ -547,6 +597,24 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setSolutionOverviewStat4Label: (solutionOverviewStat4Label: string) => set({ solutionOverviewStat4Label }),
   setSolutionOverviewStat5Value: (solutionOverviewStat5Value: string) => set({ solutionOverviewStat5Value }),
   setSolutionOverviewStat5Label: (solutionOverviewStat5Label: string) => set({ solutionOverviewStat5Label }),
+
+  // FAQ PDF setters
+  setFaqTitle: (faqTitle: string) => set({ faqTitle }),
+  setFaqPages: (faqPages: FaqPage[]) => set({ faqPages }),
+  setFaqCoverSolution: (faqCoverSolution: SolutionCategory | 'none') => set({ faqCoverSolution }),
+  setFaqCoverImageUrl: (faqCoverImageUrl: string | null) => set({ faqCoverImageUrl }),
+  setFaqCoverImagePosition: (faqCoverImagePosition: { x: number; y: number }) => set({ faqCoverImagePosition }),
+  setFaqCoverImageZoom: (faqCoverImageZoom: number) => set({ faqCoverImageZoom }),
+  setFaqCoverImageGrayscale: (faqCoverImageGrayscale: boolean) => set({ faqCoverImageGrayscale }),
+  resetFaqToDefaults: () => set({
+    faqTitle: 'Title Goes Here',
+    faqPages: createDefaultFaqPages(),
+    faqCoverSolution: 'safety',
+    faqCoverImageUrl: null,
+    faqCoverImagePosition: { x: 0, y: 0 },
+    faqCoverImageZoom: 1,
+    faqCoverImageGrayscale: false,
+  }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -2140,6 +2208,14 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
       generatedVariations: state.generatedVariations,
+      // FAQ PDF
+      faqTitle: state.faqTitle,
+      faqPages: state.faqPages,
+      faqCoverSolution: state.faqCoverSolution,
+      faqCoverImageUrl: state.faqCoverImageUrl,
+      faqCoverImagePosition: state.faqCoverImagePosition,
+      faqCoverImageZoom: state.faqCoverImageZoom,
+      faqCoverImageGrayscale: state.faqCoverImageGrayscale,
     })
   },
 
@@ -2219,6 +2295,14 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: draft.floatingBannerMobileArrowType ?? 'text',
       grayscale: draft.grayscale ?? false,
       generatedVariations: draft.generatedVariations,
+      // FAQ PDF
+      faqTitle: draft.faqTitle ?? 'Title Goes Here',
+      faqPages: draft.faqPages ?? createDefaultFaqPages(),
+      faqCoverSolution: draft.faqCoverSolution ?? 'safety',
+      faqCoverImageUrl: draft.faqCoverImageUrl ?? null,
+      faqCoverImagePosition: draft.faqCoverImagePosition ?? { x: 0, y: 0 },
+      faqCoverImageZoom: draft.faqCoverImageZoom ?? 1,
+      faqCoverImageGrayscale: draft.faqCoverImageGrayscale ?? false,
     })
     return true
   },

@@ -27,7 +27,7 @@ import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGra
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
 import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 import { Page1Cover } from '@/components/templates/SolutionOverviewPdf/Page1Cover'
-import { ContentPage as FaqContentPage } from '@/components/templates/FaqPdf'
+import { CoverPage as FaqCoverPage } from '@/components/templates/FaqPdf'
 
 interface TemplateTileProps {
   template: TemplateInfo
@@ -430,13 +430,9 @@ export function TemplateRenderer({
 
     case 'faq-pdf':
       return (
-        <FaqContentPage
-          title="FAQ Title"
-          blocks={[
-            { type: 'heading', id: '1', text: 'Section Heading' },
-            { type: 'qa', id: '2', question: 'What is this document?', answer: 'This is an FAQ document template.' },
-          ]}
-          pageNumber={1}
+        <FaqCoverPage
+          title="Title Goes Here"
+          solution="safety"
           scale={scale}
         />
       )

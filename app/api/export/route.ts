@@ -310,6 +310,18 @@ export async function POST(request: NextRequest) {
     // FAQ PDF specific
     if (body.title) params.set('title', body.title)
     if (body.pages) params.set('pages', encodeURIComponent(JSON.stringify(body.pages)))
+    // FAQ PDF cover page
+    if (body.coverSolution) params.set('coverSolution', body.coverSolution)
+    // Skip data URLs for cover image - they'll be injected via page.evaluate()
+    if (body.coverImageUrl && !body.coverImageUrl.startsWith('data:') && !body.coverImageUrl.startsWith('blob:')) {
+      params.set('coverImageUrl', body.coverImageUrl)
+    }
+    if (body.coverImagePosition) {
+      params.set('coverImagePositionX', String(body.coverImagePosition.x || 0))
+      params.set('coverImagePositionY', String(body.coverImagePosition.y || 0))
+    }
+    if (body.coverImageZoom !== undefined) params.set('coverImageZoom', String(body.coverImageZoom))
+    if (body.coverImageGrayscale !== undefined) params.set('coverImageGrayscale', String(body.coverImageGrayscale))
 
     // Get the base URL from the request
     const host = request.headers.get('host') || 'localhost:3000'
@@ -444,6 +456,11 @@ export async function POST(request: NextRequest) {
       await injectDataUrlImage(body.screenshotUrl, 'img[data-so-screenshot="true"]')
     }
 
+    // Inject FAQ cover image
+    if (body.coverImageUrl && body.coverImageUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.coverImageUrl, 'img[data-faq-cover-image="true"]')
+    }
+
     // Additional delay for rendering
     if ((imageUrl && imageUrl.startsWith('data:')) ||
         (body.speaker1ImageUrl && body.speaker1ImageUrl.startsWith('data:')) ||
@@ -451,7 +468,8 @@ export async function POST(request: NextRequest) {
         (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) ||
         (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:')) ||
         (body.heroImageUrl && body.heroImageUrl.startsWith('data:')) ||
-        (body.screenshotUrl && body.screenshotUrl.startsWith('data:'))) {
+        (body.screenshotUrl && body.screenshotUrl.startsWith('data:')) ||
+        (body.coverImageUrl && body.coverImageUrl.startsWith('data:'))) {
       await new Promise(resolve => setTimeout(resolve, 300))
     }
 

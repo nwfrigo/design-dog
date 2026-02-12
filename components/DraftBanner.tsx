@@ -2,25 +2,41 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { hasDraft, getDraftAssetCount, clearDraft } from '@/lib/draft-storage'
+import { hasDraft, getDraftAssetCount, clearDraft, loadDraftFromStorage } from '@/lib/draft-storage'
 import { useStore } from '@/store'
 
 export function DraftBanner() {
   const router = useRouter()
-  const { reset } = useStore()
+  const { reset, setCurrentScreen } = useStore()
   const [showBanner, setShowBanner] = useState(false)
   const [assetCount, setAssetCount] = useState(0)
+  const [isFaqDraft, setIsFaqDraft] = useState(false)
 
   useEffect(() => {
-    // Check for draft on mount
+    // Check for draft in localStorage
     if (hasDraft()) {
       setShowBanner(true)
       setAssetCount(getDraftAssetCount())
+
+      // Check if draft is for FAQ template (has faqPages with content)
+      const draft = loadDraftFromStorage()
+      if (draft) {
+        const hasFaqContent = draft.faqPages &&
+                              draft.faqPages.length > 0 &&
+                              draft.faqPages.some(p => p.blocks && p.blocks.length > 0)
+        setIsFaqDraft(hasFaqContent)
+      }
     }
   }, [])
 
   const handleResume = () => {
-    router.push('/editor')
+    if (isFaqDraft) {
+      // For FAQ templates, navigate to faq-editor screen
+      setCurrentScreen('faq-editor')
+      router.push('/editor')
+    } else {
+      router.push('/editor')
+    }
   }
 
   const handleStartOver = () => {
