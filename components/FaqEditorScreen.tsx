@@ -102,20 +102,20 @@ function SortableBlockItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden ${
+      className={`bg-[#1a1a2e] rounded-lg overflow-hidden ${
         isDragging ? 'shadow-lg' : ''
       }`}
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-[#252540] transition-colors"
         onClick={onToggleExpand}
       >
         {/* Drag Handle */}
         <button
           {...attributes}
           {...listeners}
-          className="p-1 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+          className="p-1 text-gray-500 hover:text-gray-300 cursor-grab active:cursor-grabbing"
           onClick={(e) => e.stopPropagation()}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,18 +124,18 @@ function SortableBlockItem({
         </button>
 
         {/* Block Type Badge */}
-        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide w-12">
+        <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide w-12">
           {block.type === 'heading' ? 'HEAD' : block.type === 'qa' ? 'Q&A' : 'TABLE'}
         </span>
 
         {/* Block Preview Text */}
-        <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
+        <span className="flex-1 text-sm text-gray-300 truncate">
           {getBlockLabel()}
         </span>
 
         {/* Expand/Collapse Icon */}
         <svg
-          className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -149,7 +149,7 @@ function SortableBlockItem({
             e.stopPropagation()
             onDelete()
           }}
-          className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+          className="p-1 text-gray-500 hover:text-red-400 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -159,13 +159,13 @@ function SortableBlockItem({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-gray-700">
+        <div className="px-3 pb-3 pt-1 border-t border-gray-700/50">
           {block.type === 'heading' && (
             <input
               type="text"
               value={block.text}
               onChange={(e) => onUpdate({ text: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-[#0d0d1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
               placeholder="Enter heading text"
             />
           )}
@@ -173,17 +173,17 @@ function SortableBlockItem({
           {block.type === 'qa' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Question</label>
+                <label className="block text-xs text-gray-500 mb-1">Question</label>
                 <input
                   type="text"
                   value={block.question}
                   onChange={(e) => onUpdate({ question: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-[#0d0d1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
                   placeholder="Enter question"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Answer</label>
+                <label className="block text-xs text-gray-500 mb-1">Answer</label>
                 <RichTextEditor
                   content={block.answer}
                   onChange={(html) => onUpdate({ answer: html })}
@@ -195,7 +195,7 @@ function SortableBlockItem({
 
           {block.type === 'table' && (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-3 text-xs text-gray-500">
                 <span>{block.rows} × {block.cols} table</span>
                 <button
                   type="button"
@@ -204,7 +204,7 @@ function SortableBlockItem({
                     const newData = [...block.data, Array(block.cols).fill('')]
                     onUpdate({ rows: newRows, data: newData })
                   }}
-                  className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
                 >
                   + Row
                 </button>
@@ -215,7 +215,7 @@ function SortableBlockItem({
                     const newData = block.data.map(row => [...row, ''])
                     onUpdate({ cols: newCols, data: newData })
                   }}
-                  className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
                 >
                   + Col
                 </button>
@@ -227,7 +227,7 @@ function SortableBlockItem({
                       const newData = block.data.slice(0, -1)
                       onUpdate({ rows: newRows, data: newData })
                     }}
-                    className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
                   >
                     - Row
                   </button>
@@ -240,25 +240,25 @@ function SortableBlockItem({
                       const newData = block.data.map(row => row.slice(0, -1))
                       onUpdate({ cols: newCols, data: newData })
                     }}
-                    className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    className="px-2 py-0.5 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-gray-300"
                   >
                     - Col
                   </button>
                 )}
               </div>
 
-              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="border border-gray-700 rounded-lg overflow-hidden">
                 <table className="w-full">
                   <tbody>
                     {block.data.map((row, rowIndex) => (
                       <tr key={rowIndex}>
                         {row.map((cell, colIndex) => (
-                          <td key={colIndex} className="border border-gray-200 dark:border-gray-700 p-0">
+                          <td key={colIndex} className="border border-gray-700 p-0">
                             <input
                               type="text"
                               value={cell}
                               onChange={(e) => updateTableCell(rowIndex, colIndex, e.target.value)}
-                              className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
+                              className="w-full px-2 py-1.5 text-xs bg-[#0d0d1a] text-gray-100 border-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
                               placeholder="..."
                             />
                           </td>
@@ -337,16 +337,15 @@ export function FaqEditorScreen() {
   const [deleteBlockConfirm, setDeleteBlockConfirm] = useState<{ blockId: string; blockType: string } | null>(null)
   const [deletePageConfirm, setDeletePageConfirm] = useState<number | null>(null)
 
+  // Preview state (matching SO editor pattern)
+  const [pdfPreviewZoom, setPdfPreviewZoom] = useState(150)
+  const [showPdfFullscreen, setShowPdfFullscreen] = useState(false)
+  const [showPdfAllPagesPreview, setShowPdfAllPagesPreview] = useState(false)
+
   // Scroll-based page detection
   const pageRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const previewContainerRef = useRef<HTMLDivElement>(null)
   const isUserScrolling = useRef(true)
-
-  // Export state
-  const [isExporting, setIsExporting] = useState(false)
-  const [exportError, setExportError] = useState<string | null>(null)
-  const [exportSuccess, setExportSuccess] = useState(false)
-  const [exportScale, setExportScale] = useState<1 | 2>(2)
 
   // Get current page
   const currentPage = pages[currentPageIndex]
@@ -368,39 +367,41 @@ export function FaqEditorScreen() {
       (entries) => {
         if (!isUserScrolling.current) return
 
-        // Find the most visible page
-        let mostVisibleEntry: IntersectionObserverEntry | null = null
-        let maxRatio = 0
-
         entries.forEach(entry => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-            maxRatio = entry.intersectionRatio
-            mostVisibleEntry = entry
+          if (entry.isIntersecting) {
+            const pageId = entry.target.getAttribute('data-page-id')
+            const pageIndex = pages.findIndex(p => p.id === pageId)
+            if (pageIndex !== -1 && pageIndex !== currentPageIndex) {
+              setCurrentPageIndex(pageIndex)
+            }
           }
         })
-
-        if (mostVisibleEntry) {
-          const pageId = (mostVisibleEntry as IntersectionObserverEntry).target.getAttribute('data-page-id')
-          const pageIndex = pages.findIndex(p => p.id === pageId)
-          if (pageIndex !== -1 && pageIndex !== currentPageIndex) {
-            setCurrentPageIndex(pageIndex)
-          }
-        }
       },
       {
         root: container,
-        rootMargin: '-40% 0px -40% 0px', // Center 20% of viewport triggers
-        threshold: [0, 0.25, 0.5, 0.75, 1]
+        rootMargin: '-33% 0px -66% 0px',
+        threshold: 0
       }
     )
 
-    // Observe all page elements
     pageRefs.current.forEach((el) => {
       observer.observe(el)
     })
 
     return () => observer.disconnect()
   }, [pages, currentPageIndex])
+
+  // Handle ESC key for fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showPdfFullscreen) setShowPdfFullscreen(false)
+        if (showPdfAllPagesPreview) setShowPdfAllPagesPreview(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showPdfFullscreen, showPdfAllPagesPreview])
 
   // Toggle block expansion
   const toggleBlockExpand = (blockId: string) => {
@@ -510,338 +511,314 @@ export function FaqEditorScreen() {
     setDeletePageConfirm(null)
   }, [pages.length, currentPageIndex])
 
-  // Export to PDF
-  const handleExport = async () => {
-    setIsExporting(true)
-    setExportError(null)
-    setExportSuccess(false)
-
-    try {
-      const exportParams = {
-        template: 'faq-pdf',
-        page: 'all',
-        title,
-        pages,
-        numPages: pages.length,
-        scale: exportScale,
-      }
-
-      const response = await fetch('/api/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportParams),
-      })
-
-      if (!response.ok) {
-        throw new Error('Export failed')
-      }
-
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      const filename = title
-        .toLowerCase()
-        .replace(/[^a-zA-Z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim() || 'faq'
-      a.download = `${filename}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-
-      setExportSuccess(true)
-      setTimeout(() => setExportSuccess(false), 3000)
-    } catch (error) {
-      console.error('Export failed:', error)
-      setExportError('Export failed. Please try again.')
-    } finally {
-      setIsExporting(false)
-    }
-  }
-
-  const handleBack = () => {
-    setCurrentScreen('select')
+  // Navigate to Review & Export screen
+  const handleReviewExport = () => {
+    // Store FAQ data in sessionStorage for the export screen
+    sessionStorage.setItem('faq-export-data', JSON.stringify({
+      title,
+      pages,
+    }))
+    setCurrentScreen('faq-export')
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Left Sidebar - Editor Controls */}
-      <div className="w-[380px] flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
-        <div className="p-5 space-y-5">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back
-            </button>
-            <h1 className="text-base font-semibold text-gray-900 dark:text-gray-100">FAQ Editor</h1>
+    <div className="space-y-6">
+      {/* Title Tab - matches SO editor pattern */}
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
+        <div className="flex">
+          <div className="px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+            FAQ - {title || 'Untitled'}
           </div>
-
-          {/* Document Title */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">
-              Document Title
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
-              placeholder="Enter document title"
-            />
-          </div>
-
-          {/* Page Navigation */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Pages ({pages.length})
-              </label>
-              <button
-                onClick={addPage}
-                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-              >
-                + Add Page
-              </button>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {pages.map((page, idx) => (
-                <button
-                  key={page.id}
-                  onClick={() => setCurrentPageIndex(idx)}
-                  className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                    idx === currentPageIndex
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  Page {idx + 1}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Add Content Buttons */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">
-              Add Content
-            </label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => addBlock('heading')}
-                className="flex-1 px-3 py-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
-                + Heading
-              </button>
-              <button
-                onClick={() => addBlock('qa')}
-                className="flex-1 px-3 py-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
-                + Q&A
-              </button>
-              <div className="relative flex-1">
-                <button
-                  onClick={() => setShowTablePicker(!showTablePicker)}
-                  className="w-full px-3 py-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  + Table
-                </button>
-                {showTablePicker && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
-                    <div className="absolute left-0 top-full mt-1 z-50">
-                      <TableGridPicker
-                        onSelect={(rows, cols) => {
-                          addBlock('table', { rows, cols })
-                          setShowTablePicker(false)
-                        }}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Content Blocks - Draggable */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">
-              Page {currentPageIndex + 1} Content ({currentPage.blocks.length} items)
-            </label>
-
-            {currentPage.blocks.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm border border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-                No content yet. Add a heading, Q&A, or table above.
-              </div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={currentPage.blocks.map(b => b.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-2">
-                    {currentPage.blocks.map((block, blockIndex) => (
-                      <SortableBlockItem
-                        key={block.id}
-                        block={block}
-                        blockIndex={blockIndex}
-                        isExpanded={expandedBlocks.has(block.id)}
-                        onToggleExpand={() => toggleBlockExpand(block.id)}
-                        onUpdate={(updates) => updateBlock(block.id, updates)}
-                        onDelete={() => setDeleteBlockConfirm({
-                          blockId: block.id,
-                          blockType: block.type === 'heading' ? 'Heading' : block.type === 'qa' ? 'Q&A' : 'Table'
-                        })}
-                        updateTableCell={(rowIndex, colIndex, value) =>
-                          updateTableCell(block.id, rowIndex, colIndex, value)
-                        }
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            )}
-          </div>
-
-          {/* Delete Page Button */}
-          {pages.length > 1 && (
-            <button
-              onClick={() => setDeletePageConfirm(currentPageIndex)}
-              className="w-full px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-            >
-              Delete Page {currentPageIndex + 1}
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Right Side - Preview */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {pages.length} page{pages.length > 1 ? 's' : ''} • Letter (8.5" × 11")
-          </div>
+      {/* Main Editor Layout */}
+      <div className="flex gap-6">
+        {/* Left: Editor Sidebar */}
+        <div className="w-[420px] flex-shrink-0">
+          <div className="bg-[#0d0d1a] rounded-xl p-5 space-y-5">
+            {/* Page Header */}
+            <div>
+              <h2 className="text-sm font-medium text-gray-100 mb-4">
+                Page {currentPageIndex + 1}
+              </h2>
 
-          <div className="flex items-center gap-3">
-            {/* Error Message */}
-            {exportError && (
-              <span className="text-sm text-red-500">{exportError}</span>
-            )}
+              {/* Document Title */}
+              <div className="mb-4">
+                <label className="block text-xs text-gray-500 mb-1.5">
+                  Document Title
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full px-3 py-2 text-sm bg-[#1a1a2e] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
+                  placeholder="Enter document title"
+                />
+                <div className="text-right text-xs text-gray-500 mt-1">{title.length}/60</div>
+              </div>
 
-            {/* Resolution Picker */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Resolution:</span>
-              <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                <button
-                  onClick={() => setExportScale(1)}
-                  className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                    exportScale === 1
-                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-                  }`}
-                >
-                  1x
-                </button>
-                <button
-                  onClick={() => setExportScale(2)}
-                  className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                    exportScale === 2
-                      ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-                  }`}
-                >
-                  2x
-                </button>
+              {/* Page Navigation */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs text-gray-500">
+                    Pages ({pages.length})
+                  </label>
+                  <button
+                    onClick={addPage}
+                    className="text-xs text-blue-400 hover:text-blue-300 font-medium"
+                  >
+                    + Add Page
+                  </button>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  {pages.map((page, idx) => (
+                    <button
+                      key={page.id}
+                      onClick={() => setCurrentPageIndex(idx)}
+                      className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                        idx === currentPageIndex
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-[#1a1a2e] text-gray-400 hover:bg-[#252540] hover:text-gray-200'
+                      }`}
+                    >
+                      Page {idx + 1}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Export Button */}
-            <button
-              onClick={handleExport}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
-            >
-              {isExporting ? (
-                <>
-                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Exporting...
-                </>
-              ) : exportSuccess ? (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Downloaded!
-                </>
+            {/* Add Content Buttons */}
+            <div>
+              <label className="block text-xs text-gray-500 mb-1.5">
+                Add Content
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => addBlock('heading')}
+                  className="flex-1 px-3 py-2 text-xs bg-[#1a1a2e] text-gray-300 rounded-lg hover:bg-[#252540] transition-colors"
+                >
+                  + Heading
+                </button>
+                <button
+                  onClick={() => addBlock('qa')}
+                  className="flex-1 px-3 py-2 text-xs bg-[#1a1a2e] text-gray-300 rounded-lg hover:bg-[#252540] transition-colors"
+                >
+                  + Q&A
+                </button>
+                <div className="relative flex-1">
+                  <button
+                    onClick={() => setShowTablePicker(!showTablePicker)}
+                    className="w-full px-3 py-2 text-xs bg-[#1a1a2e] text-gray-300 rounded-lg hover:bg-[#252540] transition-colors"
+                  >
+                    + Table
+                  </button>
+                  {showTablePicker && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
+                      <div className="absolute left-0 top-full mt-1 z-50">
+                        <TableGridPicker
+                          onSelect={(rows, cols) => {
+                            addBlock('table', { rows, cols })
+                            setShowTablePicker(false)
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Content Blocks - Draggable */}
+            <div>
+              <label className="block text-xs text-gray-500 mb-1.5">
+                Page {currentPageIndex + 1} Content ({currentPage.blocks.length} items)
+              </label>
+
+              {currentPage.blocks.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 text-sm border border-dashed border-gray-700 rounded-lg">
+                  No content yet. Add a heading, Q&A, or table above.
+                </div>
               ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Export PDF
-                </>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={currentPage.blocks.map(b => b.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2">
+                      {currentPage.blocks.map((block, blockIndex) => (
+                        <SortableBlockItem
+                          key={block.id}
+                          block={block}
+                          blockIndex={blockIndex}
+                          isExpanded={expandedBlocks.has(block.id)}
+                          onToggleExpand={() => toggleBlockExpand(block.id)}
+                          onUpdate={(updates) => updateBlock(block.id, updates)}
+                          onDelete={() => setDeleteBlockConfirm({
+                            blockId: block.id,
+                            blockType: block.type === 'heading' ? 'Heading' : block.type === 'qa' ? 'Q&A' : 'Table'
+                          })}
+                          updateTableCell={(rowIndex, colIndex, value) =>
+                            updateTableCell(block.id, rowIndex, colIndex, value)
+                          }
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               )}
-            </button>
+            </div>
+
+            {/* Delete Page Button */}
+            {pages.length > 1 && (
+              <button
+                onClick={() => setDeletePageConfirm(currentPageIndex)}
+                className="w-full px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors"
+              >
+                Delete Page {currentPageIndex + 1}
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Preview Area */}
-        <div ref={previewContainerRef} className="flex-1 overflow-auto p-6 bg-gray-100 dark:bg-gray-900">
-          <div className="max-w-[612px] mx-auto space-y-4">
-            {/* Render all pages */}
-            {pages.map((page, idx) => (
-              <div
-                key={page.id}
-                data-page-id={page.id}
-                ref={(el) => {
-                  if (el) {
-                    pageRefs.current.set(page.id, el)
-                  } else {
-                    pageRefs.current.delete(page.id)
-                  }
-                }}
+        {/* Right: Preview with Actions */}
+        <div className="flex-1 flex flex-col">
+          {/* Toolbar - matches SO editor pattern */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {/* Preview Button */}
+              <button
+                onClick={() => setShowPdfAllPagesPreview(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                  text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
+                  hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
+                  border border-gray-200 dark:border-gray-700"
               >
-                {/* Page Number Label */}
-                <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
-                  Page {idx + 1}
-                </div>
-                {/* Page Preview */}
-                <div
-                  className={`rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 cursor-pointer transition-all ${
-                    idx === currentPageIndex ? 'ring-2 ring-blue-500' : ''
-                  }`}
-                  onClick={() => {
-                    isUserScrolling.current = false
-                    setCurrentPageIndex(idx)
-                    // Re-enable scroll detection after a short delay
-                    setTimeout(() => { isUserScrolling.current = true }, 100)
-                  }}
-                >
-                  <ContentPage
-                    title={title}
-                    blocks={page.blocks}
-                    pageNumber={idx + 1}
-                    scale={1}
-                  />
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Preview
+              </button>
+
+              {/* Review & Export Button */}
+              <button
+                onClick={handleReviewExport}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white
+                  bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Review & Export
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Page Picker */}
+              <div className="flex items-center gap-1 ml-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">Page</span>
+                <div className="flex">
+                  {pages.map((page, idx) => (
+                    <button
+                      key={page.id}
+                      onClick={() => setCurrentPageIndex(idx)}
+                      className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 ${
+                        idx === 0 ? 'rounded-l' : ''
+                      } ${idx === pages.length - 1 ? 'rounded-r' : ''} ${idx > 0 ? '-ml-px' : ''} ${
+                        currentPageIndex === idx
+                          ? 'bg-blue-500 text-white border-blue-500 z-10 relative'
+                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
                 </div>
               </div>
-            ))}
+
+              {/* Divider */}
+              <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 ml-1" />
+
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-1 ml-1">
+                <button
+                  onClick={() => setPdfPreviewZoom(Math.max(75, pdfPreviewZoom - 25))}
+                  disabled={pdfPreviewZoom <= 75}
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-l bg-white dark:bg-gray-800"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                  </svg>
+                </button>
+                <select
+                  value={pdfPreviewZoom}
+                  onChange={(e) => setPdfPreviewZoom(Number(e.target.value))}
+                  className="h-7 px-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 focus:outline-none cursor-pointer"
+                >
+                  <option value={200}>200%</option>
+                  <option value={175}>175%</option>
+                  <option value={150}>150%</option>
+                  <option value={125}>125%</option>
+                  <option value={100}>100%</option>
+                  <option value={75}>75%</option>
+                </select>
+                <button
+                  onClick={() => setPdfPreviewZoom(Math.min(200, pdfPreviewZoom + 25))}
+                  disabled={pdfPreviewZoom >= 200}
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setShowPdfFullscreen(true)}
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800 ml-1"
+                  title="Fullscreen preview (ESC to exit)"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Preview Area */}
+          <div className="flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6 flex items-start justify-center overflow-auto">
+            <div
+              className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
+              style={{
+                width: 612 * (pdfPreviewZoom / 100),
+                height: 792 * (pdfPreviewZoom / 100),
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: 612,
+                height: 792,
+                transform: `scale(${pdfPreviewZoom / 100})`,
+                transformOrigin: 'top left',
+              }}>
+                <ContentPage
+                  title={title}
+                  blocks={currentPage.blocks}
+                  pageNumber={currentPageIndex + 1}
+                  scale={1}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -862,6 +839,88 @@ export function FaqEditorScreen() {
         itemType="Page"
         itemLabel={deletePageConfirm !== null ? String(deletePageConfirm + 1) : undefined}
       />
+
+      {/* Fullscreen Preview Modal */}
+      {showPdfFullscreen && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8">
+          <button
+            onClick={() => setShowPdfFullscreen(false)}
+            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="max-h-full overflow-auto">
+            <ContentPage
+              title={title}
+              blocks={currentPage.blocks}
+              pageNumber={currentPageIndex + 1}
+              scale={1}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* All Pages Preview Modal */}
+      {showPdfAllPagesPreview && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+            <h3 className="text-lg font-medium text-white">
+              All Pages Preview ({pages.length} page{pages.length !== 1 ? 's' : ''})
+            </h3>
+            <button
+              onClick={() => setShowPdfAllPagesPreview(false)}
+              className="p-2 text-white/70 hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div
+            ref={previewContainerRef}
+            className="flex-1 overflow-auto p-8"
+          >
+            <div className="max-w-[612px] mx-auto space-y-6">
+              {pages.map((page, idx) => (
+                <div
+                  key={page.id}
+                  data-page-id={page.id}
+                  ref={(el) => {
+                    if (el) {
+                      pageRefs.current.set(page.id, el)
+                    } else {
+                      pageRefs.current.delete(page.id)
+                    }
+                  }}
+                >
+                  <div className="text-xs text-gray-400 text-center mb-2">
+                    Page {idx + 1}
+                  </div>
+                  <div
+                    className={`rounded-lg overflow-hidden shadow-lg cursor-pointer transition-all ${
+                      idx === currentPageIndex ? 'ring-2 ring-blue-500' : 'ring-1 ring-gray-700'
+                    }`}
+                    onClick={() => {
+                      isUserScrolling.current = false
+                      setCurrentPageIndex(idx)
+                      setTimeout(() => { isUserScrolling.current = true }, 100)
+                    }}
+                  >
+                    <ContentPage
+                      title={title}
+                      blocks={page.blocks}
+                      pageNumber={idx + 1}
+                      scale={1}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
