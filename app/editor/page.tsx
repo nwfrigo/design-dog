@@ -12,6 +12,7 @@ import { SolutionOverviewExportScreen } from '@/components/SolutionOverviewExpor
 import { SolutionOverviewSetupScreen } from '@/components/SolutionOverviewSetupScreen'
 import { FaqEditorScreen } from '@/components/FaqEditorScreen'
 import { FaqExportScreen } from '@/components/FaqExportScreen'
+import { FaqSetupScreen } from '@/components/FaqSetupScreen'
 
 export default function EditorPage() {
   const router = useRouter()
@@ -58,12 +59,17 @@ export default function EditorPage() {
   const isQueueScreen = currentScreen === 'queue'
   const isSolutionOverviewExport = currentScreen === 'solution-overview-export'
   const isSolutionOverviewSetup = currentScreen === 'solution-overview-setup'
+  const isFaqSetup = currentScreen === 'faq-setup'
   const isFaqEditor = currentScreen === 'faq-editor'
   const isFaqExport = currentScreen === 'faq-export'
 
-  // Solution Overview Setup screen has its own layout (no EditorLayout wrapper)
+  // Setup screens have their own layout (no EditorLayout wrapper)
   if (isSolutionOverviewSetup) {
     return <SolutionOverviewSetupScreen />
+  }
+
+  if (isFaqSetup) {
+    return <FaqSetupScreen />
   }
 
   // All other screens use EditorLayout

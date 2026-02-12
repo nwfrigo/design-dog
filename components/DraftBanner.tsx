@@ -11,6 +11,7 @@ export function DraftBanner() {
   const [showBanner, setShowBanner] = useState(false)
   const [assetCount, setAssetCount] = useState(0)
   const [isFaqDraft, setIsFaqDraft] = useState(false)
+  const [hasFaqContent, setHasFaqContent] = useState(false)
 
   useEffect(() => {
     // Check for draft in localStorage
@@ -18,21 +19,27 @@ export function DraftBanner() {
       setShowBanner(true)
       setAssetCount(getDraftAssetCount())
 
-      // Check if draft is for FAQ template (has faqPages with content)
+      // Check if draft is for FAQ template (by templateType or has faqPages with content)
       const draft = loadDraftFromStorage()
       if (draft) {
-        const hasFaqContent = draft.faqPages &&
+        const isFaqTemplate = draft.templateType === 'faq-pdf'
+        const draftHasFaqContent = draft.faqPages &&
                               draft.faqPages.length > 0 &&
                               draft.faqPages.some(p => p.blocks && p.blocks.length > 0)
-        setIsFaqDraft(hasFaqContent)
+        setIsFaqDraft(isFaqTemplate || draftHasFaqContent)
+        setHasFaqContent(draftHasFaqContent)
       }
     }
   }, [])
 
   const handleResume = () => {
     if (isFaqDraft) {
-      // For FAQ templates, navigate to faq-editor screen
-      setCurrentScreen('faq-editor')
+      // For FAQ templates, go to editor if they have content, setup if not
+      if (hasFaqContent) {
+        setCurrentScreen('faq-editor')
+      } else {
+        setCurrentScreen('faq-setup')
+      }
       router.push('/editor')
     } else {
       router.push('/editor')

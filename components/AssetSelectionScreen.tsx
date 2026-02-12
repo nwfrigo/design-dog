@@ -171,10 +171,10 @@ export function AssetSelectionScreen() {
       return
     }
 
-    // FAQ PDF goes directly to its editor screen
+    // FAQ PDF goes to setup screen first
     if (templateType === 'faq-pdf') {
       goToEditorWithTemplate(templateType)
-      setCurrentScreen('faq-editor')
+      setCurrentScreen('faq-setup')
       saveDraft()
       router.push('/editor')
       return
