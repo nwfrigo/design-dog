@@ -20,7 +20,6 @@ export function FaqExportScreen() {
 
   // Local UI state
   const [filename, setFilename] = useState(sanitizeFilename(faqTitle) || 'faq')
-  const [exportScale, setExportScale] = useState<1 | 2>(2)
   const [isExporting, setIsExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const [exportSuccess, setExportSuccess] = useState(false)
@@ -51,7 +50,7 @@ export function FaqExportScreen() {
         coverSubheader: faqCoverSubheader,
         pages: faqPages,
         numPages: faqPages.length + 1, // +1 for cover
-        scale: exportScale,
+        scale: 2,
         // Cover page data
         coverSolution: faqCoverSolution,
         coverImageUrl: faqCoverImageUrl,
@@ -106,33 +105,6 @@ export function FaqExportScreen() {
         </button>
 
         <div className="flex items-center gap-3">
-          {/* Resolution Picker */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Resolution:</span>
-            <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-              <button
-                onClick={() => setExportScale(1)}
-                className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-                  exportScale === 1
-                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-                }`}
-              >
-                1x
-              </button>
-              <button
-                onClick={() => setExportScale(2)}
-                className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-                  exportScale === 2
-                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-                }`}
-              >
-                2x
-              </button>
-            </div>
-          </div>
-
           {/* Export Button */}
           <button
             onClick={handleExport}
@@ -283,20 +255,6 @@ export function FaqExportScreen() {
               </p>
             </div>
 
-            {/* Export Quality Info */}
-            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                Export Quality
-              </h3>
-              <div className="text-xs text-gray-500 dark:text-gray-400 space-y-2">
-                <p>
-                  <strong className="text-gray-700 dark:text-gray-300">1x:</strong> Standard resolution (612 × 792px per page)
-                </p>
-                <p>
-                  <strong className="text-gray-700 dark:text-gray-300">2x:</strong> High resolution (1224 × 1584px per page)
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
