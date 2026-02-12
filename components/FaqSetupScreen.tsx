@@ -233,7 +233,7 @@ export function FaqSetupScreen() {
           FAQ Document
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mb-10">
-          Create a branded FAQ document. Upload an existing FAQ to auto-populate, or start from scratch.
+          Create branded FAQs by uploading an existing document or starting from scratch.
         </p>
 
         {/* Section 1: Solution Category */}
@@ -430,7 +430,7 @@ export function FaqSetupScreen() {
 
           <button
             onClick={handleContinue}
-            disabled={isParsing}
+            disabled={isParsing || !uploadedFile}
             className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isParsing ? (
