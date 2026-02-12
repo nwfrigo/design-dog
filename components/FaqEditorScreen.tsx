@@ -521,6 +521,8 @@ export function FaqEditorScreen() {
     setFaqCoverImageZoom: setCoverImageZoom,
     faqCoverImageGrayscale: coverImageGrayscale,
     setFaqCoverImageGrayscale: setCoverImageGrayscale,
+    faqCoverSubheader: coverSubheader,
+    setFaqCoverSubheader: setCoverSubheader,
   } = useStore()
 
   // Local UI state (not persisted)
@@ -1035,6 +1037,20 @@ export function FaqEditorScreen() {
             {/* Cover Page Controls */}
             {viewingCover && (
               <div className="space-y-4">
+                {/* Cover Subheader */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                    Cover Subheader
+                  </label>
+                  <input
+                    type="text"
+                    value={coverSubheader}
+                    onChange={(e) => setCoverSubheader(e.target.value)}
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    placeholder="Frequently Asked Questions"
+                  />
+                </div>
+
                 {/* Document Title (shared between cover and content pages) */}
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
@@ -1467,6 +1483,7 @@ export function FaqEditorScreen() {
                 {viewingCover ? (
                   <CoverPage
                     title={title}
+                    subheader={coverSubheader}
                     solution={coverSolution}
                     coverImageUrl={coverImageUrl || undefined}
                     coverImagePosition={coverImagePosition}
@@ -1520,6 +1537,7 @@ export function FaqEditorScreen() {
             {viewingCover ? (
               <CoverPage
                 title={title}
+                subheader={coverSubheader}
                 solution={coverSolution}
                 coverImageUrl={coverImageUrl || undefined}
                 coverImagePosition={coverImagePosition}
@@ -1577,6 +1595,7 @@ export function FaqEditorScreen() {
                 >
                   <CoverPage
                     title={title}
+                    subheader={coverSubheader}
                     solution={coverSolution}
                     coverImageUrl={coverImageUrl || undefined}
                     coverImagePosition={coverImagePosition}

@@ -194,6 +194,7 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   solutionOverviewStat5Label: 'Clients',
   // FAQ PDF specific
   faqTitle: 'Title Goes Here',
+  faqCoverSubheader: 'Frequently Asked Questions',
   faqPages: createDefaultFaqPages(),
   faqCoverSolution: 'safety' as SolutionCategory | 'none',
   faqCoverImageUrl: null as string | null,
@@ -370,6 +371,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   // FAQ PDF specific
   faqTitle: 'Title Goes Here',
+  faqCoverSubheader: 'Frequently Asked Questions',
   faqPages: createDefaultFaqPages(),
   faqCoverSolution: 'safety' as SolutionCategory | 'none',
   faqCoverImageUrl: null as string | null,
@@ -600,6 +602,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   // FAQ PDF setters
   setFaqTitle: (faqTitle: string) => set({ faqTitle }),
+  setFaqCoverSubheader: (faqCoverSubheader: string) => set({ faqCoverSubheader }),
   setFaqPages: (faqPages: FaqPage[]) => set({ faqPages }),
   setFaqCoverSolution: (faqCoverSolution: SolutionCategory | 'none') => set({ faqCoverSolution }),
   setFaqCoverImageUrl: (faqCoverImageUrl: string | null) => set({ faqCoverImageUrl }),
@@ -608,6 +611,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setFaqCoverImageGrayscale: (faqCoverImageGrayscale: boolean) => set({ faqCoverImageGrayscale }),
   resetFaqToDefaults: () => set({
     faqTitle: 'Title Goes Here',
+    faqCoverSubheader: 'Frequently Asked Questions',
     faqPages: createDefaultFaqPages(),
     faqCoverSolution: 'safety',
     faqCoverImageUrl: null,
@@ -2210,6 +2214,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       generatedVariations: state.generatedVariations,
       // FAQ PDF
       faqTitle: state.faqTitle,
+      faqCoverSubheader: state.faqCoverSubheader,
       faqPages: state.faqPages,
       faqCoverSolution: state.faqCoverSolution,
       faqCoverImageUrl: state.faqCoverImageUrl,
@@ -2297,6 +2302,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       generatedVariations: draft.generatedVariations,
       // FAQ PDF
       faqTitle: draft.faqTitle ?? 'Title Goes Here',
+      faqCoverSubheader: draft.faqCoverSubheader ?? 'Frequently Asked Questions',
       faqPages: draft.faqPages ?? createDefaultFaqPages(),
       faqCoverSolution: draft.faqCoverSolution ?? 'safety',
       faqCoverImageUrl: draft.faqCoverImageUrl ?? null,

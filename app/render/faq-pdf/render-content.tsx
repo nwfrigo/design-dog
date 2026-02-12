@@ -7,6 +7,7 @@ import type { SolutionCategory } from '@/config/solution-overview-assets'
 
 export interface FaqPdfRenderProps {
   title: string
+  coverSubheader?: string
   pages: {
     id: string
     blocks: FaqContentBlock[]
@@ -24,6 +25,7 @@ export interface FaqPdfRenderProps {
 
 export function FaqPdfRender({
   title,
+  coverSubheader,
   pages,
   pageIndex,
   coverSolution,
@@ -60,6 +62,7 @@ export function FaqPdfRender({
   const renderCoverPage = () => (
     <CoverPage
       title={title}
+      subheader={coverSubheader}
       solution={coverSolution}
       coverImageUrl={coverImageUrl}
       coverImagePosition={coverImagePosition}

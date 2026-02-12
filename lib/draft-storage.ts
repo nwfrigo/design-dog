@@ -94,6 +94,7 @@ export interface DraftState {
   generatedVariations: { headlines: string[]; ctas: string[] } | null
   // FAQ PDF
   faqTitle: string
+  faqCoverSubheader: string
   faqPages: FaqPage[]
   faqCoverSolution: SolutionCategory | 'none'
   faqCoverImageUrl: string | null
@@ -202,6 +203,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       generatedVariations: state.generatedVariations || null,
       // FAQ PDF
       faqTitle: state.faqTitle || 'Title Goes Here',
+      faqCoverSubheader: state.faqCoverSubheader || 'Frequently Asked Questions',
       faqPages: state.faqPages || [],
       faqCoverSolution: state.faqCoverSolution || 'safety',
       faqCoverImageUrl: state.faqCoverImageUrl || null,

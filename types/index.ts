@@ -648,6 +648,7 @@ export interface AppState {
 
   // FAQ PDF state
   faqTitle: string
+  faqCoverSubheader: string
   faqPages: FaqPage[]
   faqCoverSolution: SolutionCategory | 'none'
   faqCoverImageUrl: string | null
@@ -801,6 +802,7 @@ export interface AppState {
 
   // FAQ PDF actions
   setFaqTitle: (title: string) => void
+  setFaqCoverSubheader: (subheader: string) => void
   setFaqPages: (pages: FaqPage[]) => void
   setFaqCoverSolution: (solution: SolutionCategory | 'none') => void
   setFaqCoverImageUrl: (url: string | null) => void

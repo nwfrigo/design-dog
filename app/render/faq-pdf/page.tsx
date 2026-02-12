@@ -60,6 +60,7 @@ export default function FaqPdfRenderPage({
   }
 
   // Parse cover page params
+  const coverSubheader = (searchParams.coverSubheader as string) || 'Frequently Asked Questions'
   const coverSolution = (searchParams.coverSolution as string) as SolutionCategory | 'none' || 'safety'
   const coverImageUrl = searchParams.coverImageUrl as string | undefined
   const coverImagePositionX = parseFloat(searchParams.coverImagePositionX as string) || 0
@@ -80,6 +81,7 @@ export default function FaqPdfRenderPage({
       <Suspense fallback={<div>Loading...</div>}>
         <FaqPdfRender
           title={title}
+          coverSubheader={coverSubheader}
           pages={pages}
           pageIndex={pageIndex}
           coverSolution={coverSolution}

@@ -9,6 +9,7 @@ export function FaqExportScreen() {
     setCurrentScreen,
     // FAQ state from Zustand store
     faqTitle,
+    faqCoverSubheader,
     faqPages,
     faqCoverSolution,
     faqCoverImageUrl,
@@ -47,6 +48,7 @@ export function FaqExportScreen() {
         template: 'faq-pdf',
         page: 'all',
         title: faqTitle,
+        coverSubheader: faqCoverSubheader,
         pages: faqPages,
         numPages: faqPages.length + 1, // +1 for cover
         scale: exportScale,
@@ -190,6 +192,7 @@ export function FaqExportScreen() {
                 <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700">
                   <CoverPage
                     title={faqTitle}
+                    subheader={faqCoverSubheader}
                     solution={faqCoverSolution || 'safety'}
                     coverImageUrl={faqCoverImageUrl || undefined}
                     coverImagePosition={faqCoverImagePosition || { x: 0, y: 0 }}

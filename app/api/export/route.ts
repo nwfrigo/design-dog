@@ -312,6 +312,7 @@ export async function POST(request: NextRequest) {
     if (body.pages) params.set('pages', encodeURIComponent(JSON.stringify(body.pages)))
     // FAQ PDF cover page
     if (body.coverSolution) params.set('coverSolution', body.coverSolution)
+    if (body.coverSubheader) params.set('coverSubheader', body.coverSubheader)
     // Skip data URLs for cover image - they'll be injected via page.evaluate()
     if (body.coverImageUrl && !body.coverImageUrl.startsWith('data:') && !body.coverImageUrl.startsWith('blob:')) {
       params.set('coverImageUrl', body.coverImageUrl)

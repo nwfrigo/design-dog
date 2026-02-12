@@ -22,6 +22,7 @@ function CorityLogoBlack() {
 
 export interface CoverPageProps {
   title: string
+  subheader?: string
   solution: SolutionCategory | 'none'
   coverImageUrl?: string
   coverImagePosition?: { x: number; y: number }
@@ -32,6 +33,7 @@ export interface CoverPageProps {
 
 export function CoverPage({
   title,
+  subheader = 'Frequently Asked Questions',
   solution,
   coverImageUrl,
   coverImagePosition = { x: 0, y: 0 },
@@ -84,7 +86,7 @@ export function CoverPage({
           gap: 0,
         }}
       >
-        {/* Subheader - "Frequently Asked Questions" */}
+        {/* Subheader */}
         <div
           style={{
             color: 'black',
@@ -96,7 +98,7 @@ export function CoverPage({
             marginBottom: 8,
           }}
         >
-          Frequently Asked Questions
+          {subheader}
         </div>
 
         {/* Title */}
