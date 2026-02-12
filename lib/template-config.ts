@@ -189,25 +189,25 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
     subChannels: [
       {
         id: 'email',
-        label: 'Email Banners',
+        label: 'Email Banner',
         icon: 'mail',
         templates: EMAIL_TEMPLATES,
       },
       {
         id: 'social',
-        label: 'Social Posts',
+        label: 'Social Post',
         icon: 'share',
         templates: SOCIAL_TEMPLATES,
       },
       {
         id: 'website',
-        label: 'Website Assets',
+        label: 'Website Asset',
         icon: 'globe',
         templates: WEBSITE_TEMPLATES,
       },
       {
         id: 'newsletter',
-        label: 'Newsletter Banners',
+        label: 'Newsletter Banner',
         icon: 'newspaper',
         templates: NEWSLETTER_TEMPLATES,
       },
@@ -220,7 +220,7 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
     subChannels: [
       {
         id: 'collateral-pdf',
-        label: 'Sales & Product Marketing',
+        label: 'Collateral',
         icon: 'globe',
         templates: [
           {

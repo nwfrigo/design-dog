@@ -14,10 +14,10 @@ type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales
 const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'email', label: 'Email' },
-  { id: 'social', label: 'Social' },
   { id: 'website', label: 'Website' },
+  { id: 'sales-pm', label: 'Collateral' },
+  { id: 'social', label: 'Social' },
   { id: 'newsletter', label: 'Newsletter' },
-  { id: 'sales-pm', label: 'Sales & PM' },
 ]
 
 // Extended template info with channel
@@ -26,16 +26,23 @@ interface TemplateWithChannel extends TemplateInfo {
   channelLabel: string
 }
 
-// Flatten all templates with channel info
-function getAllTemplatesWithChannels(): TemplateWithChannel[] {
-  const templates: TemplateWithChannel[] = []
+// Channel order for grid display (matches filter chip order)
+const CHANNEL_ORDER = ['email', 'website', 'collateral-pdf', 'social', 'newsletter']
 
+// Flatten all templates with channel info, ordered by channel
+function getAllTemplatesWithChannels(): TemplateWithChannel[] {
+  const templatesByChannel: Record<string, TemplateWithChannel[]> = {}
+
+  // Collect templates by channel
   for (const channel of DISTRIBUTION_CHANNELS) {
     if (channel.comingSoon) continue
 
     for (const subChannel of channel.subChannels) {
+      if (!templatesByChannel[subChannel.id]) {
+        templatesByChannel[subChannel.id] = []
+      }
       for (const template of subChannel.templates) {
-        templates.push({
+        templatesByChannel[subChannel.id].push({
           ...template,
           channel: subChannel.id,
           channelLabel: subChannel.label,
@@ -44,7 +51,15 @@ function getAllTemplatesWithChannels(): TemplateWithChannel[] {
     }
   }
 
-  return templates
+  // Return templates in desired order
+  const orderedTemplates: TemplateWithChannel[] = []
+  for (const channelId of CHANNEL_ORDER) {
+    if (templatesByChannel[channelId]) {
+      orderedTemplates.push(...templatesByChannel[channelId])
+    }
+  }
+
+  return orderedTemplates
 }
 
 // Kit type icons
@@ -97,7 +112,7 @@ function AutoCreateSidebar() {
 
   return (
     <aside className="w-full border-l border-gray-200 dark:border-gray-800 pl-8">
-      <div className="sticky top-0">
+      <div>
         {/* Header */}
         <div className="mb-4">
           <h3 className="text-2xl font-light text-gray-900 dark:text-white flex items-center gap-3 mb-2">
@@ -237,10 +252,10 @@ export function AssetSelectionScreen() {
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
                 className={`
-                  px-4 py-2 rounded-full text-sm font-medium transition-all
+                  px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border
                   ${activeFilter === filter.id
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
                   }
                 `}
               >
@@ -297,7 +312,9 @@ export function AssetSelectionScreen() {
 
       {/* Right sidebar - 1/3 */}
       <div className="flex-1 hidden lg:block">
-        <AutoCreateSidebar />
+        <div className="sticky top-[120px]">
+          <AutoCreateSidebar />
+        </div>
       </div>
 
       {/* Auto-Create Wizard Modal */}

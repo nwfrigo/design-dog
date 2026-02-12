@@ -749,17 +749,14 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
             )}
           </div>
 
-          {/* Channel badge in top left */}
-          <div className="absolute top-4 left-4">
-            <span className="px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 rounded-md shadow-sm border border-gray-200/50 dark:border-gray-700/50">
-              {channelLabel}
-            </span>
-          </div>
         </button>
 
         {/* Info area */}
         <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
+            <span className="text-xs text-gray-400 dark:text-gray-500 font-mono uppercase block mb-1">
+              {channelLabel}
+            </span>
             <span className={`text-sm font-medium truncate block ${
               isSelected
                 ? 'text-blue-700 dark:text-blue-300'
