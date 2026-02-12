@@ -1,45 +1,50 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
-import { DISTRIBUTION_CHANNELS, type SubChannelConfig, type TemplateInfo } from '@/lib/template-config'
-import { TemplateTile, ComingSoonTile, RequestTemplateTile } from '@/components/TemplateTile'
+import { DISTRIBUTION_CHANNELS, type TemplateInfo } from '@/lib/template-config'
+import { TemplateTileV2, RequestTemplateTile } from '@/components/TemplateTile'
 import { QuickStartWizard } from '@/components/QuickStartWizard'
 import { KIT_LIST } from '@/config/kit-configs'
 
-// Icons for subchannel types
-const SubChannelIcon = ({ icon }: { icon: SubChannelConfig['icon'] }) => {
-  const iconClass = "w-5 h-5"
+// Filter chip options
+type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm'
 
-  switch (icon) {
-    case 'mail':
-      return (
-        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      )
-    case 'share':
-      return (
-        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-        </svg>
-      )
-    case 'globe':
-      return (
-        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-        </svg>
-      )
-    case 'newspaper':
-      return (
-        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-        </svg>
-      )
-    default:
-      return null
+const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'email', label: 'Email' },
+  { id: 'social', label: 'Social' },
+  { id: 'website', label: 'Website' },
+  { id: 'newsletter', label: 'Newsletter' },
+  { id: 'sales-pm', label: 'Sales & PM' },
+]
+
+// Extended template info with channel
+interface TemplateWithChannel extends TemplateInfo {
+  channel: string
+  channelLabel: string
+}
+
+// Flatten all templates with channel info
+function getAllTemplatesWithChannels(): TemplateWithChannel[] {
+  const templates: TemplateWithChannel[] = []
+
+  for (const channel of DISTRIBUTION_CHANNELS) {
+    if (channel.comingSoon) continue
+
+    for (const subChannel of channel.subChannels) {
+      for (const template of subChannel.templates) {
+        templates.push({
+          ...template,
+          channel: subChannel.id,
+          channelLabel: subChannel.label,
+        })
+      }
+    }
   }
+
+  return templates
 }
 
 // Kit type icons
@@ -87,19 +92,12 @@ function AutoCreateSidebar() {
   const { startAutoCreateWithKit } = useStore()
 
   const handleKitClick = (kitId: string) => {
-    // Go directly to full-page content screen with kit pre-selected
     startAutoCreateWithKit(kitId as import('@/config/kit-configs').KitType)
   }
 
   return (
-    <aside className="w-80 flex-shrink-0 border-l border-gray-200 dark:border-gray-800 hidden lg:block">
-      <div className="sticky top-0 p-6">
-        {/* Spacer to align with main content */}
-        <div className="mb-8">
-          <p className="text-sm text-gray-500 dark:text-gray-400 invisible">
-            Spacer
-          </p>
-        </div>
+    <aside className="w-full border-l border-gray-200 dark:border-gray-800 pl-8">
+      <div className="sticky top-0">
         {/* Header */}
         <div className="mb-4">
           <h3 className="text-2xl font-light text-gray-900 dark:text-white flex items-center gap-3 mb-2">
@@ -155,15 +153,37 @@ export function AssetSelectionScreen() {
   const router = useRouter()
   const { selectedAssets, toggleAssetSelection, proceedToEditor, goToEditorWithTemplate, saveDraft, setCurrentScreen } = useStore()
 
-  // Track which subchannels are expanded (all closed by default)
-  const [expandedSubChannels, setExpandedSubChannels] = useState<Set<string>>(
-    () => new Set()
-  )
+  // Filter state
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all')
+
+  // Get all templates with channel info
+  const allTemplates = useMemo(() => getAllTemplatesWithChannels(), [])
+
+  // Filter templates based on active filter
+  const filteredTemplates = useMemo(() => {
+    if (activeFilter === 'all') return allTemplates
+
+    return allTemplates.filter(template => {
+      switch (activeFilter) {
+        case 'email':
+          return template.channel === 'email'
+        case 'social':
+          return template.channel === 'social'
+        case 'website':
+          return template.channel === 'website'
+        case 'newsletter':
+          return template.channel === 'newsletter'
+        case 'sales-pm':
+          return template.channel === 'collateral-pdf'
+        default:
+          return true
+      }
+    })
+  }, [allTemplates, activeFilter])
 
   const handleNavigateToEditor = (templateType: import('@/types').TemplateType) => {
     // Solution Overview PDF has a special setup screen
     if (templateType === 'solution-overview-pdf') {
-      // Set template so draft is valid, but go to setup screen first
       goToEditorWithTemplate(templateType)
       setCurrentScreen('solution-overview-setup')
       saveDraft()
@@ -191,167 +211,68 @@ export function AssetSelectionScreen() {
     router.push('/editor')
   }
 
-  const toggleSubChannel = (subChannelId: string) => {
-    setExpandedSubChannels(prev => {
-      const next = new Set(prev)
-      if (next.has(subChannelId)) {
-        next.delete(subChannelId)
-      } else {
-        next.add(subChannelId)
-      }
-      return next
-    })
-  }
-
-  // Count selected templates in a subchannel
-  const getSelectedCount = (templates: TemplateInfo[]) => {
-    return templates.filter(t => selectedAssets.includes(t.type)).length
+  // Get filter label for results count
+  const getFilterLabel = () => {
+    if (activeFilter === 'all') return ''
+    const filter = FILTER_OPTIONS.find(f => f.id === activeFilter)
+    return filter ? ` in ${filter.label}` : ''
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-120px)]">
-      {/* Main content area */}
-      <div className="flex-1 pr-0 lg:pr-6">
+    <div className="flex min-h-[calc(100vh-120px)] gap-8">
+      {/* Main content area - 2/3 */}
+      <div className="flex-[2]">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <p className="text-gray-500 dark:text-gray-400">
-            Pick any template(s) to get started, or use Auto-Create to make entire collections at once.
+            Pick any template to get started, or use Auto-Create to make entire collections at once.
           </p>
         </div>
 
-        {/* Distribution channels */}
-        <div className="space-y-8">
-          {DISTRIBUTION_CHANNELS.map((channel) => (
-            <div key={channel.id}>
-              {/* Channel header */}
-              <div className="flex items-baseline gap-3 mb-4">
-                <h3 className="text-2xl font-light text-gray-400 dark:text-gray-500">
-                  {channel.label}
-                </h3>
-                {channel.comingSoon && (
-                  <span className="px-2 py-0.5 text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 rounded-full">
-                    Coming soon
-                  </span>
-                )}
-              </div>
-
-              {/* Subchannels grid */}
-              {channel.comingSoon ? (
-                // Coming soon placeholders
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {channel.id === 'collateral' ? (
-                    <>
-                      <ComingSoonTile label="Solution Overview" />
-                      <ComingSoonTile label="One-Sheeter" />
-                    </>
-                  ) : channel.id === 'community' ? (
-                    <>
-                      <ComingSoonTile label="User Community Thumbnail" />
-                      <ComingSoonTile label="Academy Video Thumbnail" />
-                    </>
-                  ) : (
-                    <>
-                      <ComingSoonTile label="Template 1" />
-                      <ComingSoonTile label="Template 2" />
-                    </>
-                  )}
-                </div>
-              ) : (
-                // Active subchannels
-                <div className="space-y-3">
-                  {channel.subChannels.map((subChannel) => {
-                    const isExpanded = expandedSubChannels.has(subChannel.id)
-                    const selectedCount = getSelectedCount(subChannel.templates)
-
-                    return (
-                      <div
-                        key={subChannel.id}
-                        className={`
-                          border rounded-xl overflow-hidden transition-all duration-300
-                          ${isExpanded
-                            ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-black'
-                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900'
-                          }
-                        `}
-                      >
-                        {/* Subchannel header (clickable) */}
-                        <button
-                          onClick={() => toggleSubChannel(subChannel.id)}
-                          className={`
-                            w-full px-5 py-4 flex items-center justify-between transition-colors
-                            ${isExpanded
-                              ? 'bg-gray-50 dark:bg-gray-800/50'
-                              : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'
-                            }
-                          `}
-                        >
-                          <div className="flex items-center gap-3">
-                            {/* Expand/collapse chevron */}
-                            <svg
-                              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-
-                            {/* Icon */}
-                            <span className={`${isExpanded ? 'text-gray-600 dark:text-gray-300' : 'text-gray-400'}`}>
-                              <SubChannelIcon icon={subChannel.icon} />
-                            </span>
-
-                            {/* Label */}
-                            <span className={`font-medium ${
-                              isExpanded
-                                ? 'text-gray-900 dark:text-gray-100'
-                                : 'text-gray-900 dark:text-gray-100'
-                            }`}>
-                              {subChannel.label}
-                            </span>
-
-                            {/* Template count */}
-                            <span className="text-sm text-gray-400 dark:text-gray-500">
-                              {subChannel.templates.length} {subChannel.templates.length === 1 ? 'template' : 'templates'}
-                            </span>
-                          </div>
-
-                          {/* Selected count badge */}
-                          {selectedCount > 0 && (
-                            <span className="bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                              {selectedCount} selected
-                            </span>
-                          )}
-                        </button>
-
-                        {/* Expanded template grid */}
-                        <div
-                          className={`
-                            grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-5 overflow-hidden transition-all duration-300 ease-out
-                            ${isExpanded ? 'py-5 max-h-[1000px] opacity-100' : 'max-h-0 py-0 opacity-0'}
-                          `}
-                        >
-                          {subChannel.templates.map((template) => (
-                            <TemplateTile
-                              key={template.type}
-                              template={template}
-                              isSelected={selectedAssets.includes(template.type)}
-                              onToggle={() => toggleAssetSelection(template.type)}
-                              onNavigateToEditor={() => handleNavigateToEditor(template.type)}
-                            />
-                          ))}
-                          <RequestTemplateTile channelName={subChannel.label} />
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
+        {/* Filter Chips */}
+        <div className="mb-4">
+          <div className="flex flex-wrap gap-2">
+            {FILTER_OPTIONS.map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={`
+                  px-4 py-2 rounded-full text-sm font-medium transition-all
+                  ${activeFilter === filter.id
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }
+                `}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Footer with selection summary and continue button - only shown when templates are selected */}
+        {/* Results count */}
+        <div className="mb-6">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}{getFilterLabel()}
+          </p>
+        </div>
+
+        {/* Template Grid - 2 columns */}
+        <div className="grid grid-cols-2 gap-5">
+          {filteredTemplates.map((template) => (
+            <TemplateTileV2
+              key={template.type}
+              template={template}
+              channelLabel={template.channelLabel}
+              isSelected={selectedAssets.includes(template.type)}
+              onToggle={() => toggleAssetSelection(template.type)}
+              onNavigateToEditor={() => handleNavigateToEditor(template.type)}
+            />
+          ))}
+          <RequestTemplateTile channelName={activeFilter === 'all' ? 'new' : FILTER_OPTIONS.find(f => f.id === activeFilter)?.label || 'new'} />
+        </div>
+
+        {/* Footer with selection summary and continue button */}
         {selectedAssets.length > 0 && (
           <div className="sticky bottom-0 mt-8 py-4 bg-gradient-to-t from-white dark:from-black via-white dark:via-black to-transparent">
             <div className="flex items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-5 py-4 shadow-lg">
@@ -374,8 +295,10 @@ export function AssetSelectionScreen() {
         )}
       </div>
 
-      {/* Right sidebar */}
-      <AutoCreateSidebar />
+      {/* Right sidebar - 1/3 */}
+      <div className="flex-1 hidden lg:block">
+        <AutoCreateSidebar />
+      </div>
 
       {/* Auto-Create Wizard Modal */}
       <QuickStartWizard />

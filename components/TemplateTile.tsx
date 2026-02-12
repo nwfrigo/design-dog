@@ -641,6 +641,165 @@ export function TemplateTile({ template, isSelected, onToggle, onNavigateToEdito
   )
 }
 
+// V2: Larger template tile with channel badge for new homepage grid
+interface TemplateTileV2Props {
+  template: TemplateInfo
+  channelLabel: string
+  isSelected: boolean
+  onToggle: () => void
+  onNavigateToEditor: () => void
+}
+
+export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, onNavigateToEditor }: TemplateTileV2Props) {
+  const [colors, setColors] = useState<ColorsConfig | null>(null)
+  const [typography, setTypography] = useState<TypographyConfig | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+
+  useEffect(() => {
+    Promise.all([fetchColorsConfig(), fetchTypographyConfig()])
+      .then(([c, t]) => {
+        setColors(c)
+        setTypography(t)
+      })
+  }, [])
+
+  // Calculate preview scale - larger cards for 2-column grid
+  const targetWidth = 360
+  const previewScale = targetWidth / template.width
+  const previewHeight = Math.round(template.height * previewScale)
+
+  return (
+    <>
+      <div
+        className={`
+          group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200
+          border
+          ${isSelected
+            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
+            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg'
+          }
+        `}
+      >
+        {/* Preview area - click to go to editor */}
+        <button
+          onClick={onNavigateToEditor}
+          className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50 flex items-center justify-center"
+          style={{ minHeight: Math.max(previewHeight + 32, 180), padding: 16 }}
+        >
+          {/* Scaled template preview */}
+          <div
+            className="rounded-lg overflow-hidden shadow-md bg-white [&_*]:!text-left"
+            style={{
+              width: targetWidth,
+              height: previewHeight,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {colors && typography ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: template.width,
+                  height: template.height,
+                  transform: `scale(${previewScale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <TemplateRenderer
+                  templateType={template.type as TemplateType}
+                  colors={colors}
+                  typography={typography}
+                  scale={1}
+                />
+              </div>
+            ) : (
+              <div
+                className="bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"
+                style={{ width: targetWidth, height: previewHeight }}
+              />
+            )}
+          </div>
+
+          {/* Multi-select checkbox in top right corner */}
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle()
+            }}
+            className={`
+              absolute top-4 right-4 w-7 h-7 rounded-lg cursor-pointer transition-all duration-150
+              flex items-center justify-center shadow-sm
+              ${isSelected
+                ? 'bg-blue-500'
+                : 'bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+              }
+            `}
+          >
+            {isSelected ? (
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            )}
+          </div>
+
+          {/* Channel badge in top left */}
+          <div className="absolute top-4 left-4">
+            <span className="px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 rounded-md shadow-sm border border-gray-200/50 dark:border-gray-700/50">
+              {channelLabel}
+            </span>
+          </div>
+        </button>
+
+        {/* Info area */}
+        <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <span className={`text-sm font-medium truncate block ${
+              isSelected
+                ? 'text-blue-700 dark:text-blue-300'
+                : 'text-gray-900 dark:text-gray-100'
+            }`}>
+              {template.label}
+            </span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">
+              {template.dimensions}
+            </span>
+          </div>
+
+          {/* Preview button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowPreview(true)
+            }}
+            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400
+              hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30
+              rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+          >
+            Preview
+          </button>
+        </div>
+      </div>
+
+      {/* Preview Modal */}
+      {showPreview && colors && typography && (
+        <PreviewModal
+          template={template}
+          colors={colors}
+          typography={typography}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
+    </>
+  )
+}
+
 // Coming soon placeholder tile
 export function ComingSoonTile({ label }: { label: string }) {
   return (
