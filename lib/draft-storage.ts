@@ -1,12 +1,14 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
 export interface DraftState {
   version: number
   savedAt: number
+  // Current screen for proper navigation on resume
+  currentScreen: AppScreen
   // Editor state
   selectedAssets: TemplateType[]
   currentAssetIndex: number
@@ -101,6 +103,42 @@ export interface DraftState {
   faqCoverImagePosition: { x: number; y: number }
   faqCoverImageZoom: number
   faqCoverImageGrayscale: boolean
+  // Solution Overview PDF
+  solutionOverviewSolution: SolutionCategory
+  solutionOverviewSolutionName: string
+  solutionOverviewTagline: string
+  solutionOverviewCurrentPage: 1 | 2 | 3
+  solutionOverviewHeroImageId: string
+  solutionOverviewHeroImageUrl: string | null
+  solutionOverviewHeroImagePosition: { x: number; y: number }
+  solutionOverviewHeroImageZoom: number
+  solutionOverviewHeroImageGrayscale: boolean
+  solutionOverviewPage2Header: string
+  solutionOverviewSectionHeader: string
+  solutionOverviewIntroParagraph: string
+  solutionOverviewKeySolutions: string[]
+  solutionOverviewQuoteText: string
+  solutionOverviewQuoteName: string
+  solutionOverviewQuoteTitle: string
+  solutionOverviewQuoteCompany: string
+  solutionOverviewBenefits: SolutionOverviewBenefit[]
+  solutionOverviewFeatures: SolutionOverviewFeature[]
+  solutionOverviewScreenshotUrl: string | null
+  solutionOverviewScreenshotPosition: { x: number; y: number }
+  solutionOverviewScreenshotZoom: number
+  solutionOverviewScreenshotGrayscale: boolean
+  solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
+  solutionOverviewCtaUrl: string
+  solutionOverviewStat1Value: string
+  solutionOverviewStat1Label: string
+  solutionOverviewStat2Value: string
+  solutionOverviewStat2Label: string
+  solutionOverviewStat3Value: string
+  solutionOverviewStat3Label: string
+  solutionOverviewStat4Value: string
+  solutionOverviewStat4Label: string
+  solutionOverviewStat5Value: string
+  solutionOverviewStat5Label: string
 }
 
 const CURRENT_VERSION = 1
@@ -112,6 +150,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
     const draft: DraftState = {
       version: CURRENT_VERSION,
       savedAt: Date.now(),
+      currentScreen: state.currentScreen || 'select',
       selectedAssets: state.selectedAssets || [],
       currentAssetIndex: state.currentAssetIndex || 0,
       manualAssetCopies: state.manualAssetCopies || {},
@@ -210,6 +249,42 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       faqCoverImagePosition: state.faqCoverImagePosition || { x: 0, y: 0 },
       faqCoverImageZoom: state.faqCoverImageZoom ?? 1,
       faqCoverImageGrayscale: state.faqCoverImageGrayscale ?? false,
+      // Solution Overview PDF
+      solutionOverviewSolution: state.solutionOverviewSolution || 'health',
+      solutionOverviewSolutionName: state.solutionOverviewSolutionName || 'Solution Name Goes Here',
+      solutionOverviewTagline: state.solutionOverviewTagline || 'Subheader Goes Here',
+      solutionOverviewCurrentPage: state.solutionOverviewCurrentPage || 1,
+      solutionOverviewHeroImageId: state.solutionOverviewHeroImageId || 'placeholder',
+      solutionOverviewHeroImageUrl: state.solutionOverviewHeroImageUrl || null,
+      solutionOverviewHeroImagePosition: state.solutionOverviewHeroImagePosition || { x: 0, y: 0 },
+      solutionOverviewHeroImageZoom: state.solutionOverviewHeroImageZoom ?? 1,
+      solutionOverviewHeroImageGrayscale: state.solutionOverviewHeroImageGrayscale ?? false,
+      solutionOverviewPage2Header: state.solutionOverviewPage2Header || 'Heading 1',
+      solutionOverviewSectionHeader: state.solutionOverviewSectionHeader || 'Heading 2',
+      solutionOverviewIntroParagraph: state.solutionOverviewIntroParagraph || '',
+      solutionOverviewKeySolutions: state.solutionOverviewKeySolutions || ['Solution Name', 'Solution Name', 'Solution Name', 'Solution Name'],
+      solutionOverviewQuoteText: state.solutionOverviewQuoteText || '',
+      solutionOverviewQuoteName: state.solutionOverviewQuoteName || 'Firstname Lastname',
+      solutionOverviewQuoteTitle: state.solutionOverviewQuoteTitle || 'Job title',
+      solutionOverviewQuoteCompany: state.solutionOverviewQuoteCompany || 'Organization',
+      solutionOverviewBenefits: state.solutionOverviewBenefits || [],
+      solutionOverviewFeatures: state.solutionOverviewFeatures || [],
+      solutionOverviewScreenshotUrl: state.solutionOverviewScreenshotUrl || null,
+      solutionOverviewScreenshotPosition: state.solutionOverviewScreenshotPosition || { x: 0, y: 0 },
+      solutionOverviewScreenshotZoom: state.solutionOverviewScreenshotZoom ?? 1,
+      solutionOverviewScreenshotGrayscale: state.solutionOverviewScreenshotGrayscale ?? false,
+      solutionOverviewCtaOption: state.solutionOverviewCtaOption || 'demo',
+      solutionOverviewCtaUrl: state.solutionOverviewCtaUrl || '',
+      solutionOverviewStat1Value: state.solutionOverviewStat1Value || '20+',
+      solutionOverviewStat1Label: state.solutionOverviewStat1Label || 'Awards',
+      solutionOverviewStat2Value: state.solutionOverviewStat2Value || '350+',
+      solutionOverviewStat2Label: state.solutionOverviewStat2Label || 'Experts',
+      solutionOverviewStat3Value: state.solutionOverviewStat3Value || '100%',
+      solutionOverviewStat3Label: state.solutionOverviewStat3Label || 'Deployment',
+      solutionOverviewStat4Value: state.solutionOverviewStat4Value || '2M+',
+      solutionOverviewStat4Label: state.solutionOverviewStat4Label || 'End Users',
+      solutionOverviewStat5Value: state.solutionOverviewStat5Value || '1.2K',
+      solutionOverviewStat5Label: state.solutionOverviewStat5Label || 'Clients',
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
@@ -265,8 +340,14 @@ export function hasDraft(): boolean {
     const hasContent = draft.verbatimCopy.headline.length > 0 || draft.verbatimCopy.body.length > 0
     // Check for FAQ content (has pages with blocks)
     const hasFaqContent = draft.faqPages && draft.faqPages.length > 0 && draft.faqPages.some(p => p.blocks.length > 0)
+    // Check for Solution Overview content (templateType or currentScreen indicates SO, or has custom content)
+    const isSolutionOverview = draft.templateType === 'solution-overview-pdf' ||
+      draft.currentScreen === 'solution-overview-export' ||
+      draft.currentScreen === 'solution-overview-setup'
+    const hasCustomSolutionOverviewName = !!(draft.solutionOverviewSolutionName && draft.solutionOverviewSolutionName !== 'Solution Name Goes Here')
+    const hasSolutionOverviewContent = isSolutionOverview || hasCustomSolutionOverviewName
 
-    return hasAssets || hasQueue || hasContent || hasFaqContent
+    return hasAssets || hasQueue || hasContent || hasFaqContent || hasSolutionOverviewContent
   } catch {
     return false
   }

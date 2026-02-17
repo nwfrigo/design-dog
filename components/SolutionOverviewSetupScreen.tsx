@@ -206,9 +206,9 @@ export function SolutionOverviewSetupScreen() {
       }
     }
 
-    // Set to page 1 (cover) and go to editor
+    // Set to page 1 (cover) and go to solution overview export screen
     setSolutionOverviewCurrentPage(1)
-    setCurrentScreen('editor')
+    setCurrentScreen('solution-overview-export')
     saveDraft()
   }
 

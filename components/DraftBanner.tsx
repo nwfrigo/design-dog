@@ -12,6 +12,8 @@ export function DraftBanner() {
   const [assetCount, setAssetCount] = useState(0)
   const [isFaqDraft, setIsFaqDraft] = useState(false)
   const [hasFaqContent, setHasFaqContent] = useState(false)
+  const [isSolutionOverviewDraft, setIsSolutionOverviewDraft] = useState(false)
+  const [savedCurrentScreen, setSavedCurrentScreen] = useState<string | null>(null)
 
   useEffect(() => {
     // Check for draft in localStorage
@@ -19,15 +21,26 @@ export function DraftBanner() {
       setShowBanner(true)
       setAssetCount(getDraftAssetCount())
 
-      // Check if draft is for FAQ template (by templateType or has faqPages with content)
       const draft = loadDraftFromStorage()
       if (draft) {
+        // Save the currentScreen for proper navigation
+        if (draft.currentScreen) {
+          setSavedCurrentScreen(draft.currentScreen)
+        }
+
+        // Check if draft is for FAQ template (by templateType or has faqPages with content)
         const isFaqTemplate = draft.templateType === 'faq-pdf'
         const draftHasFaqContent = draft.faqPages &&
                               draft.faqPages.length > 0 &&
                               draft.faqPages.some(p => p.blocks && p.blocks.length > 0)
         setIsFaqDraft(isFaqTemplate || draftHasFaqContent)
         setHasFaqContent(draftHasFaqContent)
+
+        // Check if draft is for Solution Overview template
+        const isSolutionOverview = draft.templateType === 'solution-overview-pdf' ||
+          draft.currentScreen === 'solution-overview-export' ||
+          draft.currentScreen === 'solution-overview-setup'
+        setIsSolutionOverviewDraft(isSolutionOverview)
       }
     }
   }, [])
@@ -41,7 +54,17 @@ export function DraftBanner() {
         setCurrentScreen('faq-setup')
       }
       router.push('/editor')
+    } else if (isSolutionOverviewDraft) {
+      // For Solution Overview templates, restore to appropriate screen
+      // If they were in the export screen, go there; otherwise go to setup
+      if (savedCurrentScreen === 'solution-overview-export') {
+        setCurrentScreen('solution-overview-export')
+      } else {
+        setCurrentScreen('solution-overview-setup')
+      }
+      router.push('/editor')
     } else {
+      // For all other templates, currentScreen will be restored by loadDraft
       router.push('/editor')
     }
   }
