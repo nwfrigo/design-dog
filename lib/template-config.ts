@@ -18,7 +18,7 @@ export interface ChannelConfig {
 export interface SubChannelConfig {
   id: string
   label: string
-  icon: 'mail' | 'share' | 'globe' | 'newspaper'
+  icon: 'mail' | 'share' | 'globe' | 'newspaper' | 'print'
   templates: TemplateInfo[]
 }
 
@@ -236,6 +236,27 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
             dimensions: 'Letter (8.5" × 11") • Multi-page',
             width: 612,
             height: 792,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'print',
+    label: 'Print',
+    description: 'Business cards, postcards, and print materials',
+    subChannels: [
+      {
+        id: 'print-materials',
+        label: 'Print Materials',
+        icon: 'print',
+        templates: [
+          {
+            type: 'business-card',
+            label: 'Business Card',
+            dimensions: '3.5" × 2" (with bleed)',
+            width: 360,  // Base render width at 96 DPI
+            height: 216, // Base render height at 96 DPI
           },
         ],
       },

@@ -13,6 +13,7 @@ import { SolutionOverviewSetupScreen } from '@/components/SolutionOverviewSetupS
 import { FaqEditorScreen } from '@/components/FaqEditorScreen'
 import { FaqExportScreen } from '@/components/FaqExportScreen'
 import { FaqSetupScreen } from '@/components/FaqSetupScreen'
+import { BusinessCardEditorScreen } from '@/components/BusinessCardEditorScreen'
 
 export default function EditorPage() {
   const router = useRouter()
@@ -62,6 +63,7 @@ export default function EditorPage() {
   const isFaqSetup = currentScreen === 'faq-setup'
   const isFaqEditor = currentScreen === 'faq-editor'
   const isFaqExport = currentScreen === 'faq-export'
+  const isBusinessCardEditor = currentScreen === 'business-card-editor'
 
   // Setup screens have their own layout (no EditorLayout wrapper)
   if (isSolutionOverviewSetup) {
@@ -75,7 +77,9 @@ export default function EditorPage() {
   // All other screens use EditorLayout
   return (
     <EditorLayout>
-      {isFaqExport ? (
+      {isBusinessCardEditor ? (
+        <BusinessCardEditorScreen />
+      ) : isFaqExport ? (
         <FaqExportScreen />
       ) : isFaqEditor ? (
         <FaqEditorScreen />

@@ -437,6 +437,31 @@ export function TemplateRenderer({
         />
       )
 
+    case 'business-card':
+      return (
+        <div
+          style={{
+            width: 360 * scale,
+            height: 216 * scale,
+            backgroundColor: '#060015',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            padding: 24 * scale,
+            fontFamily: 'Fakt Pro, sans-serif',
+          }}
+        >
+          <div>
+            <div style={{ color: 'white', fontSize: 18 * scale, fontWeight: 500 }}>Your Name</div>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 * scale }}>Your Title</div>
+          </div>
+          <div>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10 * scale }}>email@cority.com</div>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10 * scale }}>555-123-4567</div>
+          </div>
+        </div>
+      )
+
     default:
       return null
   }

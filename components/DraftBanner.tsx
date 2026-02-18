@@ -13,6 +13,7 @@ export function DraftBanner() {
   const [isFaqDraft, setIsFaqDraft] = useState(false)
   const [hasFaqContent, setHasFaqContent] = useState(false)
   const [isSolutionOverviewDraft, setIsSolutionOverviewDraft] = useState(false)
+  const [isBusinessCardDraft, setIsBusinessCardDraft] = useState(false)
   const [savedCurrentScreen, setSavedCurrentScreen] = useState<string | null>(null)
 
   useEffect(() => {
@@ -41,6 +42,11 @@ export function DraftBanner() {
           draft.currentScreen === 'solution-overview-export' ||
           draft.currentScreen === 'solution-overview-setup'
         setIsSolutionOverviewDraft(isSolutionOverview)
+
+        // Check if draft is for Business Card template
+        const isBusinessCard = draft.templateType === 'business-card' ||
+          draft.currentScreen === 'business-card-editor'
+        setIsBusinessCardDraft(isBusinessCard)
       }
     }
   }, [])
@@ -62,6 +68,10 @@ export function DraftBanner() {
       } else {
         setCurrentScreen('solution-overview-setup')
       }
+      router.push('/editor')
+    } else if (isBusinessCardDraft) {
+      // For Business Card, always go to editor
+      setCurrentScreen('business-card-editor')
       router.push('/editor')
     } else {
       // For all other templates, currentScreen will be restored by loadDraft

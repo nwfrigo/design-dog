@@ -9,13 +9,14 @@ import { QuickStartWizard } from '@/components/QuickStartWizard'
 import { KIT_LIST } from '@/config/kit-configs'
 
 // Filter chip options
-type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm'
+type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm' | 'print'
 
 const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'email', label: 'Email' },
   { id: 'website', label: 'Website' },
   { id: 'sales-pm', label: 'Collateral' },
+  { id: 'print', label: 'Print' },
   { id: 'social', label: 'Social' },
   { id: 'newsletter', label: 'Newsletter' },
 ]
@@ -27,7 +28,7 @@ interface TemplateWithChannel extends TemplateInfo {
 }
 
 // Channel order for grid display (matches filter chip order)
-const CHANNEL_ORDER = ['email', 'website', 'collateral-pdf', 'social', 'newsletter']
+const CHANNEL_ORDER = ['email', 'website', 'collateral-pdf', 'print-materials', 'social', 'newsletter']
 
 // Flatten all templates with channel info, ordered by channel
 function getAllTemplatesWithChannels(): TemplateWithChannel[] {
@@ -190,6 +191,8 @@ export function AssetSelectionScreen() {
           return template.channel === 'newsletter'
         case 'sales-pm':
           return template.channel === 'collateral-pdf'
+        case 'print':
+          return template.channel === 'print-materials'
         default:
           return true
       }
@@ -210,6 +213,15 @@ export function AssetSelectionScreen() {
     if (templateType === 'faq-pdf') {
       goToEditorWithTemplate(templateType)
       setCurrentScreen('faq-setup')
+      saveDraft()
+      router.push('/editor')
+      return
+    }
+
+    // Business card goes directly to its editor
+    if (templateType === 'business-card') {
+      goToEditorWithTemplate(templateType)
+      setCurrentScreen('business-card-editor')
       saveDraft()
       router.push('/editor')
       return

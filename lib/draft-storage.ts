@@ -139,6 +139,12 @@ export interface DraftState {
   solutionOverviewStat4Label: string
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
+  // Business Card
+  businessCardName: string
+  businessCardTitle: string
+  businessCardEmail: string
+  businessCardPhone: string
+  businessCardCurrentSide: 'front' | 'back'
 }
 
 const CURRENT_VERSION = 1
@@ -285,6 +291,12 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       solutionOverviewStat4Label: state.solutionOverviewStat4Label || 'End Users',
       solutionOverviewStat5Value: state.solutionOverviewStat5Value || '1.2K',
       solutionOverviewStat5Label: state.solutionOverviewStat5Label || 'Clients',
+      // Business Card
+      businessCardName: state.businessCardName || 'Your Name',
+      businessCardTitle: state.businessCardTitle || 'Your Title',
+      businessCardEmail: state.businessCardEmail || 'email@cority.com',
+      businessCardPhone: state.businessCardPhone || '555-123-4567',
+      businessCardCurrentSide: state.businessCardCurrentSide || 'front',
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
@@ -346,8 +358,13 @@ export function hasDraft(): boolean {
       draft.currentScreen === 'solution-overview-setup'
     const hasCustomSolutionOverviewName = !!(draft.solutionOverviewSolutionName && draft.solutionOverviewSolutionName !== 'Solution Name Goes Here')
     const hasSolutionOverviewContent = isSolutionOverview || hasCustomSolutionOverviewName
+    // Check for Business Card content
+    const isBusinessCard = draft.templateType === 'business-card' ||
+      draft.currentScreen === 'business-card-editor'
+    const hasCustomBusinessCardName = !!(draft.businessCardName && draft.businessCardName !== 'Your Name')
+    const hasBusinessCardContent = isBusinessCard || hasCustomBusinessCardName
 
-    return hasAssets || hasQueue || hasContent || hasFaqContent || hasSolutionOverviewContent
+    return hasAssets || hasQueue || hasContent || hasFaqContent || hasSolutionOverviewContent || hasBusinessCardContent
   } catch {
     return false
   }

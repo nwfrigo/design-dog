@@ -379,6 +379,13 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   faqCoverImageZoom: 1,
   faqCoverImageGrayscale: false,
 
+  // Business Card specific
+  businessCardName: 'Your Name',
+  businessCardTitle: 'Your Title',
+  businessCardEmail: 'email@cority.com',
+  businessCardPhone: '555-123-4567',
+  businessCardCurrentSide: 'front' as 'front' | 'back',
+
   // Export queue
   exportQueue: [],
   editingQueueItemId: null as string | null,
@@ -618,6 +625,20 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     faqCoverImagePosition: { x: 0, y: 0 },
     faqCoverImageZoom: 1,
     faqCoverImageGrayscale: false,
+  }),
+
+  // Business Card setters
+  setBusinessCardName: (businessCardName: string) => set({ businessCardName }),
+  setBusinessCardTitle: (businessCardTitle: string) => set({ businessCardTitle }),
+  setBusinessCardEmail: (businessCardEmail: string) => set({ businessCardEmail }),
+  setBusinessCardPhone: (businessCardPhone: string) => set({ businessCardPhone }),
+  setBusinessCardCurrentSide: (businessCardCurrentSide: 'front' | 'back') => set({ businessCardCurrentSide }),
+  resetBusinessCardToDefaults: () => set({
+    businessCardName: 'Your Name',
+    businessCardTitle: 'Your Title',
+    businessCardEmail: 'email@cority.com',
+    businessCardPhone: '555-123-4567',
+    businessCardCurrentSide: 'front',
   }),
 
   // Multi-asset actions
@@ -2258,6 +2279,12 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat4Label: state.solutionOverviewStat4Label,
       solutionOverviewStat5Value: state.solutionOverviewStat5Value,
       solutionOverviewStat5Label: state.solutionOverviewStat5Label,
+      // Business Card
+      businessCardName: state.businessCardName,
+      businessCardTitle: state.businessCardTitle,
+      businessCardEmail: state.businessCardEmail,
+      businessCardPhone: state.businessCardPhone,
+      businessCardCurrentSide: state.businessCardCurrentSide,
     })
   },
 
@@ -2383,6 +2410,12 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat4Label: draft.solutionOverviewStat4Label ?? 'End Users',
       solutionOverviewStat5Value: draft.solutionOverviewStat5Value ?? '1.2K',
       solutionOverviewStat5Label: draft.solutionOverviewStat5Label ?? 'Clients',
+      // Business Card
+      businessCardName: draft.businessCardName ?? 'Your Name',
+      businessCardTitle: draft.businessCardTitle ?? 'Your Title',
+      businessCardEmail: draft.businessCardEmail ?? 'email@cority.com',
+      businessCardPhone: draft.businessCardPhone ?? '555-123-4567',
+      businessCardCurrentSide: draft.businessCardCurrentSide ?? 'front',
     })
     return true
   },

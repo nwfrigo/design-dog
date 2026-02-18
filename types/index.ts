@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'business-card'
 
 // Solution Overview PDF Types
 // ORDER: environmental, health, safety, quality, sustainability, converged
@@ -172,7 +172,7 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'business-card-editor'
 
 // Auto-Create Types (formerly Quick Start)
 export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'
@@ -656,6 +656,13 @@ export interface AppState {
   faqCoverImageZoom: number
   faqCoverImageGrayscale: boolean
 
+  // Business Card specific
+  businessCardName: string
+  businessCardTitle: string
+  businessCardEmail: string
+  businessCardPhone: string
+  businessCardCurrentSide: 'front' | 'back'
+
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
   setContentMode: (mode: ContentMode) => void
@@ -810,6 +817,14 @@ export interface AppState {
   setFaqCoverImageZoom: (zoom: number) => void
   setFaqCoverImageGrayscale: (grayscale: boolean) => void
   resetFaqToDefaults: () => void
+
+  // Business Card actions
+  setBusinessCardName: (name: string) => void
+  setBusinessCardTitle: (title: string) => void
+  setBusinessCardEmail: (email: string) => void
+  setBusinessCardPhone: (phone: string) => void
+  setBusinessCardCurrentSide: (side: 'front' | 'back') => void
+  resetBusinessCardToDefaults: () => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void
