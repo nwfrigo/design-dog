@@ -67,6 +67,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'email-image': { width: 640, height: 300 },
   'email-dark-gradient': { width: 640, height: 300 },
   'email-speakers': { width: 640, height: 300 },
+  'email-product-release': { width: 640, height: 164 },
   'social-dark-gradient': { width: 1200, height: 628 },
   'social-blue-gradient': { width: 1200, height: 628 },
   'social-image': { width: 1200, height: 628 },
@@ -154,6 +155,9 @@ export async function POST(request: NextRequest) {
       imageSize,
       // Image effects
       grayscale,
+      // Email product release specific
+      headlineBold,
+      headlineLight,
     } = body
 
     // Build query params for render page
@@ -258,6 +262,10 @@ export async function POST(request: NextRequest) {
 
     // Image effects
     if (grayscale !== undefined) params.set('grayscale', String(grayscale))
+
+    // Email product release specific
+    if (headlineBold) params.set('headlineBold', headlineBold)
+    if (headlineLight) params.set('headlineLight', headlineLight)
 
     // Solution Overview PDF specific - Page 1
     if (body.solutionName) params.set('solutionName', body.solutionName)

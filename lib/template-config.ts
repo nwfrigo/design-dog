@@ -61,6 +61,13 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     width: 640,
     height: 300,
   },
+  {
+    type: 'email-product-release',
+    label: 'Product Release Banner',
+    dimensions: '640 × 164px',
+    width: 640,
+    height: 164,
+  },
 ]
 
 // Template definitions for social

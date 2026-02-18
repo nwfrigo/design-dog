@@ -185,6 +185,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'email-image': 'email',
   'email-dark-gradient': 'email',
   'email-speakers': 'email',
+  'email-product-release': 'email',
   'social-dark-gradient': 'social',
   'social-blue-gradient': 'social',
   'social-image': 'social',

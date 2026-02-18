@@ -11,6 +11,7 @@ import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
 import { EmailImage } from '@/components/templates/EmailImage'
 import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
+import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -106,6 +107,17 @@ export function TemplateRenderer({
           showBody={false}
           showCta={true}
           showSolutionSet={true}
+        />
+      )
+
+    case 'email-product-release':
+      return (
+        <EmailProductRelease
+          {...commonProps}
+          eyebrow="Product Release"
+          headlineBold="GX2"
+          headlineLight="2026.1"
+          imageUrl={PLACEHOLDER_IMAGES.default}
         />
       )
 

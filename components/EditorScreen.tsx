@@ -9,6 +9,7 @@ import { WebsiteWebinar } from './templates/WebsiteWebinar'
 import { WebsiteEventListing } from './templates/WebsiteEventListing'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
+import { EmailProductRelease } from './templates/EmailProductRelease'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
 import { EmailSpeakers } from './templates/EmailSpeakers'
@@ -758,6 +759,15 @@ export function EditorScreen() {
         exportParams.speaker3ImagePositionX = speaker3ImagePosition.x
         exportParams.speaker3ImagePositionY = speaker3ImagePosition.y
         exportParams.speaker3ImageZoom = speaker3ImageZoom
+        exportParams.grayscale = grayscale
+      } else if (currentTemplate === 'email-product-release') {
+        exportParams.eyebrow = eyebrow || 'Product Release'
+        exportParams.headlineBold = verbatimCopy.headline || 'GX2'
+        exportParams.headlineLight = verbatimCopy.subhead || '2026.1'
+        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'
+        exportParams.imagePositionX = thumbnailImagePosition.x
+        exportParams.imagePositionY = thumbnailImagePosition.y
+        exportParams.imageZoom = thumbnailImageZoom
         exportParams.grayscale = grayscale
       } else if (currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient') {
         exportParams.ctaText = ctaText
@@ -3021,8 +3031,8 @@ export function EditorScreen() {
             )}
 
 
-            {/* Image - Website Thumbnail (image variant), Email Image, Social Image, Website Webinar (image variant), Website Press Release, and Website Report (image variant) */}
-            {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release' || (currentTemplate === 'website-report' && reportVariant === 'image')) && (
+            {/* Image - Website Thumbnail (image variant), Email Image, Email Product Release, Social Image, Website Webinar (image variant), Website Press Release, and Website Report (image variant) */}
+            {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'email-product-release' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release' || (currentTemplate === 'website-report' && reportVariant === 'image')) && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
@@ -3184,7 +3194,7 @@ export function EditorScreen() {
               )}
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner' || currentTemplate === 'email-product-release') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -4671,6 +4681,20 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
+                  grayscale={grayscale}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-product-release' && (
+                <EmailProductRelease
+                  eyebrow={eyebrow || 'Product Release'}
+                  headlineBold={verbatimCopy.headline || 'GX2'}
+                  headlineLight={verbatimCopy.subhead || '2026.1'}
+                  imageUrl={thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
                   grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
