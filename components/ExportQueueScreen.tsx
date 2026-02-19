@@ -12,6 +12,7 @@ import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from './templates/WebsiteFloatingBannerMobile'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
+import { EmailProductRelease } from './templates/EmailProductRelease'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
@@ -723,6 +724,18 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'email-product-release' && (
+                <EmailProductRelease
+                  eyebrow={asset.eyebrow || 'Product Release'}
+                  headline={asset.headline || 'GX2 2026.1'}
+                  imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
               {asset.templateType === 'social-dark-gradient' && (
                 <SocialDarkGradient
                   eyebrow={asset.eyebrow}
@@ -1279,6 +1292,18 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showCta={asset.showCta !== false}
               showSolutionSet={asset.showSolutionSet !== false}
               grayscale={asset.grayscale}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'email-product-release' && (
+            <EmailProductRelease
+              eyebrow={asset.eyebrow || 'Product Release'}
+              headline={asset.headline || 'GX2 2026.1'}
+              imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
