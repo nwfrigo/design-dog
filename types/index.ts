@@ -23,7 +23,7 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf'
 
 // Solution Overview PDF Types
 // ORDER: environmental, health, safety, quality, sustainability, converged
@@ -38,6 +38,143 @@ export interface SolutionOverviewBenefit {
 export interface SolutionOverviewFeature {
   title: string
   description: string
+}
+
+// Stacker PDF Types
+export type StackerModuleType =
+  | 'logo-chip'
+  | 'header'
+  | 'paragraph'
+  | 'bullet-three'
+  | 'image'
+  | 'divider'
+  | 'three-card'
+  | 'quote'
+  | 'three-stats'
+  | 'one-stat'
+  | 'footer'
+
+export interface StackerBaseModule {
+  id: string
+  type: StackerModuleType
+}
+
+export interface StackerLogoChipModule extends StackerBaseModule {
+  type: 'logo-chip'
+  showChips: boolean
+  activeCategories: SolutionCategory[]
+}
+
+export interface StackerHeaderModule extends StackerBaseModule {
+  type: 'header'
+  heading: string
+  headingSize: 'h1' | 'h2'
+  subheader: string
+  showSubheader: boolean
+  cta: string
+  ctaUrl: string
+  showCta: boolean
+}
+
+export interface StackerParagraphModule extends StackerBaseModule {
+  type: 'paragraph'
+  intro: string
+  body: string
+  showIntro: boolean
+  showBody: boolean
+}
+
+export interface StackerBulletThreeModule extends StackerBaseModule {
+  type: 'bullet-three'
+  bullets: [string, string, string]
+}
+
+export interface StackerImageModule extends StackerBaseModule {
+  type: 'image'
+  imagePosition: 'left' | 'right'
+  imageUrl: string | null
+  imagePan: { x: number; y: number }
+  imageZoom: number
+  eyebrow: string
+  showEyebrow: boolean
+  heading: string
+  showHeading: boolean
+  body: string
+  showBody: boolean
+  cta: string
+  ctaUrl: string
+  showCta: boolean
+}
+
+export interface StackerDividerModule extends StackerBaseModule {
+  type: 'divider'
+}
+
+export interface StackerThreeCardModule extends StackerBaseModule {
+  type: 'three-card'
+  cards: [
+    { icon: string; title: string; description: string },
+    { icon: string; title: string; description: string },
+    { icon: string; title: string; description: string }
+  ]
+}
+
+export interface StackerQuoteModule extends StackerBaseModule {
+  type: 'quote'
+  quote: string
+  name: string
+  jobTitle: string
+  organization: string
+}
+
+export interface StackerThreeStatsModule extends StackerBaseModule {
+  type: 'three-stats'
+  stats: [
+    { value: string; label: string },
+    { value: string; label: string },
+    { value: string; label: string }
+  ]
+}
+
+export interface StackerOneStatModule extends StackerBaseModule {
+  type: 'one-stat'
+  value: string
+  label: string
+  eyebrow: string
+  body: string
+}
+
+export interface StackerFooterModule extends StackerBaseModule {
+  type: 'footer'
+  // Stats are editable, logo and about paragraph are locked
+  stat1Value: string
+  stat1Label: string
+  stat2Value: string
+  stat2Label: string
+  stat3Value: string
+  stat3Label: string
+  stat4Value: string
+  stat4Label: string
+  stat5Value: string
+  stat5Label: string
+}
+
+export type StackerModule =
+  | StackerLogoChipModule
+  | StackerHeaderModule
+  | StackerParagraphModule
+  | StackerBulletThreeModule
+  | StackerImageModule
+  | StackerDividerModule
+  | StackerThreeCardModule
+  | StackerQuoteModule
+  | StackerThreeStatsModule
+  | StackerOneStatModule
+  | StackerFooterModule
+
+export interface StackerDocument {
+  id: string
+  modules: StackerModule[]
 }
 
 // FAQ PDF Types
@@ -172,7 +309,7 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-editor'
 
 // Auto-Create Types (formerly Quick Start)
 export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'

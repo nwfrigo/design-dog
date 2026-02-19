@@ -215,6 +215,15 @@ export function AssetSelectionScreen() {
       return
     }
 
+    // Stacker PDF goes directly to editor
+    if (templateType === 'stacker-pdf') {
+      goToEditorWithTemplate(templateType)
+      setCurrentScreen('stacker-editor')
+      saveDraft()
+      router.push('/editor')
+      return
+    }
+
     goToEditorWithTemplate(templateType)
     saveDraft()
     router.push('/editor')

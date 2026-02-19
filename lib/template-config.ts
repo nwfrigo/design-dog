@@ -244,6 +244,13 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
             width: 612,
             height: 792,
           },
+          {
+            type: 'stacker-pdf',
+            label: 'Stacker',
+            dimensions: 'Letter (8.5" × 11") • Variable height',
+            width: 612,
+            height: 792,
+          },
         ],
       },
     ],

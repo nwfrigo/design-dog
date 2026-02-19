@@ -196,6 +196,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'newsletter-top-banner': 'newsletter',
   'solution-overview-pdf': 'collateral',
   'faq-pdf': 'collateral',
+  'stacker-pdf': 'collateral',
 }
 
 /**
