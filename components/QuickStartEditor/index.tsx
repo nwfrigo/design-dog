@@ -63,6 +63,15 @@ export function AutoCreateEditor() {
     speaker3ImageZoom,
     generatedVariations,
     grayscale,
+    // Template variants
+    webinarVariant,
+    ebookVariant,
+    reportVariant,
+    eventListingVariant,
+    floatingBannerVariant,
+    floatingBannerMobileVariant,
+    floatingBannerMobileArrowType,
+    newsletterTopBannerVariant,
   } = useStore()
 
   // Track current asset ID
@@ -135,6 +144,15 @@ export function AutoCreateEditor() {
       speaker3ImageZoom,
       variations: generatedVariations,
       grayscale,
+      // Template variants
+      webinarVariant,
+      ebookVariant,
+      reportVariant,
+      eventListingVariant,
+      floatingBannerVariant,
+      floatingBannerMobileVariant,
+      floatingBannerMobileArrowType,
+      newsletterTopBannerVariant,
     })
   }
 
@@ -157,9 +175,9 @@ export function AutoCreateEditor() {
     }, 500)
 
     return () => clearTimeout(timeoutId)
-    // Only re-run when the verbatimCopy headline changes (as a proxy for editor changes)
+    // Re-run when editor values change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [verbatimCopy.headline, templateType])
+  }, [verbatimCopy.headline, templateType, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, webinarVariant, ebookVariant, reportVariant, eventListingVariant, newsletterTopBannerVariant])
 
   // Check if we're editing from queue - hide sidebar in this mode
   const isEditingFromQueue = !!editingQueueItemId
