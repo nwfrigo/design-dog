@@ -762,13 +762,11 @@ export function EditorScreen() {
         exportParams.grayscale = grayscale
       } else if (currentTemplate === 'email-product-release') {
         exportParams.eyebrow = eyebrow || 'Product Release'
-        exportParams.headlineBold = verbatimCopy.headline || 'GX2'
-        exportParams.headlineLight = verbatimCopy.subhead || '2026.1'
+        exportParams.headline = verbatimCopy.headline || 'GX2 2026.1'
         exportParams.imageUrl = thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'
         exportParams.imagePositionX = thumbnailImagePosition.x
         exportParams.imagePositionY = thumbnailImagePosition.y
         exportParams.imageZoom = thumbnailImageZoom
-        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient') {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
@@ -3114,8 +3112,8 @@ export function EditorScreen() {
                     </button>
                   </div>
                 )}
-                {/* Grayscale toggle - only show when image is selected */}
-                {thumbnailImageUrl && (
+                {/* Grayscale toggle - only show when image is selected (not for email-product-release) */}
+                {thumbnailImageUrl && currentTemplate !== 'email-product-release' && (
                   <div className="flex items-center justify-between mt-3">
                     <label className="text-xs text-gray-500">Grayscale</label>
                     <button
@@ -3194,7 +3192,7 @@ export function EditorScreen() {
               )}
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner' || currentTemplate === 'email-product-release') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -4690,12 +4688,10 @@ export function EditorScreen() {
               {currentTemplate === 'email-product-release' && (
                 <EmailProductRelease
                   eyebrow={eyebrow || 'Product Release'}
-                  headlineBold={verbatimCopy.headline || 'GX2'}
-                  headlineLight={verbatimCopy.subhead || '2026.1'}
+                  headline={verbatimCopy.headline || 'GX2 2026.1'}
                   imageUrl={thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
                   imagePosition={thumbnailImagePosition}
                   imageZoom={thumbnailImageZoom}
-                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

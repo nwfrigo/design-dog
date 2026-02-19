@@ -155,9 +155,6 @@ export async function POST(request: NextRequest) {
       imageSize,
       // Image effects
       grayscale,
-      // Email product release specific
-      headlineBold,
-      headlineLight,
     } = body
 
     // Build query params for render page
@@ -262,10 +259,6 @@ export async function POST(request: NextRequest) {
 
     // Image effects
     if (grayscale !== undefined) params.set('grayscale', String(grayscale))
-
-    // Email product release specific
-    if (headlineBold) params.set('headlineBold', headlineBold)
-    if (headlineLight) params.set('headlineLight', headlineLight)
 
     // Solution Overview PDF specific - Page 1
     if (body.solutionName) params.set('solutionName', body.solutionName)

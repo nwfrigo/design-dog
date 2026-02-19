@@ -115,8 +115,7 @@ export function TemplateRenderer({
         <EmailProductRelease
           {...commonProps}
           eyebrow="Product Release"
-          headlineBold="GX2"
-          headlineLight="2026.1"
+          headline="GX2 2026.1"
           imageUrl={PLACEHOLDER_IMAGES.default}
         />
       )

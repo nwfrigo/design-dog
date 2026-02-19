@@ -6,12 +6,10 @@ import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
 interface Props {
   eyebrow: string
-  headlineBold: string
-  headlineLight: string
+  headline: string
   imageUrl: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
-  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -39,12 +37,10 @@ export function EmailProductReleaseRender(props: Props) {
       {ready && <div id="render-ready" style={{ display: 'none' }} />}
       <EmailProductRelease
         eyebrow={props.eyebrow}
-        headlineBold={props.headlineBold}
-        headlineLight={props.headlineLight}
+        headline={props.headline}
         imageUrl={props.imageUrl}
         imagePosition={props.imagePosition}
         imageZoom={props.imageZoom}
-        grayscale={props.grayscale}
         colors={props.colors}
         typography={props.typography}
         scale={1}

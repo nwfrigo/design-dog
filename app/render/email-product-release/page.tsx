@@ -14,13 +14,11 @@ export default function RenderPage({
 }) {
   // Parse params on server
   const eyebrow = (searchParams.eyebrow as string) || 'Product Release'
-  const headlineBold = (searchParams.headlineBold as string) || 'GX2'
-  const headlineLight = (searchParams.headlineLight as string) || '2026.1'
+  const headline = (searchParams.headline as string) || 'GX2 2026.1'
   const imageUrl = (searchParams.imageUrl as string) || '/assets/images/default_placeholder_image_1.png'
   const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
   const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
   const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
-  const grayscale = searchParams.grayscale === 'true'
 
   return (
     <div style={{
@@ -34,12 +32,10 @@ export default function RenderPage({
       <Suspense fallback={<div style={{ width: 640, height: 164, background: '#F1F3F4' }}>Loading...</div>}>
         <EmailProductReleaseRender
           eyebrow={eyebrow}
-          headlineBold={headlineBold}
-          headlineLight={headlineLight}
+          headline={headline}
           imageUrl={imageUrl}
           imagePosition={{ x: imagePositionX, y: imagePositionY }}
           imageZoom={imageZoom}
-          grayscale={grayscale}
           colors={colorsConfig}
           typography={typographyConfig}
         />
