@@ -71,7 +71,7 @@ const initialAutoCreate: AutoCreateState = {
 }
 
 const getDefaultAssetSettings = (templateType?: TemplateType) => ({
-  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : templateType === 'website-thumbnail' ? 'EBOOK' : templateType === 'website-event-listing' ? 'LIVE EVENT' : templateType === 'website-report' ? 'REPORT' : 'Eyebrow',
+  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : templateType === 'website-thumbnail' ? 'EBOOK' : templateType === 'website-event-listing' ? 'LIVE EVENT' : templateType === 'website-report' ? 'REPORT' : templateType === 'email-product-release' ? 'Product Release' : 'Eyebrow',
   solution: templateType === 'website-webinar' ? 'safety' : templateType === 'website-press-release' ? 'health' : 'environmental',
   logoColor: templateType === 'website-webinar' || templateType === 'website-report' ? 'white' as const : 'black' as const,
   showEyebrow: true,
