@@ -28,6 +28,8 @@ import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGra
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
+import { WebsiteFloatingBanner } from '@/components/templates/WebsiteFloatingBanner'
+import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloatingBannerMobile'
 
 interface AssetSidebarProps {
   currentAssetId: string | null
@@ -895,6 +897,29 @@ function AssetPreviewRenderer({
             imagePosition: asset.speaker3ImagePosition || { x: 0, y: 0 },
             imageZoom: asset.speaker3ImageZoom || 1,
           }}
+        />
+      )
+    case 'website-floating-banner':
+      return (
+        <WebsiteFloatingBanner
+          {...commonProps}
+          eyebrow={asset.eyebrow || 'Eyebrow'}
+          headline={copy.headline || 'Headline'}
+          cta={asset.ctaText || 'Learn More'}
+          showEyebrow={asset.showEyebrow !== false}
+          variant={asset.floatingBannerVariant || 'dark'}
+        />
+      )
+    case 'website-floating-banner-mobile':
+      return (
+        <WebsiteFloatingBannerMobile
+          {...commonProps}
+          eyebrow={asset.eyebrow || 'Eyebrow'}
+          headline={copy.headline || 'Headline'}
+          cta={asset.ctaText || 'Learn More'}
+          showEyebrow={asset.showEyebrow !== false}
+          variant={asset.floatingBannerMobileVariant || 'light'}
+          arrowType={asset.floatingBannerMobileArrowType || 'text'}
         />
       )
     default:
