@@ -27,9 +27,9 @@ export default function RenderPage({
       margin: 0,
       padding: 0,
       overflow: 'hidden',
-      background: '#F1F3F4',
+      background: '#F9F9F9',
     }}>
-      <Suspense fallback={<div style={{ width: 640, height: 164, background: '#F1F3F4' }}>Loading...</div>}>
+      <Suspense fallback={<div style={{ width: 640, height: 164, background: '#F9F9F9' }}>Loading...</div>}>
         <EmailProductReleaseRender
           eyebrow={eyebrow}
           headline={headline}

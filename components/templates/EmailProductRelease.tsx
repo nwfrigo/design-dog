@@ -60,7 +60,7 @@ export function EmailProductRelease({
   const containerStyle: CSSProperties = {
     width: 640,
     height: 164,
-    background: '#F1F3F4',
+    background: '#F9F9F9',
     position: 'relative',
     overflow: 'hidden',
     fontFamily,
