@@ -94,7 +94,7 @@ export function EmailProductRelease({
           top: 0,
           width: 0,
           height: HEADER_HEIGHT,
-          borderLeft: `0.75px solid ${borderColor}`,
+          borderLeft: `0.5px solid ${borderColor}`,
         }} />
 
         {/* Horizontal line under header - extends to image edge */}
@@ -104,7 +104,7 @@ export function EmailProductRelease({
           top: HEADER_HEIGHT,
           width: IMAGE_START,
           height: 0,
-          borderTop: `0.75px solid ${borderColor}`,
+          borderTop: `0.5px solid ${borderColor}`,
         }} />
 
         {/* Eyebrow text - centered in the box between divider and image */}
@@ -155,7 +155,7 @@ export function EmailProductRelease({
         top: -10,
         overflow: 'hidden',
         borderRadius: 6,
-        borderLeft: `0.75px solid ${borderColor}`,
+        borderLeft: `0.5px solid ${borderColor}`,
       }}>
         {imageUrl ? (
           <img
