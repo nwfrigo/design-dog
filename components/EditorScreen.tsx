@@ -1269,6 +1269,7 @@ export function EditorScreen() {
             currentTemplate === 'website-webinar' ? 333 :
             currentTemplate === 'website-press-release' ? 338 :
             currentTemplate === 'website-report' ? 320 :
+            currentTemplate === 'email-product-release' ? 331 :
             320 // default
           }
           frameHeight={
@@ -1278,6 +1279,7 @@ export function EditorScreen() {
             currentTemplate === 'website-webinar' ? 450 :
             currentTemplate === 'website-press-release' ? 450 :
             currentTemplate === 'website-report' ? 386 :
+            currentTemplate === 'email-product-release' ? 184 :
             300 // default
           }
           initialPosition={thumbnailImagePosition}
