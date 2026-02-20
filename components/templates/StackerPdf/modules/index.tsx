@@ -27,3 +27,6 @@ export type { OneStatModuleProps } from './OneStatModule'
 
 export { FooterModule } from './FooterModule'
 export type { FooterModuleProps } from './FooterModule'
+
+export { BulletListModule } from './BulletListModule'
+export type { BulletListModuleProps } from './BulletListModule'

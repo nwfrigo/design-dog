@@ -12,6 +12,7 @@ import { QuoteModule } from './modules/QuoteModule'
 import { ThreeStatsModule } from './modules/ThreeStatsModule'
 import { OneStatModule } from './modules/OneStatModule'
 import { FooterModule } from './modules/FooterModule'
+import { BulletListModule } from './modules/BulletListModule'
 
 // Document dimensions
 const DOCUMENT_WIDTH = 612 // Same as other PDF templates (Letter width in points)
@@ -71,6 +72,7 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
           imageUrl={module.imageUrl}
           imagePan={module.imagePan}
           imageZoom={module.imageZoom}
+          grayscale={module.grayscale}
           eyebrow={module.eyebrow}
           showEyebrow={module.showEyebrow}
           heading={module.heading}
@@ -139,22 +141,13 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
         />
       )
 
-    // Placeholder for modules not yet implemented
     case 'bullet-three':
       return (
-        <div
-          style={{
-            padding: 16,
-            background: '#f5f5f5',
-            borderRadius: 4,
-            border: '1px dashed #ccc',
-            color: '#666',
-            fontSize: 12,
-            fontFamily: '"Fakt Pro", system-ui, sans-serif',
-          }}
-        >
-          {module.type} module (coming soon)
-        </div>
+        <BulletListModule
+          heading={module.heading}
+          columns={module.columns}
+          scale={scale}
+        />
       )
 
     default:

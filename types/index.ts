@@ -86,7 +86,12 @@ export interface StackerParagraphModule extends StackerBaseModule {
 
 export interface StackerBulletThreeModule extends StackerBaseModule {
   type: 'bullet-three'
-  bullets: [string, string, string]
+  heading: string
+  columns: [
+    { label: string; bullets: string[] },
+    { label: string; bullets: string[] },
+    { label: string; bullets: string[] }
+  ]
 }
 
 export interface StackerImageModule extends StackerBaseModule {
@@ -95,6 +100,7 @@ export interface StackerImageModule extends StackerBaseModule {
   imageUrl: string | null
   imagePan: { x: number; y: number }
   imageZoom: number
+  grayscale: boolean
   eyebrow: string
   showEyebrow: boolean
   heading: string

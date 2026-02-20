@@ -26,6 +26,7 @@ export interface ImageModuleProps {
   imageUrl: string | null
   imagePan: { x: number; y: number }
   imageZoom: number
+  grayscale: boolean
   eyebrow: string
   showEyebrow: boolean
   heading: string
@@ -43,6 +44,7 @@ export function ImageModule({
   imageUrl,
   imagePan,
   imageZoom,
+  grayscale,
   eyebrow,
   showEyebrow,
   heading,
@@ -78,6 +80,7 @@ export function ImageModule({
     backgroundSize: `${imageZoom * 100}%`,
     backgroundPosition: `${50 + imagePan.x}% ${50 + imagePan.y}%`,
     backgroundRepeat: 'no-repeat',
+    filter: grayscale ? 'grayscale(100%)' : undefined,
   }
 
   const textContainerStyle: CSSProperties = {
