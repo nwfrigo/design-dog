@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, ReactNode } from 'react'
 import type { StackerModule } from '@/types'
 import { LogoChipModule } from './modules/LogoChipModule'
 import { HeaderModule } from './modules/HeaderModule'
@@ -21,6 +21,8 @@ const DOCUMENT_PADDING = 48 // Padding on all sides
 export interface StackerPdfProps {
   modules: StackerModule[]
   scale?: number
+  // Optional wrapper for interactive editing (drag handles, click-to-select)
+  renderModuleWrapper?: (module: StackerModule, children: ReactNode, index: number) => ReactNode
 }
 
 // Render individual module based on type
@@ -155,7 +157,7 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
   }
 }
 
-export function StackerPdf({ modules, scale = 1 }: StackerPdfProps) {
+export function StackerPdf({ modules, scale = 1, renderModuleWrapper }: StackerPdfProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
 
   const documentStyle: CSSProperties = {
@@ -180,9 +182,12 @@ export function StackerPdf({ modules, scale = 1 }: StackerPdfProps) {
   return (
     <div style={documentStyle}>
       <div style={contentStyle}>
-        {modules.map((module) => (
-          <RenderModule key={module.id} module={module} />
-        ))}
+        {modules.map((module, index) => {
+          const moduleContent = <RenderModule key={module.id} module={module} />
+          return renderModuleWrapper
+            ? renderModuleWrapper(module, moduleContent, index)
+            : moduleContent
+        })}
         {modules.length === 0 && (
           <div
             style={{

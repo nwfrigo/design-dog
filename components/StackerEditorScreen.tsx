@@ -2,26 +2,9 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
-import { StackerPdf } from './templates/StackerPdf'
+import { StackerPreviewEditor } from './StackerPreviewEditor'
 import { ImageCropModal } from './ImageCropModal'
 import type { StackerModule, StackerImageModule, SolutionCategory } from '@/types'
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -199,18 +182,27 @@ function getModulePreview(module: StackerModule): string {
 function LockedModuleItem({
   module,
   isExpanded,
+  isSelected,
   onToggleExpand,
   onUpdate,
   onOpenCropModal,
 }: {
   module: StackerModule
   isExpanded: boolean
+  isSelected: boolean
   onToggleExpand: () => void
   onUpdate: (updates: Partial<StackerModule>) => void
   onOpenCropModal?: (moduleId: string) => void
 }) {
   return (
-    <div className="bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-transparent rounded-lg overflow-hidden">
+    <div
+      data-module-id={module.id}
+      className={`bg-white dark:bg-[#1a1a2e] border rounded-lg overflow-hidden transition-all ${
+        isSelected
+          ? 'border-blue-500 ring-2 ring-blue-500/20'
+          : 'border-gray-200 dark:border-transparent'
+      }`}
+    >
       {/* Collapsed Header - Always visible */}
       <div
         className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
@@ -224,7 +216,7 @@ function LockedModuleItem({
         </div>
 
         {/* Module Type Badge */}
-        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide w-16 truncate">
+        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide w-20 truncate">
           {MODULE_LABELS[module.type] || module.type}
         </span>
 
@@ -254,43 +246,29 @@ function LockedModuleItem({
   )
 }
 
-// Sortable Module Item Component
-function SortableModuleItem({
+// Content Module Item Component (no drag - reordering happens in preview)
+function ContentModuleItem({
   module,
   isExpanded,
+  isSelected,
   onToggleExpand,
   onUpdate,
-  onDelete,
   onOpenCropModal,
 }: {
   module: StackerModule
   isExpanded: boolean
+  isSelected: boolean
   onToggleExpand: () => void
   onUpdate: (updates: Partial<StackerModule>) => void
-  onDelete: () => void
   onOpenCropModal?: (moduleId: string) => void
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: module.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      className={`bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-transparent rounded-lg overflow-hidden ${
-        isDragging ? 'shadow-lg' : ''
+      data-module-id={module.id}
+      className={`bg-white dark:bg-[#1a1a2e] border rounded-lg overflow-hidden transition-all ${
+        isSelected
+          ? 'border-blue-500 ring-2 ring-blue-500/20'
+          : 'border-gray-200 dark:border-transparent'
       }`}
     >
       {/* Collapsed Header - Always visible */}
@@ -298,20 +276,8 @@ function SortableModuleItem({
         className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
         onClick={onToggleExpand}
       >
-        {/* Drag Handle */}
-        <button
-          {...attributes}
-          {...listeners}
-          className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-
         {/* Module Type Badge */}
-        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide w-16 truncate">
+        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide w-20 truncate">
           {MODULE_LABELS[module.type] || module.type}
         </span>
 
@@ -329,19 +295,6 @@ function SortableModuleItem({
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
-
-        {/* Delete Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete()
-          }}
-          className="p-1 text-gray-500 hover:text-red-400 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
       </div>
 
       {/* Expanded Content */}
@@ -1305,10 +1258,13 @@ export function StackerEditorScreen() {
   const [headerModule, setHeaderModule] = useState<StackerModule>(() => createDefaultModule('header'))
   const [footerModule, setFooterModule] = useState<StackerModule>(() => createDefaultModule('footer'))
 
-  // Content modules (draggable, deletable)
+  // Content modules (draggable in preview, deletable)
   const [contentModules, setContentModules] = useState<StackerModule[]>([])
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
   const [previewZoom, setPreviewZoom] = useState(100)
+
+  // Selected module for preview-sidebar sync
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null)
 
   // Image crop modal state
   const [cropModalModuleId, setCropModalModuleId] = useState<string | null>(null)
@@ -1320,14 +1276,6 @@ export function StackerEditorScreen() {
 
   // Combined modules for preview (logo-chip + header + content + footer)
   const allModules = [logoChipModule, headerModule, ...contentModules, footerModule]
-
-  // Drag and drop sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
 
   // Toggle module expansion
   const toggleModuleExpand = (moduleId: string) => {
@@ -1341,6 +1289,26 @@ export function StackerEditorScreen() {
       return next
     })
   }
+
+  // Handle module selection from preview (expands and scrolls to sidebar item)
+  const handleSelectModule = useCallback((moduleId: string) => {
+    setSelectedModuleId(moduleId)
+    // Auto-expand the module in sidebar
+    setExpandedModules(prev => new Set(prev).add(moduleId))
+    // Scroll sidebar to the module
+    requestAnimationFrame(() => {
+      const element = document.querySelector(`[data-module-id="${moduleId}"]`)
+      element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    })
+  }, [])
+
+  // Handle modules reorder from preview
+  const handleModulesChange = useCallback((newModules: StackerModule[]) => {
+    // Extract content modules (exclude locked)
+    const lockedTypes = ['logo-chip', 'header', 'footer']
+    const newContentModules = newModules.filter(m => !lockedTypes.includes(m.type))
+    setContentModules(newContentModules)
+  }, [])
 
   // Add content module
   const addModule = useCallback((type: StackerModule['type']) => {
@@ -1373,19 +1341,11 @@ export function StackerEditorScreen() {
   // Delete content module
   const deleteModule = useCallback((moduleId: string) => {
     setContentModules(prev => prev.filter(mod => mod.id !== moduleId))
-  }, [])
-
-  // Handle drag end (only for content modules)
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (over && active.id !== over.id) {
-      setContentModules(prev => {
-        const oldIndex = prev.findIndex(m => m.id === active.id)
-        const newIndex = prev.findIndex(m => m.id === over.id)
-        return arrayMove(prev, oldIndex, newIndex)
-      })
+    // Clear selection if deleted module was selected
+    if (selectedModuleId === moduleId) {
+      setSelectedModuleId(null)
     }
-  }
+  }, [selectedModuleId])
 
   return (
     <div className="space-y-6">
@@ -1419,6 +1379,7 @@ export function StackerEditorScreen() {
               <LockedModuleItem
                 module={logoChipModule}
                 isExpanded={expandedModules.has(logoChipModule.id)}
+                isSelected={selectedModuleId === logoChipModule.id}
                 onToggleExpand={() => toggleModuleExpand(logoChipModule.id)}
                 onUpdate={(updates) => updateModule(logoChipModule.id, updates)}
               />
@@ -1427,42 +1388,29 @@ export function StackerEditorScreen() {
               <LockedModuleItem
                 module={headerModule}
                 isExpanded={expandedModules.has(headerModule.id)}
+                isSelected={selectedModuleId === headerModule.id}
                 onToggleExpand={() => toggleModuleExpand(headerModule.id)}
                 onUpdate={(updates) => updateModule(headerModule.id, updates)}
               />
 
-              {/* Content Modules (draggable) */}
-              {contentModules.length > 0 && (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={contentModules.map(m => m.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-2">
-                      {contentModules.map((module) => (
-                        <SortableModuleItem
-                          key={module.id}
-                          module={module}
-                          isExpanded={expandedModules.has(module.id)}
-                          onToggleExpand={() => toggleModuleExpand(module.id)}
-                          onUpdate={(updates) => updateModule(module.id, updates)}
-                          onDelete={() => deleteModule(module.id)}
-                          onOpenCropModal={setCropModalModuleId}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-              )}
+              {/* Content Modules (reorder via preview drag) */}
+              {contentModules.map((module) => (
+                <ContentModuleItem
+                  key={module.id}
+                  module={module}
+                  isExpanded={expandedModules.has(module.id)}
+                  isSelected={selectedModuleId === module.id}
+                  onToggleExpand={() => toggleModuleExpand(module.id)}
+                  onUpdate={(updates) => updateModule(module.id, updates)}
+                  onOpenCropModal={setCropModalModuleId}
+                />
+              ))}
 
               {/* Locked: Footer */}
               <LockedModuleItem
                 module={footerModule}
                 isExpanded={expandedModules.has(footerModule.id)}
+                isSelected={selectedModuleId === footerModule.id}
                 onToggleExpand={() => toggleModuleExpand(footerModule.id)}
                 onUpdate={(updates) => updateModule(footerModule.id, updates)}
               />
@@ -1534,14 +1482,14 @@ export function StackerEditorScreen() {
           {/* Preview Area */}
           <div className="flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6 overflow-auto">
             <div className="flex justify-center">
-              <div
-                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
-                style={{
-                  zoom: previewZoom / 100,
-                }}
-              >
-                <StackerPdf modules={allModules} scale={1} />
-              </div>
+              <StackerPreviewEditor
+                modules={allModules}
+                selectedModuleId={selectedModuleId}
+                onModulesChange={handleModulesChange}
+                onSelectModule={handleSelectModule}
+                onDeleteModule={deleteModule}
+                previewZoom={previewZoom}
+              />
             </div>
           </div>
         </div>
