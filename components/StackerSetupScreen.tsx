@@ -8,7 +8,7 @@ import { useStore } from '@/store'
 export function StackerSetupScreen() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { setCurrentScreen, reset, clearDraft } = useStore()
+  const { setCurrentScreen, reset, clearDraft, setStackerGeneratedModules, setStackerDocumentTitle } = useStore()
 
   // Input mode: 'upload' or 'text'
   const [inputMode, setInputMode] = useState<'upload' | 'text'>('upload')
@@ -120,12 +120,25 @@ export function StackerSetupScreen() {
         sourceContent = textContent
       }
 
-      // TODO: Call /api/generate-stacker with sourceContent and purpose
-      // For now, just navigate to the editor
-      console.log('Source content:', sourceContent)
-      console.log('Purpose:', purpose)
+      // Call AI to generate the Stacker document
+      const generateResponse = await fetch('/api/generate-stacker', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceContent, purpose }),
+      })
 
-      // Navigate to stacker editor (will be populated by AI in next phase)
+      if (!generateResponse.ok) {
+        const errorData = await generateResponse.json()
+        throw new Error(errorData.error || 'Failed to generate document')
+      }
+
+      const result = await generateResponse.json()
+
+      // Store the generated modules and document title
+      setStackerGeneratedModules(result.modules)
+      setStackerDocumentTitle(result.documentTitle)
+
+      // Navigate to stacker editor
       setCurrentScreen('stacker-editor')
 
     } catch (err) {

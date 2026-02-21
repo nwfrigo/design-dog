@@ -379,6 +379,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   faqCoverImageZoom: 1,
   faqCoverImageGrayscale: false,
 
+  // Stacker PDF state
+  stackerGeneratedModules: null,
+  stackerDocumentTitle: null,
+
   // Export queue
   exportQueue: [],
   editingQueueItemId: null as string | null,
@@ -619,6 +623,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     faqCoverImageZoom: 1,
     faqCoverImageGrayscale: false,
   }),
+
+  // Stacker PDF actions
+  setStackerGeneratedModules: (modules) => set({ stackerGeneratedModules: modules }),
+  setStackerDocumentTitle: (title) => set({ stackerDocumentTitle: title }),
+  clearStackerGenerated: () => set({ stackerGeneratedModules: null, stackerDocumentTitle: null }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),

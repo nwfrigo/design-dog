@@ -837,6 +837,10 @@ export interface AppState {
   faqCoverImageZoom: number
   faqCoverImageGrayscale: boolean
 
+  // Stacker PDF state
+  stackerGeneratedModules: StackerModule[] | null
+  stackerDocumentTitle: string | null
+
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
   setContentMode: (mode: ContentMode) => void
@@ -991,6 +995,11 @@ export interface AppState {
   setFaqCoverImageZoom: (zoom: number) => void
   setFaqCoverImageGrayscale: (grayscale: boolean) => void
   resetFaqToDefaults: () => void
+
+  // Stacker PDF actions
+  setStackerGeneratedModules: (modules: StackerModule[] | null) => void
+  setStackerDocumentTitle: (title: string | null) => void
+  clearStackerGenerated: () => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

@@ -1726,7 +1726,7 @@ function ModuleEditor({
 
 
 export function StackerEditorScreen() {
-  const { setCurrentScreen } = useStore()
+  const { setCurrentScreen, stackerGeneratedModules, clearStackerGenerated } = useStore()
 
   // Locked modules (always present, not deletable, not draggable)
   const [logoChipModule, setLogoChipModule] = useState<StackerModule>(() => createDefaultModule('logo-chip'))
@@ -1735,6 +1735,29 @@ export function StackerEditorScreen() {
 
   // Content modules (draggable in preview, deletable)
   const [contentModules, setContentModules] = useState<StackerModule[]>([])
+
+  // Load generated modules from store on mount
+  useEffect(() => {
+    if (stackerGeneratedModules && stackerGeneratedModules.length > 0) {
+      // Find and set locked modules
+      const logoChip = stackerGeneratedModules.find(m => m.type === 'logo-chip')
+      const header = stackerGeneratedModules.find(m => m.type === 'header')
+      const footer = stackerGeneratedModules.find(m => m.type === 'footer')
+
+      if (logoChip) setLogoChipModule(logoChip)
+      if (header) setHeaderModule(header)
+      if (footer) setFooterModule(footer)
+
+      // Set content modules (everything except locked modules)
+      const content = stackerGeneratedModules.filter(
+        m => m.type !== 'logo-chip' && m.type !== 'header' && m.type !== 'footer'
+      )
+      setContentModules(content)
+
+      // Clear the store so we don't reload on future mounts
+      clearStackerGenerated()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
   const [previewZoom, setPreviewZoom] = useState(100)
 
