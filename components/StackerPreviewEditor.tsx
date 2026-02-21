@@ -37,12 +37,37 @@ import { OneStatModule } from './templates/StackerPdf/modules/OneStatModule'
 import { FooterModule } from './templates/StackerPdf/modules/FooterModule'
 import { BulletListModule } from './templates/StackerPdf/modules/BulletListModule'
 
+// Module type labels for the add menu
+const MODULE_LABELS: Record<string, string> = {
+  'paragraph': 'Paragraph',
+  'bullet-three': '3 Bullets',
+  'image': 'Image',
+  'divider': 'Divider',
+  'three-card': 'Cards',
+  'quote': 'Quote',
+  'three-stats': '3 Stats',
+  'one-stat': '1 Stat',
+}
+
+// Content module types (excludes locked modules)
+const CONTENT_MODULE_TYPES: StackerModule['type'][] = [
+  'paragraph',
+  'bullet-three',
+  'image',
+  'divider',
+  'three-card',
+  'quote',
+  'three-stats',
+  'one-stat',
+]
+
 export interface StackerPreviewEditorProps {
   modules: StackerModule[]
   selectedModuleId: string | null
   onModulesChange: (modules: StackerModule[]) => void
   onSelectModule: (moduleId: string) => void
   onDeleteModule: (moduleId: string) => void
+  onAddModule: (type: StackerModule['type']) => void
   previewZoom: number
 }
 
@@ -153,10 +178,12 @@ export function StackerPreviewEditor({
   onModulesChange,
   onSelectModule,
   onDeleteModule,
+  onAddModule,
   previewZoom,
 }: StackerPreviewEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
+  const [showAddMenu, setShowAddMenu] = useState(false)
 
   // Configure sensors with activation constraint to distinguish click vs drag
   const sensors = useSensors(
@@ -238,6 +265,25 @@ export function StackerPreviewEditor({
     )
   }, [selectedModuleId, onSelectModule, onDeleteModule, overId, activeId, modules.length])
 
+  // Render add module tile inside the document
+  const renderAddModuleTile = useCallback(() => (
+    <div className="relative">
+      <button
+        onClick={() => setShowAddMenu(true)}
+        className="w-full py-4 rounded-md border border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 group"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          <span className="text-xs font-medium text-gray-400 group-hover:text-blue-500 transition-colors">
+            Add Module
+          </span>
+        </div>
+      </button>
+    </div>
+  ), [])
+
   return (
     <DndContext
       sensors={sensors}
@@ -261,6 +307,7 @@ export function StackerPreviewEditor({
             modules={modules}
             scale={1}
             renderModuleWrapper={renderModuleWrapper}
+            renderFooterContent={renderAddModuleTile}
           />
         </div>
       </SortableContext>
@@ -289,6 +336,49 @@ export function StackerPreviewEditor({
           </div>
         )}
       </DragOverlay>
+
+      {/* Add Module Modal */}
+      {showAddMenu && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowAddMenu(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-white rounded-xl shadow-2xl p-5 w-[320px]">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-gray-900">Add Module</h3>
+              <button
+                onClick={() => setShowAddMenu(false)}
+                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Module Type Grid */}
+            <div className="grid grid-cols-2 gap-2">
+              {CONTENT_MODULE_TYPES.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => {
+                    onAddModule(type)
+                    setShowAddMenu(false)
+                  }}
+                  className="px-3 py-3 text-sm text-center text-gray-700 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                >
+                  {MODULE_LABELS[type]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </DndContext>
   )
 }

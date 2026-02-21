@@ -23,6 +23,8 @@ export interface StackerPdfProps {
   scale?: number
   // Optional wrapper for interactive editing (drag handles, click-to-select)
   renderModuleWrapper?: (module: StackerModule, children: ReactNode, index: number) => ReactNode
+  // Optional content to render after all modules (e.g., "Add Module" tile)
+  renderFooterContent?: () => ReactNode
 }
 
 // Render individual module based on type
@@ -157,7 +159,7 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
   }
 }
 
-export function StackerPdf({ modules, scale = 1, renderModuleWrapper }: StackerPdfProps) {
+export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFooterContent }: StackerPdfProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
 
   const documentStyle: CSSProperties = {
@@ -201,6 +203,8 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper }: StackerP
             Add modules to start building your document
           </div>
         )}
+        {/* Optional footer content (e.g., Add Module tile in editor) */}
+        {renderFooterContent && renderFooterContent()}
       </div>
     </div>
   )
