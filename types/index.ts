@@ -47,6 +47,7 @@ export type StackerModuleType =
   | 'paragraph'
   | 'bullet-three'
   | 'image'
+  | 'image-16x9'
   | 'divider'
   | 'three-card'
   | 'quote'
@@ -112,6 +113,21 @@ export interface StackerImageModule extends StackerBaseModule {
   showCta: boolean
 }
 
+export interface StackerImage16x9Module extends StackerBaseModule {
+  type: 'image-16x9'
+  imagePosition: 'left' | 'right'
+  imageUrl: string | null
+  imagePan: { x: number; y: number }
+  imageZoom: number
+  grayscale: boolean
+  eyebrow: string
+  showEyebrow: boolean
+  heading: string
+  showHeading: boolean
+  body: string
+  showBody: boolean
+}
+
 export interface StackerDividerModule extends StackerBaseModule {
   type: 'divider'
 }
@@ -171,6 +187,7 @@ export type StackerModule =
   | StackerParagraphModule
   | StackerBulletThreeModule
   | StackerImageModule
+  | StackerImage16x9Module
   | StackerDividerModule
   | StackerThreeCardModule
   | StackerQuoteModule
@@ -315,7 +332,7 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-editor'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-setup' | 'stacker-editor'
 
 // Auto-Create Types (formerly Quick Start)
 export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'

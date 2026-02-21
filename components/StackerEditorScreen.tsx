@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
 import { StackerPreviewEditor } from './StackerPreviewEditor'
 import { ImageCropModal } from './ImageCropModal'
-import type { StackerModule, StackerImageModule, SolutionCategory } from '@/types'
+import type { StackerModule, StackerImageModule, StackerImage16x9Module, SolutionCategory } from '@/types'
 import {
   DndContext,
   closestCenter,
@@ -32,7 +32,8 @@ const MODULE_LABELS: Record<string, string> = {
   'header': 'Header',
   'paragraph': 'Paragraph',
   'bullet-three': '3 Bullets',
-  'image': 'Image',
+  'image': 'Image - 1:1',
+  'image-16x9': 'Image - 16:9',
   'divider': 'Divider',
   'three-card': 'Cards',
   'quote': 'Quote',
@@ -103,6 +104,22 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
         cta: 'Learn More',
         ctaUrl: '',
         showCta: true,
+      }
+    case 'image-16x9':
+      return {
+        id,
+        type: 'image-16x9',
+        imagePosition: 'left',
+        imageUrl: null,
+        imagePan: { x: 0, y: 0 },
+        imageZoom: 1,
+        grayscale: false,
+        eyebrow: 'Lorem ipsum dolor',
+        showEyebrow: true,
+        heading: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        showHeading: true,
+        body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula.',
+        showBody: true,
       }
     case 'divider':
       return {
@@ -178,6 +195,8 @@ function getModulePreview(module: StackerModule): string {
       return module.heading || `${module.columns[0].bullets.length} bullets per column`
     case 'image':
       return `Image ${module.imagePosition} · ${module.imageUrl ? 'Uploaded' : 'No image'}`
+    case 'image-16x9':
+      return `Image 16:9 ${module.imagePosition} · ${module.imageUrl ? 'Uploaded' : 'No image'}`
     case 'divider':
       return 'Horizontal divider'
     case 'three-card':
@@ -956,6 +975,222 @@ function ModuleEditor({
         </div>
       )
 
+    case 'image-16x9':
+      return (
+        <div className="space-y-3">
+          {/* Image Position Toggle */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image Position</label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => onUpdate({ imagePosition: 'left' })}
+                className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                  module.imagePosition === 'left'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                Left
+              </button>
+              <button
+                onClick={() => onUpdate({ imagePosition: 'right' })}
+                className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                  module.imagePosition === 'right'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                Right
+              </button>
+            </div>
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image (16:9)</label>
+            {module.imageUrl ? (
+              <div className="relative">
+                {/* Image preview - click to adjust */}
+                <div
+                  onClick={() => onOpenCropModal?.(module.id)}
+                  className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-colors"
+                  style={{ width: '100%', height: 80 }}
+                >
+                  <img
+                    src={module.imageUrl}
+                    alt="Selected image"
+                    className="w-full h-full object-cover"
+                    style={{
+                      objectPosition: `${50 - module.imagePan.x}% ${50 - module.imagePan.y}%`,
+                      transform: module.imageZoom !== 1 ? `scale(${module.imageZoom})` : undefined,
+                    }}
+                  />
+                </div>
+                {/* Adjust button */}
+                <button
+                  onClick={() => onOpenCropModal?.(module.id)}
+                  className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                >
+                  Adjust
+                </button>
+                {/* Remove button */}
+                <button
+                  onClick={() => {
+                    onUpdate({
+                      imageUrl: null,
+                      imageZoom: 1,
+                      imagePan: { x: 0, y: 0 },
+                    })
+                  }}
+                  className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
+                  title="Remove image"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <div
+                className="border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+              >
+                <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        const reader = new FileReader()
+                        reader.onload = () => onUpdate({ imageUrl: reader.result as string })
+                        reader.readAsDataURL(file)
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Drop or click to upload
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* Grayscale Toggle - only show when image is uploaded */}
+          {module.imageUrl && (
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-500 dark:text-gray-500">Grayscale</label>
+              <button
+                onClick={() => onUpdate({ grayscale: !module.grayscale })}
+                className={`relative w-9 h-5 rounded-full transition-colors ${
+                  module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                    module.grayscale ? 'translate-x-4' : ''
+                  }`}
+                />
+              </button>
+            </div>
+          )}
+
+          {/* Show Eyebrow Toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-gray-500">Show Eyebrow</label>
+            <button
+              onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })}
+              className={`relative w-9 h-5 rounded-full transition-colors ${
+                module.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  module.showEyebrow ? 'translate-x-4' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Eyebrow Text */}
+          {module.showEyebrow && (
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Eyebrow</label>
+              <input
+                type="text"
+                value={module.eyebrow}
+                onChange={(e) => onUpdate({ eyebrow: e.target.value })}
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                placeholder="Enter eyebrow"
+              />
+            </div>
+          )}
+
+          {/* Show Heading Toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-gray-500">Show Heading</label>
+            <button
+              onClick={() => onUpdate({ showHeading: !module.showHeading })}
+              className={`relative w-9 h-5 rounded-full transition-colors ${
+                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  module.showHeading ? 'translate-x-4' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Heading Text */}
+          {module.showHeading && (
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading</label>
+              <textarea
+                value={module.heading}
+                onChange={(e) => onUpdate({ heading: e.target.value })}
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                rows={2}
+                placeholder="Enter heading"
+              />
+            </div>
+          )}
+
+          {/* Show Body Toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-gray-500">Show Body</label>
+            <button
+              onClick={() => onUpdate({ showBody: !module.showBody })}
+              className={`relative w-9 h-5 rounded-full transition-colors ${
+                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  module.showBody ? 'translate-x-4' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Body Text */}
+          {module.showBody && (
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Body</label>
+              <textarea
+                value={module.body}
+                onChange={(e) => onUpdate({ body: e.target.value })}
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                rows={3}
+                placeholder="Enter body text"
+              />
+            </div>
+          )}
+        </div>
+      )
+
     case 'three-card':
       return (
         <div className="space-y-4">
@@ -1284,7 +1519,7 @@ export function StackerEditorScreen() {
 
   // Get the image module being edited in crop modal
   const cropModalModule = cropModalModuleId
-    ? contentModules.find(m => m.id === cropModalModuleId && m.type === 'image') as StackerImageModule | undefined
+    ? contentModules.find(m => m.id === cropModalModuleId && (m.type === 'image' || m.type === 'image-16x9')) as (StackerImageModule | StackerImage16x9Module) | undefined
     : undefined
 
   // Combined modules for preview (logo-chip + header + content + footer)
@@ -1553,8 +1788,8 @@ export function StackerEditorScreen() {
           isOpen={!!cropModalModuleId}
           onClose={() => setCropModalModuleId(null)}
           imageSrc={cropModalModule.imageUrl}
-          frameWidth={200}
-          frameHeight={200}
+          frameWidth={cropModalModule.type === 'image-16x9' ? 180 : 180}
+          frameHeight={cropModalModule.type === 'image-16x9' ? 100 : 180}
           initialPosition={cropModalModule.imagePan}
           initialZoom={cropModalModule.imageZoom}
           onSave={(position, zoom) => {

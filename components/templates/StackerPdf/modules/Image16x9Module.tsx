@@ -2,26 +2,7 @@
 
 import { CSSProperties } from 'react'
 
-// Arrow SVG for CTA
-const ArrowIcon = () => (
-  <svg
-    width="11"
-    height="9"
-    viewBox="0 0 11 9"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M1 4.5H10M10 4.5L6.5 1M10 4.5L6.5 8"
-      stroke="#060015"
-      strokeWidth="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
-
-export interface ImageModuleProps {
+export interface Image16x9ModuleProps {
   imagePosition: 'left' | 'right'
   imageUrl: string | null
   imagePan: { x: number; y: number }
@@ -33,13 +14,10 @@ export interface ImageModuleProps {
   showHeading: boolean
   body: string
   showBody: boolean
-  cta: string
-  ctaUrl: string
-  showCta: boolean
   scale?: number
 }
 
-export function ImageModule({
+export function Image16x9Module({
   imagePosition,
   imageUrl,
   imagePan,
@@ -51,11 +29,8 @@ export function ImageModule({
   showHeading,
   body,
   showBody,
-  cta,
-  ctaUrl,
-  showCta,
   scale = 1,
-}: ImageModuleProps) {
+}: Image16x9ModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
 
   const containerStyle: CSSProperties = {
@@ -71,7 +46,7 @@ export function ImageModule({
 
   const imageStyle: CSSProperties = {
     width: 180,
-    height: 180,
+    height: 100,
     borderRadius: 6.45,
     border: '0.65px solid #D9D8D6',
     flexShrink: 0,
@@ -101,40 +76,19 @@ export function ImageModule({
 
   const headingStyle: CSSProperties = {
     color: 'black',
-    fontSize: 18,
-    fontWeight: 350,
-    wordWrap: 'break-word',
-  }
-
-  const bodyStyle: CSSProperties = {
-    color: 'black',
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',
     wordWrap: 'break-word',
   }
 
-  const ctaStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    textDecoration: 'none',
-    cursor: ctaUrl ? 'pointer' : 'default',
-  }
-
-  const ctaTextStyle: CSSProperties = {
-    color: '#060015',
-    fontSize: 12,
-    fontWeight: 500,
+  const bodyStyle: CSSProperties = {
+    color: 'black',
+    fontSize: 8,
+    fontWeight: 350,
     lineHeight: '12px',
+    wordWrap: 'break-word',
   }
-
-  const ctaContent = (
-    <>
-      <span style={ctaTextStyle}>{cta || 'Learn More'}</span>
-      <ArrowIcon />
-    </>
-  )
 
   return (
     <div style={containerStyle}>
@@ -152,21 +106,9 @@ export function ImageModule({
         {showBody && body && (
           <div style={bodyStyle}>{body}</div>
         )}
-
-        {showCta && (
-          ctaUrl ? (
-            <a href={ctaUrl} style={ctaStyle}>
-              {ctaContent}
-            </a>
-          ) : (
-            <div style={ctaStyle}>
-              {ctaContent}
-            </div>
-          )
-        )}
       </div>
     </div>
   )
 }
 
-export default ImageModule
+export default Image16x9Module

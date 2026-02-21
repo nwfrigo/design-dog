@@ -30,6 +30,7 @@ import { HeaderModule } from './templates/StackerPdf/modules/HeaderModule'
 import { ParagraphModule } from './templates/StackerPdf/modules/ParagraphModule'
 import { DividerModule } from './templates/StackerPdf/modules/DividerModule'
 import { ImageModule } from './templates/StackerPdf/modules/ImageModule'
+import { Image16x9Module } from './templates/StackerPdf/modules/Image16x9Module'
 import { CardsModule } from './templates/StackerPdf/modules/CardsModule'
 import { QuoteModule } from './templates/StackerPdf/modules/QuoteModule'
 import { ThreeStatsModule } from './templates/StackerPdf/modules/ThreeStatsModule'
@@ -41,7 +42,8 @@ import { BulletListModule } from './templates/StackerPdf/modules/BulletListModul
 const MODULE_LABELS: Record<string, string> = {
   'paragraph': 'Paragraph',
   'bullet-three': '3 Bullets',
-  'image': 'Image',
+  'image': 'Image - 1:1',
+  'image-16x9': 'Image - 16:9',
   'divider': 'Divider',
   'three-card': 'Cards',
   'quote': 'Quote',
@@ -54,6 +56,7 @@ const CONTENT_MODULE_TYPES: StackerModule['type'][] = [
   'paragraph',
   'bullet-three',
   'image',
+  'image-16x9',
   'divider',
   'three-card',
   'quote',
@@ -121,6 +124,22 @@ function RenderModuleForOverlay({ module }: { module: StackerModule }) {
           cta={module.cta}
           ctaUrl={module.ctaUrl}
           showCta={module.showCta}
+        />
+      )
+    case 'image-16x9':
+      return (
+        <Image16x9Module
+          imagePosition={module.imagePosition}
+          imageUrl={module.imageUrl}
+          imagePan={module.imagePan}
+          imageZoom={module.imageZoom}
+          grayscale={module.grayscale}
+          eyebrow={module.eyebrow}
+          showEyebrow={module.showEyebrow}
+          heading={module.heading}
+          showHeading={module.showHeading}
+          body={module.body}
+          showBody={module.showBody}
         />
       )
     case 'three-card':

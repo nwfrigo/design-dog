@@ -7,6 +7,7 @@ import { HeaderModule } from './modules/HeaderModule'
 import { ParagraphModule } from './modules/ParagraphModule'
 import { DividerModule } from './modules/DividerModule'
 import { ImageModule } from './modules/ImageModule'
+import { Image16x9Module } from './modules/Image16x9Module'
 import { CardsModule } from './modules/CardsModule'
 import { QuoteModule } from './modules/QuoteModule'
 import { ThreeStatsModule } from './modules/ThreeStatsModule'
@@ -86,6 +87,24 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
           cta={module.cta}
           ctaUrl={module.ctaUrl}
           showCta={module.showCta}
+          scale={scale}
+        />
+      )
+
+    case 'image-16x9':
+      return (
+        <Image16x9Module
+          imagePosition={module.imagePosition}
+          imageUrl={module.imageUrl}
+          imagePan={module.imagePan}
+          imageZoom={module.imageZoom}
+          grayscale={module.grayscale}
+          eyebrow={module.eyebrow}
+          showEyebrow={module.showEyebrow}
+          heading={module.heading}
+          showHeading={module.showHeading}
+          body={module.body}
+          showBody={module.showBody}
           scale={scale}
         />
       )
