@@ -32,6 +32,7 @@ import { DividerModule } from './templates/StackerPdf/modules/DividerModule'
 import { ImageModule } from './templates/StackerPdf/modules/ImageModule'
 import { Image16x9Module } from './templates/StackerPdf/modules/Image16x9Module'
 import { CardsModule } from './templates/StackerPdf/modules/CardsModule'
+import { ImageCardsModule } from './templates/StackerPdf/modules/ImageCardsModule'
 import { QuoteModule } from './templates/StackerPdf/modules/QuoteModule'
 import { ThreeStatsModule } from './templates/StackerPdf/modules/ThreeStatsModule'
 import { OneStatModule } from './templates/StackerPdf/modules/OneStatModule'
@@ -45,7 +46,8 @@ const MODULE_LABELS: Record<string, string> = {
   'image': 'Image - 1:1',
   'image-16x9': 'Image - 16:9',
   'divider': 'Divider',
-  'three-card': 'Cards',
+  'three-card': 'Simple Cards',
+  'image-cards': 'Image Cards',
   'quote': 'Quote',
   'three-stats': '3 Stats',
   'one-stat': '1 Stat',
@@ -59,6 +61,7 @@ const CONTENT_MODULE_TYPES: StackerModule['type'][] = [
   'image-16x9',
   'divider',
   'three-card',
+  'image-cards',
   'quote',
   'three-stats',
   'one-stat',
@@ -144,6 +147,16 @@ function RenderModuleForOverlay({ module }: { module: StackerModule }) {
       )
     case 'three-card':
       return <CardsModule cards={module.cards} />
+    case 'image-cards':
+      return (
+        <ImageCardsModule
+          heading={module.heading}
+          showHeading={module.showHeading}
+          cards={module.cards}
+          showCard3={module.showCard3}
+          grayscale={module.grayscale}
+        />
+      )
     case 'quote':
       return (
         <QuoteModule

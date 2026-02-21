@@ -9,6 +9,7 @@ import { DividerModule } from './modules/DividerModule'
 import { ImageModule } from './modules/ImageModule'
 import { Image16x9Module } from './modules/Image16x9Module'
 import { CardsModule } from './modules/CardsModule'
+import { ImageCardsModule } from './modules/ImageCardsModule'
 import { QuoteModule } from './modules/QuoteModule'
 import { ThreeStatsModule } from './modules/ThreeStatsModule'
 import { OneStatModule } from './modules/OneStatModule'
@@ -113,6 +114,18 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
       return (
         <CardsModule
           cards={module.cards}
+          scale={scale}
+        />
+      )
+
+    case 'image-cards':
+      return (
+        <ImageCardsModule
+          heading={module.heading}
+          showHeading={module.showHeading}
+          cards={module.cards}
+          showCard3={module.showCard3}
+          grayscale={module.grayscale}
           scale={scale}
         />
       )

@@ -66,7 +66,7 @@ export function LogoChipModule({
     width: '100%',
     display: 'flex',
     alignItems: 'center',
-    gap: 48,
+    justifyContent: 'space-between',
     fontFamily,
     transform: scale !== 1 ? `scale(${scale})` : undefined,
     transformOrigin: 'top left',
@@ -103,6 +103,9 @@ export function LogoChipModule({
     textTransform: 'uppercase',
     letterSpacing: 0.56,
     whiteSpace: 'nowrap',
+    lineHeight: 1,
+    position: 'relative',
+    top: 1,
   })
 
   return (

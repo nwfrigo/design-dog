@@ -23,7 +23,7 @@ const ArrowIcon = () => (
 
 export interface HeaderModuleProps {
   heading: string
-  headingSize: 'h1' | 'h2'
+  headingSize: 'h1' | 'h2' | 'h3'
   subheader?: string
   showSubheader: boolean
   cta?: string
@@ -62,7 +62,7 @@ export function HeaderModule({
 
   const headingStyle: CSSProperties = {
     color: 'black',
-    fontSize: headingSize === 'h1' ? 36 : 30,
+    fontSize: headingSize === 'h1' ? 36 : headingSize === 'h2' ? 30 : 24,
     fontWeight: 350,
     lineHeight: 1.15,
     margin: 0,

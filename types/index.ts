@@ -50,6 +50,7 @@ export type StackerModuleType =
   | 'image-16x9'
   | 'divider'
   | 'three-card'
+  | 'image-cards'
   | 'quote'
   | 'three-stats'
   | 'one-stat'
@@ -69,7 +70,7 @@ export interface StackerLogoChipModule extends StackerBaseModule {
 export interface StackerHeaderModule extends StackerBaseModule {
   type: 'header'
   heading: string
-  headingSize: 'h1' | 'h2'
+  headingSize: 'h1' | 'h2' | 'h3'
   subheader: string
   showSubheader: boolean
   cta: string
@@ -141,6 +142,25 @@ export interface StackerThreeCardModule extends StackerBaseModule {
   ]
 }
 
+export interface StackerImageCardData {
+  imageUrl: string | null
+  imagePan: { x: number; y: number }
+  imageZoom: number
+  eyebrow: string
+  showEyebrow: boolean
+  title: string
+  body: string
+}
+
+export interface StackerImageCardsModule extends StackerBaseModule {
+  type: 'image-cards'
+  heading: string
+  showHeading: boolean
+  cards: [StackerImageCardData, StackerImageCardData, StackerImageCardData]
+  showCard3: boolean
+  grayscale: boolean
+}
+
 export interface StackerQuoteModule extends StackerBaseModule {
   type: 'quote'
   quote: string
@@ -190,6 +210,7 @@ export type StackerModule =
   | StackerImage16x9Module
   | StackerDividerModule
   | StackerThreeCardModule
+  | StackerImageCardsModule
   | StackerQuoteModule
   | StackerThreeStatsModule
   | StackerOneStatModule

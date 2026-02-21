@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
 import { StackerPreviewEditor } from './StackerPreviewEditor'
 import { ImageCropModal } from './ImageCropModal'
-import type { StackerModule, StackerImageModule, StackerImage16x9Module, SolutionCategory } from '@/types'
+import type { StackerModule, StackerImageModule, StackerImage16x9Module, StackerImageCardsModule, SolutionCategory } from '@/types'
 import {
   DndContext,
   closestCenter,
@@ -35,7 +35,8 @@ const MODULE_LABELS: Record<string, string> = {
   'image': 'Image - 1:1',
   'image-16x9': 'Image - 16:9',
   'divider': 'Divider',
-  'three-card': 'Cards',
+  'three-card': 'Simple Cards',
+  'image-cards': 'Image Cards',
   'quote': 'Quote',
   'three-stats': '3 Stats',
   'one-stat': '1 Stat',
@@ -136,6 +137,44 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
           { icon: 'clock', title: 'Card 3', description: 'Description for card 3' },
         ],
       }
+    case 'image-cards':
+      return {
+        id,
+        type: 'image-cards',
+        heading: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        showHeading: true,
+        cards: [
+          {
+            imageUrl: null,
+            imagePan: { x: 0, y: 0 },
+            imageZoom: 1,
+            eyebrow: 'Lorem ipsum dolor',
+            showEyebrow: true,
+            title: 'Lorem ipsum dolor sit',
+            body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula. Donec vel felis erat. Praesent iaculis malesuada neque at mattis.',
+          },
+          {
+            imageUrl: null,
+            imagePan: { x: 0, y: 0 },
+            imageZoom: 1,
+            eyebrow: 'Lorem ipsum dolor',
+            showEyebrow: true,
+            title: 'Lorem ipsum dolor sit',
+            body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula. Donec vel felis erat. Praesent iaculis malesuada neque at mattis.',
+          },
+          {
+            imageUrl: null,
+            imagePan: { x: 0, y: 0 },
+            imageZoom: 1,
+            eyebrow: 'Lorem ipsum dolor',
+            showEyebrow: true,
+            title: 'Lorem ipsum dolor sit',
+            body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula. Donec vel felis erat. Praesent iaculis malesuada neque at mattis.',
+          },
+        ],
+        showCard3: true,
+        grayscale: false,
+      }
     case 'quote':
       return {
         id,
@@ -201,6 +240,8 @@ function getModulePreview(module: StackerModule): string {
       return 'Horizontal divider'
     case 'three-card':
       return module.cards[0]?.title || '3 Cards'
+    case 'image-cards':
+      return `${module.showCard3 ? '3' : '2'} Image Cards`
     case 'quote':
       return module.quote.substring(0, 40) || 'Quote'
     case 'three-stats':
@@ -454,7 +495,7 @@ function ModuleEditor({
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                 }`}
               >
-                H1 (36pt)
+                Large
               </button>
               <button
                 onClick={() => onUpdate({ headingSize: 'h2' })}
@@ -464,7 +505,17 @@ function ModuleEditor({
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                 }`}
               >
-                H2 (30pt)
+                Medium
+              </button>
+              <button
+                onClick={() => onUpdate({ headingSize: 'h3' })}
+                className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                  module.headingSize === 'h3'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                Small
               </button>
             </div>
           </div>
@@ -1245,6 +1296,215 @@ function ModuleEditor({
                   className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                   rows={3}
                   placeholder="Enter card description"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )
+
+    case 'image-cards':
+      return (
+        <div className="space-y-4">
+          {/* Show Heading Toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-gray-500">Show Heading</label>
+            <button
+              onClick={() => onUpdate({ showHeading: !module.showHeading })}
+              className={`relative w-9 h-5 rounded-full transition-colors ${
+                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  module.showHeading ? 'translate-x-4' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Heading Text */}
+          {module.showHeading && (
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading</label>
+              <textarea
+                value={module.heading}
+                onChange={(e) => onUpdate({ heading: e.target.value })}
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                rows={2}
+                placeholder="Enter heading"
+              />
+            </div>
+          )}
+
+          {/* Show Third Card Toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-gray-500">Show Third Card</label>
+            <button
+              onClick={() => onUpdate({ showCard3: !module.showCard3 })}
+              className={`relative w-9 h-5 rounded-full transition-colors ${
+                module.showCard3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  module.showCard3 ? 'translate-x-4' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Grayscale Toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-gray-500">Grayscale Images</label>
+            <button
+              onClick={() => onUpdate({ grayscale: !module.grayscale })}
+              className={`relative w-9 h-5 rounded-full transition-colors ${
+                module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  module.grayscale ? 'translate-x-4' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Cards */}
+          {module.cards.slice(0, module.showCard3 ? 3 : 2).map((card, index) => (
+            <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                Card {index + 1}
+              </div>
+
+              {/* Image Upload */}
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image</label>
+                {card.imageUrl ? (
+                  <div className="relative">
+                    <div
+                      className="overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600"
+                      style={{ width: '100%', height: 60 }}
+                    >
+                      <img
+                        src={card.imageUrl}
+                        alt={`Card ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        style={{ filter: module.grayscale ? 'grayscale(100%)' : undefined }}
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newCards = [...module.cards] as typeof module.cards
+                        newCards[index] = { ...card, imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1 }
+                        onUpdate({ cards: newCards })
+                      }}
+                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
+                      title="Remove image"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed rounded-lg h-12 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400">
+                    <label className="flex items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400 gap-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            const reader = new FileReader()
+                            reader.onload = () => {
+                              const newCards = [...module.cards] as typeof module.cards
+                              newCards[index] = { ...card, imageUrl: reader.result as string }
+                              onUpdate({ cards: newCards })
+                            }
+                            reader.readAsDataURL(file)
+                          }
+                        }}
+                        className="hidden"
+                      />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      Upload
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {/* Show Eyebrow Toggle */}
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-gray-500 dark:text-gray-500">Show Eyebrow</label>
+                <button
+                  onClick={() => {
+                    const newCards = [...module.cards] as typeof module.cards
+                    newCards[index] = { ...card, showEyebrow: !card.showEyebrow }
+                    onUpdate({ cards: newCards })
+                  }}
+                  className={`relative w-9 h-5 rounded-full transition-colors ${
+                    card.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                      card.showEyebrow ? 'translate-x-4' : ''
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Eyebrow Text */}
+              {card.showEyebrow && (
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Eyebrow</label>
+                  <input
+                    type="text"
+                    value={card.eyebrow}
+                    onChange={(e) => {
+                      const newCards = [...module.cards] as typeof module.cards
+                      newCards[index] = { ...card, eyebrow: e.target.value }
+                      onUpdate({ cards: newCards })
+                    }}
+                    className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    placeholder="Eyebrow text"
+                  />
+                </div>
+              )}
+
+              {/* Title */}
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={card.title}
+                  onChange={(e) => {
+                    const newCards = [...module.cards] as typeof module.cards
+                    newCards[index] = { ...card, title: e.target.value }
+                    onUpdate({ cards: newCards })
+                  }}
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  placeholder="Card title"
+                />
+              </div>
+
+              {/* Body */}
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Body</label>
+                <textarea
+                  value={card.body}
+                  onChange={(e) => {
+                    const newCards = [...module.cards] as typeof module.cards
+                    newCards[index] = { ...card, body: e.target.value }
+                    onUpdate({ cards: newCards })
+                  }}
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  rows={2}
+                  placeholder="Card body text"
                 />
               </div>
             </div>
