@@ -9,11 +9,13 @@ export interface StatData {
 
 export interface ThreeStatsModuleProps {
   stats: [StatData, StatData, StatData]
+  showStat3?: boolean
   scale?: number
 }
 
 export function ThreeStatsModule({
   stats,
+  showStat3 = true,
   scale = 1,
 }: ThreeStatsModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
@@ -54,9 +56,11 @@ export function ThreeStatsModule({
     wordWrap: 'break-word',
   }
 
+  const visibleStats = showStat3 ? stats : stats.slice(0, 2)
+
   return (
     <div style={containerStyle}>
-      {stats.map((stat, index) => (
+      {visibleStats.map((stat, index) => (
         <div key={index} style={statStyle}>
           <div style={valueStyle}>{stat.value}</div>
           <div style={labelStyle}>{stat.label}</div>

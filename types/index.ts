@@ -176,6 +176,7 @@ export interface StackerThreeStatsModule extends StackerBaseModule {
     { value: string; label: string },
     { value: string; label: string }
   ]
+  showStat3: boolean
 }
 
 export interface StackerOneStatModule extends StackerBaseModule {

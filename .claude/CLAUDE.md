@@ -553,6 +553,26 @@ npm run dev
 - Solution pill border: `#0080FF`
 - Brand orange (primary): `#D35F0B`
 
+### Editor Dark Mode Colors (Tailwind Classes)
+
+**IMPORTANT:** All editor screens must use standard Tailwind gray classes for dark mode, NOT custom purple-tinted colors. This ensures consistent dark mode appearance across all templates.
+
+| Element | Light Mode | Dark Mode |
+|---------|------------|-----------|
+| Sidebar/Panel background | `bg-gray-100` | `dark:bg-gray-800/50` |
+| Module item/card background | `bg-white` | `dark:bg-gray-800` |
+| Input field background | `bg-gray-100` | `dark:bg-gray-900` |
+| Section background | `bg-gray-50` | `dark:bg-gray-800/50` |
+| Hover state | `hover:bg-gray-100` or `hover:bg-gray-200` | `dark:hover:bg-gray-700` |
+| Border | `border-gray-200` or `border-gray-300` | `dark:border-gray-700` |
+
+**❌ NEVER use these custom colors in editor UIs:**
+- `#0d0d1a` (purple-black)
+- `#1a1a2e` (dark purple-blue)
+- `#252540` (purple-gray)
+
+These create an inconsistent purple-tinted theme that doesn't match other editor screens.
+
 ### Solution Category Colors
 - Environmental: `#49763E`
 - Health: `#00767F`

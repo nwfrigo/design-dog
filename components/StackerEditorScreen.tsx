@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
 import { StackerPreviewEditor } from './StackerPreviewEditor'
 import { ImageCropModal } from './ImageCropModal'
+import { IconPicker } from './IconPickerModal'
 import type { StackerModule, StackerImageModule, StackerImage16x9Module, StackerImageCardsModule, SolutionCategory } from '@/types'
 import {
   DndContext,
@@ -22,6 +23,51 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+// Delete Confirmation Modal
+function DeleteConfirmModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+  itemType,
+  itemLabel,
+}: {
+  isOpen: boolean
+  onConfirm: () => void
+  onCancel: () => void
+  itemType: string
+  itemLabel?: string
+}) {
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          Delete {itemType}{itemLabel ? ` ${itemLabel}` : ''}?
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          This action cannot be undone. Are you sure you want to delete this {itemType.toLowerCase()}?
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -193,6 +239,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
           { value: '0,000', label: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' },
           { value: '0,000', label: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' },
         ],
+        showStat3: true,
       }
     case 'one-stat':
       return {
@@ -274,7 +321,7 @@ function LockedModuleItem({
   return (
     <div
       data-module-id={module.id}
-      className={`bg-white dark:bg-[#1a1a2e] border rounded-lg overflow-hidden transition-all ${
+      className={`bg-white dark:bg-gray-800 border rounded-lg overflow-hidden transition-all ${
         isSelected
           ? 'border-blue-500 ring-2 ring-blue-500/20'
           : 'border-gray-200 dark:border-transparent'
@@ -282,7 +329,7 @@ function LockedModuleItem({
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
+        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         onClick={onToggleExpand}
       >
         {/* Lock Icon */}
@@ -354,7 +401,7 @@ function SortableModuleItem({
       ref={setNodeRef}
       style={style}
       data-module-id={module.id}
-      className={`bg-white dark:bg-[#1a1a2e] border rounded-lg overflow-hidden transition-all ${
+      className={`bg-white dark:bg-gray-800 border rounded-lg overflow-hidden transition-all ${
         isSelected
           ? 'border-blue-500 ring-2 ring-blue-500/20'
           : 'border-gray-200 dark:border-transparent'
@@ -362,7 +409,7 @@ function SortableModuleItem({
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
+        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         onClick={onToggleExpand}
       >
         {/* Drag Handle */}
@@ -477,7 +524,7 @@ function ModuleEditor({
             <textarea
               value={module.heading}
               onChange={(e) => onUpdate({ heading: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
               rows={2}
               placeholder="Enter heading"
             />
@@ -544,7 +591,7 @@ function ModuleEditor({
               <textarea
                 value={module.subheader}
                 onChange={(e) => onUpdate({ subheader: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={2}
                 placeholder="Enter subheader"
               />
@@ -577,7 +624,7 @@ function ModuleEditor({
                   type="text"
                   value={module.cta}
                   onChange={(e) => onUpdate({ cta: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="Enter CTA text"
                 />
               </div>
@@ -587,7 +634,7 @@ function ModuleEditor({
                   type="text"
                   value={module.ctaUrl}
                   onChange={(e) => onUpdate({ ctaUrl: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="https://..."
                 />
               </div>
@@ -623,7 +670,7 @@ function ModuleEditor({
               <textarea
                 value={module.intro}
                 onChange={(e) => onUpdate({ intro: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={2}
                 placeholder="Enter intro text"
               />
@@ -654,7 +701,7 @@ function ModuleEditor({
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={4}
                 placeholder="Enter body text"
               />
@@ -680,7 +727,7 @@ function ModuleEditor({
               type="text"
               value={module.heading}
               onChange={(e) => onUpdate({ heading: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
               placeholder="Enter heading"
             />
           </div>
@@ -703,7 +750,7 @@ function ModuleEditor({
                     newColumns[colIndex] = { ...column, label: e.target.value }
                     onUpdate({ columns: newColumns })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="Column label"
                 />
               </div>
@@ -726,7 +773,7 @@ function ModuleEditor({
                           newColumns[colIndex] = { ...column, bullets: newBullets }
                           onUpdate({ columns: newColumns })
                         }}
-                        className="flex-1 px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                        className="flex-1 px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                         placeholder={`Bullet ${bulletIndex + 1}`}
                       />
                       {column.bullets.length > 1 && (
@@ -913,7 +960,7 @@ function ModuleEditor({
                 type="text"
                 value={module.eyebrow}
                 onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                 placeholder="Enter eyebrow"
               />
             </div>
@@ -943,7 +990,7 @@ function ModuleEditor({
               <textarea
                 value={module.heading}
                 onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={2}
                 placeholder="Enter heading"
               />
@@ -974,7 +1021,7 @@ function ModuleEditor({
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={3}
                 placeholder="Enter body text"
               />
@@ -1007,7 +1054,7 @@ function ModuleEditor({
                   type="text"
                   value={module.cta}
                   onChange={(e) => onUpdate({ cta: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="Enter CTA text"
                 />
               </div>
@@ -1017,7 +1064,7 @@ function ModuleEditor({
                   type="text"
                   value={module.ctaUrl}
                   onChange={(e) => onUpdate({ ctaUrl: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="https://..."
                 />
               </div>
@@ -1172,7 +1219,7 @@ function ModuleEditor({
                 type="text"
                 value={module.eyebrow}
                 onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                 placeholder="Enter eyebrow"
               />
             </div>
@@ -1202,7 +1249,7 @@ function ModuleEditor({
               <textarea
                 value={module.heading}
                 onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={2}
                 placeholder="Enter heading"
               />
@@ -1233,7 +1280,7 @@ function ModuleEditor({
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={3}
                 placeholder="Enter body text"
               />
@@ -1254,17 +1301,27 @@ function ModuleEditor({
               {/* Icon */}
               <div>
                 <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Icon</label>
-                <input
-                  type="text"
-                  value={card.icon}
-                  onChange={(e) => {
-                    const newCards = [...module.cards] as [typeof card, typeof card, typeof card]
-                    newCards[index] = { ...card, icon: e.target.value }
-                    onUpdate({ cards: newCards })
-                  }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
-                  placeholder="e.g., zap, shield-check, clock"
-                />
+                <div className="flex items-center gap-2">
+                  <IconPicker
+                    value={card.icon}
+                    onChange={(iconName) => {
+                      const newCards = [...module.cards] as [typeof card, typeof card, typeof card]
+                      newCards[index] = { ...card, icon: iconName }
+                      onUpdate({ cards: newCards })
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={card.icon}
+                    onChange={(e) => {
+                      const newCards = [...module.cards] as [typeof card, typeof card, typeof card]
+                      newCards[index] = { ...card, icon: e.target.value }
+                      onUpdate({ cards: newCards })
+                    }}
+                    className="flex-1 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    placeholder="e.g., zap, shield-check, clock"
+                  />
+                </div>
               </div>
 
               {/* Title */}
@@ -1277,7 +1334,7 @@ function ModuleEditor({
                     newCards[index] = { ...card, title: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                   rows={2}
                   placeholder="Enter card title"
                 />
@@ -1293,7 +1350,7 @@ function ModuleEditor({
                     newCards[index] = { ...card, description: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                   rows={3}
                   placeholder="Enter card description"
                 />
@@ -1330,7 +1387,7 @@ function ModuleEditor({
               <textarea
                 value={module.heading}
                 onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={2}
                 placeholder="Enter heading"
               />
@@ -1470,7 +1527,7 @@ function ModuleEditor({
                       newCards[index] = { ...card, eyebrow: e.target.value }
                       onUpdate({ cards: newCards })
                     }}
-                    className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                     placeholder="Eyebrow text"
                   />
                 </div>
@@ -1487,7 +1544,7 @@ function ModuleEditor({
                     newCards[index] = { ...card, title: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="Card title"
                 />
               </div>
@@ -1502,7 +1559,7 @@ function ModuleEditor({
                     newCards[index] = { ...card, body: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                   rows={2}
                   placeholder="Card body text"
                 />
@@ -1521,7 +1578,7 @@ function ModuleEditor({
             <textarea
               value={module.quote}
               onChange={(e) => onUpdate({ quote: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none italic"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none italic"
               rows={4}
               placeholder="Enter quote text"
             />
@@ -1534,7 +1591,7 @@ function ModuleEditor({
               type="text"
               value={module.name}
               onChange={(e) => onUpdate({ name: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
               placeholder="Firstname Lastname"
             />
           </div>
@@ -1546,7 +1603,7 @@ function ModuleEditor({
               type="text"
               value={module.jobTitle}
               onChange={(e) => onUpdate({ jobTitle: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
               placeholder="Job Title"
             />
           </div>
@@ -1558,17 +1615,35 @@ function ModuleEditor({
               type="text"
               value={module.organization}
               onChange={(e) => onUpdate({ organization: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
               placeholder="Organization Name"
             />
           </div>
         </div>
       )
 
-    case 'three-stats':
+    case 'three-stats': {
+      const visibleStats = module.showStat3 ? module.stats : module.stats.slice(0, 2)
       return (
         <div className="space-y-4">
-          {module.stats.map((stat, index) => (
+          {/* Show 3rd Stat Toggle */}
+          <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+            <span className="text-xs text-gray-600 dark:text-gray-400">Show 3rd Stat</span>
+            <button
+              onClick={() => onUpdate({ showStat3: !module.showStat3 })}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                module.showStat3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                  module.showStat3 ? 'translate-x-[18px]' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+
+          {visibleStats.map((stat, index) => (
             <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Stat {index + 1}
@@ -1585,7 +1660,7 @@ function ModuleEditor({
                     newStats[index] = { ...stat, value: e.target.value }
                     onUpdate({ stats: newStats })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="0,000"
                 />
               </div>
@@ -1600,7 +1675,7 @@ function ModuleEditor({
                     newStats[index] = { ...stat, label: e.target.value }
                     onUpdate({ stats: newStats })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                   rows={2}
                   placeholder="Stat description"
                 />
@@ -1609,6 +1684,7 @@ function ModuleEditor({
           ))}
         </div>
       )
+    }
 
     case 'one-stat':
       return (
@@ -1626,7 +1702,7 @@ function ModuleEditor({
                 type="text"
                 value={module.value}
                 onChange={(e) => onUpdate({ value: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                 placeholder="0,000"
               />
             </div>
@@ -1637,7 +1713,7 @@ function ModuleEditor({
               <textarea
                 value={module.label}
                 onChange={(e) => onUpdate({ label: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={2}
                 placeholder="Stat description"
               />
@@ -1657,7 +1733,7 @@ function ModuleEditor({
                 type="text"
                 value={module.eyebrow}
                 onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                 placeholder="Firstname Lastname"
               />
             </div>
@@ -1668,7 +1744,7 @@ function ModuleEditor({
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
                 rows={3}
                 placeholder="Description text"
               />
@@ -1699,7 +1775,7 @@ function ModuleEditor({
                   type="text"
                   value={stat.value}
                   onChange={(e) => onUpdate({ [stat.valueKey]: e.target.value })}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="Value"
                 />
               </div>
@@ -1709,7 +1785,7 @@ function ModuleEditor({
                   type="text"
                   value={stat.label}
                   onChange={(e) => onUpdate({ [stat.labelKey]: e.target.value })}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                   placeholder="Label"
                 />
               </div>
@@ -1763,6 +1839,13 @@ export function StackerEditorScreen() {
 
   // Selected module for preview-sidebar sync
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null)
+
+  // Delete confirmation state
+  const [deleteModuleConfirm, setDeleteModuleConfirm] = useState<{ moduleId: string; moduleType: string } | null>(null)
+
+  // Preview modals state
+  const [showFullscreenPreview, setShowFullscreenPreview] = useState(false)
+  const [showAllPagesPreview, setShowAllPagesPreview] = useState(false)
 
   // Resizable editor panel
   const [editorWidth, setEditorWidth] = useState(380)
@@ -1894,13 +1977,28 @@ export function StackerEditorScreen() {
   }, [logoChipModule.id, headerModule.id, footerModule.id])
 
   // Delete content module
-  const deleteModule = useCallback((moduleId: string) => {
+  // Request delete (shows confirmation modal)
+  const requestDeleteModule = useCallback((moduleId: string) => {
+    const foundModule = contentModules.find(m => m.id === moduleId)
+    if (foundModule) {
+      setDeleteModuleConfirm({
+        moduleId,
+        moduleType: MODULE_LABELS[foundModule.type] || foundModule.type,
+      })
+    }
+  }, [contentModules])
+
+  // Execute delete (after confirmation)
+  const executeDeleteModule = useCallback(() => {
+    if (!deleteModuleConfirm) return
+    const { moduleId } = deleteModuleConfirm
     setContentModules(prev => prev.filter(mod => mod.id !== moduleId))
     // Clear selection if deleted module was selected
     if (selectedModuleId === moduleId) {
       setSelectedModuleId(null)
     }
-  }, [selectedModuleId])
+    setDeleteModuleConfirm(null)
+  }, [selectedModuleId, deleteModuleConfirm])
 
   return (
     <div className="space-y-6">
@@ -1917,7 +2015,7 @@ export function StackerEditorScreen() {
       <div className="flex h-[calc(100vh-180px)]">
         {/* Left: Module List */}
         <div className="flex-shrink-0 flex flex-col" style={{ width: editorWidth }}>
-          <div className="bg-gray-100 dark:bg-[#0d0d1a] rounded-xl p-4 flex-1 flex flex-col overflow-hidden">
+          <div className="bg-gray-100 dark:bg-gray-900 rounded-xl p-4 flex-1 flex flex-col overflow-hidden">
             {/* Module Count */}
             <div className="text-xs text-gray-500 dark:text-gray-500 mb-2">
               {allModules.length} module{allModules.length !== 1 ? 's' : ''} (3 locked)
@@ -1989,16 +2087,34 @@ export function StackerEditorScreen() {
 
         {/* Right: Preview */}
         <div className="flex-1 flex flex-col overflow-hidden pl-4">
-          {/* Preview Toolbar */}
+          {/* Toolbar - matches FAQ/SO editor pattern */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              {/* Export Button (placeholder) */}
+              {/* Preview Button */}
               <button
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+                onClick={() => setShowAllPagesPreview(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                  text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
+                  hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
+                  border border-gray-200 dark:border-gray-700"
               >
-                Export PDF
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Preview
+              </button>
+
+              {/* Review & Export Button */}
+              <button
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white
+                  bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Review & Export
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
 
@@ -2008,8 +2124,8 @@ export function StackerEditorScreen() {
               {/* Zoom Controls */}
               <div className="flex items-center gap-1 ml-1">
                 <button
-                  onClick={() => setPreviewZoom(Math.max(50, previewZoom - 25))}
-                  disabled={previewZoom <= 50}
+                  onClick={() => setPreviewZoom(Math.max(75, previewZoom - 25))}
+                  disabled={previewZoom <= 75}
                   className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-l bg-white dark:bg-gray-800"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2021,31 +2137,33 @@ export function StackerEditorScreen() {
                   onChange={(e) => setPreviewZoom(Number(e.target.value))}
                   className="h-7 px-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 focus:outline-none cursor-pointer"
                 >
+                  <option value={200}>200%</option>
+                  <option value={175}>175%</option>
                   <option value={150}>150%</option>
                   <option value={125}>125%</option>
                   <option value={100}>100%</option>
                   <option value={75}>75%</option>
-                  <option value={50}>50%</option>
                 </select>
                 <button
-                  onClick={() => setPreviewZoom(Math.min(150, previewZoom + 25))}
-                  disabled={previewZoom >= 150}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800"
+                  onClick={() => setPreviewZoom(Math.min(200, previewZoom + 25))}
+                  disabled={previewZoom >= 200}
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </button>
+                <button
+                  onClick={() => setShowFullscreenPreview(true)}
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800 ml-1"
+                  title="Fullscreen preview (ESC to exit)"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                </button>
               </div>
             </div>
-
-            {/* Back to Home */}
-            <button
-              onClick={() => setCurrentScreen('select')}
-              className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-            >
-              ← Back to Templates
-            </button>
           </div>
 
           {/* Preview Area */}
@@ -2056,7 +2174,7 @@ export function StackerEditorScreen() {
                 selectedModuleId={selectedModuleId}
                 onModulesChange={handleModulesChange}
                 onSelectModule={handleSelectModule}
-                onDeleteModule={deleteModule}
+                onDeleteModule={requestDeleteModule}
                 onAddModule={addModule}
                 previewZoom={previewZoom}
               />
@@ -2083,6 +2201,77 @@ export function StackerEditorScreen() {
             setCropModalModuleId(null)
           }}
         />
+      )}
+
+      {/* Delete Module Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModuleConfirm !== null}
+        onConfirm={executeDeleteModule}
+        onCancel={() => setDeleteModuleConfirm(null)}
+        itemType={deleteModuleConfirm?.moduleType || 'Module'}
+      />
+
+      {/* Fullscreen Preview Modal */}
+      {showFullscreenPreview && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8">
+          <button
+            onClick={() => setShowFullscreenPreview(false)}
+            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div
+            className="bg-white rounded-sm shadow-2xl overflow-auto max-h-full"
+            style={{ width: 612 }}
+          >
+            <StackerPreviewEditor
+              modules={allModules}
+              selectedModuleId={null}
+              onModulesChange={() => {}}
+              onSelectModule={() => {}}
+              onDeleteModule={() => {}}
+              onAddModule={() => {}}
+              previewZoom={100}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* All Pages Preview Modal (for Stacker, same as fullscreen) */}
+      {showAllPagesPreview && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+            <h3 className="text-lg font-medium text-white">
+              Document Preview
+            </h3>
+            <button
+              onClick={() => setShowAllPagesPreview(false)}
+              className="p-2 text-white/70 hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="flex-1 overflow-auto p-8 flex justify-center">
+            <div
+              className="bg-white rounded-sm shadow-2xl"
+              style={{ width: 612 }}
+            >
+              <StackerPreviewEditor
+                modules={allModules}
+                selectedModuleId={null}
+                onModulesChange={() => {}}
+                onSelectModule={() => {}}
+                onDeleteModule={() => {}}
+                onAddModule={() => {}}
+                previewZoom={100}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

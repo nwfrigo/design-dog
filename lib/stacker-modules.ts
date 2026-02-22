@@ -409,6 +409,7 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         id,
         type: 'three-stats',
         stats,
+        showStat3: data.showStat3 !== false,
       }
     }
 

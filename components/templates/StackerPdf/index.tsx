@@ -145,6 +145,7 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
       return (
         <ThreeStatsModule
           stats={module.stats}
+          showStat3={module.showStat3}
           scale={scale}
         />
       )
@@ -213,10 +214,15 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
     gap: 32, // Spacing between modules
   }
 
+  // Separate footer from other modules so we can render Add Module tile before footer
+  const footerModule = modules.find(m => m.type === 'footer')
+  const nonFooterModules = modules.filter(m => m.type !== 'footer')
+
   return (
     <div style={documentStyle}>
       <div style={contentStyle}>
-        {modules.map((module, index) => {
+        {/* Render all non-footer modules */}
+        {nonFooterModules.map((module, index) => {
           const moduleContent = <RenderModule key={module.id} module={module} />
           return renderModuleWrapper
             ? renderModuleWrapper(module, moduleContent, index)
@@ -235,8 +241,14 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
             Add modules to start building your document
           </div>
         )}
-        {/* Optional footer content (e.g., Add Module tile in editor) */}
+        {/* Optional content before footer (e.g., Add Module tile in editor) */}
         {renderFooterContent && renderFooterContent()}
+        {/* Footer module always last */}
+        {footerModule && (
+          renderModuleWrapper
+            ? renderModuleWrapper(footerModule, <RenderModule key={footerModule.id} module={footerModule} />, modules.length - 1)
+            : <RenderModule key={footerModule.id} module={footerModule} />
+        )}
       </div>
     </div>
   )
