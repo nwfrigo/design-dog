@@ -7,7 +7,7 @@ import type { FaqContentBlock, FaqPage } from '@/types'
 import { RichTextEditor } from './RichTextEditor'
 import { TableGridPicker } from './TableGridPicker'
 import { ZoomableImage } from './ZoomableImage'
-import { FaqCoverImageLibraryModal } from './FaqCoverImageLibraryModal'
+import { ImageLibraryModal } from './ImageLibraryModal'
 import { solutionCategories, type SolutionCategory } from '@/config/solution-overview-assets'
 import {
   DndContext,
@@ -1707,7 +1707,8 @@ export function FaqEditorScreen() {
 
       {/* Cover Image Library Modal */}
       {showCoverImageLibrary && (
-        <FaqCoverImageLibraryModal
+        <ImageLibraryModal
+          variant="faq-cover"
           solution={coverSolution === 'none' ? 'converged' : coverSolution}
           onSelect={(url) => {
             setCoverImageUrl(url)
