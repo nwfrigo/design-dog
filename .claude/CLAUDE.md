@@ -159,12 +159,12 @@ interface TemplateNameProps {
 
 | Field | Usage |
 |-------|-------|
-| `headline` | All templates (15/15) |
-| `eyebrow` | Most templates (14/15) |
-| `cta` / `ctaText` | Most templates (11/15) |
-| `subhead` | Most templates (11/15) |
-| `body` | Many templates (10/15) |
-| `metadata` | Social templates only (2/15) |
+| `headline` | All single-page templates |
+| `eyebrow` | Most templates |
+| `cta` / `ctaText` | Most templates |
+| `subhead` | Most templates |
+| `body` | Many templates |
+| `metadata` | Social templates only |
 
 ### Variant Naming
 
@@ -384,6 +384,27 @@ This is the largest file. Key patterns:
 
 Headline is NOT required. No red asterisks. All buttons (export, queue, save) work even with empty fields. Templates show fallback text when fields are empty.
 
+### Editor Toolbar Pattern (Multi-Page Collateral)
+
+All multi-page collateral editors (FAQ, Stacker, Solution Overview) use a consistent toolbar layout:
+
+```tsx
+// Left side (actions)
+<button>Preview</button>           // Eye icon, opens all-pages modal
+<button>Review & Export</button>   // Blue button, navigates to export screen
+
+// Center (if applicable)
+<PageSelector />                   // Page 1, 2, 3 buttons (not for Stacker)
+
+// Right side (zoom)
+<button>-</button>                 // Decrease zoom (min 75%)
+<select>150%</select>              // Zoom dropdown (75-200%)
+<button>+</button>                 // Increase zoom (max 200%)
+<button>⛶</button>                 // Fullscreen preview (ESC to exit)
+```
+
+**Zoom range:** 75% to 200% in 25% increments.
+
 ---
 
 ## PDF Upload & Parsing
@@ -411,7 +432,10 @@ Both flows MUST use the same pattern.
 | File | Purpose |
 |------|---------|
 | `/api/upload-pdf` | Token endpoint for Vercel Blob client uploads |
+| `/api/upload-doc` | Token endpoint for Word doc uploads |
 | `/api/parse-pdf` | Fetches PDF from Blob, sends base64 to Claude |
+| `/api/parse-faq` | Parses FAQ content from Word docs |
+| `/api/generate-stacker` | AI generates Stacker module structure |
 | `@vercel/blob/client` | Client-side upload library |
 
 ### Upload Flow (Both Modes)
@@ -590,10 +614,12 @@ These create an inconsistent purple-tinted theme that doesn't match other editor
 
 ### Template Dimensions
 - Website templates: 800×450px
+- Website floating banner: 2256×100px (desktop), 390×100px (mobile)
 - Email templates: 640×300px (varies by type)
 - Social templates: 1200×628px (varies by type)
 - Newsletter templates: 600×338px (varies by type)
 - Collateral PDFs: 612×792px (Letter size, 8.5"×11")
+- Stacker PDFs: 612px width, variable height (modular content)
 - All have 32px internal padding (except multi-page PDFs which follow print standards)
 
 ---
@@ -605,6 +631,7 @@ These create an inconsistent purple-tinted theme that doesn't match other editor
 - `email-grid` — EmailGrid
 - `email-image` — EmailImage (has image upload + grayscale)
 - `email-speakers` — EmailSpeakers (up to 3 speaker avatars)
+- `email-product-release` — EmailProductRelease
 
 ### Social
 - `social-dark-gradient` — SocialDarkGradient
@@ -619,14 +646,18 @@ These create an inconsistent purple-tinted theme that doesn't match other editor
 - `website-event-listing` — WebsiteEventListing (variants via toggle)
 - `website-report` — WebsiteReport (variants: image/none, image on LEFT)
 - `website-floating-banner` — WebsiteFloatingBanner (2256×100px, 7 style variants)
+- `website-floating-banner-mobile` — WebsiteFloatingBannerMobile (390×100px, mobile version)
 
 ### Newsletter
 - `newsletter-dark-gradient` — NewsletterDarkGradient (has image + grayscale)
 - `newsletter-blue-gradient` — NewsletterBlueGradient (has image + grayscale)
 - `newsletter-light` — NewsletterLight (has image + grayscale)
+- `newsletter-top-banner` — NewsletterTopBanner
 
 ### Collateral (Multi-Page PDFs)
 - `solution-overview-pdf` — SolutionOverviewPdf (3-page Letter PDF, 612×792px per page)
+- `faq-pdf` — FaqPdf (dynamic page count, Q&A format with tables support)
+- `stacker-pdf` — StackerPdf (modular document builder with drag-and-drop)
 
 ---
 
@@ -672,6 +703,9 @@ app/api/
 | `/api/upload-doc` | `.doc`, `.docx` | Word doc blob upload token |
 | `/api/parse-pdf` | PDFs | AI extraction + summarization |
 | `/api/parse-solution-overview` | Word docs | Verbatim field mapping |
+| `/api/parse-faq` | Word docs | FAQ content extraction |
+| `/api/generate-stacker` | N/A | AI module generation for Stacker |
+| `/api/report-bug` | N/A | Bug report submission (Resend email) |
 
 ```tsx
 // Word doc upload flow (SolutionOverviewSetupScreen.tsx)
@@ -778,6 +812,143 @@ Single-page templates export as PNG. Multi-page collateral exports as PDF:
 
 ---
 
+## Stacker PDF (Modular Document Builder)
+
+Stacker is a drag-and-drop modular PDF builder that lets users compose documents from pre-built content modules.
+
+### Architecture
+
+Unlike fixed-layout templates, Stacker uses a **module-based architecture**:
+
+| Aspect | Standard Templates | Stacker |
+|--------|-------------------|---------|
+| Layout | Fixed structure | User-composed from modules |
+| Content | AI generates copy for fixed fields | AI generates full module structure |
+| Editing | Field-by-field inputs | Module-level editing with drag-and-drop |
+| Preview | Single template preview | Live preview with reorderable modules |
+
+### File Structure
+
+```
+components/templates/StackerPdf/
+├── modules/
+│   ├── LogoChipModule.tsx      # Locked: Logo + solution category chips
+│   ├── HeaderModule.tsx        # Locked: Document title (Large/Medium/Small)
+│   ├── ParagraphModule.tsx     # Body text with optional heading
+│   ├── BulletListModule.tsx    # 3-column bullet list
+│   ├── ImageModule.tsx         # Image - 1:1 (180×180) with caption
+│   ├── Image16x9Module.tsx     # Image - 16:9 (180×100)
+│   ├── ImageCardsModule.tsx    # 2-3 image cards with titles
+│   ├── CardsModule.tsx         # Simple Cards (3 icon cards)
+│   ├── QuoteModule.tsx         # Customer testimonial
+│   ├── ThreeStatsModule.tsx    # 2-3 stat highlights
+│   ├── OneStatModule.tsx       # Single stat with description
+│   ├── DividerModule.tsx       # Visual separator
+│   └── FooterModule.tsx        # Locked: Cority boilerplate
+└── index.tsx                   # Main StackerPdf component
+
+components/
+├── StackerSetupScreen.tsx      # PDF/text input → AI generation
+├── StackerEditorScreen.tsx     # Module editing + drag-and-drop
+└── StackerPreviewEditor.tsx    # Preview with drop zones
+
+lib/
+└── stacker-modules.ts          # Module registry for AI prompts
+
+app/api/
+└── generate-stacker/route.ts   # AI endpoint for module generation
+```
+
+### Module Types
+
+**Locked Modules** (always present, not draggable):
+- `logo-chip` — Logo + solution category chips (top)
+- `header` — Document title with size options (top)
+- `footer` — Cority boilerplate (bottom)
+
+**Content Modules** (draggable, deletable):
+- `paragraph` — Body text, optional heading
+- `bullet-three` — 3-column bullet list
+- `image` — 1:1 aspect ratio image with text
+- `image-16x9` — 16:9 aspect ratio image
+- `image-cards` — 2-3 image cards with eyebrow/title/body
+- `three-card` — Simple Cards with icons
+- `quote` — Testimonial quote
+- `three-stats` — 2-3 statistics (toggle 3rd)
+- `one-stat` — Single stat with description
+- `divider` — Horizontal line separator
+
+### AI Content Generation
+
+Stacker uses AI to generate the initial document structure:
+
+1. User uploads PDF or pastes text in StackerSetupScreen
+2. `/api/generate-stacker` calls Claude with module registry
+3. Claude returns structured JSON with module array
+4. Modules are loaded into StackerEditorScreen for editing
+
+**Module Registry** (`lib/stacker-modules.ts`):
+- Single source of truth for all module definitions
+- `generateModulePromptSection()` — Creates prompt text for Claude
+- `createModuleFromAI()` — Converts AI response to typed modules
+
+### Editor Features
+
+- **Drag-and-drop reordering** in preview area (dnd-kit)
+- **Delete confirmation modal** for all modules
+- **Icon picker** for Simple Cards (Lucide icons)
+- **Show/hide toggles** for optional elements (3rd stat, 3rd card, etc.)
+- **Preview/Review & Export toolbar** matching FAQ/SO pattern
+- **Zoom controls** (75%-200%)
+- **Fullscreen preview** modal
+
+---
+
+## FAQ PDF (Multi-Page Q&A Documents)
+
+FAQ PDF generates multi-page documents with Q&A content, supporting headings and tables.
+
+### File Structure
+
+```
+components/templates/FaqPdf/
+├── CoverPage.tsx           # Title + solution category
+├── ContentPage.tsx         # Q&A blocks, headings, tables
+└── index.tsx               # Composite export
+
+components/
+├── FaqSetupScreen.tsx      # Category selection, title, doc upload
+├── FaqEditorScreen.tsx     # Block editing, page management
+└── FaqExportScreen.tsx     # Review and export
+
+app/api/
+└── parse-faq/route.ts      # Claude extraction from Word docs
+```
+
+### Key Differences from Solution Overview
+
+| Aspect | Solution Overview | FAQ PDF |
+|--------|------------------|---------|
+| Page count | Fixed 3 pages | Dynamic (auto-pagination) |
+| Content blocks | Fixed sections | Q&A, headings, tables |
+| Editing | Field-by-field | Block-based with rich text |
+| Overflow handling | N/A | Auto-creates new pages |
+
+### Block Types
+
+- `heading` — Section headers
+- `qa` — Question + Answer (rich text answer with TipTap)
+- `table` — Data tables with configurable rows/columns
+
+### Auto-Pagination
+
+FAQ pages have a fixed height (792px). When content exceeds this:
+1. System measures block heights
+2. Automatically distributes blocks across pages
+3. Shows overflow warning if redistribution fails
+
+---
+
 ## Checklist: Adding a New Template
 
 1. [ ] Create template component in `components/templates/`
@@ -809,6 +980,27 @@ Single-page templates export as PNG. Multi-page collateral exports as PDF:
 - **Two state systems:** Auto-create uses `generatedAssets` + `templateType`; manual mode uses `selectedAssets` + `currentAssetIndex`. Don't mix them.
 - **Modal state persistence:** Use React `key` prop or `useEffect` cleanup to reset modal state on mount.
 - **Local PDF uploads:** Require `BLOB_READ_WRITE_TOKEN` in `.env.local`.
+
+### Delete Confirmation Pattern
+
+All destructive actions (deleting modules, pages, blocks) **must** show a confirmation modal. Never delete content immediately on click.
+
+```tsx
+// Standard delete confirmation modal
+function DeleteConfirmModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+  itemType,    // "Module", "Page", "Block"
+  itemLabel,   // Optional: specific item name
+}: { ... })
+```
+
+**Implementation pattern:**
+1. Store pending delete in state: `const [deleteConfirm, setDeleteConfirm] = useState<{id: string, type: string} | null>(null)`
+2. On delete click: `setDeleteConfirm({ id, type })`
+3. On confirm: Execute delete, then `setDeleteConfirm(null)`
+4. On cancel: `setDeleteConfirm(null)`
 
 ### Variant Persistence (Critical for New Templates)
 
