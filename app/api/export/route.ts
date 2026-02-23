@@ -500,45 +500,34 @@ export async function POST(request: NextRequest) {
       await injectDataUrlImage(body.coverImageUrl, 'img[data-faq-cover-image="true"]')
     }
 
-    // Inject Stacker PDF images
+    // Inject Stacker PDF images using the same helper as other templates
     for (const imgData of stackerImageData) {
-      // For regular image modules
+      // For regular image modules (image, image-16x9)
       if (!imgData.moduleId.includes('-card-')) {
-        await page.evaluate((moduleId: string, imgSrc: string) => {
-          // Find the image by module ID
-          const container = document.querySelector(`[data-module-id="${moduleId}"]`)
-          if (container) {
-            const img = container.querySelector('img') as HTMLImageElement
-            if (img) {
-              img.src = imgSrc
-            }
-          }
-        }, imgData.moduleId, imgData.imageUrl)
+        const selector = `[data-module-id="${imgData.moduleId}"] img[data-stacker-image="true"]`
+        await injectDataUrlImage(imgData.imageUrl, selector)
       } else {
         // For image-cards modules - moduleId is like "module-id-card-0"
-        const [moduleId, , , cardIdx] = imgData.moduleId.split('-')
-        await page.evaluate((mId: string, cIdx: string, imgSrc: string) => {
-          const container = document.querySelector(`[data-module-id="${mId}"]`)
-          if (container) {
-            const imgs = container.querySelectorAll('img')
-            const img = imgs[parseInt(cIdx)] as HTMLImageElement
-            if (img) {
-              img.src = imgSrc
-            }
-          }
-        }, moduleId, cardIdx, imgData.imageUrl)
+        const parts = imgData.moduleId.split('-card-')
+        const moduleId = parts[0]
+        const cardIdx = parts[1]
+        const selector = `[data-module-id="${moduleId}"] img[data-stacker-card-image="${cardIdx}"]`
+        await injectDataUrlImage(imgData.imageUrl, selector)
       }
     }
 
     // Additional delay for rendering
-    if ((imageUrl && imageUrl.startsWith('data:')) ||
+    const hasDataUrlImages = (imageUrl && imageUrl.startsWith('data:')) ||
         (body.speaker1ImageUrl && body.speaker1ImageUrl.startsWith('data:')) ||
         (body.speaker2ImageUrl && body.speaker2ImageUrl.startsWith('data:')) ||
         (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) ||
         (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:')) ||
         (body.heroImageUrl && body.heroImageUrl.startsWith('data:')) ||
         (body.screenshotUrl && body.screenshotUrl.startsWith('data:')) ||
-        (body.coverImageUrl && body.coverImageUrl.startsWith('data:'))) {
+        (body.coverImageUrl && body.coverImageUrl.startsWith('data:')) ||
+        stackerImageData.length > 0
+
+    if (hasDataUrlImages) {
       await new Promise(resolve => setTimeout(resolve, 300))
     }
 

@@ -135,8 +135,10 @@ export function ImageCardsModule({
           <div key={index} style={cardStyle}>
             <div style={imageContainerStyle}>
               {card.imageUrl ? (
-                <img src={card.imageUrl} alt="" style={getImageStyle(card)} />
-              ) : null}
+                <img src={card.imageUrl} alt="" style={getImageStyle(card)} data-stacker-card-image={index} />
+              ) : (
+                <img alt="" style={{ ...getImageStyle(card), display: 'none' }} data-stacker-card-image={index} />
+              )}
             </div>
             <div style={contentStyle}>
               {card.showEyebrow && card.eyebrow && (

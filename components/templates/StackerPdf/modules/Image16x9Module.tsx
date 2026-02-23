@@ -102,8 +102,10 @@ export function Image16x9Module({
     <div style={containerStyle}>
       <div style={imageContainerStyle}>
         {imageUrl ? (
-          <img src={imageUrl} alt="" style={imageStyle} />
-        ) : null}
+          <img src={imageUrl} alt="" style={imageStyle} data-stacker-image="true" />
+        ) : (
+          <img alt="" style={{ ...imageStyle, display: 'none' }} data-stacker-image="true" />
+        )}
       </div>
 
       <div style={textContainerStyle}>
