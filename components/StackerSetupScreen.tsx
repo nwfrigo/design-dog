@@ -485,6 +485,19 @@ export function StackerSetupScreen() {
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-center">
             Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-gray-500 dark:text-gray-400">⌘</kbd> + <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-gray-500 dark:text-gray-400">Enter</kbd> to generate
           </p>
+
+          {/* Skip link */}
+          <button
+            onClick={() => {
+              // Go to editor with empty/default modules (no AI generation)
+              setStackerGeneratedModules(null)
+              setStackerDocumentTitle(null)
+              setCurrentScreen('stacker-editor')
+            }}
+            className="mt-6 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+          >
+            Skip and go to Stacker
+          </button>
         </div>
       </div>
 
