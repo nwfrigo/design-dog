@@ -15,6 +15,7 @@ export interface StackerDraggableModuleProps {
   isOverAbove: boolean
   onSelect: (moduleId: string) => void
   onDelete: (moduleId: string) => void
+  readOnly?: boolean // When true, renders without any interactive controls
 }
 
 // Locked module wrapper (no drag, just click-to-select)
@@ -205,8 +206,22 @@ function DraggableModuleWrapper({
   )
 }
 
-// Main export - chooses between locked and draggable wrapper
+// Read-only wrapper (no controls, just renders content)
+function ReadOnlyModuleWrapper({
+  children,
+}: {
+  children: ReactNode
+}) {
+  return <div>{children}</div>
+}
+
+// Main export - chooses between locked, draggable, or read-only wrapper
 export function StackerDraggableModule(props: StackerDraggableModuleProps) {
+  // Read-only mode: no interactive controls at all
+  if (props.readOnly) {
+    return <ReadOnlyModuleWrapper>{props.children}</ReadOnlyModuleWrapper>
+  }
+
   const isLocked = LOCKED_MODULE_TYPES.includes(props.module.type)
 
   if (isLocked) {

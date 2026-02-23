@@ -354,7 +354,7 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-setup' | 'stacker-editor'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-setup' | 'stacker-editor' | 'stacker-export'
 
 // Auto-Create Types (formerly Quick Start)
 export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'
@@ -841,6 +841,11 @@ export interface AppState {
   // Stacker PDF state
   stackerGeneratedModules: StackerModule[] | null
   stackerDocumentTitle: string | null
+  // Stacker edited modules (persisted for export screen)
+  stackerLogoChipModule: StackerLogoChipModule
+  stackerHeaderModule: StackerHeaderModule
+  stackerContentModules: StackerModule[]
+  stackerFooterModule: StackerFooterModule
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -1001,6 +1006,11 @@ export interface AppState {
   setStackerGeneratedModules: (modules: StackerModule[] | null) => void
   setStackerDocumentTitle: (title: string | null) => void
   clearStackerGenerated: () => void
+  // Stacker edited module actions
+  setStackerLogoChipModule: (module: StackerLogoChipModule) => void
+  setStackerHeaderModule: (module: StackerHeaderModule) => void
+  setStackerContentModules: (modules: StackerModule[]) => void
+  setStackerFooterModule: (module: StackerFooterModule) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

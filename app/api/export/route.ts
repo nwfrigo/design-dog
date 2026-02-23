@@ -78,6 +78,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'newsletter-top-banner': { width: 600, height: 240 },
   'solution-overview-pdf': { width: 612, height: 792 },
   'faq-pdf': { width: 612, height: 792 },
+  'stacker-pdf': { width: 612, height: 2000 }, // Dynamic height, this is a fallback
 }
 
 export async function POST(request: NextRequest) {
@@ -325,6 +326,9 @@ export async function POST(request: NextRequest) {
     if (body.coverImageZoom !== undefined) params.set('coverImageZoom', String(body.coverImageZoom))
     if (body.coverImageGrayscale !== undefined) params.set('coverImageGrayscale', String(body.coverImageGrayscale))
 
+    // Stacker PDF specific
+    if (body.modules) params.set('modules', encodeURIComponent(JSON.stringify(body.modules)))
+
     // Get the base URL from the request
     const host = request.headers.get('host') || 'localhost:3000'
     // Use http for localhost, otherwise check x-forwarded-proto or default to https
@@ -347,10 +351,12 @@ export async function POST(request: NextRequest) {
     // For PDF exports with page=all, use taller viewport to render all pages
     const isSolutionOverviewPdf = template === 'solution-overview-pdf' && body.page === 'all'
     const isFaqPdf = template === 'faq-pdf' && body.page === 'all'
-    const isPdfExport = isSolutionOverviewPdf || isFaqPdf
+    const isStackerPdf = template === 'stacker-pdf'
+    const isPdfExport = isSolutionOverviewPdf || isFaqPdf || isStackerPdf
     // For FAQ PDF, calculate pages from the pages array; for SO PDF, fixed at 3 pages
+    // For Stacker PDF, use a tall initial viewport (will measure actual height later)
     const numPages = isFaqPdf ? (body.numPages || 1) : 3
-    const viewportHeight = isPdfExport ? height * numPages : height
+    const viewportHeight = isStackerPdf ? 4000 : (isPdfExport ? height * numPages : height)
 
     await page.setViewport({
       width,
@@ -497,7 +503,48 @@ export async function POST(request: NextRequest) {
     // Small delay after hiding overlays
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    // For PDF exports with page=all, generate a PDF instead of PNG
+    // For Stacker PDF, measure actual content height and export as PNG
+    if (isStackerPdf) {
+      // Get actual document height
+      const actualHeight = await page.evaluate(() => {
+        const body = document.body
+        const html = document.documentElement
+        return Math.max(
+          body.scrollHeight,
+          body.offsetHeight,
+          html.clientHeight,
+          html.scrollHeight,
+          html.offsetHeight
+        )
+      })
+
+      console.log('Stacker actual height:', actualHeight)
+
+      // Take full-page screenshot with 2x scale for quality
+      const screenshot = await page.screenshot({
+        type: 'png',
+        clip: {
+          x: 0,
+          y: 0,
+          width,
+          height: actualHeight,
+        },
+      })
+
+      await browser.close()
+
+      // Track export (fire-and-forget)
+      trackExport(template)
+
+      return new NextResponse(Buffer.from(screenshot), {
+        headers: {
+          'Content-Type': 'image/png',
+          'Content-Disposition': `attachment; filename="stacker-document.png"`,
+        },
+      })
+    }
+
+    // For other PDF exports (FAQ, Solution Overview) with page=all, generate a PDF
     if (isPdfExport) {
       // Generate PDF using Puppeteer's PDF feature
       // Note: scale must be 1 for PDFs to maintain proper page dimensions

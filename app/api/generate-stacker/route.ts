@@ -39,8 +39,8 @@ ${modulePrompt}
 
 **Minimum 6-8 content modules** for a full-feeling document. A strong document typically includes:
 - Header with a compelling subheader (always include subheader for context)
-- Opening paragraph to set the stage
-- Stats module with REAL numbers (never empty values)
+- **VISUAL LEAD**: Stats module OR image module immediately after header (NOT a paragraph - avoid walls of text at the top)
+- Paragraph module placed 3rd or later for context
 - Visual variety: mix text modules (paragraph, bullets) with visual modules (stats, cards, images)
 - At least one image module (user will upload the actual image)
 - Closing content before footer (cards, quote, or call-to-action)
@@ -49,20 +49,26 @@ ${modulePrompt}
 
 1. **STATS ONLY FROM SOURCE**: Only include three-stats or one-stat modules if the source content contains actual numeric data (percentages, dollar amounts, counts, timeframes, etc.). If no stats exist in the source, DO NOT include any stats modules - use other module types instead.
 
-2. **Visual Rhythm**: Alternate between text-heavy modules (paragraph, bullet-three) and visual modules (three-stats, three-card, image). Never place two similar modules back-to-back.
+2. **QUOTES ONLY VERBATIM FROM SOURCE**: CRITICAL - Only include a quote module if the source contains an actual customer testimonial or quote that you can attribute with a real name, title, and organization found in the source. NEVER fabricate quotes, names, or organizations. If the source doesn't contain a verbatim quote with attribution, DO NOT include a quote module - use other module types instead.
 
-3. **Rich Content**: Every text field should have substantive content. Headers need subheaders. Paragraphs need both intro and body. Cards need full descriptions, not single words.
+3. **VISUAL LEAD AFTER HEADER**: Never place a paragraph module immediately after the header. Start with a visual element (stats with real data, or an image module). This creates visual interest and avoids walls of text.
 
-4. **Meaningful Labels**: For bullet columns, use descriptive labels like "Current Challenges", "Solution Benefits", "Key Outcomes" - never generic "Column 1".
+4. **IMAGE CARDS FOR PRODUCT CONTENT**: When describing product features, platform capabilities, or software functionality, prefer the "image" module type over "three-card". Image modules allow users to add screenshots showing the actual product. Use three-card for conceptual benefits; use image modules for demonstrable product features.
 
-5. **Icon Selection**: For cards, choose relevant Lucide icons: shield-check, zap, clock, target, users, trending-up, bar-chart, lock, eye, clipboard-check, settings, refresh-cw, check-circle.
+5. **Visual Rhythm**: Alternate between text-heavy modules (paragraph, bullet-three) and visual modules (three-stats, three-card, image). Never place two similar modules back-to-back.
+
+6. **Rich Content**: Every text field should have substantive content. Headers need subheaders. Paragraphs need both intro and body. Cards need full descriptions, not single words.
+
+7. **Meaningful Labels**: For bullet columns, use descriptive labels like "Current Challenges", "Solution Benefits", "Key Outcomes" - never generic "Column 1".
+
+8. **Icon Selection**: For cards, choose relevant Lucide icons: shield-check, zap, clock, target, users, trending-up, bar-chart, lock, eye, clipboard-check, settings, refresh-cw, check-circle.
 
 ## Solution Categories
 Choose the most relevant from: ${SOLUTION_CATEGORIES.join(', ')}
 
 ## Example Output
 
-Here is an example of a well-structured document:
+Here is an example of a well-structured document (note: stats/image as 2nd module, not paragraph):
 {
   "modules": [
     {
@@ -74,13 +80,6 @@ Here is an example of a well-structured document:
       "showCta": false
     },
     {
-      "type": "paragraph",
-      "intro": "Safety compliance doesn't have to be a cost center.",
-      "body": "Forward-thinking organizations are discovering that modern EHS platforms deliver measurable ROI through reduced incidents, streamlined audits, and real-time visibility across operations.",
-      "showIntro": true,
-      "showBody": true
-    },
-    {
       "type": "three-stats",
       "stats": [
         { "value": "40%", "label": "Reduction in recordable incidents" },
@@ -89,12 +88,31 @@ Here is an example of a well-structured document:
       ]
     },
     {
+      "type": "paragraph",
+      "intro": "Safety compliance doesn't have to be a cost center.",
+      "body": "Forward-thinking organizations are discovering that modern EHS platforms deliver measurable ROI through reduced incidents, streamlined audits, and real-time visibility across operations.",
+      "showIntro": true,
+      "showBody": true
+    },
+    {
       "type": "image",
       "imagePosition": "left",
       "eyebrow": "Platform Overview",
       "heading": "Unified Safety Management",
       "body": "A single platform connecting incident reporting, corrective actions, audits, and compliance tracking across all locations.",
       "cta": "See the platform",
+      "showEyebrow": true,
+      "showHeading": true,
+      "showBody": true,
+      "showCta": true
+    },
+    {
+      "type": "image",
+      "imagePosition": "right",
+      "eyebrow": "Product Feature",
+      "heading": "Mobile Incident Capture",
+      "body": "Workers can report incidents and near-misses from the field with photo evidence, GPS location, and voice-to-text descriptions.",
+      "cta": "See how it works",
       "showEyebrow": true,
       "showHeading": true,
       "showBody": true,
@@ -119,30 +137,11 @@ Here is an example of a well-structured document:
       ]
     },
     {
-      "type": "quote",
-      "quote": "We reduced our incident rate by 35% in the first year and cut audit prep time from weeks to days.",
-      "name": "Sarah Chen",
-      "jobTitle": "VP of Operations",
-      "organization": "Global Manufacturing Corp"
-    },
-    {
       "type": "three-card",
       "cards": [
-        {
-          "icon": "smartphone",
-          "title": "Mobile-First Design",
-          "description": "Capture incidents and observations from the field with an intuitive mobile app that workers actually want to use."
-        },
-        {
-          "icon": "refresh-cw",
-          "title": "Automated Workflows",
-          "description": "Route corrective actions, escalate issues, and track resolution automatically without manual follow-up."
-        },
-        {
-          "icon": "bar-chart",
-          "title": "Real-Time Analytics",
-          "description": "Identify trends, predict risks, and demonstrate compliance with executive-ready dashboards and reports."
-        }
+        { "icon": "shield-check", "heading": "Proactive Risk Management", "description": "Identify and address hazards before they become incidents with predictive analytics." },
+        { "icon": "clipboard-check", "heading": "Simplified Compliance", "description": "Stay ahead of regulatory requirements with automated tracking and audit-ready documentation." },
+        { "icon": "trending-up", "heading": "Continuous Improvement", "description": "Use data-driven insights to continuously improve safety performance across operations." }
       ]
     }
   ],
@@ -161,15 +160,19 @@ ${sourceContent}
 ${purpose ? `## Purpose/Context\n${purpose}\n` : ''}
 ## Instructions
 1. Create a visually rich document with 6-8 content modules
-2. Only include stats modules if the source contains actual numbers - otherwise skip stats entirely
-3. Vary module types for visual rhythm - alternate text and visual modules
-4. Write professional marketing copy, not just copy-paste
-5. Every field should have substantive content
-6. Include at least one image module for visual interest
+2. **VISUAL LEAD**: Place stats module (if source has numbers) OR image module as the 2nd module - NEVER a paragraph
+3. Only include stats modules if the source contains actual numbers - otherwise use image module as the visual lead
+4. For product features and platform capabilities, use "image" modules (not three-card) so users can add screenshots
+5. Vary module types for visual rhythm - alternate text and visual modules
+6. Write professional marketing copy, not just copy-paste
+7. Every field should have substantive content
 
 ## Pre-Submission Checklist
 Before returning, verify:
+- 2nd module is stats (if source had numbers) OR image - NOT a paragraph
 - Stats modules ONLY if source had numeric data (otherwise omit them)
+- Quote module ONLY if source has a verbatim quote with real name/title/org (otherwise omit it)
+- Product/feature content uses image modules (for screenshots), not three-card
 - Header has a subheader
 - At least 6 content modules total
 - No two identical module types in a row

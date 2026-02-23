@@ -1,11 +1,38 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import { useStore } from '@/store'
+import { HeaderControls } from '@/components/HeaderControls'
 
 type FileType = 'pdf' | 'docx' | 'pptx' | 'txt' | 'md'
+
+// Loading phrases that cycle during generation
+const LOADING_PHASES = {
+  upload: [
+    'Uploading your file...',
+    'Preparing content for analysis...',
+  ],
+  extract: [
+    'Reading your document...',
+    'Extracting key information...',
+    'Understanding your content...',
+  ],
+  fetch: [
+    'Fetching content from URL...',
+    'Retrieving page content...',
+  ],
+  generate: [
+    'Analyzing your content...',
+    'Identifying key themes...',
+    'Selecting the best modules...',
+    'Crafting compelling copy...',
+    'Designing document structure...',
+    'Polishing the layout...',
+    'Almost there...',
+  ],
+}
 
 function getFileType(filename: string): FileType | null {
   const ext = filename.toLowerCase().split('.').pop()
@@ -51,6 +78,27 @@ function getFileIcon(fileType: FileType) {
   }
 }
 
+// Detect if text looks like a URL
+function detectUrl(text: string): string | null {
+  const trimmed = text.trim()
+  // Check if the entire input (or first line) is a URL
+  const firstLine = trimmed.split('\n')[0].trim()
+
+  // Common URL patterns
+  const urlPattern = /^https?:\/\/[^\s]+$/i
+  if (urlPattern.test(firstLine)) {
+    return firstLine
+  }
+
+  // Check for URLs without protocol
+  const domainPattern = /^(www\.)?[a-z0-9][-a-z0-9]*(\.[a-z]{2,})+[^\s]*$/i
+  if (domainPattern.test(firstLine)) {
+    return `https://${firstLine}`
+  }
+
+  return null
+}
+
 export function StackerSetupScreen() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -66,8 +114,34 @@ export function StackerSetupScreen() {
 
   // Processing state
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatingStatus, setGeneratingStatus] = useState('')
+  const [generatingPhase, setGeneratingPhase] = useState<keyof typeof LOADING_PHASES | null>(null)
+  const [phraseIndex, setPhraseIndex] = useState(0)
   const [error, setError] = useState<string | null>(null)
+
+  // Cycle through loading phrases
+  useEffect(() => {
+    if (!isGenerating || !generatingPhase) {
+      setPhraseIndex(0)
+      return
+    }
+
+    const phrases = LOADING_PHASES[generatingPhase]
+    if (!phrases || phrases.length <= 1) return
+
+    const interval = setInterval(() => {
+      setPhraseIndex(prev => (prev + 1) % phrases.length)
+    }, 2500) // Change phrase every 2.5 seconds
+
+    return () => clearInterval(interval)
+  }, [isGenerating, generatingPhase])
+
+  // Get current loading phrase
+  const currentPhrase = generatingPhase
+    ? LOADING_PHASES[generatingPhase][phraseIndex] || LOADING_PHASES[generatingPhase][0]
+    : ''
+
+  // URL detection state
+  const detectedUrl = detectUrl(textContent)
 
   // Theme detection
   const [isDark, setIsDark] = useState(false)
@@ -144,7 +218,8 @@ export function StackerSetupScreen() {
       // - If both: text is purpose/context, attachment is sourceContent
 
       if (attachedFile && attachedFileType) {
-        setGeneratingStatus('Uploading file...')
+        setGeneratingPhase('upload')
+        setPhraseIndex(0)
 
         // For txt/md files, read content directly
         if (attachedFileType === 'txt' || attachedFileType === 'md') {
@@ -156,7 +231,8 @@ export function StackerSetupScreen() {
             handleUploadUrl: '/api/upload-content',
           })
 
-          setGeneratingStatus('Extracting content...')
+          setGeneratingPhase('extract')
+          setPhraseIndex(0)
 
           // Parse content from file
           const parseResponse = await fetch('/api/parse-content', {
@@ -178,8 +254,26 @@ export function StackerSetupScreen() {
         if (textContent.trim()) {
           purpose = textContent.trim()
         }
+      } else if (detectedUrl) {
+        // Text looks like a URL - try to fetch it
+        setGeneratingPhase('fetch')
+        setPhraseIndex(0)
+
+        const fetchResponse = await fetch('/api/fetch-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: detectedUrl }),
+        })
+
+        const fetchResult = await fetchResponse.json()
+
+        if (!fetchResult.success) {
+          throw new Error(fetchResult.error || 'Could not fetch content from URL')
+        }
+
+        sourceContent = fetchResult.content
       } else {
-        // Only text provided
+        // Regular text content
         sourceContent = textContent.trim()
       }
 
@@ -187,7 +281,8 @@ export function StackerSetupScreen() {
         throw new Error('Not enough content to generate a document. Please add more text or attach a file with more content.')
       }
 
-      setGeneratingStatus('Generating document...')
+      setGeneratingPhase('generate')
+      setPhraseIndex(0)
 
       // Call AI to generate the Stacker document
       const generateResponse = await fetch('/api/generate-stacker', {
@@ -214,7 +309,8 @@ export function StackerSetupScreen() {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setIsGenerating(false)
-      setGeneratingStatus('')
+      setGeneratingPhase(null)
+      setPhraseIndex(0)
     }
   }
 
@@ -240,7 +336,7 @@ export function StackerSetupScreen() {
     >
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-2xl mx-auto px-6 py-4">
+        <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={handleBack}
             className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
@@ -250,6 +346,7 @@ export function StackerSetupScreen() {
             </svg>
             Back to templates
           </button>
+          <HeaderControls screenName="Stacker Setup" />
         </div>
       </div>
 
@@ -362,10 +459,26 @@ export function StackerSetupScreen() {
             </div>
           )}
 
+          {/* URL detection notice */}
+          {detectedUrl && !attachedFile && (
+            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+              <div className="flex items-start gap-2">
+                <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  URL detected. We&apos;ll try to fetch the content. If it requires login, please download and upload the file instead.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Helper text */}
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center">
             {attachedFile
               ? 'Your text will be used as context for interpreting the attached content.'
+              : detectedUrl
+              ? 'Public URLs will be fetched automatically. Private links require file upload.'
               : 'Supports PDF, Word, PowerPoint, TXT, and Markdown files. Or just type your content.'
             }
           </p>
@@ -374,6 +487,60 @@ export function StackerSetupScreen() {
           </p>
         </div>
       </div>
+
+      {/* Loading Overlay */}
+      {isGenerating && (
+        <div className="fixed inset-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center max-w-md px-6">
+            {/* Animated Logo/Spinner */}
+            <div className="relative w-16 h-16 mx-auto mb-6">
+              <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700" />
+              <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
+              <div className="absolute inset-3 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Status Text with Fade Animation */}
+            <div className="h-8 flex items-center justify-center">
+              <p
+                key={currentPhrase}
+                className="text-lg font-medium text-gray-700 dark:text-gray-300 animate-fade-in"
+              >
+                {currentPhrase}
+              </p>
+            </div>
+
+            {/* Progress Dots */}
+            <div className="flex justify-center gap-1.5 mt-4">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-blue-500"
+                  style={{
+                    animation: 'pulse 1.5s ease-in-out infinite',
+                    animationDelay: `${i * 0.2}s`,
+                  }}
+                />
+              ))}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Add fade-in animation style */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   )
 }

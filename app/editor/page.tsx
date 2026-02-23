@@ -15,6 +15,7 @@ import { FaqExportScreen } from '@/components/FaqExportScreen'
 import { FaqSetupScreen } from '@/components/FaqSetupScreen'
 import { StackerSetupScreen } from '@/components/StackerSetupScreen'
 import { StackerEditorScreen } from '@/components/StackerEditorScreen'
+import { StackerExportScreen } from '@/components/StackerExportScreen'
 
 export default function EditorPage() {
   const router = useRouter()
@@ -66,6 +67,7 @@ export default function EditorPage() {
   const isFaqExport = currentScreen === 'faq-export'
   const isStackerSetup = currentScreen === 'stacker-setup'
   const isStackerEditor = currentScreen === 'stacker-editor'
+  const isStackerExport = currentScreen === 'stacker-export'
 
   // Setup screens have their own layout (no EditorLayout wrapper)
   if (isSolutionOverviewSetup) {
@@ -83,7 +85,9 @@ export default function EditorPage() {
   // All other screens use EditorLayout
   return (
     <EditorLayout>
-      {isStackerEditor ? (
+      {isStackerExport ? (
+        <StackerExportScreen />
+      ) : isStackerEditor ? (
         <StackerEditorScreen />
       ) : isFaqExport ? (
         <FaqExportScreen />

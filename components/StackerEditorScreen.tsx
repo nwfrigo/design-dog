@@ -5,7 +5,7 @@ import { useStore } from '@/store'
 import { StackerPreviewEditor } from './StackerPreviewEditor'
 import { ImageCropModal } from './ImageCropModal'
 import { IconPicker } from './IconPickerModal'
-import type { StackerModule, StackerImageModule, StackerImage16x9Module, StackerImageCardsModule, SolutionCategory } from '@/types'
+import type { StackerModule, StackerImageModule, StackerImage16x9Module, StackerImageCardsModule, SolutionCategory, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule } from '@/types'
 import {
   DndContext,
   closestCenter,
@@ -1802,7 +1802,21 @@ function ModuleEditor({
 
 
 export function StackerEditorScreen() {
-  const { setCurrentScreen, stackerGeneratedModules, clearStackerGenerated } = useStore()
+  const {
+    setCurrentScreen,
+    stackerGeneratedModules,
+    stackerDocumentTitle,
+    clearStackerGenerated,
+    setStackerLogoChipModule,
+    setStackerHeaderModule,
+    setStackerContentModules,
+    setStackerFooterModule,
+    // Persisted edited modules (for coming back from export)
+    stackerLogoChipModule: storedLogoChip,
+    stackerHeaderModule: storedHeader,
+    stackerContentModules: storedContent,
+    stackerFooterModule: storedFooter,
+  } = useStore()
 
   // Locked modules (always present, not deletable, not draggable)
   const [logoChipModule, setLogoChipModule] = useState<StackerModule>(() => createDefaultModule('logo-chip'))
@@ -1812,10 +1826,10 @@ export function StackerEditorScreen() {
   // Content modules (draggable in preview, deletable)
   const [contentModules, setContentModules] = useState<StackerModule[]>([])
 
-  // Load generated modules from store on mount
+  // Load modules from store on mount (either from fresh generation or returning from export)
   useEffect(() => {
     if (stackerGeneratedModules && stackerGeneratedModules.length > 0) {
-      // Find and set locked modules
+      // Fresh generation - load from stackerGeneratedModules
       const logoChip = stackerGeneratedModules.find(m => m.type === 'logo-chip')
       const header = stackerGeneratedModules.find(m => m.type === 'header')
       const footer = stackerGeneratedModules.find(m => m.type === 'footer')
@@ -1830,8 +1844,14 @@ export function StackerEditorScreen() {
       )
       setContentModules(content)
 
-      // Clear the store so we don't reload on future mounts
+      // Clear the generated modules so we don't reload on future mounts
       clearStackerGenerated()
+    } else if (storedContent && storedContent.length > 0) {
+      // Coming back from export - restore from persisted edited modules
+      setLogoChipModule(storedLogoChip)
+      setHeaderModule(storedHeader)
+      setContentModules(storedContent)
+      setFooterModule(storedFooter)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
@@ -2000,6 +2020,17 @@ export function StackerEditorScreen() {
     setDeleteModuleConfirm(null)
   }, [selectedModuleId, deleteModuleConfirm])
 
+  // Navigate to Review & Export screen
+  const handleGoToExport = useCallback(() => {
+    // Sync current state to store so export screen can access it
+    setStackerLogoChipModule(logoChipModule as StackerLogoChipModule)
+    setStackerHeaderModule(headerModule as StackerHeaderModule)
+    setStackerContentModules(contentModules)
+    setStackerFooterModule(footerModule as StackerFooterModule)
+    // Navigate to export screen
+    setCurrentScreen('stacker-export')
+  }, [logoChipModule, headerModule, contentModules, footerModule, setStackerLogoChipModule, setStackerHeaderModule, setStackerContentModules, setStackerFooterModule, setCurrentScreen])
+
   return (
     <div className="space-y-6">
       {/* Header with title */}
@@ -2109,6 +2140,7 @@ export function StackerEditorScreen() {
 
               {/* Review & Export Button */}
               <button
+                onClick={handleGoToExport}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white
                   bg-blue-500 rounded-md hover:bg-blue-600 transition-colors"
               >
@@ -2211,7 +2243,7 @@ export function StackerEditorScreen() {
         itemType={deleteModuleConfirm?.moduleType || 'Module'}
       />
 
-      {/* Fullscreen Preview Modal */}
+      {/* Fullscreen Preview Modal (View-Only) */}
       {showFullscreenPreview && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8">
           <button
@@ -2234,12 +2266,13 @@ export function StackerEditorScreen() {
               onDeleteModule={() => {}}
               onAddModule={() => {}}
               previewZoom={100}
+              readOnly={true}
             />
           </div>
         </div>
       )}
 
-      {/* All Pages Preview Modal (for Stacker, same as fullscreen) */}
+      {/* All Pages Preview Modal (View-Only) */}
       {showAllPagesPreview && (
         <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
@@ -2268,6 +2301,7 @@ export function StackerEditorScreen() {
                 onDeleteModule={() => {}}
                 onAddModule={() => {}}
                 previewZoom={100}
+                readOnly={true}
               />
             </div>
           </div>

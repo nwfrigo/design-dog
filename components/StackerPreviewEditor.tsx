@@ -75,6 +75,7 @@ export interface StackerPreviewEditorProps {
   onDeleteModule: (moduleId: string) => void
   onAddModule: (type: StackerModule['type']) => void
   previewZoom: number
+  readOnly?: boolean // When true, disables all drag/drop, delete, and add functionality
 }
 
 // Render a module for the drag overlay
@@ -212,6 +213,7 @@ export function StackerPreviewEditor({
   onDeleteModule,
   onAddModule,
   previewZoom,
+  readOnly = false,
 }: StackerPreviewEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
@@ -271,7 +273,7 @@ export function StackerPreviewEditor({
     setOverId(null)
   }, [])
 
-  // Render module wrapper with drag capabilities
+  // Render module wrapper with drag capabilities (or read-only)
   const renderModuleWrapper = useCallback((module: StackerModule, children: ReactNode, index: number) => {
     const isOverAbove = overId === module.id && activeId !== module.id
     const isLastModule = index === modules.length - 1
@@ -281,21 +283,22 @@ export function StackerPreviewEditor({
       <StackerDraggableModule
         key={module.id}
         module={module}
-        isSelected={selectedModuleId === module.id}
-        isOverAbove={isOverAbove}
+        isSelected={readOnly ? false : selectedModuleId === module.id}
+        isOverAbove={readOnly ? false : isOverAbove}
         onSelect={onSelectModule}
         onDelete={onDeleteModule}
+        readOnly={readOnly}
       >
         {children}
-        {/* Show drop indicator after last module when dragging */}
-        {isOverAfterLast && (
+        {/* Show drop indicator after last module when dragging (not in readOnly) */}
+        {!readOnly && isOverAfterLast && (
           <div style={{ marginTop: 8 }}>
             <StackerDropIndicator isVisible={true} />
           </div>
         )}
       </StackerDraggableModule>
     )
-  }, [selectedModuleId, onSelectModule, onDeleteModule, overId, activeId, modules.length])
+  }, [selectedModuleId, onSelectModule, onDeleteModule, overId, activeId, modules.length, readOnly])
 
   // Render add module tile inside the document
   const renderAddModuleTile = useCallback(() => (
@@ -339,7 +342,7 @@ export function StackerPreviewEditor({
             modules={modules}
             scale={1}
             renderModuleWrapper={renderModuleWrapper}
-            renderFooterContent={renderAddModuleTile}
+            renderFooterContent={readOnly ? undefined : renderAddModuleTile}
           />
         </div>
       </SortableContext>

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import { useStore } from '@/store'
+import { HeaderControls } from '@/components/HeaderControls'
 import type { SolutionCategory, FaqPage } from '@/types'
 import { solutionCategories } from '@/config/solution-overview-assets'
 
@@ -214,7 +215,7 @@ export function FaqSetupScreen() {
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-2xl mx-auto px-6 py-4">
+        <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={handleBack}
             className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
@@ -224,6 +225,7 @@ export function FaqSetupScreen() {
             </svg>
             Back to templates
           </button>
+          <HeaderControls screenName="FAQ Setup" />
         </div>
       </div>
 

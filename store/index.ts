@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, FaqPage, FaqContentBlock } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
@@ -382,6 +382,39 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Stacker PDF state
   stackerGeneratedModules: null,
   stackerDocumentTitle: null,
+  // Stacker edited modules (persisted for export screen)
+  stackerLogoChipModule: {
+    id: 'logo-chip-default',
+    type: 'logo-chip',
+    showChips: true,
+    activeCategories: ['safety'],
+  } as StackerLogoChipModule,
+  stackerHeaderModule: {
+    id: 'header-default',
+    type: 'header',
+    heading: 'Document Title',
+    headingSize: 'h1',
+    subheader: '',
+    showSubheader: false,
+    cta: 'Learn More',
+    ctaUrl: '',
+    showCta: false,
+  } as StackerHeaderModule,
+  stackerContentModules: [] as StackerModule[],
+  stackerFooterModule: {
+    id: 'footer-default',
+    type: 'footer',
+    stat1Value: '27,000+',
+    stat1Label: 'Global Customers',
+    stat2Value: '100+',
+    stat2Label: 'Countries',
+    stat3Value: '1M+',
+    stat3Label: 'Daily Users',
+    stat4Value: '200K+',
+    stat4Label: 'Daily Actions',
+    stat5Value: '15+',
+    stat5Label: 'Years',
+  } as StackerFooterModule,
 
   // Export queue
   exportQueue: [],
@@ -628,6 +661,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setStackerGeneratedModules: (modules) => set({ stackerGeneratedModules: modules }),
   setStackerDocumentTitle: (title) => set({ stackerDocumentTitle: title }),
   clearStackerGenerated: () => set({ stackerGeneratedModules: null, stackerDocumentTitle: null }),
+  // Stacker edited module actions
+  setStackerLogoChipModule: (module: StackerLogoChipModule) => set({ stackerLogoChipModule: module }),
+  setStackerHeaderModule: (module: StackerHeaderModule) => set({ stackerHeaderModule: module }),
+  setStackerContentModules: (modules: StackerModule[]) => set({ stackerContentModules: modules }),
+  setStackerFooterModule: (module: StackerFooterModule) => set({ stackerFooterModule: module }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
