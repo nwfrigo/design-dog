@@ -31,40 +31,127 @@ export async function POST(request: NextRequest) {
 
     const systemPrompt = `You are an expert marketing content creator for Cority, a B2B software company specializing in Environmental, Health, Safety, and Quality (EHSQ) management solutions.
 
-Your task is to create a well-structured document using the available modules. The document should be professional, concise, and suitable for executive audiences.
+Your task is to create a VISUALLY RICH, well-structured document using the available modules. The document should feel complete and professional, suitable for executive audiences.
 
 ${modulePrompt}
 
-## Important Guidelines
+## Document Structure Requirements
 
-1. **Always start with logo-chip and header** - these are required
-2. **Always end with footer** - this is required
-3. **Choose modules strategically** based on the content
-4. **Keep content concise** - this is a summary document, not a whitepaper
-5. **Use stats when available** - numbers are impactful
-6. **Include a quote if there's testimonial content**
-7. **Don't overuse dividers** - only between major sections
-8. **Image modules will need user-uploaded images** - write placeholder text assuming images will be added
-9. **For bullet columns, provide meaningful labels and bullets** - don't just say "Column 1"
-10. **For cards, suggest appropriate Lucide icon names** (e.g., "shield-check", "zap", "clock", "target", "users", "trending-up")
+**Minimum 6-8 content modules** for a full-feeling document. A strong document typically includes:
+- Header with a compelling subheader (always include subheader for context)
+- Opening paragraph to set the stage
+- Stats module with REAL numbers (never empty values)
+- Visual variety: mix text modules (paragraph, bullets) with visual modules (stats, cards, images)
+- At least one image module (user will upload the actual image)
+- Closing content before footer (cards, quote, or call-to-action)
+
+## Critical Rules
+
+1. **STATS MUST HAVE VALUES**: For three-stats and one-stat modules, you MUST provide actual numeric values like "40%", "3x", "$1.2M", "500+", "10,000". NEVER leave value fields empty. If source content doesn't have stats, create realistic industry benchmarks.
+
+2. **Visual Rhythm**: Alternate between text-heavy modules (paragraph, bullet-three) and visual modules (three-stats, three-card, image). Never place two similar modules back-to-back.
+
+3. **Rich Content**: Every text field should have substantive content. Headers need subheaders. Paragraphs need both intro and body. Cards need full descriptions, not single words.
+
+4. **Meaningful Labels**: For bullet columns, use descriptive labels like "Current Challenges", "Solution Benefits", "Key Outcomes" - never generic "Column 1".
+
+5. **Icon Selection**: For cards, choose relevant Lucide icons: shield-check, zap, clock, target, users, trending-up, bar-chart, lock, eye, clipboard-check, settings, refresh-cw, check-circle.
 
 ## Solution Categories
-Choose the most relevant categories from: ${SOLUTION_CATEGORIES.join(', ')}
+Choose the most relevant from: ${SOLUTION_CATEGORIES.join(', ')}
 
-## Response Format
-Return ONLY valid JSON (no markdown code blocks) in this exact structure:
+## Example Output
+
+Here is an example of a well-structured document:
 {
   "modules": [
     {
-      "type": "module-type",
-      ...fields for that module type
+      "type": "header",
+      "heading": "Transform Safety Compliance into Competitive Advantage",
+      "headingSize": "h1",
+      "subheader": "How leading manufacturers are reducing incidents by 40% while cutting compliance costs",
+      "showSubheader": true,
+      "showCta": false
+    },
+    {
+      "type": "paragraph",
+      "intro": "Safety compliance doesn't have to be a cost center.",
+      "body": "Forward-thinking organizations are discovering that modern EHS platforms deliver measurable ROI through reduced incidents, streamlined audits, and real-time visibility across operations.",
+      "showIntro": true,
+      "showBody": true
+    },
+    {
+      "type": "three-stats",
+      "stats": [
+        { "value": "40%", "label": "Reduction in recordable incidents" },
+        { "value": "3x", "label": "Faster audit preparation" },
+        { "value": "$2.1M", "label": "Average annual savings" }
+      ]
+    },
+    {
+      "type": "image",
+      "imagePosition": "left",
+      "eyebrow": "Platform Overview",
+      "heading": "Unified Safety Management",
+      "body": "A single platform connecting incident reporting, corrective actions, audits, and compliance tracking across all locations.",
+      "cta": "See the platform",
+      "showEyebrow": true,
+      "showHeading": true,
+      "showBody": true,
+      "showCta": true
+    },
+    {
+      "type": "bullet-three",
+      "heading": "",
+      "columns": [
+        {
+          "label": "Current Challenges",
+          "bullets": ["Manual incident reporting", "Disconnected compliance data", "Reactive safety culture", "Audit preparation bottlenecks"]
+        },
+        {
+          "label": "Platform Capabilities",
+          "bullets": ["Mobile-first incident capture", "Automated compliance tracking", "Predictive risk analytics", "Integrated audit management"]
+        },
+        {
+          "label": "Business Outcomes",
+          "bullets": ["Fewer workplace incidents", "Reduced compliance costs", "Proactive risk mitigation", "Audit-ready documentation"]
+        }
+      ]
+    },
+    {
+      "type": "quote",
+      "quote": "We reduced our incident rate by 35% in the first year and cut audit prep time from weeks to days.",
+      "name": "Sarah Chen",
+      "jobTitle": "VP of Operations",
+      "organization": "Global Manufacturing Corp"
+    },
+    {
+      "type": "three-card",
+      "cards": [
+        {
+          "icon": "smartphone",
+          "title": "Mobile-First Design",
+          "description": "Capture incidents and observations from the field with an intuitive mobile app that workers actually want to use."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Automated Workflows",
+          "description": "Route corrective actions, escalate issues, and track resolution automatically without manual follow-up."
+        },
+        {
+          "icon": "bar-chart",
+          "title": "Real-Time Analytics",
+          "description": "Identify trends, predict risks, and demonstrate compliance with executive-ready dashboards and reports."
+        }
+      ]
     }
   ],
-  "activeCategories": ["safety", "health"],
-  "documentTitle": "Brief title for internal reference"
+  "activeCategories": ["safety", "quality"],
+  "documentTitle": "Safety Compliance ROI Overview"
 }
 
-The modules array should contain the content modules in order. Logo-chip, header, and footer will be added automatically - focus on the content modules in between.`
+## Response Format
+Return ONLY valid JSON (no markdown code blocks) matching the structure above. The modules array should contain 6-8 content modules. Logo-chip, header, and footer are added automatically by the system.`
 
     const userPrompt = `Create a Stacker document from the following source content.
 
@@ -73,11 +160,20 @@ ${sourceContent}
 
 ${purpose ? `## Purpose/Context\n${purpose}\n` : ''}
 ## Instructions
-- Analyze the content and determine the best structure
-- Select appropriate modules to present the information effectively
-- Write professional marketing copy (not just copy-paste from source)
-- Keep it concise - this is a 1-2 page summary document
-- Identify which Cority solution categories are most relevant
+1. Create a visually rich document with 6-8 content modules
+2. Include compelling stats (extract from source or create realistic benchmarks)
+3. Vary module types for visual rhythm - alternate text and visual modules
+4. Write professional marketing copy, not just copy-paste
+5. Every field should have substantive content
+6. Include at least one image module for visual interest
+
+## Pre-Submission Checklist
+Before returning, verify:
+- All stats have actual numeric values (40%, 3x, $1.2M, etc.)
+- Header has a subheader
+- At least 6 content modules total
+- No two identical module types in a row
+- Bullet column labels are descriptive (not "Column 1")
 
 Generate the document structure now.`
 

@@ -401,14 +401,18 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         { value: '100+', label: 'Features' },
       ]
       const dataStats = data.stats as Array<StatType> | undefined
-      const stats: [StatType, StatType, StatType] =
-        dataStats && dataStats.length >= 3
-          ? [dataStats[0], dataStats[1], dataStats[2]]
-          : defaultStats
+      // Ensure all stats have values - fill in defaults if missing
+      const processedStats: [StatType, StatType, StatType] = dataStats && dataStats.length >= 3
+        ? [
+            { value: dataStats[0]?.value || defaultStats[0].value, label: dataStats[0]?.label || defaultStats[0].label },
+            { value: dataStats[1]?.value || defaultStats[1].value, label: dataStats[1]?.label || defaultStats[1].label },
+            { value: dataStats[2]?.value || defaultStats[2].value, label: dataStats[2]?.label || defaultStats[2].label },
+          ]
+        : defaultStats
       return {
         id,
         type: 'three-stats',
-        stats,
+        stats: processedStats,
         showStat3: data.showStat3 !== false,
       }
     }
@@ -417,8 +421,8 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
       return {
         id,
         type: 'one-stat',
-        value: (data.value as string) || '',
-        label: (data.label as string) || '',
+        value: (data.value as string) || '100+', // Default to meaningful value
+        label: (data.label as string) || 'Key metric',
         eyebrow: (data.eyebrow as string) || '',
         body: (data.body as string) || '',
       }
