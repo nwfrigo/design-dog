@@ -67,16 +67,24 @@ export function ImageCardsModule({
     flexDirection: 'column',
   }
 
-  const imageStyle = (card: ImageCardData): CSSProperties => ({
+  const imageContainerStyle: CSSProperties = {
     width: 180,
     height: 100,
     backgroundColor: '#f5f5f5',
-    backgroundImage: card.imageUrl ? `url(${card.imageUrl})` : undefined,
-    backgroundSize: `${card.imageZoom * 100}%`,
-    backgroundPosition: `${50 + card.imagePan.x}% ${50 + card.imagePan.y}%`,
-    backgroundRepeat: 'no-repeat',
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6,
+    overflow: 'hidden',
+  }
+
+  const getImageStyle = (card: ImageCardData): CSSProperties => ({
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: `${50 - card.imagePan.x}% ${50 - card.imagePan.y}%`,
+    transform: card.imageZoom !== 1
+      ? `translate(${card.imagePan.x * (card.imageZoom - 1)}%, ${card.imagePan.y * (card.imageZoom - 1)}%) scale(${card.imageZoom})`
+      : undefined,
+    transformOrigin: 'center',
     filter: grayscale ? 'grayscale(100%)' : undefined,
   })
 
@@ -125,7 +133,11 @@ export function ImageCardsModule({
       <div style={cardsRowStyle}>
         {visibleCards.map((card, index) => (
           <div key={index} style={cardStyle}>
-            <div style={imageStyle(card)} />
+            <div style={imageContainerStyle}>
+              {card.imageUrl ? (
+                <img src={card.imageUrl} alt="" style={getImageStyle(card)} />
+              ) : null}
+            </div>
             <div style={contentStyle}>
               {card.showEyebrow && card.eyebrow && (
                 <div style={eyebrowStyle}>{card.eyebrow}</div>

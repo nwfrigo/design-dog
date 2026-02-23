@@ -69,17 +69,25 @@ export function ImageModule({
     transformOrigin: 'top left',
   }
 
-  const imageStyle: CSSProperties = {
+  const imageContainerStyle: CSSProperties = {
     width: 180,
     height: 180,
     borderRadius: 6.45,
     border: '0.65px solid #D9D8D6',
     flexShrink: 0,
     backgroundColor: '#f5f5f5',
-    backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
-    backgroundSize: `${imageZoom * 100}%`,
-    backgroundPosition: `${50 + imagePan.x}% ${50 + imagePan.y}%`,
-    backgroundRepeat: 'no-repeat',
+    overflow: 'hidden',
+  }
+
+  const imageStyle: CSSProperties = {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: `${50 - imagePan.x}% ${50 - imagePan.y}%`,
+    transform: imageZoom !== 1
+      ? `translate(${imagePan.x * (imageZoom - 1)}%, ${imagePan.y * (imageZoom - 1)}%) scale(${imageZoom})`
+      : undefined,
+    transformOrigin: 'center',
     filter: grayscale ? 'grayscale(100%)' : undefined,
   }
 
@@ -138,7 +146,11 @@ export function ImageModule({
 
   return (
     <div style={containerStyle}>
-      <div style={imageStyle} />
+      <div style={imageContainerStyle}>
+        {imageUrl ? (
+          <img src={imageUrl} alt="" style={imageStyle} />
+        ) : null}
+      </div>
 
       <div style={textContainerStyle}>
         {showEyebrow && eyebrow && (
