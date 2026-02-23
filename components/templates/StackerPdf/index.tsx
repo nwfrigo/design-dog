@@ -224,9 +224,15 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
         {/* Render all non-footer modules */}
         {nonFooterModules.map((module, index) => {
           const moduleContent = <RenderModule key={module.id} module={module} />
+          // Wrap in div with data-module-id for export image injection
+          const wrappedContent = (
+            <div key={module.id} data-module-id={module.id}>
+              {moduleContent}
+            </div>
+          )
           return renderModuleWrapper
-            ? renderModuleWrapper(module, moduleContent, index)
-            : moduleContent
+            ? renderModuleWrapper(module, wrappedContent, index)
+            : wrappedContent
         })}
         {modules.length === 0 && (
           <div

@@ -326,8 +326,39 @@ export async function POST(request: NextRequest) {
     if (body.coverImageZoom !== undefined) params.set('coverImageZoom', String(body.coverImageZoom))
     if (body.coverImageGrayscale !== undefined) params.set('coverImageGrayscale', String(body.coverImageGrayscale))
 
-    // Stacker PDF specific
-    if (body.modules) params.set('modules', encodeURIComponent(JSON.stringify(body.modules)))
+    // Stacker PDF specific - strip data URLs to avoid URL length limits
+    // They'll be injected via page.evaluate() after loading
+    interface StackerImageData {
+      moduleId: string
+      imageUrl: string
+    }
+    const stackerImageData: StackerImageData[] = []
+
+    if (body.modules) {
+      const modulesForUrl = (body.modules as Record<string, unknown>[]).map((module) => {
+        // Check if this module has an imageUrl that's a data URL
+        const imageUrl = module.imageUrl as string | undefined
+        if (imageUrl && imageUrl.startsWith('data:')) {
+          stackerImageData.push({ moduleId: module.id as string, imageUrl })
+          return { ...module, imageUrl: null } // Clear data URL for URL params
+        }
+        // Check for image-cards modules with card images
+        const cards = module.cards as Record<string, unknown>[] | undefined
+        if (cards && Array.isArray(cards)) {
+          const updatedCards = cards.map((card, idx) => {
+            const cardImageUrl = card.imageUrl as string | undefined
+            if (cardImageUrl && cardImageUrl.startsWith('data:')) {
+              stackerImageData.push({ moduleId: `${module.id}-card-${idx}`, imageUrl: cardImageUrl })
+              return { ...card, imageUrl: null }
+            }
+            return card
+          })
+          return { ...module, cards: updatedCards }
+        }
+        return module
+      })
+      params.set('modules', encodeURIComponent(JSON.stringify(modulesForUrl)))
+    }
 
     // Get the base URL from the request
     const host = request.headers.get('host') || 'localhost:3000'
@@ -467,6 +498,36 @@ export async function POST(request: NextRequest) {
     // Inject FAQ cover image
     if (body.coverImageUrl && body.coverImageUrl.startsWith('data:')) {
       await injectDataUrlImage(body.coverImageUrl, 'img[data-faq-cover-image="true"]')
+    }
+
+    // Inject Stacker PDF images
+    for (const imgData of stackerImageData) {
+      // For regular image modules
+      if (!imgData.moduleId.includes('-card-')) {
+        await page.evaluate((moduleId: string, imgSrc: string) => {
+          // Find the image by module ID
+          const container = document.querySelector(`[data-module-id="${moduleId}"]`)
+          if (container) {
+            const img = container.querySelector('img') as HTMLImageElement
+            if (img) {
+              img.src = imgSrc
+            }
+          }
+        }, imgData.moduleId, imgData.imageUrl)
+      } else {
+        // For image-cards modules - moduleId is like "module-id-card-0"
+        const [moduleId, , , cardIdx] = imgData.moduleId.split('-')
+        await page.evaluate((mId: string, cIdx: string, imgSrc: string) => {
+          const container = document.querySelector(`[data-module-id="${mId}"]`)
+          if (container) {
+            const imgs = container.querySelectorAll('img')
+            const img = imgs[parseInt(cIdx)] as HTMLImageElement
+            if (img) {
+              img.src = imgSrc
+            }
+          }
+        }, moduleId, cardIdx, imgData.imageUrl)
+      }
     }
 
     // Additional delay for rendering

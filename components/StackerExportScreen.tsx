@@ -34,16 +34,13 @@ export function StackerExportScreen() {
     setFilename(sanitized)
   }, [stackerDocumentTitle])
 
-  // Combine all modules
+  // Combine all modules (filter out any undefined)
   const allModules: StackerModule[] = [
     stackerLogoChipModule,
     stackerHeaderModule,
     ...stackerContentModules,
     stackerFooterModule,
-  ]
-
-  // Count content modules (excluding locked)
-  const contentModuleCount = stackerContentModules.length
+  ].filter(Boolean) as StackerModule[]
 
   const handleBack = () => {
     setCurrentScreen('stacker-editor')
@@ -187,50 +184,21 @@ export function StackerExportScreen() {
                 Document Details
               </h3>
 
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Filename
-                  </label>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="text"
-                      value={filename}
-                      onChange={(e) => setFilename(e.target.value.replace(/[^a-zA-Z0-9\s-]/g, ''))}
-                      className="flex-1 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100
-                        bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600
-                        rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="stacker-document"
-                    />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">.png</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Modules
-                  </label>
-                  <div className="text-sm text-gray-900 dark:text-gray-100">
-                    {allModules.length} total ({contentModuleCount} content + 3 locked)
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Format
-                  </label>
-                  <div className="text-sm text-gray-900 dark:text-gray-100">
-                    PNG (High Resolution)
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Width
-                  </label>
-                  <div className="text-sm text-gray-900 dark:text-gray-100">
-                    1224px (612px @ 2x)
-                  </div>
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  Filename
+                </label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    value={filename}
+                    onChange={(e) => setFilename(e.target.value.replace(/[^a-zA-Z0-9\s-]/g, ''))}
+                    className="flex-1 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100
+                      bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600
+                      rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="stacker-document"
+                  />
+                  <span className="text-sm text-gray-500 dark:text-gray-400">.png</span>
                 </div>
               </div>
             </div>
