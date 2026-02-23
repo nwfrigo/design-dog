@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo, ReactNode } from 'react'
+import { useState, useCallback, useMemo, useEffect, ReactNode } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -39,33 +39,132 @@ import { OneStatModule } from './templates/StackerPdf/modules/OneStatModule'
 import { FooterModule } from './templates/StackerPdf/modules/FooterModule'
 import { BulletListModule } from './templates/StackerPdf/modules/BulletListModule'
 
-// Module type labels for the add menu
-const MODULE_LABELS: Record<string, string> = {
-  'paragraph': 'Paragraph',
-  'bullet-three': '3 Bullets',
-  'image': 'Image - 1:1',
-  'image-16x9': 'Image - 16:9',
-  'divider': 'Divider',
-  'three-card': 'Simple Cards',
-  'image-cards': 'Image Cards',
-  'quote': 'Quote',
-  'three-stats': '3 Stats',
-  'one-stat': '1 Stat',
+// Module type metadata for the add menu
+interface ModuleTypeInfo {
+  type: StackerModule['type']
+  label: string
+  description: string
 }
 
-// Content module types (excludes locked modules)
-const CONTENT_MODULE_TYPES: StackerModule['type'][] = [
-  'paragraph',
-  'bullet-three',
-  'image',
-  'image-16x9',
-  'divider',
-  'three-card',
-  'image-cards',
-  'quote',
-  'three-stats',
-  'one-stat',
+const MODULE_TYPES_INFO: ModuleTypeInfo[] = [
+  { type: 'paragraph', label: 'Paragraph', description: 'Intro text with body copy' },
+  { type: 'bullet-three', label: '3 Bullets', description: 'Three columns of bullet points' },
+  { type: 'image', label: 'Image - 1:1', description: 'Square image with text' },
+  { type: 'image-16x9', label: 'Image - 16:9', description: 'Wide image with text' },
+  { type: 'divider', label: 'Divider', description: 'Horizontal separator line' },
+  { type: 'three-card', label: 'Simple Cards', description: 'Three icon cards' },
+  { type: 'image-cards', label: 'Image Cards', description: 'Cards with images' },
+  { type: 'quote', label: 'Quote', description: 'Customer testimonial' },
+  { type: 'three-stats', label: '3 Stats', description: 'Three key metrics' },
+  { type: 'one-stat', label: '1 Stat', description: 'Single featured metric' },
 ]
+
+// Placeholder image for module previews (light gray gradient)
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Cdefs%3E%3ClinearGradient id="g" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:%23e5e7eb"%3E%3C/stop%3E%3Cstop offset="100%25" style="stop-color:%23d1d5db"%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="400" height="400" fill="url(%23g)"%3E%3C/rect%3E%3C/svg%3E'
+
+// Estimated heights for each module type at native 564px width (for scaling calculations)
+const MODULE_HEIGHTS: Record<StackerModule['type'], number> = {
+  'logo-chip': 60,
+  'header': 100,
+  'paragraph': 80,
+  'bullet-three': 140,
+  'image': 210,
+  'image-16x9': 130,
+  'divider': 30,
+  'three-card': 150,
+  'image-cards': 220,
+  'quote': 100,
+  'three-stats': 80,
+  'one-stat': 100,
+  'footer': 80,
+}
+
+// Sample data for module previews
+function getSampleModule(type: StackerModule['type']): StackerModule {
+  const id = `preview-${type}`
+  switch (type) {
+    case 'paragraph':
+      return {
+        id, type: 'paragraph',
+        intro: 'Transform your safety operations with a unified platform.',
+        body: 'Connect incident reporting, corrective actions, audits, and compliance tracking across all locations for real-time visibility.',
+        showIntro: true, showBody: true,
+      }
+    case 'bullet-three':
+      return {
+        id, type: 'bullet-three',
+        heading: '',
+        columns: [
+          { label: 'Challenges', bullets: ['Manual processes', 'Data silos', 'Compliance gaps'] },
+          { label: 'Solutions', bullets: ['Automation', 'Integration', 'Real-time tracking'] },
+          { label: 'Outcomes', bullets: ['40% faster', 'Zero incidents', 'Audit-ready'] },
+        ],
+      }
+    case 'image':
+      return {
+        id, type: 'image',
+        imagePosition: 'left', imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
+        eyebrow: 'Platform', showEyebrow: true,
+        heading: 'Unified Dashboard', showHeading: true,
+        body: 'See all your safety data in one place with real-time updates.', showBody: true,
+        cta: 'Learn More', ctaUrl: '', showCta: true,
+      }
+    case 'image-16x9':
+      return {
+        id, type: 'image-16x9',
+        imagePosition: 'right', imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
+        eyebrow: 'Feature', showEyebrow: true,
+        heading: 'Mobile Access', showHeading: true,
+        body: 'Access your data anywhere with our mobile app.', showBody: true,
+      }
+    case 'divider':
+      return { id, type: 'divider' }
+    case 'three-card':
+      return {
+        id, type: 'three-card',
+        cards: [
+          { icon: 'shield-check', title: 'Safety First', description: 'Proactive hazard identification' },
+          { icon: 'clipboard-check', title: 'Compliance', description: 'Automated tracking' },
+          { icon: 'trending-up', title: 'Analytics', description: 'Data-driven insights' },
+        ],
+      }
+    case 'image-cards':
+      return {
+        id, type: 'image-cards',
+        heading: '', showHeading: false,
+        cards: [
+          { imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Incident Reporting', body: 'Capture incidents in real-time' },
+          { imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Risk Assessment', body: 'Identify and mitigate risks' },
+          { imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Audit Management', body: 'Streamline your audits' },
+        ],
+        showCard3: true, grayscale: false,
+      }
+    case 'quote':
+      return {
+        id, type: 'quote',
+        quote: 'This platform transformed how we manage safety across all our facilities.',
+        name: 'Sarah Johnson', jobTitle: 'VP of Operations', organization: 'Global Manufacturing Inc.',
+      }
+    case 'three-stats':
+      return {
+        id, type: 'three-stats',
+        stats: [
+          { value: '40%', label: 'Incident reduction' },
+          { value: '3x', label: 'Faster audits' },
+          { value: '$2M', label: 'Annual savings' },
+        ],
+        showStat3: true,
+      }
+    case 'one-stat':
+      return {
+        id, type: 'one-stat',
+        value: '99.9%', label: 'Uptime guaranteed',
+        eyebrow: 'Reliability', body: 'Our platform ensures your critical safety systems are always available.',
+      }
+    default:
+      return { id, type: 'divider' }
+  }
+}
 
 export interface StackerPreviewEditorProps {
   modules: StackerModule[]
@@ -218,6 +317,22 @@ export function StackerPreviewEditor({
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
   const [showAddMenu, setShowAddMenu] = useState(false)
+  const [previewingModule, setPreviewingModule] = useState<StackerModule['type'] | null>(null)
+
+  // Handle Escape key to close lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (previewingModule) {
+          setPreviewingModule(null)
+        } else if (showAddMenu) {
+          setShowAddMenu(false)
+        }
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [previewingModule, showAddMenu])
 
   // Configure sensors with activation constraint to distinguish click vs drag
   const sensors = useSensors(
@@ -374,42 +489,145 @@ export function StackerPreviewEditor({
 
       {/* Add Module Modal */}
       {showAddMenu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setShowAddMenu(false)}
           />
 
           {/* Modal */}
-          <div className="relative bg-white rounded-xl shadow-2xl p-5 w-[320px]">
+          <div className="relative bg-gray-900 rounded-xl shadow-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-900">Add Module</h3>
+            <div className="flex items-center justify-between p-6 border-b border-gray-800">
+              <h2 className="text-lg font-semibold text-white">Add Module</h2>
               <button
                 onClick={() => setShowAddMenu(false)}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1 text-gray-400 hover:text-white transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            {/* Module Type Grid */}
-            <div className="grid grid-cols-2 gap-2">
-              {CONTENT_MODULE_TYPES.map((type) => (
+            {/* Module Grid - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid grid-cols-2 gap-4" style={{ gridAutoRows: 'auto' }}>
+                {MODULE_TYPES_INFO.map((info) => {
+                  const sampleModule = getSampleModule(info.type)
+                  // Scale factor: card width (~400px) / module width (564px) ≈ 0.71
+                  const scale = 0.71
+                  const padding = 16 // Padding around the preview
+                  const scaledHeight = MODULE_HEIGHTS[info.type] * scale + padding * 2
+
+                  return (
+                    <div
+                      key={info.type}
+                      className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-blue-500 transition-colors group"
+                    >
+                      {/* Preview thumbnail - full width with padding */}
+                      <div
+                        className="relative bg-white cursor-pointer overflow-hidden"
+                        onClick={() => {
+                          onAddModule(info.type)
+                          setShowAddMenu(false)
+                        }}
+                        style={{
+                          height: scaledHeight,
+                          padding: padding,
+                        }}
+                      >
+                        <div
+                          style={{
+                            transform: `scale(${scale})`,
+                            transformOrigin: 'top left',
+                            width: 564,
+                            pointerEvents: 'none',
+                          }}
+                        >
+                          <RenderModuleForOverlay module={sampleModule} />
+                        </div>
+                      </div>
+
+                      {/* Info bar */}
+                      <div className="px-4 py-3 flex items-center justify-between bg-gray-800">
+                        <h3 className="text-sm font-medium text-white">{info.label}</h3>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setPreviewingModule(info.type)
+                          }}
+                          className="text-xs text-gray-400 hover:text-white transition-colors"
+                        >
+                          Preview
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-800">
+              <button
+                onClick={() => setShowAddMenu(false)}
+                className="w-full py-3 text-sm font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Module Preview Lightbox */}
+      {previewingModule && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-8">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80"
+            onClick={() => setPreviewingModule(null)}
+          />
+
+          {/* Preview Container - stacked vertically */}
+          <div className="relative flex flex-col items-center max-w-[700px] w-full">
+            {/* Close button above preview */}
+            <div className="w-full flex justify-end mb-2">
+              <button
+                onClick={() => setPreviewingModule(null)}
+                className="text-gray-400 hover:text-white transition-colors p-1"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Preview Content */}
+            <div className="bg-white rounded-lg shadow-2xl w-full max-h-[80vh] overflow-auto">
+              {/* Module preview - scales to fill width */}
+              <div className="p-6">
+                <RenderModuleForOverlay module={getSampleModule(previewingModule)} />
+              </div>
+
+              {/* Add button */}
+              <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-700">
+                  {MODULE_TYPES_INFO.find(m => m.type === previewingModule)?.label}
+                </span>
                 <button
-                  key={type}
                   onClick={() => {
-                    onAddModule(type)
+                    onAddModule(previewingModule)
+                    setPreviewingModule(null)
                     setShowAddMenu(false)
                   }}
-                  className="px-3 py-3 text-sm text-center text-gray-700 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                  className="px-6 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  {MODULE_LABELS[type]}
+                  Add Module
                 </button>
-              ))}
+              </div>
             </div>
           </div>
         </div>
