@@ -47,7 +47,7 @@ ${modulePrompt}
 
 ## Critical Rules
 
-1. **STATS MUST HAVE VALUES**: For three-stats and one-stat modules, you MUST provide actual numeric values like "40%", "3x", "$1.2M", "500+", "10,000". NEVER leave value fields empty. If source content doesn't have stats, create realistic industry benchmarks.
+1. **STATS ONLY FROM SOURCE**: Only include three-stats or one-stat modules if the source content contains actual numeric data (percentages, dollar amounts, counts, timeframes, etc.). If no stats exist in the source, DO NOT include any stats modules - use other module types instead.
 
 2. **Visual Rhythm**: Alternate between text-heavy modules (paragraph, bullet-three) and visual modules (three-stats, three-card, image). Never place two similar modules back-to-back.
 
@@ -161,7 +161,7 @@ ${sourceContent}
 ${purpose ? `## Purpose/Context\n${purpose}\n` : ''}
 ## Instructions
 1. Create a visually rich document with 6-8 content modules
-2. Include compelling stats (extract from source or create realistic benchmarks)
+2. Only include stats modules if the source contains actual numbers - otherwise skip stats entirely
 3. Vary module types for visual rhythm - alternate text and visual modules
 4. Write professional marketing copy, not just copy-paste
 5. Every field should have substantive content
@@ -169,7 +169,7 @@ ${purpose ? `## Purpose/Context\n${purpose}\n` : ''}
 
 ## Pre-Submission Checklist
 Before returning, verify:
-- All stats have actual numeric values (40%, 3x, $1.2M, etc.)
+- Stats modules ONLY if source had numeric data (otherwise omit them)
 - Header has a subheader
 - At least 6 content modules total
 - No two identical module types in a row
