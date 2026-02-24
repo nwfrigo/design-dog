@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import mammoth from 'mammoth'
+import officeparser from 'officeparser'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
 type SupportedFileType = 'pdf' | 'docx' | 'pptx' | 'txt' | 'md'
-
-const MEDIA_TYPES: Record<SupportedFileType, string> = {
-  pdf: 'application/pdf',
-  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  txt: 'text/plain',
-  md: 'text/markdown',
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -62,7 +56,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // For PDF, DOCX, PPTX - use Claude's document API
+    // Fetch the file
     const fileResponse = await fetch(fileUrl)
     if (!fileResponse.ok) {
       return NextResponse.json(
@@ -70,55 +64,102 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-    const fileBuffer = await fileResponse.arrayBuffer()
-    const fileBase64 = Buffer.from(fileBuffer).toString('base64')
+    const fileBuffer = Buffer.from(await fileResponse.arrayBuffer())
 
-    const mediaType = MEDIA_TYPES[fileType]
+    // Handle different file types
+    if (fileType === 'pdf') {
+      // PDFs can be sent directly to Claude's document API
+      const fileBase64 = fileBuffer.toString('base64')
 
-    // Send document to Claude for content extraction
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 8192,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'document',
-              source: {
-                type: 'base64',
-                media_type: mediaType,
-                data: fileBase64,
-              },
-            } as any,
-            {
-              type: 'text',
-              text: `Extract all the text content from this document. Preserve the structure and organization of the content as much as possible.
-
-For presentations (PPTX), extract the content from each slide in order.
-For documents (PDF, DOCX), preserve headings, paragraphs, and bullet points.
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8192,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'document',
+                source: {
+                  type: 'base64',
+                  media_type: 'application/pdf',
+                  data: fileBase64,
+                },
+              } as any,
+              {
+                type: 'text',
+                text: `Extract all the text content from this document. Preserve the structure and organization of the content as much as possible. Preserve headings, paragraphs, and bullet points.
 
 Return the extracted text content directly - no JSON, no markdown code blocks, just the plain text content of the document organized in a readable way.`,
-            },
-          ],
-        },
-      ],
-    })
+              },
+            ],
+          },
+        ],
+      })
 
-    const textBlock = response.content.find(block => block.type === 'text')
-    if (!textBlock || textBlock.type !== 'text') {
-      throw new Error('No text response from Claude')
+      const textBlock = response.content.find(block => block.type === 'text')
+      if (!textBlock || textBlock.type !== 'text') {
+        throw new Error('No text response from Claude')
+      }
+
+      return NextResponse.json({
+        content: textBlock.text,
+        source: fileType,
+        debug: {
+          model: 'claude-sonnet-4-20250514',
+          fileSizeBytes: fileBuffer.byteLength,
+          fileSizeMB: (fileBuffer.byteLength / 1024 / 1024).toFixed(2),
+        },
+      })
+    } else if (fileType === 'docx') {
+      // Word docs need text extraction via mammoth first
+      const result = await mammoth.extractRawText({ buffer: fileBuffer })
+      const content = result.value
+
+      if (!content || content.trim().length === 0) {
+        return NextResponse.json(
+          { error: 'Could not extract text from document. The file may be empty or corrupted.' },
+          { status: 400 }
+        )
+      }
+
+      return NextResponse.json({
+        content,
+        source: fileType,
+        debug: {
+          method: 'mammoth',
+          fileSizeBytes: fileBuffer.byteLength,
+          fileSizeMB: (fileBuffer.byteLength / 1024 / 1024).toFixed(2),
+        },
+      })
+    } else if (fileType === 'pptx') {
+      // PowerPoint files - extract text using officeparser
+      const ast = await officeparser.parseOffice(fileBuffer)
+      const content = ast.toText()
+
+      if (!content || content.trim().length === 0) {
+        return NextResponse.json(
+          { error: 'Could not extract text from presentation. The file may be empty or corrupted.' },
+          { status: 400 }
+        )
+      }
+
+      return NextResponse.json({
+        content,
+        source: fileType,
+        debug: {
+          method: 'officeparser',
+          fileSizeBytes: fileBuffer.byteLength,
+          fileSizeMB: (fileBuffer.byteLength / 1024 / 1024).toFixed(2),
+        },
+      })
     }
 
-    return NextResponse.json({
-      content: textBlock.text,
-      source: fileType,
-      debug: {
-        model: 'claude-sonnet-4-20250514',
-        fileSizeBytes: fileBuffer.byteLength,
-        fileSizeMB: (fileBuffer.byteLength / 1024 / 1024).toFixed(2),
-      },
-    })
+    // Fallback for unknown types
+    return NextResponse.json(
+      { error: 'Unsupported file type' },
+      { status: 400 }
+    )
   } catch (error) {
     console.error('Content parsing error:', error)
 
