@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -139,6 +139,12 @@ export interface DraftState {
   solutionOverviewStat4Label: string
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
+  // Stacker PDF
+  stackerDocumentTitle: string | null
+  stackerLogoChipModule: StackerLogoChipModule
+  stackerHeaderModule: StackerHeaderModule
+  stackerContentModules: StackerModule[]
+  stackerFooterModule: StackerFooterModule
 }
 
 const CURRENT_VERSION = 1
@@ -285,6 +291,40 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       solutionOverviewStat4Label: state.solutionOverviewStat4Label || 'End Users',
       solutionOverviewStat5Value: state.solutionOverviewStat5Value || '1.2K',
       solutionOverviewStat5Label: state.solutionOverviewStat5Label || 'Clients',
+      // Stacker PDF
+      stackerDocumentTitle: state.stackerDocumentTitle || null,
+      stackerLogoChipModule: state.stackerLogoChipModule || {
+        id: 'logo-chip-default',
+        type: 'logo-chip',
+        showChips: true,
+        activeCategories: ['safety'],
+      },
+      stackerHeaderModule: state.stackerHeaderModule || {
+        id: 'header-default',
+        type: 'header',
+        heading: 'Document Title',
+        headingSize: 'h1',
+        subheader: '',
+        showSubheader: false,
+        cta: 'Learn More',
+        ctaUrl: '',
+        showCta: false,
+      },
+      stackerContentModules: state.stackerContentModules || [],
+      stackerFooterModule: state.stackerFooterModule || {
+        id: 'footer-default',
+        type: 'footer',
+        stat1Value: '27,000+',
+        stat1Label: 'customers across the globe',
+        stat2Value: '2M+',
+        stat2Label: 'end users across the globe',
+        stat3Value: '6B+',
+        stat3Label: 'safety interactions processed',
+        stat4Value: '350+',
+        stat4Label: 'experts ready to help',
+        stat5Value: '80+',
+        stat5Label: 'countries using our solutions',
+      },
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
@@ -346,8 +386,15 @@ export function hasDraft(): boolean {
       draft.currentScreen === 'solution-overview-setup'
     const hasCustomSolutionOverviewName = !!(draft.solutionOverviewSolutionName && draft.solutionOverviewSolutionName !== 'Solution Name Goes Here')
     const hasSolutionOverviewContent = isSolutionOverview || hasCustomSolutionOverviewName
+    // Check for Stacker content (has content modules or custom title)
+    const isStacker = draft.templateType === 'stacker-pdf' ||
+      draft.currentScreen === 'stacker-export' ||
+      draft.currentScreen === 'stacker-setup'
+    const hasStackerModules = !!(draft.stackerContentModules && draft.stackerContentModules.length > 0)
+    const hasStackerTitle = !!(draft.stackerDocumentTitle && draft.stackerDocumentTitle !== null)
+    const hasStackerContent = isStacker || hasStackerModules || hasStackerTitle
 
-    return hasAssets || hasQueue || hasContent || hasFaqContent || hasSolutionOverviewContent
+    return hasAssets || hasQueue || hasContent || hasFaqContent || hasSolutionOverviewContent || hasStackerContent
   } catch {
     return false
   }

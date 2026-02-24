@@ -2305,6 +2305,12 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat4Label: state.solutionOverviewStat4Label,
       solutionOverviewStat5Value: state.solutionOverviewStat5Value,
       solutionOverviewStat5Label: state.solutionOverviewStat5Label,
+      // Stacker PDF
+      stackerDocumentTitle: state.stackerDocumentTitle,
+      stackerLogoChipModule: state.stackerLogoChipModule,
+      stackerHeaderModule: state.stackerHeaderModule,
+      stackerContentModules: state.stackerContentModules,
+      stackerFooterModule: state.stackerFooterModule,
     })
   },
 
@@ -2430,6 +2436,40 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat4Label: draft.solutionOverviewStat4Label ?? 'End Users',
       solutionOverviewStat5Value: draft.solutionOverviewStat5Value ?? '1.2K',
       solutionOverviewStat5Label: draft.solutionOverviewStat5Label ?? 'Clients',
+      // Stacker PDF
+      stackerDocumentTitle: draft.stackerDocumentTitle ?? null,
+      stackerLogoChipModule: draft.stackerLogoChipModule ?? {
+        id: 'logo-chip-default',
+        type: 'logo-chip',
+        showChips: true,
+        activeCategories: ['safety'],
+      },
+      stackerHeaderModule: draft.stackerHeaderModule ?? {
+        id: 'header-default',
+        type: 'header',
+        heading: 'Document Title',
+        headingSize: 'h1',
+        subheader: '',
+        showSubheader: false,
+        cta: 'Learn More',
+        ctaUrl: '',
+        showCta: false,
+      },
+      stackerContentModules: draft.stackerContentModules ?? [],
+      stackerFooterModule: draft.stackerFooterModule ?? {
+        id: 'footer-default',
+        type: 'footer',
+        stat1Value: '27,000+',
+        stat1Label: 'customers across the globe',
+        stat2Value: '2M+',
+        stat2Label: 'end users across the globe',
+        stat3Value: '6B+',
+        stat3Label: 'safety interactions processed',
+        stat4Value: '350+',
+        stat4Label: 'experts ready to help',
+        stat5Value: '80+',
+        stat5Label: 'countries using our solutions',
+      },
     })
     return true
   },
