@@ -549,22 +549,46 @@ export function EditorScreen() {
     if (file) await handleFileUpload(file)
   }, [])
 
-  // Handle image upload for thumbnail - convert to data URL for export compatibility
-  const handleImageUpload = useCallback((file: File) => {
+  // Handle image upload for thumbnail - upload to Vercel Blob for export compatibility
+  // This avoids 413 Payload Too Large errors when exporting large images
+  const [isImageUploading, setIsImageUploading] = useState(false)
+
+  const handleImageUpload = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const dataUrl = reader.result as string
-      setThumbnailImageUrl(dataUrl)
+
+    setIsImageUploading(true)
+    try {
+      // Get file extension from name or mime type
+      const ext = file.name.split('.').pop() || file.type.split('/')[1] || 'png'
+      const filename = `images/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
+
+      // Upload to Vercel Blob
+      const blob = await upload(filename, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-image',
+      })
+
+      // Store the Blob URL instead of data URL
+      setThumbnailImageUrl(blob.url)
+    } catch (error) {
+      console.error('Image upload failed:', error)
+      // Fallback to data URL for local development without Blob token
+      const reader = new FileReader()
+      reader.onload = () => {
+        const dataUrl = reader.result as string
+        setThumbnailImageUrl(dataUrl)
+      }
+      reader.readAsDataURL(file)
+    } finally {
+      setIsImageUploading(false)
     }
-    reader.readAsDataURL(file)
   }, [setThumbnailImageUrl])
 
-  const handleImageDrop = useCallback((e: React.DragEvent) => {
+  const handleImageDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault()
     setIsImageDragging(false)
     const file = e.dataTransfer.files[0]
-    if (file) handleImageUpload(file)
+    if (file) await handleImageUpload(file)
   }, [handleImageUpload])
 
   const handleGenerate = async () => {
@@ -3088,17 +3112,30 @@ export function EditorScreen() {
                           : 'border-gray-300 dark:border-gray-600'
                       }`}
                     >
-                      <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                      <label className={`flex flex-col items-center justify-center h-full text-xs text-gray-500 dark:text-gray-400 ${isImageUploading ? 'cursor-wait' : 'cursor-pointer'}`}>
                         <input
                           type="file"
                           accept="image/*"
                           onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
                           className="hidden"
+                          disabled={isImageUploading}
                         />
-                        <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        Drop or upload
+                        {isImageUploading ? (
+                          <>
+                            <svg className="w-4 h-4 mb-1 animate-spin" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Drop or upload
+                          </>
+                        )}
                       </label>
                     </div>
                     {/* Library box */}
