@@ -254,6 +254,7 @@ export interface FaqImageBlock {
   imageZoom: number
   grayscale: boolean
   displayWidth: number // Percentage of full width (100 = full, 75, 50, 25)
+  nativeAspectRatio: number | null // Width/height ratio (e.g., 1.78 for 16:9, 0.75 for portrait)
 }
 
 export type FaqContentBlock = FaqHeadingBlock | FaqQABlock | FaqTableBlock | FaqImageBlock

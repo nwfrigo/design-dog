@@ -43,8 +43,8 @@ function ImageBlockEditor({
   block,
   onUpdate,
 }: {
-  block: { imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean; displayWidth: number }
-  onUpdate: (updates: Partial<{ imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean; displayWidth: number }>) => void
+  block: { imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean; displayWidth: number; nativeAspectRatio: number | null }
+  onUpdate: (updates: Partial<{ imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean; displayWidth: number; nativeAspectRatio: number | null }>) => void
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -56,7 +56,23 @@ function ImageBlockEditor({
     const reader = new FileReader()
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string
-      onUpdate({ imageUrl: dataUrl, imagePan: { x: 0, y: 0 }, imageZoom: 1 })
+
+      // Calculate native aspect ratio from image dimensions
+      const img = new window.Image()
+      img.onload = () => {
+        const nativeAspectRatio = img.naturalWidth / img.naturalHeight
+        onUpdate({
+          imageUrl: dataUrl,
+          imagePan: { x: 0, y: 0 },
+          imageZoom: 1,
+          nativeAspectRatio
+        })
+      }
+      img.onerror = () => {
+        // Fallback if image fails to load - use null aspect ratio (will default to 16:9)
+        onUpdate({ imageUrl: dataUrl, imagePan: { x: 0, y: 0 }, imageZoom: 1, nativeAspectRatio: null })
+      }
+      img.src = dataUrl
     }
     reader.readAsDataURL(file)
   }
@@ -117,7 +133,7 @@ function ImageBlockEditor({
           {/* Image Preview - clickable to open crop modal */}
           <div
             className="relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer group"
-            style={{ aspectRatio: '16/9' }}
+            style={{ aspectRatio: block.nativeAspectRatio ? `${block.nativeAspectRatio}` : '16/9' }}
             onClick={() => setShowCropModal(true)}
           >
             <img
@@ -209,6 +225,7 @@ function ImageBlockEditor({
           imageSrc={block.imageUrl}
           initialPosition={block.imagePan}
           initialZoom={block.imageZoom}
+          nativeAspectRatio={block.nativeAspectRatio}
           onSave={(position, zoom) => {
             onUpdate({ imagePan: position, imageZoom: zoom })
           }}
@@ -224,12 +241,14 @@ function FaqImageCropModal({
   imageSrc,
   initialPosition,
   initialZoom,
+  nativeAspectRatio,
   onSave,
   onClose,
 }: {
   imageSrc: string
   initialPosition: { x: number; y: number }
   initialZoom: number
+  nativeAspectRatio: number | null
   onSave: (position: { x: number; y: number }, zoom: number) => void
   onClose: () => void
 }) {
@@ -238,9 +257,19 @@ function FaqImageCropModal({
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
 
-  // Frame dimensions (16:9 aspect ratio at 492px width)
-  const frameWidth = 492
-  const frameHeight = 277
+  // Frame dimensions - use native aspect ratio if available, fallback to 16:9
+  const aspectRatio = nativeAspectRatio || (16 / 9)
+  // Max frame width for modal display (80% of 492px base)
+  const maxFrameWidth = 492 * 0.8
+  const maxFrameHeight = 350 // Max height to fit in modal
+  // Calculate dimensions to fit within modal constraints while preserving aspect ratio
+  let frameWidth = maxFrameWidth
+  let frameHeight = frameWidth / aspectRatio
+  // If height exceeds max, scale down based on height
+  if (frameHeight > maxFrameHeight) {
+    frameHeight = maxFrameHeight
+    frameWidth = frameHeight * aspectRatio
+  }
 
   // Handle mouse events for dragging
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -307,8 +336,8 @@ function FaqImageCropModal({
           <div
             className="relative overflow-hidden rounded border-2 border-dashed border-white/50"
             style={{
-              width: frameWidth * 0.8,
-              height: frameHeight * 0.8,
+              width: frameWidth,
+              height: frameHeight,
               cursor: isDragging ? 'grabbing' : 'grab',
             }}
             onMouseDown={handleMouseDown}
@@ -561,7 +590,9 @@ function BlockMeasurer({
       case 'image': {
         // Calculate dimensions based on displayWidth percentage
         const imgWidth = Math.round(492 * ((block.displayWidth || 100) / 100))
-        const imgHeight = Math.round(imgWidth * (9 / 16)) // Maintain 16:9 aspect ratio
+        // Use native aspect ratio if available, fallback to 16:9 for legacy images
+        const aspectRatio = block.nativeAspectRatio || (16 / 9)
+        const imgHeight = Math.round(imgWidth / aspectRatio)
         return (
           <div
             key={block.id}
@@ -1292,6 +1323,7 @@ export function FaqEditorScreen() {
           imageZoom: 1,
           grayscale: false,
           displayWidth: 100, // Full width by default
+          nativeAspectRatio: null, // Will be set when image is uploaded
         }
         break
     }

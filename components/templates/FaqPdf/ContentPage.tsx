@@ -160,7 +160,9 @@ export function ContentPage({
       case 'image': {
         // Calculate dimensions based on displayWidth percentage
         const imgWidth = Math.round(492 * ((block.displayWidth || 100) / 100))
-        const imgHeight = Math.round(imgWidth * (9 / 16)) // Maintain 16:9 aspect ratio
+        // Use native aspect ratio if available, fallback to 16:9 for legacy images
+        const aspectRatio = block.nativeAspectRatio || (16 / 9)
+        const imgHeight = Math.round(imgWidth / aspectRatio)
         return (
           <div
             key={block.id}
