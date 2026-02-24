@@ -767,6 +767,7 @@ export function EditorScreen() {
         exportParams.imagePositionX = thumbnailImagePosition.x
         exportParams.imagePositionY = thumbnailImagePosition.y
         exportParams.imageZoom = thumbnailImageZoom
+        exportParams.grayscale = grayscale
       } else if (currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient') {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
@@ -3114,8 +3115,8 @@ export function EditorScreen() {
                     </button>
                   </div>
                 )}
-                {/* Grayscale toggle - only show when image is selected (not for email-product-release) */}
-                {thumbnailImageUrl && currentTemplate !== 'email-product-release' && (
+                {/* Grayscale toggle - only show when image is selected */}
+                {thumbnailImageUrl && (
                   <div className="flex items-center justify-between mt-3">
                     <label className="text-xs text-gray-500">Grayscale</label>
                     <button
@@ -4694,6 +4695,7 @@ export function EditorScreen() {
                   imageUrl={thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
                   imagePosition={thumbnailImagePosition}
                   imageZoom={thumbnailImageZoom}
+                  grayscale={grayscale}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

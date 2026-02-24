@@ -19,6 +19,7 @@ export default function RenderPage({
   const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
   const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
   const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
+  const grayscale = searchParams.grayscale === 'true'
 
   return (
     <div style={{
@@ -36,6 +37,7 @@ export default function RenderPage({
           imageUrl={imageUrl}
           imagePosition={{ x: imagePositionX, y: imagePositionY }}
           imageZoom={imageZoom}
+          grayscale={grayscale}
           colors={colorsConfig}
           typography={typographyConfig}
         />

@@ -33,6 +33,7 @@ export interface EmailProductReleaseProps {
   imageUrl: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -49,6 +50,7 @@ export function EmailProductRelease({
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  grayscale = false,
   colors,
   typography,
   scale = 1,
@@ -171,6 +173,7 @@ export function EmailProductRelease({
                 ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
                 : undefined,
               transformOrigin: 'center',
+              filter: grayscale ? 'grayscale(100%)' : undefined,
             }}
           />
         ) : (

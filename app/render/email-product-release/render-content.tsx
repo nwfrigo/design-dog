@@ -10,6 +10,7 @@ interface Props {
   imageUrl: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  grayscale?: boolean
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -41,6 +42,7 @@ export function EmailProductReleaseRender(props: Props) {
         imageUrl={props.imageUrl}
         imagePosition={props.imagePosition}
         imageZoom={props.imageZoom}
+        grayscale={props.grayscale}
         colors={props.colors}
         typography={props.typography}
         scale={1}
