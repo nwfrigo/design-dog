@@ -30,6 +30,164 @@ import { CSS } from '@dnd-kit/utilities'
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
 
+// Image Block Editor Component
+function ImageBlockEditor({
+  block,
+  onUpdate,
+}: {
+  block: { imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean }
+  onUpdate: (updates: Partial<{ imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean }>) => void
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string
+      onUpdate({ imageUrl: dataUrl, imagePan: { x: 0, y: 0 }, imageZoom: 1 })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFileUpload(file)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  return (
+    <div className="space-y-3">
+      {/* Image Upload / Preview Area */}
+      {!block.imageUrl ? (
+        <div
+          className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+            isDragging
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+              : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+          }`}
+          onClick={() => fileInputRef.current?.click()}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) handleFileUpload(file)
+            }}
+          />
+          <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Click or drag image to upload
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {/* Image Preview */}
+          <div
+            className="relative w-full rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800"
+            style={{ aspectRatio: '16/9' }}
+          >
+            <img
+              src={block.imageUrl}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{
+                objectPosition: `${50 - block.imagePan.x}% ${50 - block.imagePan.y}%`,
+                transform: block.imageZoom !== 1
+                  ? `translate(${block.imagePan.x * (block.imageZoom - 1)}%, ${block.imagePan.y * (block.imageZoom - 1)}%) scale(${block.imageZoom})`
+                  : undefined,
+                transformOrigin: 'center',
+                filter: block.grayscale ? 'grayscale(100%)' : undefined,
+              }}
+            />
+          </div>
+
+          {/* Zoom Control */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Zoom</label>
+            <input
+              type="range"
+              min={1}
+              max={2}
+              step={0.01}
+              value={block.imageZoom}
+              onChange={(e) => onUpdate({ imageZoom: parseFloat(e.target.value) })}
+              className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+          </div>
+
+          {/* Pan Controls */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Pan X</label>
+              <input
+                type="range"
+                min={-50}
+                max={50}
+                step={1}
+                value={block.imagePan.x}
+                onChange={(e) => onUpdate({ imagePan: { ...block.imagePan, x: parseFloat(e.target.value) } })}
+                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Pan Y</label>
+              <input
+                type="range"
+                min={-50}
+                max={50}
+                step={1}
+                value={block.imagePan.y}
+                onChange={(e) => onUpdate({ imagePan: { ...block.imagePan, y: parseFloat(e.target.value) } })}
+                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Grayscale Toggle & Replace Image */}
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={block.grayscale}
+                onChange={(e) => onUpdate({ grayscale: e.target.checked })}
+                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500"
+              />
+              Grayscale
+            </label>
+            <button
+              onClick={() => onUpdate({ imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1 })}
+              className="text-xs text-gray-500 hover:text-red-500 transition-colors"
+            >
+              Remove image
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Default placeholder content from the reference PDF
 const DEFAULT_QA_BLOCKS: FaqContentBlock[] = [
   {
@@ -206,6 +364,40 @@ function BlockMeasurer({
           </div>
         )
 
+      case 'image':
+        return (
+          <div
+            key={block.id}
+            data-block-id={block.id}
+            style={{
+              width: 492,
+              height: 277, // 16:9 aspect ratio at 492px width
+              marginBottom: 24,
+              backgroundColor: '#f5f5f5',
+              borderRadius: 4,
+              overflow: 'hidden',
+            }}
+          >
+            {block.imageUrl && (
+              <img
+                src={block.imageUrl}
+                alt=""
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: `${50 - block.imagePan.x}% ${50 - block.imagePan.y}%`,
+                  transform: block.imageZoom !== 1
+                    ? `translate(${block.imagePan.x * (block.imageZoom - 1)}%, ${block.imagePan.y * (block.imageZoom - 1)}%) scale(${block.imageZoom})`
+                    : undefined,
+                  transformOrigin: 'center',
+                  filter: block.grayscale ? 'grayscale(100%)' : undefined,
+                }}
+              />
+            )}
+          </div>
+        )
+
       default:
         return null
     }
@@ -267,6 +459,7 @@ function SortableBlockItem({
     if (block.type === 'heading') return block.text || 'Heading'
     if (block.type === 'qa') return block.question || 'Q&A'
     if (block.type === 'table') return `Table (${block.rows}×${block.cols})`
+    if (block.type === 'image') return block.imageUrl ? 'Image uploaded' : 'No image'
     return 'Block'
   }
 
@@ -297,7 +490,7 @@ function SortableBlockItem({
 
         {/* Block Type Badge */}
         <span className="text-[10px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide w-14">
-          {block.type === 'heading' ? 'Header' : block.type === 'qa' ? 'Q&A' : 'Table'}
+          {block.type === 'heading' ? 'Header' : block.type === 'qa' ? 'Q&A' : block.type === 'table' ? 'Table' : 'Image'}
         </span>
 
         {/* Block Preview Text */}
@@ -451,6 +644,13 @@ function SortableBlockItem({
                 </table>
               </div>
             </div>
+          )}
+
+          {block.type === 'image' && (
+            <ImageBlockEditor
+              block={block}
+              onUpdate={onUpdate}
+            />
           )}
         </div>
       )}
@@ -831,18 +1031,36 @@ export function FaqEditorScreen() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [showPdfFullscreen, showPdfAllPagesPreview, fullscreenEditBlock, updateBlock])
 
-  const addBlock = useCallback((type: 'heading' | 'qa' | 'table', tableSize?: { rows: number; cols: number }) => {
-    const newBlock: FaqContentBlock = type === 'heading'
-      ? { type: 'heading', id: generateId(), text: 'New heading' }
-      : type === 'qa'
-        ? { type: 'qa', id: generateId(), question: 'New question?', answer: '<p>Answer goes here.</p>' }
-        : {
-            type: 'table',
-            id: generateId(),
-            rows: tableSize?.rows || 3,
-            cols: tableSize?.cols || 3,
-            data: Array(tableSize?.rows || 3).fill(null).map(() => Array(tableSize?.cols || 3).fill(''))
-          }
+  const addBlock = useCallback((type: 'heading' | 'qa' | 'table' | 'image', tableSize?: { rows: number; cols: number }) => {
+    let newBlock: FaqContentBlock
+
+    switch (type) {
+      case 'heading':
+        newBlock = { type: 'heading', id: generateId(), text: 'New heading' }
+        break
+      case 'qa':
+        newBlock = { type: 'qa', id: generateId(), question: 'New question?', answer: '<p>Answer goes here.</p>' }
+        break
+      case 'table':
+        newBlock = {
+          type: 'table',
+          id: generateId(),
+          rows: tableSize?.rows || 3,
+          cols: tableSize?.cols || 3,
+          data: Array(tableSize?.rows || 3).fill(null).map(() => Array(tableSize?.cols || 3).fill(''))
+        }
+        break
+      case 'image':
+        newBlock = {
+          type: 'image',
+          id: generateId(),
+          imageUrl: null,
+          imagePan: { x: 0, y: 0 },
+          imageZoom: 1,
+          grayscale: false,
+        }
+        break
+    }
 
     setPages(pages.map((page, idx) => {
       if (idx !== currentPageIndex) return page
@@ -1241,39 +1459,49 @@ export function FaqEditorScreen() {
                   <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
                     Add Content
                   </label>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => addBlock('heading')}
-                      className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
-                    >
-                      + Heading
-                    </button>
-                    <button
-                      onClick={() => addBlock('qa')}
-                      className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
-                    >
-                      + Q&A
-                    </button>
-                    <div className="relative flex-1">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
                       <button
-                        onClick={() => setShowTablePicker(!showTablePicker)}
-                        className="w-full px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
+                        onClick={() => addBlock('heading')}
+                        className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
                       >
-                        + Table
+                        + Heading
                       </button>
-                      {showTablePicker && (
-                        <>
-                          <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
-                          <div className="absolute left-0 top-full mt-1 z-50">
-                            <TableGridPicker
-                              onSelect={(rows, cols) => {
-                                addBlock('table', { rows, cols })
-                                setShowTablePicker(false)
-                              }}
-                            />
-                          </div>
-                        </>
-                      )}
+                      <button
+                        onClick={() => addBlock('qa')}
+                        className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
+                      >
+                        + Q&A
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <button
+                          onClick={() => setShowTablePicker(!showTablePicker)}
+                          className="w-full px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
+                        >
+                          + Table
+                        </button>
+                        {showTablePicker && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
+                            <div className="absolute left-0 top-full mt-1 z-50">
+                              <TableGridPicker
+                                onSelect={(rows, cols) => {
+                                  addBlock('table', { rows, cols })
+                                  setShowTablePicker(false)
+                                }}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => addBlock('image')}
+                        className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
+                      >
+                        + Image
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1286,7 +1514,7 @@ export function FaqEditorScreen() {
 
                   {!currentPage || currentPage.blocks.length === 0 ? (
                     <div className="text-center py-8 text-gray-500 dark:text-gray-500 text-sm border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                      No content yet. Add a heading, Q&A, or table above.
+                      No content yet. Add content above.
                     </div>
                   ) : (
                     <DndContext

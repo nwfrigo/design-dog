@@ -610,7 +610,11 @@ export async function POST(request: NextRequest) {
       // Track export (fire-and-forget)
       trackExport(template)
 
-      const filename = isFaqPdf ? 'faq.pdf' : 'solution-overview.pdf'
+      // Use document title for FAQ PDF filename, sanitized for filesystem
+      const faqFilename = body.title
+        ? `${body.title.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '-')}.pdf`
+        : 'faq.pdf'
+      const filename = isFaqPdf ? faqFilename : (isStackerPdf ? (body.filename || 'stacker.pdf') : 'solution-overview.pdf')
       return new NextResponse(Buffer.from(pdfBuffer), {
         headers: {
           'Content-Type': 'application/pdf',

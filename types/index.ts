@@ -223,7 +223,7 @@ export interface StackerDocument {
 }
 
 // FAQ PDF Types
-export type FaqContentBlockType = 'heading' | 'qa' | 'table'
+export type FaqContentBlockType = 'heading' | 'qa' | 'table' | 'image'
 
 export interface FaqHeadingBlock {
   type: 'heading'
@@ -246,7 +246,16 @@ export interface FaqTableBlock {
   data: string[][]
 }
 
-export type FaqContentBlock = FaqHeadingBlock | FaqQABlock | FaqTableBlock
+export interface FaqImageBlock {
+  type: 'image'
+  id: string
+  imageUrl: string | null
+  imagePan: { x: number; y: number }
+  imageZoom: number
+  grayscale: boolean
+}
+
+export type FaqContentBlock = FaqHeadingBlock | FaqQABlock | FaqTableBlock | FaqImageBlock
 
 export interface FaqPage {
   id: string

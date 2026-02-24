@@ -2,10 +2,23 @@ import { Suspense } from 'react'
 import { FaqPdfRender } from './render-content'
 import type { FaqContentBlock } from '@/types'
 import type { SolutionCategory } from '@/config/solution-overview-assets'
+import type { Metadata } from 'next'
 
 interface FaqPage {
   id: string
   blocks: FaqContentBlock[]
+}
+
+// Dynamic metadata to set PDF title from URL params
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}): Promise<Metadata> {
+  const title = (searchParams.title as string) || 'FAQ'
+  return {
+    title: title,
+  }
 }
 
 export default function FaqPdfRenderPage({

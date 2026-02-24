@@ -157,6 +157,40 @@ export function ContentPage({
           </div>
         )
 
+      case 'image':
+        return (
+          <div
+            key={block.id}
+            style={{
+              width: 492,
+              height: 277, // 16:9 aspect ratio at 492px width
+              marginBottom: 24,
+              backgroundColor: '#f5f5f5',
+              borderRadius: 4,
+              overflow: 'hidden',
+            }}
+          >
+            {block.imageUrl && (
+              <img
+                src={block.imageUrl}
+                alt=""
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: `${50 - block.imagePan.x}% ${50 - block.imagePan.y}%`,
+                  transform: block.imageZoom !== 1
+                    ? `translate(${block.imagePan.x * (block.imageZoom - 1)}%, ${block.imagePan.y * (block.imageZoom - 1)}%) scale(${block.imageZoom})`
+                    : undefined,
+                  transformOrigin: 'center',
+                  filter: block.grayscale ? 'grayscale(100%)' : undefined,
+                }}
+                data-faq-image={block.id}
+              />
+            )}
+          </div>
+        )
+
       default:
         return null
     }
