@@ -309,9 +309,29 @@ export async function POST(request: NextRequest) {
     if (body.heroImageGrayscale !== undefined) params.set('heroImageGrayscale', String(body.heroImageGrayscale))
     if (body.screenshotGrayscale !== undefined) params.set('screenshotGrayscale', String(body.screenshotGrayscale))
 
-    // FAQ PDF specific
+    // FAQ PDF specific - strip data URLs from image blocks to avoid URL length limits
+    // They'll be injected via page.evaluate() after loading
+    interface FaqImageData {
+      blockId: string
+      imageUrl: string
+    }
+    const faqImageData: FaqImageData[] = []
+
     if (body.title) params.set('title', body.title)
-    if (body.pages) params.set('pages', encodeURIComponent(JSON.stringify(body.pages)))
+    if (body.pages) {
+      // Process pages to extract data URL images
+      const pagesForUrl = (body.pages as Array<{ id: string; blocks: Array<{ type: string; id: string; imageUrl?: string }> }>).map((page) => {
+        const processedBlocks = page.blocks.map((block) => {
+          if (block.type === 'image' && block.imageUrl && block.imageUrl.startsWith('data:')) {
+            faqImageData.push({ blockId: block.id, imageUrl: block.imageUrl })
+            return { ...block, imageUrl: null } // Clear data URL for URL params
+          }
+          return block
+        })
+        return { ...page, blocks: processedBlocks }
+      })
+      params.set('pages', encodeURIComponent(JSON.stringify(pagesForUrl)))
+    }
     // FAQ PDF cover page
     if (body.coverSolution) params.set('coverSolution', body.coverSolution)
     if (body.coverSubheader) params.set('coverSubheader', body.coverSubheader)
@@ -500,6 +520,12 @@ export async function POST(request: NextRequest) {
       await injectDataUrlImage(body.coverImageUrl, 'img[data-faq-cover-image="true"]')
     }
 
+    // Inject FAQ content page images
+    for (const imgData of faqImageData) {
+      const selector = `img[data-faq-image="${imgData.blockId}"]`
+      await injectDataUrlImage(imgData.imageUrl, selector)
+    }
+
     // Inject Stacker PDF images using the same helper as other templates
     for (const imgData of stackerImageData) {
       // For regular image modules (image, image-16x9)
@@ -525,6 +551,7 @@ export async function POST(request: NextRequest) {
         (body.heroImageUrl && body.heroImageUrl.startsWith('data:')) ||
         (body.screenshotUrl && body.screenshotUrl.startsWith('data:')) ||
         (body.coverImageUrl && body.coverImageUrl.startsWith('data:')) ||
+        faqImageData.length > 0 ||
         stackerImageData.length > 0
 
     if (hasDataUrlImages) {
