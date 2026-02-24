@@ -981,6 +981,7 @@ FAQ pages have a fixed height (792px). When content exceeds this:
 - **Modal state persistence:** Use React `key` prop or `useEffect` cleanup to reset modal state on mount.
 - **Local PDF uploads:** Require `BLOB_READ_WRITE_TOKEN` in `.env.local`.
 - **Local state vs store state:** Editor screens using `useState` for editing MUST sync to store via `useEffect` for draft persistence to work. See "Local State vs Store State" section below.
+- **PDF export sub-pixel rendering:** Sub-pixel CSS values (e.g., `6.67px`, `0.5px` borders) render inconsistently in Puppeteer PDF export — borders appear thicker, rectangles get distorted. Fix: Round dimensions to integers (e.g., `7px` instead of `6.67px`). This applies to Stacker module borders/dimensions.
 
 ### Delete Confirmation Pattern
 
