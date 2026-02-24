@@ -1854,6 +1854,15 @@ export function StackerEditorScreen() {
       setFooterModule(storedFooter)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync local state to store for draft persistence (so EditorLayout auto-save picks up changes)
+  useEffect(() => {
+    setStackerLogoChipModule(logoChipModule as StackerLogoChipModule)
+    setStackerHeaderModule(headerModule as StackerHeaderModule)
+    setStackerContentModules(contentModules)
+    setStackerFooterModule(footerModule as StackerFooterModule)
+  }, [logoChipModule, headerModule, contentModules, footerModule, setStackerLogoChipModule, setStackerHeaderModule, setStackerContentModules, setStackerFooterModule])
+
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
   const [previewZoom, setPreviewZoom] = useState(100)
 
