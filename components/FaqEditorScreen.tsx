@@ -31,15 +31,24 @@ import { CSS } from '@dnd-kit/utilities'
 const generateId = () => Math.random().toString(36).substring(2, 9)
 
 // Image Block Editor Component
+// Image size options for display width
+const IMAGE_SIZE_OPTIONS = [
+  { value: 100, label: 'Full' },
+  { value: 75, label: '75%' },
+  { value: 50, label: '50%' },
+  { value: 25, label: '25%' },
+]
+
 function ImageBlockEditor({
   block,
   onUpdate,
 }: {
-  block: { imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean }
-  onUpdate: (updates: Partial<{ imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean }>) => void
+  block: { imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean; displayWidth: number }
+  onUpdate: (updates: Partial<{ imageUrl: string | null; imagePan: { x: number; y: number }; imageZoom: number; grayscale: boolean; displayWidth: number }>) => void
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [showCropModal, setShowCropModal] = useState(false)
 
   const handleFileUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) return
@@ -67,6 +76,9 @@ function ImageBlockEditor({
   const handleDragLeave = () => {
     setIsDragging(false)
   }
+
+  // Calculate display width in pixels (492px is full width)
+  const displayWidthPx = Math.round(492 * (block.displayWidth / 100))
 
   return (
     <div className="space-y-3">
@@ -102,10 +114,11 @@ function ImageBlockEditor({
         </div>
       ) : (
         <div className="space-y-3">
-          {/* Image Preview */}
+          {/* Image Preview - clickable to open crop modal */}
           <div
-            className="relative w-full rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800"
+            className="relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer group"
             style={{ aspectRatio: '16/9' }}
+            onClick={() => setShowCropModal(true)}
           >
             <img
               src={block.imageUrl}
@@ -120,51 +133,36 @@ function ImageBlockEditor({
                 filter: block.grayscale ? 'grayscale(100%)' : undefined,
               }}
             />
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+              <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
+                Click to adjust
+              </span>
+            </div>
           </div>
 
-          {/* Zoom Control */}
+          {/* Image Size Control */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Zoom</label>
-            <input
-              type="range"
-              min={1}
-              max={2}
-              step={0.01}
-              value={block.imageZoom}
-              onChange={(e) => onUpdate({ imageZoom: parseFloat(e.target.value) })}
-              className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-            />
+            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">Image Size</label>
+            <div className="flex gap-1">
+              {IMAGE_SIZE_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => onUpdate({ displayWidth: option.value })}
+                  className={`flex-1 px-2 py-1.5 text-xs rounded transition-colors ${
+                    block.displayWidth === option.value
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-gray-400 mt-1">{displayWidthPx}px wide on page</p>
           </div>
 
-          {/* Pan Controls */}
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Pan X</label>
-              <input
-                type="range"
-                min={-50}
-                max={50}
-                step={1}
-                value={block.imagePan.x}
-                onChange={(e) => onUpdate({ imagePan: { ...block.imagePan, x: parseFloat(e.target.value) } })}
-                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Pan Y</label>
-              <input
-                type="range"
-                min={-50}
-                max={50}
-                step={1}
-                value={block.imagePan.y}
-                onChange={(e) => onUpdate({ imagePan: { ...block.imagePan, y: parseFloat(e.target.value) } })}
-                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-              />
-            </div>
-          </div>
-
-          {/* Grayscale Toggle & Replace Image */}
+          {/* Grayscale Toggle & Actions */}
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <input
@@ -175,15 +173,211 @@ function ImageBlockEditor({
               />
               Grayscale
             </label>
-            <button
-              onClick={() => onUpdate({ imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1 })}
-              className="text-xs text-gray-500 hover:text-red-500 transition-colors"
-            >
-              Remove image
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs text-gray-500 hover:text-blue-500 transition-colors"
+              >
+                Replace
+              </button>
+              <button
+                onClick={() => onUpdate({ imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1, displayWidth: 100 })}
+                className="text-xs text-gray-500 hover:text-red-500 transition-colors"
+              >
+                Remove
+              </button>
+            </div>
           </div>
+
+          {/* Hidden file input for replace */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) handleFileUpload(file)
+            }}
+          />
         </div>
       )}
+
+      {/* Crop Modal */}
+      {showCropModal && block.imageUrl && (
+        <FaqImageCropModal
+          imageSrc={block.imageUrl}
+          initialPosition={block.imagePan}
+          initialZoom={block.imageZoom}
+          onSave={(position, zoom) => {
+            onUpdate({ imagePan: position, imageZoom: zoom })
+          }}
+          onClose={() => setShowCropModal(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+// Crop Modal for FAQ Images
+function FaqImageCropModal({
+  imageSrc,
+  initialPosition,
+  initialZoom,
+  onSave,
+  onClose,
+}: {
+  imageSrc: string
+  initialPosition: { x: number; y: number }
+  initialZoom: number
+  onSave: (position: { x: number; y: number }, zoom: number) => void
+  onClose: () => void
+}) {
+  const [position, setPosition] = useState(initialPosition)
+  const [zoom, setZoom] = useState(initialZoom)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+
+  // Frame dimensions (16:9 aspect ratio at 492px width)
+  const frameWidth = 492
+  const frameHeight = 277
+
+  // Handle mouse events for dragging
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }, [])
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging) return
+
+    const deltaX = e.clientX - dragStart.x
+    const deltaY = e.clientY - dragStart.y
+
+    // Convert pixel movement to position units (scaled)
+    const sensitivity = 0.3
+    const newX = Math.max(-50, Math.min(50, position.x - deltaX * sensitivity))
+    const newY = Math.max(-50, Math.min(50, position.y - deltaY * sensitivity))
+
+    setPosition({ x: newX, y: newY })
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }, [isDragging, dragStart, position])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleReset = () => {
+    setPosition({ x: 0, y: 0 })
+    setZoom(1)
+  }
+
+  const handleSave = () => {
+    onSave(position, zoom)
+    onClose()
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      <div className="bg-gray-900 rounded-xl p-6 max-w-2xl w-full mx-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-white text-lg font-medium">Adjust Image</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Crop area */}
+        <div
+          className="relative flex items-center justify-center bg-gray-800 rounded-lg overflow-hidden"
+          style={{ minHeight: 350 }}
+        >
+          <div
+            className="relative overflow-hidden rounded border-2 border-dashed border-white/50"
+            style={{
+              width: frameWidth * 0.8,
+              height: frameHeight * 0.8,
+              cursor: isDragging ? 'grabbing' : 'grab',
+            }}
+            onMouseDown={handleMouseDown}
+          >
+            <img
+              src={imageSrc}
+              alt=""
+              draggable={false}
+              className="absolute w-full h-full object-cover"
+              style={{
+                objectPosition: `${50 - position.x}% ${50 - position.y}%`,
+                transform: zoom !== 1
+                  ? `translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%) scale(${zoom})`
+                  : undefined,
+                transformOrigin: 'center',
+                userSelect: 'none',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Instructions */}
+        <p className="text-center text-xs text-gray-500 mt-2">
+          Drag to pan. Use slider to zoom.
+        </p>
+
+        {/* Zoom Control */}
+        <div className="mt-4 flex items-center gap-4">
+          <div className="flex-1 flex items-center gap-3">
+            <span className="text-gray-400 text-sm">Zoom</span>
+            <input
+              type="range"
+              min="1"
+              max="3"
+              step="0.1"
+              value={zoom}
+              onChange={(e) => setZoom(parseFloat(e.target.value))}
+              className="flex-1 h-2 accent-blue-500 cursor-pointer"
+            />
+            <span className="text-gray-400 text-sm w-12 text-right">
+              {Math.round(zoom * 100)}%
+            </span>
+          </div>
+
+          {/* Reset button */}
+          <button
+            onClick={handleReset}
+            className="px-3 py-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            Reset
+          </button>
+        </div>
+
+        {/* Action buttons */}
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -364,14 +558,17 @@ function BlockMeasurer({
           </div>
         )
 
-      case 'image':
+      case 'image': {
+        // Calculate dimensions based on displayWidth percentage
+        const imgWidth = Math.round(492 * ((block.displayWidth || 100) / 100))
+        const imgHeight = Math.round(imgWidth * (9 / 16)) // Maintain 16:9 aspect ratio
         return (
           <div
             key={block.id}
             data-block-id={block.id}
             style={{
-              width: 492,
-              height: 277, // 16:9 aspect ratio at 492px width
+              width: imgWidth,
+              height: imgHeight,
               marginBottom: 24,
               backgroundColor: '#f5f5f5',
               borderRadius: 4,
@@ -397,6 +594,7 @@ function BlockMeasurer({
             )}
           </div>
         )
+      }
 
       default:
         return null
@@ -455,12 +653,12 @@ function SortableBlockItem({
     opacity: isDragging ? 0.5 : 1,
   }
 
-  const getBlockLabel = () => {
-    if (block.type === 'heading') return block.text || 'Heading'
-    if (block.type === 'qa') return block.question || 'Q&A'
-    if (block.type === 'table') return `Table (${block.rows}×${block.cols})`
-    if (block.type === 'image') return block.imageUrl ? 'Image uploaded' : 'No image'
-    return 'Block'
+  // Block type labels (matches Stacker style)
+  const BLOCK_LABELS: Record<string, string> = {
+    'heading': 'Header',
+    'qa': 'Q&A',
+    'table': 'Table',
+    'image': 'Image',
   }
 
   return (
@@ -473,7 +671,7 @@ function SortableBlockItem({
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
+        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
         onClick={onToggleExpand}
       >
         {/* Drag Handle */}
@@ -488,15 +686,17 @@ function SortableBlockItem({
           </svg>
         </button>
 
-        {/* Block Type Badge */}
-        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide w-14">
-          {block.type === 'heading' ? 'Header' : block.type === 'qa' ? 'Q&A' : block.type === 'table' ? 'Table' : 'Image'}
-        </span>
-
-        {/* Block Preview Text */}
-        <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
-          {getBlockLabel()}
-        </span>
+        {/* Block Type Label */}
+        <div className="flex-1 flex items-center gap-2 min-w-0">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide flex-shrink-0">
+            {BLOCK_LABELS[block.type] || block.type}
+          </span>
+          {block.type === 'qa' && block.question && (
+            <span className="text-sm text-gray-500 dark:text-gray-500 truncate">
+              {block.question}
+            </span>
+          )}
+        </div>
 
         {/* Expand/Collapse Icon */}
         <svg
@@ -765,6 +965,39 @@ export function FaqEditorScreen() {
   // Track if we're viewing the cover page (index -1) or content pages (0+)
   // Cover is always page 1, content pages start at page 2
   const [viewingCover, setViewingCover] = useState(true)
+
+  // Resizable editor panel
+  const [editorWidth, setEditorWidth] = useState(420)
+  const isResizing = useRef(false)
+
+  // Handle resize drag
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing.current) return
+      const newWidth = Math.min(Math.max(280, e.clientX - 24), 600) // min 280, max 600
+      setEditorWidth(newWidth)
+    }
+
+    const handleMouseUp = () => {
+      isResizing.current = false
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [])
+
+  const startResizing = useCallback(() => {
+    isResizing.current = true
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [])
 
   // Get all blocks from all pages for measurement
   const allBlocks = pages.flatMap(page => page.blocks)
@@ -1058,6 +1291,7 @@ export function FaqEditorScreen() {
           imagePan: { x: 0, y: 0 },
           imageZoom: 1,
           grayscale: false,
+          displayWidth: 100, // Full width by default
         }
         break
     }
@@ -1193,9 +1427,9 @@ export function FaqEditorScreen() {
       </div>
 
       {/* Main Editor Layout */}
-      <div className="flex gap-6 h-[calc(100vh-180px)]">
+      <div className="flex h-[calc(100vh-180px)]">
         {/* Left: Editor Sidebar */}
-        <div className="w-[420px] flex-shrink-0 overflow-y-auto">
+        <div className="flex-shrink-0 flex flex-col overflow-y-auto" style={{ width: editorWidth }}>
           <div className="bg-gray-100 dark:bg-[#0d0d1a] rounded-xl p-5 space-y-5">
             {/* Page Header */}
             <div>
@@ -1569,8 +1803,16 @@ export function FaqEditorScreen() {
           </div>
         </div>
 
+        {/* Resize Handle */}
+        <div
+          onMouseDown={startResizing}
+          className="w-2 flex-shrink-0 cursor-col-resize group flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+        >
+          <div className="w-0.5 h-12 bg-gray-300 dark:bg-gray-600 group-hover:bg-blue-400 rounded-full transition-colors" />
+        </div>
+
         {/* Right: Preview with Actions */}
-        <div className="flex-1 flex flex-col overflow-y-auto">
+        <div className="flex-1 flex flex-col overflow-y-auto pl-4">
           {/* Toolbar - matches SO editor pattern */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">

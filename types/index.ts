@@ -253,6 +253,7 @@ export interface FaqImageBlock {
   imagePan: { x: number; y: number }
   imageZoom: number
   grayscale: boolean
+  displayWidth: number // Percentage of full width (100 = full, 75, 50, 25)
 }
 
 export type FaqContentBlock = FaqHeadingBlock | FaqQABlock | FaqTableBlock | FaqImageBlock
