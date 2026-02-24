@@ -4,6 +4,24 @@
 import type { ReactNode } from 'react'
 import type { FaqContentBlock } from '@/types'
 
+// Normalize special Unicode characters to ASCII equivalents
+// Prevents missing glyph issues in PDF export (Fakt Pro font doesn't have all Unicode chars)
+function normalizeText(text: string): string {
+  return text
+    // Dashes
+    .replace(/[\u2013\u2014\u2015]/g, '-')  // en-dash, em-dash, horizontal bar → hyphen
+    .replace(/[\u2010\u2011\u2012]/g, '-')  // hyphen, non-breaking hyphen, figure dash → hyphen
+    // Quotes
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")  // single curly quotes → straight quote
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')  // double curly quotes → straight quote
+    // Spaces
+    .replace(/[\u00A0\u2002\u2003\u2009]/g, ' ')  // non-breaking space, en/em space, thin space → regular space
+    // Ellipsis
+    .replace(/\u2026/g, '...')  // horizontal ellipsis → three dots
+    // Other common replacements
+    .replace(/\u2212/g, '-')  // minus sign → hyphen
+}
+
 // Re-export for convenience
 export type { FaqContentBlock } from '@/types'
 
@@ -59,7 +77,7 @@ export function ContentPage({
               marginBottom: 24,
             }}
           >
-            {block.text}
+            {normalizeText(block.text)}
           </div>
         )
 
@@ -89,7 +107,7 @@ export function ContentPage({
                 wordWrap: 'break-word',
               }}
             >
-              {block.question}
+              {normalizeText(block.question)}
             </div>
             {/* Answer - light weight, supports rich text HTML */}
             <div
@@ -113,7 +131,7 @@ export function ContentPage({
               `}} />
               <div
                 className={`faq-answer-${block.id}`}
-                dangerouslySetInnerHTML={{ __html: block.answer }}
+                dangerouslySetInnerHTML={{ __html: normalizeText(block.answer) }}
               />
             </div>
           </div>
@@ -154,7 +172,7 @@ export function ContentPage({
                           overflowWrap: 'break-word',
                         }}
                       >
-                        {cell}
+                        {normalizeText(cell)}
                       </td>
                     ))}
                   </tr>
@@ -282,7 +300,7 @@ export function ContentPage({
               wordWrap: 'break-word',
             }}
           >
-            {title}
+            {normalizeText(title)}
           </div>
         </div>
 

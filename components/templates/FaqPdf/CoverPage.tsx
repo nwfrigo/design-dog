@@ -3,6 +3,24 @@
 
 import { solutionCategories, type SolutionCategory } from '@/config/solution-overview-assets'
 
+// Normalize special Unicode characters to ASCII equivalents
+// Prevents missing glyph issues in PDF export (Fakt Pro font doesn't have all Unicode chars)
+function normalizeText(text: string): string {
+  return text
+    // Dashes
+    .replace(/[\u2013\u2014\u2015]/g, '-')  // en-dash, em-dash, horizontal bar → hyphen
+    .replace(/[\u2010\u2011\u2012]/g, '-')  // hyphen, non-breaking hyphen, figure dash → hyphen
+    // Quotes
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")  // single curly quotes → straight quote
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')  // double curly quotes → straight quote
+    // Spaces
+    .replace(/[\u00A0\u2002\u2003\u2009]/g, ' ')  // non-breaking space, en/em space, thin space → regular space
+    // Ellipsis
+    .replace(/\u2026/g, '...')  // horizontal ellipsis → three dots
+    // Other common replacements
+    .replace(/\u2212/g, '-')  // minus sign → hyphen
+}
+
 // Inline SVG for Cority logo (black version, 81px wide to match design)
 function CorityLogoBlack() {
   return (
@@ -98,7 +116,7 @@ export function CoverPage({
             marginBottom: 8,
           }}
         >
-          {subheader}
+          {normalizeText(subheader)}
         </div>
 
         {/* Title */}
@@ -113,7 +131,7 @@ export function CoverPage({
             marginBottom: 24,
           }}
         >
-          {title}
+          {normalizeText(title)}
         </div>
 
         {/* Solution Pill - only shown when solution is not 'none' */}

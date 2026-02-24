@@ -9,6 +9,27 @@ const anthropic = new Anthropic({
 // Generate unique IDs for blocks
 const generateId = () => Math.random().toString(36).substring(2, 9)
 
+// Normalize special Unicode characters to ASCII equivalents
+// This prevents missing glyph issues in PDF export (Fakt Pro font doesn't have all Unicode chars)
+function normalizeText(text: string): string {
+  return text
+    // Dashes
+    .replace(/[\u2013\u2014\u2015]/g, '-')  // en-dash, em-dash, horizontal bar → hyphen
+    .replace(/[\u2010\u2011\u2012]/g, '-')  // hyphen, non-breaking hyphen, figure dash → hyphen
+    // Quotes
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")  // single curly quotes → straight quote
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')  // double curly quotes → straight quote
+    // Spaces
+    .replace(/[\u00A0\u2002\u2003\u2009]/g, ' ')  // non-breaking space, en/em space, thin space → regular space
+    // Ellipsis
+    .replace(/\u2026/g, '...')  // horizontal ellipsis → three dots
+    // Bullets
+    .replace(/[\u2022\u2023\u25E6\u2043]/g, '•')  // various bullets → standard bullet
+    // Other common replacements
+    .replace(/\u00B7/g, '·')  // middle dot (usually supported)
+    .replace(/\u2212/g, '-')  // minus sign → hyphen
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -282,10 +303,15 @@ function distributeBlocksToPages(blocks: Array<{
       currentHeight = 0
     }
 
-    // Add block with generated ID
+    // Add block with generated ID and normalize text
     const blockWithId = {
       ...block,
       id: generateId(),
+      // Normalize text fields to replace special Unicode characters
+      ...(block.text && { text: normalizeText(block.text) }),
+      ...(block.question && { question: normalizeText(block.question) }),
+      ...(block.answer && { answer: normalizeText(block.answer) }),
+      ...(block.data && { data: block.data.map(row => row.map(cell => normalizeText(cell))) }),
     }
     currentPage.push(blockWithId)
     currentHeight += blockHeight
