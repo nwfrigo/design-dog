@@ -29,6 +29,9 @@ import { NewsletterLight } from '@/components/templates/NewsletterLight'
 import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 import { Page1Cover } from '@/components/templates/SolutionOverviewPdf/Page1Cover'
 import { CoverPage as FaqCoverPage } from '@/components/templates/FaqPdf'
+import { StackerPdf } from '@/components/templates/StackerPdf'
+import { STACKER_PLACEHOLDER_IMAGE_1x1 } from '@/lib/stacker-modules'
+import type { StackerModule } from '@/types'
 
 interface TemplateTileProps {
   template: TemplateInfo
@@ -447,6 +450,65 @@ export function TemplateRenderer({
           scale={scale}
         />
       )
+
+    case 'stacker-pdf': {
+      // Preview modules: Logo/Chips, Header, Image 1:1, Simple Cards, Quote
+      const previewModules: StackerModule[] = [
+        {
+          id: 'preview-logo',
+          type: 'logo-chip',
+          showChips: true,
+          activeCategories: ['environmental', 'health', 'safety', 'quality', 'sustainability'],
+        },
+        {
+          id: 'preview-header',
+          type: 'header',
+          heading: 'Lorem ipsum dolor sit amet',
+          headingSize: 'h1',
+          subheader: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          showSubheader: true,
+          cta: 'Learn More',
+          ctaUrl: '',
+          showCta: true,
+        },
+        {
+          id: 'preview-image',
+          type: 'image',
+          imagePosition: 'left',
+          imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1,
+          imagePan: { x: 0, y: 0 },
+          imageZoom: 1,
+          grayscale: false,
+          eyebrow: 'Lorem ipsum dolor',
+          showEyebrow: true,
+          heading: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultrices',
+          showHeading: true,
+          body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula. Donec vel felis erat. Praesent iaculis malesuada neque at mattis.',
+          showBody: true,
+          cta: 'Learn More',
+          ctaUrl: '',
+          showCta: true,
+        },
+        {
+          id: 'preview-cards',
+          type: 'three-card',
+          cards: [
+            { icon: 'zap', title: 'Card 1', description: 'Description for card 1' },
+            { icon: 'shield-check', title: 'Card 2', description: 'Description for card 2' },
+            { icon: 'clock', title: 'Card 3', description: 'Description for card 3' },
+          ],
+        },
+        {
+          id: 'preview-quote',
+          type: 'quote',
+          quote: '"Aliquam a nunc lobortis, sodales erat vel, lobortis mi. In semper elit at feugiat sodales."',
+          name: 'Firstname Lastname',
+          jobTitle: 'Job Title',
+          organization: 'Organization Name',
+        },
+      ]
+      return <StackerPdf modules={previewModules} scale={scale} />
+    }
 
     default:
       return null

@@ -20,6 +20,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import type { StackerModule } from '@/types'
+import { STACKER_PLACEHOLDER_IMAGE_1x1, STACKER_PLACEHOLDER_IMAGE_16x9 } from '@/lib/stacker-modules'
 import { StackerPdf } from './templates/StackerPdf'
 import { StackerDraggableModule } from './StackerDraggableModule'
 import { StackerDropIndicator } from './StackerDropIndicator'
@@ -58,9 +59,6 @@ const MODULE_TYPES_INFO: ModuleTypeInfo[] = [
   { type: 'three-stats', label: '3 Stats', description: 'Three key metrics' },
   { type: 'one-stat', label: '1 Stat', description: 'Single featured metric' },
 ]
-
-// Placeholder image for module previews (light gray gradient)
-const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Cdefs%3E%3ClinearGradient id="g" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:%23e5e7eb"%3E%3C/stop%3E%3Cstop offset="100%25" style="stop-color:%23d1d5db"%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="400" height="400" fill="url(%23g)"%3E%3C/rect%3E%3C/svg%3E'
 
 // Estimated heights for each module type at native 564px width (for scaling calculations)
 const MODULE_HEIGHTS: Record<StackerModule['type'], number> = {
@@ -103,7 +101,7 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
     case 'image':
       return {
         id, type: 'image',
-        imagePosition: 'left', imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
+        imagePosition: 'left', imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
         eyebrow: 'Platform', showEyebrow: true,
         heading: 'Unified Dashboard', showHeading: true,
         body: 'See all your safety data in one place with real-time updates.', showBody: true,
@@ -112,7 +110,7 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
     case 'image-16x9':
       return {
         id, type: 'image-16x9',
-        imagePosition: 'right', imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
+        imagePosition: 'right', imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
         eyebrow: 'Feature', showEyebrow: true,
         heading: 'Mobile Access', showHeading: true,
         body: 'Access your data anywhere with our mobile app.', showBody: true,
@@ -133,9 +131,9 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
         id, type: 'image-cards',
         heading: '', showHeading: false,
         cards: [
-          { imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Incident Reporting', body: 'Capture incidents in real-time' },
-          { imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Risk Assessment', body: 'Identify and mitigate risks' },
-          { imageUrl: PLACEHOLDER_IMAGE, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Audit Management', body: 'Streamline your audits' },
+          { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Incident Reporting', body: 'Capture incidents in real-time' },
+          { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Risk Assessment', body: 'Identify and mitigate risks' },
+          { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Audit Management', body: 'Streamline your audits' },
         ],
         showCard3: true, grayscale: false,
       }

@@ -7,6 +7,10 @@
 
 import type { StackerModule, SolutionCategory } from '@/types'
 
+// Default placeholder images for Stacker modules
+export const STACKER_PLACEHOLDER_IMAGE_1x1 = '/assets/images/default_placeholder_image_stacker_1-1.png'
+export const STACKER_PLACEHOLDER_IMAGE_16x9 = '/assets/images/default_placeholder_image_stacker_16-9.png'
+
 // Module type definitions for AI prompt
 export interface ModuleDefinition {
   type: string
@@ -295,7 +299,7 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         id,
         type: 'image',
         imagePosition: (data.imagePosition as 'left' | 'right') || 'left',
-        imageUrl: null, // User will upload
+        imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1,
         imagePan: { x: 0, y: 0 },
         imageZoom: 1,
         grayscale: false,
@@ -315,7 +319,7 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         id,
         type: 'image-16x9',
         imagePosition: (data.imagePosition as 'left' | 'right') || 'left',
-        imageUrl: null,
+        imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9,
         imagePan: { x: 0, y: 0 },
         imageZoom: 1,
         grayscale: false,
@@ -363,9 +367,9 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         body: string
       }
       const defaultImageCards: [ImageCardType, ImageCardType, ImageCardType] = [
-        { imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
-        { imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
-        { imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
+        { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
+        { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
+        { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
       ]
       const dataImageCards = data.cards as Array<ImageCardType> | undefined
       const imageCards: [ImageCardType, ImageCardType, ImageCardType] =

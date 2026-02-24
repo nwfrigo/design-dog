@@ -6,6 +6,7 @@ import { StackerPreviewEditor } from './StackerPreviewEditor'
 import { ImageCropModal } from './ImageCropModal'
 import { IconPicker } from './IconPickerModal'
 import type { StackerModule, StackerImageModule, StackerImage16x9Module, StackerImageCardsModule, SolutionCategory, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule } from '@/types'
+import { STACKER_PLACEHOLDER_IMAGE_1x1, STACKER_PLACEHOLDER_IMAGE_16x9 } from '@/lib/stacker-modules'
 import {
   DndContext,
   closestCenter,
@@ -138,7 +139,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
         id,
         type: 'image',
         imagePosition: 'left',
-        imageUrl: null,
+        imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1,
         imagePan: { x: 0, y: 0 },
         imageZoom: 1,
         grayscale: false,
@@ -157,7 +158,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
         id,
         type: 'image-16x9',
         imagePosition: 'left',
-        imageUrl: null,
+        imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9,
         imagePan: { x: 0, y: 0 },
         imageZoom: 1,
         grayscale: false,
@@ -191,7 +192,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
         showHeading: true,
         cards: [
           {
-            imageUrl: null,
+            imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9,
             imagePan: { x: 0, y: 0 },
             imageZoom: 1,
             eyebrow: 'Lorem ipsum dolor',
@@ -200,7 +201,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
             body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula. Donec vel felis erat. Praesent iaculis malesuada neque at mattis.',
           },
           {
-            imageUrl: null,
+            imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9,
             imagePan: { x: 0, y: 0 },
             imageZoom: 1,
             eyebrow: 'Lorem ipsum dolor',
@@ -209,7 +210,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
             body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula. Donec vel felis erat. Praesent iaculis malesuada neque at mattis.',
           },
           {
-            imageUrl: null,
+            imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9,
             imagePan: { x: 0, y: 0 },
             imageZoom: 1,
             eyebrow: 'Lorem ipsum dolor',
