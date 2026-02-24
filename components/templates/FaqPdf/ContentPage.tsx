@@ -182,24 +182,24 @@ export function ContentPage({
               overflow: 'hidden',
             }}
           >
-            {block.imageUrl && (
-              <img
-                src={block.imageUrl}
-                alt=""
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: `${50 - block.imagePan.x}% ${50 - block.imagePan.y}%`,
-                  transform: block.imageZoom !== 1
-                    ? `translate(${block.imagePan.x * (block.imageZoom - 1)}%, ${block.imagePan.y * (block.imageZoom - 1)}%) scale(${block.imageZoom})`
-                    : undefined,
-                  transformOrigin: 'center',
-                  filter: block.grayscale ? 'grayscale(100%)' : undefined,
-                }}
-                data-faq-image={block.id}
-              />
-            )}
+            {/* Always render img tag so data URL injection can work during export */}
+            <img
+              src={block.imageUrl || undefined}
+              alt=""
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: `${50 - block.imagePan.x}% ${50 - block.imagePan.y}%`,
+                transform: block.imageZoom !== 1
+                  ? `translate(${block.imagePan.x * (block.imageZoom - 1)}%, ${block.imagePan.y * (block.imageZoom - 1)}%) scale(${block.imageZoom})`
+                  : undefined,
+                transformOrigin: 'center',
+                filter: block.grayscale ? 'grayscale(100%)' : undefined,
+                display: block.imageUrl ? 'block' : 'none',
+              }}
+              data-faq-image={block.id}
+            />
           </div>
         )
       }
