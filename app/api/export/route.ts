@@ -409,10 +409,14 @@ export async function POST(request: NextRequest) {
     const numPages = isFaqPdf ? (body.numPages || 1) : 3
     const viewportHeight = isStackerPdf ? 4000 : (isPdfExport ? height * numPages : height)
 
+    // For Stacker PDF export, use scale 1 to preserve thin CSS borders
+    const isStackerPdfExport = isStackerPdf && body.format === 'pdf'
+    const viewportScale = isStackerPdfExport ? 1 : scale
+
     await page.setViewport({
       width,
       height: viewportHeight,
-      deviceScaleFactor: scale,
+      deviceScaleFactor: viewportScale,
     })
 
     // Navigate to render page
@@ -580,24 +584,48 @@ export async function POST(request: NextRequest) {
     // Small delay after hiding overlays
     await new Promise(resolve => setTimeout(resolve, 100))
 
-    // For Stacker PDF, measure actual content height and export as PNG
+    // For Stacker, measure actual content height and export as PNG or PDF based on format
     if (isStackerPdf) {
-      // Get actual document height
+      // Get actual content height from the wrapper element
       const actualHeight = await page.evaluate(() => {
-        const body = document.body
-        const html = document.documentElement
-        return Math.max(
-          body.scrollHeight,
-          body.offsetHeight,
-          html.clientHeight,
-          html.scrollHeight,
-          html.offsetHeight
-        )
+        const content = document.getElementById('stacker-content')
+        if (content) {
+          return content.offsetHeight
+        }
+        // Fallback to body measurement
+        return document.body.scrollHeight
       })
 
       console.log('Stacker actual height:', actualHeight)
 
-      // Take full-page screenshot with 2x scale for quality
+      const stackerFilename = body.filename || 'stacker-document'
+
+      // Export as PDF if format is 'pdf'
+      if (body.format === 'pdf') {
+        // Use screen media type to preserve thin borders (print media can round them up)
+        await page.emulateMediaType('screen')
+
+        // Generate PDF with dynamic height based on content
+        const pdfBuffer = await page.pdf({
+          width: `${width}px`,
+          height: `${actualHeight}px`,
+          printBackground: true,
+        })
+
+        await browser.close()
+
+        // Track export (fire-and-forget)
+        trackExport(template)
+
+        return new NextResponse(Buffer.from(pdfBuffer), {
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${stackerFilename}.pdf"`,
+          },
+        })
+      }
+
+      // Default: Take full-page screenshot with 2x scale for quality (PNG)
       const screenshot = await page.screenshot({
         type: 'png',
         clip: {
@@ -616,7 +644,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse(Buffer.from(screenshot), {
         headers: {
           'Content-Type': 'image/png',
-          'Content-Disposition': `attachment; filename="stacker-document.png"`,
+          'Content-Disposition': `attachment; filename="${stackerFilename}.png"`,
         },
       })
     }

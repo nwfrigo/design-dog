@@ -48,7 +48,7 @@ export function Image16x9Module({
     width: 180,
     height: 100,
     borderRadius: 6.45,
-    border: '0.65px solid #D9D8D6',
+    border: '0.33px solid #D9D8D6',
     flexShrink: 0,
     backgroundColor: '#f5f5f5',
     overflow: 'hidden',

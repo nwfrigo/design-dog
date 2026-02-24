@@ -62,7 +62,7 @@ export function ImageCardsModule({
   const cardStyle: CSSProperties = {
     overflow: 'hidden',
     borderRadius: 6,
-    border: '0.5px solid #D9D8D6',
+    border: '0.25px solid #D9D8D6',
     display: 'flex',
     flexDirection: 'column',
   }

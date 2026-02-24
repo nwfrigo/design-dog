@@ -27,7 +27,9 @@ export function StackerPdfRender({ modules }: StackerPdfRenderProps) {
   return (
     <>
       {ready && <div id="render-ready" style={{ display: 'none' }} />}
-      <StackerPdf modules={modules} scale={1} />
+      <div id="stacker-content">
+        <StackerPdf modules={modules} scale={1} />
+      </div>
     </>
   )
 }

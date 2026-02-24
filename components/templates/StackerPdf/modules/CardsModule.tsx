@@ -34,7 +34,7 @@ export function CardsModule({
     padding: 12,
     background: '#F9F9F9',
     borderRadius: 6,
-    border: '0.5px solid #D9D8D6',
+    border: '0.25px solid #D9D8D6',
     display: 'flex',
     flexDirection: 'column',
     gap: 12,

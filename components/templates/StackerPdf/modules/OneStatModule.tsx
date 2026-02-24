@@ -24,7 +24,7 @@ export function OneStatModule({
     padding: 24,
     background: '#F9F9F9',
     borderRadius: 6,
-    border: '1px solid #D9D8D6',
+    border: '0.5px solid #D9D8D6',
     display: 'flex',
     alignItems: 'center',
     gap: 24,

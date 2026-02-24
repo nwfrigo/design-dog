@@ -75,33 +75,33 @@ export function LogoChipModule({
   const chipRowStyle: CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 5.06,
+    gap: 5,
   }
 
   const getChipStyle = (): CSSProperties => ({
-    padding: 6.67,
+    padding: 7,
     background: 'white',
-    borderRadius: 2.78,
-    border: '0.28px solid #B3B2B1',
+    borderRadius: 3,
+    border: '0.14px solid #B3B2B1',
     display: 'flex',
     alignItems: 'center',
-    gap: 6.12,
+    gap: 6,
   })
 
   const getDotStyle = (category: SolutionCategory, isActive: boolean): CSSProperties => ({
-    width: 6.67,
-    height: 6.67,
+    width: 7,
+    height: 7,
     background: isActive ? SOLUTION_COLORS[category] : '#D9D8D6',
-    borderRadius: 1.11,
+    borderRadius: 1,
     flexShrink: 0,
   })
 
   const getLabelStyle = (isActive: boolean): CSSProperties => ({
     color: isActive ? 'black' : '#B3B2B1',
-    fontSize: 5.06,
+    fontSize: 5,
     fontWeight: 500,
     textTransform: 'uppercase',
-    letterSpacing: 0.56,
+    letterSpacing: 0.5,
     whiteSpace: 'nowrap',
     lineHeight: 1,
     position: 'relative',

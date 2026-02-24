@@ -53,7 +53,7 @@ export function FooterModule({
     width: '100%',
     paddingTop: 24,
     paddingBottom: 24,
-    borderTop: '0.5px solid #89888B',
+    borderTop: '0.25px solid #89888B',
     display: 'flex',
     alignItems: 'center',
     gap: 38,
