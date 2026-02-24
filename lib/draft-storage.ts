@@ -388,6 +388,7 @@ export function hasDraft(): boolean {
     const hasSolutionOverviewContent = isSolutionOverview || hasCustomSolutionOverviewName
     // Check for Stacker content (has content modules or custom title)
     const isStacker = draft.templateType === 'stacker-pdf' ||
+      draft.currentScreen === 'stacker-editor' ||
       draft.currentScreen === 'stacker-export' ||
       draft.currentScreen === 'stacker-setup'
     const hasStackerModules = !!(draft.stackerContentModules && draft.stackerContentModules.length > 0)

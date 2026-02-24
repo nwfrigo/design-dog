@@ -13,6 +13,7 @@ export function DraftBanner() {
   const [isFaqDraft, setIsFaqDraft] = useState(false)
   const [hasFaqContent, setHasFaqContent] = useState(false)
   const [isSolutionOverviewDraft, setIsSolutionOverviewDraft] = useState(false)
+  const [isStackerDraft, setIsStackerDraft] = useState(false)
   const [savedCurrentScreen, setSavedCurrentScreen] = useState<string | null>(null)
 
   useEffect(() => {
@@ -41,6 +42,13 @@ export function DraftBanner() {
           draft.currentScreen === 'solution-overview-export' ||
           draft.currentScreen === 'solution-overview-setup'
         setIsSolutionOverviewDraft(isSolutionOverview)
+
+        // Check if draft is for Stacker template
+        const isStacker = draft.templateType === 'stacker-pdf' ||
+          draft.currentScreen === 'stacker-editor' ||
+          draft.currentScreen === 'stacker-export' ||
+          draft.currentScreen === 'stacker-setup'
+        setIsStackerDraft(isStacker)
       }
     }
   }, [])
@@ -61,6 +69,16 @@ export function DraftBanner() {
         setCurrentScreen('solution-overview-export')
       } else {
         setCurrentScreen('solution-overview-setup')
+      }
+      router.push('/editor')
+    } else if (isStackerDraft) {
+      // For Stacker templates, restore to appropriate screen
+      if (savedCurrentScreen === 'stacker-export') {
+        setCurrentScreen('stacker-export')
+      } else if (savedCurrentScreen === 'stacker-editor') {
+        setCurrentScreen('stacker-editor')
+      } else {
+        setCurrentScreen('stacker-setup')
       }
       router.push('/editor')
     } else {
