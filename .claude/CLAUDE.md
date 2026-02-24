@@ -980,6 +980,7 @@ FAQ pages have a fixed height (792px). When content exceeds this:
 - **Two state systems:** Auto-create uses `generatedAssets` + `templateType`; manual mode uses `selectedAssets` + `currentAssetIndex`. Don't mix them.
 - **Modal state persistence:** Use React `key` prop or `useEffect` cleanup to reset modal state on mount.
 - **Local PDF uploads:** Require `BLOB_READ_WRITE_TOKEN` in `.env.local`.
+- **Local state vs store state:** Editor screens using `useState` for editing MUST sync to store via `useEffect` for draft persistence to work. See "Local State vs Store State" section below.
 
 ### Delete Confirmation Pattern
 
@@ -1023,6 +1024,47 @@ function DeleteConfirmModal({
 3. Add default value to `getDefaultAssetSettings()` function in `store/index.ts`
 
 **Reference:** The queue system (`addToQueue`, `editQueuedAsset`) already handles all variants correctly — follow that pattern.
+
+### Local State vs Store State (Critical for Draft Persistence)
+
+**Problem:** Editor screens that use local React state (`useState`) for editing will NOT auto-save unless they sync to the Zustand store. The auto-save in `EditorLayout.tsx` watches the **store**, not local component state. If a component edits locally and only syncs to the store on "Export" or "Save", draft persistence breaks — users will lose work when navigating away.
+
+**Symptoms:**
+- User edits content in editor
+- User clicks logo to go home, sees "Resume" banner
+- User clicks "Resume" → content is empty/default instead of their edits
+- `localStorage` shows empty arrays for the template's content fields
+
+**The Pattern That Breaks:**
+```tsx
+// ❌ BAD - Local state never reaches store during editing
+const [modules, setModules] = useState([])
+
+const handleExport = () => {
+  setStoreModules(modules)  // Only syncs on export!
+  navigate('/export')
+}
+```
+
+**The Fix — Add a Sync useEffect:**
+```tsx
+// ✅ GOOD - Sync local state to store for draft persistence
+const [modules, setModules] = useState([])
+
+// Sync to store whenever local state changes
+useEffect(() => {
+  setStoreModules(modules)
+}, [modules, setStoreModules])
+```
+
+**Checklist for editor screens with local state:**
+1. Does the component use `useState` for editable content?
+2. Does it have store setters (e.g., `setStackerContentModules`)?
+3. Is there a `useEffect` that syncs local state → store on every change?
+4. Are those store fields in `EditorLayout.tsx` auto-save dependencies?
+5. Are those fields in `draft-storage.ts` save/load functions?
+
+**Reference:** `StackerEditorScreen.tsx` lines 1859-1867 shows the correct sync pattern.
 
 ### Scaling Large Templates in Preview (CSS Transform Gotcha)
 
