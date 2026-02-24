@@ -11,12 +11,15 @@ import { FaqCoverImageLibraryModal } from './FaqCoverImageLibraryModal'
 import { solutionCategories, type SolutionCategory } from '@/config/solution-overview-assets'
 import {
   DndContext,
+  DragOverlay,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
+  DragOverEvent,
 } from '@dnd-kit/core'
 import {
   arrayMove,
@@ -26,6 +29,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { FaqDraggableBlock } from './FaqDraggableBlock'
+import { StackerDropIndicator } from './StackerDropIndicator'
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -969,6 +974,12 @@ export function FaqEditorScreen() {
   const [showPdfFullscreen, setShowPdfFullscreen] = useState(false)
   const [showPdfAllPagesPreview, setShowPdfAllPagesPreview] = useState(false)
 
+  // Preview drag-and-drop state
+  const [previewActiveId, setPreviewActiveId] = useState<string | null>(null)
+  const [previewOverId, setPreviewOverId] = useState<string | null>(null)
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
+  const [showAddContentMenu, setShowAddContentMenu] = useState(false)
+
   // Auto-pagination state
   const [blockHeights, setBlockHeights] = useState<Map<string, number>>(new Map())
   const isRedistributing = useRef(false)
@@ -1208,13 +1219,76 @@ export function FaqEditorScreen() {
     }
   }, [])
 
-  // Drag and drop sensors
+  // Drag and drop sensors for sidebar
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // Drag and drop sensors for preview (with distance constraint to distinguish from click)
+  const previewSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement to start drag
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // Preview drag handlers
+  const handlePreviewDragStart = useCallback((event: DragStartEvent) => {
+    setPreviewActiveId(event.active.id as string)
+  }, [])
+
+  const handlePreviewDragOver = useCallback((event: DragOverEvent) => {
+    setPreviewOverId(event.over?.id as string | null)
+  }, [])
+
+  const handlePreviewDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+    setPreviewActiveId(null)
+    setPreviewOverId(null)
+
+    if (over && active.id !== over.id) {
+      const currentBlocks = currentPage?.blocks || []
+      const oldIndex = currentBlocks.findIndex(b => b.id === active.id)
+      const newIndex = currentBlocks.findIndex(b => b.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setPages(pages.map((page, idx) => {
+          if (idx !== currentPageIndex) return page
+          return { ...page, blocks: arrayMove(page.blocks, oldIndex, newIndex) }
+        }))
+      }
+    }
+  }, [currentPage, currentPageIndex, pages, setPages])
+
+  const handlePreviewDragCancel = useCallback(() => {
+    setPreviewActiveId(null)
+    setPreviewOverId(null)
+  }, [])
+
+  // Handle block selection from preview (expands and scrolls to sidebar item)
+  const handleSelectBlock = useCallback((blockId: string) => {
+    setSelectedBlockId(blockId)
+    setExpandedBlocks(new Set([blockId]))
+    // Scroll sidebar to the block
+    requestAnimationFrame(() => {
+      const element = document.querySelector(`[data-block-id="${blockId}"]`)
+      element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    })
+  }, [])
+
+  // Handle block delete from preview
+  const handleDeleteBlockFromPreview = useCallback((blockId: string) => {
+    const block = currentPage?.blocks.find(b => b.id === blockId)
+    if (block) {
+      setDeleteBlockConfirm({ blockId, blockType: block.type })
+    }
+  }, [currentPage])
 
   // Scroll-based page detection using IntersectionObserver
   useEffect(() => {
@@ -1249,16 +1323,15 @@ export function FaqEditorScreen() {
     return () => observer.disconnect()
   }, [pages, currentPageIndex])
 
-  // Toggle block expansion
+  // Toggle block expansion (accordion behavior - only one at a time)
   const toggleBlockExpand = (blockId: string) => {
     setExpandedBlocks(prev => {
-      const next = new Set(prev)
-      if (next.has(blockId)) {
-        next.delete(blockId)
-      } else {
-        next.add(blockId)
+      // If already expanded, collapse it
+      if (prev.has(blockId)) {
+        return new Set()
       }
-      return next
+      // Otherwise, collapse all and expand only this one
+      return new Set([blockId])
     })
   }
 
@@ -1720,58 +1793,6 @@ export function FaqEditorScreen() {
             {/* Content Page Controls */}
             {!viewingCover && (
               <>
-                {/* Add Content Buttons */}
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
-                    Add Content
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => addBlock('heading')}
-                        className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
-                      >
-                        + Heading
-                      </button>
-                      <button
-                        onClick={() => addBlock('qa')}
-                        className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
-                      >
-                        + Q&A
-                      </button>
-                    </div>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <button
-                          onClick={() => setShowTablePicker(!showTablePicker)}
-                          className="w-full px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
-                        >
-                          + Table
-                        </button>
-                        {showTablePicker && (
-                          <>
-                            <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
-                            <div className="absolute left-0 top-full mt-1 z-50">
-                              <TableGridPicker
-                                onSelect={(rows, cols) => {
-                                  addBlock('table', { rows, cols })
-                                  setShowTablePicker(false)
-                                }}
-                              />
-                            </div>
-                          </>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => addBlock('image')}
-                        className="flex-1 px-3 py-2 text-xs bg-white dark:bg-[#1a1a2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-[#252540] border border-gray-300 dark:border-transparent transition-colors"
-                      >
-                        + Image
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Content Blocks - Draggable */}
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
@@ -1780,7 +1801,7 @@ export function FaqEditorScreen() {
 
                   {!currentPage || currentPage.blocks.length === 0 ? (
                     <div className="text-center py-8 text-gray-500 dark:text-gray-500 text-sm border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                      No content yet. Add content above.
+                      No content yet. Click &quot;+ Add Content&quot; on the preview.
                     </div>
                   ) : (
                     <DndContext
@@ -1964,45 +1985,102 @@ export function FaqEditorScreen() {
 
           {/* Preview Area */}
           <div className="flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6 flex items-start justify-center overflow-auto">
-            <div
-              className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
-              style={{
-                width: 612 * (pdfPreviewZoom / 100),
-                height: 792 * (pdfPreviewZoom / 100),
-                position: 'relative',
-                overflow: 'hidden',
-              }}
+            <DndContext
+              sensors={previewSensors}
+              collisionDetection={closestCenter}
+              onDragStart={handlePreviewDragStart}
+              onDragOver={handlePreviewDragOver}
+              onDragEnd={handlePreviewDragEnd}
+              onDragCancel={handlePreviewDragCancel}
             >
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: 612,
-                height: 792,
-                transform: `scale(${pdfPreviewZoom / 100})`,
-                transformOrigin: 'top left',
-              }}>
-                {viewingCover ? (
-                  <CoverPage
-                    title={title}
-                    subheader={coverSubheader}
-                    solution={coverSolution}
-                    coverImageUrl={coverImageUrl || undefined}
-                    coverImagePosition={coverImagePosition}
-                    coverImageZoom={coverImageZoom}
-                    coverImageGrayscale={coverImageGrayscale}
-                    scale={1}
-                  />
-                ) : (
-                  <ContentPage
-                    title={title}
-                    blocks={currentPage?.blocks || []}
-                    pageNumber={currentPageIndex + 2}
-                    scale={1}
-                  />
-                )}
-              </div>
-            </div>
+              <SortableContext
+                items={(currentPage?.blocks || []).map(b => b.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div
+                  className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
+                  style={{
+                    width: 612 * (pdfPreviewZoom / 100),
+                    height: 792 * (pdfPreviewZoom / 100),
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: 612,
+                    height: 792,
+                    transform: `scale(${pdfPreviewZoom / 100})`,
+                    transformOrigin: 'top left',
+                  }}>
+                    {viewingCover ? (
+                      <CoverPage
+                        title={title}
+                        subheader={coverSubheader}
+                        solution={coverSolution}
+                        coverImageUrl={coverImageUrl || undefined}
+                        coverImagePosition={coverImagePosition}
+                        coverImageZoom={coverImageZoom}
+                        coverImageGrayscale={coverImageGrayscale}
+                        scale={1}
+                      />
+                    ) : (
+                      <ContentPage
+                        title={title}
+                        blocks={currentPage?.blocks || []}
+                        pageNumber={currentPageIndex + 2}
+                        scale={1}
+                        renderBlockWrapper={(block, children, index) => {
+                          const isOverAbove = previewOverId === block.id && previewActiveId !== block.id
+                          return (
+                            <FaqDraggableBlock
+                              key={block.id}
+                              blockId={block.id}
+                              isSelected={selectedBlockId === block.id}
+                              isOverAbove={isOverAbove}
+                              onSelect={handleSelectBlock}
+                              onDelete={handleDeleteBlockFromPreview}
+                            >
+                              {children}
+                            </FaqDraggableBlock>
+                          )
+                        }}
+                        renderFooterContent={() => (
+                          <div style={{ marginTop: 16, marginBottom: 8 }}>
+                            <button
+                              onClick={() => setShowAddContentMenu(true)}
+                              style={{
+                                width: '100%',
+                                padding: '10px 0',
+                                border: '1px dashed #d1d5db',
+                                borderRadius: 4,
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 6,
+                                transition: 'all 200ms',
+                              }}
+                              className="hover:border-blue-400 hover:bg-blue-50/50 group"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" className="group-hover:stroke-blue-500">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                              </svg>
+                              <span style={{ fontSize: 10, fontWeight: 500, color: '#9ca3af' }} className="group-hover:!text-blue-500">
+                                Add Content
+                              </span>
+                            </button>
+                          </div>
+                        )}
+                      />
+                    )}
+                  </div>
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
       </div>
@@ -2023,6 +2101,136 @@ export function FaqEditorScreen() {
         itemType="Page"
         itemLabel={deletePageConfirm !== null ? String(deletePageConfirm + 1) : undefined}
       />
+
+      {/* Add Content Modal */}
+      {showAddContentMenu && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setShowAddContentMenu(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-gray-900 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-gray-800">
+              <h2 className="text-lg font-semibold text-white">Add Content</h2>
+              <button
+                onClick={() => setShowAddContentMenu(false)}
+                className="p-1 text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content Type Options */}
+            <div className="p-5 space-y-3">
+              <button
+                onClick={() => {
+                  addBlock('heading')
+                  setShowAddContentMenu(false)
+                }}
+                className="w-full px-4 py-3 text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-gray-600 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-white">Heading</div>
+                    <div className="text-xs text-gray-400">Section title text</div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  addBlock('qa')
+                  setShowAddContentMenu(false)
+                }}
+                className="w-full px-4 py-3 text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-gray-600 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-white">Q&A</div>
+                    <div className="text-xs text-gray-400">Question and answer pair</div>
+                  </div>
+                </div>
+              </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => setShowTablePicker(!showTablePicker)}
+                  className="w-full px-4 py-3 text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-gray-600 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-white">Table</div>
+                      <div className="text-xs text-gray-400">Data in rows and columns</div>
+                    </div>
+                  </div>
+                </button>
+                {showTablePicker && (
+                  <div className="absolute left-0 top-full mt-1 z-50">
+                    <TableGridPicker
+                      onSelect={(rows, cols) => {
+                        addBlock('table', { rows, cols })
+                        setShowTablePicker(false)
+                        setShowAddContentMenu(false)
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => {
+                  addBlock('image')
+                  setShowAddContentMenu(false)
+                }}
+                className="w-full px-4 py-3 text-left bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-gray-600 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-white">Image</div>
+                    <div className="text-xs text-gray-400">Upload or paste image</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 border-t border-gray-800">
+              <button
+                onClick={() => setShowAddContentMenu(false)}
+                className="w-full py-2.5 text-sm font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Fullscreen Preview Modal */}
       {showPdfFullscreen && (

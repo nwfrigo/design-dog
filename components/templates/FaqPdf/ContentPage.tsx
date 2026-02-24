@@ -1,6 +1,7 @@
 // FAQ PDF Template - Content Page
 // Layout: Header bar with title and logo, content area with headings, Q&A pairs, and tables
 
+import type { ReactNode } from 'react'
 import type { FaqContentBlock } from '@/types'
 
 // Re-export for convenience
@@ -28,6 +29,10 @@ export interface ContentPageProps {
   blocks: FaqContentBlock[]
   pageNumber?: number
   scale?: number
+  // Optional wrapper for each block (used by editor for drag handles)
+  renderBlockWrapper?: (block: FaqContentBlock, children: ReactNode, index: number) => ReactNode
+  // Optional content to render after blocks (used by editor for "Add Content" button)
+  renderFooterContent?: () => ReactNode
 }
 
 export function ContentPage({
@@ -35,6 +40,8 @@ export function ContentPage({
   blocks,
   pageNumber,
   scale = 1,
+  renderBlockWrapper,
+  renderFooterContent,
 }: ContentPageProps) {
   // Render a content block
   const renderBlock = (block: FaqContentBlock) => {
@@ -299,7 +306,13 @@ export function ContentPage({
           width: 492,
         }}
       >
-        {blocks.map((block) => renderBlock(block))}
+        {blocks.map((block, index) => {
+          const renderedBlock = renderBlock(block)
+          return renderBlockWrapper
+            ? renderBlockWrapper(block, renderedBlock, index)
+            : renderedBlock
+        })}
+        {renderFooterContent && renderFooterContent()}
       </div>
 
       {/* Page Number (optional) */}
