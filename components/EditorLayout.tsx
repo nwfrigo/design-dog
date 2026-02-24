@@ -33,6 +33,12 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     faqPages,
     faqCoverSolution,
     faqCoverImageUrl,
+    // Stacker fields for auto-save
+    stackerDocumentTitle,
+    stackerLogoChipModule,
+    stackerHeaderModule,
+    stackerContentModules,
+    stackerFooterModule,
   } = useStore()
 
   // Check if we're editing from queue
@@ -70,6 +76,12 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     faqPages,
     faqCoverSolution,
     faqCoverImageUrl,
+    // Stacker fields
+    stackerDocumentTitle,
+    stackerLogoChipModule,
+    stackerHeaderModule,
+    stackerContentModules,
+    stackerFooterModule,
   ])
 
   const handleLogoClick = () => {
