@@ -180,101 +180,136 @@ Before returning, verify:
 
 Generate the document structure now.`
 
-    // Call Claude
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      messages: [
-        {
-          role: 'user',
-          content: userPrompt,
-        },
-      ],
-      system: systemPrompt,
-    })
+    // Call Claude with retry logic for transient errors (429, 529)
+    const maxRetries = 3
+    let lastError: Error | null = null
 
-    const textContent = response.content.find(block => block.type === 'text')
-    if (!textContent || textContent.type !== 'text') {
-      throw new Error('No text response from Claude')
-    }
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4096,
+          messages: [
+            {
+              role: 'user',
+              content: userPrompt,
+            },
+          ],
+          system: systemPrompt,
+        })
 
-    // Parse Claude's response
-    let jsonStr = textContent.text
-    // Remove any markdown code blocks if present
-    const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/)
-    if (jsonMatch) {
-      jsonStr = jsonMatch[1]
-    }
+        // Success - process the response
+        const textContent = response.content.find(block => block.type === 'text')
+        if (!textContent || textContent.type !== 'text') {
+          throw new Error('No text response from Claude')
+        }
 
-    let generatedContent: {
-      modules: Array<{ type: string; [key: string]: unknown }>
-      activeCategories: string[]
-      documentTitle: string
-    }
+        // Parse Claude's response
+        let jsonStr = textContent.text
+        // Remove any markdown code blocks if present
+        const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/)
+        if (jsonMatch) {
+          jsonStr = jsonMatch[1]
+        }
 
-    try {
-      generatedContent = JSON.parse(jsonStr.trim())
-    } catch {
-      console.error('Failed to parse JSON:', jsonStr)
-      throw new Error('Failed to parse AI response')
-    }
+        let generatedContent: {
+          modules: Array<{ type: string; [key: string]: unknown }>
+          activeCategories: string[]
+          documentTitle: string
+        }
 
-    // Build the full module list
-    const fullModules: StackerModule[] = []
+        try {
+          generatedContent = JSON.parse(jsonStr.trim())
+        } catch {
+          console.error('Failed to parse JSON:', jsonStr)
+          throw new Error('Failed to parse AI response')
+        }
 
-    // 1. Add logo-chip
-    const logoChip = createModuleFromAI('logo-chip', {
-      showChips: true,
-      activeCategories: (generatedContent.activeCategories || ['safety']) as SolutionCategory[],
-    })
-    if (logoChip) fullModules.push(logoChip)
+        // Build the full module list
+        const fullModules: StackerModule[] = []
 
-    // 2. Find and add header from generated modules, or create default
-    const headerModule = generatedContent.modules.find(m => m.type === 'header')
-    const header = createModuleFromAI('header', headerModule || {
-      heading: generatedContent.documentTitle || 'Document Title',
-      headingSize: 'h1',
-      showSubheader: false,
-      showCta: false,
-    })
-    if (header) fullModules.push(header)
+        // 1. Add logo-chip
+        const logoChip = createModuleFromAI('logo-chip', {
+          showChips: true,
+          activeCategories: (generatedContent.activeCategories || ['safety']) as SolutionCategory[],
+        })
+        if (logoChip) fullModules.push(logoChip)
 
-    // 3. Add content modules (excluding header and footer)
-    for (const moduleData of generatedContent.modules) {
-      if (moduleData.type === 'header' || moduleData.type === 'footer' || moduleData.type === 'logo-chip') {
-        continue // Skip, we handle these specially
+        // 2. Find and add header from generated modules, or create default
+        const headerModule = generatedContent.modules.find(m => m.type === 'header')
+        const header = createModuleFromAI('header', headerModule || {
+          heading: generatedContent.documentTitle || 'Document Title',
+          headingSize: 'h1',
+          showSubheader: false,
+          showCta: false,
+        })
+        if (header) fullModules.push(header)
+
+        // 3. Add content modules (excluding header and footer)
+        for (const moduleData of generatedContent.modules) {
+          if (moduleData.type === 'header' || moduleData.type === 'footer' || moduleData.type === 'logo-chip') {
+            continue // Skip, we handle these specially
+          }
+
+          const stackerModule = createModuleFromAI(moduleData.type, moduleData)
+          if (stackerModule) {
+            fullModules.push(stackerModule)
+          }
+        }
+
+        // 4. Add footer
+        const footer = createModuleFromAI('footer', {})
+        if (footer) fullModules.push(footer)
+
+        return NextResponse.json({
+          modules: fullModules,
+          documentTitle: generatedContent.documentTitle || 'Generated Document',
+          activeCategories: generatedContent.activeCategories || ['safety'],
+          debug: {
+            model: 'claude-sonnet-4-20250514',
+            moduleCount: fullModules.length,
+            contentModuleCount: generatedContent.modules.length,
+            rawResponse: textContent.text,
+          },
+        })
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+
+        // Check if this is a retryable error (429 rate limit or 529 overloaded)
+        const errorMessage = lastError.message || ''
+        const isRetryable = errorMessage.includes('529') ||
+          errorMessage.includes('overloaded') ||
+          errorMessage.includes('Overloaded') ||
+          errorMessage.includes('429') ||
+          errorMessage.includes('rate')
+
+        if (isRetryable && attempt < maxRetries) {
+          // Exponential backoff: 1s, 2s, 4s
+          const delay = Math.pow(2, attempt - 1) * 1000
+          console.log(`Retrying after ${delay}ms (attempt ${attempt}/${maxRetries})...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          continue
+        }
+
+        // Not retryable or max retries reached - throw to outer catch
+        throw lastError
       }
-
-      const stackerModule = createModuleFromAI(moduleData.type, moduleData)
-      if (stackerModule) {
-        fullModules.push(stackerModule)
-      }
     }
 
-    // 4. Add footer
-    const footer = createModuleFromAI('footer', {})
-    if (footer) fullModules.push(footer)
-
-    return NextResponse.json({
-      modules: fullModules,
-      documentTitle: generatedContent.documentTitle || 'Generated Document',
-      activeCategories: generatedContent.activeCategories || ['safety'],
-      debug: {
-        model: 'claude-sonnet-4-20250514',
-        moduleCount: fullModules.length,
-        contentModuleCount: generatedContent.modules.length,
-        rawResponse: textContent.text,
-      },
-    })
+    // Should not reach here, but just in case
+    throw lastError || new Error('Failed after retries')
   } catch (error) {
     console.error('Stacker generation error:', error)
 
     const errorMessage = error instanceof Error ? error.message : 'Failed to generate document'
+    const isOverloaded = errorMessage.includes('529') || errorMessage.includes('overloaded') || errorMessage.includes('Overloaded')
     const isRateLimited = errorMessage.includes('rate') || errorMessage.includes('429')
 
     return NextResponse.json(
       {
-        error: isRateLimited
+        error: isOverloaded
+          ? 'The AI service is temporarily busy. Please wait a moment and try again.'
+          : isRateLimited
           ? 'API rate limited. Please wait a moment and try again.'
           : `Failed to generate document: ${errorMessage}`,
         debug: {
@@ -282,7 +317,7 @@ Generate the document structure now.`
           errorDetails: errorMessage,
         },
       },
-      { status: 500 }
+      { status: isOverloaded ? 503 : 500 }
     )
   }
 }
