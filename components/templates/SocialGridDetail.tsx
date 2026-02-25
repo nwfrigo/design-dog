@@ -51,6 +51,7 @@ export interface SocialGridDetailProps {
   subhead: string
   eyebrow: string
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
 
   // Solution pill
@@ -79,6 +80,7 @@ export function SocialGridDetail({
   subhead,
   eyebrow,
   showEyebrow,
+  showHeadline = true,
   showSubhead,
   showSolutionSet,
   solution,
@@ -247,15 +249,17 @@ export function SocialGridDetail({
             gap: 36,
           }}>
             {/* Headline */}
-            <div style={{
-              alignSelf: 'stretch',
-              color: textColor,
-              fontSize: 84,
-              fontWeight: 300,
-              lineHeight: '96px',
-            }}>
-              {headline || 'Headline'}
-            </div>
+            {showHeadline && (
+              <div style={{
+                alignSelf: 'stretch',
+                color: textColor,
+                fontSize: 84,
+                fontWeight: 300,
+                lineHeight: '96px',
+              }}>
+                {headline || 'Headline'}
+              </div>
+            )}
 
             {/* Subhead */}
             {showSubhead && subhead && (

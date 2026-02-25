@@ -53,6 +53,7 @@ export interface SocialImageProps {
   layout: LayoutVariant
   solution: string
   logoColor: 'black' | 'orange'
+  showHeadline?: boolean
   showSubhead: boolean
   showMetadata: boolean
   showCta: boolean
@@ -70,6 +71,22 @@ const IMAGE_WIDTHS: Record<LayoutVariant, number> = {
   'more-text': 376,
 }
 
+// Check if HTML content is effectively empty (handles <p></p> etc.)
+function isHtmlEmpty(html: string | undefined): boolean {
+  if (!html) return true
+  // Strip tags and check for content
+  const stripped = html.replace(/<[^>]*>/g, '').trim()
+  return stripped === ''
+}
+
+// Inline styles for rich text elements (dark text on light background)
+const RICH_TEXT_STYLES = `
+  .rich-text-dark strong { font-weight: 500; }
+  .rich-text-dark em { font-style: italic; }
+  .rich-text-dark p { margin: 0; }
+  .rich-text-dark p + p { margin-top: 0.3em; }
+`
+
 export function SocialImage({
   headline,
   subhead,
@@ -81,6 +98,7 @@ export function SocialImage({
   layout,
   solution,
   logoColor,
+  showHeadline = true,
   showSubhead,
   showMetadata,
   showCta,
@@ -126,6 +144,10 @@ export function SocialImage({
     img.src = imageUrl
   }, [imageUrl, grayscale])
 
+  // Determine if content is empty for conditional rendering
+  const hasHeadline = !isHtmlEmpty(headline)
+  const hasSubhead = !isHtmlEmpty(subhead)
+
   const containerStyle: CSSProperties = {
     width: 1200,
     height: 628,
@@ -142,6 +164,8 @@ export function SocialImage({
 
   return (
     <div style={containerStyle}>
+      {/* Rich text styles for HTML content */}
+      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
       {/* Left content area */}
       <div style={{
         flex: '1 1 0',
@@ -201,26 +225,32 @@ export function SocialImage({
             flexDirection: 'column',
             gap: 36,
           }}>
-            {/* Headline */}
-            <div style={{
-              color: textColor,
-              fontSize: 84,
-              fontWeight: 300,
-              lineHeight: '96px',
-            }}>
-              {headline || 'Headline'}
-            </div>
+            {/* Headline - supports rich text (bold, italic, line breaks) */}
+            {showHeadline && (
+              <div
+                className="rich-text-dark"
+                style={{
+                  color: textColor,
+                  fontSize: 84,
+                  fontWeight: 300,
+                  lineHeight: '96px',
+                }}
+                dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
+              />
+            )}
 
-            {/* Subhead */}
-            {showSubhead && subhead && (
-              <div style={{
-                color: textColor,
-                fontSize: 36,
-                fontWeight: 300,
-                lineHeight: 1.3,
-              }}>
-                {subhead}
-              </div>
+            {/* Subhead - supports rich text (bold, italic, line breaks) */}
+            {showSubhead && hasSubhead && (
+              <div
+                className="rich-text-dark"
+                style={{
+                  color: textColor,
+                  fontSize: 36,
+                  fontWeight: 300,
+                  lineHeight: 1.3,
+                }}
+                dangerouslySetInnerHTML={{ __html: subhead }}
+              />
             )}
           </div>
 

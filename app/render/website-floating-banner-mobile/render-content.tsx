@@ -43,6 +43,7 @@ export function RenderContent() {
   const headline = searchParams.get('headline') || 'Headline'
   const cta = searchParams.get('cta') || 'Learn More'
   const showEyebrow = searchParams.get('showEyebrow') !== 'false'
+  const showHeadline = searchParams.get('showHeadline') !== 'false'
   const variant = (searchParams.get('variant') || 'light') as FloatingBannerMobileVariant
   const arrowType = (searchParams.get('arrowType') || 'text') as FloatingBannerMobileArrowType
 
@@ -54,6 +55,7 @@ export function RenderContent() {
         headline={headline}
         cta={cta}
         showEyebrow={showEyebrow}
+        showHeadline={showHeadline}
         variant={variant}
         arrowType={arrowType}
         colors={colorsConfig}

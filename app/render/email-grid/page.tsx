@@ -20,6 +20,7 @@ export default function RenderPage({
   const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
 
   const showEyebrow = searchParams.showEyebrow === 'true'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showLightHeader = searchParams.showLightHeader !== 'false'
   const showHeavyHeader = searchParams.showHeavyHeader === 'true'
   const showSubheading = searchParams.showSubheading === 'true'
@@ -52,6 +53,7 @@ export default function RenderPage({
           solution={solution}
           logoColor={logoColor}
           showEyebrow={showEyebrow}
+          showHeadline={showHeadline}
           showLightHeader={showLightHeader}
           showHeavyHeader={showHeavyHeader}
           showSubheading={showSubheading}

@@ -23,6 +23,7 @@ import { NewsletterDarkGradient } from './templates/NewsletterDarkGradient'
 import { NewsletterBlueGradient } from './templates/NewsletterBlueGradient'
 import { NewsletterLight } from './templates/NewsletterLight'
 import { NewsletterTopBanner } from './templates/NewsletterTopBanner'
+import { stripHtml } from './SimpleRichTextEditor'
 import {
   fetchColorsConfig,
   fetchTypographyConfig,
@@ -497,22 +498,23 @@ function QueueItem({
   const thumbnailScale = 0.12 // Scale down to fit in thumbnail area
 
   // Build text fields list based on what has content
+  // Strip HTML tags for display (content may contain rich text formatting)
   const textFields: { label: string; value: string }[] = []
 
   if (asset.eyebrow && asset.showEyebrow) {
     textFields.push({ label: 'Eyebrow', value: asset.eyebrow })
   }
   if (asset.headline) {
-    textFields.push({ label: 'Headline', value: asset.headline })
+    textFields.push({ label: 'Headline', value: stripHtml(asset.headline) })
   }
   if (asset.subhead && asset.showSubhead) {
-    textFields.push({ label: 'Subhead', value: asset.subhead })
+    textFields.push({ label: 'Subhead', value: stripHtml(asset.subhead) })
   }
   if (asset.subheading && asset.showSubheading) {
     textFields.push({ label: 'Subheading', value: asset.subheading })
   }
   if (asset.body && asset.showBody) {
-    textFields.push({ label: 'Body', value: asset.body })
+    textFields.push({ label: 'Body', value: stripHtml(asset.body) })
   }
   if (asset.templateType === 'email-grid') {
     if (asset.gridDetail1Text) {

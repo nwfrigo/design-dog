@@ -24,6 +24,7 @@ export default function RenderPage({
   const showRow3 = searchParams.showRow3 !== 'false'
   const showRow4 = searchParams.showRow4 !== 'false'
   const showEyebrow = searchParams.showEyebrow !== 'false'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showSubhead = searchParams.showSubhead !== 'false'
 
   return (
@@ -49,6 +50,7 @@ export default function RenderPage({
           showRow3={showRow3}
           showRow4={showRow4}
           showEyebrow={showEyebrow}
+          showHeadline={showHeadline}
           showSubhead={showSubhead}
           colors={colorsConfig}
           typography={typographyConfig}

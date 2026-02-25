@@ -58,6 +58,7 @@ export interface SocialDarkGradientProps {
   ctaStyle: CtaStyle
   logoColor: 'orange' | 'white'
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showBody: boolean
   showMetadata: boolean
@@ -92,6 +93,22 @@ const BODY_SIZES: Record<HeadingSize, number> = {
   'L': 26,
 }
 
+// Check if HTML content is effectively empty (handles <p></p> etc.)
+function isHtmlEmpty(html: string | undefined): boolean {
+  if (!html) return true
+  // Strip tags and check for content
+  const stripped = html.replace(/<[^>]*>/g, '').trim()
+  return stripped === ''
+}
+
+// Inline styles for rich text elements (white text on dark background)
+const RICH_TEXT_STYLES = `
+  .rich-text-white strong { font-weight: 500; }
+  .rich-text-white em { font-style: italic; }
+  .rich-text-white p { margin: 0; }
+  .rich-text-white p + p { margin-top: 0.3em; }
+`
+
 export function SocialDarkGradient({
   eyebrow,
   headline,
@@ -105,6 +122,7 @@ export function SocialDarkGradient({
   ctaStyle,
   logoColor,
   showEyebrow,
+  showHeadline = true,
   showSubhead,
   showBody,
   showMetadata,
@@ -150,8 +168,16 @@ export function SocialDarkGradient({
     maxWidth: alignment === 'center' ? 900 : undefined,
   }
 
+  // Determine if content is empty for conditional rendering
+  const hasHeadline = !isHtmlEmpty(headline)
+  const hasSubhead = !isHtmlEmpty(subhead)
+  const hasBody = !isHtmlEmpty(body)
+
   return (
     <div style={containerStyle}>
+      {/* Rich text styles for HTML content */}
+      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
+
       {/* Background Image */}
       <img
         src={BACKGROUND_IMAGES[colorStyle]}
@@ -201,45 +227,47 @@ export function SocialDarkGradient({
             gap: 36,
             alignItems: alignment === 'center' ? 'center' : 'flex-start',
           }}>
-            {/* Headline */}
-            <div
-              style={{
-                color: textColor,
-                fontSize: HEADING_SIZES[headingSize],
-                fontWeight: 300,
-                lineHeight: 1.1,
-              }}
-            >
-              {headline || 'Headline'}
-            </div>
-
-            {/* Subhead */}
-            {showSubhead && subhead && (
+            {/* Headline - supports rich text (bold, italic, line breaks) */}
+            {showHeadline && (
               <div
+                className="rich-text-white"
+                style={{
+                  color: textColor,
+                  fontSize: HEADING_SIZES[headingSize],
+                  fontWeight: 300,
+                  lineHeight: 1.1,
+                }}
+                dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
+              />
+            )}
+
+            {/* Subhead - supports rich text (bold, italic, line breaks) */}
+            {showSubhead && hasSubhead && (
+              <div
+                className="rich-text-white"
                 style={{
                   color: textColor,
                   fontSize: SUBHEAD_SIZES[headingSize],
                   fontWeight: 300,
                   lineHeight: 1.3,
                 }}
-              >
-                {subhead}
-              </div>
+                dangerouslySetInnerHTML={{ __html: subhead }}
+              />
             )}
           </div>
 
-          {/* Body */}
-          {showBody && body && (
+          {/* Body - supports rich text (bold, italic, line breaks) */}
+          {showBody && hasBody && (
             <div
+              className="rich-text-white"
               style={{
                 color: textColor,
                 fontSize: BODY_SIZES[headingSize],
                 fontWeight: 300,
                 lineHeight: 1.4,
               }}
-            >
-              {body}
-            </div>
+              dangerouslySetInnerHTML={{ __html: body }}
+            />
           )}
 
           {/* Metadata */}

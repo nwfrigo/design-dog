@@ -12,6 +12,7 @@ interface Props {
   solution: string
   logoColor: 'black' | 'orange'
   showEyebrow: boolean
+  showHeadline?: boolean
   showLightHeader: boolean
   showHeavyHeader: boolean
   showSubheading: boolean
@@ -57,6 +58,7 @@ export function EmailGridRender(props: Props) {
         solution={props.solution}
         logoColor={props.logoColor}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showLightHeader={props.showLightHeader}
         showHeavyHeader={props.showHeavyHeader}
         showSubheading={props.showSubheading}

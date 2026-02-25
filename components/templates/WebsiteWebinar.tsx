@@ -56,6 +56,7 @@ export interface WebsiteWebinarProps {
   imagePosition?: { x: number; y: number }
   imageZoom?: number
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showBody: boolean
   showCta: boolean
@@ -165,6 +166,7 @@ export function WebsiteWebinar({
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
   showEyebrow,
+  showHeadline = true,
   showSubhead,
   showBody,
   showCta,
@@ -379,17 +381,19 @@ export function WebsiteWebinar({
               gap: headlineGap,
             }}
           >
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: 'white',
-                fontSize: headlineFontSize,
-                fontWeight: 350,
-                lineHeight: headlineLineHeight,
-              }}
-            >
-              {headline || 'Lightweight header.'}
-            </div>
+            {showHeadline && (
+              <div
+                style={{
+                  alignSelf: 'stretch',
+                  color: 'white',
+                  fontSize: headlineFontSize,
+                  fontWeight: 350,
+                  lineHeight: headlineLineHeight,
+                }}
+              >
+                {headline || 'Lightweight header.'}
+              </div>
+            )}
 
             {showSubhead && subhead && (
               <div

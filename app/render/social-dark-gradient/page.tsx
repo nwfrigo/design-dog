@@ -25,6 +25,7 @@ export default function RenderPage({
   const ctaStyle = ((searchParams.ctaStyle as string) || 'link') as 'link' | 'button'
   const logoColor = ((searchParams.logoColor as string) || 'white') as 'orange' | 'white'
   const showEyebrow = searchParams.showEyebrow !== 'false'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showSubhead = searchParams.showSubhead !== 'false'
   const showBody = searchParams.showBody !== 'false'
   const showMetadata = searchParams.showMetadata !== 'false'
@@ -53,6 +54,7 @@ export default function RenderPage({
           ctaStyle={ctaStyle}
           logoColor={logoColor}
           showEyebrow={showEyebrow}
+          showHeadline={showHeadline}
           showSubhead={showSubhead}
           showBody={showBody}
           showMetadata={showMetadata}

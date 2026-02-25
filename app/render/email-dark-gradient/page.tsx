@@ -22,6 +22,7 @@ export default function RenderPage({
   const alignment = ((searchParams.alignment as string) || 'left') as 'left' | 'center'
   const ctaStyle = ((searchParams.ctaStyle as string) || 'link') as 'link' | 'button'
   const showEyebrow = searchParams.showEyebrow === 'true'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showSubheading = searchParams.showSubheading === 'true'
   const showBody = searchParams.showBody !== 'false'
   const showCta = searchParams.showCta !== 'false'
@@ -46,6 +47,7 @@ export default function RenderPage({
           alignment={alignment}
           ctaStyle={ctaStyle}
           showEyebrow={showEyebrow}
+          showHeadline={showHeadline}
           showSubheading={showSubheading}
           showBody={showBody}
           showCta={showCta}

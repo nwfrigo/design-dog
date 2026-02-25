@@ -54,6 +54,7 @@ export interface WebsiteFloatingBannerProps {
   headline: string
   cta: string
   showEyebrow: boolean
+  showHeadline?: boolean
   variant: FloatingBannerVariant
   colors: ColorsConfig
   typography: TypographyConfig
@@ -148,6 +149,7 @@ export function WebsiteFloatingBanner({
   headline,
   cta,
   showEyebrow,
+  showHeadline = true,
   variant,
   colors,
   typography,
@@ -226,16 +228,18 @@ export function WebsiteFloatingBanner({
           )}
 
           {/* Headline */}
-          <div style={{
-            textAlign: 'center',
-            color: styles.textColor,
-            fontSize: 32.73,
-            fontWeight: 350,
-            lineHeight: '32.73px',
-            textShadow: textShadowStyle,
-          }}>
-            {headline || 'Headline'}
-          </div>
+          {showHeadline && (
+            <div style={{
+              textAlign: 'center',
+              color: styles.textColor,
+              fontSize: 32.73,
+              fontWeight: 350,
+              lineHeight: '32.73px',
+              textShadow: textShadowStyle,
+            }}>
+              {headline || 'Headline'}
+            </div>
+          )}
         </div>
 
         {/* CTA */}

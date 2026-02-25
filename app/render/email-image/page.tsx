@@ -23,6 +23,7 @@ export default function RenderPage({
   const layout = ((searchParams.layout as string) || 'even') as 'even' | 'more-image' | 'more-text'
   const solution = (searchParams.solution as string) || 'environmental'
   const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showBody = searchParams.showBody !== 'false'
   const showCta = searchParams.showCta !== 'false'
   const showSolutionSet = searchParams.showSolutionSet !== 'false'
@@ -48,6 +49,7 @@ export default function RenderPage({
           layout={layout}
           solution={solution}
           logoColor={logoColor}
+          showHeadline={showHeadline}
           showBody={showBody}
           showCta={showCta}
           showSolutionSet={showSolutionSet}

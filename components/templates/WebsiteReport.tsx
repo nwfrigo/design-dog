@@ -47,6 +47,7 @@ export interface WebsiteReportProps {
   imagePosition?: { x: number; y: number }
   imageZoom?: number
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showCta: boolean
   grayscale?: boolean
@@ -66,6 +67,7 @@ export function WebsiteReport({
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
   showEyebrow,
+  showHeadline = true,
   showSubhead,
   showCta,
   grayscale = false,
@@ -263,17 +265,19 @@ export function WebsiteReport({
               gap: headlineSubheadGap,
             }}
           >
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: 'white',
-                fontSize: headlineSize,
-                fontWeight: 350,
-                lineHeight: headlineLineHeight,
-              }}
-            >
-              {headline || 'Lightweight header.'}
-            </div>
+            {showHeadline && (
+              <div
+                style={{
+                  alignSelf: 'stretch',
+                  color: 'white',
+                  fontSize: headlineSize,
+                  fontWeight: 350,
+                  lineHeight: headlineLineHeight,
+                }}
+              >
+                {headline || 'Lightweight header.'}
+              </div>
+            )}
 
             {showSubhead && subhead && (
               <div

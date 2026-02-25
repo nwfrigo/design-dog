@@ -43,6 +43,7 @@ export interface NewsletterTopBannerProps {
   headline: string
   subhead: string
   variant: TopBannerVariant
+  showHeadline?: boolean
   showSubhead: boolean
   colors: ColorsConfig
   typography: TypographyConfig
@@ -54,6 +55,7 @@ export function NewsletterTopBanner({
   headline,
   subhead,
   variant = 'dark',
+  showHeadline = true,
   showSubhead,
   colors,
   typography,
@@ -219,16 +221,18 @@ export function NewsletterTopBanner({
             gap: 5.6,
             display: 'flex',
           }}>
-            <div style={{
-              alignSelf: 'stretch',
-              color: textColor,
-              fontSize: 36.91,
-              fontFamily: 'Fakt Pro',
-              fontWeight: '350',
-              wordWrap: 'break-word',
-            }}>
-              {headline || 'EHS+ Newsletter'}
-            </div>
+            {showHeadline && (
+              <div style={{
+                alignSelf: 'stretch',
+                color: textColor,
+                fontSize: 36.91,
+                fontFamily: 'Fakt Pro',
+                fontWeight: '350',
+                wordWrap: 'break-word',
+              }}>
+                {headline || 'EHS+ Newsletter'}
+              </div>
+            )}
 
             {showSubhead && subhead && (
               <div style={{

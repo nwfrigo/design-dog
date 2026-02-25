@@ -16,6 +16,7 @@ interface Props {
   imagePosition?: { x: number; y: number }
   imageZoom?: number
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showBody: boolean
   showCta: boolean
@@ -64,6 +65,7 @@ export function WebsiteWebinarRender(props: Props) {
         imagePosition={props.imagePosition}
         imageZoom={props.imageZoom}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
         showBody={props.showBody}
         showCta={props.showCta}

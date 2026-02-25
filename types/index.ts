@@ -443,6 +443,7 @@ export interface GeneratedAsset {
   showEyebrow: boolean
   showSubhead: boolean
   showBody: boolean
+  showHeadline: boolean
   thumbnailImageUrl: string | null
   thumbnailImagePosition: { x: number; y: number }
   thumbnailImageZoom: number
@@ -572,6 +573,7 @@ export interface QueuedAsset {
   showEyebrow: boolean
   showSubhead: boolean
   showBody: boolean
+  showHeadline: boolean
   thumbnailImageUrl: string | null
   thumbnailImagePosition: { x: number; y: number }
   thumbnailImageZoom: number
@@ -725,6 +727,7 @@ export interface AppState {
   showEyebrow: boolean
   showSubhead: boolean
   showBody: boolean
+  showHeadline: boolean
 
   // Email Grid specific settings
   subheading: string
@@ -877,6 +880,7 @@ export interface AppState {
   setSolution: (solution: string) => void
   setLogoColor: (color: 'black' | 'orange' | 'white') => void
   setShowEyebrow: (show: boolean) => void
+  setShowHeadline: (show: boolean) => void
   setShowSubhead: (show: boolean) => void
   setShowBody: (show: boolean) => void
 

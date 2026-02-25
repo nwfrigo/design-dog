@@ -12,6 +12,7 @@ interface Props {
   solution: string
   logoColor: 'black' | 'orange'
   showEyebrow?: boolean
+  showHeadline?: boolean
   showBody: boolean
   showCta: boolean
   showSolutionSet: boolean
@@ -53,6 +54,7 @@ export function EmailSpeakersRender(props: Props) {
         solution={props.solution}
         logoColor={props.logoColor}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showBody={props.showBody}
         showCta={props.showCta}
         showSolutionSet={props.showSolutionSet}

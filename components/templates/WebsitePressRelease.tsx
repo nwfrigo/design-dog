@@ -45,6 +45,7 @@ export interface WebsitePressReleaseProps {
   imagePosition?: { x: number; y: number }
   imageZoom?: number
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showBody: boolean
   showCta: boolean
@@ -66,6 +67,7 @@ export function WebsitePressRelease({
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
   showEyebrow,
+  showHeadline = true,
   showSubhead,
   showBody,
   showCta,
@@ -258,17 +260,19 @@ export function WebsitePressRelease({
               gap: 4.17,
             }}
           >
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: colors.ui.textPrimary,
-                fontSize: 35.42,
-                fontWeight: 350,
-                lineHeight: '50.20px',
-              }}
-            >
-              {headline || 'Lightweight header.'}
-            </div>
+            {showHeadline && (
+              <div
+                style={{
+                  alignSelf: 'stretch',
+                  color: colors.ui.textPrimary,
+                  fontSize: 35.42,
+                  fontWeight: 350,
+                  lineHeight: '50.20px',
+                }}
+              >
+                {headline || 'Lightweight header.'}
+              </div>
+            )}
 
             {showSubhead && subhead && (
               <div

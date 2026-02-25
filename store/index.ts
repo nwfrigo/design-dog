@@ -77,6 +77,7 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   showEyebrow: true,
   showSubhead: templateType === 'website-press-release' ? false : true,
   showBody: true,
+  showHeadline: true,
   ebookVariant: 'image' as const,
   reportVariant: 'image' as const,
   thumbnailImageUrl: null,
@@ -242,6 +243,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   showEyebrow: true,
   showSubhead: true,
   showBody: true,
+  showHeadline: true,
 
   // Email Grid specific settings
   subheading: '',
@@ -459,6 +461,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setShowEyebrow: (show: boolean) => set({ showEyebrow: show }),
   setShowSubhead: (show: boolean) => set({ showSubhead: show }),
   setShowBody: (show: boolean) => set({ showBody: show }),
+  setShowHeadline: (show: boolean) => set({ showHeadline: show }),
 
   // Email Grid specific actions
   setSubheading: (subheading: string) => set({ subheading }),
@@ -1020,6 +1023,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showEyebrow: state.showEyebrow,
       showSubhead: state.showSubhead,
       showBody: state.showBody,
+      showHeadline: state.showHeadline,
       thumbnailImageUrl: state.thumbnailImageUrl,
       thumbnailImagePosition: imageSettings.position,
       thumbnailImageZoom: imageSettings.zoom,
@@ -1157,6 +1161,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showEyebrow: asset.showEyebrow,
       showSubhead: asset.showSubhead,
       showBody: asset.showBody,
+      showHeadline: asset.showHeadline,
       thumbnailImageUrl: asset.thumbnailImageUrl,
       // Store per-template image settings
       thumbnailImageSettings: {
@@ -1253,6 +1258,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showEyebrow: state.showEyebrow,
       showSubhead: state.showSubhead,
       showBody: state.showBody,
+      showHeadline: state.showHeadline,
       thumbnailImageUrl: state.thumbnailImageUrl,
       thumbnailImagePosition: imageSettings.position,
       thumbnailImageZoom: imageSettings.zoom,
@@ -1689,6 +1695,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showEyebrow: asset.showEyebrow,
       showSubhead: asset.showSubhead,
       showBody: asset.showBody,
+      showHeadline: asset.showHeadline,
       thumbnailImageUrl: asset.thumbnailImageUrl,
       // Store per-template image settings
       thumbnailImageSettings: {
@@ -1989,6 +1996,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           showEyebrow: asset.showEyebrow,
           showSubhead: asset.showSubhead,
           showBody: asset.showBody,
+          showHeadline: asset.showHeadline,
           thumbnailImageUrl: asset.thumbnailImageUrl,
           thumbnailImagePosition: asset.thumbnailImagePosition,
           thumbnailImageZoom: asset.thumbnailImageZoom,
@@ -2118,6 +2126,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showEyebrow: true,
       showSubhead: true,
       showBody: true,
+      showHeadline: true,
       subheading: '',
       showLightHeader: true,
       showSubheading: false,
@@ -2203,6 +2212,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showEyebrow: state.showEyebrow,
       showSubhead: state.showSubhead,
       showBody: state.showBody,
+      showHeadline: state.showHeadline,
       thumbnailImageUrl: state.thumbnailImageUrl,
       thumbnailImageSettings: state.thumbnailImageSettings,
       subheading: state.subheading,
@@ -2335,6 +2345,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showEyebrow: draft.showEyebrow,
       showSubhead: draft.showSubhead,
       showBody: draft.showBody,
+      showHeadline: draft.showHeadline ?? true,
       thumbnailImageUrl: draft.thumbnailImageUrl,
       thumbnailImageSettings: draft.thumbnailImageSettings ?? {},
       subheading: draft.subheading,

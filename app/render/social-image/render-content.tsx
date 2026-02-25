@@ -15,6 +15,7 @@ interface Props {
   layout: 'even' | 'more-image' | 'more-text'
   solution: string
   logoColor: 'black' | 'orange'
+  showHeadline?: boolean
   showSubhead: boolean
   showMetadata: boolean
   showCta: boolean
@@ -56,6 +57,7 @@ export function SocialImageRender(props: Props) {
         layout={props.layout}
         solution={props.solution}
         logoColor={props.logoColor}
+        showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
         showMetadata={props.showMetadata}
         showCta={props.showCta}

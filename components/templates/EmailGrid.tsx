@@ -49,6 +49,7 @@ export interface EmailGridProps {
   body: string
   showEyebrow: boolean
   eyebrow?: string
+  showHeadline?: boolean
   showLightHeader: boolean
   showHeavyHeader: boolean
   showSubheading: boolean
@@ -79,6 +80,7 @@ export function EmailGrid({
   body,
   showEyebrow,
   eyebrow = '',
+  showHeadline = true,
   showLightHeader,
   showHeavyHeader,
   showSubheading,
@@ -238,7 +240,7 @@ export function EmailGrid({
           )}
 
           {/* Headline */}
-          {showLightHeader && (
+          {showLightHeader && showHeadline && (
             <div style={{
               color: colors.ui.textPrimary,
               fontSize: 38,

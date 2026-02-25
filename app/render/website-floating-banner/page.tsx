@@ -17,6 +17,7 @@ export default function RenderPage({
   const headline = (searchParams.headline as string) || 'Headline'
   const cta = (searchParams.cta as string) || (searchParams.ctaText as string) || 'Learn More'
   const showEyebrow = searchParams.showEyebrow === 'true'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const variant = ((searchParams.variant as string) || 'dark') as FloatingBannerVariant
 
   return (
@@ -33,6 +34,7 @@ export default function RenderPage({
           headline={headline}
           cta={cta}
           showEyebrow={showEyebrow}
+          showHeadline={showHeadline}
           variant={variant}
           colors={colorsConfig}
           typography={typographyConfig}

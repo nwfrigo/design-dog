@@ -31,6 +31,7 @@ import { IconPickerModal, getIconByName } from './IconPickerModal'
 import { TemplateRenderer, PreviewModal } from './TemplateTile'
 import { ZoomableImage } from './ZoomableImage'
 import { ImageCropModal } from './ImageCropModal'
+import { SimpleRichTextEditor, isHtmlEmpty } from './SimpleRichTextEditor'
 import type { TemplateInfo } from '@/lib/template-config'
 import {
   fetchColorsConfig,
@@ -109,6 +110,8 @@ export function EditorScreen() {
     setShowSubhead,
     showBody,
     setShowBody,
+    showHeadline,
+    setShowHeadline,
     // Email Grid specific
     subheading,
     setSubheading,
@@ -657,6 +660,7 @@ export function EditorScreen() {
         solution,
         logoColor,
         showEyebrow,
+        showHeadline,
       }
 
       if (currentTemplate === 'website-thumbnail') {
@@ -710,8 +714,11 @@ export function EditorScreen() {
         exportParams.headingSize = headingSize
         exportParams.alignment = alignment
         exportParams.ctaStyle = ctaStyle
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.showBody = showBody && !!verbatimCopy.body
+        // Both templates support rich text, use HTML empty check since content may contain tags
+        const subheadHasContent = !isHtmlEmpty(verbatimCopy.subhead)
+        const bodyHasContent = !isHtmlEmpty(verbatimCopy.body)
+        exportParams.showSubhead = showSubhead && subheadHasContent
+        exportParams.showBody = showBody && bodyHasContent
         exportParams.showMetadata = showMetadata
         exportParams.showCta = showCta
       } else if (currentTemplate === 'social-image') {
@@ -722,7 +729,8 @@ export function EditorScreen() {
         exportParams.imagePositionY = thumbnailImagePosition.y
         exportParams.imageZoom = thumbnailImageZoom
         exportParams.layout = layout
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
+        // SocialImage supports rich text, use HTML empty check since content may contain tags
+        exportParams.showSubhead = showSubhead && !isHtmlEmpty(verbatimCopy.subhead)
         exportParams.showMetadata = showMetadata
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
@@ -745,7 +753,8 @@ export function EditorScreen() {
         exportParams.imagePositionY = thumbnailImagePosition.y
         exportParams.imageZoom = thumbnailImageZoom
         exportParams.layout = layout
-        exportParams.showBody = showBody && !!verbatimCopy.body
+        // EmailImage supports rich text, use HTML empty check
+        exportParams.showBody = showBody && !isHtmlEmpty(verbatimCopy.body)
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
         exportParams.grayscale = grayscale
@@ -755,13 +764,15 @@ export function EditorScreen() {
         exportParams.alignment = alignment
         exportParams.ctaStyle = ctaStyle
         exportParams.showEyebrow = showEyebrow && !!eyebrow
-        exportParams.showSubheading = showSubhead && !!verbatimCopy.subhead
-        exportParams.showBody = showBody && !!verbatimCopy.body
+        // EmailDarkGradient supports rich text, use HTML empty check
+        exportParams.showSubheading = showSubhead && !isHtmlEmpty(verbatimCopy.subhead)
+        exportParams.showBody = showBody && !isHtmlEmpty(verbatimCopy.body)
         exportParams.showCta = showCta
       } else if (currentTemplate === 'email-speakers') {
         exportParams.ctaText = ctaText
         exportParams.showEyebrow = showEyebrow && !!eyebrow
-        exportParams.showBody = showBody && !!verbatimCopy.body
+        // EmailSpeakers supports rich text, use HTML empty check
+        exportParams.showBody = showBody && !isHtmlEmpty(verbatimCopy.body)
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
         exportParams.speakerCount = speakerCount
@@ -3218,16 +3229,27 @@ export function EditorScreen() {
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                     Headline
                   </label>
+                  <EyeIcon visible={showHeadline} onClick={() => setShowHeadline(!showHeadline)} />
                 </div>
-                <input
-                  type="text"
-                  value={verbatimCopy.headline}
-                  onChange={(e) => setVerbatimCopy({ headline: e.target.value })}
-                  placeholder="Headline"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                    bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                    focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                {/* Rich text editor for social templates with rich text support */}
+                {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient') ? (
+                  <SimpleRichTextEditor
+                    content={verbatimCopy.headline}
+                    onChange={(html) => setVerbatimCopy({ headline: html })}
+                    placeholder="Headline"
+                    singleLine={false}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={verbatimCopy.headline}
+                    onChange={(e) => setVerbatimCopy({ headline: e.target.value })}
+                    placeholder="Headline"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                )}
               </div>
               )}
 
@@ -3240,16 +3262,27 @@ export function EditorScreen() {
                     </label>
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
                   </div>
-                  <textarea
-                    value={verbatimCopy.subhead}
-                    onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
-                    placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') ? 'Subheader text' : 'Supporting subheadline'}
-                    rows={2}
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                      focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
-                      ${!showSubhead ? 'opacity-50' : ''}`}
-                  />
+                  {/* Rich text editor for templates with rich text support */}
+                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient') ? (
+                    <div className={!showSubhead ? 'opacity-50' : ''}>
+                      <SimpleRichTextEditor
+                        content={verbatimCopy.subhead}
+                        onChange={(html) => setVerbatimCopy({ subhead: html })}
+                        placeholder="Supporting subheadline"
+                      />
+                    </div>
+                  ) : (
+                    <textarea
+                      value={verbatimCopy.subhead}
+                      onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
+                      placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') ? 'Subheader text' : 'Supporting subheadline'}
+                      rows={2}
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
+                        ${!showSubhead ? 'opacity-50' : ''}`}
+                    />
+                  )}
                 </div>
               )}
 
@@ -3283,16 +3316,27 @@ export function EditorScreen() {
                     </label>
                     <EyeIcon visible={showBody} onClick={() => setShowBody(!showBody)} />
                   </div>
-                  <textarea
-                    value={verbatimCopy.body}
-                    onChange={(e) => setVerbatimCopy({ body: e.target.value })}
-                    placeholder="Body text"
-                    rows={3}
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                      focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
-                      ${!showBody ? 'opacity-50' : ''}`}
-                  />
+                  {/* Rich text editor for templates with rich text support */}
+                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient') ? (
+                    <div className={!showBody ? 'opacity-50' : ''}>
+                      <SimpleRichTextEditor
+                        content={verbatimCopy.body}
+                        onChange={(html) => setVerbatimCopy({ body: html })}
+                        placeholder="Body text"
+                      />
+                    </div>
+                  ) : (
+                    <textarea
+                      value={verbatimCopy.body}
+                      onChange={(e) => setVerbatimCopy({ body: e.target.value })}
+                      placeholder="Body text"
+                      rows={3}
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
+                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
+                        ${!showBody ? 'opacity-50' : ''}`}
+                    />
+                  )}
                 </div>
               )}
 
@@ -4368,6 +4412,7 @@ export function EditorScreen() {
                     headline={verbatimCopy.headline || 'Headline'}
                     cta={ctaText || 'Learn More'}
                     showEyebrow={showEyebrow}
+                    showHeadline={showHeadline}
                     variant={floatingBannerVariant}
                     colors={colorsConfig}
                     typography={typographyConfig}
@@ -4476,6 +4521,7 @@ export function EditorScreen() {
                   imagePosition={thumbnailImagePosition}
                   imageZoom={thumbnailImageZoom}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
                   grayscale={grayscale}
@@ -4497,6 +4543,7 @@ export function EditorScreen() {
                   imagePosition={thumbnailImagePosition}
                   imageZoom={thumbnailImageZoom}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
@@ -4520,6 +4567,7 @@ export function EditorScreen() {
                   imagePosition={thumbnailImagePosition}
                   imageZoom={thumbnailImageZoom}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
@@ -4568,6 +4616,7 @@ export function EditorScreen() {
                   showRow3={showRow3}
                   showRow4={showRow4}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -4586,6 +4635,7 @@ export function EditorScreen() {
                   imagePosition={thumbnailImagePosition}
                   imageZoom={thumbnailImageZoom}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
                   grayscale={grayscale}
@@ -4601,6 +4651,7 @@ export function EditorScreen() {
                   eyebrow={eyebrow}
                   subheading={subheading}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showLightHeader={showLightHeader}
                   showHeavyHeader={false}
                   showSubheading={showSubheading}
@@ -4631,6 +4682,7 @@ export function EditorScreen() {
                   ctaStyle={ctaStyle}
                   logoColor={logoColor === 'black' ? 'white' : logoColor}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showMetadata={showMetadata}
@@ -4653,6 +4705,7 @@ export function EditorScreen() {
                   alignment={alignment}
                   ctaStyle={ctaStyle}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showMetadata={showMetadata}
@@ -4674,6 +4727,7 @@ export function EditorScreen() {
                   layout={layout}
                   solution={solution}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showMetadata={showMetadata}
                   showCta={showCta}
@@ -4690,6 +4744,7 @@ export function EditorScreen() {
                   subhead={verbatimCopy.subhead || 'This is your subheader or description text. Keep it to two lines if you can.'}
                   eyebrow={eyebrow || "Don't miss this."}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showSolutionSet={showSolutionSet}
                   solution={solution}
@@ -4716,6 +4771,7 @@ export function EditorScreen() {
                   layout={layout}
                   solution={solution}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  showHeadline={showHeadline}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
@@ -4749,6 +4805,7 @@ export function EditorScreen() {
                   alignment={alignment}
                   ctaStyle={ctaStyle}
                   showEyebrow={showEyebrow && !!eyebrow}
+                  showHeadline={showHeadline}
                   showSubheading={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
@@ -4769,6 +4826,7 @@ export function EditorScreen() {
                   imagePosition={newsletterImagePosition}
                   imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
+                  showHeadline={showHeadline}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
@@ -4789,6 +4847,7 @@ export function EditorScreen() {
                   imagePosition={newsletterImagePosition}
                   imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
+                  showHeadline={showHeadline}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
@@ -4808,6 +4867,7 @@ export function EditorScreen() {
                   imagePosition={newsletterImagePosition}
                   imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
+                  showHeadline={showHeadline}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
@@ -4822,6 +4882,7 @@ export function EditorScreen() {
                   headline={verbatimCopy.headline || 'EHS+ Newsletter'}
                   subhead={verbatimCopy.subhead || ''}
                   variant={newsletterTopBannerVariant}
+                  showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -4837,6 +4898,7 @@ export function EditorScreen() {
                   solution={solution}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   showEyebrow={showEyebrow && !!eyebrow}
+                  showHeadline={showHeadline}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
@@ -4874,6 +4936,7 @@ export function EditorScreen() {
                   headline={verbatimCopy.headline || 'Headline'}
                   cta={ctaText || 'Learn More'}
                   showEyebrow={showEyebrow}
+                  showHeadline={showHeadline}
                   variant={floatingBannerMobileVariant}
                   arrowType={floatingBannerMobileArrowType}
                   colors={colorsConfig}

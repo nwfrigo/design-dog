@@ -50,6 +50,7 @@ export interface WebsiteEventListingProps {
   showRow3: boolean
   showRow4: boolean
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   colors: ColorsConfig
   typography: TypographyConfig
@@ -69,6 +70,7 @@ export function WebsiteEventListing({
   showRow3,
   showRow4,
   showEyebrow,
+  showHeadline = true,
   showSubhead,
   colors,
   typography,
@@ -193,17 +195,19 @@ export function WebsiteEventListing({
               display: 'flex',
             }}
           >
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: variantColors.textColor,
-                fontSize: 58,
-                fontWeight: 350,
-                lineHeight: '64px',
-              }}
-            >
-              {headline || 'Headline'}
-            </div>
+            {showHeadline && (
+              <div
+                style={{
+                  alignSelf: 'stretch',
+                  color: variantColors.textColor,
+                  fontSize: 58,
+                  fontWeight: 350,
+                  lineHeight: '64px',
+                }}
+              >
+                {headline || 'Headline'}
+              </div>
+            )}
 
             {showSubhead && subhead && (
               <div

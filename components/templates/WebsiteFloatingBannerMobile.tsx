@@ -32,6 +32,7 @@ export interface WebsiteFloatingBannerMobileProps {
   headline: string
   cta: string
   showEyebrow: boolean
+  showHeadline?: boolean
   variant: FloatingBannerMobileVariant
   arrowType: FloatingBannerMobileArrowType
   colors: ColorsConfig
@@ -111,6 +112,7 @@ export function WebsiteFloatingBannerMobile({
   headline,
   cta,
   showEyebrow,
+  showHeadline = true,
   variant,
   arrowType,
   colors,
@@ -187,15 +189,17 @@ export function WebsiteFloatingBannerMobile({
           )}
 
           {/* Headline */}
-          <div style={{
-            flex: 1,
-            color: styles.textColor,
-            fontSize: 14,
-            fontWeight: 350,
-            lineHeight: '15.40px',
-          }}>
-            {headline || 'Headline'}
-          </div>
+          {showHeadline && (
+            <div style={{
+              flex: 1,
+              color: styles.textColor,
+              fontSize: 14,
+              fontWeight: 350,
+              lineHeight: '15.40px',
+            }}>
+              {headline || 'Headline'}
+            </div>
+          )}
         </div>
 
         {/* CTA */}

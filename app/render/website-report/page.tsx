@@ -24,6 +24,7 @@ export default function RenderPage({
   const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
   const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
   const showEyebrow = searchParams.showEyebrow !== 'false'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showSubhead = searchParams.showSubhead === 'true'
   const showCta = searchParams.showCta !== 'false'
   const grayscale = searchParams.grayscale === 'true'
@@ -49,6 +50,7 @@ export default function RenderPage({
           imagePosition={{ x: imagePositionX, y: imagePositionY }}
           imageZoom={imageZoom}
           showEyebrow={showEyebrow}
+          showHeadline={showHeadline}
           showSubhead={showSubhead}
           showCta={showCta}
           grayscale={grayscale}

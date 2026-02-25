@@ -30,6 +30,7 @@ export interface NewsletterDarkGradientProps {
   imagePosition?: { x: number; y: number }
   imageZoom?: number
   showEyebrow: boolean
+  showHeadline?: boolean
   showBody: boolean
   showCta: boolean
   grayscale?: boolean
@@ -70,6 +71,7 @@ export function NewsletterDarkGradient({
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
   showEyebrow,
+  showHeadline = true,
   showBody,
   showCta,
   grayscale = false,
@@ -187,15 +189,17 @@ export function NewsletterDarkGradient({
             )}
 
             {/* Headline */}
-            <div style={{
-              alignSelf: 'stretch',
-              color: textColor,
-              fontSize: 24,
-              fontWeight: 350,
-              lineHeight: '26px',
-            }}>
-              {headline || 'Headline'}
-            </div>
+            {showHeadline && (
+              <div style={{
+                alignSelf: 'stretch',
+                color: textColor,
+                fontSize: 24,
+                fontWeight: 350,
+                lineHeight: '26px',
+              }}>
+                {headline || 'Headline'}
+              </div>
+            )}
 
             {/* Body */}
             {showBody && body && (

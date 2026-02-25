@@ -16,6 +16,7 @@ interface Props {
   alignment: 'left' | 'center'
   ctaStyle: 'link' | 'button'
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showBody: boolean
   showMetadata: boolean
@@ -57,6 +58,7 @@ export function SocialBlueGradientRender(props: Props) {
         alignment={props.alignment}
         ctaStyle={props.ctaStyle}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
         showBody={props.showBody}
         showMetadata={props.showMetadata}

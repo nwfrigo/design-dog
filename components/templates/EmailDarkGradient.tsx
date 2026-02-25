@@ -54,6 +54,7 @@ export interface EmailDarkGradientProps {
   alignment: Alignment
   ctaStyle: CtaStyle
   showEyebrow?: boolean
+  showHeadline?: boolean
   showSubheading?: boolean
   showBody: boolean
   showCta: boolean
@@ -61,6 +62,21 @@ export interface EmailDarkGradientProps {
   typography: TypographyConfig
   scale?: number
 }
+
+// Check if HTML content is effectively empty (handles <p></p> etc.)
+function isHtmlEmpty(html: string | undefined): boolean {
+  if (!html) return true
+  const stripped = html.replace(/<[^>]*>/g, '').trim()
+  return stripped === ''
+}
+
+// Inline styles for rich text elements (white text on dark background)
+const RICH_TEXT_STYLES = `
+  .rich-text-white strong { font-weight: 500; }
+  .rich-text-white em { font-style: italic; }
+  .rich-text-white p { margin: 0; }
+  .rich-text-white p + p { margin-top: 0.3em; }
+`
 
 // Using same background images as social-dark-gradient
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
@@ -80,6 +96,7 @@ export function EmailDarkGradient({
   alignment,
   ctaStyle,
   showEyebrow = false,
+  showHeadline = true,
   showSubheading = false,
   showBody,
   showCta,
@@ -90,6 +107,11 @@ export function EmailDarkGradient({
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const textColor = '#FFFFFF'
   const ctaColor = '#0080FF' // Cobalt blue for arrow
+
+  // Determine if content is empty for conditional rendering
+  const hasHeadline = !isHtmlEmpty(headline)
+  const hasSubheading = !isHtmlEmpty(subheading)
+  const hasBody = !isHtmlEmpty(body)
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -125,6 +147,9 @@ export function EmailDarkGradient({
 
   return (
     <div style={containerStyle}>
+      {/* Rich text styles for HTML content */}
+      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
+
       {/* Background Image */}
       <img
         src={BACKGROUND_IMAGES[colorStyle]}
@@ -167,44 +192,46 @@ export function EmailDarkGradient({
             </div>
           )}
 
-          {/* Headline */}
-          <div
-            style={{
-              color: textColor,
-              fontSize: 38,
-              fontWeight: 350,
-              lineHeight: 1.26,
-            }}
-          >
-            {headline || 'Headline'}
-          </div>
-
-          {/* Subheading */}
-          {showSubheading && subheading && (
+          {/* Headline - supports rich text (bold, italic, line breaks) */}
+          {showHeadline && (
             <div
+              className="rich-text-white"
+              style={{
+                color: textColor,
+                fontSize: 38,
+                fontWeight: 350,
+                lineHeight: 1.26,
+              }}
+              dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
+            />
+          )}
+
+          {/* Subheading - supports rich text (bold, italic, line breaks) */}
+          {showSubheading && hasSubheading && (
+            <div
+              className="rich-text-white"
               style={{
                 color: textColor,
                 fontSize: 24,
                 fontWeight: 350,
                 lineHeight: 1.4,
               }}
-            >
-              {subheading}
-            </div>
+              dangerouslySetInnerHTML={{ __html: subheading! }}
+            />
           )}
 
-          {/* Body */}
-          {showBody && body && (
+          {/* Body - supports rich text (bold, italic, line breaks) */}
+          {showBody && hasBody && (
             <div
+              className="rich-text-white"
               style={{
                 color: textColor,
                 fontSize: 18,
                 fontWeight: 350,
                 lineHeight: 1.4,
               }}
-            >
-              {body}
-            </div>
+              dangerouslySetInnerHTML={{ __html: body }}
+            />
           )}
         </div>
 

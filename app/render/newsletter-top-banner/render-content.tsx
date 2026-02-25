@@ -9,6 +9,7 @@ interface Props {
   headline: string
   subhead: string
   variant: 'dark' | 'light'
+  showHeadline?: boolean
   showSubhead: boolean
   colors: ColorsConfig
   typography: TypographyConfig
@@ -40,6 +41,7 @@ export function NewsletterTopBannerRender(props: Props) {
         headline={props.headline}
         subhead={props.subhead}
         variant={props.variant}
+        showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
         colors={props.colors}
         typography={props.typography}

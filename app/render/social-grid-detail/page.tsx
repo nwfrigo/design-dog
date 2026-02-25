@@ -17,6 +17,7 @@ export default function RenderPage({
   const subhead = (searchParams.subhead as string) || 'This is your subheader or description text. Keep it to two lines if you can.'
   const eyebrow = (searchParams.eyebrow as string) || "Don't miss this."
   const showEyebrow = searchParams.showEyebrow !== 'false'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showSubhead = searchParams.showSubhead !== 'false'
   const showSolutionSet = searchParams.showSolutionSet !== 'false'
   const solution = (searchParams.solution as string) || 'environmental'
@@ -52,6 +53,7 @@ export default function RenderPage({
           subhead={subhead}
           eyebrow={eyebrow}
           showEyebrow={showEyebrow}
+          showHeadline={showHeadline}
           showSubhead={showSubhead}
           showSolutionSet={showSolutionSet}
           solution={solution}

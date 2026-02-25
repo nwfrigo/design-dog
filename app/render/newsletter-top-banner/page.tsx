@@ -17,6 +17,7 @@ export default function RenderPage({
   const headline = (searchParams.headline as string) || 'EHS+ Newsletter'
   const subhead = (searchParams.subhead as string) || ''
   const variant = ((searchParams.variant as string) || 'dark') as 'dark' | 'light'
+  const showHeadline = searchParams.showHeadline !== 'false'
   const showSubhead = searchParams.showSubhead === 'true'
 
   return (
@@ -34,6 +35,7 @@ export default function RenderPage({
           headline={headline}
           subhead={subhead}
           variant={variant}
+          showHeadline={showHeadline}
           showSubhead={showSubhead}
           colors={colorsConfig}
           typography={typographyConfig}

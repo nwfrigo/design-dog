@@ -9,6 +9,7 @@ interface Props {
   headline: string
   cta: string
   showEyebrow: boolean
+  showHeadline?: boolean
   variant: FloatingBannerVariant
   colors: ColorsConfig
   typography: TypographyConfig
@@ -40,6 +41,7 @@ export function WebsiteFloatingBannerRender(props: Props) {
         headline={props.headline}
         cta={props.cta}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         variant={props.variant}
         colors={props.colors}
         typography={props.typography}

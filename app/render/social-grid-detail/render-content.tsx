@@ -9,6 +9,7 @@ interface Props {
   subhead: string
   eyebrow: string
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showSolutionSet: boolean
   solution: string
@@ -49,6 +50,7 @@ export function SocialGridDetailRender(props: Props) {
         subhead={props.subhead}
         eyebrow={props.eyebrow}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
         showSolutionSet={props.showSolutionSet}
         solution={props.solution}

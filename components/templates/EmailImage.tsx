@@ -52,6 +52,7 @@ export interface EmailImageProps {
   layout: LayoutVariant
   solution: string
   logoColor: 'black' | 'orange'
+  showHeadline?: boolean
   showBody: boolean
   showCta: boolean
   showSolutionSet: boolean
@@ -75,6 +76,21 @@ const IMAGE_WIDTHS: Record<LayoutVariant, number> = {
   'more-text': 180,
 }
 
+// Check if HTML content is effectively empty (handles <p></p> etc.)
+function isHtmlEmpty(html: string | undefined): boolean {
+  if (!html) return true
+  const stripped = html.replace(/<[^>]*>/g, '').trim()
+  return stripped === ''
+}
+
+// Inline styles for rich text elements (dark text on light background)
+const RICH_TEXT_STYLES = `
+  .rich-text-dark strong { font-weight: 500; }
+  .rich-text-dark em { font-style: italic; }
+  .rich-text-dark p { margin: 0; }
+  .rich-text-dark p + p { margin-top: 0.3em; }
+`
+
 export function EmailImage({
   headline,
   body,
@@ -85,6 +101,7 @@ export function EmailImage({
   layout,
   solution,
   logoColor,
+  showHeadline = true,
   showBody,
   showCta,
   showSolutionSet,
@@ -130,6 +147,10 @@ export function EmailImage({
     img.src = imageUrl
   }, [imageUrl, grayscale])
 
+  // Determine if content is empty for conditional rendering
+  const hasHeadline = !isHtmlEmpty(headline)
+  const hasBody = !isHtmlEmpty(body)
+
   const containerStyle: CSSProperties = {
     width: 640,
     height: 300,
@@ -150,6 +171,8 @@ export function EmailImage({
 
   return (
     <div style={containerStyle}>
+      {/* Rich text styles for HTML content */}
+      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
       {/* Left content area */}
       <div style={{
         width: textWidth,
@@ -211,27 +234,33 @@ export function EmailImage({
           alignItems: 'flex-start',
           gap: 17,
         }}>
-          {/* Headline */}
-          <div style={{
-            alignSelf: 'stretch',
-            color: textColor,
-            fontSize: 38.15,
-            fontWeight: 300,
-            lineHeight: '48.19px',
-          }}>
-            {headline || 'Headline'}
-          </div>
+          {/* Headline - supports rich text (bold, italic, line breaks) */}
+          {showHeadline && (
+            <div
+              className="rich-text-dark"
+              style={{
+                alignSelf: 'stretch',
+                color: textColor,
+                fontSize: 38.15,
+                fontWeight: 300,
+                lineHeight: '48.19px',
+              }}
+              dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
+            />
+          )}
 
-          {/* Body */}
-          {showBody && body && (
-            <div style={{
-              alignSelf: 'stretch',
-              color: textColor,
-              fontSize: 18.07,
-              fontWeight: 300,
-            }}>
-              {body}
-            </div>
+          {/* Body - supports rich text (bold, italic, line breaks) */}
+          {showBody && hasBody && (
+            <div
+              className="rich-text-dark"
+              style={{
+                alignSelf: 'stretch',
+                color: textColor,
+                fontSize: 18.07,
+                fontWeight: 300,
+              }}
+              dangerouslySetInnerHTML={{ __html: body }}
+            />
           )}
         </div>
 

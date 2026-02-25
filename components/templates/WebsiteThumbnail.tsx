@@ -99,6 +99,7 @@ export interface WebsiteThumbnailProps {
   imagePosition?: { x: number; y: number }
   imageZoom?: number
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showCta: boolean
   logoColor: 'black' | 'orange'
@@ -119,6 +120,7 @@ export function WebsiteThumbnail({
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
   showEyebrow,
+  showHeadline = true,
   showSubhead,
   showCta,
   logoColor,
@@ -288,17 +290,19 @@ export function WebsiteThumbnail({
               gap: headlineSubheadGap,
             }}
           >
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: colors.ui.textPrimary,
-                fontSize: headlineSize,
-                fontWeight: 350,
-                lineHeight: headlineLineHeight,
-              }}
-            >
-              {headline || 'Lightweight header.'}
-            </div>
+            {showHeadline && (
+              <div
+                style={{
+                  alignSelf: 'stretch',
+                  color: colors.ui.textPrimary,
+                  fontSize: headlineSize,
+                  fontWeight: 350,
+                  lineHeight: headlineLineHeight,
+                }}
+              >
+                {headline || 'Lightweight header.'}
+              </div>
+            )}
 
             {showSubhead && subhead && (
               <div

@@ -14,6 +14,7 @@ interface Props {
   alignment: 'left' | 'center'
   ctaStyle: 'link' | 'button'
   showEyebrow?: boolean
+  showHeadline?: boolean
   showSubheading?: boolean
   showBody: boolean
   showCta: boolean
@@ -52,6 +53,7 @@ export function EmailDarkGradientRender(props: Props) {
         alignment={props.alignment}
         ctaStyle={props.ctaStyle}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showSubheading={props.showSubheading}
         showBody={props.showBody}
         showCta={props.showCta}

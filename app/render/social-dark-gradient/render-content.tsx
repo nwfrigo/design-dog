@@ -17,6 +17,7 @@ interface Props {
   ctaStyle: 'link' | 'button'
   logoColor: 'orange' | 'white'
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showBody: boolean
   showMetadata: boolean
@@ -59,6 +60,7 @@ export function SocialDarkGradientRender(props: Props) {
         ctaStyle={props.ctaStyle}
         logoColor={props.logoColor}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
         showBody={props.showBody}
         showMetadata={props.showMetadata}

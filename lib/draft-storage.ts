@@ -26,6 +26,7 @@ export interface DraftState {
   solution: string
   logoColor: 'black' | 'orange' | 'white'
   showEyebrow: boolean
+  showHeadline: boolean
   showSubhead: boolean
   showBody: boolean
   thumbnailImageUrl: string | null
@@ -187,6 +188,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       solution: state.solution || 'environmental',
       logoColor: state.logoColor || 'black',
       showEyebrow: state.showEyebrow ?? true,
+      showHeadline: state.showHeadline ?? true,
       showSubhead: state.showSubhead ?? true,
       showBody: state.showBody ?? true,
       thumbnailImageUrl: state.thumbnailImageUrl || null,

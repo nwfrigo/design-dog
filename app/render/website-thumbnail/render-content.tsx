@@ -15,6 +15,7 @@ interface Props {
   imagePosition?: { x: number; y: number }
   imageZoom?: number
   showEyebrow: boolean
+  showHeadline?: boolean
   showSubhead: boolean
   showCta: boolean
   logoColor: 'black' | 'orange'
@@ -55,6 +56,7 @@ export function WebsiteThumbnailRender(props: Props) {
         imagePosition={props.imagePosition}
         imageZoom={props.imageZoom}
         showEyebrow={props.showEyebrow}
+        showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
         showCta={props.showCta}
         logoColor={props.logoColor}

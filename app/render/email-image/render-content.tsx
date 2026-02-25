@@ -14,6 +14,7 @@ interface Props {
   layout: 'even' | 'more-image' | 'more-text'
   solution: string
   logoColor: 'black' | 'orange'
+  showHeadline?: boolean
   showBody: boolean
   showCta: boolean
   showSolutionSet: boolean
@@ -53,6 +54,7 @@ export function EmailImageRender(props: Props) {
         layout={props.layout}
         solution={props.solution}
         logoColor={props.logoColor}
+        showHeadline={props.showHeadline}
         showBody={props.showBody}
         showCta={props.showCta}
         showSolutionSet={props.showSolutionSet}
