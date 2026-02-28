@@ -214,6 +214,27 @@ style={{
 
 Import from `components/ZoomableImage`. Use for all image upload areas in the editor.
 
+### Image Library System
+
+Three image library modals exist, each serving different use cases:
+
+| Modal | File | Used By | Categories |
+|-------|------|---------|------------|
+| `ImageLibraryModal` | `components/ImageLibraryModal.tsx` | EditorScreen (banners, speakers, newsletters), StackerEditorScreen (all image modules) | Scenes, People, Product (from `library.json`) |
+| `FaqCoverImageLibraryModal` | `components/FaqCoverImageLibraryModal.tsx` | FaqEditorScreen (cover image) | 5 solution categories, 3 images each |
+| `SolutionOverviewImageLibraryModal` | `components/SolutionOverviewImageLibraryModal.tsx` | EditorScreen (SO hero image on Page 2) | 5 solution categories, 9 images each |
+
+**Global library** (`ImageLibraryModal`):
+- Reads manifest from `/public/assets/image-library/library.json`
+- Supports explicit `categories` array in JSON (shown even if empty, e.g., "Product")
+- Categories merge explicit list with those derived from image entries
+- Images stored in `/public/assets/image-library/images/{category}/`
+- Also supports direct file upload (drag-and-drop or click)
+
+**In EditorScreen**, the global library uses flags to route selections to the correct setter: `activeSpeakerForImage`, `selectingNewsletterImage`, `selectingSOScreenshot`. Always reset all flags in both `onSelect` and `onClose`.
+
+**Specialized modals** (FAQ, SO) have curated images per solution category with configs in `/config/faq-cover-images.ts` and `/config/solution-overview-hero-images.ts`.
+
 ### Image Settings: Editor ↔ Queue ↔ Export Consistency
 
 **The Core Rule:** Image settings (position, zoom, grayscale) must flow through **four locations** to ensure editor preview, queue preview, and exported PNG all match:
