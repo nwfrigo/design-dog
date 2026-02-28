@@ -16,6 +16,7 @@ interface ImageLibraryModalProps {
 
 export function ImageLibraryModal({ onSelect, onClose }: ImageLibraryModalProps) {
   const [images, setImages] = useState<LibraryImage[]>([])
+  const [explicitCategories, setExplicitCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -65,6 +66,7 @@ export function ImageLibraryModal({ onSelect, onClose }: ImageLibraryModalProps)
         if (response.ok) {
           const data = await response.json()
           setImages(data.images || [])
+          if (data.categories) setExplicitCategories(data.categories)
         }
       } catch (error) {
         console.error('Failed to load image library:', error)
@@ -75,8 +77,11 @@ export function ImageLibraryModal({ onSelect, onClose }: ImageLibraryModalProps)
     loadLibrary()
   }, [])
 
-  // Get unique categories
-  const categories = Array.from(new Set(images.map(img => img.category).filter((c): c is string => Boolean(c))))
+  // Get unique categories (merge explicit list with those found in images)
+  const categories = Array.from(new Set([
+    ...explicitCategories,
+    ...images.map(img => img.category).filter((c): c is string => Boolean(c)),
+  ]))
 
   // Filter images by category
   const filteredImages = selectedCategory

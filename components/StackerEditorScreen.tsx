@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
 import { StackerPreviewEditor } from './StackerPreviewEditor'
 import { ImageCropModal } from './ImageCropModal'
+import { ImageLibraryModal } from './ImageLibraryModal'
 import { IconPicker } from './IconPickerModal'
 import type { StackerModule, StackerImageModule, StackerImage16x9Module, StackerImageCardsModule, SolutionCategory, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule } from '@/types'
 import { STACKER_PLACEHOLDER_IMAGE_1x1, STACKER_PLACEHOLDER_IMAGE_16x9 } from '@/lib/stacker-modules'
@@ -311,6 +312,7 @@ function LockedModuleItem({
   onToggleExpand,
   onUpdate,
   onOpenCropModal,
+  onOpenLibrary,
 }: {
   module: StackerModule
   isExpanded: boolean
@@ -318,6 +320,7 @@ function LockedModuleItem({
   onToggleExpand: () => void
   onUpdate: (updates: Partial<StackerModule>) => void
   onOpenCropModal?: (moduleId: string) => void
+  onOpenLibrary?: (moduleId: string, cardIndex?: number) => void
 }) {
   return (
     <div
@@ -359,7 +362,7 @@ function LockedModuleItem({
       {/* Expanded Content */}
       {isExpanded && (
         <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-gray-700/50">
-          <ModuleEditor module={module} onUpdate={onUpdate} onOpenCropModal={onOpenCropModal} />
+          <ModuleEditor module={module} onUpdate={onUpdate} onOpenCropModal={onOpenCropModal} onOpenLibrary={onOpenLibrary} />
         </div>
       )}
     </div>
@@ -374,6 +377,7 @@ function SortableModuleItem({
   onToggleExpand,
   onUpdate,
   onOpenCropModal,
+  onOpenLibrary,
 }: {
   module: StackerModule
   isExpanded: boolean
@@ -381,6 +385,7 @@ function SortableModuleItem({
   onToggleExpand: () => void
   onUpdate: (updates: Partial<StackerModule>) => void
   onOpenCropModal?: (moduleId: string) => void
+  onOpenLibrary?: (moduleId: string, cardIndex?: number) => void
 }) {
   const {
     attributes,
@@ -444,7 +449,7 @@ function SortableModuleItem({
       {/* Expanded Content */}
       {isExpanded && (
         <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-gray-700/50">
-          <ModuleEditor module={module} onUpdate={onUpdate} onOpenCropModal={onOpenCropModal} />
+          <ModuleEditor module={module} onUpdate={onUpdate} onOpenCropModal={onOpenCropModal} onOpenLibrary={onOpenLibrary} />
         </div>
       )}
     </div>
@@ -456,10 +461,12 @@ function ModuleEditor({
   module,
   onUpdate,
   onOpenCropModal,
+  onOpenLibrary,
 }: {
   module: StackerModule
   onUpdate: (updates: Partial<StackerModule>) => void
   onOpenCropModal?: (moduleId: string) => void
+  onOpenLibrary?: (moduleId: string, cardIndex?: number) => void
 }) {
   const categoryOptions: SolutionCategory[] = ['environmental', 'health', 'safety', 'quality', 'sustainability']
 
@@ -866,13 +873,21 @@ function ModuleEditor({
                     }}
                   />
                 </div>
-                {/* Adjust button */}
-                <button
-                  onClick={() => onOpenCropModal?.(module.id)}
-                  className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                >
-                  Adjust
-                </button>
+                {/* Adjust / Library buttons */}
+                <div className="absolute bottom-1 left-1 flex gap-1 z-20">
+                  <button
+                    onClick={() => onOpenCropModal?.(module.id)}
+                    className="px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors"
+                  >
+                    Adjust
+                  </button>
+                  <button
+                    onClick={() => onOpenLibrary?.(module.id)}
+                    className="px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors"
+                  >
+                    Library
+                  </button>
+                </div>
                 {/* Remove button */}
                 <button
                   onClick={() => {
@@ -891,28 +906,39 @@ function ModuleEditor({
                 </button>
               </div>
             ) : (
-              <div
-                className="border-2 border-dashed rounded-lg h-20 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
-              >
-                <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        const reader = new FileReader()
-                        reader.onload = () => onUpdate({ imageUrl: reader.result as string })
-                        reader.readAsDataURL(file)
-                      }
-                    }}
-                    className="hidden"
-                  />
+              <div className="flex gap-2">
+                <div
+                  className="flex-1 border-2 border-dashed rounded-lg h-20 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                >
+                  <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          const reader = new FileReader()
+                          reader.onload = () => onUpdate({ imageUrl: reader.result as string })
+                          reader.readAsDataURL(file)
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Upload
+                  </label>
+                </div>
+                <button
+                  onClick={() => onOpenLibrary?.(module.id)}
+                  className="border-2 border-dashed rounded-lg h-20 px-3 transition-colors border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-500 flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                >
                   <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  Drop or click to upload
-                </label>
+                  Library
+                </button>
               </div>
             )}
           </div>
@@ -1125,13 +1151,21 @@ function ModuleEditor({
                     }}
                   />
                 </div>
-                {/* Adjust button */}
-                <button
-                  onClick={() => onOpenCropModal?.(module.id)}
-                  className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                >
-                  Adjust
-                </button>
+                {/* Adjust / Library buttons */}
+                <div className="absolute bottom-1 left-1 flex gap-1 z-20">
+                  <button
+                    onClick={() => onOpenCropModal?.(module.id)}
+                    className="px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors"
+                  >
+                    Adjust
+                  </button>
+                  <button
+                    onClick={() => onOpenLibrary?.(module.id)}
+                    className="px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors"
+                  >
+                    Library
+                  </button>
+                </div>
                 {/* Remove button */}
                 <button
                   onClick={() => {
@@ -1150,28 +1184,39 @@ function ModuleEditor({
                 </button>
               </div>
             ) : (
-              <div
-                className="border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
-              >
-                <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        const reader = new FileReader()
-                        reader.onload = () => onUpdate({ imageUrl: reader.result as string })
-                        reader.readAsDataURL(file)
-                      }
-                    }}
-                    className="hidden"
-                  />
-                  <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
-                  Drop or click to upload
+              <div className="flex gap-2">
+                <div
+                  className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                >
+                  <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          const reader = new FileReader()
+                          reader.onload = () => onUpdate({ imageUrl: reader.result as string })
+                          reader.readAsDataURL(file)
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Upload
                 </label>
+              </div>
+                <button
+                  onClick={() => onOpenLibrary?.(module.id)}
+                  className="border-2 border-dashed rounded-lg h-16 px-3 transition-colors border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-500 flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                >
+                  <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Library
+                </button>
               </div>
             )}
           </div>
@@ -1467,30 +1512,41 @@ function ModuleEditor({
                     </button>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed rounded-lg h-12 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400">
-                    <label className="flex items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400 gap-1">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) {
-                            const reader = new FileReader()
-                            reader.onload = () => {
-                              const newCards = [...module.cards] as typeof module.cards
-                              newCards[index] = { ...card, imageUrl: reader.result as string }
-                              onUpdate({ cards: newCards })
+                  <div className="flex gap-1.5">
+                    <div className="flex-1 border-2 border-dashed rounded-lg h-12 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400">
+                      <label className="flex items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400 gap-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              const reader = new FileReader()
+                              reader.onload = () => {
+                                const newCards = [...module.cards] as typeof module.cards
+                                newCards[index] = { ...card, imageUrl: reader.result as string }
+                                onUpdate({ cards: newCards })
+                              }
+                              reader.readAsDataURL(file)
                             }
-                            reader.readAsDataURL(file)
-                          }
-                        }}
-                        className="hidden"
-                      />
+                          }}
+                          className="hidden"
+                        />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        Upload
+                      </label>
+                    </div>
+                    <button
+                      onClick={() => onOpenLibrary?.(module.id, index)}
+                      className="border-2 border-dashed rounded-lg h-12 px-2 transition-colors border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                      title="Choose from library"
+                    >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      Upload
-                    </label>
+                    </button>
                   </div>
                 )}
               </div>
@@ -1918,6 +1974,35 @@ export function StackerEditorScreen() {
     ? contentModules.find(m => m.id === cropModalModuleId && (m.type === 'image' || m.type === 'image-16x9')) as (StackerImageModule | StackerImage16x9Module) | undefined
     : undefined
 
+  // Image library modal state
+  const [showImageLibrary, setShowImageLibrary] = useState(false)
+  const [imageLibraryTarget, setImageLibraryTarget] = useState<{ moduleId: string; cardIndex?: number } | null>(null)
+
+  const openImageLibrary = (moduleId: string, cardIndex?: number) => {
+    setImageLibraryTarget({ moduleId, cardIndex })
+    setShowImageLibrary(true)
+  }
+
+  const handleLibrarySelect = (url: string) => {
+    if (imageLibraryTarget) {
+      if (imageLibraryTarget.cardIndex !== undefined) {
+        // Image Cards — update specific card
+        const mod = contentModules.find(m => m.id === imageLibraryTarget.moduleId)
+        if (mod && mod.type === 'image-cards') {
+          const typedMod = mod as StackerImageCardsModule
+          const newCards: typeof typedMod.cards = [...typedMod.cards]
+          newCards[imageLibraryTarget.cardIndex] = { ...newCards[imageLibraryTarget.cardIndex], imageUrl: url }
+          updateModule(imageLibraryTarget.moduleId, { cards: newCards })
+        }
+      } else {
+        // Image or Image 16:9
+        updateModule(imageLibraryTarget.moduleId, { imageUrl: url, imageZoom: 1, imagePan: { x: 0, y: 0 } })
+      }
+    }
+    setShowImageLibrary(false)
+    setImageLibraryTarget(null)
+  }
+
   // Combined modules for preview (logo-chip + header + content + footer)
   const allModules = [logoChipModule, headerModule, ...contentModules, footerModule]
 
@@ -2101,6 +2186,7 @@ export function StackerEditorScreen() {
                       onToggleExpand={() => toggleModuleExpand(module.id)}
                       onUpdate={(updates) => updateModule(module.id, updates)}
                       onOpenCropModal={setCropModalModuleId}
+                      onOpenLibrary={openImageLibrary}
                     />
                   ))}
                 </SortableContext>
@@ -2241,6 +2327,17 @@ export function StackerEditorScreen() {
               imageZoom: zoom,
             })
             setCropModalModuleId(null)
+          }}
+        />
+      )}
+
+      {/* Image Library Modal */}
+      {showImageLibrary && (
+        <ImageLibraryModal
+          onSelect={handleLibrarySelect}
+          onClose={() => {
+            setShowImageLibrary(false)
+            setImageLibraryTarget(null)
           }}
         />
       )}
