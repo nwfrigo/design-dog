@@ -1,7 +1,7 @@
 'use client'
 
 import { CSSProperties, ReactNode } from 'react'
-import type { StackerModule } from '@/types'
+import type { StackerModule, SolutionCategory } from '@/types'
 import { LogoChipModule } from './modules/LogoChipModule'
 import { HeaderModule } from './modules/HeaderModule'
 import { ParagraphModule } from './modules/ParagraphModule'
@@ -15,6 +15,16 @@ import { ThreeStatsModule } from './modules/ThreeStatsModule'
 import { OneStatModule } from './modules/OneStatModule'
 import { FooterModule } from './modules/FooterModule'
 import { BulletListModule } from './modules/BulletListModule'
+
+// Solution category colors (same as LogoChipModule)
+const SOLUTION_COLORS: Record<SolutionCategory, string> = {
+  environmental: '#49763E',
+  health: '#00767F',
+  safety: '#C3B01E',
+  quality: '#006FA3',
+  sustainability: '#A61F67',
+  converged: '#D35F0B',
+}
 
 // Document dimensions
 const DOCUMENT_WIDTH = 612 // Same as other PDF templates (Letter width in points)
@@ -30,7 +40,7 @@ export interface StackerPdfProps {
 }
 
 // Render individual module based on type
-function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: number }) {
+function RenderModule({ module, scale = 1, accentColor }: { module: StackerModule; scale?: number; accentColor?: string }) {
   switch (module.type) {
     case 'logo-chip':
       return (
@@ -183,6 +193,7 @@ function RenderModule({ module, scale = 1 }: { module: StackerModule; scale?: nu
         <BulletListModule
           heading={module.heading}
           columns={module.columns}
+          accentColor={accentColor}
           scale={scale}
         />
       )
@@ -214,6 +225,14 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
     gap: 32, // Spacing between modules
   }
 
+  // Derive accent color from logo-chip module's active categories
+  // Single category → that category's color. Multiple or none → black.
+  const logoChipModule = modules.find(m => m.type === 'logo-chip')
+  let accentColor = '#000000'
+  if (logoChipModule && logoChipModule.type === 'logo-chip' && logoChipModule.activeCategories.length === 1) {
+    accentColor = SOLUTION_COLORS[logoChipModule.activeCategories[0]] || '#000000'
+  }
+
   // Separate footer from other modules so we can render Add Module tile before footer
   const footerModule = modules.find(m => m.type === 'footer')
   const nonFooterModules = modules.filter(m => m.type !== 'footer')
@@ -223,7 +242,7 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
       <div style={contentStyle}>
         {/* Render all non-footer modules */}
         {nonFooterModules.map((module, index) => {
-          const moduleContent = <RenderModule key={module.id} module={module} />
+          const moduleContent = <RenderModule key={module.id} module={module} accentColor={accentColor} />
           // Wrap in div with data-module-id for export image injection
           const wrappedContent = (
             <div key={module.id} data-module-id={module.id}>

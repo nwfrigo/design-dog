@@ -9,16 +9,17 @@ export interface BulletListModuleProps {
     { label: string; bullets: string[] },
     { label: string; bullets: string[] }
   ]
+  accentColor?: string
   scale?: number
 }
 
 export function BulletListModule({
   heading,
   columns,
+  accentColor = '#000000',
   scale = 1,
 }: BulletListModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
-  const accentColor = '#00767F'
 
   const containerStyle: CSSProperties = {
     width: '100%',

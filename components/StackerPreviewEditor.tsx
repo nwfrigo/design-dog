@@ -19,7 +19,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import type { StackerModule } from '@/types'
+import type { StackerModule, SolutionCategory } from '@/types'
 import { STACKER_PLACEHOLDER_IMAGE_1x1, STACKER_PLACEHOLDER_IMAGE_16x9 } from '@/lib/stacker-modules'
 import { StackerPdf } from './templates/StackerPdf'
 import { StackerDraggableModule } from './StackerDraggableModule'
@@ -175,8 +175,26 @@ export interface StackerPreviewEditorProps {
   readOnly?: boolean // When true, disables all drag/drop, delete, and add functionality
 }
 
+// Solution category colors
+const SOLUTION_COLORS: Record<SolutionCategory, string> = {
+  environmental: '#49763E',
+  health: '#00767F',
+  safety: '#C3B01E',
+  quality: '#006FA3',
+  sustainability: '#A61F67',
+  converged: '#D35F0B',
+}
+
+function getAccentColor(modules: StackerModule[]): string {
+  const logoChip = modules.find(m => m.type === 'logo-chip')
+  if (logoChip && logoChip.type === 'logo-chip' && logoChip.activeCategories.length === 1) {
+    return SOLUTION_COLORS[logoChip.activeCategories[0]] || '#000000'
+  }
+  return '#000000'
+}
+
 // Render a module for the drag overlay
-function RenderModuleForOverlay({ module }: { module: StackerModule }) {
+function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule; accentColor?: string }) {
   switch (module.type) {
     case 'logo-chip':
       return (
@@ -295,6 +313,7 @@ function RenderModuleForOverlay({ module }: { module: StackerModule }) {
         <BulletListModule
           heading={module.heading}
           columns={module.columns}
+          accentColor={accentColor}
         />
       )
     default:
@@ -480,7 +499,7 @@ export function StackerPreviewEditor({
               pointerEvents: 'none',
             }}
           >
-            <RenderModuleForOverlay module={activeModule} />
+            <RenderModuleForOverlay module={activeModule} accentColor={getAccentColor(modules)} />
           </div>
         )}
       </DragOverlay>
