@@ -361,6 +361,7 @@ export function EditorScreen() {
   const [showImageLibrary, setShowImageLibrary] = useState(false)
   const [activeSpeakerForImage, setActiveSpeakerForImage] = useState<1 | 2 | 3 | null>(null)
   const [selectingNewsletterImage, setSelectingNewsletterImage] = useState(false)
+  const [selectingSOScreenshot, setSelectingSOScreenshot] = useState(false)
 
   // Solution Overview hero image library modal state
   const [showHeroImageLibrary, setShowHeroImageLibrary] = useState(false)
@@ -1242,17 +1243,21 @@ export function EditorScreen() {
               setSpeaker3ImageUrl(url)
             } else if (selectingNewsletterImage) {
               setNewsletterImageUrl(url)
+            } else if (selectingSOScreenshot) {
+              setSolutionOverviewScreenshotUrl(url)
             } else {
               setThumbnailImageUrl(url)
             }
             setShowImageLibrary(false)
             setActiveSpeakerForImage(null)
             setSelectingNewsletterImage(false)
+            setSelectingSOScreenshot(false)
           }}
           onClose={() => {
             setShowImageLibrary(false)
             setActiveSpeakerForImage(null)
             setSelectingNewsletterImage(false)
+            setSelectingSOScreenshot(false)
           }}
         />
       )}
@@ -2754,33 +2759,44 @@ export function EditorScreen() {
                       )}
                     </div>
 
-                    {/* Product Image */}
+                    {/* Image */}
                     <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Image</h4>
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image</h4>
                       {!solutionOverviewScreenshotUrl ? (
-                        <label className="block w-full aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition-colors">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file && file.type.startsWith('image/')) {
-                                const reader = new FileReader()
-                                reader.onload = () => {
-                                  setSolutionOverviewScreenshotUrl(reader.result as string)
+                        <div className="flex gap-2">
+                          <label className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition-colors">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file && file.type.startsWith('image/')) {
+                                  const reader = new FileReader()
+                                  reader.onload = () => {
+                                    setSolutionOverviewScreenshotUrl(reader.result as string)
+                                  }
+                                  reader.readAsDataURL(file)
                                 }
-                                reader.readAsDataURL(file)
-                              }
-                            }}
-                          />
-                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                              }}
+                            />
+                            <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <span className="text-sm">Upload</span>
+                            </div>
+                          </label>
+                          <button
+                            onClick={() => { setSelectingSOScreenshot(true); setShowImageLibrary(true) }}
+                            className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition-colors flex flex-col items-center justify-center text-gray-400"
+                          >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                             </svg>
-                            <span className="text-sm">Upload Product Image</span>
-                          </div>
-                        </label>
+                            <span className="text-sm">Library</span>
+                          </button>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           {/* Image preview - click to adjust */}
@@ -2792,7 +2808,7 @@ export function EditorScreen() {
                             >
                               <img
                                 src={solutionOverviewScreenshotUrl}
-                                alt="Product image"
+                                alt="Image"
                                 className="w-full h-full object-cover"
                                 style={{
                                   objectPosition: `${50 - solutionOverviewScreenshotPosition.x}% ${50 - solutionOverviewScreenshotPosition.y}%`,
@@ -2800,12 +2816,18 @@ export function EditorScreen() {
                                 }}
                               />
                             </div>
-                            {/* Adjust button */}
+                            {/* Adjust + Library buttons */}
                             <button
                               onClick={() => setShowSOScreenshotCropModal(true)}
                               className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
                             >
                               Adjust
+                            </button>
+                            <button
+                              onClick={() => { setSelectingSOScreenshot(true); setShowImageLibrary(true) }}
+                              className="absolute bottom-1 left-16 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
+                            >
+                              Library
                             </button>
                             {/* Remove button */}
                             <button
