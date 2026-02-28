@@ -63,6 +63,13 @@ ${modulePrompt}
 
 8. **Icon Selection**: For cards, choose relevant Lucide icons: shield-check, zap, clock, target, users, trending-up, bar-chart, lock, eye, clipboard-check, settings, refresh-cw, check-circle.
 
+9. **MATCH MODULE COMPLEXITY TO CONTENT**: Never select a module that requires more text fields than you can fill with substantive content. Specifically:
+   - "one-stat" has a stat value/label on the left AND eyebrow + body paragraph on the right. Only use it if you have a compelling stat AND enough supporting context for both the eyebrow and a full body paragraph. If you only have the stat, use "three-stats" with 1-2 stats instead.
+   - "image" (1:1) is a large module with eyebrow, heading, body, AND CTA. Only use it for product features or content with enough detail to fill all text fields. For strategic summaries, overview points, or content with just a heading and short description, use "image-16x9" instead — it's more compact and doesn't require a CTA.
+   - Every text field you include MUST contain substantive content. Do NOT leave body, eyebrow, or description fields empty or with placeholder text.
+
+10. **IMAGE MODULE SIZING**: Use "image" (1:1, 180×180) ONLY for product screenshots, platform features, or content with substantial accompanying text. Use "image-16x9" (180×100) for strategic content, overview items, summaries, or when the accompanying text is brief. The 16:9 variant prevents the image from dominating the layout when text content is light.
+
 ## Solution Categories
 Choose the most relevant from: ${SOLUTION_CATEGORIES.join(', ')}
 
@@ -173,10 +180,13 @@ Before returning, verify:
 - Stats modules ONLY if source had numeric data (otherwise omit them)
 - Quote module ONLY if source has a verbatim quote with real name/title/org (otherwise omit it)
 - Product/feature content uses image modules (for screenshots), not three-card
+- Non-product content uses image-16x9 (compact), not image (1:1)
 - Header has a subheader
 - At least 6 content modules total
 - No two identical module types in a row
 - Bullet column labels are descriptive (not "Column 1")
+- Every text field in every module has substantive content (no empty body, eyebrow, or description)
+- one-stat only used when you have both a stat AND a full body paragraph
 
 Generate the document structure now.`
 
@@ -280,6 +290,47 @@ Verify every numerical figure in the generated modules against the raw source da
           // Graceful fallback: use original unvalidated output
           console.warn('Numerical validation failed, using original output:', validationError)
         }
+
+        // === CONTENT-AWARE MODULE CLEANUP ===
+        // Fix modules where the AI selected a complex module but left fields empty.
+        generatedContent.modules = generatedContent.modules.map(mod => {
+          // one-stat with empty body/eyebrow: toggle off empty fields
+          if (mod.type === 'one-stat') {
+            if (!mod.body || (mod.body as string).trim() === '') {
+              mod.body = ''
+            }
+            if (!mod.eyebrow || (mod.eyebrow as string).trim() === '') {
+              mod.eyebrow = ''
+            }
+          }
+
+          // image (1:1) with sparse text: downgrade to image-16x9
+          if (mod.type === 'image') {
+            const hasBody = mod.body && (mod.body as string).trim().length > 0
+            const hasHeading = mod.heading && (mod.heading as string).trim().length > 0
+            const hasCta = mod.showCta === true && mod.cta && (mod.cta as string).trim().length > 0
+
+            // If missing body OR missing both heading and CTA, it's too sparse for the 1:1 layout
+            if (!hasBody || (!hasHeading && !hasCta)) {
+              mod.type = 'image-16x9'
+              delete mod.cta
+              delete mod.ctaUrl
+              delete mod.showCta
+            }
+          }
+
+          // paragraph with empty body or empty intro: toggle off empty fields
+          if (mod.type === 'paragraph') {
+            if (!mod.body || (mod.body as string).trim() === '') {
+              mod.showBody = false
+            }
+            if (!mod.intro || (mod.intro as string).trim() === '') {
+              mod.showIntro = false
+            }
+          }
+
+          return mod
+        })
 
         // Build the full module list
         const fullModules: StackerModule[] = []
