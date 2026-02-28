@@ -30,6 +30,9 @@ const LOADING_PHASES = {
     'Crafting compelling copy...',
     'Designing document structure...',
     'Polishing the layout...',
+    'Validating data accuracy...',
+    'Cross-checking figures against source...',
+    'Verifying counts and statistics...',
     'Almost there...',
   ],
 }

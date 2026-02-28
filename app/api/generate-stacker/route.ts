@@ -225,6 +225,62 @@ Generate the document structure now.`
           throw new Error('Failed to parse AI response')
         }
 
+        // === POST-GENERATION NUMERICAL VALIDATION ===
+        // LLMs are unreliable at precise counting (e.g., 37 items counted as 34).
+        // This second call re-reads the raw source alongside generated output and
+        // corrects any numerical discrepancies before final render.
+        let validated = false
+        try {
+          const validationSystemPrompt = `You are a numerical accuracy auditor. Your ONLY job is to verify that every number, count, total, percentage, frequency, and quantified breakdown in the generated document accurately reflects the raw source data.
+
+## Instructions
+
+1. Read the RAW SOURCE DATA carefully. Extract every countable quantity, statistic, percentage, frequency, total, and ranked count.
+2. Read the GENERATED MODULES JSON. Find every numerical claim.
+3. Cross-reference each number in the generated output against the source data.
+4. For counts and totals: manually count the items in the source data yourself. Do NOT trust any summary counts provided in the source — recount from the raw data.
+5. If ANY number is wrong, fix it in the modules JSON and return the corrected version.
+6. If all numbers are accurate, return the modules JSON unchanged.
+7. Do NOT change any non-numerical content (text, formatting, structure, module types, field names). Only fix numbers.
+
+## Response Format
+Return ONLY valid JSON — the modules array (same structure as input). No markdown code blocks, no explanation.`
+
+          const validationUserPrompt = `## RAW SOURCE DATA
+${sourceContent}
+
+## GENERATED MODULES
+${JSON.stringify(generatedContent.modules, null, 2)}
+
+Verify every numerical figure in the generated modules against the raw source data. Return the corrected modules array as JSON.`
+
+          const validationResponse = await anthropic.messages.create({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 4096,
+            messages: [{ role: 'user', content: validationUserPrompt }],
+            system: validationSystemPrompt,
+          })
+
+          const validationText = validationResponse.content.find(block => block.type === 'text')
+          if (validationText && validationText.type === 'text') {
+            let validationJson = validationText.text
+            const validationJsonMatch = validationJson.match(/```(?:json)?\s*([\s\S]*?)```/)
+            if (validationJsonMatch) {
+              validationJson = validationJsonMatch[1]
+            }
+
+            const correctedModules = JSON.parse(validationJson.trim())
+            if (Array.isArray(correctedModules) && correctedModules.length > 0) {
+              generatedContent.modules = correctedModules
+              validated = true
+              console.log('Numerical validation passed — modules verified/corrected')
+            }
+          }
+        } catch (validationError) {
+          // Graceful fallback: use original unvalidated output
+          console.warn('Numerical validation failed, using original output:', validationError)
+        }
+
         // Build the full module list
         const fullModules: StackerModule[] = []
 
@@ -270,6 +326,7 @@ Generate the document structure now.`
             moduleCount: fullModules.length,
             contentModuleCount: generatedContent.modules.length,
             rawResponse: textContent.text,
+            validated,
           },
         })
       } catch (error) {
