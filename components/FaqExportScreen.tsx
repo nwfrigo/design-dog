@@ -96,7 +96,7 @@ export function FaqExportScreen() {
       <div className="flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -154,14 +154,14 @@ export function FaqExportScreen() {
       <div className="flex gap-8">
         {/* PDF Preview - Left/Main */}
         <div className="flex-1">
-          <div className="bg-gray-100 dark:bg-gray-800/50 rounded-xl p-6">
+          <div className="bg-gray-100 dark:bg-surface-secondary rounded-xl p-6">
             <div className="max-w-[612px] mx-auto space-y-4">
               {/* Cover Page */}
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
+                <div className="text-xs text-gray-500 dark:text-content-secondary text-center mb-2">
                   Page 1 (Cover)
                 </div>
-                <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700">
+                <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-line-subtle">
                   <CoverPage
                     title={faqTitle}
                     subheader={faqCoverSubheader}
@@ -177,10 +177,10 @@ export function FaqExportScreen() {
               {/* Render content pages */}
               {faqPages.map((page, idx) => (
                 <div key={page.id}>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
+                  <div className="text-xs text-gray-500 dark:text-content-secondary text-center mb-2">
                     Page {idx + 2}
                   </div>
-                  <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700">
+                  <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-line-subtle">
                     <ContentPage
                       title={faqTitle}
                       blocks={page.blocks}
@@ -198,35 +198,35 @@ export function FaqExportScreen() {
         <div className="w-[300px] flex-shrink-0">
           <div className="sticky top-0 space-y-6">
             {/* Document Info */}
-            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-4">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-4">
+              <h3 className="text-sm font-medium text-gray-900 dark:text-content-primary">
                 Document Details
               </h3>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">
                     Title
                   </label>
-                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                  <div className="text-sm text-gray-900 dark:text-content-primary">
                     {faqTitle}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">
                     Pages
                   </label>
-                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                  <div className="text-sm text-gray-900 dark:text-content-primary">
                     {faqPages.length + 1} page{faqPages.length !== 0 ? 's' : ''} (1 cover + {faqPages.length} content)
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">
                     Format
                   </label>
-                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                  <div className="text-sm text-gray-900 dark:text-content-primary">
                     Letter (8.5" × 11")
                   </div>
                 </div>
@@ -234,8 +234,8 @@ export function FaqExportScreen() {
             </div>
 
             {/* Filename */}
-            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3">
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-3">
+              <label className="block text-sm font-medium text-gray-900 dark:text-content-primary">
                 Filename
               </label>
               <div className="flex items-center gap-2">
@@ -243,14 +243,14 @@ export function FaqExportScreen() {
                   type="text"
                   value={filename}
                   onChange={(e) => setFilename(sanitizeFilename(e.target.value))}
-                  className="flex-1 px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg
+                  className="flex-1 px-3 py-2 text-sm bg-white dark:bg-surface-primary border border-gray-200 dark:border-line-subtle rounded-lg
                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                    text-gray-900 dark:text-gray-100"
+                    text-gray-900 dark:text-content-primary"
                   placeholder="Enter filename"
                 />
-                <span className="text-sm text-gray-500 dark:text-gray-400">.pdf</span>
+                <span className="text-sm text-gray-500 dark:text-content-secondary">.pdf</span>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-content-secondary">
                 Special characters will be removed automatically
               </p>
             </div>

@@ -26,7 +26,7 @@ export function TableGridPicker({ onSelect, maxRows = 8, maxCols = 6 }: TableGri
   return (
     <div className="inline-block">
       <div
-        className="grid gap-0.5 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
+        className="grid gap-0.5 p-2 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg shadow-lg"
         onMouseLeave={handleMouseLeave}
       >
         {Array.from({ length: maxRows }).map((_, rowIndex) => (
@@ -44,7 +44,7 @@ export function TableGridPicker({ onSelect, maxRows = 8, maxCols = 6 }: TableGri
                     w-5 h-5 border rounded-sm transition-colors
                     ${isHighlighted
                       ? 'bg-blue-500 border-blue-600'
-                      : 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                      : 'bg-gray-100 dark:bg-surface-tertiary border-gray-300 dark:border-line-subtle hover:border-blue-400'
                     }
                   `}
                   onMouseEnter={() => handleMouseEnter(row, col)}
@@ -56,7 +56,7 @@ export function TableGridPicker({ onSelect, maxRows = 8, maxCols = 6 }: TableGri
         ))}
       </div>
       {/* Size indicator */}
-      <div className="mt-1 text-center text-xs text-gray-500 dark:text-gray-400">
+      <div className="mt-1 text-center text-xs text-gray-500 dark:text-content-secondary">
         {hoveredCell ? `${hoveredCell.row} × ${hoveredCell.col}` : 'Select size'}
       </div>
     </div>

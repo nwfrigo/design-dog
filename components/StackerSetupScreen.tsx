@@ -333,16 +333,16 @@ export function StackerSetupScreen() {
 
   return (
     <div
-      className="min-h-screen bg-white dark:bg-black"
+      className="min-h-screen bg-white dark:bg-surface-primary"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-800">
+      <div className="border-b border-gray-200 dark:border-line-subtle">
         <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -355,10 +355,10 @@ export function StackerSetupScreen() {
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-light text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-light text-gray-900 dark:text-content-primary mb-2">
           Stacker
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-10">
+        <p className="text-gray-500 dark:text-content-secondary mb-10">
           Describe what you need or attach source content. AI will generate a structured document for you.
         </p>
 
@@ -369,7 +369,7 @@ export function StackerSetupScreen() {
               border rounded-2xl transition-all
               ${error
                 ? 'border-red-300 dark:border-red-700'
-                : 'border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20'
+                : 'border-gray-300 dark:border-line-subtle focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20'
               }
             `}
             style={{ backgroundColor: isDark ? '#000000' : 'white' }}
@@ -377,14 +377,14 @@ export function StackerSetupScreen() {
             {/* Attached file pill */}
             {attachedFile && attachedFileType && (
               <div className="px-4 pt-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-surface-secondary rounded-lg text-sm">
                   {getFileIcon(attachedFileType)}
-                  <span className="text-gray-700 dark:text-gray-300 max-w-[200px] truncate">
+                  <span className="text-gray-700 dark:text-content-secondary max-w-[200px] truncate">
                     {attachedFile.name}
                   </span>
                   <button
                     onClick={handleRemoveFile}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-content-primary transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -404,18 +404,18 @@ export function StackerSetupScreen() {
                 ? "Add context or instructions for the document (optional)..."
                 : "Describe what you need, paste content, or attach a file..."
               }
-              className="w-full px-4 py-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none resize-none bg-transparent min-h-[80px]"
+              className="w-full px-4 py-3 text-sm text-gray-900 dark:text-content-primary placeholder-gray-400 dark:placeholder:text-content-secondary focus:outline-none resize-none bg-transparent min-h-[80px]"
               rows={3}
               disabled={isGenerating}
             />
 
             {/* Bottom bar with attachment + submit */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-line-subtle">
               {/* Attachment button */}
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isGenerating}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors disabled:opacity-50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="p-2 text-gray-500 dark:text-content-secondary hover:text-gray-700 dark:hover:text-content-primary transition-colors disabled:opacity-50 rounded-lg hover:bg-gray-100 dark:hover:bg-interactive-hover"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
@@ -438,7 +438,7 @@ export function StackerSetupScreen() {
                   p-2 rounded-lg transition-all
                   ${canGenerate && !isGenerating
                     ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'}
+                    : 'bg-gray-100 dark:bg-surface-secondary text-gray-400 cursor-not-allowed'}
                 `}
               >
                 {isGenerating ? (
@@ -477,7 +477,7 @@ export function StackerSetupScreen() {
           )}
 
           {/* Helper text */}
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center">
+          <p className="text-xs text-gray-400 dark:text-content-secondary mt-3 text-center">
             {attachedFile
               ? 'Your text will be used as context for interpreting the attached content.'
               : detectedUrl
@@ -485,8 +485,8 @@ export function StackerSetupScreen() {
               : 'Supports PDF, Word, PowerPoint, TXT, and Markdown files. Or just type your content.'
             }
           </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-center">
-            Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-gray-500 dark:text-gray-400">⌘</kbd> + <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-gray-500 dark:text-gray-400">Enter</kbd> to generate
+          <p className="text-xs text-gray-400 dark:text-content-secondary mt-1 text-center">
+            Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-surface-secondary rounded text-gray-500 dark:text-content-secondary">⌘</kbd> + <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-surface-secondary rounded text-gray-500 dark:text-content-secondary">Enter</kbd> to generate
           </p>
 
           {/* Skip link */}
@@ -497,7 +497,7 @@ export function StackerSetupScreen() {
               setStackerDocumentTitle(null)
               setCurrentScreen('stacker-editor')
             }}
-            className="mt-6 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+            className="mt-6 text-xs text-gray-400 dark:text-content-secondary hover:text-gray-600 dark:hover:text-content-secondary transition-colors"
           >
             Skip and go to Stacker
           </button>
@@ -506,11 +506,11 @@ export function StackerSetupScreen() {
 
       {/* Loading Overlay */}
       {isGenerating && (
-        <div className="fixed inset-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-white/95 dark:bg-surface-primary/95 backdrop-blur-sm flex items-center justify-center">
           <div className="text-center max-w-md px-6">
             {/* Animated Logo/Spinner */}
             <div className="relative w-16 h-16 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700" />
+              <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-line-subtle" />
               <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
               <div className="absolute inset-3 rounded-full bg-blue-500/10 flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -523,7 +523,7 @@ export function StackerSetupScreen() {
             <div className="h-8 flex items-center justify-center">
               <p
                 key={currentPhrase}
-                className="text-lg font-medium text-gray-700 dark:text-gray-300 animate-fade-in"
+                className="text-lg font-medium text-gray-700 dark:text-content-secondary animate-fade-in"
               >
                 {currentPhrase}
               </p>

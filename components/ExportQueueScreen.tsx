@@ -228,10 +228,10 @@ export function ExportQueueScreen() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-content-primary">
             Export Queue
           </h2>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-500 dark:text-content-secondary">
             {exportQueue.length} {exportQueue.length === 1 ? 'asset' : 'assets'}
           </span>
         </div>
@@ -249,8 +249,8 @@ export function ExportQueueScreen() {
               <select
                 value={exportAllScale}
                 onChange={(e) => setExportAllScale(e.target.value as ExportScale)}
-                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                  bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                  bg-white dark:bg-surface-secondary text-gray-900 dark:text-content-primary"
               >
                 <option value="1x">1x</option>
                 <option value="2x">2x</option>
@@ -281,20 +281,20 @@ export function ExportQueueScreen() {
 
       {/* Queue List */}
       {exportQueue.length === 0 ? (
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
-          <svg className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white dark:bg-surface-primary rounded-xl border border-gray-200 dark:border-line-subtle p-12 text-center">
+          <svg className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-content-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-content-primary mb-2">
             No assets in queue
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-gray-500 dark:text-content-secondary mb-6">
             Add assets to the queue from the editor to export them here.
           </p>
           <button
             onClick={() => setCurrentScreen('select')}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700
-              text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-surface-secondary dark:hover:bg-interactive-hover
+              text-gray-700 dark:text-content-secondary rounded-lg font-medium transition-colors"
           >
             Go to Editor
           </button>
@@ -322,8 +322,8 @@ export function ExportQueueScreen() {
       {showNewAssetModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowNewAssetModal(false)} />
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 w-[450px] max-w-[90vw] max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add New Assets</h3>
+          <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl p-6 w-[450px] max-w-[90vw] max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-4">Add New Assets</h3>
             <div className="space-y-2 mb-6">
               {CHANNELS.map((channel) => {
                 const isExpanded = modalExpandedChannels.has(channel.id)
@@ -333,7 +333,7 @@ export function ExportQueueScreen() {
                 ).length
 
                 return (
-                  <div key={channel.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                  <div key={channel.id} className="border border-gray-200 dark:border-line-subtle rounded-lg overflow-hidden">
                     {/* Channel Header */}
                     <button
                       onClick={() => {
@@ -348,8 +348,8 @@ export function ExportQueueScreen() {
                         })
                       }}
                       disabled={!hasTemplates}
-                      className={`w-full px-3 py-2.5 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50
-                        ${hasTemplates ? 'hover:bg-gray-100 dark:hover:bg-gray-800' : 'cursor-default opacity-60'}
+                      className={`w-full px-3 py-2.5 flex items-center justify-between bg-gray-50 dark:bg-surface-secondary
+                        ${hasTemplates ? 'hover:bg-gray-100 dark:hover:bg-interactive-hover' : 'cursor-default opacity-60'}
                         transition-colors`}
                     >
                       <div className="flex items-center gap-2">
@@ -363,7 +363,7 @@ export function ExportQueueScreen() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                             d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                         </svg>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <span className="text-sm font-medium text-gray-900 dark:text-content-primary">
                           {channel.label}
                         </span>
                         {!hasTemplates && (
@@ -379,16 +379,16 @@ export function ExportQueueScreen() {
 
                     {/* Templates List */}
                     {isExpanded && hasTemplates && (
-                      <div className="border-t border-gray-200 dark:border-gray-700">
+                      <div className="border-t border-gray-200 dark:border-line-subtle">
                         {channel.templates.map((template) => {
                           const countInPending = pendingAssets.filter(t => t === template.type).length
                           return (
                             <div
                               key={template.type}
-                              className="flex items-center gap-3 p-3 pl-10 border-b last:border-b-0 border-gray-100 dark:border-gray-800"
+                              className="flex items-center gap-3 p-3 pl-10 border-b last:border-b-0 border-gray-100 dark:border-line-subtle"
                             >
                               <div className="flex-1 min-w-0">
-                                <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                                <div className="font-medium text-sm text-gray-900 dark:text-content-primary">
                                   {template.label}
                                 </div>
                               </div>
@@ -406,14 +406,14 @@ export function ExportQueueScreen() {
                                   }}
                                   disabled={countInPending === 0}
                                   className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300
-                                    dark:border-gray-600 text-gray-600 dark:text-gray-400 disabled:opacity-30
-                                    hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                    dark:border-line-subtle text-gray-600 dark:text-content-secondary disabled:opacity-30
+                                    hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors"
                                 >
                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                                   </svg>
                                 </button>
-                                <span className="w-5 text-center text-xs font-medium text-gray-900 dark:text-gray-100">
+                                <span className="w-5 text-center text-xs font-medium text-gray-900 dark:text-content-primary">
                                   {countInPending}
                                 </span>
                                 <button
@@ -438,8 +438,8 @@ export function ExportQueueScreen() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowNewAssetModal(false)}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300
-                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-content-secondary
+                  bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover"
               >
                 Cancel
               </button>
@@ -569,12 +569,12 @@ function QueueItem({
   const gridDetail3: GridDetail = { type: asset.gridDetail3Type, text: asset.gridDetail3Text }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+    <div className="bg-white dark:bg-surface-primary rounded-xl border border-gray-200 dark:border-line-subtle p-4">
       <div className="flex items-start gap-4">
         {/* Preview thumbnail - renders actual asset */}
         <button
           onClick={onPreview}
-          className="relative group flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700
+          className="relative group flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-line-subtle
             hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer [&_*]:!text-left"
           style={{
             width: dimensions.width * thumbnailScale,
@@ -1023,7 +1023,7 @@ function QueueItem({
               )}
             </div>
           ) : (
-            <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <div className="w-full h-full bg-gray-100 dark:bg-surface-secondary flex items-center justify-center">
               <svg className="w-6 h-6 text-gray-400 animate-pulse" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               </svg>
@@ -1041,7 +1041,7 @@ function QueueItem({
         {/* Asset info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded">
+            <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-surface-secondary text-gray-600 dark:text-content-secondary rounded">
               {getTemplateName(asset.templateType)}
             </span>
           </div>
@@ -1049,13 +1049,13 @@ function QueueItem({
           {/* Text fields */}
           <div className="space-y-1">
             {textFields.slice(0, 4).map((field, index) => (
-              <p key={index} className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                <span className="font-medium text-gray-700 dark:text-gray-300">{field.label}:</span>{' '}
+              <p key={index} className="text-xs text-gray-600 dark:text-content-secondary truncate">
+                <span className="font-medium text-gray-700 dark:text-content-secondary">{field.label}:</span>{' '}
                 {field.value}
               </p>
             ))}
             {textFields.length > 4 && (
-              <p className="text-xs text-gray-400 dark:text-gray-500">
+              <p className="text-xs text-gray-400 dark:text-content-secondary">
                 +{textFields.length - 4} more fields
               </p>
             )}
@@ -1069,8 +1069,8 @@ function QueueItem({
             value={scale}
             onChange={(e) => setScale(e.target.value as ExportScale)}
             disabled={isExporting}
-            className="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-              bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="px-2 py-1.5 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+              bg-white dark:bg-surface-secondary text-gray-900 dark:text-content-primary"
           >
             <option value="1x">1x</option>
             <option value="2x">2x</option>

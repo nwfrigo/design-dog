@@ -522,10 +522,10 @@ export function AutoCreateContentScreen() {
     >
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-content-primary mb-2">
           Generate Asset Copy with AI
         </h1>
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-gray-500 dark:text-content-secondary">
           {kitConfig?.contentPrompts.upload || 'Provide content for AI to generate copy from'}
         </p>
       </div>
@@ -537,7 +537,7 @@ export function AutoCreateContentScreen() {
             border rounded-2xl transition-all
             ${error
               ? 'border-red-300 dark:border-red-700'
-              : 'border-gray-300 dark:border-gray-600 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20'
+              : 'border-gray-300 dark:border-line-subtle focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20'
             }
           `}
           style={{ backgroundColor: isDark ? '#000000' : 'white' }}
@@ -545,15 +545,15 @@ export function AutoCreateContentScreen() {
           {/* Attached file pill */}
           {(attachedFile || contentSource.uploadedFileName) && (
             <div className="px-4 pt-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-surface-secondary rounded-lg text-sm">
                 {attachedFileType && getFileIcon(attachedFileType)}
                 {!attachedFileType && contentSource.uploadedFileType && getFileIcon(contentSource.uploadedFileType as FileType)}
-                <span className="text-gray-700 dark:text-gray-300 max-w-[200px] truncate">
+                <span className="text-gray-700 dark:text-content-secondary max-w-[200px] truncate">
                   {attachedFile?.name || contentSource.uploadedFileName}
                 </span>
                 <button
                   onClick={handleRemoveFile}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-content-primary transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -574,18 +574,18 @@ export function AutoCreateContentScreen() {
                 ? 'Add context or instructions (optional)...'
                 : kitConfig?.contentPrompts.placeholder || 'Describe what you need, paste content, or attach a file...'
             }
-            className="w-full px-4 py-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none resize-none bg-transparent min-h-[80px]"
+            className="w-full px-4 py-3 text-sm text-gray-900 dark:text-content-primary placeholder-gray-400 dark:placeholder:text-content-secondary focus:outline-none resize-none bg-transparent min-h-[80px]"
             rows={3}
             disabled={isProcessing}
           />
 
           {/* Bottom bar */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-line-subtle">
             {/* Attachment button */}
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
-              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors disabled:opacity-50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 text-gray-500 dark:text-content-secondary hover:text-gray-700 dark:hover:text-content-primary transition-colors disabled:opacity-50 rounded-lg hover:bg-gray-100 dark:hover:bg-interactive-hover"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
@@ -608,7 +608,7 @@ export function AutoCreateContentScreen() {
                 p-2 rounded-lg transition-all
                 ${canContinue && !isProcessing
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'}
+                  : 'bg-gray-100 dark:bg-surface-secondary text-gray-400 cursor-not-allowed'}
               `}
             >
               {isProcessing ? (
@@ -647,7 +647,7 @@ export function AutoCreateContentScreen() {
         )}
 
         {/* Helper text */}
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center">
+        <p className="text-xs text-gray-400 dark:text-content-secondary mt-3 text-center">
           {attachedFile || contentSource.uploadedFileName
             ? 'Your text will be used as additional context for interpreting the attached content.'
             : detectedUrl
@@ -655,18 +655,18 @@ export function AutoCreateContentScreen() {
             : 'Supports PDF, Word, PowerPoint, TXT, and Markdown files. Or just type your content.'
           }
         </p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-center">
-          Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-gray-500 dark:text-gray-400">⌘</kbd> + <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-gray-500 dark:text-gray-400">Enter</kbd> to continue
+        <p className="text-xs text-gray-400 dark:text-content-secondary mt-1 text-center">
+          Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-surface-secondary rounded text-gray-500 dark:text-content-secondary">⌘</kbd> + <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-surface-secondary rounded text-gray-500 dark:text-content-secondary">Enter</kbd> to continue
         </p>
       </div>
 
       {/* Analysis Panel */}
       {analysisInfo && (
-        <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white dark:bg-gray-900">
+        <div className="mt-6 border border-gray-200 dark:border-line-subtle rounded-xl overflow-hidden bg-white dark:bg-surface-primary">
           {/* Header */}
           <button
             onClick={() => setAnalysisExpanded(!analysisExpanded)}
-            className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -676,7 +676,7 @@ export function AutoCreateContentScreen() {
               </div>
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-content-primary">
                     Analysis
                   </span>
                   {analysisInfo.error && (
@@ -685,7 +685,7 @@ export function AutoCreateContentScreen() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-content-secondary">
                   Review and edit AI analysis before generating assets
                 </p>
               </div>
@@ -701,7 +701,7 @@ export function AutoCreateContentScreen() {
           </button>
 
           {analysisExpanded && (
-            <div className="border-t border-gray-200 dark:border-gray-700">
+            <div className="border-t border-gray-200 dark:border-line-subtle">
               {/* Error display */}
               {analysisInfo.error && (
                 <div className="p-5">
@@ -734,7 +734,7 @@ export function AutoCreateContentScreen() {
                                 setAutoCreateContentSource({ analysisInfo: null })
                                 handleSubmit()
                               }}
-                              className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                              className="px-3 py-1.5 text-xs font-medium bg-white dark:bg-surface-secondary text-gray-600 dark:text-content-secondary border border-gray-200 dark:border-line-subtle rounded-lg hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors"
                             >
                               Try again
                             </button>
@@ -769,7 +769,7 @@ export function AutoCreateContentScreen() {
               {!analysisInfo.error && (
                 <div className="p-5 space-y-5">
                   {/* Metadata row */}
-                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-content-secondary">
                     <span className="flex items-center gap-1.5">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -789,7 +789,7 @@ export function AutoCreateContentScreen() {
                   {/* Title */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Title</label>
+                      <label className="text-xs font-medium text-gray-500 dark:text-content-secondary">Title</label>
                       {editedFields.has('title') && (
                         <span className="text-[10px] font-medium text-blue-500 dark:text-blue-400">Edited</span>
                       )}
@@ -799,17 +799,17 @@ export function AutoCreateContentScreen() {
                       value={editedContent.title}
                       onChange={(e) => handleFieldEdit('title', e.target.value)}
                       placeholder="Not detected — add manually"
-                      className="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-gray-800
-                        hover:border-gray-300 dark:hover:border-gray-600 transition-colors
-                        placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      className="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-surface-secondary
+                        hover:border-gray-300 dark:hover:border-line-focus transition-colors
+                        placeholder:text-gray-400 dark:placeholder:text-content-secondary"
                     />
                   </div>
 
                   {/* Overview */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Overview</label>
+                      <label className="text-xs font-medium text-gray-500 dark:text-content-secondary">Overview</label>
                       {editedFields.has('mainMessage') && (
                         <span className="text-[10px] font-medium text-blue-500 dark:text-blue-400">Edited</span>
                       )}
@@ -819,17 +819,17 @@ export function AutoCreateContentScreen() {
                       onChange={(e) => handleFieldEdit('mainMessage', e.target.value)}
                       placeholder="Not detected — add manually"
                       rows={3}
-                      className="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg resize-none
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-gray-800
-                        hover:border-gray-300 dark:hover:border-gray-600 transition-colors
-                        placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      className="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg resize-none
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-surface-secondary
+                        hover:border-gray-300 dark:hover:border-line-focus transition-colors
+                        placeholder:text-gray-400 dark:placeholder:text-content-secondary"
                     />
                   </div>
 
                   {/* Key Points */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Key Points</label>
+                      <label className="text-xs font-medium text-gray-500 dark:text-content-secondary">Key Points</label>
                       {editedFields.has('keyPoints') && (
                         <span className="text-[10px] font-medium text-blue-500 dark:text-blue-400">Edited</span>
                       )}
@@ -838,7 +838,7 @@ export function AutoCreateContentScreen() {
                       {editedContent.keyPoints.length === 0 ? (
                         <button
                           onClick={handleAddKeyPoint}
-                          className="w-full px-4 py-3 text-sm text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg
+                          className="w-full px-4 py-3 text-sm text-gray-400 dark:text-content-secondary bg-gray-50 dark:bg-surface-secondary border border-dashed border-gray-300 dark:border-line-subtle rounded-lg
                             hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                         >
                           + Add a key point
@@ -853,10 +853,10 @@ export function AutoCreateContentScreen() {
                                 value={point}
                                 onChange={(e) => handleKeyPointEdit(index, e.target.value)}
                                 placeholder="Enter key point..."
-                                className="flex-1 px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg
-                                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-gray-800
-                                  hover:border-gray-300 dark:hover:border-gray-600 transition-colors
-                                  placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                className="flex-1 px-4 py-2.5 text-sm bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg
+                                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-surface-secondary
+                                  hover:border-gray-300 dark:hover:border-line-focus transition-colors
+                                  placeholder:text-gray-400 dark:placeholder:text-content-secondary"
                               />
                               <button
                                 onClick={() => handleRemoveKeyPoint(index)}
@@ -871,7 +871,7 @@ export function AutoCreateContentScreen() {
                           ))}
                           <button
                             onClick={handleAddKeyPoint}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-content-secondary
                               hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -887,7 +887,7 @@ export function AutoCreateContentScreen() {
                   {/* Call to Action */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Call to Action</label>
+                      <label className="text-xs font-medium text-gray-500 dark:text-content-secondary">Call to Action</label>
                       {editedFields.has('callToAction') && (
                         <span className="text-[10px] font-medium text-blue-500 dark:text-blue-400">Edited</span>
                       )}
@@ -897,10 +897,10 @@ export function AutoCreateContentScreen() {
                       value={editedContent.callToAction}
                       onChange={(e) => handleFieldEdit('callToAction', e.target.value)}
                       placeholder="Not detected — add manually"
-                      className="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-gray-800
-                        hover:border-gray-300 dark:hover:border-gray-600 transition-colors
-                        placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      className="w-full px-4 py-3 text-sm bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:focus:bg-surface-secondary
+                        hover:border-gray-300 dark:hover:border-line-focus transition-colors
+                        placeholder:text-gray-400 dark:placeholder:text-content-secondary"
                     />
                   </div>
                 </div>
@@ -920,7 +920,7 @@ export function AutoCreateContentScreen() {
               px-6 py-2.5 rounded-lg text-sm font-medium transition-all
               ${canContinue
                 ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-100 dark:bg-surface-secondary text-gray-400 cursor-not-allowed'
               }
             `}
           >
@@ -933,21 +933,21 @@ export function AutoCreateContentScreen() {
       <div className="flex flex-col items-center mt-6">
         <button
           onClick={goToAutoCreateAssets}
-          className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+          className="text-xs text-gray-400 dark:text-content-secondary hover:text-gray-600 dark:hover:text-content-secondary transition-colors"
         >
           Skip and go to assets
         </button>
-        <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 text-center">
+        <span className="text-[10px] text-gray-400 dark:text-content-secondary mt-0.5 text-center">
           You can always write with generative AI in the editor, or come back to this stage.
         </span>
       </div>
 
       {/* Loading Overlay */}
       {isProcessing && (
-        <div className="fixed inset-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-white/95 dark:bg-surface-primary/95 backdrop-blur-sm flex items-center justify-center">
           <div className="text-center max-w-md px-6">
             <div className="relative w-16 h-16 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700" />
+              <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-line-subtle" />
               <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
               <div className="absolute inset-3 rounded-full bg-blue-500/10 flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -958,7 +958,7 @@ export function AutoCreateContentScreen() {
             <div className="h-8 flex items-center justify-center">
               <p
                 key={currentPhrase}
-                className="text-lg font-medium text-gray-700 dark:text-gray-300 animate-fade-in"
+                className="text-lg font-medium text-gray-700 dark:text-content-secondary animate-fade-in"
               >
                 {currentPhrase}
               </p>

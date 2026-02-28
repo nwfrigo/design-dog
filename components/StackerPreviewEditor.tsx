@@ -465,7 +465,7 @@ export function StackerPreviewEditor({
         strategy={verticalListSortingStrategy}
       >
         <div
-          className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
+          className="ring-1 ring-gray-300/50 dark:ring-line-subtle/50 rounded-sm shadow-lg"
           style={{
             zoom: previewZoom / 100,
           }}

@@ -93,7 +93,7 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[80px] px-3 py-2 text-gray-900 dark:text-gray-100',
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[80px] px-3 py-2 text-gray-900 dark:text-content-primary',
       },
     },
   })
@@ -159,19 +159,19 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
 
   if (!editor) {
     return (
-      <div className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg min-h-[120px] animate-pulse" />
+      <div className="w-full bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg min-h-[120px] animate-pulse" />
     )
   }
 
   return (
-    <div className="w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+    <div className="w-full border border-gray-200 dark:border-line-subtle rounded-lg overflow-hidden bg-white dark:bg-surface-secondary">
       {/* Toolbar */}
-      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-gray-200 dark:border-line-subtle bg-gray-50 dark:bg-surface-primary">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('bold') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-600 dark:text-gray-400'
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('bold') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-600 dark:text-content-secondary'
           }`}
           title="Bold (⌘B)"
         >
@@ -184,8 +184,8 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-600 dark:text-gray-400'
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('italic') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-600 dark:text-content-secondary'
           }`}
           title="Italic (⌘I)"
         >
@@ -197,8 +197,8 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('underline') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-600 dark:text-gray-400'
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('underline') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-600 dark:text-content-secondary'
           }`}
           title="Underline (⌘U)"
         >
@@ -208,13 +208,13 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
           </svg>
         </button>
 
-        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
+        <div className="w-px h-4 bg-gray-300 dark:bg-surface-tertiary mx-1" />
 
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-600 dark:text-gray-400'
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-600 dark:text-content-secondary'
           }`}
           title="Bullet List"
         >
@@ -229,8 +229,8 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('orderedList') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-600 dark:text-gray-400'
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('orderedList') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-600 dark:text-content-secondary'
           }`}
           title="Numbered List"
         >
@@ -246,9 +246,9 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
           type="button"
           onClick={outdent}
           disabled={!editor.isActive('listItem')}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
             !editor.isActive('listItem') ? 'opacity-40 cursor-not-allowed' : ''
-          } text-gray-600 dark:text-gray-400`}
+          } text-gray-600 dark:text-content-secondary`}
           title="Decrease Indent"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,9 +261,9 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
           type="button"
           onClick={indent}
           disabled={!editor.isActive('listItem')}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
             !editor.isActive('listItem') ? 'opacity-40 cursor-not-allowed' : ''
-          } text-gray-600 dark:text-gray-400`}
+          } text-gray-600 dark:text-content-secondary`}
           title="Increase Indent"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,13 +272,13 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
           </svg>
         </button>
 
-        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
+        <div className="w-px h-4 bg-gray-300 dark:bg-surface-tertiary mx-1" />
 
         <button
           type="button"
           onClick={setLink}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('link') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-600 dark:text-gray-400'
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('link') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-600 dark:text-content-secondary'
           }`}
           title="Add Link (⌘K)"
         >
@@ -291,7 +291,7 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
           <button
             type="button"
             onClick={() => editor.chain().focus().unsetLink().run()}
-            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-red-500"
+            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors text-red-500"
             title="Remove Link"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,7 +308,7 @@ export function RichTextEditor({ content, onChange, placeholder, onRequestFullsc
           <button
             type="button"
             onClick={onRequestFullscreen}
-            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400"
+            className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors text-gray-600 dark:text-content-secondary"
             title="Edit in Fullscreen"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

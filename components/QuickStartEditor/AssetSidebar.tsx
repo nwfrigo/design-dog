@@ -117,10 +117,10 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
   }
 
   return (
-    <div className="w-72 bg-gray-50 dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 flex flex-col h-full">
+    <div className="w-72 bg-gray-50 dark:bg-surface-primary/50 border-r border-gray-200 dark:border-line-subtle flex flex-col h-full">
       {/* Header */}
-      <div className="p-5 border-b border-gray-200 dark:border-gray-800">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+      <div className="p-5 border-b border-gray-200 dark:border-line-subtle">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-content-primary">
           {headerTitle}
         </h3>
       </div>
@@ -145,7 +145,7 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
       </div>
 
       {/* Actions */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+      <div className="p-4 border-t border-gray-200 dark:border-line-subtle space-y-2">
         {successfulAssets.length > 0 && (
           <button
             onClick={handleAddAllToQueue}
@@ -205,17 +205,17 @@ function DeleteConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-sm w-full p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+      <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl max-w-sm w-full p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
           Delete Asset?
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        <p className="text-sm text-gray-500 dark:text-content-secondary mb-6">
           Are you sure you want to delete this asset? This action cannot be undone.
         </p>
         <div className="flex items-center justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
           >
             Cancel
           </button>
@@ -253,13 +253,13 @@ function AddAssetModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col overflow-hidden">
+      <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Add Assets</h3>
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-line-subtle flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary">Add Assets</h3>
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-content-primary transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -277,7 +277,7 @@ function AddAssetModal({
               return (
                 <div key={channel.id}>
                   {/* Channel label */}
-                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-content-secondary mb-3">
                     {channel.label}
                   </h4>
 
@@ -304,7 +304,7 @@ function AddAssetModal({
                             border-[0.75px] text-left
                             ${isSelected
                               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-                              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-blue-400 dark:hover:border-blue-500'
+                              : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary hover:border-blue-400 dark:hover:border-blue-500'
                             }
                           `}
                         >
@@ -313,14 +313,14 @@ function AddAssetModal({
                             <div className={`px-3 py-1.5 text-xs font-medium ${
                               isSelected
                                 ? 'text-blue-600 dark:text-blue-400'
-                                : 'text-gray-500 dark:text-gray-400'
+                                : 'text-gray-500 dark:text-content-secondary'
                             }`}>
                               Recommended
                             </div>
                           )}
 
                           {/* Preview */}
-                          <div className={`relative overflow-hidden bg-gray-100 dark:bg-gray-800/50 p-2 ${!isRecommended ? 'rounded-t-lg' : ''}`}
+                          <div className={`relative overflow-hidden bg-gray-100 dark:bg-surface-secondary p-2 ${!isRecommended ? 'rounded-t-lg' : ''}`}
                             style={{ height: Math.min(previewHeight + 16, 120) }}
                           >
                             <div
@@ -352,7 +352,7 @@ function AddAssetModal({
                                   />
                                 </div>
                               ) : (
-                                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                                <div className="w-full h-full bg-gray-200 dark:bg-surface-tertiary animate-pulse" />
                               )}
                             </div>
 
@@ -367,13 +367,13 @@ function AddAssetModal({
                           </div>
 
                           {/* Info */}
-                          <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800">
+                          <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle">
                             <span className={`text-sm font-medium block truncate ${
-                              isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'
+                              isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-content-primary'
                             }`}>
                               {template.label}
                             </span>
-                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+                            <span className="text-[10px] text-gray-400 dark:text-content-secondary font-mono">
                               {template.dimensions}
                             </span>
                           </div>
@@ -388,15 +388,15 @@ function AddAssetModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-gray-500 dark:text-content-secondary">
               {pendingAssets.length} {pendingAssets.length === 1 ? 'asset' : 'assets'} selected
             </span>
             {pendingAssets.length > 0 && (
               <button
                 onClick={() => setPendingAssets([])}
-                className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-content-primary transition-colors"
               >
                 Deselect all
               </button>
@@ -405,7 +405,7 @@ function AddAssetModal({
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
             >
               Cancel
             </button>
@@ -427,17 +427,17 @@ function AddAssetCard({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex flex-col rounded-lg overflow-hidden bg-white dark:bg-gray-800/50 border-[0.75px] border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
+      className="w-full flex flex-col rounded-lg overflow-hidden bg-white dark:bg-surface-secondary border-[0.75px] border-gray-200 dark:border-line-subtle hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
     >
       {/* Preview area */}
       <div className="flex-1 min-h-[100px] flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-gray-100 dark:bg-gray-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center transition-colors">
+          <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-gray-100 dark:bg-surface-tertiary group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center transition-colors">
             <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
             </svg>
           </div>
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <span className="text-xs font-medium text-gray-500 dark:text-content-secondary group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             Add new asset
           </span>
         </div>
@@ -476,8 +476,8 @@ function AssetCard({
         ${isSelected
           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
           : asset.status === 'complete'
-            ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
-            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 opacity-60'
+            ? 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
+            : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary opacity-60'
         }
       `}
     >
@@ -485,7 +485,7 @@ function AssetCard({
       <button
         onClick={onClick}
         disabled={asset.status !== 'complete'}
-        className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50"
+        className="relative overflow-hidden bg-gray-100 dark:bg-surface-secondary"
         style={{ height: previewHeight + 16, padding: 8 }}
       >
         {/* Scaled template preview */}
@@ -532,7 +532,7 @@ function AssetCard({
               </div>
             </div>
           ) : (
-            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="w-full h-full bg-gray-200 dark:bg-surface-tertiary animate-pulse" />
           )}
         </div>
 
@@ -553,17 +553,17 @@ function AssetCard({
       </button>
 
       {/* Info area */}
-      <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+      <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
           <span className={`text-sm font-medium truncate block ${
             isSelected
               ? 'text-blue-700 dark:text-blue-300'
-              : 'text-gray-900 dark:text-gray-100'
+              : 'text-gray-900 dark:text-content-primary'
           }`}>
             {TEMPLATE_LABELS[asset.templateType] || asset.templateType}
           </span>
           {dimensions && (
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+            <span className="text-[10px] text-gray-400 dark:text-content-secondary font-mono">
               {dimensions.width} × {dimensions.height}
             </span>
           )}

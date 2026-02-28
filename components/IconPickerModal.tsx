@@ -58,13 +58,13 @@ export function IconPickerModal({ value, onChange, onClose }: IconPickerModalPro
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-[560px] max-w-[90vw] max-h-[80vh] flex flex-col">
+      <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl w-[560px] max-w-[90vw] max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Select Icon</h3>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-line-subtle">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary">Select Icon</h3>
           <button
             onClick={onClose}
-            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-content-primary"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -73,14 +73,14 @@ export function IconPickerModal({ value, onChange, onClose }: IconPickerModalPro
         </div>
 
         {/* Search */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-line-subtle">
           <div className="relative">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search 1500+ icons..."
-              className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               autoFocus
             />
             <svg
@@ -112,14 +112,14 @@ export function IconPickerModal({ value, onChange, onClose }: IconPickerModalPro
                     className={`p-2 rounded-lg flex items-center justify-center transition-all ${
                       isSelected
                         ? 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-blue-500'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                        : 'hover:bg-gray-100 dark:hover:bg-interactive-hover'
                     }`}
                   >
                     <IconComponent
                       className={`w-5 h-5 ${
                         isSelected
                           ? 'text-blue-600 dark:text-blue-400'
-                          : 'text-gray-600 dark:text-gray-400'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     />
                   </button>
@@ -130,7 +130,7 @@ export function IconPickerModal({ value, onChange, onClose }: IconPickerModalPro
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+        <div className="px-4 py-3 border-t border-gray-200 dark:border-line-subtle text-xs text-gray-500 dark:text-content-secondary">
           {filteredIcons.length} icon{filteredIcons.length !== 1 ? 's' : ''} available
         </div>
       </div>
@@ -154,11 +154,11 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={`flex-shrink-0 w-8 h-8 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded flex items-center justify-center hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer ${className ?? ''}`}
+        className={`flex-shrink-0 w-8 h-8 bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded flex items-center justify-center hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer ${className ?? ''}`}
         title="Select icon"
       >
         {SelectedIcon ? (
-          <SelectedIcon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+          <SelectedIcon className="w-4 h-4 text-gray-600 dark:text-content-secondary" />
         ) : (
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />

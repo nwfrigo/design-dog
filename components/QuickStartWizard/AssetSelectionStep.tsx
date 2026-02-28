@@ -49,10 +49,10 @@ export function AssetSelectionStep() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-content-primary mb-1">
           Select your assets
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-gray-500 dark:text-content-secondary">
           {kitConfig?.id === 'custom'
             ? 'Choose which assets to generate'
             : 'We recommend these assets based on your kit type. Toggle to customize.'}
@@ -63,7 +63,7 @@ export function AssetSelectionStep() {
       <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
         {Object.entries(templatesByChannel).map(([channel, templates]) => (
           <div key={channel}>
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">
+            <h4 className="text-sm font-medium text-gray-500 dark:text-content-secondary mb-3 uppercase tracking-wider">
               {channel}
             </h4>
             <div className="grid grid-cols-2 gap-3">
@@ -79,7 +79,7 @@ export function AssetSelectionStep() {
                       relative flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left
                       ${isSelected
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        : 'border-gray-200 dark:border-line-subtle hover:border-gray-300 dark:hover:border-line-focus'
                       }
                     `}
                   >
@@ -89,7 +89,7 @@ export function AssetSelectionStep() {
                         w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors
                         ${isSelected
                           ? 'bg-blue-500 text-white'
-                          : 'border-2 border-gray-300 dark:border-gray-600'
+                          : 'border-2 border-gray-300 dark:border-line-subtle'
                         }
                       `}
                     >
@@ -105,11 +105,11 @@ export function AssetSelectionStep() {
                       <span className={`text-sm font-medium block truncate ${
                         isSelected
                           ? 'text-blue-700 dark:text-blue-300'
-                          : 'text-gray-700 dark:text-gray-300'
+                          : 'text-gray-700 dark:text-content-secondary'
                       }`}>
                         {getTemplateLabel(template.type)}
                       </span>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                      <span className="text-xs text-gray-400 dark:text-content-secondary">
                         {template.dimensions}
                       </span>
                     </div>
@@ -129,7 +129,7 @@ export function AssetSelectionStep() {
       </div>
 
       {/* Selection summary */}
-      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+      <div className="mt-6 p-4 bg-gray-50 dark:bg-surface-secondary rounded-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -138,10 +138,10 @@ export function AssetSelectionStep() {
               </span>
             </div>
             <div>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <span className="text-sm font-medium text-gray-900 dark:text-content-primary">
                 {selectedAssets.length === 1 ? 'asset' : 'assets'} selected
               </span>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-content-secondary">
                 AI will generate copy for each
               </p>
             </div>
@@ -150,10 +150,10 @@ export function AssetSelectionStep() {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-line-subtle">
         <button
           onClick={handleBack}
-          className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
         >
           ← Back
         </button>
@@ -164,7 +164,7 @@ export function AssetSelectionStep() {
             px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2
             ${selectedAssets.length > 0
               ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-100 dark:bg-surface-secondary text-gray-400 cursor-not-allowed'
             }
           `}
         >

@@ -54,10 +54,10 @@ export function KitSelectionStep() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-content-primary mb-1">
           What are you creating?
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-gray-500 dark:text-content-secondary">
           Choose a kit type to get started with recommended assets
         </p>
       </div>
@@ -67,7 +67,7 @@ export function KitSelectionStep() {
           <button
             key={kit.id}
             onClick={() => handleSelectKit(kit.id)}
-            className="group relative flex flex-col items-start p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all text-left"
+            className="group relative flex flex-col items-start p-5 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all text-left"
           >
             {/* Icon */}
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4 group-hover:from-blue-100 group-hover:to-purple-100 dark:group-hover:from-blue-900/50 dark:group-hover:to-purple-900/50 transition-colors">
@@ -75,10 +75,10 @@ export function KitSelectionStep() {
             </div>
 
             {/* Content */}
-            <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">
+            <h4 className="text-base font-semibold text-gray-900 dark:text-content-primary mb-1">
               {kit.label}
             </h4>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <p className="text-sm text-gray-500 dark:text-content-secondary mb-3">
               {kit.description}
             </p>
 

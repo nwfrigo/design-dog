@@ -49,13 +49,13 @@ export function IconLibraryModal({ onSelect, onClose, currentIconId }: IconLibra
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-[500px] max-w-[90vw] max-h-[70vh] flex flex-col">
+      <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl w-[500px] max-w-[90vw] max-h-[70vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Select Icon</h3>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-line-subtle">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary">Select Icon</h3>
           <button
             onClick={onClose}
-            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-content-primary"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -65,13 +65,13 @@ export function IconLibraryModal({ onSelect, onClose, currentIconId }: IconLibra
 
         {/* Category filters */}
         {categories.length > 0 && (
-          <div className="flex flex-wrap gap-2 p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap gap-2 p-4 border-b border-gray-200 dark:border-line-subtle">
             <button
               onClick={() => setSelectedCategory(null)}
               className={`px-3 py-1 text-sm rounded-full transition-colors ${
                 selectedCategory === null
                   ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 dark:bg-surface-secondary dark:text-content-secondary hover:bg-gray-200'
               }`}
             >
               All
@@ -83,7 +83,7 @@ export function IconLibraryModal({ onSelect, onClose, currentIconId }: IconLibra
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
                   selectedCategory === cat
                     ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 dark:bg-surface-secondary dark:text-content-secondary hover:bg-gray-200'
                 }`}
               >
                 {cat}
@@ -113,10 +113,10 @@ export function IconLibraryModal({ onSelect, onClose, currentIconId }: IconLibra
                   key={icon.id}
                   onClick={() => onSelect(icon.id)}
                   className={`group relative aspect-square rounded-lg overflow-hidden border-2 transition-all
-                    flex items-center justify-center bg-white dark:bg-gray-800
+                    flex items-center justify-center bg-white dark:bg-surface-secondary
                     ${currentIconId === icon.id
                       ? 'border-blue-500 ring-2 ring-blue-500/30'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-400'
+                      : 'border-gray-200 dark:border-line-subtle hover:border-blue-400'
                     }`}
                   title={icon.name}
                 >

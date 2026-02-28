@@ -134,7 +134,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   const centerContent = isQueueScreen ? (
     <button
       onClick={handleBackToEditor}
-      className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1"
+      className="text-sm text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors flex items-center gap-1"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -173,7 +173,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   )
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-surface-primary flex flex-col">
       <Header
         onLogoClick={handleLogoClick}
         centerContent={centerContent}
@@ -208,19 +208,19 @@ export function EditorLayout({ children }: EditorLayoutProps) {
       {showCancelConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowCancelConfirm(false)} />
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl p-6 max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
               Discard changes?
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm text-gray-600 dark:text-content-secondary mb-6">
               Your changes will not be saved. The original asset will remain in the queue.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
-                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
-                  border border-gray-200 dark:border-gray-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary
+                  bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover
+                  border border-gray-200 dark:border-line-subtle transition-colors"
               >
                 Keep Editing
               </button>

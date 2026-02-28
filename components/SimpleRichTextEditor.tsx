@@ -117,21 +117,21 @@ export function SimpleRichTextEditor({
   if (!editor) {
     return (
       <div
-        className={`w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg animate-pulse ${className}`}
+        className={`w-full bg-white dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg animate-pulse ${className}`}
         style={{ minHeight }}
       />
     )
   }
 
   return (
-    <div className="w-full border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
+    <div className="w-full border border-gray-300 dark:border-line-subtle rounded-lg overflow-hidden bg-white dark:bg-surface-primary">
       {/* Compact Toolbar */}
-      <div className="flex items-center gap-0.5 px-2 py-1 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div className="flex items-center gap-0.5 px-2 py-1 border-b border-gray-200 dark:border-line-subtle bg-gray-50 dark:bg-surface-secondary">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('bold') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-500 dark:text-gray-400'
+          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('bold') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-500 dark:text-content-secondary'
           }`}
           title="Bold (⌘B)"
         >
@@ -144,8 +144,8 @@ export function SimpleRichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-700 text-blue-600' : 'text-gray-500 dark:text-gray-400'
+          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+            editor.isActive('italic') ? 'bg-gray-200 dark:bg-surface-tertiary text-blue-600' : 'text-gray-500 dark:text-content-secondary'
           }`}
           title="Italic (⌘I)"
         >
@@ -156,7 +156,7 @@ export function SimpleRichTextEditor({
 
         <div className="flex-1" />
 
-        <span className="text-[10px] text-gray-400 dark:text-gray-500">
+        <span className="text-[10px] text-gray-400 dark:text-content-secondary">
           {singleLine ? '⌘B bold · ⌘I italic' : '⌘B bold · ⌘I italic · Enter for new line'}
         </span>
       </div>

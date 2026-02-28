@@ -84,10 +84,10 @@ export function AutoCreateAssetsScreen() {
     <div className="max-w-4xl mx-auto flex flex-col h-full">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-content-primary mb-2">
           Select your {kitLabel} assets
         </h1>
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-gray-500 dark:text-content-secondary">
           {kitConfig?.id === 'custom'
             ? 'Choose which assets to generate.'
             : `We recommend these assets to promote your ${kitLabel}, but choose any you want.`}
@@ -99,9 +99,9 @@ export function AutoCreateAssetsScreen() {
         {Object.entries(templatesByChannel).map(([channel, templates], index) => (
           <div
             key={channel}
-            className={index > 0 ? 'pt-8 mt-8 border-t border-gray-200 dark:border-gray-800' : ''}
+            className={index > 0 ? 'pt-8 mt-8 border-t border-gray-200 dark:border-line-subtle' : ''}
           >
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider">
+            <h4 className="text-sm font-medium text-gray-500 dark:text-content-secondary mb-4 uppercase tracking-wider">
               {channel}
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
@@ -122,7 +122,7 @@ export function AutoCreateAssetsScreen() {
                       border-[0.75px] text-left cursor-pointer
                       ${isSelected
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
+                        : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
                       }
                     `}
                   >
@@ -132,7 +132,7 @@ export function AutoCreateAssetsScreen() {
                         <svg className="w-3 h-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
-                        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                        <span className="text-[10px] font-medium text-gray-500 dark:text-content-secondary">
                           Recommended
                         </span>
                       </div>
@@ -140,7 +140,7 @@ export function AutoCreateAssetsScreen() {
 
                     {/* Preview area */}
                     <div
-                      className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50"
+                      className="relative overflow-hidden bg-gray-100 dark:bg-surface-secondary"
                       style={{ height: previewHeight + 24, padding: 12 }}
                     >
                       {/* Scaled template preview */}
@@ -173,7 +173,7 @@ export function AutoCreateAssetsScreen() {
                           </div>
                         ) : (
                           <div
-                            className="bg-gray-200 dark:bg-gray-700 animate-pulse rounded"
+                            className="bg-gray-200 dark:bg-surface-tertiary animate-pulse rounded"
                             style={{ width: targetWidth, height: previewHeight }}
                           />
                         )}
@@ -181,16 +181,16 @@ export function AutoCreateAssetsScreen() {
                     </div>
 
                     {/* Info area */}
-                    <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between">
                       <div className="min-w-0 flex-1">
                         <span className={`text-sm font-medium truncate block ${
                           isSelected
                             ? 'text-blue-700 dark:text-blue-300'
-                            : 'text-gray-900 dark:text-gray-100'
+                            : 'text-gray-900 dark:text-content-primary'
                         }`}>
                           {TEMPLATE_LABELS[template.type] || template.type}
                         </span>
-                        <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+                        <span className="text-[10px] text-gray-400 dark:text-content-secondary font-mono">
                           {template.dimensions}
                         </span>
                       </div>
@@ -200,7 +200,7 @@ export function AutoCreateAssetsScreen() {
                           w-5 h-5 rounded flex-shrink-0 flex items-center justify-center transition-all duration-150
                           ${isSelected
                             ? 'bg-blue-500'
-                            : 'border border-gray-300 dark:border-gray-600'
+                            : 'border border-gray-300 dark:border-line-subtle'
                           }
                         `}
                       >
@@ -270,7 +270,7 @@ export function AutoCreateAssetsScreen() {
       {showContextWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowContextWarning(false)} />
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-md w-full p-6">
+          <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl max-w-md w-full p-6">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,15 +278,15 @@ export function AutoCreateAssetsScreen() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-1">
                   Limited content detected
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500 dark:text-content-secondary">
                   There isn't much content to work with. The AI may generate generic copy that doesn't reflect your specific material.
                 </p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-sm text-gray-600 dark:text-content-secondary mb-6">
               Go back to add more details, or continue anyway.
             </p>
             <div className="flex items-center justify-end gap-3">
@@ -295,7 +295,7 @@ export function AutoCreateAssetsScreen() {
                   setShowContextWarning(false)
                   setCurrentScreen('auto-create-content')
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
               >
                 ← Add more content
               </button>

@@ -48,7 +48,7 @@ function EyeIcon({ visible, onClick }: { visible: boolean; onClick: () => void }
     <button
       type="button"
       onClick={onClick}
-      className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+      className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors ${
         visible ? 'text-gray-500' : 'text-gray-300'
       }`}
       title={visible ? 'Hide in preview' : 'Show in preview'}
@@ -989,7 +989,7 @@ export function EditorScreen() {
     <div className="space-y-6">
       {/* Tab Navigation - only show in regular mode, not auto-create mode */}
       {!isAutoCreateMode && (
-        <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center border-b border-gray-200 dark:border-line-subtle">
           <div className="flex">
             {selectedAssets.map((asset, index) => (
               <button
@@ -997,8 +997,8 @@ export function EditorScreen() {
                 onClick={() => goToAsset(index)}
                 className={`px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px transition-colors ${
                   index === currentAssetIndex
-                    ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                    ? 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary'
                 } ${index > 0 ? '-ml-px' : ''}`}
               >
                 {getAssetLabel(asset, index)}
@@ -1011,7 +1011,7 @@ export function EditorScreen() {
                   setPendingAssets([])
                   setShowAddAssetModal(true)
                 }}
-                className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="ml-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-content-primary hover:bg-gray-100 dark:hover:bg-interactive-hover rounded-lg transition-colors"
                 title="Add asset"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1027,13 +1027,13 @@ export function EditorScreen() {
       {showAddAssetModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddAssetModal(false)} />
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col overflow-hidden">
+          <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Add Assets</h3>
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-line-subtle flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary">Add Assets</h3>
               <button
                 onClick={() => setShowAddAssetModal(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-content-primary transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1051,7 +1051,7 @@ export function EditorScreen() {
                   return (
                     <div key={channel.id}>
                       {/* Channel label */}
-                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                      <h4 className="text-sm font-medium text-gray-500 dark:text-content-secondary mb-3">
                         {channel.label}
                       </h4>
 
@@ -1084,13 +1084,13 @@ export function EditorScreen() {
                                 border-[0.75px]
                                 ${isSelected
                                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-                                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
+                                  : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
                                 }
                               `}
                             >
                               {/* Preview area */}
                               <div
-                                className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50 flex items-center justify-center"
+                                className="relative overflow-hidden bg-gray-100 dark:bg-surface-secondary flex items-center justify-center"
                                 style={{ height: previewHeight + 24, padding: 12 }}
                               >
                                 {/* Scaled template preview */}
@@ -1124,7 +1124,7 @@ export function EditorScreen() {
                                     </div>
                                   ) : (
                                     <div
-                                      className="bg-gray-200 dark:bg-gray-700 animate-pulse rounded"
+                                      className="bg-gray-200 dark:bg-surface-tertiary animate-pulse rounded"
                                       style={{ width: targetWidth, height: previewHeight }}
                                     />
                                   )}
@@ -1150,16 +1150,16 @@ export function EditorScreen() {
                               </div>
 
                               {/* Info area */}
-                              <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+                              <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between gap-2">
                                 <div className="flex-1 min-w-0">
                                   <span className={`text-sm font-medium truncate block ${
                                     isSelected
                                       ? 'text-blue-700 dark:text-blue-300'
-                                      : 'text-gray-900 dark:text-gray-100'
+                                      : 'text-gray-900 dark:text-content-primary'
                                   }`}>
                                     {template.label.replace(/^(Email|Social|Website|Newsletter)\s*-?\s*/, '')}
                                   </span>
-                                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+                                  <span className="text-[10px] text-gray-400 dark:text-content-secondary font-mono">
                                     {template.dimensions}
                                   </span>
                                   {existingCount > 0 && (
@@ -1175,7 +1175,7 @@ export function EditorScreen() {
                                     e.stopPropagation()
                                     setModalPreviewTemplate(template)
                                   }}
-                                  className="flex-shrink-0 px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400
+                                  className="flex-shrink-0 px-2 py-1 text-xs font-medium text-gray-500 dark:text-content-secondary
                                     hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30
                                     rounded transition-colors"
                                 >
@@ -1193,11 +1193,11 @@ export function EditorScreen() {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex gap-3">
+            <div className="px-6 py-4 border-t border-gray-100 dark:border-line-subtle flex gap-3">
               <button
                 onClick={() => setShowAddAssetModal(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300
-                  bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-content-secondary
+                  bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
               >
                 Cancel
               </button>
@@ -1212,7 +1212,7 @@ export function EditorScreen() {
                 }}
                 disabled={pendingAssets.length === 0}
                 className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg
-                  hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+                  hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-btn-primary-disabled disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
               >
                 Add {pendingAssets.length > 0 ? `(${pendingAssets.length})` : ''}
               </button>
@@ -1388,13 +1388,13 @@ export function EditorScreen() {
         <div className="w-[340px] flex-shrink-0 space-y-5 overflow-y-auto">
           {/* Mode Toggle - hidden for solution-overview-pdf */}
           {currentTemplate !== 'solution-overview-pdf' && (
-            <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <div className="flex gap-1 p-1 bg-gray-100 dark:bg-surface-secondary rounded-lg">
               <button
                 onClick={() => setContentMode('verbatim')}
                 className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                   contentMode === 'verbatim'
-                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+                    ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                    : 'text-gray-600 dark:text-content-secondary hover:text-gray-900'
                 }`}
               >
                 Direct Edit
@@ -1403,8 +1403,8 @@ export function EditorScreen() {
                 onClick={() => setContentMode('generate')}
                 className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
                   contentMode === 'generate'
-                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+                    ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                    : 'text-gray-600 dark:text-content-secondary hover:text-gray-900'
                 }`}
               >
                 <svg className="w-4 h-4" viewBox="0 0 18 17" fill="none">
@@ -1416,20 +1416,20 @@ export function EditorScreen() {
           )}
 
           {/* Template Options */}
-          <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+          <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
               {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setLogoColor('orange')}
                       className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         logoColor === 'orange'
-                          ? 'bg-white dark:bg-gray-900 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                       style={{ color: logoColor === 'orange' ? colorsConfig.brand.primary : undefined }}
                     >
@@ -1439,21 +1439,21 @@ export function EditorScreen() {
                       onClick={() => setLogoColor('white')}
                       className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         logoColor === 'white'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       White
                     </button>
                   </div>
                 ) : (
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setLogoColor('black')}
                       className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         logoColor === 'black'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Black
@@ -1462,8 +1462,8 @@ export function EditorScreen() {
                       onClick={() => setLogoColor('orange')}
                       className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         logoColor === 'orange'
-                          ? 'bg-white dark:bg-gray-900 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                       style={{ color: logoColor === 'orange' ? colorsConfig.brand.primary : undefined }}
                     >
@@ -1482,8 +1482,8 @@ export function EditorScreen() {
                     <select
                       value={solution}
                       onChange={(e) => setSolution(e.target.value)}
-                      className="w-full px-3 py-2 pr-8 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 appearance-none cursor-pointer"
+                      className="w-full px-3 py-2 pr-8 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary appearance-none cursor-pointer"
                     >
                       {solutionOptions.map(({ key, label }) => (
                         <option key={key} value={key}>{label}</option>
@@ -1516,7 +1516,7 @@ export function EditorScreen() {
                         className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
                           colorStyle === style
                             ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
                         }`}
                       >
                         <img
@@ -1532,13 +1532,13 @@ export function EditorScreen() {
                 {/* Alignment */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Alignment</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setAlignment('left')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'left'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Left
@@ -1547,8 +1547,8 @@ export function EditorScreen() {
                       onClick={() => setAlignment('center')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'center'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Center
@@ -1559,13 +1559,13 @@ export function EditorScreen() {
                 {/* CTA Style */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setCtaStyle('link')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'link'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Link
@@ -1574,8 +1574,8 @@ export function EditorScreen() {
                       onClick={() => setCtaStyle('button')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'button'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Button
@@ -1599,7 +1599,7 @@ export function EditorScreen() {
                         className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
                           colorStyle === style
                             ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
                         }`}
                       >
                         <img
@@ -1615,13 +1615,13 @@ export function EditorScreen() {
                 {/* Image Size */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Image Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setNewsletterImageSize('none')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       None
@@ -1630,8 +1630,8 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('small')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Small
@@ -1640,8 +1640,8 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('large')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Large
@@ -1697,9 +1697,9 @@ export function EditorScreen() {
                       <div className="flex gap-2">
                         {/* Upload box */}
                         <div
-                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
                         >
-                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
                             <input
                               type="file"
                               accept="image/*"
@@ -1722,9 +1722,9 @@ export function EditorScreen() {
                         {/* Library box */}
                         <button
                           onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
-                            hover:border-gray-400 dark:hover:border-gray-500 transition-colors
-                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
+                            hover:border-gray-400 dark:hover:border-line-focus transition-colors
+                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                         >
                           <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1752,7 +1752,7 @@ export function EditorScreen() {
                         className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
                           colorStyle === style
                             ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
                         }`}
                       >
                         <img
@@ -1768,13 +1768,13 @@ export function EditorScreen() {
                 {/* Image Size */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Image Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setNewsletterImageSize('none')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       None
@@ -1783,8 +1783,8 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('small')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Small
@@ -1793,8 +1793,8 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('large')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Large
@@ -1850,9 +1850,9 @@ export function EditorScreen() {
                       <div className="flex gap-2">
                         {/* Upload box */}
                         <div
-                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
                         >
-                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
                             <input
                               type="file"
                               accept="image/*"
@@ -1875,9 +1875,9 @@ export function EditorScreen() {
                         {/* Library box */}
                         <button
                           onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
-                            hover:border-gray-400 dark:hover:border-gray-500 transition-colors
-                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
+                            hover:border-gray-400 dark:hover:border-line-focus transition-colors
+                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                         >
                           <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1897,13 +1897,13 @@ export function EditorScreen() {
                 {/* Image Size */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Image Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setNewsletterImageSize('none')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       None
@@ -1912,8 +1912,8 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('small')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Small
@@ -1922,8 +1922,8 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('large')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Large
@@ -1979,9 +1979,9 @@ export function EditorScreen() {
                       <div className="flex gap-2">
                         {/* Upload box */}
                         <div
-                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
                         >
-                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
                             <input
                               type="file"
                               accept="image/*"
@@ -2004,9 +2004,9 @@ export function EditorScreen() {
                         {/* Library box */}
                         <button
                           onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
-                            hover:border-gray-400 dark:hover:border-gray-500 transition-colors
-                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
+                            hover:border-gray-400 dark:hover:border-line-focus transition-colors
+                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                         >
                           <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -2034,7 +2034,7 @@ export function EditorScreen() {
                         className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
                           newsletterTopBannerVariant === variant
                             ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
                         }`}
                       >
                         <img
@@ -2055,15 +2055,15 @@ export function EditorScreen() {
                 {/* Speaker Count */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Number of Speakers</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {([1, 2, 3] as const).map((count) => (
                       <button
                         key={count}
                         onClick={() => setSpeakerCount(count)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           speakerCount === count
-                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
                         {count}
@@ -2080,15 +2080,15 @@ export function EditorScreen() {
                 {/* Variant */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Layout</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['image', 'none'] as const).map((variant) => (
                       <button
                         key={variant}
                         onClick={() => setEbookVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           ebookVariant === variant
-                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
                         {variant === 'image' ? 'Image' : 'None'}
@@ -2105,15 +2105,15 @@ export function EditorScreen() {
                 {/* Variant */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Right Side Content</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['none', 'image', 'speakers'] as const).map((variant) => (
                       <button
                         key={variant}
                         onClick={() => setWebinarVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           webinarVariant === variant
-                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
                         {variant === 'none' ? 'None' : variant === 'image' ? 'Image' : 'Speakers'}
@@ -2130,15 +2130,15 @@ export function EditorScreen() {
                 {/* Variant */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Style</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['orange', 'light', 'dark-gradient'] as const).map((variant) => (
                       <button
                         key={variant}
                         onClick={() => setEventListingVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           eventListingVariant === variant
-                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
                         {variant === 'orange' ? 'Orange' : variant === 'light' ? 'Light' : 'Dark'}
@@ -2155,15 +2155,15 @@ export function EditorScreen() {
                 {/* Variant */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Layout</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['image', 'none'] as const).map((variant) => (
                       <button
                         key={variant}
                         onClick={() => setReportVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           reportVariant === variant
-                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
                         {variant === 'image' ? 'Image' : 'None'}
@@ -2183,7 +2183,7 @@ export function EditorScreen() {
                   <select
                     value={floatingBannerVariant}
                     onChange={(e) => setFloatingBannerVariant(e.target.value as typeof floatingBannerVariant)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="white">White</option>
                     <option value="orange">Orange</option>
@@ -2206,7 +2206,7 @@ export function EditorScreen() {
                   <select
                     value={floatingBannerMobileVariant}
                     onChange={(e) => setFloatingBannerMobileVariant(e.target.value as typeof floatingBannerMobileVariant)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="light">Light</option>
                     <option value="orange">Orange</option>
@@ -2220,13 +2220,13 @@ export function EditorScreen() {
                 {/* Arrow Type */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setFloatingBannerMobileArrowType('text')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         floatingBannerMobileArrowType === 'text'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Text + Arrow
@@ -2235,8 +2235,8 @@ export function EditorScreen() {
                       onClick={() => setFloatingBannerMobileArrowType('arrow')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         floatingBannerMobileArrowType === 'arrow'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Arrow Only
@@ -2252,7 +2252,7 @@ export function EditorScreen() {
                 {/* Page 1 Controls (Cover) */}
                 {solutionOverviewCurrentPage === 1 && (
                   <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Cover Page</h4>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Cover Page</h4>
 
                     {/* Solution Category */}
                     <div>
@@ -2260,7 +2260,7 @@ export function EditorScreen() {
                       <select
                         value={solutionOverviewSolution}
                         onChange={(e) => setSolutionOverviewSolution(e.target.value as SolutionCategory)}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         {Object.entries(solutionCategories).map(([key, { label }]) => (
                           <option key={key} value={key}>{label}</option>
@@ -2276,7 +2276,7 @@ export function EditorScreen() {
                         value={solutionOverviewSolutionName}
                         onChange={(e) => setSolutionOverviewSolutionName(e.target.value)}
                         placeholder="Employee Health Essentials"
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                       <div className="mt-1 text-xs text-gray-400 text-right">
                         {solutionOverviewSolutionName.length}/60
@@ -2291,7 +2291,7 @@ export function EditorScreen() {
                         value={solutionOverviewTagline}
                         onChange={(e) => setSolutionOverviewTagline(e.target.value)}
                         placeholder="Built for Healthcare. Ready for You."
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                       <div className="mt-1 text-xs text-gray-400 text-right">
                         {solutionOverviewTagline.length}/80
@@ -2303,7 +2303,7 @@ export function EditorScreen() {
                 {/* Page 2 Controls (Body) */}
                 {solutionOverviewCurrentPage === 2 && (
                   <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Body Page</h4>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Body Page</h4>
 
                     {/* Hero Image Upload */}
                     <div>
@@ -2311,8 +2311,8 @@ export function EditorScreen() {
                       {!solutionOverviewHeroImageUrl ? (
                         <div className="flex gap-2">
                           {/* Upload box */}
-                          <div className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-                            <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                          <div className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16 hover:border-gray-400 dark:hover:border-line-focus transition-colors">
+                            <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -2337,9 +2337,9 @@ export function EditorScreen() {
                           {/* Library box */}
                           <button
                             onClick={() => setShowHeroImageLibrary(true)}
-                            className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
-                              hover:border-gray-400 dark:hover:border-gray-500 transition-colors
-                              flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                            className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
+                              hover:border-gray-400 dark:hover:border-line-focus transition-colors
+                              flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                           >
                             <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -2380,7 +2380,7 @@ export function EditorScreen() {
                             <button
                               onClick={() => setSolutionOverviewHeroImageGrayscale(!solutionOverviewHeroImageGrayscale)}
                               className={`relative w-9 h-5 rounded-full transition-colors ${
-                                solutionOverviewHeroImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                                solutionOverviewHeroImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
                               }`}
                             >
                               <span
@@ -2393,8 +2393,8 @@ export function EditorScreen() {
                           {/* Replace/Remove buttons */}
                           <div className="flex gap-2">
                             {/* Replace with upload */}
-                            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-                              <label className="flex items-center justify-center gap-1 h-8 cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <div className="flex-1 border border-gray-300 dark:border-line-subtle rounded-lg overflow-hidden">
+                              <label className="flex items-center justify-center gap-1 h-8 cursor-pointer text-xs text-gray-500 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors">
                                 <input
                                   type="file"
                                   accept="image/*"
@@ -2421,7 +2421,7 @@ export function EditorScreen() {
                             {/* Replace from library */}
                             <button
                               onClick={() => setShowHeroImageLibrary(true)}
-                              className="flex-1 flex items-center justify-center gap-1 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                              className="flex-1 flex items-center justify-center gap-1 h-8 border border-gray-300 dark:border-line-subtle rounded-lg text-xs text-gray-500 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors"
                             >
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -2436,7 +2436,7 @@ export function EditorScreen() {
                                 setSolutionOverviewHeroImageZoom(1)
                                 setSolutionOverviewHeroImageGrayscale(false)
                               }}
-                              className="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors"
+                              className="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-line-subtle rounded-lg text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors"
                               title="Remove image"
                             >
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2456,7 +2456,7 @@ export function EditorScreen() {
                         value={solutionOverviewPage2Header}
                         onChange={(e) => setSolutionOverviewPage2Header(e.target.value)}
                         placeholder="Employee Health Essentials"
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                       <div className="mt-1 text-xs text-gray-400 text-right">
                         {solutionOverviewPage2Header.length}/60
@@ -2471,7 +2471,7 @@ export function EditorScreen() {
                         onChange={(e) => setSolutionOverviewSectionHeader(e.target.value)}
                         placeholder="Streamline Employee Health.\nStrengthen Compliance."
                         rows={2}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
                       />
                       <div className="mt-1 text-xs text-gray-400 text-right">
                         {solutionOverviewSectionHeader.length}/80
@@ -2486,7 +2486,7 @@ export function EditorScreen() {
                         onChange={(e) => setSolutionOverviewIntroParagraph(e.target.value)}
                         placeholder="Enter introduction text..."
                         rows={7}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
                       />
                       <div className={`mt-1 text-xs text-right ${solutionOverviewIntroParagraph.length > 500 ? 'text-orange-500' : 'text-gray-400'}`}>
                         {solutionOverviewIntroParagraph.length}/500
@@ -2504,7 +2504,7 @@ export function EditorScreen() {
                               value={solution}
                               onChange={(e) => setSolutionOverviewKeySolution(index, e.target.value)}
                               placeholder={`Solution ${index + 1}`}
-                              className="flex-1 px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="flex-1 px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                             {solutionOverviewKeySolutions.length > 1 && (
                               <button
@@ -2534,7 +2534,7 @@ export function EditorScreen() {
                     </div>
 
                     {/* Quote Section */}
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <div className="border-t border-gray-200 dark:border-line-subtle pt-4">
                       <label className="block text-xs text-gray-500 mb-2">Quote Section</label>
 
                       {/* Quote Text */}
@@ -2545,7 +2545,7 @@ export function EditorScreen() {
                           onChange={(e) => setSolutionOverviewQuoteText(e.target.value)}
                           placeholder="Enter customer quote..."
                           rows={4}
-                          className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                          className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
                         />
                         <div className={`mt-1 text-xs text-right ${solutionOverviewQuoteText.length > 350 ? 'text-orange-500' : 'text-gray-400'}`}>
                           {solutionOverviewQuoteText.length}/350
@@ -2561,7 +2561,7 @@ export function EditorScreen() {
                             value={solutionOverviewQuoteName}
                             onChange={(e) => setSolutionOverviewQuoteName(e.target.value)}
                             placeholder="Firstname Lastname"
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
                         <div>
@@ -2571,7 +2571,7 @@ export function EditorScreen() {
                             value={solutionOverviewQuoteTitle}
                             onChange={(e) => setSolutionOverviewQuoteTitle(e.target.value)}
                             placeholder="Job Title"
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
                         <div>
@@ -2581,15 +2581,15 @@ export function EditorScreen() {
                             value={solutionOverviewQuoteCompany}
                             onChange={(e) => setSolutionOverviewQuoteCompany(e.target.value)}
                             placeholder="Company Name"
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
                       </div>
                     </div>
 
                     {/* Footer Stats Section */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Footer Stats</h4>
+                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary mb-3">Footer Stats</h4>
                       <div className="grid grid-cols-5 gap-2">
                         {/* Stat 1 */}
                         <div className="space-y-1">
@@ -2598,14 +2598,14 @@ export function EditorScreen() {
                             value={solutionOverviewStat1Value}
                             onChange={(e) => setSolutionOverviewStat1Value(e.target.value)}
                             placeholder="20+"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                           <input
                             type="text"
                             value={solutionOverviewStat1Label}
                             onChange={(e) => setSolutionOverviewStat1Label(e.target.value)}
                             placeholder="Awards"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                         </div>
                         {/* Stat 2 */}
@@ -2615,14 +2615,14 @@ export function EditorScreen() {
                             value={solutionOverviewStat2Value}
                             onChange={(e) => setSolutionOverviewStat2Value(e.target.value)}
                             placeholder="350+"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                           <input
                             type="text"
                             value={solutionOverviewStat2Label}
                             onChange={(e) => setSolutionOverviewStat2Label(e.target.value)}
                             placeholder="Experts"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                         </div>
                         {/* Stat 3 */}
@@ -2632,14 +2632,14 @@ export function EditorScreen() {
                             value={solutionOverviewStat3Value}
                             onChange={(e) => setSolutionOverviewStat3Value(e.target.value)}
                             placeholder="100%"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                           <input
                             type="text"
                             value={solutionOverviewStat3Label}
                             onChange={(e) => setSolutionOverviewStat3Label(e.target.value)}
                             placeholder="Deployment"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                         </div>
                         {/* Stat 4 */}
@@ -2649,14 +2649,14 @@ export function EditorScreen() {
                             value={solutionOverviewStat4Value}
                             onChange={(e) => setSolutionOverviewStat4Value(e.target.value)}
                             placeholder="2M+"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                           <input
                             type="text"
                             value={solutionOverviewStat4Label}
                             onChange={(e) => setSolutionOverviewStat4Label(e.target.value)}
                             placeholder="End Users"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                         </div>
                         {/* Stat 5 */}
@@ -2666,14 +2666,14 @@ export function EditorScreen() {
                             value={solutionOverviewStat5Value}
                             onChange={(e) => setSolutionOverviewStat5Value(e.target.value)}
                             placeholder="1.2K"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                           <input
                             type="text"
                             value={solutionOverviewStat5Label}
                             onChange={(e) => setSolutionOverviewStat5Label(e.target.value)}
                             placeholder="Clients"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
+                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
                           />
                         </div>
                       </div>
@@ -2687,12 +2687,12 @@ export function EditorScreen() {
                     {/* Key Benefits Section */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Key Benefits</h4>
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Key Benefits</h4>
                         <span className="text-xs text-gray-400">{solutionOverviewBenefits.length}/7</span>
                       </div>
                       <div className="space-y-3">
                         {solutionOverviewBenefits.map((benefit, index) => (
-                          <div key={index} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-2">
+                          <div key={index} className="p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-2">
                             {/* Row 1: Icon picker + Title + X button */}
                             <div className="flex items-center gap-2">
                               {/* Icon Picker - same height as input */}
@@ -2704,11 +2704,11 @@ export function EditorScreen() {
                                       setActiveBenefitForIcon(index)
                                       setShowIconLibrary(true)
                                     }}
-                                    className="flex-shrink-0 w-8 h-8 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded flex items-center justify-center hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
+                                    className="flex-shrink-0 w-8 h-8 bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded flex items-center justify-center hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
                                     title={benefit.icon ? `Icon: ${benefit.icon.replace(/-/g, ' ')}` : 'Select icon'}
                                   >
                                     {IconComponent ? (
-                                      <IconComponent className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                      <IconComponent className="w-4 h-4 text-gray-600 dark:text-content-secondary" />
                                     ) : (
                                       <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
@@ -2723,7 +2723,7 @@ export function EditorScreen() {
                                 value={benefit.title}
                                 onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, title: e.target.value })}
                                 placeholder="Benefit title"
-                                className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
                               {/* X button - only show when more than 3 benefits */}
                               {solutionOverviewBenefits.length > 3 && (
@@ -2744,7 +2744,7 @@ export function EditorScreen() {
                               onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, description: e.target.value })}
                               placeholder="Description"
                               rows={4}
-                              className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                              className="w-full px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                             />
                           </div>
                         ))}
@@ -2760,11 +2760,11 @@ export function EditorScreen() {
                     </div>
 
                     {/* Image */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image</h4>
+                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary mb-2">Image</h4>
                       {!solutionOverviewScreenshotUrl ? (
                         <div className="flex gap-2">
-                          <label className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition-colors">
+                          <label className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg cursor-pointer hover:border-blue-400 transition-colors">
                             <input
                               type="file"
                               accept="image/*"
@@ -2789,7 +2789,7 @@ export function EditorScreen() {
                           </label>
                           <button
                             onClick={() => { setSelectingSOScreenshot(true); setShowImageLibrary(true) }}
-                            className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 transition-colors flex flex-col items-center justify-center text-gray-400"
+                            className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg cursor-pointer hover:border-blue-400 transition-colors flex flex-col items-center justify-center text-gray-400"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -2851,7 +2851,7 @@ export function EditorScreen() {
                             <button
                               onClick={() => setSolutionOverviewScreenshotGrayscale(!solutionOverviewScreenshotGrayscale)}
                               className={`relative w-9 h-5 rounded-full transition-colors ${
-                                solutionOverviewScreenshotGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                                solutionOverviewScreenshotGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
                               }`}
                             >
                               <span
@@ -2866,14 +2866,14 @@ export function EditorScreen() {
                     </div>
 
                     {/* Powerful Features Section */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Powerful Features</h4>
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Powerful Features</h4>
                         <span className="text-xs text-gray-400">{solutionOverviewFeatures.length} features</span>
                       </div>
                       <div className="space-y-3">
                         {solutionOverviewFeatures.map((feature, index) => (
-                          <div key={index} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                          <div key={index} className="p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">
                             <div className="flex items-start gap-2">
                               <div className="flex-1 space-y-2">
                                 <input
@@ -2881,14 +2881,14 @@ export function EditorScreen() {
                                   value={feature.title}
                                   onChange={(e) => setSolutionOverviewFeature(index, { ...feature, title: e.target.value })}
                                   placeholder="Feature title"
-                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <textarea
                                   value={feature.description}
                                   onChange={(e) => setSolutionOverviewFeature(index, { ...feature, description: e.target.value })}
                                   placeholder="Description"
                                   rows={3}
-                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                                 />
                               </div>
                               {solutionOverviewFeatures.length > 1 && (
@@ -2915,12 +2915,12 @@ export function EditorScreen() {
                     </div>
 
                     {/* CTA Option */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Call to Action</h4>
+                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle space-y-3">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Call to Action</h4>
                       <select
                         value={solutionOverviewCtaOption}
                         onChange={(e) => setSolutionOverviewCtaOption(e.target.value as 'demo' | 'learn' | 'start' | 'contact')}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         {ctaOptions.map((option) => (
                           <option key={option.id} value={option.id}>{option.label}</option>
@@ -2933,7 +2933,7 @@ export function EditorScreen() {
                           value={solutionOverviewCtaUrl}
                           onChange={(e) => setSolutionOverviewCtaUrl(e.target.value)}
                           placeholder="https://cority.com/request-demo"
-                          className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                          className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                         />
                         <p className="mt-1 text-xs text-gray-400">This link will be clickable in the exported PDF</p>
                       </div>
@@ -2957,7 +2957,7 @@ export function EditorScreen() {
                         className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
                           colorStyle === style
                             ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
                         }`}
                       >
                         <img
@@ -2973,13 +2973,13 @@ export function EditorScreen() {
                 {/* Alignment */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Alignment</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setAlignment('left')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'left'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Left
@@ -2988,8 +2988,8 @@ export function EditorScreen() {
                       onClick={() => setAlignment('center')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'center'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Center
@@ -3000,15 +3000,15 @@ export function EditorScreen() {
                 {/* Heading Size */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Heading Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['S', 'M', 'L'] as const).map((size) => (
                       <button
                         key={size}
                         onClick={() => setHeadingSize(size)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           headingSize === size
-                            ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
                         {size}
@@ -3020,13 +3020,13 @@ export function EditorScreen() {
                 {/* CTA Style */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setCtaStyle('link')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'link'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Link
@@ -3035,8 +3035,8 @@ export function EditorScreen() {
                       onClick={() => setCtaStyle('button')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'button'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Button
@@ -3051,13 +3051,13 @@ export function EditorScreen() {
               <>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Layout</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setLayout('more-text')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         layout === 'more-text'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       More Text
@@ -3066,8 +3066,8 @@ export function EditorScreen() {
                       onClick={() => setLayout('even')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         layout === 'even'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       Even
@@ -3076,8 +3076,8 @@ export function EditorScreen() {
                       onClick={() => setLayout('more-image')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         layout === 'more-image'
-                          ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       More Image
@@ -3142,10 +3142,10 @@ export function EditorScreen() {
                       className={`flex-1 border-2 border-dashed rounded-lg h-16 transition-colors ${
                         isImageDragging
                           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-300 dark:border-gray-600'
+                          : 'border-gray-300 dark:border-line-subtle'
                       }`}
                     >
-                      <label className={`flex flex-col items-center justify-center h-full text-xs text-gray-500 dark:text-gray-400 ${isImageUploading ? 'cursor-wait' : 'cursor-pointer'}`}>
+                      <label className={`flex flex-col items-center justify-center h-full text-xs text-gray-500 dark:text-content-secondary ${isImageUploading ? 'cursor-wait' : 'cursor-pointer'}`}>
                         <input
                           type="file"
                           accept="image/*"
@@ -3174,9 +3174,9 @@ export function EditorScreen() {
                     {/* Library box */}
                     <button
                       onClick={() => setShowImageLibrary(true)}
-                      className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
-                        hover:border-gray-400 dark:hover:border-gray-500 transition-colors
-                        flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                      className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
+                        hover:border-gray-400 dark:hover:border-line-focus transition-colors
+                        flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                     >
                       <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -3192,7 +3192,7 @@ export function EditorScreen() {
                     <button
                       onClick={() => setGrayscale(!grayscale)}
                       className={`relative w-9 h-5 rounded-full transition-colors ${
-                        grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                        grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
                       }`}
                     >
                       <span
@@ -3224,8 +3224,8 @@ export function EditorScreen() {
                     value={eyebrow}
                     onChange={(e) => setEyebrow(e.target.value)}
                     placeholder={currentTemplate === 'email-product-release' ? 'Product Release' : 'e.g., EBOOK, WEBINAR'}
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showEyebrow ? 'opacity-50' : ''}`}
                   />
@@ -3267,8 +3267,8 @@ export function EditorScreen() {
                     value={verbatimCopy.headline}
                     onChange={(e) => setVerbatimCopy({ headline: e.target.value })}
                     placeholder="Headline"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 )}
@@ -3299,8 +3299,8 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
                       placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') ? 'Subheader text' : 'Supporting subheadline'}
                       rows={2}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showSubhead ? 'opacity-50' : ''}`}
                     />
@@ -3321,8 +3321,8 @@ export function EditorScreen() {
                     value={subheading}
                     onChange={(e) => setSubheading(e.target.value)}
                     placeholder="Optional subheading"
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showSubheading ? 'opacity-50' : ''}`}
                   />
@@ -3353,8 +3353,8 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ body: e.target.value })}
                       placeholder="Body text"
                       rows={3}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showBody ? 'opacity-50' : ''}`}
                     />
@@ -3376,8 +3376,8 @@ export function EditorScreen() {
                     value={ctaText}
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="e.g., Responsive"
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showCta ? 'opacity-50' : ''}`}
                   />
@@ -3395,8 +3395,8 @@ export function EditorScreen() {
                     value={ctaText}
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="e.g., Learn More"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                      bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -3404,7 +3404,7 @@ export function EditorScreen() {
 
               {/* Grid Details - Email Grid only */}
               {currentTemplate === 'email-grid' && (
-                <div className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <div className="space-y-3 pt-3 border-t border-gray-200 dark:border-line-subtle">
                   <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide">Grid Details</h4>
 
                   {/* Detail 1 - Always data */}
@@ -3414,8 +3414,8 @@ export function EditorScreen() {
                       type="text"
                       value={gridDetail1Text}
                       onChange={(e) => setGridDetail1Text(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary"
                     />
                   </div>
 
@@ -3429,8 +3429,8 @@ export function EditorScreen() {
                       type="text"
                       value={gridDetail2Text}
                       onChange={(e) => setGridDetail2Text(e.target.value)}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 ${!showGridDetail2 ? 'opacity-50' : ''}`}
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary ${!showGridDetail2 ? 'opacity-50' : ''}`}
                     />
                   </div>
 
@@ -3441,8 +3441,8 @@ export function EditorScreen() {
                       <select
                         value={gridDetail3Type}
                         onChange={(e) => setGridDetail3Type(e.target.value as 'data' | 'cta')}
-                        className="px-2 py-0.5 text-xs border border-gray-300 dark:border-gray-600 rounded
-                          bg-white dark:bg-gray-900"
+                        className="px-2 py-0.5 text-xs border border-gray-300 dark:border-line-subtle rounded
+                          bg-white dark:bg-surface-primary"
                       >
                         <option value="data">Data</option>
                         <option value="cta">CTA</option>
@@ -3452,8 +3452,8 @@ export function EditorScreen() {
                       type="text"
                       value={gridDetail3Text}
                       onChange={(e) => setGridDetail3Text(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary"
                     />
                   </div>
                 </div>
@@ -3475,8 +3475,8 @@ export function EditorScreen() {
                       value={metadata}
                       onChange={(e) => setMetadata(e.target.value)}
                       placeholder="e.g., Day / Month | 00:00"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showMetadata ? 'opacity-50' : ''}`}
                     />
@@ -3495,8 +3495,8 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Learn More"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
@@ -3520,8 +3520,8 @@ export function EditorScreen() {
                       value={metadata}
                       onChange={(e) => setMetadata(e.target.value)}
                       placeholder="e.g., Day / Month | 00:00"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showMetadata ? 'opacity-50' : ''}`}
                     />
@@ -3540,8 +3540,8 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Learn More"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
@@ -3565,8 +3565,8 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
@@ -3590,8 +3590,8 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
@@ -3615,8 +3615,8 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
@@ -3640,8 +3640,8 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
@@ -3665,8 +3665,8 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
                     />
@@ -3691,8 +3691,8 @@ export function EditorScreen() {
                         value={ctaText}
                         onChange={(e) => setCtaText(e.target.value)}
                         placeholder="e.g., Responsive"
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showCta ? 'opacity-50' : ''}`}
                       />
@@ -3700,7 +3700,7 @@ export function EditorScreen() {
                   )}
 
                   {/* Speaker 1 */}
-                  <div className={`p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker1 ? 'opacity-50' : ''}`}>
+                  <div className={`p-3 bg-gray-100 dark:bg-surface-secondary rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker1 ? 'opacity-50' : ''}`}>
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 1</label>
                       {currentTemplate === 'website-webinar' && (
@@ -3710,7 +3710,7 @@ export function EditorScreen() {
                     <div className="flex gap-3">
                       <div className="flex-shrink-0">
                         <div
-                          className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden cursor-pointer relative"
+                          className="w-12 h-12 rounded-full bg-gray-300 dark:bg-surface-tertiary overflow-hidden cursor-pointer relative"
                           onClick={() => { setActiveSpeakerForImage(1); setShowImageLibrary(true) }}
                           style={{ backgroundImage: speaker1ImageUrl ? `url(${speaker1ImageUrl})` : undefined, backgroundSize: `${speaker1ImageZoom * 100}%`, backgroundPosition: `${50 + speaker1ImagePosition.x}% ${50 + speaker1ImagePosition.y}%` }}
                         >
@@ -3739,14 +3739,14 @@ export function EditorScreen() {
                           value={speaker1Name}
                           onChange={(e) => setSpeaker1Name(e.target.value)}
                           placeholder="Name"
-                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
                         />
                         <input
                           type="text"
                           value={speaker1Role}
                           onChange={(e) => setSpeaker1Role(e.target.value)}
                           placeholder="Role, Company"
-                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
                         />
                       </div>
                     </div>
@@ -3754,7 +3754,7 @@ export function EditorScreen() {
 
                   {/* Speaker 2 */}
                   {(currentTemplate === 'website-webinar' || speakerCount >= 2) && (
-                    <div className={`p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker2 ? 'opacity-50' : ''}`}>
+                    <div className={`p-3 bg-gray-100 dark:bg-surface-secondary rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker2 ? 'opacity-50' : ''}`}>
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 2</label>
                         {currentTemplate === 'website-webinar' && (
@@ -3764,7 +3764,7 @@ export function EditorScreen() {
                       <div className="flex gap-3">
                         <div className="flex-shrink-0">
                           <div
-                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden cursor-pointer relative"
+                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-surface-tertiary overflow-hidden cursor-pointer relative"
                             onClick={() => { setActiveSpeakerForImage(2); setShowImageLibrary(true) }}
                             style={{ backgroundImage: speaker2ImageUrl ? `url(${speaker2ImageUrl})` : undefined, backgroundSize: `${speaker2ImageZoom * 100}%`, backgroundPosition: `${50 + speaker2ImagePosition.x}% ${50 + speaker2ImagePosition.y}%` }}
                           >
@@ -3793,14 +3793,14 @@ export function EditorScreen() {
                             value={speaker2Name}
                             onChange={(e) => setSpeaker2Name(e.target.value)}
                             placeholder="Name"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
                           />
                           <input
                             type="text"
                             value={speaker2Role}
                             onChange={(e) => setSpeaker2Role(e.target.value)}
                             placeholder="Role, Company"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
                           />
                         </div>
                       </div>
@@ -3809,7 +3809,7 @@ export function EditorScreen() {
 
                   {/* Speaker 3 */}
                   {(currentTemplate === 'website-webinar' || speakerCount >= 3) && (
-                    <div className={`p-3 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker3 ? 'opacity-50' : ''}`}>
+                    <div className={`p-3 bg-gray-100 dark:bg-surface-secondary rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker3 ? 'opacity-50' : ''}`}>
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 3</label>
                         {currentTemplate === 'website-webinar' && (
@@ -3819,7 +3819,7 @@ export function EditorScreen() {
                       <div className="flex gap-3">
                         <div className="flex-shrink-0">
                           <div
-                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden cursor-pointer relative"
+                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-surface-tertiary overflow-hidden cursor-pointer relative"
                             onClick={() => { setActiveSpeakerForImage(3); setShowImageLibrary(true) }}
                             style={{ backgroundImage: speaker3ImageUrl ? `url(${speaker3ImageUrl})` : undefined, backgroundSize: `${speaker3ImageZoom * 100}%`, backgroundPosition: `${50 + speaker3ImagePosition.x}% ${50 + speaker3ImagePosition.y}%` }}
                           >
@@ -3848,14 +3848,14 @@ export function EditorScreen() {
                             value={speaker3Name}
                             onChange={(e) => setSpeaker3Name(e.target.value)}
                             placeholder="Name"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
                           />
                           <input
                             type="text"
                             value={speaker3Role}
                             onChange={(e) => setSpeaker3Role(e.target.value)}
                             placeholder="Role, Company"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
                           />
                         </div>
                       </div>
@@ -3880,8 +3880,8 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
                       placeholder="This is your subheader or description text..."
                       rows={2}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showSubhead ? 'opacity-50' : ''}`}
                     />
@@ -3901,8 +3901,8 @@ export function EditorScreen() {
                         value={gridDetail1Text}
                         onChange={(e) => setGridDetail1Text(e.target.value)}
                         placeholder="Date: January 1st, 2026"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -3915,8 +3915,8 @@ export function EditorScreen() {
                         value={gridDetail2Text}
                         onChange={(e) => setGridDetail2Text(e.target.value)}
                         placeholder="Time: Midnight, EST"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -3929,8 +3929,8 @@ export function EditorScreen() {
                           <select
                             value={gridDetail3Type}
                             onChange={(e) => setGridDetail3Type(e.target.value as 'data' | 'cta')}
-                            className="text-xs px-1.5 py-0.5 border border-gray-300 dark:border-gray-600 rounded
-                              bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400"
+                            className="text-xs px-1.5 py-0.5 border border-gray-300 dark:border-line-subtle rounded
+                              bg-white dark:bg-surface-primary text-gray-600 dark:text-content-secondary"
                           >
                             <option value="data">Data</option>
                             <option value="cta">CTA</option>
@@ -3943,8 +3943,8 @@ export function EditorScreen() {
                         value={gridDetail3Text}
                         onChange={(e) => setGridDetail3Text(e.target.value)}
                         placeholder={gridDetail3Type === 'cta' ? 'Join the event' : 'Place: Wherever'}
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow3 ? 'opacity-50' : ''}`}
                       />
@@ -3958,8 +3958,8 @@ export function EditorScreen() {
                           <select
                             value={gridDetail4Type}
                             onChange={(e) => setGridDetail4Type(e.target.value as 'data' | 'cta')}
-                            className="text-xs px-1.5 py-0.5 border border-gray-300 dark:border-gray-600 rounded
-                              bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400"
+                            className="text-xs px-1.5 py-0.5 border border-gray-300 dark:border-line-subtle rounded
+                              bg-white dark:bg-surface-primary text-gray-600 dark:text-content-secondary"
                           >
                             <option value="data">Data</option>
                             <option value="cta">CTA</option>
@@ -3972,8 +3972,8 @@ export function EditorScreen() {
                         value={gridDetail4Text}
                         onChange={(e) => setGridDetail4Text(e.target.value)}
                         placeholder={gridDetail4Type === 'cta' ? 'Join the event' : 'Additional info'}
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow4 ? 'opacity-50' : ''}`}
                       />
@@ -3998,8 +3998,8 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
                       placeholder="This is your subheader or description text..."
                       rows={2}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                        bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showSubhead ? 'opacity-50' : ''}`}
                     />
@@ -4019,8 +4019,8 @@ export function EditorScreen() {
                         value={gridDetail1Text}
                         onChange={(e) => setGridDetail1Text(e.target.value)}
                         placeholder="Add Details or Hide Me"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -4036,8 +4036,8 @@ export function EditorScreen() {
                         value={gridDetail2Text}
                         onChange={(e) => setGridDetail2Text(e.target.value)}
                         placeholder="Add Details or Hide Me"
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow3 ? 'opacity-50' : ''}`}
                       />
@@ -4054,8 +4054,8 @@ export function EditorScreen() {
                         value={gridDetail3Text}
                         onChange={(e) => setGridDetail3Text(e.target.value)}
                         placeholder="Add Details or Hide Me"
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow4 ? 'opacity-50' : ''}`}
                       />
@@ -4069,8 +4069,8 @@ export function EditorScreen() {
                         value={gridDetail4Text}
                         onChange={(e) => setGridDetail4Text(e.target.value)}
                         placeholder="Join the event"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -4092,8 +4092,8 @@ export function EditorScreen() {
                   onChange={(e) => setGenerationContext(e.target.value)}
                   placeholder="Describe the content, product, or offer..."
                   rows={5}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-                    bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                    bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                     focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
@@ -4106,7 +4106,7 @@ export function EditorScreen() {
                 className={`border-2 border-dashed rounded-lg p-3 text-center text-sm transition-colors ${
                   isDragging
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-300 dark:border-gray-600'
+                    : 'border-gray-300 dark:border-line-subtle'
                 }`}
               >
                 {isUploading ? (
@@ -4123,7 +4123,7 @@ export function EditorScreen() {
                       <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-700 dark:text-gray-300">{contextFile.name}</span>
+                      <span className="text-gray-700 dark:text-content-secondary">{contextFile.name}</span>
                       <button
                         onClick={() => { setContextFile(null); setPdfContent(null) }}
                         className="text-red-600 hover:text-red-700"
@@ -4138,7 +4138,7 @@ export function EditorScreen() {
                     )}
                   </div>
                 ) : (
-                  <label className="cursor-pointer text-gray-600 dark:text-gray-400">
+                  <label className="cursor-pointer text-gray-600 dark:text-content-secondary">
                     <input
                       type="file"
                       accept=".pdf"
@@ -4188,9 +4188,9 @@ export function EditorScreen() {
                 <div className="relative">
                   <button
                     onClick={(e) => { e.stopPropagation(); setShowScaleDropdown(!showScaleDropdown) }}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400
-                      bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md
-                      hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-content-secondary
+                      bg-gray-100 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-md
+                      hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
                   >
                     {exportScale}x
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4199,14 +4199,14 @@ export function EditorScreen() {
                   </button>
 
                   {showScaleDropdown && (
-                    <div className="absolute left-0 mt-1 w-16 bg-white dark:bg-gray-800 border border-gray-200
-                      dark:border-gray-700 rounded-md shadow-lg overflow-hidden z-10">
+                    <div className="absolute left-0 mt-1 w-16 bg-white dark:bg-surface-secondary border border-gray-200
+                      dark:border-line-subtle rounded-md shadow-lg overflow-hidden z-10">
                       {[1, 2, 3].map((scale) => (
                         <button
                           key={scale}
                           onClick={(e) => { e.stopPropagation(); setExportScale(scale); setShowScaleDropdown(false) }}
-                          className={`w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700
-                            ${exportScale === scale ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-gray-600 dark:text-gray-400'}`}
+                          className={`w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-interactive-hover
+                            ${exportScale === scale ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-gray-600 dark:text-content-secondary'}`}
                         >
                           {scale}x
                         </button>
@@ -4248,9 +4248,9 @@ export function EditorScreen() {
                     setTimeout(() => setShowQueuedFeedback(false), 2000)
                   }}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                    text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
-                    hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
-                    border border-gray-200 dark:border-gray-700"
+                    text-gray-600 dark:text-content-secondary bg-gray-100 dark:bg-surface-secondary rounded-md
+                    hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors
+                    border border-gray-200 dark:border-line-subtle"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -4265,9 +4265,9 @@ export function EditorScreen() {
                   <button
                     onClick={() => setShowPdfAllPagesPreview(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                      text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
-                      hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
-                      border border-gray-200 dark:border-gray-700"
+                      text-gray-600 dark:text-content-secondary bg-gray-100 dark:bg-surface-secondary rounded-md
+                      hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors
+                      border border-gray-200 dark:border-line-subtle"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -4295,18 +4295,18 @@ export function EditorScreen() {
                 <div className="flex items-center gap-3 ml-2">
                   {/* Page Picker */}
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">Page</span>
+                    <span className="text-xs text-gray-500 dark:text-content-secondary mr-1">Page</span>
                     <div className="flex">
                       {([1, 2, 3] as const).map((page, idx) => (
                         <button
                           key={page}
                           onClick={() => setSolutionOverviewCurrentPage(page)}
-                          className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 ${
+                          className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-line-subtle ${
                             idx === 0 ? 'rounded-l' : ''
                           } ${idx === 2 ? 'rounded-r' : ''} ${idx > 0 ? '-ml-px' : ''} ${
                             solutionOverviewCurrentPage === page
                               ? 'bg-blue-500 text-white border-blue-500 z-10 relative'
-                              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                              : 'bg-white dark:bg-surface-secondary text-gray-600 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover'
                           }`}
                         >
                           {page}
@@ -4316,14 +4316,14 @@ export function EditorScreen() {
                   </div>
 
                   {/* Divider */}
-                  <div className="w-px h-5 bg-gray-300 dark:bg-gray-600" />
+                  <div className="w-px h-5 bg-gray-300 dark:bg-surface-tertiary" />
 
                   {/* Zoom Controls */}
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setPdfPreviewZoom(Math.max(75, pdfPreviewZoom - 25))}
                       disabled={pdfPreviewZoom <= 75}
-                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-l bg-white dark:bg-gray-800"
+                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle rounded-l bg-white dark:bg-surface-secondary"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -4332,7 +4332,7 @@ export function EditorScreen() {
                     <select
                       value={pdfPreviewZoom}
                       onChange={(e) => setPdfPreviewZoom(Number(e.target.value))}
-                      className="h-7 px-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 focus:outline-none cursor-pointer"
+                      className="h-7 px-2 text-xs text-gray-600 dark:text-content-secondary bg-white dark:bg-surface-secondary border-y border-gray-300 dark:border-line-subtle focus:outline-none cursor-pointer"
                     >
                       <option value={200}>200%</option>
                       <option value={175}>175%</option>
@@ -4344,7 +4344,7 @@ export function EditorScreen() {
                     <button
                       onClick={() => setPdfPreviewZoom(Math.min(200, pdfPreviewZoom + 25))}
                       disabled={pdfPreviewZoom >= 200}
-                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle bg-white dark:bg-surface-secondary"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -4352,7 +4352,7 @@ export function EditorScreen() {
                     </button>
                     <button
                       onClick={() => setShowPdfFullscreen(true)}
-                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800 ml-1"
+                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary border border-gray-300 dark:border-line-subtle rounded-r bg-white dark:bg-surface-secondary ml-1"
                       title="Fullscreen preview (ESC to exit)"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4375,7 +4375,7 @@ export function EditorScreen() {
                   }
                 }}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium
-                  text-gray-500 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400
+                  text-gray-500 hover:text-red-600 dark:text-content-secondary dark:hover:text-red-400
                   transition-colors"
                 title="Delete this asset"
               >
@@ -4409,7 +4409,7 @@ export function EditorScreen() {
             {currentTemplate === 'website-floating-banner' ? (
               <div
                 ref={floatingBannerContainerRef}
-                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm w-full"
+                className="ring-1 ring-gray-300/50 dark:ring-line-subtle/50 rounded-sm w-full"
                 style={{
                   position: 'relative',
                   height: floatingBannerContainerWidth > 0
@@ -4445,7 +4445,7 @@ export function EditorScreen() {
             ) : currentTemplate === 'solution-overview-pdf' ? (
               /* PDF Preview - simple container matching page dimensions */
               <div
-                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
+                className="ring-1 ring-gray-300/50 dark:ring-line-subtle/50 rounded-sm shadow-lg"
                 style={{
                   width: 612 * (pdfPreviewZoom / 100),
                   height: 792 * (pdfPreviewZoom / 100),
@@ -4518,7 +4518,7 @@ export function EditorScreen() {
             ) : (
             <div className="flex flex-col">
               <div
-                className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm"
+                className="ring-1 ring-gray-300/50 dark:ring-line-subtle/50 rounded-sm"
                 style={{
                   width: dimensions.width * previewScale,
                   height: dimensions.height * previewScale,
@@ -4976,9 +4976,9 @@ export function EditorScreen() {
               <div className="mt-3 flex items-center justify-end gap-3">
                 <button
                   onClick={() => setShowCancelConfirm(true)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
-                    bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
-                    border border-gray-200 dark:border-gray-700 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary
+                    bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover
+                    border border-gray-200 dark:border-line-subtle transition-colors"
                 >
                   Cancel
                 </button>
@@ -4997,19 +4997,19 @@ export function EditorScreen() {
           {showCancelConfirm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               <div className="absolute inset-0 bg-black/50" onClick={() => setShowCancelConfirm(false)} />
-              <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-sm w-full">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl p-6 max-w-sm w-full">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
                   Discard changes?
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-sm text-gray-600 dark:text-content-secondary mb-6">
                   Your changes will not be saved. The original asset will remain in the queue.
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
                     onClick={() => setShowCancelConfirm(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400
-                      bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700
-                      border border-gray-200 dark:border-gray-700 transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary
+                      bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover
+                      border border-gray-200 dark:border-line-subtle transition-colors"
                   >
                     Keep Editing
                   </button>

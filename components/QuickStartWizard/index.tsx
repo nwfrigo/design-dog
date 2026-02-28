@@ -37,9 +37,9 @@ export function QuickStartWizard() {
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[700px] max-w-[95vw] max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative bg-white dark:bg-surface-primary rounded-2xl shadow-2xl w-[700px] max-w-[95vw] max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-line-subtle">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,17 +47,17 @@ export function QuickStartWizard() {
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-content-primary">
                 Auto-Create
               </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-content-secondary">
                 Create multiple assets with AI assistance
               </p>
             </div>
           </div>
           <button
             onClick={closeAutoCreateWizard}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-content-primary rounded-lg hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -99,7 +99,7 @@ function StepIndicator({ currentStep, selectedKit }: { currentStep: string; sele
   const currentIndex = getCurrentIndex()
 
   return (
-    <div className="px-6 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800">
+    <div className="px-6 py-3 bg-gray-50 dark:bg-surface-secondary border-b border-gray-200 dark:border-line-subtle">
       <div className="flex items-center justify-between">
         {steps.map((step, index) => (
           <div key={step.id} className="flex items-center">
@@ -111,7 +111,7 @@ function StepIndicator({ currentStep, selectedKit }: { currentStep: string; sele
                     ? 'bg-blue-500 text-white'
                     : index === currentIndex
                       ? 'bg-blue-500 text-white ring-4 ring-blue-100 dark:ring-blue-900/50'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                      : 'bg-gray-200 dark:bg-surface-tertiary text-gray-500 dark:text-content-secondary'
                   }
                 `}
               >
@@ -127,8 +127,8 @@ function StepIndicator({ currentStep, selectedKit }: { currentStep: string; sele
                 <span
                   className={`text-sm block ${
                     index <= currentIndex
-                      ? 'text-gray-900 dark:text-gray-100 font-medium'
-                      : 'text-gray-400 dark:text-gray-500'
+                      ? 'text-gray-900 dark:text-content-primary font-medium'
+                      : 'text-gray-400 dark:text-content-secondary'
                   }`}
                 >
                   {step.label}
@@ -145,7 +145,7 @@ function StepIndicator({ currentStep, selectedKit }: { currentStep: string; sele
                 className={`w-8 sm:w-12 h-0.5 mx-2 sm:mx-3 ${
                   index < currentIndex
                     ? 'bg-blue-500'
-                    : 'bg-gray-200 dark:bg-gray-700'
+                    : 'bg-gray-200 dark:bg-surface-tertiary'
                 }`}
               />
             )}

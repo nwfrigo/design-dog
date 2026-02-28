@@ -77,13 +77,13 @@ export function FaqCoverImageLibraryModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-[700px] max-w-[90vw] max-h-[85vh] flex flex-col">
+      <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl w-[700px] max-w-[90vw] max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-line-subtle">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-content-primary"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -92,7 +92,7 @@ export function FaqCoverImageLibraryModal({
         </div>
 
         {/* Upload section */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-line-subtle">
           <input
             ref={fileInputRef}
             type="file"
@@ -104,7 +104,7 @@ export function FaqCoverImageLibraryModal({
             onClick={() => fileInputRef.current?.click()}
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
-            className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer
+            className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg cursor-pointer
               hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
           >
             {isUploading ? (
@@ -114,7 +114,7 @@ export function FaqCoverImageLibraryModal({
                 <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-content-secondary">
                   <span className="font-medium text-blue-600 dark:text-blue-400">Upload your own image</span>
                   {' '}or drag and drop
                 </span>
@@ -124,13 +124,13 @@ export function FaqCoverImageLibraryModal({
         </div>
 
         {/* Category tabs */}
-        <div className="flex gap-2 p-4 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+        <div className="flex gap-2 p-4 border-b border-gray-200 dark:border-line-subtle overflow-x-auto">
           <button
             onClick={() => setSelectedCategory(null)}
             className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
               selectedCategory === null
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-600 dark:bg-surface-tertiary dark:text-content-secondary hover:bg-gray-200 dark:hover:bg-interactive-hover'
             }`}
           >
             All
@@ -142,7 +142,7 @@ export function FaqCoverImageLibraryModal({
               className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
                 selectedCategory === cat
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-600 dark:bg-surface-tertiary dark:text-content-secondary hover:bg-gray-200 dark:hover:bg-interactive-hover'
               }`}
             >
               {faqCoverCategoryLabels[cat as keyof typeof faqCoverCategoryLabels]}
@@ -161,7 +161,7 @@ export function FaqCoverImageLibraryModal({
                 key={image.id}
                 onClick={() => onSelect(image.url)}
                 className="group relative aspect-[204/792] rounded-lg overflow-hidden border-2 border-transparent
-                  hover:border-blue-500 transition-all bg-gray-100 dark:bg-gray-800"
+                  hover:border-blue-500 transition-all bg-gray-100 dark:bg-surface-secondary"
               >
                 <img
                   src={image.url}
@@ -182,7 +182,7 @@ export function FaqCoverImageLibraryModal({
         </div>
 
         {/* Footer with count */}
-        <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+        <div className="px-4 py-3 border-t border-gray-200 dark:border-line-subtle text-xs text-gray-500 dark:text-content-secondary">
           {filteredImages.length} image{filteredImages.length !== 1 ? 's' : ''} available
         </div>
       </div>

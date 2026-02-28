@@ -601,14 +601,14 @@ export function TemplateTile({ template, isSelected, onToggle, onNavigateToEdito
           border-[0.75px]
           ${isSelected
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
+            : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-secondary hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
           }
         `}
       >
         {/* Preview area - click to go to editor */}
         <button
           onClick={onNavigateToEditor}
-          className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50"
+          className="relative overflow-hidden bg-gray-100 dark:bg-surface-secondary"
           style={{ height: previewHeight + 24, padding: 12 }}
         >
           {/* Scaled template preview */}
@@ -642,7 +642,7 @@ export function TemplateTile({ template, isSelected, onToggle, onNavigateToEdito
               </div>
             ) : (
               <div
-                className="bg-gray-200 dark:bg-gray-700 animate-pulse rounded"
+                className="bg-gray-200 dark:bg-surface-tertiary animate-pulse rounded"
                 style={{ width: targetWidth, height: previewHeight }}
               />
             )}
@@ -672,16 +672,16 @@ export function TemplateTile({ template, isSelected, onToggle, onNavigateToEdito
         </button>
 
         {/* Info area */}
-        <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
+        <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between gap-2">
           <div className="flex-1 min-w-0">
             <span className={`text-sm font-medium truncate block ${
               isSelected
                 ? 'text-blue-700 dark:text-blue-300'
-                : 'text-gray-900 dark:text-gray-100'
+                : 'text-gray-900 dark:text-content-primary'
             }`}>
               {template.label}
             </span>
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+            <span className="text-[10px] text-gray-400 dark:text-content-secondary font-mono">
               {template.dimensions}
             </span>
           </div>
@@ -692,7 +692,7 @@ export function TemplateTile({ template, isSelected, onToggle, onNavigateToEdito
               e.stopPropagation()
               setShowPreview(true)
             }}
-            className="flex-shrink-0 px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400
+            className="flex-shrink-0 px-2 py-1 text-xs font-medium text-gray-500 dark:text-content-secondary
               hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30
               rounded transition-colors"
           >
@@ -749,14 +749,14 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
           border
           ${isSelected
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg'
+            : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-secondary hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg'
           }
         `}
       >
         {/* Preview area - click to go to editor */}
         <button
           onClick={onNavigateToEditor}
-          className="relative overflow-hidden bg-gray-100 dark:bg-gray-800/50 flex items-center justify-center"
+          className="relative overflow-hidden bg-gray-100 dark:bg-surface-secondary flex items-center justify-center"
           style={{ minHeight: Math.max(previewHeight + 32, 180), padding: 16 }}
         >
           {/* Scaled template preview */}
@@ -790,7 +790,7 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
               </div>
             ) : (
               <div
-                className="bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"
+                className="bg-gray-200 dark:bg-surface-tertiary animate-pulse rounded-lg"
                 style={{ width: targetWidth, height: previewHeight }}
               />
             )}
@@ -807,7 +807,7 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
               flex items-center justify-center shadow-sm
               ${isSelected
                 ? 'bg-blue-500'
-                : 'bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+                : 'bg-white/90 dark:bg-surface-secondary hover:bg-white dark:hover:bg-interactive-hover border border-gray-200 dark:border-line-subtle'
               }
             `}
           >
@@ -825,19 +825,19 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
         </button>
 
         {/* Info area */}
-        <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
+        <div className="px-4 py-3 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <span className="text-xs text-gray-400 dark:text-gray-500 font-mono uppercase block mb-1">
+            <span className="text-xs text-gray-400 dark:text-content-secondary font-mono uppercase block mb-1">
               {channelLabel}
             </span>
             <span className={`text-sm font-medium truncate block ${
               isSelected
                 ? 'text-blue-700 dark:text-blue-300'
-                : 'text-gray-900 dark:text-gray-100'
+                : 'text-gray-900 dark:text-content-primary'
             }`}>
               {template.label}
             </span>
-            <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">
+            <span className="text-xs text-gray-400 dark:text-content-secondary font-mono">
               {template.dimensions}
             </span>
           </div>
@@ -848,9 +848,9 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
               e.stopPropagation()
               setShowPreview(true)
             }}
-            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400
+            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-content-secondary
               hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30
-              rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+              rounded-lg transition-colors border border-gray-200 dark:border-line-subtle"
           >
             Preview
           </button>
@@ -873,22 +873,22 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
 // Coming soon placeholder tile
 export function ComingSoonTile({ label }: { label: string }) {
   return (
-    <div className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800/50 opacity-60">
+    <div className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-surface-secondary opacity-60">
       {/* Preview area placeholder */}
       <div className="h-32 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
+          <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-gray-200 dark:bg-surface-secondary flex items-center justify-center">
             <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <span className="text-xs text-gray-400 dark:text-gray-500">Coming soon</span>
+          <span className="text-xs text-gray-400 dark:text-content-secondary">Coming soon</span>
         </div>
       </div>
 
       {/* Info area */}
-      <div className="px-3 py-2.5 border-t border-gray-100 dark:border-gray-800">
-        <span className="text-sm font-medium text-gray-400 dark:text-gray-500">{label}</span>
+      <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle">
+        <span className="text-sm font-medium text-gray-400 dark:text-content-secondary">{label}</span>
       </div>
     </div>
   )
@@ -956,24 +956,24 @@ function RequestTemplateModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-white dark:bg-surface-primary rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-line-subtle">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-content-primary">
               Request New Template
             </h2>
             <button
               onClick={onClose}
               disabled={isSubmitting}
-              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
+              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-content-primary transition-colors disabled:opacity-50"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 dark:text-content-secondary">
             Tell us what {channelName} template you need
           </p>
         </div>
@@ -987,15 +987,15 @@ function RequestTemplateModal({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-content-primary mb-2">
                 Request Submitted
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-500 dark:text-content-secondary mb-6">
                 Thanks for your feedback! We'll review your request and get back to you.
               </p>
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+                className="px-6 py-2.5 bg-gray-900 dark:bg-surface-inverse text-white dark:text-content-inverse rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-btn-primary-hover transition-colors"
               >
                 Close
               </button>
@@ -1005,7 +1005,7 @@ function RequestTemplateModal({
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             {/* Name */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-1.5">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -1014,7 +1014,7 @@ function RequestTemplateModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
+                className="w-full px-3 py-2.5 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg text-gray-900 dark:text-content-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
                 placeholder="Your name"
                 required
               />
@@ -1022,7 +1022,7 @@ function RequestTemplateModal({
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-1.5">
                 Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -1031,7 +1031,7 @@ function RequestTemplateModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
+                className="w-full px-3 py-2.5 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg text-gray-900 dark:text-content-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
                 placeholder="you@example.com"
                 required
               />
@@ -1039,7 +1039,7 @@ function RequestTemplateModal({
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-1.5">
                 What template do you need? <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -1048,7 +1048,7 @@ function RequestTemplateModal({
                 onChange={(e) => setDescription(e.target.value)}
                 disabled={isSubmitting}
                 rows={4}
-                className="w-full px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 resize-none transition-colors"
+                className="w-full px-3 py-2.5 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg text-gray-900 dark:text-content-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 resize-none transition-colors"
                 placeholder="Describe the template you're looking for, including dimensions, use case, and any specific requirements..."
                 required
               />
@@ -1096,17 +1096,17 @@ export function RequestTemplateTile({ channelName }: { channelName: string }) {
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
+        className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-surface-secondary hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
       >
         {/* Preview area */}
         <div className="flex-1 min-h-[136px] flex items-center justify-center p-6">
           <div className="text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-100 dark:bg-gray-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center transition-colors">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-100 dark:bg-surface-secondary group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center transition-colors">
               <svg className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <span className="text-sm font-medium text-gray-500 dark:text-content-secondary group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               Request new template
             </span>
           </div>

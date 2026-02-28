@@ -66,8 +66,43 @@
 
 /* Class-based dark mode (not system preference) */
 html.dark {
-  --foreground: #ededed;
-  --background: #0a0a0a;
+  --foreground: #F2F2F3;
+  --background: #161719;
+
+  /* Semantic background tokens */
+  --surface-primary: #161719;     /* neutral/900 */
+  --surface-secondary: #242527;   /* neutral/750 */
+  --surface-tertiary: #1C1D1F;    /* neutral/850 */
+  --surface-inverse: #F2F2F3;     /* neutral/50 */
+
+  /* Semantic text tokens */
+  --content-primary: #F2F2F3;     /* neutral/50 */
+  --content-secondary: #7C7D80;   /* neutral/500 */
+  --content-tertiary: #343538;    /* neutral/700 */
+  --content-inverse: #161719;     /* neutral/900 */
+  --content-destructive: #EB3232; /* red/300 */
+  --content-success: #54D571;     /* green/300 */
+  --content-warning: #EAA618;     /* amber/300 */
+
+  /* Semantic border tokens */
+  --line-subtle: #494A4C;         /* neutral/650 */
+  --line-focus: #BDBEC0;          /* neutral/250 */
+  --line-destructive: #EB3232;    /* red/300 */
+
+  /* Button tokens */
+  --btn-primary-bg: #F2F2F3;
+  --btn-primary-bg-hover: #E5E5E6;
+  --btn-primary-bg-disabled: #343538;
+  --btn-primary-text: #161719;
+  --btn-secondary-bg: #161719;
+  --btn-secondary-bg-hover: #1C1D1F;
+  --btn-secondary-text: #F2F2F3;
+  --btn-secondary-border: #494A4C;
+  --btn-ghost-text: #7C7D80;
+
+  /* Interactive tokens */
+  --interactive-hover: #202123;   /* neutral/800 */
+  --interactive-active: #57585B;  /* neutral/600 */
 }
 
 body {
@@ -87,5 +122,5 @@ body {
 
 /* Keyboard shortcuts hint */
 .kbd {
-  @apply inline-flex items-center px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700;
+  @apply inline-flex items-center px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-surface-secondary rounded border border-gray-200 dark:border-line-subtle;
 }

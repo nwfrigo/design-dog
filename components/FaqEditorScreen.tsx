@@ -109,7 +109,7 @@ function ImageBlockEditor({
           className={`relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
             isDragging
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-              : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+              : 'border-gray-300 dark:border-line-subtle hover:border-gray-400 dark:hover:border-line-focus'
           }`}
           onClick={() => fileInputRef.current?.click()}
           onDrop={handleDrop}
@@ -129,7 +129,7 @@ function ImageBlockEditor({
           <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-content-secondary">
             Click or drag image to upload
           </p>
         </div>
@@ -137,7 +137,7 @@ function ImageBlockEditor({
         <div className="space-y-3">
           {/* Image Preview - clickable to open crop modal */}
           <div
-            className="relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer group"
+            className="relative rounded-lg overflow-hidden bg-gray-100 dark:bg-surface-secondary cursor-pointer group"
             style={{ aspectRatio: block.nativeAspectRatio ? `${block.nativeAspectRatio}` : '16/9' }}
             onClick={() => setShowCropModal(true)}
           >
@@ -164,7 +164,7 @@ function ImageBlockEditor({
 
           {/* Image Size Control */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">Image Size</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1.5">Image Size</label>
             <div className="flex gap-1">
               {IMAGE_SIZE_OPTIONS.map((option) => (
                 <button
@@ -173,7 +173,7 @@ function ImageBlockEditor({
                   className={`flex-1 px-2 py-1.5 text-xs rounded transition-colors ${
                     block.displayWidth === option.value
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                      : 'bg-gray-200 dark:bg-surface-tertiary text-gray-700 dark:text-content-secondary hover:bg-gray-300 dark:hover:bg-interactive-hover'
                   }`}
                 >
                   {option.label}
@@ -185,12 +185,12 @@ function ImageBlockEditor({
 
           {/* Grayscale Toggle & Actions */}
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-content-secondary">
               <input
                 type="checkbox"
                 checked={block.grayscale}
                 onChange={(e) => onUpdate({ grayscale: e.target.checked })}
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-gray-300 dark:border-line-subtle text-blue-500 focus:ring-blue-500"
               />
               Grayscale
             </label>
@@ -701,20 +701,20 @@ function SortableBlockItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-transparent rounded-lg overflow-hidden ${
+      className={`bg-white dark:bg-surface-secondary border border-gray-200 dark:border-transparent rounded-lg overflow-hidden ${
         isDragging ? 'shadow-lg' : ''
       }`}
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252540] transition-colors"
+        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors"
         onClick={onToggleExpand}
       >
         {/* Drag Handle */}
         <button
           {...attributes}
           {...listeners}
-          className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+          className="p-1 text-gray-400 dark:text-content-secondary hover:text-gray-600 dark:hover:text-content-primary cursor-grab active:cursor-grabbing"
           onClick={(e) => e.stopPropagation()}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -724,11 +724,11 @@ function SortableBlockItem({
 
         {/* Block Type Label */}
         <div className="flex-1 flex items-center gap-2 min-w-0">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide flex-shrink-0">
+          <span className="text-sm font-medium text-gray-700 dark:text-content-secondary uppercase tracking-wide flex-shrink-0">
             {BLOCK_LABELS[block.type] || block.type}
           </span>
           {block.type === 'qa' && block.question && (
-            <span className="text-sm text-gray-500 dark:text-gray-500 truncate">
+            <span className="text-sm text-gray-500 dark:text-content-secondary truncate">
               {block.question}
             </span>
           )}
@@ -760,13 +760,13 @@ function SortableBlockItem({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-gray-700/50">
+        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-line-subtle/50">
           {block.type === 'heading' && (
             <input
               type="text"
               value={block.text}
               onChange={(e) => onUpdate({ text: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
               placeholder="Enter heading text"
             />
           )}
@@ -774,17 +774,17 @@ function SortableBlockItem({
           {block.type === 'qa' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Question</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Question</label>
                 <input
                   type="text"
                   value={block.question}
                   onChange={(e) => onUpdate({ question: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-[#0d0d1a] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Enter question"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Answer</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Answer</label>
                 <RichTextEditor
                   content={block.answer}
                   onChange={(html) => onUpdate({ answer: html })}
@@ -806,7 +806,7 @@ function SortableBlockItem({
 
           {block.type === 'table' && (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
+              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-content-secondary">
                 <span>{block.rows} × {block.cols} table</span>
                 <button
                   type="button"
@@ -815,7 +815,7 @@ function SortableBlockItem({
                     const newData = [...block.data, Array(block.cols).fill('')]
                     onUpdate({ rows: newRows, data: newData })
                   }}
-                  className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
+                  className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
                 >
                   + Row
                 </button>
@@ -826,7 +826,7 @@ function SortableBlockItem({
                     const newData = block.data.map(row => [...row, ''])
                     onUpdate({ cols: newCols, data: newData })
                   }}
-                  className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
+                  className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
                 >
                   + Col
                 </button>
@@ -838,7 +838,7 @@ function SortableBlockItem({
                       const newData = block.data.slice(0, -1)
                       onUpdate({ rows: newRows, data: newData })
                     }}
-                    className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
+                    className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
                   >
                     - Row
                   </button>
@@ -851,25 +851,25 @@ function SortableBlockItem({
                       const newData = block.data.map(row => row.slice(0, -1))
                       onUpdate({ cols: newCols, data: newData })
                     }}
-                    className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
+                    className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
                   >
                     - Col
                   </button>
                 )}
               </div>
 
-              <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="border border-gray-300 dark:border-line-subtle rounded-lg overflow-hidden">
                 <table className="w-full">
                   <tbody>
                     {block.data.map((row, rowIndex) => (
                       <tr key={rowIndex}>
                         {row.map((cell, colIndex) => (
-                          <td key={colIndex} className="border border-gray-300 dark:border-gray-700 p-0">
+                          <td key={colIndex} className="border border-gray-300 dark:border-line-subtle p-0">
                             <input
                               type="text"
                               value={cell}
                               onChange={(e) => updateTableCell(rowIndex, colIndex, e.target.value)}
-                              className="w-full px-2 py-1.5 text-xs bg-gray-100 dark:bg-[#0d0d1a] text-gray-900 dark:text-gray-100 border-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
+                              className="w-full px-2 py-1.5 text-xs bg-gray-100 dark:bg-surface-primary text-gray-900 dark:text-content-primary border-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
                               placeholder="..."
                             />
                           </td>
@@ -913,17 +913,17 @@ function DeleteConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+      <div className="relative bg-white dark:bg-surface-secondary rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
           Delete {itemType}{itemLabel ? ` ${itemLabel}` : ''}?
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+        <p className="text-sm text-gray-600 dark:text-content-secondary mb-6">
           This action cannot be undone. Are you sure you want to delete this {itemType.toLowerCase()}?
         </p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-content-secondary bg-gray-100 dark:bg-surface-tertiary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
           >
             Cancel
           </button>
@@ -1523,9 +1523,9 @@ export function FaqEditorScreen() {
       <BlockMeasurer blocks={allBlocks} onMeasured={handleBlocksMeasured} />
 
       {/* Title Tab - matches SO editor pattern */}
-      <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center border-b border-gray-200 dark:border-line-subtle">
         <div className="flex">
-          <div className="px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+          <div className="px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary">
             FAQ - {title || 'Untitled'}
           </div>
         </div>
@@ -1535,17 +1535,17 @@ export function FaqEditorScreen() {
       <div className="flex h-[calc(100vh-180px)]">
         {/* Left: Editor Sidebar */}
         <div className="flex-shrink-0 flex flex-col overflow-y-auto" style={{ width: editorWidth }}>
-          <div className="bg-gray-100 dark:bg-[#0d0d1a] rounded-xl p-5 space-y-5">
+          <div className="bg-gray-100 dark:bg-surface-primary rounded-xl p-5 space-y-5">
             {/* Page Header */}
             <div>
-              <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-sm font-medium text-gray-900 dark:text-content-primary mb-4">
                 {viewingCover ? 'Cover' : `Page ${currentPageIndex + 2}`}
               </h2>
 
               {/* Page Navigation */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs text-gray-500 dark:text-gray-500">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary">
                     Pages ({pages.length + 1})
                   </label>
                   <button
@@ -1565,7 +1565,7 @@ export function FaqEditorScreen() {
                     className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
                       viewingCover
                         ? 'bg-blue-600 text-white'
-                        : 'bg-white dark:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#252540] hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-transparent'
+                        : 'bg-white dark:bg-surface-secondary text-gray-600 dark:text-content-secondary hover:bg-gray-200 dark:hover:bg-interactive-hover hover:text-gray-900 dark:hover:text-content-primary border border-gray-300 dark:border-transparent'
                     }`}
                   >
                     Cover
@@ -1581,7 +1581,7 @@ export function FaqEditorScreen() {
                       className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
                         !viewingCover && idx === currentPageIndex
                           ? 'bg-blue-600 text-white'
-                          : 'bg-white dark:bg-[#1a1a2e] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#252540] hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-transparent'
+                          : 'bg-white dark:bg-surface-secondary text-gray-600 dark:text-content-secondary hover:bg-gray-200 dark:hover:bg-interactive-hover hover:text-gray-900 dark:hover:text-content-primary border border-gray-300 dark:border-transparent'
                       }`}
                     >
                       Page {idx + 2}
@@ -1596,42 +1596,42 @@ export function FaqEditorScreen() {
               <div className="space-y-4">
                 {/* Cover Subheader */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1.5">
                     Cover Subheader
                   </label>
                   <input
                     type="text"
                     value={coverSubheader}
                     onChange={(e) => setCoverSubheader(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                     placeholder="Frequently Asked Questions"
                   />
                 </div>
 
                 {/* Document Title (shared between cover and content pages) */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1.5">
                     Document Title
                   </label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                     placeholder="Enter document title"
                   />
-                  <div className="text-right text-xs text-gray-500 dark:text-gray-500 mt-1">{title.length}/60</div>
+                  <div className="text-right text-xs text-gray-500 dark:text-content-secondary mt-1">{title.length}/60</div>
                 </div>
 
                 {/* Solution Category */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1.5">
                     Solution Category
                   </label>
                   <select
                     value={coverSolution}
                     onChange={(e) => setCoverSolution(e.target.value as SolutionCategory | 'none')}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#1a1a2e] border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   >
                     <option value="none">None</option>
                     {Object.entries(solutionCategories)
@@ -1646,12 +1646,12 @@ export function FaqEditorScreen() {
 
                 {/* Cover Image */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">Cover Image</label>
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1.5">Cover Image</label>
                   {!coverImageUrl ? (
                     <div className="flex gap-2">
                       {/* Upload box */}
-                      <div className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-                        <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16 hover:border-gray-400 dark:hover:border-line-focus transition-colors">
+                        <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
                           <input
                             type="file"
                             accept="image/*"
@@ -1676,9 +1676,9 @@ export function FaqEditorScreen() {
                       {/* Library box */}
                       <button
                         onClick={() => setShowCoverImageLibrary(true)}
-                        className="flex-1 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16
-                          hover:border-gray-400 dark:hover:border-gray-500 transition-colors
-                          flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                        className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
+                          hover:border-gray-400 dark:hover:border-line-focus transition-colors
+                          flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                       >
                         <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1716,11 +1716,11 @@ export function FaqEditorScreen() {
                       </div>
                       {/* Grayscale toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="text-xs text-gray-500 dark:text-gray-500">Grayscale</label>
+                        <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale</label>
                         <button
                           onClick={() => setCoverImageGrayscale(!coverImageGrayscale)}
                           className={`relative w-9 h-5 rounded-full transition-colors ${
-                            coverImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                            coverImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
                           }`}
                         >
                           <span
@@ -1733,8 +1733,8 @@ export function FaqEditorScreen() {
                       {/* Replace/Remove buttons */}
                       <div className="flex gap-2">
                         {/* Replace with upload */}
-                        <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-                          <label className="flex items-center justify-center gap-1 h-8 cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                        <div className="flex-1 border border-gray-300 dark:border-line-subtle rounded-lg overflow-hidden">
+                          <label className="flex items-center justify-center gap-1 h-8 cursor-pointer text-xs text-gray-500 dark:text-content-secondary hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors">
                             <input
                               type="file"
                               accept="image/*"
@@ -1761,7 +1761,7 @@ export function FaqEditorScreen() {
                         {/* Replace from library */}
                         <button
                           onClick={() => setShowCoverImageLibrary(true)}
-                          className="flex-1 flex items-center justify-center gap-1 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                          className="flex-1 flex items-center justify-center gap-1 h-8 border border-gray-300 dark:border-line-subtle rounded-lg text-xs text-gray-500 dark:text-content-secondary hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1776,7 +1776,7 @@ export function FaqEditorScreen() {
                             setCoverImageZoom(1)
                             setCoverImageGrayscale(false)
                           }}
-                          className="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:text-red-500 hover:border-red-500/50 transition-colors"
+                          className="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-line-subtle rounded-lg text-gray-500 dark:text-content-secondary hover:text-red-500 hover:border-red-500/50 transition-colors"
                           title="Remove image"
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1795,12 +1795,12 @@ export function FaqEditorScreen() {
               <>
                 {/* Content Blocks - Draggable */}
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1.5">
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1.5">
                     Page {currentPageIndex + 2} Content ({currentPage?.blocks.length || 0} items)
                   </label>
 
                   {!currentPage || currentPage.blocks.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-500 text-sm border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                    <div className="text-center py-8 text-gray-500 dark:text-content-secondary text-sm border border-dashed border-gray-300 dark:border-line-subtle rounded-lg">
                       No content yet. Click &quot;+ Add Content&quot; on the preview.
                     </div>
                   ) : (
@@ -1861,7 +1861,7 @@ export function FaqEditorScreen() {
           onMouseDown={startResizing}
           className="w-2 flex-shrink-0 cursor-col-resize group flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
         >
-          <div className="w-0.5 h-12 bg-gray-300 dark:bg-gray-600 group-hover:bg-blue-400 rounded-full transition-colors" />
+          <div className="w-0.5 h-12 bg-gray-300 dark:bg-surface-tertiary group-hover:bg-blue-400 rounded-full transition-colors" />
         </div>
 
         {/* Right: Preview with Actions */}
@@ -1873,9 +1873,9 @@ export function FaqEditorScreen() {
               <button
                 onClick={() => setShowPdfAllPagesPreview(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                  text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
-                  hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
-                  border border-gray-200 dark:border-gray-700"
+                  text-gray-600 dark:text-content-secondary bg-gray-100 dark:bg-surface-secondary rounded-md
+                  hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors
+                  border border-gray-200 dark:border-line-subtle"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -1900,15 +1900,15 @@ export function FaqEditorScreen() {
 
               {/* Page Picker */}
               <div className="flex items-center gap-1 ml-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">Page</span>
+                <span className="text-xs text-gray-500 dark:text-content-secondary mr-1">Page</span>
                 <div className="flex">
                   {/* Cover page button */}
                   <button
                     onClick={() => setViewingCover(true)}
-                    className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 rounded-l ${
+                    className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-line-subtle rounded-l ${
                       viewingCover
                         ? 'bg-blue-500 text-white border-blue-500 z-10 relative'
-                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        : 'bg-white dark:bg-surface-secondary text-gray-600 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover'
                     }`}
                   >
                     1
@@ -1921,12 +1921,12 @@ export function FaqEditorScreen() {
                         setViewingCover(false)
                         setCurrentPageIndex(idx)
                       }}
-                      className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-gray-600 -ml-px ${
+                      className={`w-7 h-7 text-xs font-medium transition-colors border border-gray-300 dark:border-line-subtle -ml-px ${
                         idx === pages.length - 1 ? 'rounded-r' : ''
                       } ${
                         !viewingCover && currentPageIndex === idx
                           ? 'bg-blue-500 text-white border-blue-500 z-10 relative'
-                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          : 'bg-white dark:bg-surface-secondary text-gray-600 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover'
                       }`}
                     >
                       {idx + 2}
@@ -1936,14 +1936,14 @@ export function FaqEditorScreen() {
               </div>
 
               {/* Divider */}
-              <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 ml-1" />
+              <div className="w-px h-5 bg-gray-300 dark:bg-surface-tertiary ml-1" />
 
               {/* Zoom Controls */}
               <div className="flex items-center gap-1 ml-1">
                 <button
                   onClick={() => setPdfPreviewZoom(Math.max(75, pdfPreviewZoom - 25))}
                   disabled={pdfPreviewZoom <= 75}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-l bg-white dark:bg-gray-800"
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle rounded-l bg-white dark:bg-surface-secondary"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -1952,7 +1952,7 @@ export function FaqEditorScreen() {
                 <select
                   value={pdfPreviewZoom}
                   onChange={(e) => setPdfPreviewZoom(Number(e.target.value))}
-                  className="h-7 px-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 focus:outline-none cursor-pointer"
+                  className="h-7 px-2 text-xs text-gray-600 dark:text-content-secondary bg-white dark:bg-surface-secondary border-y border-gray-300 dark:border-line-subtle focus:outline-none cursor-pointer"
                 >
                   <option value={200}>200%</option>
                   <option value={175}>175%</option>
@@ -1964,7 +1964,7 @@ export function FaqEditorScreen() {
                 <button
                   onClick={() => setPdfPreviewZoom(Math.min(200, pdfPreviewZoom + 25))}
                   disabled={pdfPreviewZoom >= 200}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle bg-white dark:bg-surface-secondary"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1972,7 +1972,7 @@ export function FaqEditorScreen() {
                 </button>
                 <button
                   onClick={() => setShowPdfFullscreen(true)}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800 ml-1"
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary border border-gray-300 dark:border-line-subtle rounded-r bg-white dark:bg-surface-secondary ml-1"
                   title="Fullscreen preview (ESC to exit)"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1998,7 +1998,7 @@ export function FaqEditorScreen() {
                 strategy={verticalListSortingStrategy}
               >
                 <div
-                  className="ring-1 ring-gray-300/50 dark:ring-gray-700/50 rounded-sm shadow-lg"
+                  className="ring-1 ring-gray-300/50 dark:ring-line-subtle/50 rounded-sm shadow-lg"
                   style={{
                     width: 612 * (pdfPreviewZoom / 100),
                     height: 792 * (pdfPreviewZoom / 100),
@@ -2360,16 +2360,16 @@ export function FaqEditorScreen() {
       {/* Fullscreen Rich Text Editor Modal */}
       {fullscreenEditBlock && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8">
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+          <div className="bg-white dark:bg-surface-primary rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-line-subtle">
               <div className="flex-1 mr-4">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Question</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Question</label>
                 <input
                   type="text"
                   value={fullscreenEditBlock.question}
                   onChange={(e) => setFullscreenEditBlock(prev => prev ? { ...prev, question: e.target.value } : null)}
-                  className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Enter question"
                 />
               </div>
@@ -2377,7 +2377,7 @@ export function FaqEditorScreen() {
 
             {/* Modal Body - Rich Text Editor */}
             <div className="flex-1 p-6 overflow-auto">
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">Answer</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-2">Answer</label>
               <div className="h-[400px]">
                 <RichTextEditor
                   content={fullscreenEditBlock.answer}
@@ -2388,10 +2388,10 @@ export function FaqEditorScreen() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-line-subtle">
               <button
                 onClick={() => setFullscreenEditBlock(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-content-secondary bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
               >
                 Cancel
               </button>
@@ -2433,14 +2433,14 @@ export function FaqEditorScreen() {
       {showCoverImageCropModal && coverImageUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowCoverImageCropModal(false)} />
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-xl w-full mx-4">
+          <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl p-6 max-w-xl w-full mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary">
                 Adjust Cover Image
               </h3>
               <button
                 onClick={() => setShowCoverImageCropModal(false)}
-                className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-content-primary"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -2468,7 +2468,7 @@ export function FaqEditorScreen() {
                   setCoverImagePosition({ x: 0, y: 0 })
                   setCoverImageZoom(1)
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-content-secondary bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
               >
                 Reset
               </button>

@@ -103,7 +103,7 @@ export function StackerExportScreen() {
       <div className="flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -161,9 +161,9 @@ export function StackerExportScreen() {
       <div className="flex gap-8">
         {/* Document Preview - Left/Main */}
         <div className="flex-1">
-          <div className="bg-gray-100 dark:bg-gray-800/50 rounded-xl p-6">
+          <div className="bg-gray-100 dark:bg-surface-secondary rounded-xl p-6">
             <div className="max-w-[612px] mx-auto">
-              <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700">
+              <div className="rounded-lg overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-line-subtle">
                 <StackerPreviewEditor
                   modules={allModules}
                   selectedModuleId={null}
@@ -183,14 +183,14 @@ export function StackerExportScreen() {
         <div className="w-[300px] flex-shrink-0">
           <div className="sticky top-0 space-y-6">
             {/* Document Info */}
-            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-4">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-4">
+              <h3 className="text-sm font-medium text-gray-900 dark:text-content-primary">
                 Export Settings
               </h3>
 
               {/* Format Selector */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-2">
                   Format
                 </label>
                 <div className="flex gap-2">
@@ -199,7 +199,7 @@ export function StackerExportScreen() {
                     className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
                       exportFormat === 'pdf'
                         ? 'bg-blue-500 text-white border-blue-500'
-                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                        : 'bg-white dark:bg-surface-primary text-gray-700 dark:text-content-secondary border-gray-300 dark:border-line-subtle hover:border-gray-400 dark:hover:border-line-focus'
                     }`}
                   >
                     PDF
@@ -209,7 +209,7 @@ export function StackerExportScreen() {
                     className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
                       exportFormat === 'png'
                         ? 'bg-blue-500 text-white border-blue-500'
-                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                        : 'bg-white dark:bg-surface-primary text-gray-700 dark:text-content-secondary border-gray-300 dark:border-line-subtle hover:border-gray-400 dark:hover:border-line-focus'
                     }`}
                   >
                     PNG
@@ -219,7 +219,7 @@ export function StackerExportScreen() {
 
               {/* Filename */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">
                   Filename
                 </label>
                 <div className="flex items-center gap-1">
@@ -227,12 +227,12 @@ export function StackerExportScreen() {
                     type="text"
                     value={filename}
                     onChange={(e) => setFilename(e.target.value.replace(/[^a-zA-Z0-9\s-]/g, ''))}
-                    className="flex-1 px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100
-                      bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600
+                    className="flex-1 px-2 py-1.5 text-sm text-gray-900 dark:text-content-primary
+                      bg-white dark:bg-surface-primary border border-gray-300 dark:border-line-subtle
                       rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="stacker-document"
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">.{exportFormat}</span>
+                  <span className="text-sm text-gray-500 dark:text-content-secondary">.{exportFormat}</span>
                 </div>
               </div>
             </div>

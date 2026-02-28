@@ -46,7 +46,7 @@ function HomeContent() {
   }
 
   return (
-    <main className="min-h-screen bg-white dark:bg-black">
+    <main className="min-h-screen bg-white dark:bg-surface-primary">
       {/* Draft Banner */}
       {isSelectScreen && <DraftBanner />}
 
@@ -97,7 +97,7 @@ function HomeContent() {
 export default function Home() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-surface-primary flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     }>

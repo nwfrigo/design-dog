@@ -83,24 +83,24 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-white dark:bg-surface-primary rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-line-subtle">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-content-primary">
               Report a Bug
             </h2>
             <button
               onClick={onClose}
               disabled={isSubmitting}
-              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
+              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-content-primary transition-colors disabled:opacity-50"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 dark:text-content-secondary">
             Help us improve Design Dog
           </p>
         </div>
@@ -114,15 +114,15 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-content-primary mb-2">
                 Bug Report Submitted
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-500 dark:text-content-secondary mb-6">
                 Thanks for reporting this bug! We'll look into it.
               </p>
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+                className="px-6 py-2.5 bg-gray-900 dark:bg-surface-inverse text-white dark:text-content-inverse rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-btn-primary-hover transition-colors"
               >
                 Close
               </button>
@@ -132,7 +132,7 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             {/* Name */}
             <div>
-              <label htmlFor="bug-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label htmlFor="bug-name" className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-1.5">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -141,7 +141,7 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
+                className="w-full px-3 py-2.5 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg text-gray-900 dark:text-content-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
                 placeholder="Your name"
                 required
               />
@@ -149,7 +149,7 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
 
             {/* Email */}
             <div>
-              <label htmlFor="bug-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label htmlFor="bug-email" className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-1.5">
                 Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -158,7 +158,7 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
+                className="w-full px-3 py-2.5 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg text-gray-900 dark:text-content-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 transition-colors"
                 placeholder="you@example.com"
                 required
               />
@@ -166,7 +166,7 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
 
             {/* Description */}
             <div>
-              <label htmlFor="bug-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label htmlFor="bug-description" className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-1.5">
                 Bug Description <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -175,7 +175,7 @@ export function ReportBugModal({ screenName, onClose }: ReportBugModalProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 disabled={isSubmitting}
                 rows={4}
-                className="w-full px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 resize-none transition-colors"
+                className="w-full px-3 py-2.5 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg text-gray-900 dark:text-content-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 resize-none transition-colors"
                 placeholder="What happened? What did you expect to happen?"
                 required
               />
@@ -220,7 +220,7 @@ export function ReportBugLink({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+      className="text-xs text-gray-500 dark:text-content-secondary hover:text-gray-700 dark:hover:text-content-primary transition-colors"
     >
       Report Bug
     </button>

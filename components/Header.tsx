@@ -41,7 +41,7 @@ export function Header({
   return (
     <header
       ref={headerRef}
-      className="bg-white dark:bg-black border-b border-gray-100 dark:border-gray-900 flex-shrink-0 transition-all duration-200 ease-in-out sticky top-0 z-40"
+      className="bg-white dark:bg-surface-primary border-b border-gray-100 dark:border-line-subtle flex-shrink-0 transition-all duration-200 ease-in-out sticky top-0 z-40"
       style={{ height: isScrolled ? 60 : 100 }}
     >
       <div className={`${maxWidth} mx-auto px-6 h-full flex items-center justify-between`}>

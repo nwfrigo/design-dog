@@ -76,10 +76,10 @@ export function AutoCreateGeneratingScreen() {
                 </svg>
               </div>
             )}
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-content-primary mb-2">
               {successCount > 0 ? 'Generation Complete!' : 'Generation Failed'}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 dark:text-content-secondary">
               {successCount > 0
                 ? `Successfully generated ${successCount} ${successCount === 1 ? 'asset' : 'assets'}${errorCount > 0 ? ` (${errorCount} failed - you can retry below)` : ''}`
                 : 'All assets failed to generate. This is usually caused by a temporary API limit.'}
@@ -101,10 +101,10 @@ export function AutoCreateGeneratingScreen() {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-content-primary mb-2">
               Generating your assets...
             </h1>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 dark:text-content-secondary">
               {completed} of {total} complete
             </p>
           </>
@@ -113,7 +113,7 @@ export function AutoCreateGeneratingScreen() {
 
       {/* Progress bar */}
       <div className="mb-10">
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="h-3 bg-gray-200 dark:bg-surface-tertiary rounded-full overflow-hidden">
           <div
             className={`h-full transition-all duration-500 ${
               isComplete && errorCount > 0 && successCount === 0
@@ -140,7 +140,7 @@ export function AutoCreateGeneratingScreen() {
                   ? 'bg-red-50 dark:bg-red-900/20'
                   : asset.status === 'generating'
                     ? 'bg-blue-50 dark:bg-blue-900/20'
-                    : 'bg-gray-50 dark:bg-gray-800/50'
+                    : 'bg-gray-50 dark:bg-surface-secondary'
               }
             `}
           >
@@ -166,7 +166,7 @@ export function AutoCreateGeneratingScreen() {
                   </svg>
                 </div>
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600" />
+                <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-surface-tertiary" />
               )}
             </div>
 
@@ -175,7 +175,7 @@ export function AutoCreateGeneratingScreen() {
               <span className={`text-base font-medium ${
                 asset.status === 'error'
                   ? 'text-red-700 dark:text-red-300'
-                  : 'text-gray-900 dark:text-gray-100'
+                  : 'text-gray-900 dark:text-content-primary'
               }`}>
                 {TEMPLATE_LABELS[asset.templateType] || asset.templateType}
               </span>
@@ -213,10 +213,10 @@ export function AutoCreateGeneratingScreen() {
 
       {/* Navigation */}
       {isComplete && generatingCount === 0 && (
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-line-subtle">
           <button
             onClick={handleBack}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
           >
             ← Back to Assets
           </button>

@@ -45,17 +45,17 @@ function DeleteConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+      <div className="relative bg-white dark:bg-surface-secondary rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
           Delete {itemType}{itemLabel ? ` ${itemLabel}` : ''}?
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+        <p className="text-sm text-gray-600 dark:text-content-secondary mb-6">
           This action cannot be undone. Are you sure you want to delete this {itemType.toLowerCase()}?
         </p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-content-secondary bg-gray-100 dark:bg-surface-tertiary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
           >
             Cancel
           </button>
@@ -325,7 +325,7 @@ function LockedModuleItem({
   return (
     <div
       data-module-id={module.id}
-      className={`bg-white dark:bg-gray-800 border rounded-lg overflow-hidden transition-all ${
+      className={`bg-white dark:bg-surface-secondary border rounded-lg overflow-hidden transition-all ${
         isSelected
           ? 'border-blue-500 ring-2 ring-blue-500/20'
           : 'border-gray-200 dark:border-transparent'
@@ -333,18 +333,18 @@ function LockedModuleItem({
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors"
         onClick={onToggleExpand}
       >
         {/* Lock Icon */}
-        <div className="p-1 text-gray-300 dark:text-gray-600">
+        <div className="p-1 text-gray-300 dark:text-content-tertiary">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
 
         {/* Module Type Label */}
-        <span className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+        <span className="flex-1 text-sm font-medium text-gray-700 dark:text-content-secondary uppercase tracking-wide">
           {MODULE_LABELS[module.type] || module.type}
         </span>
 
@@ -361,7 +361,7 @@ function LockedModuleItem({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-gray-700/50">
+        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-line-subtle/50">
           <ModuleEditor module={module} onUpdate={onUpdate} onOpenCropModal={onOpenCropModal} onOpenLibrary={onOpenLibrary} />
         </div>
       )}
@@ -407,7 +407,7 @@ function SortableModuleItem({
       ref={setNodeRef}
       style={style}
       data-module-id={module.id}
-      className={`bg-white dark:bg-gray-800 border rounded-lg overflow-hidden transition-all ${
+      className={`bg-white dark:bg-surface-secondary border rounded-lg overflow-hidden transition-all ${
         isSelected
           ? 'border-blue-500 ring-2 ring-blue-500/20'
           : 'border-gray-200 dark:border-transparent'
@@ -415,14 +415,14 @@ function SortableModuleItem({
     >
       {/* Collapsed Header - Always visible */}
       <div
-        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors"
         onClick={onToggleExpand}
       >
         {/* Drag Handle */}
         <button
           {...attributes}
           {...listeners}
-          className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+          className="p-1 text-gray-400 dark:text-content-secondary hover:text-gray-600 dark:hover:text-content-primary cursor-grab active:cursor-grabbing"
           onClick={(e) => e.stopPropagation()}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,7 +431,7 @@ function SortableModuleItem({
         </button>
 
         {/* Module Type Label */}
-        <span className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+        <span className="flex-1 text-sm font-medium text-gray-700 dark:text-content-secondary uppercase tracking-wide">
           {MODULE_LABELS[module.type] || module.type}
         </span>
 
@@ -448,7 +448,7 @@ function SortableModuleItem({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-gray-700/50">
+        <div className="px-3 pb-3 pt-1 border-t border-gray-200 dark:border-line-subtle/50">
           <ModuleEditor module={module} onUpdate={onUpdate} onOpenCropModal={onOpenCropModal} onOpenLibrary={onOpenLibrary} />
         </div>
       )}
@@ -476,11 +476,11 @@ function ModuleEditor({
         <div className="space-y-3">
           {/* Show Chips Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Category Chips</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Category Chips</label>
             <button
               onClick={() => onUpdate({ showChips: !module.showChips })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showChips ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showChips ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -494,7 +494,7 @@ function ModuleEditor({
           {/* Category Toggles */}
           {module.showChips && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-2">Active Categories</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-2">Active Categories</label>
               <div className="flex flex-wrap gap-2">
                 {categoryOptions.map((cat) => {
                   const isActive = module.activeCategories.includes(cat)
@@ -510,7 +510,7 @@ function ModuleEditor({
                       className={`px-2 py-1 text-xs rounded transition-colors ${
                         isActive
                           ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                          : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                       }`}
                     >
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -528,11 +528,11 @@ function ModuleEditor({
         <div className="space-y-3">
           {/* Heading */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
             <textarea
               value={module.heading}
               onChange={(e) => onUpdate({ heading: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
               rows={2}
               placeholder="Enter heading"
             />
@@ -540,14 +540,14 @@ function ModuleEditor({
 
           {/* Heading Size */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading Size</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading Size</label>
             <div className="flex gap-2">
               <button
                 onClick={() => onUpdate({ headingSize: 'h1' })}
                 className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   module.headingSize === 'h1'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                 }`}
               >
                 Large
@@ -557,7 +557,7 @@ function ModuleEditor({
                 className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   module.headingSize === 'h2'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                 }`}
               >
                 Medium
@@ -567,7 +567,7 @@ function ModuleEditor({
                 className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   module.headingSize === 'h3'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                 }`}
               >
                 Small
@@ -577,11 +577,11 @@ function ModuleEditor({
 
           {/* Subheader Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Subheader</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Subheader</label>
             <button
               onClick={() => onUpdate({ showSubheader: !module.showSubheader })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showSubheader ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showSubheader ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -595,11 +595,11 @@ function ModuleEditor({
           {/* Subheader Text */}
           {module.showSubheader && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Subheader</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Subheader</label>
               <textarea
                 value={module.subheader}
                 onChange={(e) => onUpdate({ subheader: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={2}
                 placeholder="Enter subheader"
               />
@@ -608,11 +608,11 @@ function ModuleEditor({
 
           {/* CTA Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show CTA</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show CTA</label>
             <button
               onClick={() => onUpdate({ showCta: !module.showCta })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showCta ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showCta ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -627,22 +627,22 @@ function ModuleEditor({
           {module.showCta && (
             <div className="space-y-2">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">CTA Text</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">CTA Text</label>
                 <input
                   type="text"
                   value={module.cta}
                   onChange={(e) => onUpdate({ cta: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Enter CTA text"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">CTA URL</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">CTA URL</label>
                 <input
                   type="text"
                   value={module.ctaUrl}
                   onChange={(e) => onUpdate({ ctaUrl: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="https://..."
                 />
               </div>
@@ -656,11 +656,11 @@ function ModuleEditor({
         <div className="space-y-3">
           {/* Show Intro Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Intro</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Intro</label>
             <button
               onClick={() => onUpdate({ showIntro: !module.showIntro })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showIntro ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showIntro ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -674,11 +674,11 @@ function ModuleEditor({
           {/* Intro Text */}
           {module.showIntro && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Intro (18pt)</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Intro (18pt)</label>
               <textarea
                 value={module.intro}
                 onChange={(e) => onUpdate({ intro: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={2}
                 placeholder="Enter intro text"
               />
@@ -687,11 +687,11 @@ function ModuleEditor({
 
           {/* Show Body Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Body</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Body</label>
             <button
               onClick={() => onUpdate({ showBody: !module.showBody })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -705,11 +705,11 @@ function ModuleEditor({
           {/* Body Text */}
           {module.showBody && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Body (12pt)</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body (12pt)</label>
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={4}
                 placeholder="Enter body text"
               />
@@ -720,7 +720,7 @@ function ModuleEditor({
 
     case 'divider':
       return (
-        <div className="text-sm text-gray-500 dark:text-gray-400 py-2 text-center">
+        <div className="text-sm text-gray-500 dark:text-content-secondary py-2 text-center">
           No settings for divider
         </div>
       )
@@ -730,26 +730,26 @@ function ModuleEditor({
         <div className="space-y-4">
           {/* Heading */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
             <input
               type="text"
               value={module.heading}
               onChange={(e) => onUpdate({ heading: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
               placeholder="Enter heading"
             />
           </div>
 
           {/* Columns */}
           {module.columns.map((column, colIndex) => (
-            <div key={colIndex} className="space-y-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+            <div key={colIndex} className="space-y-2 p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">
+              <div className="text-xs font-medium text-gray-600 dark:text-content-secondary mb-2">
                 Column {colIndex + 1}
               </div>
 
               {/* Column Label */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Label</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Label</label>
                 <input
                   type="text"
                   value={column.label}
@@ -758,14 +758,14 @@ function ModuleEditor({
                     newColumns[colIndex] = { ...column, label: e.target.value }
                     onUpdate({ columns: newColumns })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Column label"
                 />
               </div>
 
               {/* Bullets */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">
                   Bullets ({column.bullets.length})
                 </label>
                 <div className="space-y-1.5">
@@ -781,7 +781,7 @@ function ModuleEditor({
                           newColumns[colIndex] = { ...column, bullets: newBullets }
                           onUpdate({ columns: newColumns })
                         }}
-                        className="flex-1 px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                        className="flex-1 px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                         placeholder={`Bullet ${bulletIndex + 1}`}
                       />
                       {column.bullets.length > 1 && (
@@ -827,14 +827,14 @@ function ModuleEditor({
         <div className="space-y-3">
           {/* Image Position Toggle */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image Position</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image Position</label>
             <div className="flex gap-2">
               <button
                 onClick={() => onUpdate({ imagePosition: 'left' })}
                 className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   module.imagePosition === 'left'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                 }`}
               >
                 Left
@@ -844,7 +844,7 @@ function ModuleEditor({
                 className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   module.imagePosition === 'right'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                 }`}
               >
                 Right
@@ -854,13 +854,13 @@ function ModuleEditor({
 
           {/* Image Upload */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image</label>
             {module.imageUrl ? (
               <div className="relative">
                 {/* Image preview - click to adjust */}
                 <div
                   onClick={() => onOpenCropModal?.(module.id)}
-                  className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-colors"
+                  className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 dark:border-line-subtle hover:border-blue-400 transition-colors"
                   style={{ width: '100%', height: 120 }}
                 >
                   <img
@@ -908,9 +908,9 @@ function ModuleEditor({
             ) : (
               <div className="flex gap-2">
                 <div
-                  className="flex-1 border-2 border-dashed rounded-lg h-20 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                  className="flex-1 border-2 border-dashed rounded-lg h-20 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
                 >
-                  <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                  <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
                     <input
                       type="file"
                       accept="image/*"
@@ -932,7 +932,7 @@ function ModuleEditor({
                 </div>
                 <button
                   onClick={() => onOpenLibrary?.(module.id)}
-                  className="border-2 border-dashed rounded-lg h-20 px-3 transition-colors border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-500 flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                  className="border-2 border-dashed rounded-lg h-20 px-3 transition-colors border-gray-300 dark:border-line-subtle hover:border-blue-400 hover:text-blue-500 flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                 >
                   <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -946,11 +946,11 @@ function ModuleEditor({
           {/* Grayscale Toggle - only show when image is uploaded */}
           {module.imageUrl && (
             <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-500 dark:text-gray-500">Grayscale</label>
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale</label>
               <button
                 onClick={() => onUpdate({ grayscale: !module.grayscale })}
                 className={`relative w-9 h-5 rounded-full transition-colors ${
-                  module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                  module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
                 }`}
               >
                 <span
@@ -964,11 +964,11 @@ function ModuleEditor({
 
           {/* Show Eyebrow Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Eyebrow</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Eyebrow</label>
             <button
               onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -982,12 +982,12 @@ function ModuleEditor({
           {/* Eyebrow Text */}
           {module.showEyebrow && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Eyebrow</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
               <input
                 type="text"
                 value={module.eyebrow}
                 onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                 placeholder="Enter eyebrow"
               />
             </div>
@@ -995,11 +995,11 @@ function ModuleEditor({
 
           {/* Show Heading Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Heading</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Heading</label>
             <button
               onClick={() => onUpdate({ showHeading: !module.showHeading })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1013,11 +1013,11 @@ function ModuleEditor({
           {/* Heading Text */}
           {module.showHeading && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
               <textarea
                 value={module.heading}
                 onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={2}
                 placeholder="Enter heading"
               />
@@ -1026,11 +1026,11 @@ function ModuleEditor({
 
           {/* Show Body Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Body</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Body</label>
             <button
               onClick={() => onUpdate({ showBody: !module.showBody })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1044,11 +1044,11 @@ function ModuleEditor({
           {/* Body Text */}
           {module.showBody && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Body</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={3}
                 placeholder="Enter body text"
               />
@@ -1057,11 +1057,11 @@ function ModuleEditor({
 
           {/* Show CTA Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show CTA</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show CTA</label>
             <button
               onClick={() => onUpdate({ showCta: !module.showCta })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showCta ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showCta ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1076,22 +1076,22 @@ function ModuleEditor({
           {module.showCta && (
             <div className="space-y-2">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">CTA Text</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">CTA Text</label>
                 <input
                   type="text"
                   value={module.cta}
                   onChange={(e) => onUpdate({ cta: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Enter CTA text"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">CTA URL</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">CTA URL</label>
                 <input
                   type="text"
                   value={module.ctaUrl}
                   onChange={(e) => onUpdate({ ctaUrl: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="https://..."
                 />
               </div>
@@ -1105,14 +1105,14 @@ function ModuleEditor({
         <div className="space-y-3">
           {/* Image Position Toggle */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image Position</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image Position</label>
             <div className="flex gap-2">
               <button
                 onClick={() => onUpdate({ imagePosition: 'left' })}
                 className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   module.imagePosition === 'left'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                 }`}
               >
                 Left
@@ -1122,7 +1122,7 @@ function ModuleEditor({
                 className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   module.imagePosition === 'right'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
                 }`}
               >
                 Right
@@ -1132,13 +1132,13 @@ function ModuleEditor({
 
           {/* Image Upload */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image (16:9)</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image (16:9)</label>
             {module.imageUrl ? (
               <div className="relative">
                 {/* Image preview - click to adjust */}
                 <div
                   onClick={() => onOpenCropModal?.(module.id)}
-                  className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-colors"
+                  className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 dark:border-line-subtle hover:border-blue-400 transition-colors"
                   style={{ width: '100%', height: 80 }}
                 >
                   <img
@@ -1186,9 +1186,9 @@ function ModuleEditor({
             ) : (
               <div className="flex gap-2">
                 <div
-                  className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400"
+                  className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
                 >
-                  <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                  <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
                     <input
                       type="file"
                       accept="image/*"
@@ -1210,7 +1210,7 @@ function ModuleEditor({
               </div>
                 <button
                   onClick={() => onOpenLibrary?.(module.id)}
-                  className="border-2 border-dashed rounded-lg h-16 px-3 transition-colors border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-500 flex flex-col items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                  className="border-2 border-dashed rounded-lg h-16 px-3 transition-colors border-gray-300 dark:border-line-subtle hover:border-blue-400 hover:text-blue-500 flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                 >
                   <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1224,11 +1224,11 @@ function ModuleEditor({
           {/* Grayscale Toggle - only show when image is uploaded */}
           {module.imageUrl && (
             <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-500 dark:text-gray-500">Grayscale</label>
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale</label>
               <button
                 onClick={() => onUpdate({ grayscale: !module.grayscale })}
                 className={`relative w-9 h-5 rounded-full transition-colors ${
-                  module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                  module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
                 }`}
               >
                 <span
@@ -1242,11 +1242,11 @@ function ModuleEditor({
 
           {/* Show Eyebrow Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Eyebrow</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Eyebrow</label>
             <button
               onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1260,12 +1260,12 @@ function ModuleEditor({
           {/* Eyebrow Text */}
           {module.showEyebrow && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Eyebrow</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
               <input
                 type="text"
                 value={module.eyebrow}
                 onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                 placeholder="Enter eyebrow"
               />
             </div>
@@ -1273,11 +1273,11 @@ function ModuleEditor({
 
           {/* Show Heading Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Heading</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Heading</label>
             <button
               onClick={() => onUpdate({ showHeading: !module.showHeading })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1291,11 +1291,11 @@ function ModuleEditor({
           {/* Heading Text */}
           {module.showHeading && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
               <textarea
                 value={module.heading}
                 onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={2}
                 placeholder="Enter heading"
               />
@@ -1304,11 +1304,11 @@ function ModuleEditor({
 
           {/* Show Body Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Body</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Body</label>
             <button
               onClick={() => onUpdate({ showBody: !module.showBody })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1322,11 +1322,11 @@ function ModuleEditor({
           {/* Body Text */}
           {module.showBody && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Body</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={3}
                 placeholder="Enter body text"
               />
@@ -1339,14 +1339,14 @@ function ModuleEditor({
       return (
         <div className="space-y-4">
           {module.cards.map((card, index) => (
-            <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+            <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">
+              <div className="text-xs font-medium text-gray-600 dark:text-content-secondary mb-2">
                 Card {index + 1}
               </div>
 
               {/* Icon */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Icon</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Icon</label>
                 <div className="flex items-center gap-2">
                   <IconPicker
                     value={card.icon}
@@ -1364,7 +1364,7 @@ function ModuleEditor({
                       newCards[index] = { ...card, icon: e.target.value }
                       onUpdate({ cards: newCards })
                     }}
-                    className="flex-1 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    className="flex-1 px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                     placeholder="e.g., zap, shield-check, clock"
                   />
                 </div>
@@ -1372,7 +1372,7 @@ function ModuleEditor({
 
               {/* Title */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Title</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Title</label>
                 <textarea
                   value={card.title}
                   onChange={(e) => {
@@ -1380,7 +1380,7 @@ function ModuleEditor({
                     newCards[index] = { ...card, title: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                   rows={2}
                   placeholder="Enter card title"
                 />
@@ -1388,7 +1388,7 @@ function ModuleEditor({
 
               {/* Description */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Description</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Description</label>
                 <textarea
                   value={card.description}
                   onChange={(e) => {
@@ -1396,7 +1396,7 @@ function ModuleEditor({
                     newCards[index] = { ...card, description: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                   rows={3}
                   placeholder="Enter card description"
                 />
@@ -1411,11 +1411,11 @@ function ModuleEditor({
         <div className="space-y-4">
           {/* Show Heading Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Heading</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Heading</label>
             <button
               onClick={() => onUpdate({ showHeading: !module.showHeading })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1429,11 +1429,11 @@ function ModuleEditor({
           {/* Heading Text */}
           {module.showHeading && (
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Heading</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
               <textarea
                 value={module.heading}
                 onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={2}
                 placeholder="Enter heading"
               />
@@ -1442,11 +1442,11 @@ function ModuleEditor({
 
           {/* Show Third Card Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Show Third Card</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Third Card</label>
             <button
               onClick={() => onUpdate({ showCard3: !module.showCard3 })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showCard3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showCard3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1459,11 +1459,11 @@ function ModuleEditor({
 
           {/* Grayscale Toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-gray-500">Grayscale Images</label>
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale Images</label>
             <button
               onClick={() => onUpdate({ grayscale: !module.grayscale })}
               className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1476,18 +1476,18 @@ function ModuleEditor({
 
           {/* Cards */}
           {module.cards.slice(0, module.showCard3 ? 3 : 2).map((card, index) => (
-            <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+            <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">
+              <div className="text-xs font-medium text-gray-600 dark:text-content-secondary mb-2">
                 Card {index + 1}
               </div>
 
               {/* Image Upload */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Image</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image</label>
                 {card.imageUrl ? (
                   <div className="relative">
                     <div
-                      className="overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600"
+                      className="overflow-hidden rounded-lg border border-gray-300 dark:border-line-subtle"
                       style={{ width: '100%', height: 60 }}
                     >
                       <img
@@ -1513,8 +1513,8 @@ function ModuleEditor({
                   </div>
                 ) : (
                   <div className="flex gap-1.5">
-                    <div className="flex-1 border-2 border-dashed rounded-lg h-12 transition-colors border-gray-300 dark:border-gray-600 hover:border-gray-400">
-                      <label className="flex items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-gray-400 gap-1">
+                    <div className="flex-1 border-2 border-dashed rounded-lg h-12 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400">
+                      <label className="flex items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary gap-1">
                         <input
                           type="file"
                           accept="image/*"
@@ -1540,7 +1540,7 @@ function ModuleEditor({
                     </div>
                     <button
                       onClick={() => onOpenLibrary?.(module.id, index)}
-                      className="border-2 border-dashed rounded-lg h-12 px-2 transition-colors border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                      className="border-2 border-dashed rounded-lg h-12 px-2 transition-colors border-gray-300 dark:border-line-subtle hover:border-blue-400 hover:text-blue-500 flex items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
                       title="Choose from library"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1553,7 +1553,7 @@ function ModuleEditor({
 
               {/* Show Eyebrow Toggle */}
               <div className="flex items-center justify-between">
-                <label className="text-xs text-gray-500 dark:text-gray-500">Show Eyebrow</label>
+                <label className="text-xs text-gray-500 dark:text-content-secondary">Show Eyebrow</label>
                 <button
                   onClick={() => {
                     const newCards = [...module.cards] as typeof module.cards
@@ -1561,7 +1561,7 @@ function ModuleEditor({
                     onUpdate({ cards: newCards })
                   }}
                   className={`relative w-9 h-5 rounded-full transition-colors ${
-                    card.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                    card.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
                   }`}
                 >
                   <span
@@ -1575,7 +1575,7 @@ function ModuleEditor({
               {/* Eyebrow Text */}
               {card.showEyebrow && (
                 <div>
-                  <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Eyebrow</label>
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
                   <input
                     type="text"
                     value={card.eyebrow}
@@ -1584,7 +1584,7 @@ function ModuleEditor({
                       newCards[index] = { ...card, eyebrow: e.target.value }
                       onUpdate({ cards: newCards })
                     }}
-                    className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                    className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                     placeholder="Eyebrow text"
                   />
                 </div>
@@ -1592,7 +1592,7 @@ function ModuleEditor({
 
               {/* Title */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Title</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Title</label>
                 <input
                   type="text"
                   value={card.title}
@@ -1601,14 +1601,14 @@ function ModuleEditor({
                     newCards[index] = { ...card, title: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Card title"
                 />
               </div>
 
               {/* Body */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Body</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
                 <textarea
                   value={card.body}
                   onChange={(e) => {
@@ -1616,7 +1616,7 @@ function ModuleEditor({
                     newCards[index] = { ...card, body: e.target.value }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                   rows={2}
                   placeholder="Card body text"
                 />
@@ -1631,11 +1631,11 @@ function ModuleEditor({
         <div className="space-y-3">
           {/* Quote Text */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Quote</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Quote</label>
             <textarea
               value={module.quote}
               onChange={(e) => onUpdate({ quote: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none italic"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none italic"
               rows={4}
               placeholder="Enter quote text"
             />
@@ -1643,36 +1643,36 @@ function ModuleEditor({
 
           {/* Name */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Name</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Name</label>
             <input
               type="text"
               value={module.name}
               onChange={(e) => onUpdate({ name: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
               placeholder="Firstname Lastname"
             />
           </div>
 
           {/* Job Title */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Job Title</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Job Title</label>
             <input
               type="text"
               value={module.jobTitle}
               onChange={(e) => onUpdate({ jobTitle: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
               placeholder="Job Title"
             />
           </div>
 
           {/* Organization */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Organization</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Organization</label>
             <input
               type="text"
               value={module.organization}
               onChange={(e) => onUpdate({ organization: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
               placeholder="Organization Name"
             />
           </div>
@@ -1684,12 +1684,12 @@ function ModuleEditor({
       return (
         <div className="space-y-4">
           {/* Show 3rd Stat Toggle */}
-          <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700">
-            <span className="text-xs text-gray-600 dark:text-gray-400">Show 3rd Stat</span>
+          <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-line-subtle">
+            <span className="text-xs text-gray-600 dark:text-content-secondary">Show 3rd Stat</span>
             <button
               onClick={() => onUpdate({ showStat3: !module.showStat3 })}
               className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                module.showStat3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                module.showStat3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
               }`}
             >
               <span
@@ -1701,14 +1701,14 @@ function ModuleEditor({
           </div>
 
           {visibleStats.map((stat, index) => (
-            <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+            <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">
+              <div className="text-xs font-medium text-gray-600 dark:text-content-secondary mb-2">
                 Stat {index + 1}
               </div>
 
               {/* Value */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Value</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Value</label>
                 <input
                   type="text"
                   value={stat.value}
@@ -1717,14 +1717,14 @@ function ModuleEditor({
                     newStats[index] = { ...stat, value: e.target.value }
                     onUpdate({ stats: newStats })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="0,000"
                 />
               </div>
 
               {/* Label */}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Label</label>
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Label</label>
                 <textarea
                   value={stat.label}
                   onChange={(e) => {
@@ -1732,7 +1732,7 @@ function ModuleEditor({
                     newStats[index] = { ...stat, label: e.target.value }
                     onUpdate({ stats: newStats })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                   rows={2}
                   placeholder="Stat description"
                 />
@@ -1747,30 +1747,30 @@ function ModuleEditor({
       return (
         <div className="space-y-3">
           {/* Stat Section */}
-          <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-2">
-            <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+          <div className="p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-2">
+            <div className="text-xs font-medium text-gray-600 dark:text-content-secondary mb-2">
               Stat
             </div>
 
             {/* Value */}
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Value</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Value</label>
               <input
                 type="text"
                 value={module.value}
                 onChange={(e) => onUpdate({ value: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                 placeholder="0,000"
               />
             </div>
 
             {/* Label */}
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Label</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Label</label>
               <textarea
                 value={module.label}
                 onChange={(e) => onUpdate({ label: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={2}
                 placeholder="Stat description"
               />
@@ -1778,30 +1778,30 @@ function ModuleEditor({
           </div>
 
           {/* Description Section */}
-          <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-2">
-            <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+          <div className="p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-2">
+            <div className="text-xs font-medium text-gray-600 dark:text-content-secondary mb-2">
               Description
             </div>
 
             {/* Eyebrow */}
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Eyebrow</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
               <input
                 type="text"
                 value={module.eyebrow}
                 onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                 placeholder="Firstname Lastname"
               />
             </div>
 
             {/* Body */}
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Body</label>
+              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
               <textarea
                 value={module.body}
                 onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
                 rows={3}
                 placeholder="Description text"
               />
@@ -1813,7 +1813,7 @@ function ModuleEditor({
     case 'footer':
       return (
         <div className="space-y-4">
-          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <div className="text-xs text-gray-500 dark:text-content-secondary mb-2">
             Logo and about paragraph are locked. Stats are editable.
           </div>
 
@@ -1827,22 +1827,22 @@ function ModuleEditor({
           ].map((stat) => (
             <div key={stat.num} className="flex gap-2">
               <div className="w-20">
-                <label className="block text-[10px] text-gray-500 dark:text-gray-500 mb-1">Stat {stat.num}</label>
+                <label className="block text-[10px] text-gray-500 dark:text-content-secondary mb-1">Stat {stat.num}</label>
                 <input
                   type="text"
                   value={stat.value}
                   onChange={(e) => onUpdate({ [stat.valueKey]: e.target.value })}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Value"
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-[10px] text-gray-500 dark:text-gray-500 mb-1">Label</label>
+                <label className="block text-[10px] text-gray-500 dark:text-content-secondary mb-1">Label</label>
                 <input
                   type="text"
                   value={stat.label}
                   onChange={(e) => onUpdate({ [stat.labelKey]: e.target.value })}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
                   placeholder="Label"
                 />
               </div>
@@ -2129,9 +2129,9 @@ export function StackerEditorScreen() {
   return (
     <div className="space-y-6">
       {/* Header with title */}
-      <div className="flex items-center border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center border-b border-gray-200 dark:border-line-subtle">
         <div className="flex">
-          <div className="px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+          <div className="px-4 py-2.5 text-sm font-medium border-t border-l border-r rounded-t-lg -mb-px border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary">
             Stacker Document
           </div>
         </div>
@@ -2141,9 +2141,9 @@ export function StackerEditorScreen() {
       <div className="flex h-[calc(100vh-180px)]">
         {/* Left: Module List */}
         <div className="flex-shrink-0 flex flex-col" style={{ width: editorWidth }}>
-          <div className="bg-gray-100 dark:bg-gray-900 rounded-xl p-4 flex-1 flex flex-col overflow-hidden">
+          <div className="bg-gray-100 dark:bg-surface-primary rounded-xl p-4 flex-1 flex flex-col overflow-hidden">
             {/* Module Count */}
-            <div className="text-xs text-gray-500 dark:text-gray-500 mb-2">
+            <div className="text-xs text-gray-500 dark:text-content-secondary mb-2">
               {allModules.length} module{allModules.length !== 1 ? 's' : ''} (3 locked)
             </div>
 
@@ -2209,7 +2209,7 @@ export function StackerEditorScreen() {
           onMouseDown={startResizing}
           className="w-2 flex-shrink-0 cursor-col-resize group flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
         >
-          <div className="w-0.5 h-12 bg-gray-300 dark:bg-gray-600 group-hover:bg-blue-400 rounded-full transition-colors" />
+          <div className="w-0.5 h-12 bg-gray-300 dark:bg-surface-tertiary group-hover:bg-blue-400 rounded-full transition-colors" />
         </div>
 
         {/* Right: Preview */}
@@ -2221,9 +2221,9 @@ export function StackerEditorScreen() {
               <button
                 onClick={() => setShowAllPagesPreview(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                  text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-md
-                  hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors
-                  border border-gray-200 dark:border-gray-700"
+                  text-gray-600 dark:text-content-secondary bg-gray-100 dark:bg-surface-secondary rounded-md
+                  hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors
+                  border border-gray-200 dark:border-line-subtle"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -2247,14 +2247,14 @@ export function StackerEditorScreen() {
               </button>
 
               {/* Divider */}
-              <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 ml-1" />
+              <div className="w-px h-5 bg-gray-300 dark:bg-surface-tertiary ml-1" />
 
               {/* Zoom Controls */}
               <div className="flex items-center gap-1 ml-1">
                 <button
                   onClick={() => setPreviewZoom(Math.max(75, previewZoom - 25))}
                   disabled={previewZoom <= 75}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-l bg-white dark:bg-gray-800"
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle rounded-l bg-white dark:bg-surface-secondary"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -2263,7 +2263,7 @@ export function StackerEditorScreen() {
                 <select
                   value={previewZoom}
                   onChange={(e) => setPreviewZoom(Number(e.target.value))}
-                  className="h-7 px-2 text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 focus:outline-none cursor-pointer"
+                  className="h-7 px-2 text-xs text-gray-600 dark:text-content-secondary bg-white dark:bg-surface-secondary border-y border-gray-300 dark:border-line-subtle focus:outline-none cursor-pointer"
                 >
                   <option value={200}>200%</option>
                   <option value={175}>175%</option>
@@ -2275,7 +2275,7 @@ export function StackerEditorScreen() {
                 <button
                   onClick={() => setPreviewZoom(Math.min(200, previewZoom + 25))}
                   disabled={previewZoom >= 200}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle bg-white dark:bg-surface-secondary"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -2283,7 +2283,7 @@ export function StackerEditorScreen() {
                 </button>
                 <button
                   onClick={() => setShowFullscreenPreview(true)}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-r bg-white dark:bg-gray-800 ml-1"
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary border border-gray-300 dark:border-line-subtle rounded-r bg-white dark:bg-surface-secondary ml-1"
                   title="Fullscreen preview (ESC to exit)"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

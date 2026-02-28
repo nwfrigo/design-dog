@@ -115,10 +115,10 @@ export function ContentSourceStep() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-content-primary mb-1">
           Add your content
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-gray-500 dark:text-content-secondary">
           {kitConfig?.contentPrompts.upload || 'Provide content to generate copy from'}
         </p>
       </div>
@@ -128,34 +128,34 @@ export function ContentSourceStep() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <button
             onClick={() => handleMethodSelect('upload')}
-            className="flex flex-col items-center p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all"
+            className="flex flex-col items-center p-6 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all"
           >
             <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-3">
               <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <span className="text-sm font-medium text-gray-900 dark:text-content-primary">
               Upload materials
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+            <span className="text-xs text-gray-500 dark:text-content-secondary mt-1 text-center">
               I have a PDF or document to upload
             </span>
           </button>
 
           <button
             onClick={() => handleMethodSelect('manual')}
-            className="flex flex-col items-center p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all"
+            className="flex flex-col items-center p-6 bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all"
           >
             <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-3">
               <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <span className="text-sm font-medium text-gray-900 dark:text-content-primary">
               Describe it manually
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+            <span className="text-xs text-gray-500 dark:text-content-secondary mt-1 text-center">
               I&apos;ll type in the details
             </span>
           </button>
@@ -182,7 +182,7 @@ export function ContentSourceStep() {
               flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl cursor-pointer transition-colors
               ${contentSource.uploadedFileName
                 ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20'
-                : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                : 'border-gray-300 dark:border-line-subtle hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
               }
             `}
           >
@@ -201,10 +201,10 @@ export function ContentSourceStep() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                <span className="text-sm font-medium text-gray-900 dark:text-content-primary">
                   {contentSource.uploadedFileName}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <span className="text-xs text-gray-500 dark:text-content-secondary mt-1">
                   Click to replace
                 </span>
               </>
@@ -213,7 +213,7 @@ export function ContentSourceStep() {
                 <svg className="w-10 h-10 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-content-secondary">
                   <span className="font-medium text-blue-600 dark:text-blue-400">Upload a PDF</span>
                   {' '}or drag and drop
                 </span>
@@ -223,21 +223,21 @@ export function ContentSourceStep() {
 
           {/* Additional context */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-2">
               Additional context (optional)
             </label>
             <textarea
               value={contentSource.additionalContext}
               onChange={(e) => setAutoCreateContentSource({ additionalContext: e.target.value })}
               placeholder="Add any extra details, tone preferences, or specific requirements..."
-              className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           {/* Change method */}
           <button
             onClick={() => setAutoCreateContentSource({ method: null, uploadedFileName: null, pdfContent: null })}
-            className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-content-primary"
           >
             ← Choose a different method
           </button>
@@ -248,45 +248,45 @@ export function ContentSourceStep() {
       {contentSource.method === 'manual' && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-2">
               Description
             </label>
             <textarea
               value={contentSource.manualDescription}
               onChange={(e) => setAutoCreateContentSource({ manualDescription: e.target.value })}
               placeholder={kitConfig?.contentPrompts.manual || "Describe what you're promoting..."}
-              className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-2">
               Key points
             </label>
             <textarea
               value={contentSource.manualKeyPoints}
               onChange={(e) => setAutoCreateContentSource({ manualKeyPoints: e.target.value })}
               placeholder="List the main benefits, features, or takeaways (one per line)..."
-              className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-24 px-4 py-3 text-sm bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-2">
               Additional notes (optional)
             </label>
             <textarea
               value={contentSource.additionalContext}
               onChange={(e) => setAutoCreateContentSource({ additionalContext: e.target.value })}
               placeholder="Tone preferences, audience info, or other requirements..."
-              className="w-full h-20 px-4 py-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-20 px-4 py-3 text-sm bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           {/* Change method */}
           <button
             onClick={() => setAutoCreateContentSource({ method: null })}
-            className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-content-primary"
           >
             ← Choose a different method
           </button>
@@ -295,10 +295,10 @@ export function ContentSourceStep() {
 
       {/* Navigation */}
       {contentSource.method && (
-        <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-line-subtle">
           <button
             onClick={handleBack}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
           >
             ← Back
           </button>
@@ -309,7 +309,7 @@ export function ContentSourceStep() {
               px-6 py-2.5 rounded-lg text-sm font-medium transition-all
               ${canContinue()
                 ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-100 dark:bg-surface-secondary text-gray-400 cursor-not-allowed'
               }
             `}
           >

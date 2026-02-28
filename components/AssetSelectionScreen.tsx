@@ -111,17 +111,17 @@ function AutoCreateSidebar() {
   }
 
   return (
-    <aside className="w-full border-l border-gray-200 dark:border-gray-800 pl-8">
+    <aside className="w-full border-l border-gray-200 dark:border-line-subtle pl-8">
       <div>
         {/* Header */}
         <div className="mb-4">
-          <h3 className="text-2xl font-light text-gray-900 dark:text-white flex items-center gap-3 mb-2">
+          <h3 className="text-2xl font-light text-gray-900 dark:text-content-primary flex items-center gap-3 mb-2">
             <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             Auto-Create
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-content-secondary">
             Write and design assets for a Promo Kit in just a few clicks
           </p>
         </div>
@@ -132,20 +132,20 @@ function AutoCreateSidebar() {
             <button
               key={kit.id}
               onClick={() => handleKitClick(kit.id)}
-              className="w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-lg hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all group text-left"
+              className="w-full flex items-center gap-3 p-3 bg-white dark:bg-surface-secondary border border-gray-100 dark:border-line-subtle rounded-lg hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all group text-left"
             >
-              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
-                <KitIcon icon={kit.icon} className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-surface-tertiary flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                <KitIcon icon={kit.icon} className="w-4 h-4 text-gray-500 dark:text-content-secondary group-hover:text-blue-600 dark:group-hover:text-blue-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100 block">
+                <span className="text-sm font-medium text-gray-900 dark:text-content-primary block">
                   {kit.label}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-500 dark:text-content-secondary">
                   {kit.recommendedAssets.length} assets
                 </span>
               </div>
-              <svg className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-300 dark:text-content-tertiary group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -153,9 +153,9 @@ function AutoCreateSidebar() {
         </div>
 
         {/* About blurb */}
-        <p className="mt-8 text-xs font-mono text-gray-400 dark:text-gray-500 leading-relaxed">
+        <p className="mt-8 text-xs font-mono text-gray-400 dark:text-content-secondary leading-relaxed">
           designdog is a homemade app that makes marketing assets for Cority. The possibilities are endless, and there&apos;s always room for improvement. If you see any, let Nick know!{' '}
-          <a href="mailto:nicholas.frigo@cority.com" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">
+          <a href="mailto:nicholas.frigo@cority.com" className="hover:text-gray-600 dark:hover:text-content-secondary transition-colors">
             nicholas.frigo@cority.com
           </a>
         </p>
@@ -248,7 +248,7 @@ export function AssetSelectionScreen() {
       <div className="flex-[2]">
         {/* Header */}
         <div className="mb-6">
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500 dark:text-content-secondary">
             Pick any template to get started, or use Auto-Create to make entire collections at once.
           </p>
         </div>
@@ -264,7 +264,7 @@ export function AssetSelectionScreen() {
                   px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border
                   ${activeFilter === filter.id
                     ? 'bg-blue-500 text-white border-blue-500'
-                    : 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
+                    : 'text-gray-500 dark:text-content-secondary border-gray-200 dark:border-line-subtle hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
                   }
                 `}
               >
@@ -276,7 +276,7 @@ export function AssetSelectionScreen() {
 
         {/* Results count */}
         <div className="mb-6">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-content-secondary">
             {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}{getFilterLabel()}
           </p>
         </div>
@@ -299,12 +299,12 @@ export function AssetSelectionScreen() {
         {/* Footer with selection summary and continue button */}
         {selectedAssets.length > 0 && (
           <div className="sticky bottom-0 mt-8 py-4 bg-gradient-to-t from-white dark:from-black via-white dark:via-black to-transparent">
-            <div className="flex items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-5 py-4 shadow-lg">
+            <div className="flex items-center justify-between bg-white dark:bg-surface-primary border border-gray-200 dark:border-line-subtle rounded-xl px-5 py-4 shadow-lg">
               <div className="flex items-center gap-4">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-sm">
                   {selectedAssets.length}
                 </span>
-                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                <span className="text-gray-700 dark:text-content-secondary font-medium">
                   asset{selectedAssets.length > 1 ? 's' : ''} selected
                 </span>
               </div>

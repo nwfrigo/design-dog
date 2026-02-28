@@ -53,7 +53,7 @@ export function SolutionOverviewSetupScreen() {
   }, [])
 
   // Unselected color based on theme
-  const unselectedColor = isDark ? '#37393D' : '#dddddd'
+  const unselectedColor = isDark ? '#494A4C' : '#dddddd'
 
   const handleCategorySelect = (category: SolutionCategory) => {
     setSolutionOverviewSolution(category)
@@ -220,13 +220,13 @@ export function SolutionOverviewSetupScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-surface-primary">
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-800">
+      <div className="border-b border-gray-200 dark:border-line-subtle">
         <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -239,16 +239,16 @@ export function SolutionOverviewSetupScreen() {
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-light text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-light text-gray-900 dark:text-content-primary mb-2">
           Solution Overview
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-10">
+        <p className="text-gray-500 dark:text-content-secondary mb-10">
           Set up your Solution Overview document by selecting options below.
         </p>
 
         {/* Section 1: Solution Category */}
         <div className="mb-10">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-3">
             Solution Category
           </label>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10 }}>
@@ -299,7 +299,7 @@ export function SolutionOverviewSetupScreen() {
 
         {/* Section 2: Solution Name */}
         <div className="mb-10">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-3">
             Solution Name
           </label>
           <input
@@ -307,16 +307,16 @@ export function SolutionOverviewSetupScreen() {
             value={solutionOverviewSolutionName}
             onChange={(e) => setSolutionOverviewSolutionName(e.target.value)}
             placeholder={defaultSolutionOverviewContent.solutionName}
-            className="w-full px-6 py-5 border border-gray-300 dark:border-gray-600 rounded-xl text-3xl font-light text-gray-900 dark:text-gray-100 placeholder-[#37393D] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full px-6 py-5 border border-gray-300 dark:border-line-subtle rounded-xl text-3xl font-light text-gray-900 dark:text-content-primary placeholder-[#494A4C] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             style={{ backgroundColor: isDark ? '#000000' : 'white' }}
           />
         </div>
 
         {/* Section 3: Word Doc Upload */}
         <div className="mb-12">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-content-secondary mb-3">
             Content Document
-            <span className="text-gray-400 dark:text-gray-500 font-normal ml-2">(optional)</span>
+            <span className="text-gray-400 dark:text-content-secondary font-normal ml-2">(optional)</span>
           </label>
 
           {!uploadedFile ? (
@@ -329,7 +329,7 @@ export function SolutionOverviewSetupScreen() {
                 relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
                 ${isDragging
                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'}
+                  : 'border-gray-300 dark:border-line-subtle hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-interactive-hover'}
               `}
             >
               <input
@@ -340,33 +340,33 @@ export function SolutionOverviewSetupScreen() {
                 className="hidden"
               />
               <div className="flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-surface-tertiary flex items-center justify-center">
                   <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-gray-600 dark:text-content-secondary">
                     <span className="text-blue-600 dark:text-blue-400 font-medium">Upload a Word doc</span> or drag and drop
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  <p className="text-xs text-gray-400 dark:text-content-secondary mt-1">
                     .doc or .docx files
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg border border-gray-200 dark:border-line-subtle">
               <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                <p className="text-sm font-medium text-gray-900 dark:text-content-primary truncate">
                   {uploadedFile.name}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-content-secondary">
                   {(uploadedFile.size / 1024).toFixed(1)} KB
                 </p>
               </div>
@@ -381,7 +381,7 @@ export function SolutionOverviewSetupScreen() {
               </button>
             </div>
           )}
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+          <p className="text-xs text-gray-400 dark:text-content-secondary mt-2">
             Upload the Solution Overview Word document template to auto-populate content fields.
           </p>
 
