@@ -176,6 +176,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
           manualKeyPoints: '',
           additionalContext: '',
           uploadedFileName: null,
+          uploadedFileType: null,
           analysisInfo: null,
           editedContent: null,
           editedFields: [],

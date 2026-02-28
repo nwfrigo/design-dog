@@ -42,6 +42,17 @@ export function AutoCreateGeneratingScreen() {
     await retryFailedAsset(assetId)
   }
 
+  const handleRetryAll = async () => {
+    const failedAssets = assetList.filter(a => a.status === 'error')
+    // Stagger retries to avoid rate limits
+    for (let i = 0; i < failedAssets.length; i++) {
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+      retryFailedAsset(failedAssets[i].id)
+    }
+  }
+
   const handleBack = () => {
     setCurrentScreen('auto-create-assets')
   }
@@ -71,8 +82,16 @@ export function AutoCreateGeneratingScreen() {
             <p className="text-gray-500 dark:text-gray-400">
               {successCount > 0
                 ? `Successfully generated ${successCount} ${successCount === 1 ? 'asset' : 'assets'}${errorCount > 0 ? ` (${errorCount} failed - you can retry below)` : ''}`
-                : 'All assets failed to generate. You can retry each one below.'}
+                : 'All assets failed to generate. This is usually caused by a temporary API limit.'}
             </p>
+            {errorCount > 1 && generatingCount === 0 && (
+              <button
+                onClick={handleRetryAll}
+                className="mt-4 px-5 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Retry All ({errorCount})
+              </button>
+            )}
           </>
         ) : (
           <>

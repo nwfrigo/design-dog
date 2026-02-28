@@ -397,16 +397,18 @@ export interface AnalysisInfo {
   fileFormat: string
   extracted?: ExtractedContent
   error?: string
+  errorCode?: 'rate_limit' | 'overloaded' | 'invalid_pdf' | 'unknown'
   errorDetails?: string
 }
 
 export interface ContentSourceState {
-  method: 'upload' | 'manual' | null
+  method: 'upload' | 'manual' | 'unified' | null
   pdfContent: string | null
   manualDescription: string
   manualKeyPoints: string
   additionalContext: string
   uploadedFileName: string | null
+  uploadedFileType: 'pdf' | 'docx' | 'pptx' | 'txt' | 'md' | null
   // Persisted analysis state
   analysisInfo: AnalysisInfo | null
   editedContent: EditedContent | null

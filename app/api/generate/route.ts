@@ -87,11 +87,37 @@ Respond in JSON format only, no markdown code blocks:
   }
 }`
 
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1024,
-    messages: [{ role: 'user', content: prompt }],
-  })
+  // Call Claude with retry logic for transient errors (429, 529)
+  const MAX_RETRIES = 3
+  let response: Anthropic.Messages.Message | null = null
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+      })
+      break
+    } catch (retryError) {
+      const msg = String(retryError)
+      const isRateLimit = msg.includes('429') || msg.includes('rate_limit')
+      const isOverloaded = msg.includes('529') || msg.includes('overloaded') || msg.includes('Overloaded')
+      const isRetryable = isRateLimit || isOverloaded
+      if (isRetryable && attempt < MAX_RETRIES) {
+        // Rate limits need longer waits (per-minute budget); overloaded needs shorter
+        const delay = isRateLimit ? attempt * 15000 : attempt * 3000
+        console.log(`generate: ${isRateLimit ? 'Rate limited' : 'Overloaded'} on attempt ${attempt}, waiting ${delay / 1000}s...`, msg.slice(0, 200))
+        await new Promise(resolve => setTimeout(resolve, delay))
+        continue
+      }
+      throw retryError
+    }
+  }
+
+  if (!response) {
+    throw new Error('Failed to get response from Claude after retries')
+  }
 
   const textContent = response.content.find(block => block.type === 'text')
   if (!textContent || textContent.type !== 'text') {
@@ -158,8 +184,25 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Generation error:', error)
+    const errorStr = String(error)
+    const isRateLimited = errorStr.includes('429') || errorStr.includes('rate_limit')
+    const isOverloaded = errorStr.includes('529') || errorStr.includes('overloaded') || errorStr.includes('Overloaded')
+
+    let userMessage: string
+    let errorCode: string
+    if (isRateLimited) {
+      userMessage = 'The AI service is temporarily busy. Please wait a moment and retry.'
+      errorCode = 'rate_limit'
+    } else if (isOverloaded) {
+      userMessage = 'The AI service is temporarily overloaded. Please retry in a moment.'
+      errorCode = 'overloaded'
+    } else {
+      userMessage = error instanceof Error ? error.message : 'Failed to generate copy'
+      errorCode = 'unknown'
+    }
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to generate copy' },
+      { error: userMessage, errorCode },
       { status: 500 }
     )
   }

@@ -6,9 +6,12 @@ const anthropic = new Anthropic({
 })
 
 export async function POST(request: NextRequest) {
+  let requestFileSize: number | null = null
+
   try {
     const body = await request.json()
     const { pdfUrl, fileSize } = body
+    requestFileSize = fileSize || null
 
     if (!pdfUrl) {
       return NextResponse.json(
@@ -36,25 +39,30 @@ export async function POST(request: NextRequest) {
     const pdfBuffer = await pdfResponse.arrayBuffer()
     const pdfBase64 = Buffer.from(pdfBuffer).toString('base64')
 
-    // Send PDF to Claude for visual analysis using base64
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      messages: [
-        {
-          role: 'user',
-          content: [
+    // Send PDF to Claude for visual analysis using base64 (with retry for transient errors)
+    const MAX_RETRIES = 3
+    let response: Anthropic.Messages.Message | null = null
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        response = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4096,
+          messages: [
             {
-              type: 'document',
-              source: {
-                type: 'base64',
-                media_type: 'application/pdf',
-                data: pdfBase64,
-              },
-            } as any,
-            {
-              type: 'text',
-              text: `Analyze this PDF document and extract the following information for marketing purposes.
+              role: 'user',
+              content: [
+                {
+                  type: 'document',
+                  source: {
+                    type: 'base64',
+                    media_type: 'application/pdf',
+                    data: pdfBase64,
+                  },
+                } as any,
+                {
+                  type: 'text',
+                  text: `Analyze this PDF document and extract the following information for marketing purposes.
 
 Read through the entire document carefully and provide:
 
@@ -83,11 +91,27 @@ Respond in JSON format only, no markdown code blocks:
   "speakers": ["name - title"] or null,
   "rawSummary": "A 2-3 paragraph summary of the document content for context"
 }`,
+                },
+              ],
             },
           ],
-        },
-      ],
-    })
+        })
+        break // Success — exit retry loop
+      } catch (retryError) {
+        const msg = String(retryError)
+        const isRetryable = msg.includes('529') || msg.includes('overloaded') || msg.includes('Overloaded')
+        if (isRetryable && attempt < MAX_RETRIES) {
+          console.log(`parse-pdf: Retryable error on attempt ${attempt}, retrying in ${attempt * 2}s...`, msg.slice(0, 200))
+          await new Promise(resolve => setTimeout(resolve, attempt * 2000))
+          continue
+        }
+        throw retryError // Not retryable or max retries reached
+      }
+    }
+
+    if (!response) {
+      throw new Error('Failed to get response from Claude after retries')
+    }
 
     const textContent = response.content.find(block => block.type === 'text')
     if (!textContent || textContent.type !== 'text') {
@@ -141,24 +165,36 @@ Respond in JSON format only, no markdown code blocks:
     const errorMessage = error instanceof Error ? error.message : 'Failed to analyze PDF'
     const errorStr = String(error)
 
-    const isRateLimited = errorMessage.includes('rate') || errorMessage.includes('429')
-    const isInvalidPdf = errorMessage.includes('Could not process') ||
-                         errorMessage.includes('document') ||
-                         errorMessage.includes('parse') ||
-                         errorStr.includes('Could not process')
+    console.error('parse-pdf error details:', errorStr.slice(0, 500))
+
+    const isRateLimited = errorStr.includes('429') || errorStr.includes('rate_limit')
+    const isOverloaded = errorStr.includes('529') || errorStr.includes('overloaded') || errorStr.includes('Overloaded')
+    const isTokenLimit = errorStr.includes('input tokens') || errorStr.includes('token') && (errorStr.includes('limit') || errorStr.includes('exceed'))
+    const isInvalidPdf = errorStr.includes('Could not process') || errorStr.includes('invalid_request_error')
 
     let userMessage: string
-    if (isRateLimited) {
-      userMessage = 'API rate limited. Please wait a moment and try again.'
+    let errorCode: string
+    if (isRateLimited || isTokenLimit) {
+      const fileSizeMB = requestFileSize ? (requestFileSize / 1024 / 1024).toFixed(1) : null
+      userMessage = fileSizeMB && parseFloat(fileSizeMB) > 5
+        ? `This PDF is too large (${fileSizeMB} MB) for the current API plan. Try a shorter document, or paste the key content as text instead.`
+        : 'The AI service is temporarily busy. Please wait a moment and try again, or paste your content as text instead.'
+      errorCode = 'rate_limit'
+    } else if (isOverloaded) {
+      userMessage = 'The AI service is temporarily overloaded. Please wait a moment and try again.'
+      errorCode = 'overloaded'
     } else if (isInvalidPdf) {
       userMessage = 'Could not read this PDF. It may be scanned, corrupted, or password-protected. Try a different PDF or provide details in the text field instead.'
+      errorCode = 'invalid_pdf'
     } else {
-      userMessage = 'Failed to analyze PDF. Try a different file or provide details in the text field instead.'
+      userMessage = 'Something went wrong analyzing this PDF. Try a different file or paste your content as text instead.'
+      errorCode = 'unknown'
     }
 
     return NextResponse.json(
       {
         error: userMessage,
+        errorCode,
         debug: {
           errorType: error instanceof Error ? error.constructor.name : 'Unknown',
           errorDetails: errorMessage,

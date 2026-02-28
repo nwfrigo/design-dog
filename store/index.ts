@@ -52,6 +52,7 @@ const initialContentSource: ContentSourceState = {
   manualKeyPoints: '',
   additionalContext: '',
   uploadedFileName: null,
+  uploadedFileType: null,
   analysisInfo: null,
   editedContent: null,
   editedFields: [],
@@ -1577,10 +1578,15 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     })
     set({ generatedAssets: initialAssets })
 
-    // Fire parallel API calls
+    // Fire staggered API calls (1.5s apart to avoid rate limits)
     const results = await Promise.allSettled(
       selectedAssets.map(async (templateType, i) => {
         const id = assetIds[i]
+
+        // Stagger calls to avoid hitting rate limits
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, i * 1500))
+        }
 
         // Mark as generating
         set((state) => ({
@@ -1600,11 +1606,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
             body: JSON.stringify({ context, templateType }),
           })
 
-          if (!response.ok) {
-            throw new Error(`Generation failed: ${response.status}`)
-          }
-
           const data = await response.json()
+
+          if (!response.ok) {
+            throw new Error(data.error || `Generation failed: ${response.status}`)
+          }
 
           // Update asset with generated copy
           set((state) => ({
@@ -1829,11 +1835,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         body: JSON.stringify({ context, templateType: asset.templateType }),
       })
 
-      if (!response.ok) {
-        throw new Error(`Generation failed: ${response.status}`)
-      }
-
       const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || `Generation failed: ${response.status}`)
+      }
 
       // Update asset with generated copy
       set((state) => ({
@@ -1933,11 +1939,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
             body: JSON.stringify({ context, templateType }),
           })
 
-          if (!response.ok) {
-            throw new Error(`Generation failed: ${response.status}`)
-          }
-
           const data = await response.json()
+
+          if (!response.ok) {
+            throw new Error(data.error || `Generation failed: ${response.status}`)
+          }
 
           // Update asset with generated copy
           set((state) => ({
