@@ -69,40 +69,40 @@ html.dark {
   --foreground: #F2F2F3;
   --background: #161719;
 
-  /* Semantic background tokens */
-  --surface-primary: #161719;     /* neutral/900 */
-  --surface-secondary: #242527;   /* neutral/750 */
-  --surface-tertiary: #1C1D1F;    /* neutral/850 */
-  --surface-inverse: #F2F2F3;     /* neutral/50 */
+  /* Semantic background tokens (RGB for Tailwind opacity support) */
+  --surface-primary: 22 23 25;       /* neutral/900 #161719 */
+  --surface-secondary: 36 37 39;     /* neutral/750 #242527 */
+  --surface-tertiary: 28 29 31;      /* neutral/850 #1C1D1F */
+  --surface-inverse: 242 242 243;    /* neutral/50  #F2F2F3 */
 
   /* Semantic text tokens */
-  --content-primary: #F2F2F3;     /* neutral/50 */
-  --content-secondary: #7C7D80;   /* neutral/500 */
-  --content-tertiary: #343538;    /* neutral/700 */
-  --content-inverse: #161719;     /* neutral/900 */
-  --content-destructive: #EB3232; /* red/300 */
-  --content-success: #54D571;     /* green/300 */
-  --content-warning: #EAA618;     /* amber/300 */
+  --content-primary: 242 242 243;    /* neutral/50  #F2F2F3 */
+  --content-secondary: 124 125 128;  /* neutral/500 #7C7D80 */
+  --content-tertiary: 52 53 56;      /* neutral/700 #343538 */
+  --content-inverse: 22 23 25;       /* neutral/900 #161719 */
+  --content-destructive: 235 50 50;  /* red/300     #EB3232 */
+  --content-success: 84 213 113;     /* green/300   #54D571 */
+  --content-warning: 234 166 24;     /* amber/300   #EAA618 */
 
   /* Semantic border tokens */
-  --line-subtle: #494A4C;         /* neutral/650 */
-  --line-focus: #BDBEC0;          /* neutral/250 */
-  --line-destructive: #EB3232;    /* red/300 */
+  --line-subtle: 73 74 76;           /* neutral/650 #494A4C */
+  --line-focus: 189 190 192;         /* neutral/250 #BDBEC0 */
+  --line-destructive: 235 50 50;     /* red/300     #EB3232 */
 
   /* Button tokens */
-  --btn-primary-bg: #F2F2F3;
-  --btn-primary-bg-hover: #E5E5E6;
-  --btn-primary-bg-disabled: #343538;
-  --btn-primary-text: #161719;
-  --btn-secondary-bg: #161719;
-  --btn-secondary-bg-hover: #1C1D1F;
-  --btn-secondary-text: #F2F2F3;
-  --btn-secondary-border: #494A4C;
-  --btn-ghost-text: #7C7D80;
+  --btn-primary-bg: 242 242 243;     /* #F2F2F3 */
+  --btn-primary-bg-hover: 229 229 230; /* #E5E5E6 */
+  --btn-primary-bg-disabled: 52 53 56; /* #343538 */
+  --btn-primary-text: 22 23 25;      /* #161719 */
+  --btn-secondary-bg: 22 23 25;      /* #161719 */
+  --btn-secondary-bg-hover: 28 29 31; /* #1C1D1F */
+  --btn-secondary-text: 242 242 243; /* #F2F2F3 */
+  --btn-secondary-border: 73 74 76;  /* #494A4C */
+  --btn-ghost-text: 124 125 128;     /* #7C7D80 */
 
   /* Interactive tokens */
-  --interactive-hover: #202123;   /* neutral/800 */
-  --interactive-active: #57585B;  /* neutral/600 */
+  --interactive-hover: 32 33 35;     /* neutral/800 #202123 */
+  --interactive-active: 87 88 91;    /* neutral/600 #57585B */
 }
 
 body {
