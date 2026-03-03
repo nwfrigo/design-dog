@@ -392,10 +392,20 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
         { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: '', showEyebrow: true, title: '', body: '' },
       ]
-      const dataImageCards = data.cards as Array<ImageCardType> | undefined
+      const dataImageCards = data.cards as Array<Partial<ImageCardType>> | undefined
+      // Merge AI text fields with image defaults (AI won't provide imagePan/imageZoom/imageUrl)
+      const mergeCard = (ai: Partial<ImageCardType>, fallback: ImageCardType): ImageCardType => ({
+        imageUrl: ai.imageUrl || fallback.imageUrl,
+        imagePan: ai.imagePan || fallback.imagePan,
+        imageZoom: ai.imageZoom ?? fallback.imageZoom,
+        eyebrow: ai.eyebrow ?? fallback.eyebrow,
+        showEyebrow: ai.showEyebrow ?? fallback.showEyebrow,
+        title: ai.title ?? fallback.title,
+        body: ai.body ?? fallback.body,
+      })
       const imageCards: [ImageCardType, ImageCardType, ImageCardType] =
         dataImageCards && dataImageCards.length >= 3
-          ? [dataImageCards[0], dataImageCards[1], dataImageCards[2]]
+          ? [mergeCard(dataImageCards[0], defaultImageCards[0]), mergeCard(dataImageCards[1], defaultImageCards[1]), mergeCard(dataImageCards[2], defaultImageCards[2])]
           : defaultImageCards
       return {
         id,
