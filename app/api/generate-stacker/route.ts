@@ -47,9 +47,9 @@ ${modulePrompt}
 
 ## Critical Rules
 
-1. **STATS ONLY FROM SOURCE**: Only include three-stats or one-stat modules if the source content contains actual numeric data (percentages, dollar amounts, counts, timeframes, etc.). If no stats exist in the source, DO NOT include any stats modules - use other module types instead.
+1. **STATS ARE VERBATIM — NEVER INVENT OR ALTER**: Only include three-stats or one-stat modules if the source content contains EXACT numeric data (percentages, dollar amounts, counts, timeframes). Copy the numbers EXACTLY as they appear in the source — do not round, estimate, reframe, or combine numbers. If the source says "37 items", the stat must say "37", not "35+" or "nearly 40". If no exact stats exist in the source, DO NOT include any stats modules — use other module types instead. This is non-negotiable.
 
-2. **QUOTES ONLY VERBATIM FROM SOURCE**: CRITICAL - Only include a quote module if the source contains an actual customer testimonial or quote that you can attribute with a real name, title, and organization found in the source. NEVER fabricate quotes, names, or organizations. If the source doesn't contain a verbatim quote with attribution, DO NOT include a quote module - use other module types instead.
+2. **QUOTES ARE VERBATIM — NEVER COMPOSE OR PARAPHRASE**: Only include a quote module if the source contains an ACTUAL quoted statement (in quotation marks or clearly attributed) with a real person's name, title, and organization ALL found in the source. Copy the quote text EXACTLY as written — do not rewrite, summarize, or improve the wording. Copy the name, title, and organization EXACTLY. If the source doesn't contain a verbatim quote with full attribution, DO NOT include a quote module — use other module types instead. This is non-negotiable.
 
 3. **VISUAL LEAD AFTER HEADER**: Never place a paragraph module immediately after the header. Start with a visual element (stats with real data, or an image module). This creates visual interest and avoids walls of text.
 
@@ -177,8 +177,8 @@ ${purpose ? `## Purpose/Context\n${purpose}\n` : ''}
 ## Pre-Submission Checklist
 Before returning, verify:
 - 2nd module is stats (if source had numbers) OR image - NOT a paragraph
-- Stats modules ONLY if source had numeric data (otherwise omit them)
-- Quote module ONLY if source has a verbatim quote with real name/title/org (otherwise omit it)
+- Stats modules ONLY if source had EXACT numeric data — every number copied verbatim (otherwise omit them entirely)
+- Quote module ONLY if source has a VERBATIM quote with real name/title/org — copied exactly, not rewritten (otherwise omit it entirely)
 - Product/feature content uses image modules (for screenshots), not three-card
 - Non-product content uses image-16x9 (compact), not image (1:1)
 - Header has a subheader

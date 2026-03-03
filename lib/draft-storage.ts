@@ -142,6 +142,7 @@ export interface DraftState {
   solutionOverviewStat5Label: string
   // Stacker PDF
   stackerDocumentTitle: string | null
+  stackerSourceContent: string | null
   stackerLogoChipModule: StackerLogoChipModule
   stackerHeaderModule: StackerHeaderModule
   stackerContentModules: StackerModule[]
@@ -296,6 +297,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       solutionOverviewStat5Label: state.solutionOverviewStat5Label || 'Clients',
       // Stacker PDF
       stackerDocumentTitle: state.stackerDocumentTitle || null,
+      stackerSourceContent: state.stackerSourceContent ?? null,
       stackerLogoChipModule: state.stackerLogoChipModule || {
         id: 'logo-chip-default',
         type: 'logo-chip',

@@ -229,6 +229,27 @@ ${moduleDef.description}
   return prompt
 }
 
+// Generate prompt section for a single module type (used for single-module AI gen)
+export function generateSingleModulePromptSection(type: string): string {
+  const moduleDef = MODULE_REGISTRY.find(m => m.type === type)
+  if (!moduleDef) return ''
+
+  let prompt = `## Module Type: ${moduleDef.name} (type: "${moduleDef.type}")
+${moduleDef.description}
+**When to use:** ${moduleDef.whenToUse}
+
+### Fields
+`
+
+  for (const field of moduleDef.fields) {
+    const requiredTag = field.required ? ' (required)' : ''
+    const optionsTag = field.options ? ` — options: ${field.options.join(', ')}` : ''
+    prompt += `- **${field.name}** (${field.type}): ${field.description}${requiredTag}${optionsTag}\n`
+  }
+
+  return prompt
+}
+
 // Solution categories for reference
 export const SOLUTION_CATEGORIES: SolutionCategory[] = [
   'environmental',

@@ -857,6 +857,7 @@ export interface AppState {
   // Stacker PDF state
   stackerGeneratedModules: StackerModule[] | null
   stackerDocumentTitle: string | null
+  stackerSourceContent: string | null
   // Stacker edited modules (persisted for export screen)
   stackerLogoChipModule: StackerLogoChipModule
   stackerHeaderModule: StackerHeaderModule
@@ -1022,6 +1023,7 @@ export interface AppState {
   // Stacker PDF actions
   setStackerGeneratedModules: (modules: StackerModule[] | null) => void
   setStackerDocumentTitle: (title: string | null) => void
+  setStackerSourceContent: (content: string | null) => void
   clearStackerGenerated: () => void
   // Stacker edited module actions
   setStackerLogoChipModule: (module: StackerLogoChipModule) => void

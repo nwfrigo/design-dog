@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo, useEffect, ReactNode } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef, ReactNode } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -171,6 +171,9 @@ export interface StackerPreviewEditorProps {
   onSelectModule: (moduleId: string) => void
   onDeleteModule: (moduleId: string) => void
   onAddModule: (type: StackerModule['type']) => void
+  onAddModuleWithAI?: (type: StackerModule['type']) => void
+  hasSourceContent?: boolean
+  isGeneratingModule?: boolean
   previewZoom: number
   readOnly?: boolean // When true, disables all drag/drop, delete, and add functionality
 }
@@ -328,18 +331,43 @@ export function StackerPreviewEditor({
   onSelectModule,
   onDeleteModule,
   onAddModule,
+  onAddModuleWithAI,
+  hasSourceContent = false,
+  isGeneratingModule = false,
   previewZoom,
   readOnly = false,
 }: StackerPreviewEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
   const [showAddMenu, setShowAddMenu] = useState(false)
+  const [addMenuStep, setAddMenuStep] = useState<'choice' | 'select-blank' | 'select-ai'>('choice')
   const [previewingModule, setPreviewingModule] = useState<StackerModule['type'] | null>(null)
+  const [generatingModuleType, setGeneratingModuleType] = useState<string | null>(null)
+  const wasGenerating = useRef(false)
+
+  // Reset step when modal opens
+  useEffect(() => {
+    if (showAddMenu) {
+      setAddMenuStep('choice')
+      setGeneratingModuleType(null)
+    }
+  }, [showAddMenu])
+
+  // Auto-close modal when generation completes
+  useEffect(() => {
+    if (wasGenerating.current && !isGeneratingModule) {
+      // Generation just finished — close the modal
+      setShowAddMenu(false)
+      setGeneratingModuleType(null)
+    }
+    wasGenerating.current = isGeneratingModule
+  }, [isGeneratingModule])
 
   // Handle Escape key to close lightbox
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (isGeneratingModule) return // Don't close during generation
         if (previewingModule) {
           setPreviewingModule(null)
         } else if (showAddMenu) {
@@ -349,7 +377,7 @@ export function StackerPreviewEditor({
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [previewingModule, showAddMenu])
+  }, [previewingModule, showAddMenu, isGeneratingModule])
 
   // Configure sensors with activation constraint to distinguish click vs drag
   const sensors = useSensors(
@@ -504,97 +532,204 @@ export function StackerPreviewEditor({
         )}
       </DragOverlay>
 
-      {/* Add Module Modal */}
+      {/* Add Module Modal — Two-step: choice → module grid */}
       {showAddMenu && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setShowAddMenu(false)}
+            className="absolute inset-0 bg-black/50"
+            onClick={() => !isGeneratingModule && setShowAddMenu(false)}
           />
 
           {/* Modal */}
-          <div className="relative bg-gray-900 rounded-xl shadow-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col">
+          <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-2xl w-full max-w-[900px] max-h-[85vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-800">
-              <h2 className="text-lg font-semibold text-white">Add Module</h2>
-              <button
-                onClick={() => setShowAddMenu(false)}
-                className="p-1 text-gray-400 hover:text-white transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-line-subtle">
+              <div className="flex items-center gap-3">
+                {addMenuStep !== 'choice' && !isGeneratingModule && (
+                  <button
+                    onClick={() => setAddMenuStep('choice')}
+                    className="p-1 text-gray-400 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                )}
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-content-primary">
+                  {addMenuStep === 'choice' ? 'Add Module' : addMenuStep === 'select-ai' ? 'Write with AI' : 'Insert Blank Module'}
+                </h2>
+              </div>
+              {!isGeneratingModule && (
+                <button
+                  onClick={() => setShowAddMenu(false)}
+                  className="p-1 text-gray-400 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
 
-            {/* Module Grid - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="grid grid-cols-2 gap-4" style={{ gridAutoRows: 'auto' }}>
-                {MODULE_TYPES_INFO.map((info) => {
-                  const sampleModule = getSampleModule(info.type)
-                  // Scale factor: card width (~400px) / module width (564px) ≈ 0.71
-                  const scale = 0.71
-                  const padding = 16 // Padding around the preview
-                  const scaledHeight = MODULE_HEIGHTS[info.type] * scale + padding * 2
+            {/* Step 1: Choice — AI vs Blank */}
+            {addMenuStep === 'choice' && (
+              <div className="flex-1 p-8 flex items-center justify-center">
+                <div className="grid grid-cols-2 gap-6 w-full max-w-[560px]">
+                  {/* Write with AI */}
+                  <button
+                    onClick={() => hasSourceContent && setAddMenuStep('select-ai')}
+                    disabled={!hasSourceContent}
+                    className={`flex flex-col items-center gap-4 p-8 rounded-xl border-2 transition-all ${
+                      hasSourceContent
+                        ? 'border-gray-200 dark:border-line-subtle hover:border-blue-500 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-surface-secondary cursor-pointer'
+                        : 'border-gray-100 dark:border-line-subtle/30 opacity-40 cursor-not-allowed'
+                    }`}
+                  >
+                    {/* Sparkle icon */}
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${hasSourceContent ? 'bg-blue-50 dark:bg-blue-500/20' : 'bg-gray-100 dark:bg-surface-secondary'}`}>
+                      <svg className={`w-6 h-6 ${hasSourceContent ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-content-secondary'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <h3 className={`text-sm font-semibold ${hasSourceContent ? 'text-gray-900 dark:text-content-primary' : 'text-gray-400 dark:text-content-secondary'}`}>Write with AI</h3>
+                      <p className={`text-xs mt-1 ${hasSourceContent ? 'text-gray-500 dark:text-content-secondary' : 'text-gray-400 dark:text-content-secondary'}`}>
+                        {hasSourceContent
+                          ? 'Generate content from your source material'
+                          : 'No source content available'}
+                      </p>
+                    </div>
+                  </button>
 
-                  return (
-                    <div
-                      key={info.type}
-                      className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-blue-500 transition-colors group"
-                    >
-                      {/* Preview thumbnail - full width with padding */}
+                  {/* Insert Blank */}
+                  <button
+                    onClick={() => setAddMenuStep('select-blank')}
+                    className="flex flex-col items-center gap-4 p-8 rounded-xl border-2 border-gray-200 dark:border-line-subtle hover:border-blue-500 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-surface-secondary transition-all cursor-pointer"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-surface-secondary flex items-center justify-center">
+                      <svg className="w-6 h-6 text-gray-400 dark:text-content-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-content-primary">Insert Blank Module</h3>
+                      <p className="text-xs text-gray-500 dark:text-content-secondary mt-1">Start with an empty template</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2a: Blank module grid */}
+            {addMenuStep === 'select-blank' && (
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="grid grid-cols-2 gap-4" style={{ gridAutoRows: 'auto' }}>
+                  {MODULE_TYPES_INFO.map((info) => {
+                    const sampleModule = getSampleModule(info.type)
+                    const scale = 0.71
+                    const padding = 16
+                    const scaledHeight = MODULE_HEIGHTS[info.type] * scale + padding * 2
+
+                    return (
                       <div
-                        className="relative bg-white cursor-pointer overflow-hidden"
-                        onClick={() => {
-                          onAddModule(info.type)
-                          setShowAddMenu(false)
-                        }}
-                        style={{
-                          height: scaledHeight,
-                          padding: padding,
-                        }}
+                        key={info.type}
+                        className="bg-gray-50 dark:bg-surface-secondary rounded-lg overflow-hidden border border-gray-200 dark:border-line-subtle hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
                       >
                         <div
-                          style={{
-                            transform: `scale(${scale})`,
-                            transformOrigin: 'top left',
-                            width: 564,
-                            pointerEvents: 'none',
+                          className="relative bg-white cursor-pointer overflow-hidden"
+                          onClick={() => {
+                            onAddModule(info.type)
+                            setShowAddMenu(false)
                           }}
+                          style={{ height: scaledHeight, padding }}
                         >
-                          <RenderModuleForOverlay module={sampleModule} />
+                          <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: 564, pointerEvents: 'none' }}>
+                            <RenderModuleForOverlay module={sampleModule} />
+                          </div>
+                        </div>
+                        <div className="px-4 py-3 flex items-center justify-between">
+                          <h3 className="text-sm font-medium text-gray-900 dark:text-content-primary">{info.label}</h3>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setPreviewingModule(info.type) }}
+                            className="text-xs text-gray-400 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
+                          >
+                            Preview
+                          </button>
                         </div>
                       </div>
-
-                      {/* Info bar */}
-                      <div className="px-4 py-3 flex items-center justify-between bg-gray-800">
-                        <h3 className="text-sm font-medium text-white">{info.label}</h3>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setPreviewingModule(info.type)
-                          }}
-                          className="text-xs text-gray-400 hover:text-white transition-colors"
-                        >
-                          Preview
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Footer */}
-            <div className="p-6 border-t border-gray-800">
-              <button
-                onClick={() => setShowAddMenu(false)}
-                className="w-full py-3 text-sm font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
+            {/* Step 2b: AI module grid (excludes divider, quote, stats — verbatim-only modules) */}
+            {addMenuStep === 'select-ai' && (
+              <div className="flex-1 overflow-y-auto p-6 relative">
+                {/* Loading overlay */}
+                {isGeneratingModule && (
+                  <div className="absolute inset-0 z-10 bg-white/80 dark:bg-surface-primary/80 flex flex-col items-center justify-center gap-4 rounded-b-xl">
+                    <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-gray-600 dark:text-content-secondary">
+                      Generating {generatingModuleType ? MODULE_TYPES_INFO.find(m => m.type === generatingModuleType)?.label || generatingModuleType : 'module'}...
+                    </p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4" style={{ gridAutoRows: 'auto' }}>
+                  {MODULE_TYPES_INFO.filter(info => !['divider', 'quote', 'three-stats', 'one-stat'].includes(info.type)).map((info) => {
+                    const sampleModule = getSampleModule(info.type)
+                    const scale = 0.71
+                    const padding = 16
+                    const scaledHeight = MODULE_HEIGHTS[info.type] * scale + padding * 2
+
+                    return (
+                      <div
+                        key={info.type}
+                        className="bg-gray-50 dark:bg-surface-secondary rounded-lg overflow-hidden border border-gray-200 dark:border-line-subtle hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+                      >
+                        <div
+                          className="relative bg-white cursor-pointer overflow-hidden"
+                          onClick={() => {
+                            if (!isGeneratingModule && onAddModuleWithAI) {
+                              setGeneratingModuleType(info.type)
+                              onAddModuleWithAI(info.type)
+                            }
+                          }}
+                          style={{ height: scaledHeight, padding }}
+                        >
+                          <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: 564, pointerEvents: 'none' }}>
+                            <RenderModuleForOverlay module={sampleModule} />
+                          </div>
+                        </div>
+                        <div className="px-4 py-3 flex items-center justify-between">
+                          <h3 className="text-sm font-medium text-gray-900 dark:text-content-primary">{info.label}</h3>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setPreviewingModule(info.type) }}
+                            className="text-xs text-gray-400 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
+                          >
+                            Preview
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Footer — shown on choice and grid steps, hidden during generation */}
+            {!isGeneratingModule && (
+              <div className="p-6 border-t border-gray-200 dark:border-line-subtle">
+                <button
+                  onClick={() => setShowAddMenu(false)}
+                  className="w-full py-3 text-sm font-medium text-gray-600 dark:text-content-secondary bg-gray-100 dark:bg-surface-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

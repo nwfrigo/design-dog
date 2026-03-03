@@ -1868,6 +1868,7 @@ export function StackerEditorScreen() {
     setStackerHeaderModule,
     setStackerContentModules,
     setStackerFooterModule,
+    stackerSourceContent,
     // Persisted edited modules (for coming back from export)
     stackerLogoChipModule: storedLogoChip,
     stackerHeaderModule: storedHeader,
@@ -1932,6 +1933,13 @@ export function StackerEditorScreen() {
   // Preview modals state
   const [showFullscreenPreview, setShowFullscreenPreview] = useState(false)
   const [showAllPagesPreview, setShowAllPagesPreview] = useState(false)
+
+  // AI module generation state
+  const [isGeneratingModule, setIsGeneratingModule] = useState(false)
+  const [showAIToast, setShowAIToast] = useState(false)
+  const [aiToastMessage, setAiToastMessage] = useState('')
+  const [aiToastExiting, setAiToastExiting] = useState(false)
+  const aiToastTimeout = useRef<NodeJS.Timeout | null>(null)
 
   // Resizable editor panel
   const [editorWidth, setEditorWidth] = useState(380)
@@ -2062,12 +2070,78 @@ export function StackerEditorScreen() {
     }
   }, [])
 
-  // Add content module
+  // Add content module (blank)
   const addModule = useCallback((type: StackerModule['type']) => {
     const newModule = createDefaultModule(type)
     setContentModules(prev => [...prev, newModule])
     // Auto-expand the new module (accordion - only this one)
     setExpandedModules(new Set([newModule.id]))
+  }, [])
+
+  // Add content module via AI generation
+  const addModuleWithAI = useCallback(async (type: StackerModule['type']) => {
+    if (!stackerSourceContent) return
+
+    setIsGeneratingModule(true)
+    try {
+      // Build lightweight context of existing modules
+      const existingModules = contentModules.map(m => {
+        let heading: string | undefined
+        if (m.type === 'paragraph' || m.type === 'bullet-three' || m.type === 'image' || m.type === 'image-16x9' || m.type === 'image-cards') {
+          heading = 'heading' in m ? m.heading : undefined
+        }
+        return { type: m.type, heading }
+      })
+
+      const response = await fetch('/api/generate-stacker-module', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          moduleType: type,
+          sourceContent: stackerSourceContent,
+          existingModules,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('API request failed')
+      }
+
+      const result = await response.json()
+      if (result.module) {
+        setContentModules(prev => [...prev, result.module])
+        setExpandedModules(new Set([result.module.id]))
+      } else {
+        throw new Error('No module in response')
+      }
+    } catch {
+      // Fallback: insert blank module + show toast
+      const fallbackModule = createDefaultModule(type)
+      setContentModules(prev => [...prev, fallbackModule])
+      setExpandedModules(new Set([fallbackModule.id]))
+
+      // Show failure toast
+      if (aiToastTimeout.current) clearTimeout(aiToastTimeout.current)
+      setAiToastMessage('Could not generate. Inserted a blank one instead.')
+      setShowAIToast(true)
+      setAiToastExiting(false)
+      aiToastTimeout.current = setTimeout(() => {
+        setAiToastExiting(true)
+        setTimeout(() => {
+          setShowAIToast(false)
+          setAiToastExiting(false)
+        }, 500)
+      }, 4000)
+    } finally {
+      setIsGeneratingModule(false)
+    }
+  }, [stackerSourceContent, contentModules, aiToastTimeout])
+
+  // Cleanup toast timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (aiToastTimeout.current) clearTimeout(aiToastTimeout.current)
+    }
   }, [])
 
   // Update any module (locked or content)
@@ -2304,6 +2378,9 @@ export function StackerEditorScreen() {
                 onSelectModule={handleSelectModule}
                 onDeleteModule={requestDeleteModule}
                 onAddModule={addModule}
+                onAddModuleWithAI={addModuleWithAI}
+                hasSourceContent={!!stackerSourceContent}
+                isGeneratingModule={isGeneratingModule}
                 previewZoom={previewZoom}
               />
             </div>
@@ -2411,6 +2488,24 @@ export function StackerEditorScreen() {
                 readOnly={true}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Generation Failure Toast */}
+      {showAIToast && (
+        <div
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
+            aiToastExiting
+              ? 'opacity-0 -translate-y-4'
+              : 'opacity-100 translate-y-0'
+          }`}
+        >
+          <div className="flex items-center gap-3 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-lg shadow-lg backdrop-blur-sm">
+            <svg className="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <span className="text-sm font-medium text-amber-200">{aiToastMessage}</span>
           </div>
         </div>
       )}

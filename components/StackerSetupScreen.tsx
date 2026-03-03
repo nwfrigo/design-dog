@@ -106,7 +106,7 @@ export function StackerSetupScreen() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const { setCurrentScreen, reset, clearDraft, setStackerGeneratedModules, setStackerDocumentTitle } = useStore()
+  const { setCurrentScreen, reset, clearDraft, setStackerGeneratedModules, setStackerDocumentTitle, setStackerSourceContent } = useStore()
 
   // Single text input
   const [textContent, setTextContent] = useState('')
@@ -301,9 +301,10 @@ export function StackerSetupScreen() {
 
       const result = await generateResponse.json()
 
-      // Store the generated modules and document title
+      // Store the generated modules, document title, and source content for single-module AI gen
       setStackerGeneratedModules(result.modules)
       setStackerDocumentTitle(result.documentTitle)
+      setStackerSourceContent(sourceContent)
 
       // Navigate to stacker editor
       setCurrentScreen('stacker-editor')
@@ -495,6 +496,7 @@ export function StackerSetupScreen() {
               // Go to editor with empty/default modules (no AI generation)
               setStackerGeneratedModules(null)
               setStackerDocumentTitle(null)
+              setStackerSourceContent(null)
               setCurrentScreen('stacker-editor')
             }}
             className="mt-6 text-xs text-gray-400 dark:text-content-secondary hover:text-gray-600 dark:hover:text-content-secondary transition-colors"

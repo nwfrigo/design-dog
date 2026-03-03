@@ -88,25 +88,37 @@ textBoxEdge: 'cap alphabetic'
 - Sustainability: `#A61F67`
 - Converged: Uses brand orange `#D35F0B`
 
-### Editor Dark Mode Colors (Tailwind Classes)
+### Dark Mode — Semantic Color Tokens (Required)
 
-**IMPORTANT:** All editor screens must use standard Tailwind gray classes for dark mode, NOT custom purple-tinted colors. This ensures consistent dark mode appearance across all templates.
+**The app has a semantic color token system defined in `globals.css` and mapped in `tailwind.config.ts`.** All dark mode styling MUST use these tokens. Never hardcode hex values or use raw Tailwind gray classes for dark mode.
+
+**How it works:** Every element uses a light-mode class paired with a `dark:` semantic token. The tokens resolve to neutral grays in dark mode via CSS variables.
 
 | Element | Light Mode | Dark Mode |
 |---------|------------|-----------|
-| Sidebar/Panel background | `bg-gray-100` | `dark:bg-gray-800/50` |
-| Module item/card background | `bg-white` | `dark:bg-gray-800` |
-| Input field background | `bg-gray-100` | `dark:bg-gray-900` |
-| Section background | `bg-gray-50` | `dark:bg-gray-800/50` |
-| Hover state | `hover:bg-gray-100` or `hover:bg-gray-200` | `dark:hover:bg-gray-700` |
-| Border | `border-gray-200` or `border-gray-300` | `dark:border-gray-700` |
+| Page/modal background | `bg-white` | `dark:bg-surface-primary` |
+| Card/panel background | `bg-gray-50` or `bg-gray-100` | `dark:bg-surface-secondary` |
+| Input field background | `bg-gray-100` | `dark:bg-surface-primary` or `dark:bg-surface-secondary` |
+| Sidebar background | `bg-gray-100` | `dark:bg-gray-800/50` |
+| Primary text | `text-gray-900` | `dark:text-content-primary` |
+| Secondary/muted text | `text-gray-500` or `text-gray-600` | `dark:text-content-secondary` |
+| Border | `border-gray-200` or `border-gray-300` | `dark:border-line-subtle` |
+| Hover background | `hover:bg-gray-100` or `hover:bg-gray-200` | `dark:hover:bg-interactive-hover` |
+| Cancel/secondary button | `bg-gray-100 text-gray-600` | `dark:bg-surface-secondary dark:text-content-secondary` |
 
-**❌ NEVER use these custom colors in editor UIs:**
-- `#0d0d1a` (purple-black)
-- `#1a1a2e` (dark purple-blue)
-- `#252540` (purple-gray)
+**Token reference** (values in dark mode):
+- `surface-primary` = `#161719` — darkest background (modals, pages)
+- `surface-secondary` = `#242527` — cards, inputs, secondary panels
+- `surface-tertiary` = `#1C1D1F` — subtle backgrounds
+- `content-primary` = `#F2F2F3` — headings, main text
+- `content-secondary` = `#7C7D80` — helper text, labels
+- `line-subtle` = `#494A4C` — borders, dividers
+- `interactive-hover` = `#202123` — hover backgrounds
 
-These create an inconsistent purple-tinted theme that doesn't match other editor screens.
+**❌ NEVER do this:**
+- Hardcode dark hex values: `bg-gray-900`, `bg-gray-800`, `text-white`, `border-gray-700` — these bypass the design system and break if tokens change
+- Use custom purple-tinted colors: `#0d0d1a`, `#1a1a2e`, `#252540`
+- Style dark-mode-only (e.g., `bg-gray-900` without a light-mode counterpart) — always pair light + dark
 
 ---
 

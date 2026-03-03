@@ -35,6 +35,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     faqCoverImageUrl,
     // Stacker fields for auto-save
     stackerDocumentTitle,
+    stackerSourceContent,
     stackerLogoChipModule,
     stackerHeaderModule,
     stackerContentModules,
@@ -78,6 +79,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     faqCoverImageUrl,
     // Stacker fields
     stackerDocumentTitle,
+    stackerSourceContent,
     stackerLogoChipModule,
     stackerHeaderModule,
     stackerContentModules,

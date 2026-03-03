@@ -385,6 +385,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Stacker PDF state
   stackerGeneratedModules: null,
   stackerDocumentTitle: null,
+  stackerSourceContent: null as string | null,
   // Stacker edited modules (persisted for export screen)
   stackerLogoChipModule: {
     id: 'logo-chip-default',
@@ -664,6 +665,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Stacker PDF actions
   setStackerGeneratedModules: (modules) => set({ stackerGeneratedModules: modules }),
   setStackerDocumentTitle: (title) => set({ stackerDocumentTitle: title }),
+  setStackerSourceContent: (content) => set({ stackerSourceContent: content }),
   clearStackerGenerated: () => set({ stackerGeneratedModules: null, stackerDocumentTitle: null }),
   // Stacker edited module actions
   setStackerLogoChipModule: (module: StackerLogoChipModule) => set({ stackerLogoChipModule: module }),
@@ -2323,6 +2325,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat5Label: state.solutionOverviewStat5Label,
       // Stacker PDF
       stackerDocumentTitle: state.stackerDocumentTitle,
+      stackerSourceContent: state.stackerSourceContent,
       stackerLogoChipModule: state.stackerLogoChipModule,
       stackerHeaderModule: state.stackerHeaderModule,
       stackerContentModules: state.stackerContentModules,
@@ -2455,6 +2458,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat5Label: draft.solutionOverviewStat5Label ?? 'Clients',
       // Stacker PDF
       stackerDocumentTitle: draft.stackerDocumentTitle ?? null,
+      stackerSourceContent: draft.stackerSourceContent ?? null,
       stackerLogoChipModule: draft.stackerLogoChipModule ?? {
         id: 'logo-chip-default',
         type: 'logo-chip',
