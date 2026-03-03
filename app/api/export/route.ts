@@ -586,11 +586,19 @@ export async function POST(request: NextRequest) {
 
     // For Stacker, measure actual content height and export as PNG or PDF based on format
     if (isStackerPdf) {
-      // Get actual content height from the wrapper element
+      // Reset body min-height to prevent min-h-screen (100vh) from inflating
+      // the page beyond actual content — 100vh in a 4000px viewport creates
+      // extra blank PDF pages
+      await page.evaluate(() => {
+        document.body.style.minHeight = '0'
+      })
+
+      // Use getBoundingClientRect for sub-pixel precision (offsetHeight rounds
+      // to integer which can undercount by <1px, pushing the footer to page 2)
       const actualHeight = await page.evaluate(() => {
         const content = document.getElementById('stacker-content')
         if (content) {
-          return content.offsetHeight
+          return Math.ceil(content.getBoundingClientRect().height)
         }
         // Fallback to body measurement
         return document.body.scrollHeight
@@ -606,10 +614,13 @@ export async function POST(request: NextRequest) {
         await page.emulateMediaType('screen')
 
         // Generate PDF with dynamic height based on content
+        // Explicit zero margins prevent any default PDF margin from shrinking
+        // the content area below the measured height
         const pdfBuffer = await page.pdf({
           width: `${width}px`,
           height: `${actualHeight}px`,
           printBackground: true,
+          margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
         })
 
         await browser.close()
