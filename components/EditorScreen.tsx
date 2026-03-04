@@ -234,6 +234,9 @@ export function EditorScreen() {
     // Image effects
     grayscale,
     setGrayscale,
+    // Manual text size
+    headlineFontSize,
+    setHeadlineFontSize,
     // Solution Overview PDF - Page 1
     solutionOverviewSolution,
     setSolutionOverviewSolution,
@@ -759,6 +762,7 @@ export function EditorScreen() {
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
         exportParams.grayscale = grayscale
+        exportParams.headlineFontSize = headlineFontSize
       } else if (currentTemplate === 'email-dark-gradient') {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
@@ -3260,6 +3264,10 @@ export function EditorScreen() {
                     onChange={(html) => setVerbatimCopy({ headline: html })}
                     placeholder="Headline"
                     singleLine={false}
+                    onFontSizeUp={currentTemplate === 'email-image' ? () => setHeadlineFontSize(Math.min(headlineFontSize + 2, 50)) : undefined}
+                    onFontSizeDown={currentTemplate === 'email-image' ? () => setHeadlineFontSize(Math.max(headlineFontSize - 2, 16)) : undefined}
+                    fontSizeAtMax={headlineFontSize >= 50}
+                    fontSizeAtMin={headlineFontSize <= 16}
                   />
                 ) : (
                   <input
@@ -4798,6 +4806,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

@@ -142,6 +142,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   newsletterTopBannerVariant: 'dark' as const,
   // Image effects
   grayscale: false,
+  // Manual text size
+  headlineFontSize: 38,
   // Solution Overview PDF specific - Page 1
   solutionOverviewSolution: 'health' as const,
   solutionOverviewSolutionName: 'Solution Name Goes Here',
@@ -319,6 +321,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   newsletterTopBannerVariant: 'dark',
   // Image effects
   grayscale: false,
+  // Manual text size
+  headlineFontSize: 38,
   // Solution Overview PDF specific - Page 1
   solutionOverviewSolution: 'health' as const,
   solutionOverviewSolutionName: 'Solution Name Goes Here',
@@ -541,6 +545,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setNewsletterTopBannerVariant: (newsletterTopBannerVariant: 'dark' | 'light') => set({ newsletterTopBannerVariant }),
   // Image effects
   setGrayscale: (grayscale: boolean) => set({ grayscale }),
+  // Manual text size
+  setHeadlineFontSize: (headlineFontSize: number) => set({ headlineFontSize }),
 
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solutionOverviewSolution: SolutionCategory) => set({ solutionOverviewSolution }),
@@ -2283,6 +2289,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
+      headlineFontSize: state.headlineFontSize,
       generatedVariations: state.generatedVariations,
       // FAQ PDF
       faqTitle: state.faqTitle,
@@ -2419,6 +2426,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileVariant: draft.floatingBannerMobileVariant ?? 'light',
       floatingBannerMobileArrowType: draft.floatingBannerMobileArrowType ?? 'text',
       grayscale: draft.grayscale ?? false,
+      headlineFontSize: draft.headlineFontSize ?? 38,
       generatedVariations: draft.generatedVariations,
       // FAQ PDF
       faqTitle: draft.faqTitle ?? 'Title Goes Here',

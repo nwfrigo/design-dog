@@ -57,6 +57,7 @@ export interface EmailImageProps {
   showCta: boolean
   showSolutionSet: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -106,6 +107,7 @@ export function EmailImage({
   showCta,
   showSolutionSet,
   grayscale = false,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -146,6 +148,10 @@ export function EmailImage({
     img.onerror = () => setGrayscaleImageUrl(null)
     img.src = imageUrl
   }, [imageUrl, grayscale])
+
+  const DEFAULT_FONT_SIZE = 38.15
+  const LINE_HEIGHT_RATIO = 48.19 / 38.15 // ≈ 1.263
+  const fontSize = headlineFontSize ?? DEFAULT_FONT_SIZE
 
   // Determine if content is empty for conditional rendering
   const hasHeadline = !isHtmlEmpty(headline)
@@ -241,9 +247,9 @@ export function EmailImage({
               style={{
                 alignSelf: 'stretch',
                 color: textColor,
-                fontSize: 38.15,
+                fontSize,
                 fontWeight: 300,
-                lineHeight: '48.19px',
+                lineHeight: `${fontSize * LINE_HEIGHT_RATIO}px`,
               }}
               dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
             />

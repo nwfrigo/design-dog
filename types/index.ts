@@ -846,6 +846,9 @@ export interface AppState {
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
 
+  // Manual text size
+  headlineFontSize: number
+
   // FAQ PDF state
   faqTitle: string
   faqCoverSubheader: string
@@ -968,6 +971,8 @@ export interface AppState {
   setNewsletterTopBannerVariant: (variant: 'dark' | 'light') => void
   // Image effects
   setGrayscale: (grayscale: boolean) => void
+  // Manual text size
+  setHeadlineFontSize: (size: number) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void
   setSolutionOverviewSolutionName: (name: string) => void

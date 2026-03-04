@@ -50,6 +50,10 @@ interface SimpleRichTextEditorProps {
   className?: string
   minHeight?: string
   singleLine?: boolean // If true, prevents Enter from creating new paragraphs
+  onFontSizeUp?: () => void
+  onFontSizeDown?: () => void
+  fontSizeAtMax?: boolean
+  fontSizeAtMin?: boolean
 }
 
 export function SimpleRichTextEditor({
@@ -59,6 +63,10 @@ export function SimpleRichTextEditor({
   className = '',
   minHeight = '40px',
   singleLine = false,
+  onFontSizeUp,
+  onFontSizeDown,
+  fontSizeAtMax = false,
+  fontSizeAtMin = false,
 }: SimpleRichTextEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -153,6 +161,41 @@ export function SimpleRichTextEditor({
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 4h4m0 0l-4 16m0 0h4M6 20h4" />
           </svg>
         </button>
+
+        {/* Font size inc/dec buttons */}
+        {(onFontSizeUp || onFontSizeDown) && (
+          <>
+            <div className="w-px h-4 bg-gray-300 dark:bg-line-subtle mx-1" />
+            <button
+              type="button"
+              onClick={onFontSizeUp}
+              disabled={fontSizeAtMax}
+              className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+                fontSizeAtMax ? 'opacity-30 cursor-not-allowed' : 'text-gray-500 dark:text-content-secondary'
+              }`}
+              title="Increase text size"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                <text x="0" y="13" fontSize="13" fontWeight="500" fontFamily="system-ui">A</text>
+                <path d="M12.5 3 L14.5 0.5 L16.5 3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" transform="translate(-2, 1.5)" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={onFontSizeDown}
+              disabled={fontSizeAtMin}
+              className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+                fontSizeAtMin ? 'opacity-30 cursor-not-allowed' : 'text-gray-500 dark:text-content-secondary'
+              }`}
+              title="Decrease text size"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                <text x="0" y="13" fontSize="10" fontWeight="500" fontFamily="system-ui">A</text>
+                <path d="M10.5 0.5 L12.5 3 L14.5 0.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" transform="translate(-2, 1.5)" />
+              </svg>
+            </button>
+          </>
+        )}
 
         <div className="flex-1" />
 
