@@ -113,6 +113,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
       return (
         <Image16x9Module
           imagePosition={module.imagePosition}
+          imageSize={module.imageSize}
           imageUrl={module.imageUrl}
           imagePan={module.imagePan}
           imageZoom={module.imageZoom}

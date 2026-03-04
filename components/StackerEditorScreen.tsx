@@ -160,6 +160,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
         id,
         type: 'image-16x9',
         imagePosition: 'left',
+        imageSize: 'S',
         imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9,
         imagePan: { x: 0, y: 0 },
         imageZoom: 1,
@@ -1148,6 +1149,26 @@ function ModuleEditor({
               >
                 Right
               </button>
+            </div>
+          </div>
+
+          {/* Image Size Picker */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
+            <div className="flex gap-2">
+              {(['S', 'M', 'L'] as const).map((size) => (
+                <button
+                  key={size}
+                  onClick={() => onUpdate({ imageSize: size })}
+                  className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                    (module.imageSize || 'S') === size
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
+                  }`}
+                >
+                  {size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -2489,10 +2510,13 @@ export function StackerEditorScreen() {
         const imageSrc = isCardCrop ? card?.imageUrl : (cropModalModule as StackerImageModule | StackerImage16x9Module).imageUrl
         const initialPosition = isCardCrop ? (card?.imagePan ?? { x: 0, y: 0 }) : (cropModalModule as StackerImageModule | StackerImage16x9Module).imagePan
         const initialZoom = isCardCrop ? (card?.imageZoom ?? 1) : (cropModalModule as StackerImageModule | StackerImage16x9Module).imageZoom
-        const imageSizeWidths: Record<string, number> = { S: 200, M: 270, L: 372 }
+        const imageTallWidths: Record<string, number> = { S: 200, M: 270, L: 372 }
+        const imageShortWidths: Record<string, number> = { S: 180, M: 270, L: 372 }
         const frameWidth = cropModalModule.type === 'image'
-          ? imageSizeWidths[(cropModalModule as StackerImageModule).imageSize || 'S']
-          : 180
+          ? imageTallWidths[(cropModalModule as StackerImageModule).imageSize || 'S']
+          : cropModalModule.type === 'image-16x9'
+            ? imageShortWidths[(cropModalModule as StackerImage16x9Module).imageSize || 'S']
+            : 180
         const frameHeight = (isCardCrop || cropModalModule.type === 'image-16x9') ? 100 : 200
 
         if (!imageSrc) return null

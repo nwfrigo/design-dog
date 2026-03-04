@@ -2,8 +2,15 @@
 
 import { CSSProperties } from 'react'
 
+const IMAGE_SIZE_WIDTHS: Record<'S' | 'M' | 'L', number> = {
+  S: 180,
+  M: 270,
+  L: 372,
+}
+
 export interface Image16x9ModuleProps {
   imagePosition: 'left' | 'right'
+  imageSize?: 'S' | 'M' | 'L'
   imageUrl: string | null
   imagePan: { x: number; y: number }
   imageZoom: number
@@ -19,6 +26,7 @@ export interface Image16x9ModuleProps {
 
 export function Image16x9Module({
   imagePosition,
+  imageSize = 'S',
   imageUrl,
   imagePan,
   imageZoom,
@@ -45,7 +53,7 @@ export function Image16x9Module({
   }
 
   const imageContainerStyle: CSSProperties = {
-    width: 180,
+    width: IMAGE_SIZE_WIDTHS[imageSize],
     height: 100,
     borderRadius: 6.45,
     border: '0.33px solid #D9D8D6',

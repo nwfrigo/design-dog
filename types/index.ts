@@ -118,6 +118,7 @@ export interface StackerImageModule extends StackerBaseModule {
 export interface StackerImage16x9Module extends StackerBaseModule {
   type: 'image-16x9'
   imagePosition: 'left' | 'right'
+  imageSize: 'S' | 'M' | 'L'
   imageUrl: string | null
   imagePan: { x: number; y: number }
   imageZoom: number

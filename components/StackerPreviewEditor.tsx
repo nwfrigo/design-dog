@@ -111,7 +111,7 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
     case 'image-16x9':
       return {
         id, type: 'image-16x9',
-        imagePosition: 'right', imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
+        imagePosition: 'right', imageSize: 'S' as const, imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
         eyebrow: 'Feature', showEyebrow: true,
         heading: 'Mobile Access', showHeading: true,
         body: 'Access your data anywhere with our mobile app.', showBody: true,
@@ -260,6 +260,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
       return (
         <Image16x9Module
           imagePosition={module.imagePosition}
+          imageSize={module.imageSize}
           imageUrl={module.imageUrl}
           imagePan={module.imagePan}
           imageZoom={module.imageZoom}
