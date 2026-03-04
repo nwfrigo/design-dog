@@ -552,6 +552,8 @@ export interface GeneratedAsset {
   solutionOverviewStat4Label: string
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
+  // Manual text size
+  headlineFontSize: number
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -687,6 +689,8 @@ export interface QueuedAsset {
   solutionOverviewStat4Label: string
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
+  // Manual text size
+  headlineFontSize: number
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }

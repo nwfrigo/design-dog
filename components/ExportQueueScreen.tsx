@@ -177,6 +177,8 @@ export function ExportQueueScreen() {
           arrowType: asset.floatingBannerMobileArrowType,
           // Image effects
           grayscale: asset.grayscale,
+          // Manual text size
+          headlineFontSize: asset.headlineFontSize,
         }),
       })
 
@@ -721,6 +723,7 @@ function QueueItem({
                   showCta={asset.showCta !== false}
                   showSolutionSet={asset.showSolutionSet !== false}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -1294,6 +1297,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showCta={asset.showCta !== false}
               showSolutionSet={asset.showSolutionSet !== false}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

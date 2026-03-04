@@ -1101,6 +1101,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
+      headlineFontSize: state.headlineFontSize,
       // Solution Overview PDF specific - Page 1
       solutionOverviewSolution: state.solutionOverviewSolution,
       solutionOverviewSolutionName: state.solutionOverviewSolutionName,
@@ -1242,6 +1243,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
       grayscale: asset.grayscale,
+      headlineFontSize: asset.headlineFontSize ?? 38,
       // Track that we're editing from queue
       editingQueueItemId: id,
     })
@@ -1331,6 +1333,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: state.newsletterTopBannerVariant,
       grayscale: state.grayscale,
+      headlineFontSize: state.headlineFontSize,
       // Solution Overview PDF specific - Page 1
       solutionOverviewSolution: state.solutionOverviewSolution,
       solutionOverviewSolutionName: state.solutionOverviewSolutionName,
@@ -1776,6 +1779,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
       grayscale: asset.grayscale,
+      headlineFontSize: asset.headlineFontSize ?? 38,
       generatedVariations: asset.variations,
     })
   },
@@ -2074,6 +2078,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
           newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
           grayscale: asset.grayscale,
+          headlineFontSize: asset.headlineFontSize ?? 38,
           // Solution Overview PDF specific - Page 1
           solutionOverviewSolution: asset.solutionOverviewSolution,
           solutionOverviewSolutionName: asset.solutionOverviewSolutionName,
