@@ -147,6 +147,7 @@ export interface DraftState {
   stackerHeaderModule: StackerHeaderModule
   stackerContentModules: StackerModule[]
   stackerFooterModule: StackerFooterModule
+  stackerModuleSpacing: Record<string, number>
 }
 
 const CURRENT_VERSION = 1
@@ -330,6 +331,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
         stat5Value: '80+',
         stat5Label: 'countries using our solutions',
       },
+      stackerModuleSpacing: state.stackerModuleSpacing || {},
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))

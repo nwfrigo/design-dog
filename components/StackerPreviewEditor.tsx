@@ -24,6 +24,7 @@ import { STACKER_PLACEHOLDER_IMAGE_1x1, STACKER_PLACEHOLDER_IMAGE_16x9 } from '@
 import { StackerPdf } from './templates/StackerPdf'
 import { StackerDraggableModule } from './StackerDraggableModule'
 import { StackerDropIndicator } from './StackerDropIndicator'
+import { StackerSpacingHandle } from './StackerSpacingHandle'
 
 // Module types for rendering in overlay
 import { LogoChipModule } from './templates/StackerPdf/modules/LogoChipModule'
@@ -176,6 +177,9 @@ export interface StackerPreviewEditorProps {
   isGeneratingModule?: boolean
   previewZoom: number
   readOnly?: boolean // When true, disables all drag/drop, delete, and add functionality
+  moduleSpacing?: Record<string, number>
+  onSpacingChange?: (moduleId: string, spacing: number) => void
+  onDeselectAll?: () => void
 }
 
 // Solution category colors
@@ -336,6 +340,9 @@ export function StackerPreviewEditor({
   isGeneratingModule = false,
   previewZoom,
   readOnly = false,
+  moduleSpacing,
+  onSpacingChange,
+  onDeselectAll,
 }: StackerPreviewEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
@@ -497,11 +504,25 @@ export function StackerPreviewEditor({
           style={{
             zoom: previewZoom / 100,
           }}
+          onClick={() => {
+            // Deselect when clicking the document background
+            if (onDeselectAll) onDeselectAll()
+          }}
         >
           <StackerPdf
             modules={modules}
             scale={1}
+            moduleSpacing={moduleSpacing}
             renderModuleWrapper={renderModuleWrapper}
+            renderSpacerBetween={!readOnly && onSpacingChange ? (moduleId, spacing) => (
+              <StackerSpacingHandle
+                key={`spacer-${moduleId}`}
+                moduleId={moduleId}
+                spacing={spacing}
+                onChange={onSpacingChange}
+                scale={previewZoom / 100}
+              />
+            ) : undefined}
             renderFooterContent={readOnly ? undefined : renderAddModuleTile}
           />
         </div>

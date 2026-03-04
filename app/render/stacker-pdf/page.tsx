@@ -21,6 +21,20 @@ export default function StackerPdfRenderPage({
     console.error('Failed to parse modules JSON:', e)
   }
 
+  // Parse module spacing
+  let moduleSpacing: Record<string, number> = {}
+  try {
+    const spacingJson = searchParams.moduleSpacing as string
+    if (spacingJson) {
+      const parsed = JSON.parse(decodeURIComponent(spacingJson))
+      if (parsed && typeof parsed === 'object') {
+        moduleSpacing = parsed
+      }
+    }
+  } catch (e) {
+    console.error('Failed to parse moduleSpacing JSON:', e)
+  }
+
   // If no modules provided, use default placeholder
   if (modules.length === 0) {
     modules = [
@@ -69,7 +83,7 @@ export default function StackerPdfRenderPage({
       }}
     >
       <Suspense fallback={<div>Loading...</div>}>
-        <StackerPdfRender modules={modules} />
+        <StackerPdfRender modules={modules} moduleSpacing={moduleSpacing} />
       </Suspense>
     </div>
   )

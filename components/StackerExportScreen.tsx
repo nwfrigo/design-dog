@@ -16,6 +16,7 @@ export function StackerExportScreen() {
     stackerContentModules,
     stackerFooterModule,
     stackerDocumentTitle,
+    stackerModuleSpacing,
   } = useStore()
 
   // Local state for export
@@ -61,6 +62,7 @@ export function StackerExportScreen() {
         template: 'stacker-pdf',
         scale: 2,
         modules: allModules,
+        moduleSpacing: stackerModuleSpacing,
         format: exportFormat,
         filename: finalFilename,
       }
@@ -173,6 +175,7 @@ export function StackerExportScreen() {
                   onAddModule={() => {}}
                   previewZoom={100}
                   readOnly={true}
+                  moduleSpacing={stackerModuleSpacing}
                 />
               </div>
             </div>

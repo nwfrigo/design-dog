@@ -863,6 +863,8 @@ export interface AppState {
   stackerHeaderModule: StackerHeaderModule
   stackerContentModules: StackerModule[]
   stackerFooterModule: StackerFooterModule
+  // Per-module vertical spacing (keyed by module ID, missing = 32px default)
+  stackerModuleSpacing: Record<string, number>
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -1030,6 +1032,7 @@ export interface AppState {
   setStackerHeaderModule: (module: StackerHeaderModule) => void
   setStackerContentModules: (modules: StackerModule[]) => void
   setStackerFooterModule: (module: StackerFooterModule) => void
+  setStackerModuleSpacing: (spacing: Record<string, number>) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

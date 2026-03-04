@@ -419,6 +419,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     stat5Value: '15+',
     stat5Label: 'Years',
   } as StackerFooterModule,
+  stackerModuleSpacing: {} as Record<string, number>,
 
   // Export queue
   exportQueue: [],
@@ -672,6 +673,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setStackerHeaderModule: (module: StackerHeaderModule) => set({ stackerHeaderModule: module }),
   setStackerContentModules: (modules: StackerModule[]) => set({ stackerContentModules: modules }),
   setStackerFooterModule: (module: StackerFooterModule) => set({ stackerFooterModule: module }),
+  setStackerModuleSpacing: (spacing: Record<string, number>) => set({ stackerModuleSpacing: spacing }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -2330,6 +2332,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       stackerHeaderModule: state.stackerHeaderModule,
       stackerContentModules: state.stackerContentModules,
       stackerFooterModule: state.stackerFooterModule,
+      stackerModuleSpacing: state.stackerModuleSpacing,
     })
   },
 
@@ -2491,6 +2494,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         stat5Value: '80+',
         stat5Label: 'countries using our solutions',
       },
+      stackerModuleSpacing: draft.stackerModuleSpacing ?? {},
     })
     return true
   },

@@ -33,7 +33,7 @@ function LockedModuleWrapper({
   const contentStyle: CSSProperties = {
     position: 'relative',
     borderRadius: 4,
-    outline: isSelected ? '2px solid #3B82F6' : 'none',
+    outline: isSelected ? '1px solid #3B82F6' : 'none',
     outlineOffset: 4,
     cursor: 'pointer',
   }
@@ -58,7 +58,7 @@ function LockedModuleWrapper({
     <div className="group">
       <div
         style={contentStyle}
-        onClick={() => onSelect(module.id)}
+        onClick={(e) => { e.stopPropagation(); onSelect(module.id) }}
       >
         {children}
         <div
@@ -105,39 +105,12 @@ function DraggableModuleWrapper({
   const contentStyle: CSSProperties = {
     position: 'relative',
     borderRadius: 4,
-    outline: isSelected ? '2px solid #3B82F6' : 'none',
+    outline: isSelected ? '1px solid #3B82F6' : 'none',
     outlineOffset: 4,
     cursor: 'pointer',
   }
 
-  // Hover overlay with controls
-  const overlayStyle: CSSProperties = {
-    position: 'absolute',
-    inset: 0,
-    pointerEvents: 'none',
-    zIndex: 10,
-  }
-
-  // Drag handle styles (center-top, pill-shaped)
-  const dragHandleStyle: CSSProperties = {
-    position: 'absolute',
-    top: -12,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '4px 12px',
-    background: 'white',
-    borderRadius: 12,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-    cursor: 'grab',
-    pointerEvents: 'auto',
-    opacity: 0,
-    transition: 'opacity 150ms ease-out',
-  }
-
-  // Delete button styles (top-right)
+  // Delete button styles (top-right, visible on hover)
   const deleteButtonStyle: CSSProperties = {
     position: 'absolute',
     top: 4,
@@ -153,6 +126,29 @@ function DraggableModuleWrapper({
     pointerEvents: 'auto',
     opacity: 0,
     transition: 'opacity 150ms ease-out',
+    zIndex: 10,
+  }
+
+  // Drag handle on the left — only visible when selected
+  const dragHandleStyle: CSSProperties = {
+    position: 'absolute',
+    left: -22,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 20,
+    height: 28,
+    background: 'white',
+    borderRadius: 6,
+    boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+    cursor: 'grab',
+    opacity: isSelected ? 1 : 0,
+    pointerEvents: isSelected ? 'auto' : 'none',
+    transition: 'opacity 150ms ease-out',
+    zIndex: 10,
   }
 
   return (
@@ -168,39 +164,40 @@ function DraggableModuleWrapper({
 
       <div
         style={contentStyle}
-        onClick={() => onSelect(module.id)}
+        onClick={(e) => { e.stopPropagation(); onSelect(module.id) }}
       >
         {children}
 
-        {/* Hover overlay with controls */}
-        <div style={overlayStyle}>
-          {/* Drag handle */}
-          <button
-            {...attributes}
-            {...listeners}
-            style={dragHandleStyle}
-            className="group-hover:!opacity-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
-              <path d="M0 1h16M0 5h16M0 9h16" stroke="#9CA3AF" strokeWidth="1.5" />
-            </svg>
-          </button>
+        {/* Drag handle — left side, only when selected */}
+        <button
+          {...attributes}
+          {...listeners}
+          style={dragHandleStyle}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+            <circle cx="3" cy="3" r="1.5" fill="#9CA3AF" />
+            <circle cx="7" cy="3" r="1.5" fill="#9CA3AF" />
+            <circle cx="3" cy="8" r="1.5" fill="#9CA3AF" />
+            <circle cx="7" cy="8" r="1.5" fill="#9CA3AF" />
+            <circle cx="3" cy="13" r="1.5" fill="#9CA3AF" />
+            <circle cx="7" cy="13" r="1.5" fill="#9CA3AF" />
+          </svg>
+        </button>
 
-          {/* Delete button */}
-          <button
-            style={deleteButtonStyle}
-            className="group-hover:!opacity-100 hover:!bg-red-50"
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(module.id)
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2">
-              <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
+        {/* Delete button — top-right, visible on hover */}
+        <button
+          style={deleteButtonStyle}
+          className="group-hover:!opacity-100 hover:!bg-red-50"
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(module.id)
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2">
+            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
     </div>
   )

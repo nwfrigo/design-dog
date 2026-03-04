@@ -319,7 +319,7 @@ function LockedModuleItem({
   isSelected: boolean
   onToggleExpand: () => void
   onUpdate: (updates: Partial<StackerModule>) => void
-  onOpenCropModal?: (moduleId: string) => void
+  onOpenCropModal?: (moduleId: string, cardIndex?: number) => void
   onOpenLibrary?: (moduleId: string, cardIndex?: number) => void
 }) {
   return (
@@ -384,7 +384,7 @@ function SortableModuleItem({
   isSelected: boolean
   onToggleExpand: () => void
   onUpdate: (updates: Partial<StackerModule>) => void
-  onOpenCropModal?: (moduleId: string) => void
+  onOpenCropModal?: (moduleId: string, cardIndex?: number) => void
   onOpenLibrary?: (moduleId: string, cardIndex?: number) => void
 }) {
   const {
@@ -465,7 +465,7 @@ function ModuleEditor({
 }: {
   module: StackerModule
   onUpdate: (updates: Partial<StackerModule>) => void
-  onOpenCropModal?: (moduleId: string) => void
+  onOpenCropModal?: (moduleId: string, cardIndex?: number) => void
   onOpenLibrary?: (moduleId: string, cardIndex?: number) => void
 }) {
   const categoryOptions: SolutionCategory[] = ['environmental', 'health', 'safety', 'quality', 'sustainability']
@@ -1487,23 +1487,44 @@ function ModuleEditor({
                 {card.imageUrl ? (
                   <div className="relative">
                     <div
-                      className="overflow-hidden rounded-lg border border-gray-300 dark:border-line-subtle"
+                      onClick={() => onOpenCropModal?.(module.id, index)}
+                      className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 dark:border-line-subtle hover:border-blue-400 transition-colors"
                       style={{ width: '100%', height: 60 }}
                     >
                       <img
                         src={card.imageUrl}
                         alt={`Card ${index + 1}`}
                         className="w-full h-full object-cover"
-                        style={{ filter: module.grayscale ? 'grayscale(100%)' : undefined }}
+                        style={{
+                          objectPosition: `${50 - (card.imagePan?.x ?? 0)}% ${50 - (card.imagePan?.y ?? 0)}%`,
+                          transform: (card.imageZoom ?? 1) !== 1 ? `scale(${card.imageZoom})` : undefined,
+                          filter: module.grayscale ? 'grayscale(100%)' : undefined,
+                        }}
                       />
                     </div>
+                    {/* Adjust / Library buttons */}
+                    <div className="absolute bottom-1 left-1 flex gap-1 z-20">
+                      <button
+                        onClick={() => onOpenCropModal?.(module.id, index)}
+                        className="px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors"
+                      >
+                        Adjust
+                      </button>
+                      <button
+                        onClick={() => onOpenLibrary?.(module.id, index)}
+                        className="px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors"
+                      >
+                        Library
+                      </button>
+                    </div>
+                    {/* Remove button */}
                     <button
                       onClick={() => {
                         const newCards = [...module.cards] as typeof module.cards
                         newCards[index] = { ...card, imageUrl: null, imagePan: { x: 0, y: 0 }, imageZoom: 1 }
                         onUpdate({ cards: newCards })
                       }}
-                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
+                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
                       title="Remove image"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1868,12 +1889,14 @@ export function StackerEditorScreen() {
     setStackerHeaderModule,
     setStackerContentModules,
     setStackerFooterModule,
+    setStackerModuleSpacing,
     stackerSourceContent,
     // Persisted edited modules (for coming back from export)
     stackerLogoChipModule: storedLogoChip,
     stackerHeaderModule: storedHeader,
     stackerContentModules: storedContent,
     stackerFooterModule: storedFooter,
+    stackerModuleSpacing: storedModuleSpacing,
   } = useStore()
 
   // Locked modules (always present, not deletable, not draggable)
@@ -1883,6 +1906,9 @@ export function StackerEditorScreen() {
 
   // Content modules (draggable in preview, deletable)
   const [contentModules, setContentModules] = useState<StackerModule[]>([])
+
+  // Per-module vertical spacing
+  const [moduleSpacing, setModuleSpacing] = useState<Record<string, number>>({})
 
   // Load modules from store on mount (either from fresh generation or returning from export)
   useEffect(() => {
@@ -1911,6 +1937,10 @@ export function StackerEditorScreen() {
       setContentModules(storedContent)
       setFooterModule(storedFooter)
     }
+    // Always restore spacing from store
+    if (storedModuleSpacing && Object.keys(storedModuleSpacing).length > 0) {
+      setModuleSpacing(storedModuleSpacing)
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync local state to store for draft persistence (so EditorLayout auto-save picks up changes)
@@ -1920,6 +1950,11 @@ export function StackerEditorScreen() {
     setStackerContentModules(contentModules)
     setStackerFooterModule(footerModule as StackerFooterModule)
   }, [logoChipModule, headerModule, contentModules, footerModule, setStackerLogoChipModule, setStackerHeaderModule, setStackerContentModules, setStackerFooterModule])
+
+  // Sync module spacing to store for draft persistence
+  useEffect(() => {
+    setStackerModuleSpacing(moduleSpacing)
+  }, [moduleSpacing, setStackerModuleSpacing])
 
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
   const [previewZoom, setPreviewZoom] = useState(100)
@@ -1976,10 +2011,16 @@ export function StackerEditorScreen() {
 
   // Image crop modal state
   const [cropModalModuleId, setCropModalModuleId] = useState<string | null>(null)
+  const [cropModalCardIndex, setCropModalCardIndex] = useState<number | undefined>(undefined)
+
+  const openCropModal = (moduleId: string, cardIndex?: number) => {
+    setCropModalModuleId(moduleId)
+    setCropModalCardIndex(cardIndex)
+  }
 
   // Get the image module being edited in crop modal
   const cropModalModule = cropModalModuleId
-    ? contentModules.find(m => m.id === cropModalModuleId && (m.type === 'image' || m.type === 'image-16x9')) as (StackerImageModule | StackerImage16x9Module) | undefined
+    ? contentModules.find(m => m.id === cropModalModuleId && (m.type === 'image' || m.type === 'image-16x9' || m.type === 'image-cards')) as (StackerImageModule | StackerImage16x9Module | StackerImageCardsModule) | undefined
     : undefined
 
   // Image library modal state
@@ -2182,6 +2223,12 @@ export function StackerEditorScreen() {
     if (!deleteModuleConfirm) return
     const { moduleId } = deleteModuleConfirm
     setContentModules(prev => prev.filter(mod => mod.id !== moduleId))
+    // Clean up spacing entry for deleted module
+    setModuleSpacing(prev => {
+      const next = { ...prev }
+      delete next[moduleId]
+      return next
+    })
     // Clear selection if deleted module was selected
     if (selectedModuleId === moduleId) {
       setSelectedModuleId(null)
@@ -2196,9 +2243,10 @@ export function StackerEditorScreen() {
     setStackerHeaderModule(headerModule as StackerHeaderModule)
     setStackerContentModules(contentModules)
     setStackerFooterModule(footerModule as StackerFooterModule)
+    setStackerModuleSpacing(moduleSpacing)
     // Navigate to export screen
     setCurrentScreen('stacker-export')
-  }, [logoChipModule, headerModule, contentModules, footerModule, setStackerLogoChipModule, setStackerHeaderModule, setStackerContentModules, setStackerFooterModule, setCurrentScreen])
+  }, [logoChipModule, headerModule, contentModules, footerModule, moduleSpacing, setStackerLogoChipModule, setStackerHeaderModule, setStackerContentModules, setStackerFooterModule, setStackerModuleSpacing, setCurrentScreen])
 
   return (
     <div className="space-y-6">
@@ -2259,7 +2307,7 @@ export function StackerEditorScreen() {
                       isSelected={selectedModuleId === module.id}
                       onToggleExpand={() => toggleModuleExpand(module.id)}
                       onUpdate={(updates) => updateModule(module.id, updates)}
-                      onOpenCropModal={setCropModalModuleId}
+                      onOpenCropModal={openCropModal}
                       onOpenLibrary={openImageLibrary}
                     />
                   ))}
@@ -2382,6 +2430,11 @@ export function StackerEditorScreen() {
                 hasSourceContent={!!stackerSourceContent}
                 isGeneratingModule={isGeneratingModule}
                 previewZoom={previewZoom}
+                moduleSpacing={moduleSpacing}
+                onSpacingChange={(moduleId, spacing) => {
+                  setModuleSpacing(prev => ({ ...prev, [moduleId]: spacing }))
+                }}
+                onDeselectAll={() => setSelectedModuleId(null)}
               />
             </div>
           </div>
@@ -2389,24 +2442,45 @@ export function StackerEditorScreen() {
       </div>
 
       {/* Image Crop Modal */}
-      {cropModalModule && cropModalModule.imageUrl && (
-        <ImageCropModal
-          isOpen={!!cropModalModuleId}
-          onClose={() => setCropModalModuleId(null)}
-          imageSrc={cropModalModule.imageUrl}
-          frameWidth={cropModalModule.type === 'image-16x9' ? 180 : 180}
-          frameHeight={cropModalModule.type === 'image-16x9' ? 100 : 180}
-          initialPosition={cropModalModule.imagePan}
-          initialZoom={cropModalModule.imageZoom}
-          onSave={(position, zoom) => {
-            updateModule(cropModalModule.id, {
-              imagePan: position,
-              imageZoom: zoom,
-            })
-            setCropModalModuleId(null)
-          }}
-        />
-      )}
+      {cropModalModule && (() => {
+        // Derive modal props based on module type
+        const isCardCrop = cropModalModule.type === 'image-cards' && cropModalCardIndex !== undefined
+        const cardModule = isCardCrop ? (cropModalModule as StackerImageCardsModule) : null
+        const card = cardModule?.cards[cropModalCardIndex!]
+        const imageSrc = isCardCrop ? card?.imageUrl : (cropModalModule as StackerImageModule | StackerImage16x9Module).imageUrl
+        const initialPosition = isCardCrop ? (card?.imagePan ?? { x: 0, y: 0 }) : (cropModalModule as StackerImageModule | StackerImage16x9Module).imagePan
+        const initialZoom = isCardCrop ? (card?.imageZoom ?? 1) : (cropModalModule as StackerImageModule | StackerImage16x9Module).imageZoom
+        const frameWidth = 180
+        const frameHeight = (isCardCrop || cropModalModule.type === 'image-16x9') ? 100 : 180
+
+        if (!imageSrc) return null
+
+        return (
+          <ImageCropModal
+            isOpen={!!cropModalModuleId}
+            onClose={() => { setCropModalModuleId(null); setCropModalCardIndex(undefined) }}
+            imageSrc={imageSrc}
+            frameWidth={frameWidth}
+            frameHeight={frameHeight}
+            initialPosition={initialPosition}
+            initialZoom={initialZoom}
+            onSave={(position, zoom) => {
+              if (isCardCrop && cardModule) {
+                const newCards = [...cardModule.cards] as typeof cardModule.cards
+                newCards[cropModalCardIndex!] = { ...newCards[cropModalCardIndex!], imagePan: position, imageZoom: zoom }
+                updateModule(cropModalModule.id, { cards: newCards })
+              } else {
+                updateModule(cropModalModule.id, {
+                  imagePan: position,
+                  imageZoom: zoom,
+                })
+              }
+              setCropModalModuleId(null)
+              setCropModalCardIndex(undefined)
+            }}
+          />
+        )
+      })()}
 
       {/* Image Library Modal */}
       {showImageLibrary && (
@@ -2451,6 +2525,7 @@ export function StackerEditorScreen() {
               onAddModule={() => {}}
               previewZoom={100}
               readOnly={true}
+              moduleSpacing={moduleSpacing}
             />
           </div>
         </div>
@@ -2486,6 +2561,7 @@ export function StackerEditorScreen() {
                 onAddModule={() => {}}
                 previewZoom={100}
                 readOnly={true}
+                moduleSpacing={moduleSpacing}
               />
             </div>
           </div>

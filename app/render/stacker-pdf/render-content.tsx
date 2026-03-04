@@ -6,9 +6,10 @@ import type { StackerModule } from '@/types'
 
 export interface StackerPdfRenderProps {
   modules: StackerModule[]
+  moduleSpacing?: Record<string, number>
 }
 
-export function StackerPdfRender({ modules }: StackerPdfRenderProps) {
+export function StackerPdfRender({ modules, moduleSpacing }: StackerPdfRenderProps) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function StackerPdfRender({ modules }: StackerPdfRenderProps) {
     <>
       {ready && <div id="render-ready" style={{ display: 'none' }} />}
       <div id="stacker-content">
-        <StackerPdf modules={modules} scale={1} />
+        <StackerPdf modules={modules} scale={1} moduleSpacing={moduleSpacing} />
       </div>
     </>
   )

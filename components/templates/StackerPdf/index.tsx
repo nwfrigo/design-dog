@@ -33,8 +33,12 @@ const DOCUMENT_PADDING = 48 // Padding on all sides
 export interface StackerPdfProps {
   modules: StackerModule[]
   scale?: number
+  // Per-module vertical spacing (keyed by module ID, missing = 32px default)
+  moduleSpacing?: Record<string, number>
   // Optional wrapper for interactive editing (drag handles, click-to-select)
   renderModuleWrapper?: (module: StackerModule, children: ReactNode, index: number) => ReactNode
+  // Optional callback to render interactive spacer between modules (e.g., drag handles)
+  renderSpacerBetween?: (moduleId: string, spacing: number) => ReactNode
   // Optional content to render after all modules (e.g., "Add Module" tile)
   renderFooterContent?: () => ReactNode
 }
@@ -203,7 +207,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
   }
 }
 
-export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFooterContent }: StackerPdfProps) {
+export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrapper, renderSpacerBetween, renderFooterContent }: StackerPdfProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
 
   const documentStyle: CSSProperties = {
@@ -222,7 +226,6 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
     paddingLeft: 24,
     display: 'flex',
     flexDirection: 'column',
-    gap: 32, // Spacing between modules
   }
 
   // Derive accent color from logo-chip module's active categories
@@ -240,7 +243,7 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
   return (
     <div style={documentStyle}>
       <div style={contentStyle}>
-        {/* Render all non-footer modules */}
+        {/* Render all non-footer modules with spacers between them */}
         {nonFooterModules.map((module, index) => {
           const moduleContent = <RenderModule key={module.id} module={module} accentColor={accentColor} />
           // Wrap in div with data-module-id for export image injection
@@ -249,9 +252,22 @@ export function StackerPdf({ modules, scale = 1, renderModuleWrapper, renderFoot
               {moduleContent}
             </div>
           )
-          return renderModuleWrapper
+          const renderedModule = renderModuleWrapper
             ? renderModuleWrapper(module, wrappedContent, index)
             : wrappedContent
+
+          // Add spacer after each module to create gap before the next module/footer
+          const spacing = moduleSpacing?.[module.id] ?? 32
+
+          return (
+            <div key={`wrapper-${module.id}`}>
+              {renderedModule}
+              {renderSpacerBetween
+                ? renderSpacerBetween(module.id, spacing)
+                : <div style={{ height: spacing }} />
+              }
+            </div>
+          )
         })}
         {modules.length === 0 && (
           <div

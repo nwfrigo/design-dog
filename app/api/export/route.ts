@@ -378,6 +378,11 @@ export async function POST(request: NextRequest) {
         return module
       })
       params.set('modules', encodeURIComponent(JSON.stringify(modulesForUrl)))
+
+      // Pass module spacing if provided
+      if (body.moduleSpacing && Object.keys(body.moduleSpacing).length > 0) {
+        params.set('moduleSpacing', encodeURIComponent(JSON.stringify(body.moduleSpacing)))
+      }
     }
 
     // Get the base URL from the request
