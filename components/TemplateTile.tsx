@@ -475,6 +475,7 @@ export function TemplateRenderer({
           id: 'preview-image',
           type: 'image',
           imagePosition: 'left',
+          imageSize: 'S',
           imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1,
           imagePan: { x: 0, y: 0 },
           imageZoom: 1,

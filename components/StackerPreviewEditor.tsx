@@ -51,8 +51,8 @@ interface ModuleTypeInfo {
 const MODULE_TYPES_INFO: ModuleTypeInfo[] = [
   { type: 'paragraph', label: 'Paragraph', description: 'Intro text with body copy' },
   { type: 'bullet-three', label: '3 Bullets', description: 'Three columns of bullet points' },
-  { type: 'image', label: 'Image - 1:1', description: 'Square image with text' },
-  { type: 'image-16x9', label: 'Image - 16:9', description: 'Wide image with text' },
+  { type: 'image', label: 'Image - Tall', description: 'Tall image with text' },
+  { type: 'image-16x9', label: 'Image - Short', description: 'Short image with text' },
   { type: 'divider', label: 'Divider', description: 'Horizontal separator line' },
   { type: 'three-card', label: 'Simple Cards', description: 'Three icon cards' },
   { type: 'image-cards', label: 'Image Cards', description: 'Cards with images' },
@@ -102,7 +102,7 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
     case 'image':
       return {
         id, type: 'image',
-        imagePosition: 'left', imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
+        imagePosition: 'left', imageSize: 'S' as const, imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1, imagePan: { x: 0, y: 0 }, imageZoom: 1, grayscale: false,
         eyebrow: 'Platform', showEyebrow: true,
         heading: 'Unified Dashboard', showHeading: true,
         body: 'See all your safety data in one place with real-time updates.', showBody: true,
@@ -180,6 +180,9 @@ export interface StackerPreviewEditorProps {
   moduleSpacing?: Record<string, number>
   onSpacingChange?: (moduleId: string, spacing: number) => void
   onDeselectAll?: () => void
+  onDuplicateModule?: (moduleId: string) => void
+  onToggleFooterVisibility?: () => void
+  isFooterHidden?: boolean
 }
 
 // Solution category colors
@@ -237,6 +240,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
       return (
         <ImageModule
           imagePosition={module.imagePosition}
+          imageSize={module.imageSize}
           imageUrl={module.imageUrl}
           imagePan={module.imagePan}
           imageZoom={module.imageZoom}
@@ -343,6 +347,9 @@ export function StackerPreviewEditor({
   moduleSpacing,
   onSpacingChange,
   onDeselectAll,
+  onDuplicateModule,
+  onToggleFooterVisibility,
+  isFooterHidden = false,
 }: StackerPreviewEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
@@ -445,6 +452,8 @@ export function StackerPreviewEditor({
     const isOverAbove = overId === module.id && activeId !== module.id
     const isLastModule = index === modules.length - 1
     const isOverAfterLast = isLastModule && overId === module.id && activeId !== null
+    const isFooter = module.type === 'footer'
+    const isLocked = ['logo-chip', 'header', 'footer'].includes(module.type)
 
     return (
       <StackerDraggableModule
@@ -454,6 +463,9 @@ export function StackerPreviewEditor({
         isOverAbove={readOnly ? false : isOverAbove}
         onSelect={onSelectModule}
         onDelete={onDeleteModule}
+        onDuplicate={!readOnly && !isLocked ? onDuplicateModule : undefined}
+        onToggleVisibility={!readOnly && isFooter && onToggleFooterVisibility ? () => onToggleFooterVisibility() : undefined}
+        isHidden={isFooter ? isFooterHidden : false}
         readOnly={readOnly}
       >
         {children}
@@ -465,7 +477,7 @@ export function StackerPreviewEditor({
         )}
       </StackerDraggableModule>
     )
-  }, [selectedModuleId, onSelectModule, onDeleteModule, overId, activeId, modules.length, readOnly])
+  }, [selectedModuleId, onSelectModule, onDeleteModule, onDuplicateModule, onToggleFooterVisibility, isFooterHidden, overId, activeId, modules.length, readOnly])
 
   // Render add module tile inside the document
   const renderAddModuleTile = useCallback(() => (

@@ -41,6 +41,8 @@ export interface StackerPdfProps {
   renderSpacerBetween?: (moduleId: string, spacing: number) => ReactNode
   // Optional content to render after all modules (e.g., "Add Module" tile)
   renderFooterContent?: () => ReactNode
+  // Hide footer in export (editor shows dimmed via wrapper opacity)
+  hideFooter?: boolean
 }
 
 // Render individual module based on type
@@ -89,6 +91,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
       return (
         <ImageModule
           imagePosition={module.imagePosition}
+          imageSize={module.imageSize}
           imageUrl={module.imageUrl}
           imagePan={module.imagePan}
           imageZoom={module.imageZoom}
@@ -207,7 +210,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
   }
 }
 
-export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrapper, renderSpacerBetween, renderFooterContent }: StackerPdfProps) {
+export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrapper, renderSpacerBetween, renderFooterContent, hideFooter }: StackerPdfProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
 
   const documentStyle: CSSProperties = {
@@ -288,7 +291,7 @@ export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrap
         {footerModule && (
           renderModuleWrapper
             ? renderModuleWrapper(footerModule, <RenderModule key={footerModule.id} module={footerModule} />, modules.length - 1)
-            : <RenderModule key={footerModule.id} module={footerModule} />
+            : !hideFooter && <RenderModule key={footerModule.id} module={footerModule} />
         )}
       </div>
     </div>

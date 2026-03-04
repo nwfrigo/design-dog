@@ -320,6 +320,7 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         id,
         type: 'image',
         imagePosition: (data.imagePosition as 'left' | 'right') || 'left',
+        imageSize: (data.imageSize as 'S' | 'M' | 'L') || 'S',
         imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1,
         imagePan: { x: 0, y: 0 },
         imageZoom: 1,

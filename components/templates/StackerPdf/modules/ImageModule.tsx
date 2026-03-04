@@ -21,8 +21,15 @@ const ArrowIcon = () => (
   </svg>
 )
 
+const IMAGE_SIZE_WIDTHS: Record<'S' | 'M' | 'L', number> = {
+  S: 200,
+  M: 270,
+  L: 372,
+}
+
 export interface ImageModuleProps {
   imagePosition: 'left' | 'right'
+  imageSize?: 'S' | 'M' | 'L'
   imageUrl: string | null
   imagePan: { x: number; y: number }
   imageZoom: number
@@ -41,6 +48,7 @@ export interface ImageModuleProps {
 
 export function ImageModule({
   imagePosition,
+  imageSize = 'S',
   imageUrl,
   imagePan,
   imageZoom,
@@ -70,8 +78,8 @@ export function ImageModule({
   }
 
   const imageContainerStyle: CSSProperties = {
-    width: 180,
-    height: 180,
+    width: IMAGE_SIZE_WIDTHS[imageSize],
+    height: 200,
     borderRadius: 6.45,
     border: '0.33px solid #D9D8D6',
     flexShrink: 0,

@@ -99,6 +99,7 @@ export interface StackerBulletThreeModule extends StackerBaseModule {
 export interface StackerImageModule extends StackerBaseModule {
   type: 'image'
   imagePosition: 'left' | 'right'
+  imageSize: 'S' | 'M' | 'L'
   imageUrl: string | null
   imagePan: { x: number; y: number }
   imageZoom: number
@@ -865,6 +866,8 @@ export interface AppState {
   stackerFooterModule: StackerFooterModule
   // Per-module vertical spacing (keyed by module ID, missing = 32px default)
   stackerModuleSpacing: Record<string, number>
+  // Footer visibility toggle
+  stackerFooterHidden: boolean
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -1033,6 +1036,7 @@ export interface AppState {
   setStackerContentModules: (modules: StackerModule[]) => void
   setStackerFooterModule: (module: StackerFooterModule) => void
   setStackerModuleSpacing: (spacing: Record<string, number>) => void
+  setStackerFooterHidden: (hidden: boolean) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

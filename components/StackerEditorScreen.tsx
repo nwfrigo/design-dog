@@ -80,8 +80,8 @@ const MODULE_LABELS: Record<string, string> = {
   'header': 'Header',
   'paragraph': 'Paragraph',
   'bullet-three': '3 Bullets',
-  'image': 'Image - 1:1',
-  'image-16x9': 'Image - 16:9',
+  'image': 'Image - Tall',
+  'image-16x9': 'Image - Short',
   'divider': 'Divider',
   'three-card': 'Simple Cards',
   'image-cards': 'Image Cards',
@@ -140,6 +140,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
         id,
         type: 'image',
         imagePosition: 'left',
+        imageSize: 'S',
         imageUrl: STACKER_PLACEHOLDER_IMAGE_1x1,
         imagePan: { x: 0, y: 0 },
         imageZoom: 1,
@@ -284,7 +285,7 @@ function getModulePreview(module: StackerModule): string {
     case 'image':
       return `Image ${module.imagePosition} · ${module.imageUrl ? 'Uploaded' : 'No image'}`
     case 'image-16x9':
-      return `Image 16:9 ${module.imagePosition} · ${module.imageUrl ? 'Uploaded' : 'No image'}`
+      return `Image Short ${module.imagePosition} · ${module.imageUrl ? 'Uploaded' : 'No image'}`
     case 'divider':
       return 'Horizontal divider'
     case 'three-card':
@@ -852,6 +853,26 @@ function ModuleEditor({
             </div>
           </div>
 
+          {/* Image Size Picker */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
+            <div className="flex gap-2">
+              {(['S', 'M', 'L'] as const).map((size) => (
+                <button
+                  key={size}
+                  onClick={() => onUpdate({ imageSize: size })}
+                  className={`flex-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                    (module.imageSize || 'S') === size
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
+                  }`}
+                >
+                  {size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Image Upload */}
           <div>
             <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image</label>
@@ -1132,7 +1153,7 @@ function ModuleEditor({
 
           {/* Image Upload */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image (16:9)</label>
+            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Image (Short)</label>
             {module.imageUrl ? (
               <div className="relative">
                 {/* Image preview - click to adjust */}
@@ -1890,6 +1911,7 @@ export function StackerEditorScreen() {
     setStackerContentModules,
     setStackerFooterModule,
     setStackerModuleSpacing,
+    setStackerFooterHidden,
     stackerSourceContent,
     // Persisted edited modules (for coming back from export)
     stackerLogoChipModule: storedLogoChip,
@@ -1897,6 +1919,7 @@ export function StackerEditorScreen() {
     stackerContentModules: storedContent,
     stackerFooterModule: storedFooter,
     stackerModuleSpacing: storedModuleSpacing,
+    stackerFooterHidden: storedFooterHidden,
   } = useStore()
 
   // Locked modules (always present, not deletable, not draggable)
@@ -1909,6 +1932,9 @@ export function StackerEditorScreen() {
 
   // Per-module vertical spacing
   const [moduleSpacing, setModuleSpacing] = useState<Record<string, number>>({})
+
+  // Footer visibility
+  const [isFooterHidden, setIsFooterHidden] = useState(false)
 
   // Load modules from store on mount (either from fresh generation or returning from export)
   useEffect(() => {
@@ -1937,10 +1963,11 @@ export function StackerEditorScreen() {
       setContentModules(storedContent)
       setFooterModule(storedFooter)
     }
-    // Always restore spacing from store
+    // Always restore spacing and footer visibility from store
     if (storedModuleSpacing && Object.keys(storedModuleSpacing).length > 0) {
       setModuleSpacing(storedModuleSpacing)
     }
+    setIsFooterHidden(storedFooterHidden)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync local state to store for draft persistence (so EditorLayout auto-save picks up changes)
@@ -1956,6 +1983,11 @@ export function StackerEditorScreen() {
     setStackerModuleSpacing(moduleSpacing)
   }, [moduleSpacing, setStackerModuleSpacing])
 
+  // Sync footer visibility to store for draft persistence
+  useEffect(() => {
+    setStackerFooterHidden(isFooterHidden)
+  }, [isFooterHidden, setStackerFooterHidden])
+
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
   const [previewZoom, setPreviewZoom] = useState(100)
 
@@ -1966,7 +1998,6 @@ export function StackerEditorScreen() {
   const [deleteModuleConfirm, setDeleteModuleConfirm] = useState<{ moduleId: string; moduleType: string } | null>(null)
 
   // Preview modals state
-  const [showFullscreenPreview, setShowFullscreenPreview] = useState(false)
   const [showAllPagesPreview, setShowAllPagesPreview] = useState(false)
 
   // AI module generation state
@@ -2178,6 +2209,19 @@ export function StackerEditorScreen() {
     }
   }, [stackerSourceContent, contentModules, aiToastTimeout])
 
+  // Duplicate a content module (deep clone with new ID, insert after original)
+  const duplicateModule = useCallback((moduleId: string) => {
+    setContentModules(prev => {
+      const index = prev.findIndex(m => m.id === moduleId)
+      if (index === -1) return prev
+      const original = prev[index]
+      const clone = { ...JSON.parse(JSON.stringify(original)), id: generateId() }
+      const next = [...prev]
+      next.splice(index + 1, 0, clone)
+      return next
+    })
+  }, [])
+
   // Cleanup toast timeout on unmount
   useEffect(() => {
     return () => {
@@ -2244,9 +2288,10 @@ export function StackerEditorScreen() {
     setStackerContentModules(contentModules)
     setStackerFooterModule(footerModule as StackerFooterModule)
     setStackerModuleSpacing(moduleSpacing)
+    setStackerFooterHidden(isFooterHidden)
     // Navigate to export screen
     setCurrentScreen('stacker-export')
-  }, [logoChipModule, headerModule, contentModules, footerModule, moduleSpacing, setStackerLogoChipModule, setStackerHeaderModule, setStackerContentModules, setStackerFooterModule, setStackerModuleSpacing, setCurrentScreen])
+  }, [logoChipModule, headerModule, contentModules, footerModule, moduleSpacing, isFooterHidden, setStackerLogoChipModule, setStackerHeaderModule, setStackerContentModules, setStackerFooterModule, setStackerModuleSpacing, setStackerFooterHidden, setCurrentScreen])
 
   return (
     <div className="space-y-6">
@@ -2397,19 +2442,10 @@ export function StackerEditorScreen() {
                 <button
                   onClick={() => setPreviewZoom(Math.min(200, previewZoom + 25))}
                   disabled={previewZoom >= 200}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle bg-white dark:bg-surface-secondary"
+                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 dark:border-line-subtle rounded-r bg-white dark:bg-surface-secondary"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setShowFullscreenPreview(true)}
-                  className="w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary border border-gray-300 dark:border-line-subtle rounded-r bg-white dark:bg-surface-secondary ml-1"
-                  title="Fullscreen preview (ESC to exit)"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                   </svg>
                 </button>
               </div>
@@ -2435,6 +2471,9 @@ export function StackerEditorScreen() {
                   setModuleSpacing(prev => ({ ...prev, [moduleId]: spacing }))
                 }}
                 onDeselectAll={() => setSelectedModuleId(null)}
+                onDuplicateModule={duplicateModule}
+                onToggleFooterVisibility={() => setIsFooterHidden(prev => !prev)}
+                isFooterHidden={isFooterHidden}
               />
             </div>
           </div>
@@ -2450,8 +2489,11 @@ export function StackerEditorScreen() {
         const imageSrc = isCardCrop ? card?.imageUrl : (cropModalModule as StackerImageModule | StackerImage16x9Module).imageUrl
         const initialPosition = isCardCrop ? (card?.imagePan ?? { x: 0, y: 0 }) : (cropModalModule as StackerImageModule | StackerImage16x9Module).imagePan
         const initialZoom = isCardCrop ? (card?.imageZoom ?? 1) : (cropModalModule as StackerImageModule | StackerImage16x9Module).imageZoom
-        const frameWidth = 180
-        const frameHeight = (isCardCrop || cropModalModule.type === 'image-16x9') ? 100 : 180
+        const imageSizeWidths: Record<string, number> = { S: 200, M: 270, L: 372 }
+        const frameWidth = cropModalModule.type === 'image'
+          ? imageSizeWidths[(cropModalModule as StackerImageModule).imageSize || 'S']
+          : 180
+        const frameHeight = (isCardCrop || cropModalModule.type === 'image-16x9') ? 100 : 200
 
         if (!imageSrc) return null
 
@@ -2500,36 +2542,6 @@ export function StackerEditorScreen() {
         onCancel={() => setDeleteModuleConfirm(null)}
         itemType={deleteModuleConfirm?.moduleType || 'Module'}
       />
-
-      {/* Fullscreen Preview Modal (View-Only) */}
-      {showFullscreenPreview && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8">
-          <button
-            onClick={() => setShowFullscreenPreview(false)}
-            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <div
-            className="bg-white rounded-sm shadow-2xl overflow-auto max-h-full"
-            style={{ width: 612 }}
-          >
-            <StackerPreviewEditor
-              modules={allModules}
-              selectedModuleId={null}
-              onModulesChange={() => {}}
-              onSelectModule={() => {}}
-              onDeleteModule={() => {}}
-              onAddModule={() => {}}
-              previewZoom={100}
-              readOnly={true}
-              moduleSpacing={moduleSpacing}
-            />
-          </div>
-        </div>
-      )}
 
       {/* All Pages Preview Modal (View-Only) */}
       {showAllPagesPreview && (
