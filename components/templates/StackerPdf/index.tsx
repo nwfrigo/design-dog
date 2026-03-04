@@ -2,6 +2,7 @@
 
 import { CSSProperties, ReactNode } from 'react'
 import type { StackerModule, SolutionCategory } from '@/types'
+import { getStackerTheme } from '@/lib/stacker-theme'
 import { LogoChipModule } from './modules/LogoChipModule'
 import { HeaderModule } from './modules/HeaderModule'
 import { ParagraphModule } from './modules/ParagraphModule'
@@ -28,7 +29,6 @@ const SOLUTION_COLORS: Record<SolutionCategory, string> = {
 
 // Document dimensions
 const DOCUMENT_WIDTH = 612 // Same as other PDF templates (Letter width in points)
-const DOCUMENT_PADDING = 48 // Padding on all sides
 
 export interface StackerPdfProps {
   modules: StackerModule[]
@@ -43,10 +43,12 @@ export interface StackerPdfProps {
   renderFooterContent?: () => ReactNode
   // Hide footer in export (editor shows dimmed via wrapper opacity)
   hideFooter?: boolean
+  // Dark mode toggle
+  darkMode?: boolean
 }
 
 // Render individual module based on type
-function RenderModule({ module, scale = 1, accentColor }: { module: StackerModule; scale?: number; accentColor?: string }) {
+function RenderModule({ module, scale = 1, accentColor, darkMode }: { module: StackerModule; scale?: number; accentColor?: string; darkMode?: boolean }) {
   switch (module.type) {
     case 'logo-chip':
       return (
@@ -54,6 +56,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           showChips={module.showChips}
           activeCategories={module.activeCategories}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -68,6 +71,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           ctaUrl={module.ctaUrl}
           showCta={module.showCta}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -79,12 +83,13 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           showIntro={module.showIntro}
           showBody={module.showBody}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
     case 'divider':
       return (
-        <DividerModule scale={scale} />
+        <DividerModule scale={scale} darkMode={darkMode} />
       )
 
     case 'image':
@@ -106,6 +111,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           ctaUrl={module.ctaUrl}
           showCta={module.showCta}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -125,6 +131,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           body={module.body}
           showBody={module.showBody}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -133,6 +140,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
         <CardsModule
           cards={module.cards}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -145,6 +153,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           showCard3={module.showCard3}
           grayscale={module.grayscale}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -156,6 +165,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           jobTitle={module.jobTitle}
           organization={module.organization}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -165,6 +175,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           stats={module.stats}
           showStat3={module.showStat3}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -176,6 +187,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           eyebrow={module.eyebrow}
           body={module.body}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -193,6 +205,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           stat5Value={module.stat5Value}
           stat5Label={module.stat5Label}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -203,6 +216,7 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
           columns={module.columns}
           accentColor={accentColor}
           scale={scale}
+          darkMode={darkMode}
         />
       )
 
@@ -211,13 +225,14 @@ function RenderModule({ module, scale = 1, accentColor }: { module: StackerModul
   }
 }
 
-export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrapper, renderSpacerBetween, renderFooterContent, hideFooter }: StackerPdfProps) {
+export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrapper, renderSpacerBetween, renderFooterContent, hideFooter, darkMode }: StackerPdfProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const documentStyle: CSSProperties = {
     width: DOCUMENT_WIDTH,
     minHeight: 200, // Variable height, but minimum to show something
-    background: 'white',
+    background: t.bg,
     fontFamily,
     transform: scale !== 1 ? `scale(${scale})` : undefined,
     transformOrigin: 'top left',
@@ -249,7 +264,7 @@ export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrap
       <div style={contentStyle}>
         {/* Render all non-footer modules with spacers between them */}
         {nonFooterModules.map((module, index) => {
-          const moduleContent = <RenderModule key={module.id} module={module} accentColor={accentColor} />
+          const moduleContent = <RenderModule key={module.id} module={module} accentColor={accentColor} darkMode={darkMode} />
           // Wrap in div with data-module-id for export image injection
           const wrappedContent = (
             <div key={module.id} data-module-id={module.id}>
@@ -291,8 +306,8 @@ export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrap
         {/* Footer module always last */}
         {footerModule && (
           renderModuleWrapper
-            ? renderModuleWrapper(footerModule, <RenderModule key={footerModule.id} module={footerModule} />, modules.length - 1)
-            : !hideFooter && <RenderModule key={footerModule.id} module={footerModule} />
+            ? renderModuleWrapper(footerModule, <RenderModule key={footerModule.id} module={footerModule} darkMode={darkMode} />, modules.length - 1)
+            : !hideFooter && <RenderModule key={footerModule.id} module={footerModule} darkMode={darkMode} />
         )}
       </div>
     </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface BulletListModuleProps {
   heading: string
@@ -11,6 +12,7 @@ export interface BulletListModuleProps {
   ]
   accentColor?: string
   scale?: number
+  darkMode?: boolean
 }
 
 export function BulletListModule({
@@ -18,8 +20,10 @@ export function BulletListModule({
   columns,
   accentColor = '#000000',
   scale = 1,
+  darkMode,
 }: BulletListModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -52,7 +56,7 @@ export function BulletListModule({
   }
 
   const labelStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 8,
     fontWeight: 500,
     textTransform: 'uppercase',
@@ -82,7 +86,7 @@ export function BulletListModule({
 
   const bulletTextStyle: CSSProperties = {
     flex: '1 1 0',
-    color: 'black',
+    color: t.text,
     fontSize: 9,
     fontWeight: 350,
     lineHeight: '13px',

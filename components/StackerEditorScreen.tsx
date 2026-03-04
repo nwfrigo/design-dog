@@ -1934,6 +1934,8 @@ export function StackerEditorScreen() {
     setStackerModuleSpacing,
     setStackerFooterHidden,
     stackerSourceContent,
+    stackerDarkMode,
+    setStackerDarkMode,
     // Persisted edited modules (for coming back from export)
     stackerLogoChipModule: storedLogoChip,
     stackerHeaderModule: storedHeader,
@@ -2470,6 +2472,33 @@ export function StackerEditorScreen() {
                   </svg>
                 </button>
               </div>
+
+              {/* Divider */}
+              <div className="w-px h-5 bg-gray-300 dark:bg-surface-tertiary ml-1" />
+
+              {/* Dark Mode Toggle Switch */}
+              <button
+                onClick={() => setStackerDarkMode(!stackerDarkMode)}
+                className="h-7 flex items-center gap-0 rounded-full border border-gray-300 dark:border-line-subtle bg-white dark:bg-surface-secondary ml-1 px-0.5 cursor-pointer transition-colors"
+                title={stackerDarkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+              >
+                {/* Sun icon */}
+                <div className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors ${
+                  !stackerDarkMode ? 'bg-amber-100 text-amber-600' : 'text-gray-400 dark:text-content-secondary'
+                }`}>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+                {/* Moon icon */}
+                <div className={`w-6 h-6 flex items-center justify-center rounded-full transition-colors ${
+                  stackerDarkMode ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-content-secondary'
+                }`}>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                </div>
+              </button>
             </div>
           </div>
 
@@ -2495,6 +2524,7 @@ export function StackerEditorScreen() {
                 onDuplicateModule={duplicateModule}
                 onToggleFooterVisibility={() => setIsFooterHidden(prev => !prev)}
                 isFooterHidden={isFooterHidden}
+                darkMode={stackerDarkMode}
               />
             </div>
           </div>
@@ -2585,8 +2615,8 @@ export function StackerEditorScreen() {
           </div>
           <div className="flex-1 overflow-auto p-8 flex justify-center">
             <div
-              className="bg-white rounded-sm shadow-2xl"
-              style={{ width: 612 }}
+              className="rounded-sm shadow-2xl"
+              style={{ width: 612, background: stackerDarkMode ? '#060015' : 'white' }}
             >
               <StackerPreviewEditor
                 modules={allModules}
@@ -2598,6 +2628,7 @@ export function StackerEditorScreen() {
                 previewZoom={100}
                 readOnly={true}
                 moduleSpacing={moduleSpacing}
+                darkMode={stackerDarkMode}
               />
             </div>
           </div>

@@ -1,14 +1,19 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface DividerModuleProps {
   scale?: number
+  darkMode?: boolean
 }
 
 export function DividerModule({
   scale = 1,
+  darkMode,
 }: DividerModuleProps) {
+  const t = getStackerTheme(darkMode)
+
   const containerStyle: CSSProperties = {
     width: '100%',
     transform: scale !== 1 ? `scale(${scale})` : undefined,
@@ -18,7 +23,7 @@ export function DividerModule({
   const lineStyle: CSSProperties = {
     width: '100%',
     height: 1,
-    background: '#B3B2B1',
+    background: t.dividerColor,
   }
 
   return (

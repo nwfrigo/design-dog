@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface StatData {
   value: string
@@ -11,14 +12,17 @@ export interface ThreeStatsModuleProps {
   stats: [StatData, StatData, StatData]
   showStat3?: boolean
   scale?: number
+  darkMode?: boolean
 }
 
 export function ThreeStatsModule({
   stats,
   showStat3 = true,
   scale = 1,
+  darkMode,
 }: ThreeStatsModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -38,7 +42,7 @@ export function ThreeStatsModule({
   }
 
   const valueStyle: CSSProperties = {
-    color: 'black',
+    color: t.statValueColor,
     fontSize: 36,
     fontWeight: 350,
     textAlign: 'center',
@@ -49,7 +53,7 @@ export function ThreeStatsModule({
     width: '100%',
     maxWidth: 172,
     textAlign: 'center',
-    color: 'black',
+    color: t.text,
     fontSize: 8,
     fontWeight: 350,
     lineHeight: '12px',

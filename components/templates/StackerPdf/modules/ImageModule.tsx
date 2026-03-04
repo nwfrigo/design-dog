@@ -1,9 +1,10 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 // Arrow SVG for CTA
-const ArrowIcon = () => (
+const ArrowIcon = ({ color = '#060015' }: { color?: string }) => (
   <svg
     width="11"
     height="9"
@@ -13,7 +14,7 @@ const ArrowIcon = () => (
   >
     <path
       d="M1 4.5H10M10 4.5L6.5 1M10 4.5L6.5 8"
-      stroke="#060015"
+      stroke={color}
       strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -44,6 +45,7 @@ export interface ImageModuleProps {
   ctaUrl: string
   showCta: boolean
   scale?: number
+  darkMode?: boolean
 }
 
 export function ImageModule({
@@ -63,8 +65,10 @@ export function ImageModule({
   ctaUrl,
   showCta,
   scale = 1,
+  darkMode,
 }: ImageModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -81,9 +85,9 @@ export function ImageModule({
     width: IMAGE_SIZE_WIDTHS[imageSize],
     height: 200,
     borderRadius: 6.45,
-    border: '0.33px solid #D9D8D6',
+    border: t.imageBorder,
     flexShrink: 0,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: t.imagePlaceholderBg,
     overflow: 'hidden',
   }
 
@@ -107,7 +111,7 @@ export function ImageModule({
   }
 
   const eyebrowStyle: CSSProperties = {
-    color: 'black',
+    color: t.textSecondary,
     fontSize: 8,
     fontWeight: 500,
     textTransform: 'uppercase',
@@ -116,14 +120,14 @@ export function ImageModule({
   }
 
   const headingStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 18,
     fontWeight: 350,
     wordWrap: 'break-word',
   }
 
   const bodyStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',
@@ -139,7 +143,7 @@ export function ImageModule({
   }
 
   const ctaTextStyle: CSSProperties = {
-    color: '#060015',
+    color: t.ctaColor,
     fontSize: 12,
     fontWeight: 500,
     lineHeight: '12px',
@@ -148,7 +152,7 @@ export function ImageModule({
   const ctaContent = (
     <>
       <span style={ctaTextStyle}>{cta || 'Learn More'}</span>
-      <ArrowIcon />
+      <ArrowIcon color={t.ctaColor} />
     </>
   )
 

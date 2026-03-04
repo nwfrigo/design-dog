@@ -421,6 +421,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   } as StackerFooterModule,
   stackerModuleSpacing: {} as Record<string, number>,
   stackerFooterHidden: false,
+  stackerDarkMode: false,
 
   // Export queue
   exportQueue: [],
@@ -676,6 +677,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setStackerFooterModule: (module: StackerFooterModule) => set({ stackerFooterModule: module }),
   setStackerModuleSpacing: (spacing: Record<string, number>) => set({ stackerModuleSpacing: spacing }),
   setStackerFooterHidden: (hidden: boolean) => set({ stackerFooterHidden: hidden }),
+  setStackerDarkMode: (darkMode: boolean) => set({ stackerDarkMode: darkMode }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
@@ -2336,6 +2338,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       stackerFooterModule: state.stackerFooterModule,
       stackerModuleSpacing: state.stackerModuleSpacing,
       stackerFooterHidden: state.stackerFooterHidden,
+      stackerDarkMode: state.stackerDarkMode,
     })
   },
 
@@ -2499,6 +2502,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       },
       stackerModuleSpacing: draft.stackerModuleSpacing ?? {},
       stackerFooterHidden: draft.stackerFooterHidden ?? false,
+      stackerDarkMode: draft.stackerDarkMode ?? false,
     })
     return true
   },

@@ -8,9 +8,10 @@ export interface StackerPdfRenderProps {
   modules: StackerModule[]
   moduleSpacing?: Record<string, number>
   hideFooter?: boolean
+  darkMode?: boolean
 }
 
-export function StackerPdfRender({ modules, moduleSpacing, hideFooter }: StackerPdfRenderProps) {
+export function StackerPdfRender({ modules, moduleSpacing, hideFooter, darkMode }: StackerPdfRenderProps) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export function StackerPdfRender({ modules, moduleSpacing, hideFooter }: Stacker
     <>
       {ready && <div id="render-ready" style={{ display: 'none' }} />}
       <div id="stacker-content">
-        <StackerPdf modules={modules} scale={1} moduleSpacing={moduleSpacing} hideFooter={hideFooter} />
+        <StackerPdf modules={modules} scale={1} moduleSpacing={moduleSpacing} hideFooter={hideFooter} darkMode={darkMode} />
       </div>
     </>
   )

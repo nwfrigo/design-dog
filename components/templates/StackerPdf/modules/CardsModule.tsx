@@ -2,6 +2,7 @@
 
 import { CSSProperties } from 'react'
 import { getIconByName } from '@/components/IconPickerModal'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface CardData {
   icon: string
@@ -12,13 +13,16 @@ export interface CardData {
 export interface CardsModuleProps {
   cards: [CardData, CardData, CardData]
   scale?: number
+  darkMode?: boolean
 }
 
 export function CardsModule({
   cards,
   scale = 1,
+  darkMode,
 }: CardsModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -33,9 +37,9 @@ export function CardsModule({
   const cardStyle: CSSProperties = {
     flex: '1 1 0',
     padding: 12,
-    background: '#F9F9F9',
+    background: t.cardBg,
     borderRadius: 6,
-    border: '0.25px solid #D9D8D6',
+    border: t.cardBorder,
     display: 'flex',
     flexDirection: 'column',
     gap: 12,
@@ -47,7 +51,7 @@ export function CardsModule({
   }
 
   const titleStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',
@@ -55,7 +59,7 @@ export function CardsModule({
   }
 
   const descriptionStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 8,
     fontWeight: 350,
     lineHeight: '12px',
@@ -70,7 +74,7 @@ export function CardsModule({
           <div key={index} style={cardStyle}>
             <div style={iconContainerStyle}>
               {IconComponent && (
-                <IconComponent size={17} strokeWidth={1.5} color="black" />
+                <IconComponent size={17} strokeWidth={1.5} color={t.iconColor} />
               )}
             </div>
             <div style={titleStyle}>{card.title}</div>

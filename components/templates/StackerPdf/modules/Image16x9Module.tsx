@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 const IMAGE_SIZE_WIDTHS: Record<'S' | 'M' | 'L', number> = {
   S: 180,
@@ -22,6 +23,7 @@ export interface Image16x9ModuleProps {
   body: string
   showBody: boolean
   scale?: number
+  darkMode?: boolean
 }
 
 export function Image16x9Module({
@@ -38,8 +40,10 @@ export function Image16x9Module({
   body,
   showBody,
   scale = 1,
+  darkMode,
 }: Image16x9ModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -56,9 +60,9 @@ export function Image16x9Module({
     width: IMAGE_SIZE_WIDTHS[imageSize],
     height: 100,
     borderRadius: 6.45,
-    border: '0.33px solid #D9D8D6',
+    border: t.imageBorder,
     flexShrink: 0,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: t.imagePlaceholderBg,
     overflow: 'hidden',
   }
 
@@ -82,7 +86,7 @@ export function Image16x9Module({
   }
 
   const eyebrowStyle: CSSProperties = {
-    color: 'black',
+    color: t.textSecondary,
     fontSize: 8,
     fontWeight: 500,
     textTransform: 'uppercase',
@@ -91,7 +95,7 @@ export function Image16x9Module({
   }
 
   const headingStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',
@@ -99,7 +103,7 @@ export function Image16x9Module({
   }
 
   const bodyStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 8,
     fontWeight: 350,
     lineHeight: '12px',

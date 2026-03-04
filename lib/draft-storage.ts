@@ -149,6 +149,7 @@ export interface DraftState {
   stackerFooterModule: StackerFooterModule
   stackerModuleSpacing: Record<string, number>
   stackerFooterHidden: boolean
+  stackerDarkMode: boolean
 }
 
 const CURRENT_VERSION = 1
@@ -334,6 +335,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       },
       stackerModuleSpacing: state.stackerModuleSpacing || {},
       stackerFooterHidden: state.stackerFooterHidden ?? false,
+      stackerDarkMode: state.stackerDarkMode ?? false,
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))

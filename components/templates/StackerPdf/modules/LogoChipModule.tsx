@@ -2,9 +2,10 @@
 
 import { CSSProperties } from 'react'
 import type { SolutionCategory } from '@/types'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
-// Inline SVG logo for export compatibility (black)
-const CorityLogo = ({ height = 20 }: { height?: number }) => {
+// Inline SVG logo for export compatibility
+const CorityLogo = ({ height = 20, fill = 'black' }: { height?: number; fill?: string }) => {
   const width = Math.round(height * 3.06)
   return (
     <svg
@@ -12,7 +13,7 @@ const CorityLogo = ({ height = 20 }: { height?: number }) => {
       viewBox="0 0 383.8 128.41"
       width={width}
       height={height}
-      fill="black"
+      fill={fill}
     >
       <path d="M278.36,86.3c-4.39,0-6.9-3.61-6.9-8.32V43.78h13l-6.78-17.41h-6.26V0H251.38V83.31c0,13.5,7.53,20.71,21.49,20.71,8.29,0,13.61-2.18,16.6-4.84L284,85A12.73,12.73,0,0,1,278.36,86.3Z"/>
       <path d="M112.31,24.18c-24.94,0-40,18.19-40,39.69s15.06,39.84,40,39.84c25.1,0,40.16-18.2,40.16-39.84S137.41,24.18,112.31,24.18Zm0,61.8C99.92,86,93,75.79,93,63.87c0-11.77,6.9-22,19.29-22s19.46,10.2,19.46,22C131.77,75.79,124.71,86,112.31,86Z"/>
@@ -53,14 +54,17 @@ export interface LogoChipModuleProps {
   showChips: boolean
   activeCategories: SolutionCategory[]
   scale?: number
+  darkMode?: boolean
 }
 
 export function LogoChipModule({
   showChips,
   activeCategories,
   scale = 1,
+  darkMode,
 }: LogoChipModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -78,11 +82,11 @@ export function LogoChipModule({
     gap: 5,
   }
 
-  const getChipStyle = (): CSSProperties => ({
+  const getChipStyle = (isActive: boolean): CSSProperties => ({
     padding: 7,
-    background: 'white',
+    background: isActive ? t.chipActiveBg : 'transparent',
     borderRadius: 3,
-    border: '0.14px solid #B3B2B1',
+    border: isActive ? t.chipActiveBorder : `0.14px solid ${t.chipInactiveBorder}`,
     display: 'flex',
     alignItems: 'center',
     gap: 6,
@@ -91,13 +95,13 @@ export function LogoChipModule({
   const getDotStyle = (category: SolutionCategory, isActive: boolean): CSSProperties => ({
     width: 7,
     height: 7,
-    background: isActive ? SOLUTION_COLORS[category] : '#D9D8D6',
+    background: isActive ? SOLUTION_COLORS[category] : t.chipInactiveDot,
     borderRadius: 1,
     flexShrink: 0,
   })
 
   const getLabelStyle = (isActive: boolean): CSSProperties => ({
-    color: isActive ? 'black' : '#B3B2B1',
+    color: isActive ? t.chipActiveText : t.chipInactiveText,
     fontSize: 5,
     fontWeight: 500,
     textTransform: 'uppercase',
@@ -110,14 +114,14 @@ export function LogoChipModule({
 
   return (
     <div style={containerStyle}>
-      <CorityLogo height={20} />
+      <CorityLogo height={20} fill={t.logoFill} />
 
       {showChips && (
         <div style={chipRowStyle}>
           {DISPLAY_CATEGORIES.map((category) => {
             const isActive = activeCategories.includes(category)
             return (
-              <div key={category} style={getChipStyle()}>
+              <div key={category} style={getChipStyle(isActive)}>
                 <div style={getDotStyle(category, isActive)} />
                 <span style={getLabelStyle(isActive)}>
                   {SOLUTION_LABELS[category]}

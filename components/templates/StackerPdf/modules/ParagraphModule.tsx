@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface ParagraphModuleProps {
   intro: string
@@ -8,6 +9,7 @@ export interface ParagraphModuleProps {
   showIntro: boolean
   showBody: boolean
   scale?: number
+  darkMode?: boolean
 }
 
 export function ParagraphModule({
@@ -16,8 +18,10 @@ export function ParagraphModule({
   showIntro,
   showBody,
   scale = 1,
+  darkMode,
 }: ParagraphModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -30,14 +34,14 @@ export function ParagraphModule({
   }
 
   const introStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 18,
     fontWeight: 350,
     wordWrap: 'break-word',
   }
 
   const bodyStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',

@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface QuoteModuleProps {
   quote: string
@@ -8,6 +9,7 @@ export interface QuoteModuleProps {
   jobTitle: string
   organization: string
   scale?: number
+  darkMode?: boolean
 }
 
 export function QuoteModule({
@@ -16,8 +18,10 @@ export function QuoteModule({
   jobTitle,
   organization,
   scale = 1,
+  darkMode,
 }: QuoteModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -37,7 +41,7 @@ export function QuoteModule({
   const quoteStyle: CSSProperties = {
     width: '100%',
     textAlign: 'center',
-    color: '#060015',
+    color: t.ctaColor,
     fontSize: 16,
     fontStyle: 'italic',
     fontWeight: 350,
@@ -53,7 +57,7 @@ export function QuoteModule({
 
   const nameStyle: CSSProperties = {
     textAlign: 'center',
-    color: 'black',
+    color: t.text,
     fontSize: 8,
     fontWeight: 500,
     textTransform: 'uppercase',
@@ -70,7 +74,7 @@ export function QuoteModule({
 
   const titleStyle: CSSProperties = {
     textAlign: 'center',
-    color: 'black',
+    color: t.text,
     fontSize: 9,
     fontWeight: 350,
     wordWrap: 'break-word',

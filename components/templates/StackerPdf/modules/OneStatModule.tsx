@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface OneStatModuleProps {
   value: string
@@ -8,6 +9,7 @@ export interface OneStatModuleProps {
   eyebrow: string
   body: string
   scale?: number
+  darkMode?: boolean
 }
 
 export function OneStatModule({
@@ -16,15 +18,17 @@ export function OneStatModule({
   eyebrow,
   body,
   scale = 1,
+  darkMode,
 }: OneStatModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
     padding: 24,
-    background: '#F9F9F9',
+    background: t.cardBg,
     borderRadius: 6,
-    border: '0.5px solid #D9D8D6',
+    border: t.cardBorder,
     display: 'flex',
     alignItems: 'center',
     gap: 24,
@@ -43,7 +47,7 @@ export function OneStatModule({
   }
 
   const valueStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 36,
     fontWeight: 350,
     wordWrap: 'break-word',
@@ -53,7 +57,7 @@ export function OneStatModule({
     width: '100%',
     maxWidth: 172,
     textAlign: 'center',
-    color: 'black',
+    color: t.text,
     fontSize: 8,
     fontWeight: 350,
     lineHeight: '12px',
@@ -68,7 +72,7 @@ export function OneStatModule({
   }
 
   const eyebrowStyle: CSSProperties = {
-    color: 'black',
+    color: t.textSecondary,
     fontSize: 8,
     fontWeight: 500,
     textTransform: 'uppercase',
@@ -77,7 +81,7 @@ export function OneStatModule({
   }
 
   const bodyStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',

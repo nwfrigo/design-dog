@@ -386,6 +386,9 @@ export async function POST(request: NextRequest) {
       if (body.footerHidden) {
         params.set('footerHidden', '1')
       }
+      if (body.darkMode) {
+        params.set('darkMode', '1')
+      }
     }
 
     // Get the base URL from the request

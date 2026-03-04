@@ -18,6 +18,7 @@ export function StackerExportScreen() {
     stackerDocumentTitle,
     stackerModuleSpacing,
     stackerFooterHidden,
+    stackerDarkMode,
   } = useStore()
 
   // Local state for export
@@ -65,6 +66,7 @@ export function StackerExportScreen() {
         modules: allModules,
         moduleSpacing: stackerModuleSpacing,
         footerHidden: stackerFooterHidden,
+        darkMode: stackerDarkMode,
         format: exportFormat,
         filename: finalFilename,
       }
@@ -178,6 +180,7 @@ export function StackerExportScreen() {
                   previewZoom={100}
                   readOnly={true}
                   moduleSpacing={stackerModuleSpacing}
+                  darkMode={stackerDarkMode}
                 />
               </div>
             </div>

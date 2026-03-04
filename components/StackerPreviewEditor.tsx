@@ -183,6 +183,7 @@ export interface StackerPreviewEditorProps {
   onDuplicateModule?: (moduleId: string) => void
   onToggleFooterVisibility?: () => void
   isFooterHidden?: boolean
+  darkMode?: boolean
 }
 
 // Solution category colors
@@ -204,13 +205,14 @@ function getAccentColor(modules: StackerModule[]): string {
 }
 
 // Render a module for the drag overlay
-function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule; accentColor?: string }) {
+function RenderModuleForOverlay({ module, accentColor, darkMode }: { module: StackerModule; accentColor?: string; darkMode?: boolean }) {
   switch (module.type) {
     case 'logo-chip':
       return (
         <LogoChipModule
           showChips={module.showChips}
           activeCategories={module.activeCategories}
+          darkMode={darkMode}
         />
       )
     case 'header':
@@ -223,6 +225,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           cta={module.cta}
           ctaUrl={module.ctaUrl}
           showCta={module.showCta}
+          darkMode={darkMode}
         />
       )
     case 'paragraph':
@@ -232,10 +235,11 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           body={module.body}
           showIntro={module.showIntro}
           showBody={module.showBody}
+          darkMode={darkMode}
         />
       )
     case 'divider':
-      return <DividerModule />
+      return <DividerModule darkMode={darkMode} />
     case 'image':
       return (
         <ImageModule
@@ -254,6 +258,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           cta={module.cta}
           ctaUrl={module.ctaUrl}
           showCta={module.showCta}
+          darkMode={darkMode}
         />
       )
     case 'image-16x9':
@@ -271,10 +276,11 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           showHeading={module.showHeading}
           body={module.body}
           showBody={module.showBody}
+          darkMode={darkMode}
         />
       )
     case 'three-card':
-      return <CardsModule cards={module.cards} />
+      return <CardsModule cards={module.cards} darkMode={darkMode} />
     case 'image-cards':
       return (
         <ImageCardsModule
@@ -283,6 +289,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           cards={module.cards}
           showCard3={module.showCard3}
           grayscale={module.grayscale}
+          darkMode={darkMode}
         />
       )
     case 'quote':
@@ -292,10 +299,11 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           name={module.name}
           jobTitle={module.jobTitle}
           organization={module.organization}
+          darkMode={darkMode}
         />
       )
     case 'three-stats':
-      return <ThreeStatsModule stats={module.stats} />
+      return <ThreeStatsModule stats={module.stats} darkMode={darkMode} />
     case 'one-stat':
       return (
         <OneStatModule
@@ -303,6 +311,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           label={module.label}
           eyebrow={module.eyebrow}
           body={module.body}
+          darkMode={darkMode}
         />
       )
     case 'footer':
@@ -318,6 +327,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           stat4Label={module.stat4Label}
           stat5Value={module.stat5Value}
           stat5Label={module.stat5Label}
+          darkMode={darkMode}
         />
       )
     case 'bullet-three':
@@ -326,6 +336,7 @@ function RenderModuleForOverlay({ module, accentColor }: { module: StackerModule
           heading={module.heading}
           columns={module.columns}
           accentColor={accentColor}
+          darkMode={darkMode}
         />
       )
     default:
@@ -351,6 +362,7 @@ export function StackerPreviewEditor({
   onDuplicateModule,
   onToggleFooterVisibility,
   isFooterHidden = false,
+  darkMode,
 }: StackerPreviewEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
@@ -537,6 +549,7 @@ export function StackerPreviewEditor({
               />
             ) : undefined}
             renderFooterContent={readOnly ? undefined : renderAddModuleTile}
+            darkMode={darkMode}
           />
         </div>
       </SortableContext>
@@ -561,7 +574,7 @@ export function StackerPreviewEditor({
               pointerEvents: 'none',
             }}
           >
-            <RenderModuleForOverlay module={activeModule} accentColor={getAccentColor(modules)} />
+            <RenderModuleForOverlay module={activeModule} accentColor={getAccentColor(modules)} darkMode={darkMode} />
           </div>
         )}
       </DragOverlay>

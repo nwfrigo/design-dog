@@ -1,9 +1,10 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 // Arrow SVG for CTA
-const ArrowIcon = () => (
+const ArrowIcon = ({ color = '#060015' }: { color?: string }) => (
   <svg
     width="11"
     height="9"
@@ -13,7 +14,7 @@ const ArrowIcon = () => (
   >
     <path
       d="M1 4.5H10M10 4.5L6.5 1M10 4.5L6.5 8"
-      stroke="#060015"
+      stroke={color}
       strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -30,6 +31,7 @@ export interface HeaderModuleProps {
   ctaUrl?: string
   showCta: boolean
   scale?: number
+  darkMode?: boolean
 }
 
 export function HeaderModule({
@@ -41,8 +43,10 @@ export function HeaderModule({
   ctaUrl,
   showCta,
   scale = 1,
+  darkMode,
 }: HeaderModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -61,7 +65,7 @@ export function HeaderModule({
   }
 
   const headingStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: headingSize === 'h1' ? 36 : headingSize === 'h2' ? 30 : 24,
     fontWeight: 350,
     lineHeight: 1.15,
@@ -70,7 +74,7 @@ export function HeaderModule({
   }
 
   const subheaderStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',
@@ -88,7 +92,7 @@ export function HeaderModule({
   }
 
   const ctaTextStyle: CSSProperties = {
-    color: '#060015',
+    color: t.ctaColor,
     fontSize: 12,
     fontWeight: 500,
     lineHeight: '12px',
@@ -97,7 +101,7 @@ export function HeaderModule({
   const ctaContent = (
     <>
       <span style={ctaTextStyle}>{cta || 'Responsive'}</span>
-      <ArrowIcon />
+      <ArrowIcon color={t.ctaColor} />
     </>
   )
 

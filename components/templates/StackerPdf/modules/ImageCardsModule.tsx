@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties } from 'react'
+import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface ImageCardData {
   imageUrl: string | null
@@ -19,6 +20,7 @@ export interface ImageCardsModuleProps {
   showCard3: boolean
   grayscale: boolean
   scale?: number
+  darkMode?: boolean
 }
 
 export function ImageCardsModule({
@@ -28,8 +30,10 @@ export function ImageCardsModule({
   showCard3,
   grayscale,
   scale = 1,
+  darkMode,
 }: ImageCardsModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
+  const t = getStackerTheme(darkMode)
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -46,7 +50,7 @@ export function ImageCardsModule({
   const headingStyle: CSSProperties = {
     alignSelf: 'stretch',
     textAlign: 'center',
-    color: 'black',
+    color: t.text,
     fontSize: 18,
     fontWeight: 350,
     wordWrap: 'break-word',
@@ -62,7 +66,7 @@ export function ImageCardsModule({
   const cardStyle: CSSProperties = {
     overflow: 'hidden',
     borderRadius: 6,
-    border: '0.25px solid #D9D8D6',
+    border: t.cardBorder,
     display: 'flex',
     flexDirection: 'column',
   }
@@ -70,7 +74,7 @@ export function ImageCardsModule({
   const imageContainerStyle: CSSProperties = {
     width: 180,
     height: 100,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: t.imagePlaceholderBg,
     overflow: 'hidden',
   }
 
@@ -89,7 +93,7 @@ export function ImageCardsModule({
   const contentStyle: CSSProperties = {
     width: 180,
     padding: 12,
-    background: '#F9F9F9',
+    background: t.cardBg,
     display: 'flex',
     flexDirection: 'column',
     gap: 12,
@@ -97,7 +101,7 @@ export function ImageCardsModule({
   }
 
   const eyebrowStyle: CSSProperties = {
-    color: 'black',
+    color: t.textSecondary,
     fontSize: 8,
     fontWeight: 500,
     textTransform: 'uppercase',
@@ -106,7 +110,7 @@ export function ImageCardsModule({
   }
 
   const titleStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 12,
     fontWeight: 350,
     lineHeight: '16px',
@@ -114,7 +118,7 @@ export function ImageCardsModule({
   }
 
   const bodyStyle: CSSProperties = {
-    color: 'black',
+    color: t.text,
     fontSize: 8,
     fontWeight: 350,
     lineHeight: '12px',

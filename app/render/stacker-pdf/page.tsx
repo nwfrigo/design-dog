@@ -38,6 +38,9 @@ export default function StackerPdfRenderPage({
   // Parse footer visibility
   const footerHidden = searchParams.footerHidden === '1'
 
+  // Parse dark mode
+  const darkMode = searchParams.darkMode === '1'
+
   // If no modules provided, use default placeholder
   if (modules.length === 0) {
     modules = [
@@ -86,7 +89,7 @@ export default function StackerPdfRenderPage({
       }}
     >
       <Suspense fallback={<div>Loading...</div>}>
-        <StackerPdfRender modules={modules} moduleSpacing={moduleSpacing} hideFooter={footerHidden} />
+        <StackerPdfRender modules={modules} moduleSpacing={moduleSpacing} hideFooter={footerHidden} darkMode={darkMode} />
       </Suspense>
     </div>
   )

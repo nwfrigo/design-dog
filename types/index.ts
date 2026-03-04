@@ -869,6 +869,8 @@ export interface AppState {
   stackerModuleSpacing: Record<string, number>
   // Footer visibility toggle
   stackerFooterHidden: boolean
+  // Dark mode toggle
+  stackerDarkMode: boolean
 
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
@@ -1038,6 +1040,7 @@ export interface AppState {
   setStackerFooterModule: (module: StackerFooterModule) => void
   setStackerModuleSpacing: (spacing: Record<string, number>) => void
   setStackerFooterHidden: (hidden: boolean) => void
+  setStackerDarkMode: (darkMode: boolean) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void
