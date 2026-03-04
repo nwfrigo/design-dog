@@ -26,6 +26,7 @@ export default function RenderPage({
   const showSubheading = searchParams.showSubheading === 'true'
   const showBody = searchParams.showBody !== 'false'
   const showCta = searchParams.showCta !== 'false'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -51,6 +52,7 @@ export default function RenderPage({
           showSubheading={showSubheading}
           showBody={showBody}
           showCta={showCta}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

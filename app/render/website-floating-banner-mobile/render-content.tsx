@@ -46,6 +46,7 @@ export function RenderContent() {
   const showHeadline = searchParams.get('showHeadline') !== 'false'
   const variant = (searchParams.get('variant') || 'light') as FloatingBannerMobileVariant
   const arrowType = (searchParams.get('arrowType') || 'text') as FloatingBannerMobileArrowType
+  const headlineFontSize = searchParams.get('headlineFontSize') ? parseFloat(searchParams.get('headlineFontSize')!) : undefined
 
   return (
     <>
@@ -58,6 +59,7 @@ export function RenderContent() {
         showHeadline={showHeadline}
         variant={variant}
         arrowType={arrowType}
+        headlineFontSize={headlineFontSize}
         colors={colorsConfig}
         typography={typographyConfig}
         scale={1}

@@ -19,6 +19,7 @@ interface Props {
   showSubhead: boolean
   showCta: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -59,6 +60,7 @@ export function WebsiteReportRender(props: Props) {
         showSubhead={props.showSubhead}
         showCta={props.showCta}
         grayscale={props.grayscale}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

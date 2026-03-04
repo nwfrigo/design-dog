@@ -58,6 +58,7 @@ export interface EmailDarkGradientProps {
   showSubheading?: boolean
   showBody: boolean
   showCta: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -100,6 +101,7 @@ export function EmailDarkGradient({
   showSubheading = false,
   showBody,
   showCta,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -198,7 +200,7 @@ export function EmailDarkGradient({
               className="rich-text-white"
               style={{
                 color: textColor,
-                fontSize: 38,
+                fontSize: headlineFontSize ?? 38,
                 fontWeight: 350,
                 lineHeight: 1.26,
               }}

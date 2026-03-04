@@ -304,6 +304,8 @@ export interface ManualAssetSettings {
   speaker3ImageUrl: string
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
+  // Manual text size
+  headlineFontSize: number | null
   // Template variant settings (must persist when switching assets)
   ebookVariant: 'image' | 'none'
   reportVariant: 'image' | 'none'
@@ -553,7 +555,7 @@ export interface GeneratedAsset {
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
   // Manual text size
-  headlineFontSize: number
+  headlineFontSize: number | null
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -690,7 +692,7 @@ export interface QueuedAsset {
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
   // Manual text size
-  headlineFontSize: number
+  headlineFontSize: number | null
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -851,7 +853,7 @@ export interface AppState {
   solutionOverviewStat5Label: string
 
   // Manual text size
-  headlineFontSize: number
+  headlineFontSize: number | null
 
   // FAQ PDF state
   faqTitle: string
@@ -976,7 +978,7 @@ export interface AppState {
   // Image effects
   setGrayscale: (grayscale: boolean) => void
   // Manual text size
-  setHeadlineFontSize: (size: number) => void
+  setHeadlineFontSize: (size: number | null) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void
   setSolutionOverviewSolutionName: (name: string) => void

@@ -20,6 +20,7 @@ interface Props {
   gridDetail2: GridDetailRow
   gridDetail3: GridDetailRow
   gridDetail4: GridDetailRow
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -61,6 +62,7 @@ export function SocialGridDetailRender(props: Props) {
         gridDetail2={props.gridDetail2}
         gridDetail3={props.gridDetail3}
         gridDetail4={props.gridDetail4}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

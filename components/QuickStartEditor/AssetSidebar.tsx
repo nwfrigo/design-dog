@@ -608,6 +608,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead}
           cta={asset.ctaText || 'Responsive'}
           solution={asset.solution}
@@ -625,6 +626,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Lightweight header.'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead}
           body={copy.body}
           cta={asset.ctaText || 'Responsive'}
@@ -642,6 +644,7 @@ function AssetPreviewRenderer({
         <EmailGrid
           {...commonProps}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           body={copy.body}
           eyebrow={asset.eyebrow}
           subheading={asset.subheading}
@@ -664,6 +667,7 @@ function AssetPreviewRenderer({
         <EmailImage
           {...commonProps}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           body={copy.body || 'This is your body copy.'}
           ctaText={asset.ctaText || 'Responsive'}
           imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
@@ -681,6 +685,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead}
           body={copy.body}
           metadata={asset.metadata}
@@ -703,6 +708,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead}
           body={copy.body}
           metadata={asset.metadata}
@@ -723,6 +729,7 @@ function AssetPreviewRenderer({
         <SocialImage
           {...commonProps}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || ''}
           metadata={asset.metadata || 'Day / Month | 00:00'}
           ctaText={asset.ctaText || 'Learn More'}
@@ -741,6 +748,7 @@ function AssetPreviewRenderer({
         <SocialGridDetail
           {...commonProps}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || 'This is your subheader or description text.'}
           eyebrow={asset.eyebrow || "Don't miss this."}
           showEyebrow={asset.showEyebrow}
@@ -761,6 +769,7 @@ function AssetPreviewRenderer({
         <EmailDarkGradient
           {...commonProps}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           eyebrow={asset.eyebrow}
           subheading={copy.subhead}
           body={copy.body || 'This is your body copy.'}
@@ -779,6 +788,7 @@ function AssetPreviewRenderer({
         <EmailSpeakers
           {...commonProps}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           eyebrow={asset.eyebrow}
           body={copy.body || 'This is your body copy.'}
           ctaText={asset.ctaText || 'Responsive'}
@@ -818,6 +828,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           body={copy.body || 'This is your body copy.'}
           ctaText={asset.ctaText || 'Responsive'}
           colorStyle={asset.colorStyle || '1'}
@@ -834,6 +845,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           body={copy.body || 'This is your body copy.'}
           ctaText={asset.ctaText || 'Responsive'}
           colorStyle={asset.colorStyle || '1'}
@@ -850,6 +862,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           body={copy.body || 'This is your body copy.'}
           ctaText={asset.ctaText || 'Responsive'}
           imageSize={asset.newsletterImageSize || 'none'}
@@ -865,6 +878,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow || 'Webinar'}
           headline={copy.headline || 'Lightweight header.'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || ''}
           body={copy.body || ''}
           cta={asset.ctaText || 'Responsive'}
@@ -905,6 +919,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow || 'Eyebrow'}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           cta={asset.ctaText || 'Learn More'}
           showEyebrow={asset.showEyebrow !== false}
           variant={asset.floatingBannerVariant || 'dark'}
@@ -916,6 +931,7 @@ function AssetPreviewRenderer({
           {...commonProps}
           eyebrow={asset.eyebrow || 'Eyebrow'}
           headline={copy.headline || 'Headline'}
+          headlineFontSize={asset.headlineFontSize ?? undefined}
           cta={asset.ctaText || 'Learn More'}
           showEyebrow={asset.showEyebrow !== false}
           variant={asset.floatingBannerMobileVariant || 'light'}

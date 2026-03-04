@@ -29,6 +29,7 @@ export default function RenderPage({
   const showBody = searchParams.showBody !== 'false'
   const showMetadata = searchParams.showMetadata !== 'false'
   const showCta = searchParams.showCta !== 'false'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -57,6 +58,7 @@ export default function RenderPage({
           showBody={showBody}
           showMetadata={showMetadata}
           showCta={showCta}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

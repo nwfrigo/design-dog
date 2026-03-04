@@ -20,6 +20,7 @@ interface Props {
   showCta: boolean
   logoColor: 'black' | 'orange'
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -61,6 +62,7 @@ export function WebsiteThumbnailRender(props: Props) {
         showCta={props.showCta}
         logoColor={props.logoColor}
         grayscale={props.grayscale}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

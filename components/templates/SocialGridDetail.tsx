@@ -69,6 +69,9 @@ export interface SocialGridDetailProps {
   gridDetail3: GridDetailRow
   gridDetail4: GridDetailRow
 
+  // Text sizing
+  headlineFontSize?: number
+
   // Brand config
   colors: ColorsConfig
   typography: TypographyConfig
@@ -91,6 +94,7 @@ export function SocialGridDetail({
   gridDetail2,
   gridDetail3,
   gridDetail4,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -253,9 +257,9 @@ export function SocialGridDetail({
               <div style={{
                 alignSelf: 'stretch',
                 color: textColor,
-                fontSize: 84,
+                fontSize: headlineFontSize ?? 84,
                 fontWeight: 300,
-                lineHeight: '96px',
+                lineHeight: `${(headlineFontSize ?? 84) * (96 / 84)}px`,
               }}>
                 {headline || 'Headline'}
               </div>

@@ -21,6 +21,7 @@ interface Props {
   showCta: boolean
   showSolutionSet: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -63,6 +64,7 @@ export function SocialImageRender(props: Props) {
         showCta={props.showCta}
         showSolutionSet={props.showSolutionSet}
         grayscale={props.grayscale}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

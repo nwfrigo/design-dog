@@ -20,6 +20,7 @@ interface Props {
   showBody: boolean
   showCta: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   logoColor: 'black' | 'orange'
   colors: ColorsConfig
   typography: TypographyConfig
@@ -62,6 +63,7 @@ export function WebsitePressReleaseRender(props: Props) {
         showBody={props.showBody}
         showCta={props.showCta}
         grayscale={props.grayscale}
+        headlineFontSize={props.headlineFontSize}
         logoColor={props.logoColor}
         colors={props.colors}
         typography={props.typography}

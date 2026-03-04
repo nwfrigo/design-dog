@@ -32,6 +32,7 @@ export interface NewsletterLightProps {
   showBody: boolean
   showCta: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -65,6 +66,7 @@ export function NewsletterLight({
   showBody,
   showCta,
   grayscale = false,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -171,9 +173,9 @@ export function NewsletterLight({
               <div style={{
                 alignSelf: 'stretch',
                 color: textColor,
-                fontSize: 24,
+                fontSize: headlineFontSize ?? 24,
                 fontWeight: 350,
-                lineHeight: '26px',
+                lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
               }}>
                 {headline || 'Headline'}
               </div>

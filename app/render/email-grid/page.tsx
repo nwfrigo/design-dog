@@ -34,6 +34,7 @@ export default function RenderPage({
   const gridDetail2Text = (searchParams.gridDetail2Text as string) || 'Date: January 1st, 2026'
   const gridDetail3Type = ((searchParams.gridDetail3Type as string) || 'cta') as 'data' | 'cta'
   const gridDetail3Text = (searchParams.gridDetail3Text as string) || 'Responsive'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -66,6 +67,7 @@ export default function RenderPage({
           gridDetail2Text={gridDetail2Text}
           gridDetail3Type={gridDetail3Type}
           gridDetail3Text={gridDetail3Text}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

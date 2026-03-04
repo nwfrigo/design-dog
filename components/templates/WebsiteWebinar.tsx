@@ -68,6 +68,7 @@ export interface WebsiteWebinarProps {
   showSpeaker1?: boolean
   showSpeaker2?: boolean
   showSpeaker3?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -178,6 +179,7 @@ export function WebsiteWebinar({
   showSpeaker1 = true,
   showSpeaker2 = true,
   showSpeaker3 = true,
+  headlineFontSize: headlineFontSizeProp,
   colors,
   typography,
   scale = 1,
@@ -217,9 +219,10 @@ export function WebsiteWebinar({
   }, [imageUrl, variant, grayscale])
 
   // Font sizes differ based on variant
-  const headlineFontSize = variant === 'none' ? 54 : 35.42
+  const defaultHeadlineFontSize = variant === 'none' ? 54 : 35.42
+  const headlineFontSize = headlineFontSizeProp ?? defaultHeadlineFontSize
   const contentWidth = variant === 'none' ? 574 : 401.04
-  const headlineLineHeight = variant === 'none' ? '50.20px' : '50.20px'
+  const headlineLineHeight = `${headlineFontSize * (50.20 / defaultHeadlineFontSize)}px`
   const headlineGap = variant === 'none' ? 8 : 4.17
 
   const containerStyle: CSSProperties = {

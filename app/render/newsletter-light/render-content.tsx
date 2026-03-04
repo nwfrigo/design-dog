@@ -18,6 +18,7 @@ interface Props {
   showBody: boolean
   showCta: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -57,6 +58,7 @@ export function NewsletterLightRender(props: Props) {
         showBody={props.showBody}
         showCta={props.showCta}
         grayscale={props.grayscale}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

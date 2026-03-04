@@ -42,6 +42,28 @@ import {
 import { CHANNELS, TEMPLATE_DIMENSIONS, TEMPLATE_LABELS } from '@/lib/template-config'
 import type { TemplateType } from '@/types'
 
+// Headline font size configuration per template
+const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: number; step: number }> = {
+  'email-image': { default: 38, min: 16, max: 50, step: 2 },
+  'email-grid': { default: 38, min: 16, max: 50, step: 2 },
+  'email-speakers': { default: 38, min: 16, max: 50, step: 2 },
+  'email-dark-gradient': { default: 38, min: 16, max: 50, step: 2 },
+  'website-thumbnail': { default: 35, min: 16, max: 54, step: 2 },
+  'website-press-release': { default: 35, min: 16, max: 50, step: 2 },
+  'website-webinar': { default: 35, min: 16, max: 54, step: 2 },
+  'website-event-listing': { default: 58, min: 30, max: 80, step: 2 },
+  'website-report': { default: 35, min: 16, max: 54, step: 2 },
+  'website-floating-banner': { default: 33, min: 16, max: 44, step: 1 },
+  'website-floating-banner-mobile': { default: 14, min: 8, max: 20, step: 1 },
+  'social-dark-gradient': { default: 84, min: 40, max: 140, step: 4 },
+  'social-blue-gradient': { default: 84, min: 40, max: 140, step: 4 },
+  'social-image': { default: 84, min: 40, max: 120, step: 4 },
+  'social-grid-detail': { default: 84, min: 40, max: 120, step: 4 },
+  'newsletter-dark-gradient': { default: 24, min: 12, max: 36, step: 1 },
+  'newsletter-blue-gradient': { default: 24, min: 12, max: 36, step: 1 },
+  'newsletter-light': { default: 24, min: 12, max: 36, step: 1 },
+}
+
 // Eye icon for visibility toggle
 function EyeIcon({ visible, onClick }: { visible: boolean; onClick: () => void }) {
   return (
@@ -665,6 +687,7 @@ export function EditorScreen() {
         logoColor,
         showEyebrow,
         showHeadline,
+        headlineFontSize,
       }
 
       if (currentTemplate === 'website-thumbnail') {
@@ -762,7 +785,6 @@ export function EditorScreen() {
         exportParams.showCta = showCta
         exportParams.showSolutionSet = showSolutionSet
         exportParams.grayscale = grayscale
-        exportParams.headlineFontSize = headlineFontSize
       } else if (currentTemplate === 'email-dark-gradient') {
         exportParams.ctaText = ctaText
         exportParams.colorStyle = colorStyle
@@ -3001,26 +3023,6 @@ export function EditorScreen() {
                   </div>
                 </div>
 
-                {/* Heading Size */}
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Heading Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
-                    {(['S', 'M', 'L'] as const).map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => setHeadingSize(size)}
-                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-                          headingSize === size
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
-                            : 'text-gray-600 dark:text-content-secondary'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* CTA Style */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
@@ -3264,21 +3266,75 @@ export function EditorScreen() {
                     onChange={(html) => setVerbatimCopy({ headline: html })}
                     placeholder="Headline"
                     singleLine={false}
-                    onFontSizeUp={currentTemplate === 'email-image' ? () => setHeadlineFontSize(Math.min(headlineFontSize + 2, 50)) : undefined}
-                    onFontSizeDown={currentTemplate === 'email-image' ? () => setHeadlineFontSize(Math.max(headlineFontSize - 2, 16)) : undefined}
-                    fontSizeAtMax={headlineFontSize >= 50}
-                    fontSizeAtMin={headlineFontSize <= 16}
+                    onFontSizeUp={HEADLINE_SIZE_CONFIG[currentTemplate] ? () => {
+                      const cfg = HEADLINE_SIZE_CONFIG[currentTemplate]
+                      const effective = headlineFontSize ?? cfg.default
+                      setHeadlineFontSize(Math.min(effective + cfg.step, cfg.max))
+                    } : undefined}
+                    onFontSizeDown={HEADLINE_SIZE_CONFIG[currentTemplate] ? () => {
+                      const cfg = HEADLINE_SIZE_CONFIG[currentTemplate]
+                      const effective = headlineFontSize ?? cfg.default
+                      setHeadlineFontSize(Math.max(effective - cfg.step, cfg.min))
+                    } : undefined}
+                    fontSizeAtMax={HEADLINE_SIZE_CONFIG[currentTemplate] ? (headlineFontSize ?? HEADLINE_SIZE_CONFIG[currentTemplate].default) >= HEADLINE_SIZE_CONFIG[currentTemplate].max : false}
+                    fontSizeAtMin={HEADLINE_SIZE_CONFIG[currentTemplate] ? (headlineFontSize ?? HEADLINE_SIZE_CONFIG[currentTemplate].default) <= HEADLINE_SIZE_CONFIG[currentTemplate].min : false}
                   />
                 ) : (
-                  <input
-                    type="text"
-                    value={verbatimCopy.headline}
-                    onChange={(e) => setVerbatimCopy({ headline: e.target.value })}
-                    placeholder="Headline"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
-                      bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                      focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  <div className="flex gap-1.5 items-start">
+                    <input
+                      type="text"
+                      value={verbatimCopy.headline}
+                      onChange={(e) => setVerbatimCopy({ headline: e.target.value })}
+                      placeholder="Headline"
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    {HEADLINE_SIZE_CONFIG[currentTemplate] && (
+                      <div className="flex gap-0.5 pt-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cfg = HEADLINE_SIZE_CONFIG[currentTemplate]
+                            const effective = headlineFontSize ?? cfg.default
+                            setHeadlineFontSize(Math.min(effective + cfg.step, cfg.max))
+                          }}
+                          disabled={(headlineFontSize ?? HEADLINE_SIZE_CONFIG[currentTemplate].default) >= HEADLINE_SIZE_CONFIG[currentTemplate].max}
+                          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+                            (headlineFontSize ?? HEADLINE_SIZE_CONFIG[currentTemplate].default) >= HEADLINE_SIZE_CONFIG[currentTemplate].max
+                              ? 'opacity-30 cursor-not-allowed'
+                              : 'text-gray-500 dark:text-content-secondary'
+                          }`}
+                          title="Increase text size"
+                        >
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                            <text x="0" y="13" fontSize="13" fontWeight="500" fontFamily="system-ui">A</text>
+                            <path d="M12.5 3 L14.5 0.5 L16.5 3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" transform="translate(-2, 1.5)" />
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cfg = HEADLINE_SIZE_CONFIG[currentTemplate]
+                            const effective = headlineFontSize ?? cfg.default
+                            setHeadlineFontSize(Math.max(effective - cfg.step, cfg.min))
+                          }}
+                          disabled={(headlineFontSize ?? HEADLINE_SIZE_CONFIG[currentTemplate].default) <= HEADLINE_SIZE_CONFIG[currentTemplate].min}
+                          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors ${
+                            (headlineFontSize ?? HEADLINE_SIZE_CONFIG[currentTemplate].default) <= HEADLINE_SIZE_CONFIG[currentTemplate].min
+                              ? 'opacity-30 cursor-not-allowed'
+                              : 'text-gray-500 dark:text-content-secondary'
+                          }`}
+                          title="Decrease text size"
+                        >
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                            <text x="0" y="13" fontSize="10" fontWeight="500" fontFamily="system-ui">A</text>
+                            <path d="M10.5 0.5 L12.5 3 L14.5 0.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" transform="translate(-2, 1.5)" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
               )}
@@ -4444,6 +4500,7 @@ export function EditorScreen() {
                     showEyebrow={showEyebrow}
                     showHeadline={showHeadline}
                     variant={floatingBannerVariant}
+                    headlineFontSize={headlineFontSize ?? undefined}
                     colors={colorsConfig}
                     typography={typographyConfig}
                     scale={1}
@@ -4555,6 +4612,7 @@ export function EditorScreen() {
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -4578,6 +4636,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -4627,6 +4686,7 @@ export function EditorScreen() {
                   showSpeaker2={showSpeaker2}
                   showSpeaker3={showSpeaker3}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4648,6 +4708,7 @@ export function EditorScreen() {
                   showEyebrow={showEyebrow}
                   showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4669,6 +4730,7 @@ export function EditorScreen() {
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4693,6 +4755,7 @@ export function EditorScreen() {
                   gridDetail1={gridDetail1}
                   gridDetail2={gridDetail2}
                   gridDetail3={gridDetail3}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4717,6 +4780,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showMetadata={showMetadata}
                   showCta={showCta}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4740,6 +4804,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showMetadata={showMetadata}
                   showCta={showCta}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4763,6 +4828,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4785,6 +4851,7 @@ export function EditorScreen() {
                   gridDetail2={{ type: 'data', text: gridDetail2Text }}
                   gridDetail3={{ type: gridDetail3Type, text: gridDetail3Text }}
                   gridDetail4={{ type: gridDetail4Type, text: gridDetail4Text }}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4806,7 +4873,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
                   grayscale={grayscale}
-                  headlineFontSize={headlineFontSize}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4840,6 +4907,7 @@ export function EditorScreen() {
                   showSubheading={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4861,6 +4929,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4882,6 +4951,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4902,6 +4972,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4956,6 +5027,7 @@ export function EditorScreen() {
                     imageZoom: speaker3ImageZoom,
                   }}
                   grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4970,6 +5042,7 @@ export function EditorScreen() {
                   showHeadline={showHeadline}
                   variant={floatingBannerMobileVariant}
                   arrowType={floatingBannerMobileArrowType}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

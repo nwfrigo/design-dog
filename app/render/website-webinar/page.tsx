@@ -60,6 +60,7 @@ export default function RenderPage({
   const showSpeaker2 = searchParams.showSpeaker2 !== 'false'
   const showSpeaker3 = searchParams.showSpeaker3 !== 'false'
   const grayscale = searchParams.grayscale === 'true'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -113,6 +114,7 @@ export default function RenderPage({
           showSpeaker2={showSpeaker2}
           showSpeaker3={showSpeaker3}
           grayscale={grayscale}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

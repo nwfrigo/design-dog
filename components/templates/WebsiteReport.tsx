@@ -51,6 +51,7 @@ export interface WebsiteReportProps {
   showSubhead: boolean
   showCta: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -71,6 +72,7 @@ export function WebsiteReport({
   showSubhead,
   showCta,
   grayscale = false,
+  headlineFontSize: headlineFontSizeProp,
   colors,
   typography,
   scale = 1,
@@ -110,8 +112,10 @@ export function WebsiteReport({
   }, [imageUrl, variant, grayscale])
 
   // Text sizes change based on variant
-  const headlineSize = variant === 'none' ? 54 : 35
-  const headlineLineHeight = variant === 'none' ? '58px' : '48.19px'
+  const defaultHeadlineSize = variant === 'none' ? 54 : 35
+  const headlineSize = headlineFontSizeProp ?? defaultHeadlineSize
+  const defaultLineHeight = variant === 'none' ? 58 : 48.19
+  const headlineLineHeight = `${headlineSize * (defaultLineHeight / defaultHeadlineSize)}px`
   const headlineSubheadGap = variant === 'none' ? 8 : 4
 
   const containerStyle: CSSProperties = {

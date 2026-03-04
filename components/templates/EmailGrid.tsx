@@ -69,6 +69,9 @@ export interface EmailGridProps {
   gridDetail2: GridDetail
   gridDetail3: GridDetail
 
+  // Text sizing
+  headlineFontSize?: number
+
   // Brand config
   colors: ColorsConfig
   typography: TypographyConfig
@@ -93,6 +96,7 @@ export function EmailGrid({
   gridDetail1,
   gridDetail2,
   gridDetail3,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -243,9 +247,9 @@ export function EmailGrid({
           {showLightHeader && showHeadline && (
             <div style={{
               color: colors.ui.textPrimary,
-              fontSize: 38,
+              fontSize: headlineFontSize ?? 38,
               fontWeight: 300,
-              lineHeight: '48px',
+              lineHeight: `${(headlineFontSize ?? 38) * (48 / 38)}px`,
             }}>
               {headline || 'Headline'}
             </div>

@@ -25,6 +25,7 @@ interface Props {
   gridDetail2Text: string
   gridDetail3Type: 'data' | 'cta'
   gridDetail3Text: string
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -68,6 +69,7 @@ export function EmailGridRender(props: Props) {
         gridDetail1={{ type: props.gridDetail1Type, text: props.gridDetail1Text }}
         gridDetail2={{ type: props.gridDetail2Type, text: props.gridDetail2Text }}
         gridDetail3={{ type: props.gridDetail3Type, text: props.gridDetail3Text }}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

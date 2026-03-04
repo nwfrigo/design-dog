@@ -95,7 +95,7 @@ export interface DraftState {
   // Image effects
   grayscale: boolean
   // Manual text size
-  headlineFontSize?: number
+  headlineFontSize?: number | null
   generatedVariations: { headlines: string[]; ctas: string[] } | null
   // FAQ PDF
   faqTitle: string
@@ -254,7 +254,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType || 'text',
       newsletterTopBannerVariant: state.newsletterTopBannerVariant || 'dark',
       grayscale: state.grayscale ?? false,
-      headlineFontSize: state.headlineFontSize ?? 38,
+      headlineFontSize: state.headlineFontSize ?? null,
       generatedVariations: state.generatedVariations || null,
       // FAQ PDF
       faqTitle: state.faqTitle || 'Title Goes Here',

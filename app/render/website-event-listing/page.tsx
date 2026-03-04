@@ -26,6 +26,7 @@ export default function RenderPage({
   const showEyebrow = searchParams.showEyebrow !== 'false'
   const showHeadline = searchParams.showHeadline !== 'false'
   const showSubhead = searchParams.showSubhead !== 'false'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -52,6 +53,7 @@ export default function RenderPage({
           showEyebrow={showEyebrow}
           showHeadline={showHeadline}
           showSubhead={showSubhead}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

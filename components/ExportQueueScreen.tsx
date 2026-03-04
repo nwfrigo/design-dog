@@ -611,6 +611,7 @@ function QueueItem({
                   showCta={asset.showCta}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -633,6 +634,7 @@ function QueueItem({
                   showCta={asset.showCta}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -680,6 +682,7 @@ function QueueItem({
                   showSpeaker2={asset.showSpeaker2}
                   showSpeaker3={asset.showSpeaker3}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -703,6 +706,7 @@ function QueueItem({
                   gridDetail1={gridDetail1}
                   gridDetail2={gridDetail2}
                   gridDetail3={gridDetail3}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -723,7 +727,7 @@ function QueueItem({
                   showCta={asset.showCta !== false}
                   showSolutionSet={asset.showSolutionSet !== false}
                   grayscale={asset.grayscale}
-                  headlineFontSize={asset.headlineFontSize}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -759,6 +763,7 @@ function QueueItem({
                   showBody={asset.showBody && !!asset.body}
                   showMetadata={asset.showMetadata}
                   showCta={asset.showCta}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -781,6 +786,7 @@ function QueueItem({
                   showBody={asset.showBody && !!asset.body}
                   showMetadata={asset.showMetadata}
                   showCta={asset.showCta}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -803,6 +809,7 @@ function QueueItem({
                   showCta={asset.showCta !== false}
                   showSolutionSet={asset.showSolutionSet !== false}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -824,6 +831,7 @@ function QueueItem({
                   gridDetail2={{ type: 'data', text: asset.gridDetail2Text || 'Time: Midnight, EST' }}
                   gridDetail3={{ type: asset.gridDetail3Type || 'data', text: asset.gridDetail3Text || 'Place: Wherever' }}
                   gridDetail4={{ type: asset.gridDetail4Type || 'cta', text: asset.gridDetail4Text || 'Join the event' }}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -843,6 +851,7 @@ function QueueItem({
                   showSubheading={asset.showSubhead && !!asset.subhead}
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -883,6 +892,7 @@ function QueueItem({
                     imageZoom: asset.speaker3ImageZoom || 1,
                   }}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -903,6 +913,7 @@ function QueueItem({
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -923,6 +934,7 @@ function QueueItem({
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -942,6 +954,7 @@ function QueueItem({
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -974,6 +987,7 @@ function QueueItem({
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showCta={asset.showCta}
                   grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -994,6 +1008,7 @@ function QueueItem({
                   showRow4={asset.showRow4}
                   showEyebrow={asset.showEyebrow}
                   showSubhead={asset.showSubhead && !!asset.subhead}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -1006,6 +1021,7 @@ function QueueItem({
                   cta={asset.ctaText || 'Learn More'}
                   showEyebrow={asset.showEyebrow}
                   variant={asset.floatingBannerVariant || 'dark'}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -1019,6 +1035,7 @@ function QueueItem({
                   showEyebrow={asset.showEyebrow}
                   variant={asset.floatingBannerMobileVariant || 'light'}
                   arrowType={asset.floatingBannerMobileArrowType || 'text'}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -1185,6 +1202,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showCta={asset.showCta}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1207,6 +1225,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showCta={asset.showCta}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1254,6 +1273,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showSpeaker2={asset.showSpeaker2}
               showSpeaker3={asset.showSpeaker3}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1277,6 +1297,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               gridDetail1={gridDetail1}
               gridDetail2={gridDetail2}
               gridDetail3={gridDetail3}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1297,7 +1318,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showCta={asset.showCta !== false}
               showSolutionSet={asset.showSolutionSet !== false}
               grayscale={asset.grayscale}
-              headlineFontSize={asset.headlineFontSize}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1333,6 +1354,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showMetadata={asset.showMetadata}
               showCta={asset.showCta}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1355,6 +1377,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showMetadata={asset.showMetadata}
               showCta={asset.showCta}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1377,6 +1400,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showCta={asset.showCta !== false}
               showSolutionSet={asset.showSolutionSet !== false}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1398,6 +1422,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               gridDetail2={{ type: 'data', text: asset.gridDetail2Text || 'Time: Midnight, EST' }}
               gridDetail3={{ type: asset.gridDetail3Type || 'data', text: asset.gridDetail3Text || 'Place: Wherever' }}
               gridDetail4={{ type: asset.gridDetail4Type || 'cta', text: asset.gridDetail4Text || 'Join the event' }}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1417,6 +1442,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showSubheading={asset.showSubhead && !!asset.subhead}
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1457,6 +1483,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
                 imageZoom: asset.speaker3ImageZoom || 1,
               }}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1477,6 +1504,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1497,6 +1525,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1516,6 +1545,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1548,6 +1578,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showSubhead={asset.showSubhead && !!asset.subhead}
               showCta={asset.showCta}
               grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1568,6 +1599,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showRow4={asset.showRow4}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1580,6 +1612,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               cta={asset.ctaText || 'Learn More'}
               showEyebrow={asset.showEyebrow}
               variant={asset.floatingBannerVariant || 'dark'}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}
@@ -1593,6 +1626,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showEyebrow={asset.showEyebrow}
               variant={asset.floatingBannerMobileVariant || 'light'}
               arrowType={asset.floatingBannerMobileArrowType || 'text'}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

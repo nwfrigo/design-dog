@@ -56,6 +56,7 @@ export interface WebsiteFloatingBannerProps {
   showEyebrow: boolean
   showHeadline?: boolean
   variant: FloatingBannerVariant
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -151,6 +152,7 @@ export function WebsiteFloatingBanner({
   showEyebrow,
   showHeadline = true,
   variant,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -232,9 +234,9 @@ export function WebsiteFloatingBanner({
             <div style={{
               textAlign: 'center',
               color: styles.textColor,
-              fontSize: 32.73,
+              fontSize: headlineFontSize ?? 32.73,
               fontWeight: 350,
-              lineHeight: '32.73px',
+              lineHeight: `${headlineFontSize ?? 32.73}px`,
               textShadow: textShadowStyle,
             }}>
               {headline || 'Headline'}

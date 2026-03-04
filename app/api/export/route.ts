@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
     if (grayscale !== undefined) params.set('grayscale', String(grayscale))
 
     // Manual text size
-    if (body.headlineFontSize !== undefined) params.set('headlineFontSize', String(body.headlineFontSize))
+    if (body.headlineFontSize != null) params.set('headlineFontSize', String(body.headlineFontSize))
 
     // Solution Overview PDF specific - Page 1
     if (body.solutionName) params.set('solutionName', body.solutionName)

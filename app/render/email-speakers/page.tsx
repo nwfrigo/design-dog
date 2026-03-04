@@ -50,6 +50,7 @@ export default function RenderPage({
   const speaker3ImagePositionY = parseFloat(searchParams.speaker3ImagePositionY as string) || 0
   const speaker3ImageZoom = parseFloat(searchParams.speaker3ImageZoom as string) || 1
   const grayscale = searchParams.grayscale === 'true'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -96,6 +97,7 @@ export default function RenderPage({
             imageZoom: speaker3ImageZoom,
           }}
           grayscale={grayscale}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

@@ -30,6 +30,7 @@ export default function RenderPage({
   const showCta = searchParams.showCta !== 'false'
   const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
   const grayscale = searchParams.grayscale === 'true'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -57,6 +58,7 @@ export default function RenderPage({
           showCta={showCta}
           logoColor={logoColor}
           grayscale={grayscale}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

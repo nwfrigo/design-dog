@@ -59,6 +59,7 @@ export interface SocialImageProps {
   showCta: boolean
   showSolutionSet: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -104,6 +105,7 @@ export function SocialImage({
   showCta,
   showSolutionSet,
   grayscale = false,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -231,9 +233,9 @@ export function SocialImage({
                 className="rich-text-dark"
                 style={{
                   color: textColor,
-                  fontSize: 84,
+                  fontSize: headlineFontSize ?? 84,
                   fontWeight: 300,
-                  lineHeight: '96px',
+                  lineHeight: `${(headlineFontSize ?? 84) * (96 / 84)}px`,
                 }}
                 dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
               />

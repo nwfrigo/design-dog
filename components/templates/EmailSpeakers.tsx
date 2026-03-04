@@ -65,6 +65,7 @@ export interface EmailSpeakersProps {
   speaker1: SpeakerInfo
   speaker2: SpeakerInfo
   speaker3: SpeakerInfo
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -183,6 +184,7 @@ export function EmailSpeakers({
   speaker1,
   speaker2,
   speaker3,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -298,9 +300,9 @@ export function EmailSpeakers({
               style={{
                 alignSelf: 'stretch',
                 color: textColor,
-                fontSize: 38.15,
+                fontSize: headlineFontSize ?? 38.15,
                 fontWeight: 350,
-                lineHeight: '48.19px',
+                lineHeight: `${(headlineFontSize ?? 38.15) * (48.19 / 38.15)}px`,
               }}
               dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
             />

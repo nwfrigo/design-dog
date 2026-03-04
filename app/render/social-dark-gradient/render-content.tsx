@@ -22,6 +22,7 @@ interface Props {
   showBody: boolean
   showMetadata: boolean
   showCta: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -65,6 +66,7 @@ export function SocialDarkGradientRender(props: Props) {
         showBody={props.showBody}
         showMetadata={props.showMetadata}
         showCta={props.showCta}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

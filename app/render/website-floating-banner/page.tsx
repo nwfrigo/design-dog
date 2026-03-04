@@ -19,6 +19,7 @@ export default function RenderPage({
   const showEyebrow = searchParams.showEyebrow === 'true'
   const showHeadline = searchParams.showHeadline !== 'false'
   const variant = ((searchParams.variant as string) || 'dark') as FloatingBannerVariant
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -36,6 +37,7 @@ export default function RenderPage({
           showEyebrow={showEyebrow}
           showHeadline={showHeadline}
           variant={variant}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

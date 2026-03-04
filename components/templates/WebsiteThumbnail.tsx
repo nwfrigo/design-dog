@@ -104,6 +104,7 @@ export interface WebsiteThumbnailProps {
   showCta: boolean
   logoColor: 'black' | 'orange'
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -125,6 +126,7 @@ export function WebsiteThumbnail({
   showCta,
   logoColor,
   grayscale = false,
+  headlineFontSize: headlineFontSizeProp,
   colors,
   typography,
   scale = 1,
@@ -165,8 +167,9 @@ export function WebsiteThumbnail({
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
   // Text sizes change based on variant
-  const headlineSize = variant === 'none' ? 54 : 35
-  const headlineLineHeight = variant === 'none' ? '48.19px' : '48.19px'
+  const defaultHeadlineSize = variant === 'none' ? 54 : 35
+  const headlineSize = headlineFontSizeProp ?? defaultHeadlineSize
+  const headlineLineHeight = `${headlineSize * (48.19 / defaultHeadlineSize)}px`
   const headlineSubheadGap = variant === 'none' ? 8 : 4
 
   const containerStyle: CSSProperties = {

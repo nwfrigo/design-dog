@@ -11,6 +11,7 @@ interface Props {
   showEyebrow: boolean
   showHeadline?: boolean
   variant: FloatingBannerVariant
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -43,6 +44,7 @@ export function WebsiteFloatingBannerRender(props: Props) {
         showEyebrow={props.showEyebrow}
         showHeadline={props.showHeadline}
         variant={props.variant}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

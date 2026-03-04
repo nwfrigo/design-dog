@@ -52,6 +52,7 @@ export interface WebsiteEventListingProps {
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -72,6 +73,7 @@ export function WebsiteEventListing({
   showEyebrow,
   showHeadline = true,
   showSubhead,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -200,9 +202,9 @@ export function WebsiteEventListing({
                 style={{
                   alignSelf: 'stretch',
                   color: variantColors.textColor,
-                  fontSize: 58,
+                  fontSize: headlineFontSize ?? 58,
                   fontWeight: 350,
-                  lineHeight: '64px',
+                  lineHeight: `${(headlineFontSize ?? 58) * (64 / 58)}px`,
                 }}
               >
                 {headline || 'Headline'}

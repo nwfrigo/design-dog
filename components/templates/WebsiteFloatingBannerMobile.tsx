@@ -35,6 +35,7 @@ export interface WebsiteFloatingBannerMobileProps {
   showHeadline?: boolean
   variant: FloatingBannerMobileVariant
   arrowType: FloatingBannerMobileArrowType
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -115,6 +116,7 @@ export function WebsiteFloatingBannerMobile({
   showHeadline = true,
   variant,
   arrowType,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -193,9 +195,9 @@ export function WebsiteFloatingBannerMobile({
             <div style={{
               flex: 1,
               color: styles.textColor,
-              fontSize: 14,
+              fontSize: headlineFontSize ?? 14,
               fontWeight: 350,
-              lineHeight: '15.40px',
+              lineHeight: `${(headlineFontSize ?? 14) * (15.40 / 14)}px`,
             }}>
               {headline || 'Headline'}
             </div>

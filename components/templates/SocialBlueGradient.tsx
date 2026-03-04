@@ -62,6 +62,7 @@ export interface SocialBlueGradientProps {
   showBody: boolean
   showMetadata: boolean
   showCta: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -125,6 +126,7 @@ export function SocialBlueGradient({
   showBody,
   showMetadata,
   showCta,
+  headlineFontSize,
   typography,
   scale = 1,
 }: SocialBlueGradientProps) {
@@ -228,7 +230,7 @@ export function SocialBlueGradient({
                 className="rich-text-white"
                 style={{
                   color: textColor,
-                  fontSize: HEADING_SIZES[headingSize],
+                  fontSize: headlineFontSize ?? HEADING_SIZES[headingSize],
                   fontWeight: 300,
                   lineHeight: 1.1,
                 }}

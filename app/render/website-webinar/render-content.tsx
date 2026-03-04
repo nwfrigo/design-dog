@@ -28,6 +28,7 @@ interface Props {
   showSpeaker2: boolean
   showSpeaker3: boolean
   grayscale?: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -77,6 +78,7 @@ export function WebsiteWebinarRender(props: Props) {
         showSpeaker2={props.showSpeaker2}
         showSpeaker3={props.showSpeaker3}
         grayscale={props.grayscale}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}

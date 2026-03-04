@@ -51,6 +51,7 @@ export interface WebsitePressReleaseProps {
   showCta: boolean
   grayscale?: boolean
   logoColor: 'black' | 'orange'
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -73,6 +74,7 @@ export function WebsitePressRelease({
   showCta,
   grayscale = false,
   logoColor,
+  headlineFontSize,
   colors,
   typography,
   scale = 1,
@@ -265,9 +267,9 @@ export function WebsitePressRelease({
                 style={{
                   alignSelf: 'stretch',
                   color: colors.ui.textPrimary,
-                  fontSize: 35.42,
+                  fontSize: headlineFontSize ?? 35.42,
                   fontWeight: 350,
-                  lineHeight: '50.20px',
+                  lineHeight: `${(headlineFontSize ?? 35.42) * (50.20 / 35.42)}px`,
                 }}
               >
                 {headline || 'Lightweight header.'}

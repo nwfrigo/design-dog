@@ -28,6 +28,7 @@ export default function RenderPage({
   const showBody = searchParams.showBody !== 'false'
   const showCta = searchParams.showCta !== 'false'
   const grayscale = searchParams.grayscale === 'true'
+  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
 
   return (
     <div style={{
@@ -54,6 +55,7 @@ export default function RenderPage({
           showBody={showBody}
           showCta={showCta}
           grayscale={grayscale}
+          headlineFontSize={headlineFontSize}
           colors={colorsConfig}
           typography={typographyConfig}
         />

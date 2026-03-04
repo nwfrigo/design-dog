@@ -19,6 +19,7 @@ interface Props {
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
+  headlineFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -59,6 +60,7 @@ export function WebsiteEventListingRender(props: Props) {
         showEyebrow={props.showEyebrow}
         showHeadline={props.showHeadline}
         showSubhead={props.showSubhead}
+        headlineFontSize={props.headlineFontSize}
         colors={props.colors}
         typography={props.typography}
         scale={1}
