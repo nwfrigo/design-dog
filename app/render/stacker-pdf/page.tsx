@@ -35,6 +35,9 @@ export default function StackerPdfRenderPage({
     console.error('Failed to parse moduleSpacing JSON:', e)
   }
 
+  // Parse footer visibility
+  const footerHidden = searchParams.footerHidden === '1'
+
   // If no modules provided, use default placeholder
   if (modules.length === 0) {
     modules = [
@@ -83,7 +86,7 @@ export default function StackerPdfRenderPage({
       }}
     >
       <Suspense fallback={<div>Loading...</div>}>
-        <StackerPdfRender modules={modules} moduleSpacing={moduleSpacing} />
+        <StackerPdfRender modules={modules} moduleSpacing={moduleSpacing} hideFooter={footerHidden} />
       </Suspense>
     </div>
   )

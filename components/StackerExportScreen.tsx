@@ -17,6 +17,7 @@ export function StackerExportScreen() {
     stackerFooterModule,
     stackerDocumentTitle,
     stackerModuleSpacing,
+    stackerFooterHidden,
   } = useStore()
 
   // Local state for export
@@ -38,12 +39,12 @@ export function StackerExportScreen() {
     setFilename(sanitized)
   }, [stackerDocumentTitle])
 
-  // Combine all modules (filter out any undefined)
+  // Combine all modules (filter out any undefined, hide footer if toggled)
   const allModules: StackerModule[] = [
     stackerLogoChipModule,
     stackerHeaderModule,
     ...stackerContentModules,
-    stackerFooterModule,
+    ...(stackerFooterHidden ? [] : [stackerFooterModule]),
   ].filter(Boolean) as StackerModule[]
 
   const handleBack = () => {
@@ -63,6 +64,7 @@ export function StackerExportScreen() {
         scale: 2,
         modules: allModules,
         moduleSpacing: stackerModuleSpacing,
+        footerHidden: stackerFooterHidden,
         format: exportFormat,
         filename: finalFilename,
       }

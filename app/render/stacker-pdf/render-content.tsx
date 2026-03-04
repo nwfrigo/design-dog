@@ -7,9 +7,10 @@ import type { StackerModule } from '@/types'
 export interface StackerPdfRenderProps {
   modules: StackerModule[]
   moduleSpacing?: Record<string, number>
+  hideFooter?: boolean
 }
 
-export function StackerPdfRender({ modules, moduleSpacing }: StackerPdfRenderProps) {
+export function StackerPdfRender({ modules, moduleSpacing, hideFooter }: StackerPdfRenderProps) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function StackerPdfRender({ modules, moduleSpacing }: StackerPdfRenderPro
     <>
       {ready && <div id="render-ready" style={{ display: 'none' }} />}
       <div id="stacker-content">
-        <StackerPdf modules={modules} scale={1} moduleSpacing={moduleSpacing} />
+        <StackerPdf modules={modules} scale={1} moduleSpacing={moduleSpacing} hideFooter={hideFooter} />
       </div>
     </>
   )

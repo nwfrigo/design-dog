@@ -383,6 +383,9 @@ export async function POST(request: NextRequest) {
       if (body.moduleSpacing && Object.keys(body.moduleSpacing).length > 0) {
         params.set('moduleSpacing', encodeURIComponent(JSON.stringify(body.moduleSpacing)))
       }
+      if (body.footerHidden) {
+        params.set('footerHidden', '1')
+      }
     }
 
     // Get the base URL from the request

@@ -55,7 +55,7 @@ export function ImageCardsModule({
   const cardsRowStyle: CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
     gap: 12,
   }
 
@@ -71,8 +71,6 @@ export function ImageCardsModule({
     width: 180,
     height: 100,
     backgroundColor: '#f5f5f5',
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 6,
     overflow: 'hidden',
   }
 
@@ -95,6 +93,7 @@ export function ImageCardsModule({
     display: 'flex',
     flexDirection: 'column',
     gap: 12,
+    flex: 1,
   }
 
   const eyebrowStyle: CSSProperties = {

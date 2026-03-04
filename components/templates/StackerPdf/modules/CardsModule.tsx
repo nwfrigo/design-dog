@@ -23,6 +23,7 @@ export function CardsModule({
   const containerStyle: CSSProperties = {
     width: '100%',
     display: 'flex',
+    alignItems: 'stretch',
     gap: 12,
     fontFamily,
     transform: scale !== 1 ? `scale(${scale})` : undefined,
