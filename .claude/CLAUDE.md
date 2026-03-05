@@ -22,8 +22,9 @@ Before beginning any work, read all reference docs to understand the full system
 1. **ARCHITECTURE.md** — System design, state management, export pipeline, API endpoints
 2. **TEMPLATES.md** — Template catalog, multi-page collateral, module types, checklists
 3. **BRAND.md** — Colors, typography, Figma overrides, image handling, dimensions
+4. **LESSONS.md** — Recent feedback, error patterns, and design decisions from QA
 
-These files live alongside this one in `.claude/`. Always consult the relevant reference doc before making changes in that area.
+These files live alongside this one in `.claude/`. Always consult the relevant reference doc before making changes in that area. When doing UI or QA work, read LESSONS.md and silently apply any relevant lessons.
 
 ---
 
@@ -34,6 +35,38 @@ These files live alongside this one in `.claude/`. Always consult the relevant r
 | `ARCHITECTURE.md` | Template architecture, props, state management (Zustand), export system, PDF upload flow, API endpoints, draft persistence, editor patterns |
 | `TEMPLATES.md` | Full template catalog, multi-page collateral (SO, FAQ, Stacker), module types, "adding a new template" checklist, template-specific gotchas |
 | `BRAND.md` | Brand colors, typography, Figma override rules, solution pills, image handling, image libraries, template dimensions, dark mode colors |
+| `LESSONS.md` | Running log of QA feedback, error patterns, and design decisions — applied silently, graduated with approval |
+| `GRADUATED_PENDING.md` | Queue of lessons proposed for promotion into reference docs — awaiting Nick's review |
+
+---
+
+## Lessons System
+
+A lightweight feedback loop for capturing and applying design/dev lessons learned during QA.
+
+### How It Works
+
+**Capturing lessons (no confirmation needed):**
+When Nick says "remember this," "note this," "add this to lessons," or similar — immediately append to `LESSONS.md` under today's date heading with an appropriate tag. No confirmation, no discussion. Just log it and move on.
+
+**Applying lessons (silent):**
+Before doing UI or QA work, read LESSONS.md. Apply any relevant lessons silently — don't announce "I'm applying lesson X." Just do the right thing.
+
+**Proposing graduation (autonomous, but read-only on reference docs):**
+When a lesson has been validated across 2+ instances or is clearly a universal rule, propose it for graduation by adding an entry to `GRADUATED_PENDING.md`. Include: the proposed destination doc, the original lesson text, the source date, and a one-line rationale. **Do not modify BRAND.md, ARCHITECTURE.md, TEMPLATES.md, or any other reference doc.** At the end of any session where graduations were proposed, tell Nick: "I flagged X items for graduation — review when you get a chance."
+
+**Approval flow:**
+- Nick approves → move the item to the destination reference doc, remove from LESSONS.md, clear from GRADUATED_PENDING.md
+- Nick rejects → remove from GRADUATED_PENDING.md only, leave in LESSONS.md
+
+### LESSONS.md Format
+
+```markdown
+## YYYY-MM-DD
+- [tag] Description of the lesson or feedback
+```
+
+Tags: `[ui]`, `[pattern]`, `[bug]`, `[export]`, `[dark-mode]`, `[template]`, `[state]`, `[perf]`, `[ux]`, `[a11y]`
 
 ---
 

@@ -21,7 +21,7 @@ function HomeContent() {
 
   // Redirect to /editor for editor screens
   useEffect(() => {
-    if (currentScreen === 'editor' || currentScreen === 'queue' || currentScreen === 'auto-create-editor' || currentScreen === 'faq-setup' || currentScreen === 'faq-editor' || currentScreen === 'faq-export' || currentScreen === 'stacker-setup' || currentScreen === 'stacker-editor' || currentScreen === 'stacker-export') {
+    if (currentScreen === 'editor' || currentScreen === 'queue' || currentScreen === 'auto-create-editor' || currentScreen === 'faq-setup' || currentScreen === 'faq-editor' || currentScreen === 'faq-export' || currentScreen === 'stacker-setup' || currentScreen === 'stacker-editor' || currentScreen === 'stacker-export' || currentScreen === 'social-carousel-editor') {
       router.push('/editor')
     }
   }, [currentScreen, router])

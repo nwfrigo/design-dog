@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
@@ -56,6 +56,33 @@ const initialContentSource: ContentSourceState = {
   analysisInfo: null,
   editedContent: null,
   editedFields: [],
+}
+
+// Create a default carousel slide
+export function createDefaultCarouselSlide(slideType: CarouselSlideType): CarouselSlide {
+  const isCoverOrOutro = slideType === 'cover-text' || slideType === 'cover-image' || slideType === 'outro'
+  return {
+    id: Math.random().toString(36).substring(2, 9),
+    slideType,
+    backgroundStyle: '1',
+    eyebrow: '',
+    headline: '',
+    subhead: '',
+    body: '',
+    metadata: '',
+    ctaText: '',
+    showEyebrow: false,
+    showHeadline: true,
+    showSubhead: true,
+    showBody: false,
+    showMetadata: slideType === 'outro',
+    showCta: slideType === 'outro',
+    headlineFontSize: isCoverOrOutro ? 112 : 60,
+    imageUrl: null,
+    imagePosition: { x: 0, y: 0 },
+    imageZoom: 1,
+    grayscale: false,
+  }
 }
 
 const initialAutoCreate: AutoCreateState = {
@@ -196,6 +223,9 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   solutionOverviewStat4Label: 'End Users',
   solutionOverviewStat5Value: '1.2K',
   solutionOverviewStat5Label: 'Clients',
+  // Social Carousel specific
+  carouselSlides: [createDefaultCarouselSlide('cover-text')],
+  carouselCurrentSlideIndex: 0,
   // FAQ PDF specific
   faqTitle: 'Title Goes Here',
   faqCoverSubheader: 'Frequently Asked Questions',
@@ -426,6 +456,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   stackerModuleSpacing: {} as Record<string, number>,
   stackerFooterHidden: false,
   stackerDarkMode: false,
+
+  // Social Carousel state
+  carouselSlides: [createDefaultCarouselSlide('cover-text')],
+  carouselCurrentSlideIndex: 0,
 
   // Export queue
   exportQueue: [],
@@ -685,6 +719,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setStackerFooterHidden: (hidden: boolean) => set({ stackerFooterHidden: hidden }),
   setStackerDarkMode: (darkMode: boolean) => set({ stackerDarkMode: darkMode }),
 
+  // Social Carousel actions
+  setCarouselSlides: (slides: CarouselSlide[]) => set({ carouselSlides: slides }),
+  setCarouselCurrentSlideIndex: (index: number) => set({ carouselCurrentSlideIndex: index }),
+
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),
   toggleAssetSelection: (asset: TemplateType) => {
@@ -697,7 +735,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -791,6 +829,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         solutionOverviewStat4Label,
         solutionOverviewStat5Value,
         solutionOverviewStat5Label,
+        // Social Carousel
+        carouselSlides,
+        carouselCurrentSlideIndex,
       }
       const updatedSettings = {
         ...manualAssetSettings,
@@ -882,6 +923,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         solutionOverviewStat4Label: targetTemplateDefaults.solutionOverviewStat4Label,
         solutionOverviewStat5Value: targetTemplateDefaults.solutionOverviewStat5Value,
         solutionOverviewStat5Label: targetTemplateDefaults.solutionOverviewStat5Label,
+        // Social Carousel
+        carouselSlides: targetTemplateDefaults.carouselSlides,
+        carouselCurrentSlideIndex: targetTemplateDefaults.carouselCurrentSlideIndex,
       }
       const targetSettings = updatedSettings[index] || defaultSettings
 
@@ -981,6 +1025,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         solutionOverviewStat4Label: targetSettings.solutionOverviewStat4Label,
         solutionOverviewStat5Value: targetSettings.solutionOverviewStat5Value,
         solutionOverviewStat5Label: targetSettings.solutionOverviewStat5Label,
+        // Social Carousel
+        carouselSlides: targetSettings.carouselSlides,
+        carouselCurrentSlideIndex: targetSettings.carouselCurrentSlideIndex,
         // Reset generation state when switching assets - each asset has its own generation context
         pdfContent: null,
         generationContext: '',
@@ -1004,6 +1051,20 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Navigate directly to editor with a single template (for single-click)
   goToEditorWithTemplate: (templateType: TemplateType) => {
     const defaults = getDefaultAssetSettings(templateType)
+
+    // Social Carousel gets its own editor screen
+    if (templateType === 'social-carousel') {
+      set({
+        currentScreen: 'social-carousel-editor',
+        selectedAssets: [templateType],
+        currentAssetIndex: 0,
+        templateType: templateType,
+        carouselSlides: [createDefaultCarouselSlide('cover-text')],
+        carouselCurrentSlideIndex: 0,
+      })
+      return
+    }
+
     set({
       currentScreen: 'editor',
       selectedAssets: [templateType],
@@ -1143,6 +1204,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat4Label: state.solutionOverviewStat4Label,
       solutionOverviewStat5Value: state.solutionOverviewStat5Value,
       solutionOverviewStat5Label: state.solutionOverviewStat5Label,
+      // Social Carousel specific
+      carouselSlides: state.carouselSlides,
+      carouselCurrentSlideIndex: state.carouselCurrentSlideIndex,
       sourceAssetIndex: state.currentAssetIndex,
     }
     set({ exportQueue: [...state.exportQueue, newAsset] })
@@ -1375,6 +1439,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       solutionOverviewStat4Label: state.solutionOverviewStat4Label,
       solutionOverviewStat5Value: state.solutionOverviewStat5Value,
       solutionOverviewStat5Label: state.solutionOverviewStat5Label,
+      // Social Carousel specific
+      carouselSlides: state.carouselSlides,
+      carouselCurrentSlideIndex: state.carouselCurrentSlideIndex,
     }
 
     // Update the queue item and return to queue
@@ -2120,6 +2187,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           solutionOverviewStat4Label: asset.solutionOverviewStat4Label,
           solutionOverviewStat5Value: asset.solutionOverviewStat5Value,
           solutionOverviewStat5Label: asset.solutionOverviewStat5Label,
+          // Social Carousel specific
+          carouselSlides: asset.carouselSlides || [],
+          carouselCurrentSlideIndex: asset.carouselCurrentSlideIndex ?? 0,
           sourceAssetIndex: 0,
         })
       }
@@ -2354,6 +2424,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       stackerModuleSpacing: state.stackerModuleSpacing,
       stackerFooterHidden: state.stackerFooterHidden,
       stackerDarkMode: state.stackerDarkMode,
+      // Social Carousel
+      carouselSlides: state.carouselSlides,
+      carouselCurrentSlideIndex: state.carouselCurrentSlideIndex,
     })
   },
 
@@ -2519,6 +2592,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       stackerModuleSpacing: draft.stackerModuleSpacing ?? {},
       stackerFooterHidden: draft.stackerFooterHidden ?? false,
       stackerDarkMode: draft.stackerDarkMode ?? false,
+      // Social Carousel
+      carouselSlides: draft.carouselSlides ?? [createDefaultCarouselSlide('cover-text')],
+      carouselCurrentSlideIndex: draft.carouselCurrentSlideIndex ?? 0,
     })
     return true
   },

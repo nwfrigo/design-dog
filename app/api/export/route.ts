@@ -79,6 +79,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'solution-overview-pdf': { width: 612, height: 792 },
   'faq-pdf': { width: 612, height: 792 },
   'stacker-pdf': { width: 612, height: 2000 }, // Dynamic height, this is a fallback
+  'social-carousel': { width: 1080, height: 1080 },
 }
 
 export async function POST(request: NextRequest) {
@@ -394,6 +395,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Social Carousel specific
+    if (template === 'social-carousel') {
+      if (body.slideType) params.set('slideType', body.slideType)
+      if (body.backgroundStyle) params.set('backgroundStyle', body.backgroundStyle)
+      if (body.showEyebrow !== undefined) params.set('showEyebrow', String(body.showEyebrow))
+      if (body.showHeadline !== undefined) params.set('showHeadline', String(body.showHeadline))
+      if (body.showSubhead !== undefined) params.set('showSubhead', String(body.showSubhead))
+      if (body.showBody !== undefined) params.set('showBody', String(body.showBody))
+      if (body.showMetadata !== undefined) params.set('showMetadata', String(body.showMetadata))
+      if (body.showCta !== undefined) params.set('showCta', String(body.showCta))
+      if (body.headlineFontSize != null) params.set('headlineFontSize', String(body.headlineFontSize))
+      if (body.page === 'all') {
+        params.set('page', 'all')
+        if (body.slidesData) params.set('slidesData', body.slidesData)
+      }
+    }
+
     // Get the base URL from the request
     const host = request.headers.get('host') || 'localhost:3000'
     // Use http for localhost, otherwise check x-forwarded-proto or default to https
@@ -417,10 +435,12 @@ export async function POST(request: NextRequest) {
     const isSolutionOverviewPdf = template === 'solution-overview-pdf' && body.page === 'all'
     const isFaqPdf = template === 'faq-pdf' && body.page === 'all'
     const isStackerPdf = template === 'stacker-pdf'
-    const isPdfExport = isSolutionOverviewPdf || isFaqPdf || isStackerPdf
+    const isCarouselPdf = template === 'social-carousel' && body.page === 'all'
+    const isPdfExport = isSolutionOverviewPdf || isFaqPdf || isStackerPdf || isCarouselPdf
     // For FAQ PDF, calculate pages from the pages array; for SO PDF, fixed at 3 pages
     // For Stacker PDF, use a tall initial viewport (will measure actual height later)
-    const numPages = isFaqPdf ? (body.numPages || 1) : 3
+    // For Carousel PDF, calculate from number of slides
+    const numPages = isFaqPdf ? (body.numPages || 1) : isCarouselPdf ? (body.numSlides || 1) : 3
     const viewportHeight = isStackerPdf ? 4000 : (isPdfExport ? height * numPages : height)
 
     // For Stacker PDF export, use scale 1 to preserve thin CSS borders
@@ -694,7 +714,7 @@ export async function POST(request: NextRequest) {
       const faqFilename = body.title
         ? `${body.title.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '-')}.pdf`
         : 'faq.pdf'
-      const filename = isFaqPdf ? faqFilename : (isStackerPdf ? (body.filename || 'stacker.pdf') : 'solution-overview.pdf')
+      const filename = isCarouselPdf ? 'social-carousel.pdf' : isFaqPdf ? faqFilename : (isStackerPdf ? (body.filename || 'stacker.pdf') : 'solution-overview.pdf')
       return new NextResponse(Buffer.from(pdfBuffer), {
         headers: {
           'Content-Type': 'application/pdf',

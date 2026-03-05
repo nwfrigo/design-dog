@@ -100,6 +100,13 @@ const SOCIAL_TEMPLATES: TemplateInfo[] = [
     width: 1200,
     height: 628,
   },
+  {
+    type: 'social-carousel',
+    label: 'Carousel',
+    dimensions: '1080 × 1080px',
+    width: 1080,
+    height: 1080,
+  },
 ]
 
 // Template definitions for website

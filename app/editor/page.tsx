@@ -16,6 +16,7 @@ import { FaqSetupScreen } from '@/components/FaqSetupScreen'
 import { StackerSetupScreen } from '@/components/StackerSetupScreen'
 import { StackerEditorScreen } from '@/components/StackerEditorScreen'
 import { StackerExportScreen } from '@/components/StackerExportScreen'
+import { SocialCarouselEditorScreen } from '@/components/SocialCarouselEditorScreen'
 
 export default function EditorPage() {
   const router = useRouter()
@@ -68,6 +69,7 @@ export default function EditorPage() {
   const isStackerSetup = currentScreen === 'stacker-setup'
   const isStackerEditor = currentScreen === 'stacker-editor'
   const isStackerExport = currentScreen === 'stacker-export'
+  const isSocialCarouselEditor = currentScreen === 'social-carousel-editor'
 
   // Setup screens have their own layout (no EditorLayout wrapper)
   if (isSolutionOverviewSetup) {
@@ -85,7 +87,9 @@ export default function EditorPage() {
   // All other screens use EditorLayout
   return (
     <EditorLayout>
-      {isStackerExport ? (
+      {isSocialCarouselEditor ? (
+        <SocialCarouselEditorScreen />
+      ) : isStackerExport ? (
         <StackerExportScreen />
       ) : isStackerEditor ? (
         <StackerEditorScreen />

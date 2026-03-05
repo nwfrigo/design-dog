@@ -190,6 +190,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'social-blue-gradient': 'social',
   'social-image': 'social',
   'social-grid-detail': 'social',
+  'social-carousel': 'social',
   'newsletter-dark-gradient': 'newsletter',
   'newsletter-blue-gradient': 'newsletter',
   'newsletter-light': 'newsletter',

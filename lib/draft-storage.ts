@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -152,6 +152,9 @@ export interface DraftState {
   stackerModuleSpacing: Record<string, number>
   stackerFooterHidden: boolean
   stackerDarkMode: boolean
+  // Social Carousel
+  carouselSlides: CarouselSlide[]
+  carouselCurrentSlideIndex: number
 }
 
 const CURRENT_VERSION = 1
@@ -339,6 +342,9 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       stackerModuleSpacing: state.stackerModuleSpacing || {},
       stackerFooterHidden: state.stackerFooterHidden ?? false,
       stackerDarkMode: state.stackerDarkMode ?? false,
+      // Social Carousel
+      carouselSlides: state.carouselSlides || [],
+      carouselCurrentSlideIndex: state.carouselCurrentSlideIndex ?? 0,
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
@@ -408,8 +414,13 @@ export function hasDraft(): boolean {
     const hasStackerModules = !!(draft.stackerContentModules && draft.stackerContentModules.length > 0)
     const hasStackerTitle = !!(draft.stackerDocumentTitle && draft.stackerDocumentTitle !== null)
     const hasStackerContent = isStacker || hasStackerModules || hasStackerTitle
+    // Check for Social Carousel content
+    const isCarousel = draft.templateType === 'social-carousel' ||
+      draft.currentScreen === 'social-carousel-editor'
+    const hasCarouselSlides = !!(draft.carouselSlides && draft.carouselSlides.length > 0)
+    const hasCarouselContent = isCarousel || hasCarouselSlides
 
-    return hasAssets || hasQueue || hasContent || hasFaqContent || hasSolutionOverviewContent || hasStackerContent
+    return hasAssets || hasQueue || hasContent || hasFaqContent || hasSolutionOverviewContent || hasStackerContent || hasCarouselContent
   } catch {
     return false
   }

@@ -40,6 +40,8 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     stackerHeaderModule,
     stackerContentModules,
     stackerFooterModule,
+    // Carousel fields for auto-save
+    carouselSlides,
   } = useStore()
 
   // Check if we're editing from queue
@@ -84,6 +86,8 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     stackerHeaderModule,
     stackerContentModules,
     stackerFooterModule,
+    // Carousel
+    carouselSlides,
   ])
 
   const handleLogoClick = () => {

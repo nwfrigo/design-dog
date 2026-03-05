@@ -62,6 +62,7 @@ const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: 
   'newsletter-dark-gradient': { default: 24, min: 12, max: 36, step: 1 },
   'newsletter-blue-gradient': { default: 24, min: 12, max: 36, step: 1 },
   'newsletter-light': { default: 24, min: 12, max: 36, step: 1 },
+  'social-carousel': { default: 112, min: 40, max: 140, step: 4 },
 }
 
 // Eye icon for visibility toggle

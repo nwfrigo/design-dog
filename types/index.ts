@@ -23,7 +23,34 @@ export interface BrandVoiceConfig {
 }
 
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf'
+
+// Social Carousel Types
+export type CarouselSlideType = 'cover-text' | 'cover-image' | 'text' | 'text-image' | 'outro'
+export type CarouselBackgroundStyle = '1' | '2' | '3' | '4' | '5' | '6' | '7'
+
+export interface CarouselSlide {
+  id: string
+  slideType: CarouselSlideType
+  backgroundStyle: CarouselBackgroundStyle
+  eyebrow: string
+  headline: string
+  subhead: string
+  body: string
+  metadata: string
+  ctaText: string
+  showEyebrow: boolean
+  showHeadline: boolean
+  showSubhead: boolean
+  showBody: boolean
+  showMetadata: boolean
+  showCta: boolean
+  headlineFontSize: number | null
+  imageUrl: string | null
+  imagePosition: { x: number; y: number }
+  imageZoom: number
+  grayscale: boolean
+}
 
 // Solution Overview PDF Types
 // ORDER: environmental, health, safety, quality, sustainability, converged
@@ -358,6 +385,9 @@ export interface ManualAssetSettings {
   solutionOverviewStat4Label: string
   solutionOverviewStat5Value: string
   solutionOverviewStat5Label: string
+  // Social Carousel specific
+  carouselSlides: CarouselSlide[]
+  carouselCurrentSlideIndex: number
 }
 
 export interface GeneratedCopy extends CopyContent {
@@ -369,7 +399,7 @@ export interface GeneratedCopy extends CopyContent {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-setup' | 'stacker-editor' | 'stacker-export'
+export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-setup' | 'stacker-editor' | 'stacker-export' | 'social-carousel-editor'
 
 // Auto-Create Types (formerly Quick Start)
 export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'
@@ -556,6 +586,9 @@ export interface GeneratedAsset {
   solutionOverviewStat5Label: string
   // Manual text size
   headlineFontSize: number | null
+  // Social Carousel specific
+  carouselSlides: CarouselSlide[]
+  carouselCurrentSlideIndex: number
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -693,6 +726,9 @@ export interface QueuedAsset {
   solutionOverviewStat5Label: string
   // Manual text size
   headlineFontSize: number | null
+  // Social Carousel specific
+  carouselSlides: CarouselSlide[]
+  carouselCurrentSlideIndex: number
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -881,6 +917,10 @@ export interface AppState {
   // Dark mode toggle
   stackerDarkMode: boolean
 
+  // Social Carousel state
+  carouselSlides: CarouselSlide[]
+  carouselCurrentSlideIndex: number
+
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
   setContentMode: (mode: ContentMode) => void
@@ -1052,6 +1092,10 @@ export interface AppState {
   setStackerModuleSpacing: (spacing: Record<string, number>) => void
   setStackerFooterHidden: (hidden: boolean) => void
   setStackerDarkMode: (darkMode: boolean) => void
+
+  // Social Carousel actions
+  setCarouselSlides: (slides: CarouselSlide[]) => void
+  setCarouselCurrentSlideIndex: (index: number) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void
