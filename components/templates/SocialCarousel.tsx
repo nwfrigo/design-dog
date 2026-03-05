@@ -191,20 +191,32 @@ export function SocialCarousel({
           {/* Right image - absolute positioned, bleeds to right edge */}
           {slide.imageUrl ? (
             <div
-              data-export-image="true"
               style={{
                 position: 'absolute',
                 left: 778,
                 top: 0,
                 width: 302,
                 height: 1080,
-                backgroundImage: `url(${slide.imageUrl})`,
-                backgroundSize: `${slide.imageZoom * 100}%`,
-                backgroundPosition: `${50 + slide.imagePosition.x}% ${50 + slide.imagePosition.y}%`,
-                backgroundRepeat: 'no-repeat',
-                filter: slide.grayscale ? 'grayscale(100%)' : undefined,
+                overflow: 'hidden',
               }}
-            />
+            >
+              <img
+                src={slide.imageUrl}
+                alt=""
+                data-export-image="true"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: `${50 - slide.imagePosition.x}% ${50 - slide.imagePosition.y}%`,
+                  transform: slide.imageZoom !== 1
+                    ? `translate(${slide.imagePosition.x * (slide.imageZoom - 1)}%, ${slide.imagePosition.y * (slide.imageZoom - 1)}%) scale(${slide.imageZoom})`
+                    : undefined,
+                  transformOrigin: 'center',
+                  filter: slide.grayscale ? 'grayscale(100%)' : undefined,
+                }}
+              />
+            </div>
           ) : (
             <div
               style={{
@@ -298,19 +310,30 @@ export function SocialCarousel({
           <div style={{ flex: 1 }} />
           {slide.imageUrl ? (
             <div
-              data-export-image="true"
               style={{
                 width: 952,
                 height: 628,
                 borderRadius: 20,
                 overflow: 'hidden',
-                backgroundImage: `url(${slide.imageUrl})`,
-                backgroundSize: `${slide.imageZoom * 100}%`,
-                backgroundPosition: `${50 + slide.imagePosition.x}% ${50 + slide.imagePosition.y}%`,
-                backgroundRepeat: 'no-repeat',
-                filter: slide.grayscale ? 'grayscale(100%)' : undefined,
               }}
-            />
+            >
+              <img
+                src={slide.imageUrl}
+                alt=""
+                data-export-image="true"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: `${50 - slide.imagePosition.x}% ${50 - slide.imagePosition.y}%`,
+                  transform: slide.imageZoom !== 1
+                    ? `translate(${slide.imagePosition.x * (slide.imageZoom - 1)}%, ${slide.imagePosition.y * (slide.imageZoom - 1)}%) scale(${slide.imageZoom})`
+                    : undefined,
+                  transformOrigin: 'center',
+                  filter: slide.grayscale ? 'grayscale(100%)' : undefined,
+                }}
+              />
+            </div>
           ) : (
             <div
               style={{
