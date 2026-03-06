@@ -51,3 +51,37 @@ Tags: [ui], [pattern], [bug], [export], [dark-mode], [template], [state], [perf]
 - [ux] Export buttons go in the toolbar (matching other template editors), not in the sidebar. Use a dropdown for multiple export options.
 - [ui] Layout type picker: compact pill-style chips (`flex flex-wrap gap-1.5`, `rounded-full text-[11px]`) with short labels.
 - [ux] Grayscale toggle should be a switch, not a checkbox. Use toggle switches consistently for boolean options.
+
+## 2026-03-06 — Refactor Principles
+
+### File & Component Size
+- [pattern] No component file should exceed 500 lines. When approaching that limit, extract template-specific form sections, export logic, or modal groups into named sub-files in the same directory (e.g., `components/editors/SolutionOverviewEditor.tsx`).
+- [pattern] A store file is allowed to be large if it's a single cohesive state machine — but any function that enumerates all fields (serialize, deserialize, copy) must call a shared helper, not inline the field list.
+
+### Extract-on-Second-Use Rule
+- [pattern] When you copy-paste a component, hook, or utility into a second file, stop and extract it into a shared location (`components/shared/`, `hooks/`, `lib/`) immediately. Don't wait for a third copy. This applies to: SVG icons, toggle switches, confirmation modals, image upload boxes, labeled inputs, and any UI primitive used in editor panels.
+- [pattern] When the same `useEffect` pattern (canvas processing, MutationObserver, ResizeObserver, matchMedia) appears in 2+ components, extract it as a custom hook immediately. Inline effects that subscribe to browser APIs are never "too small" to extract.
+
+### Single Source of Truth for Field Lists
+- [state] When multiple functions serialize or deserialize the same data shape (e.g., store↔queue, store↔draft, store↔export), define a single canonical field list and write one pair of snapshot/restore functions. Never enumerate the same fields in more than one place — silent data loss happens when one list falls out of sync.
+- [state] When adding a new editor prop, add the field name to the shared snapshot field list. If you find yourself copy-pasting a field name into 3+ functions, the architecture is wrong.
+
+### Consistent Parsing & Serialization
+- [export] Every URL parameter parsed in a render page must go through a shared typed parser (`parseBoolTrue`, `parseBoolFalse`, `parseString`, `parseNumber`) with an explicit default. Never write inline `=== 'true'` or `!== 'false'` — the default must be declared, not implicit in the comparison operator.
+- [export] Boolean parameters must have a documented canonical default per field name. `showHeadline` always defaults true. `grayscale` always defaults false. The export API and render page must agree — if they don't, the editor preview and the export will silently diverge.
+
+### Naming Consistency
+- [pattern] Before naming a new field, grep the types file for existing names that represent the same concept. Field names must be identical across all interfaces that touch the same data (e.g., don't use `cta` in one interface and `ctaText` in another for the same value).
+- [pattern] Nullable values should use `T | null` consistently, not sometimes empty string `''` and sometimes `null`. Pick one empty sentinel per type and use it everywhere. Prefer `null` for "no value" — it's unambiguous and works with `?? defaultValue`.
+
+### Style & Constant Deduplication
+- [pattern] Style constants (CSS strings for rich text, color maps, spacing presets) used by 2+ templates belong in a shared `lib/` file. Templates import the constant, not redefine it.
+- [template] When a better UI pattern supersedes an old one (e.g., ImageCropModal replacing ZoomableImage), migrate all remaining usages in the same session. Don't leave the deprecated pattern around — it becomes the default for copy-paste.
+
+### Preventing Monoliths
+- [pattern] Export param building should use a registry pattern (`Record<TemplateType, ParamBuilder>`), not a switch statement. Adding a new template means adding one entry to the registry, not inserting a case into a 300-line switch.
+- [pattern] When a component dispatches to template-specific logic (forms, export params, modals), use a lookup/registry instead of growing a switch. Switch statements that grow with every new template are a monolith signal.
+- [pattern] Confirmation dialogs, empty states, and loading spinners should be shared components from first use. They are always reused — building them inline guarantees duplication.
+
+### Dead Code Discipline
+- [pattern] Don't commit stub functions with TODO comments. Either implement the feature or don't add the skeleton. Dead stubs mislead future developers into thinking functionality exists.
