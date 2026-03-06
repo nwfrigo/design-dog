@@ -143,6 +143,14 @@ When adding a new template with variants:
 
 **Reference:** The queue system (`addToQueue`, `editQueuedAsset`) already handles all variants correctly — follow that pattern.
 
+### AssetSnapshot Pattern (Field Serialization)
+
+Five store functions serialize/deserialize editor state: `addToQueue`, `editQueuedAsset`, `saveQueuedAssetEdit`, `loadGeneratedAssetIntoEditor`, `addAllGeneratedToQueue`. They all use the shared `SNAPSHOT_FIELDS` array in `lib/asset-snapshot.ts` as the single source of truth for which fields to copy.
+
+**Adding a new editor field:** Add it to `SNAPSHOT_FIELDS` in `lib/asset-snapshot.ts` (plus the relevant type interfaces). All 5 store functions will pick it up automatically.
+
+**Never enumerate fields manually** in store serialization functions. If you find yourself listing field names in a store function, use the snapshot helpers instead: `captureEditorSnapshot()`, `restoreEditorSnapshot()`, `snapshotToQueuedAsset()`.
+
 ### Local State vs Store State (Critical for Draft Persistence)
 
 **Problem:** Editor screens that use local React state (`useState`) for editing will NOT auto-save unless they sync to the Zustand store. The auto-save in `EditorLayout.tsx` watches the **store**, not local component state. If a component edits locally and only syncs to the store on "Export" or "Save", draft persistence breaks — users will lose work when navigating away.
@@ -186,6 +194,39 @@ useEffect(() => {
 
 ---
 
+## Code Organization
+
+### Shared Locations
+
+| Type | Location | Examples |
+|------|----------|----------|
+| SVG icons, UI primitives | `components/shared/` | CorityLogo, ArrowIcon, ToggleSwitch, DeleteConfirmModal |
+| Template-specific editors | `components/editors/` | SolutionOverviewEditor, SpeakerEditor |
+| Custom hooks | `hooks/` | useGrayscaleImage, useThemeDetection |
+| Utilities & constants | `lib/` | asset-snapshot, render-params, export-params |
+
+### Extract-on-Second-Use
+
+When you copy-paste a component, hook, or utility into a second file, extract it into the appropriate shared location immediately. This applies to SVG icons, toggle switches, modals, labeled inputs, `useEffect` patterns (canvas processing, MutationObserver, ResizeObserver), and style constants.
+
+### Registry Over Switch
+
+When a function dispatches to template-specific logic (export params, form sections, modals), use a registry (`Record<TemplateType, Handler>`) instead of a switch statement. Adding a new template should mean adding one registry entry, not inserting a case into a growing switch. Reference: `lib/export-params.ts`.
+
+### File Size Limits
+
+No component file should exceed 500 lines. When approaching that limit, extract template-specific form sections, export logic, or modal groups into sub-files (e.g., `components/editors/SolutionOverviewEditor.tsx`). The store file is an exception — it's a single cohesive state machine — but any function that enumerates fields must use the `asset-snapshot.ts` helpers.
+
+### Naming & Type Conventions
+
+Before naming a new field, grep `types/index.ts` for existing names that represent the same concept. Field names must be identical across all interfaces that touch the same data. Use `T | null` consistently for "no value" — never empty string `''`. When a better pattern supersedes an old one, migrate all remaining usages in the same session. Don't leave deprecated patterns around. Don't commit stub functions with TODO comments.
+
+### Nullable Props
+
+Use `T | null` (not fixed defaults) for props where different templates have wildly different native values (e.g., `headlineFontSize`). Templates apply per-template defaults with `prop ?? TEMPLATE_NATIVE_SIZE`, so both `null` and `undefined` trigger the template's own default.
+
+---
+
 ## Export System
 
 ### How Export Works
@@ -196,26 +237,38 @@ useEffect(() => {
 4. Puppeteer screenshots the rendered page
 5. Returns PNG
 
-### Critical: Export Params
+### Adding a New Prop (Full Pipeline Checklist)
 
-**Every visible prop must be included in `exportParams`.** Missing params = broken exports.
+Every new editable prop must appear in all of these locations:
 
-When adding a new template, ensure `handleExport` includes ALL params:
-- Text content (headline, eyebrow, subhead, body, cta)
-- Visibility toggles (showEyebrow, showSubhead, etc.)
-- Variant
-- Image URL, position, zoom
-- Grayscale
-- Solution
-- Logo color
-- Any template-specific params
+1. `types/index.ts` — Add to `ManualAssetSettings`, `QueuedAsset`, `GeneratedAsset`
+2. `lib/asset-snapshot.ts` — Add field name to `SNAPSHOT_FIELDS` (handles all 5 store serialization functions)
+3. `store/index.ts` — Add state field + setter to `AppState`
+4. `lib/draft-storage.ts` — Add to save/load if needed for draft persistence
+5. `lib/export-params.ts` — Add to the template's param builder function
+6. `app/api/export/route.ts` — Add to the template's export handler
+7. `app/render/{slug}/page.tsx` — Parse using `lib/render-params.ts` helpers
+
+The export API route is the #1 silent failure point — the editor preview renders correctly (React), but Puppeteer loads a separate render URL. If the param isn't in the query string, the export silently uses defaults.
+
+### Export Gotchas
+
+**Sub-pixel rendering in PDF exports:** Puppeteer renders sub-pixel CSS values inconsistently — borders appear thicker, rectangles distort, page breaks land wrong. Use `getBoundingClientRect().height` with `Math.ceil()` instead of `offsetHeight` (which rounds down). Reset `body { min-height: 0 }` before measuring page height (the root layout applies `min-h-screen`).
+
+**URLSearchParams auto-encoding:** `URLSearchParams.set()` auto-encodes values. Never pre-encode with `encodeURIComponent()` — it causes double-encoding (`%255B` instead of `%5B`). Pass raw strings.
 
 ### Render Page Pattern
 
-Each render page at `app/render/{slug}/page.tsx` must:
-- Parse all URL search params
-- Pass them to the render-content component
-- Match the template component's props exactly
+Each render page at `app/render/{slug}/page.tsx` parses URL params and passes them to the template component. All param parsing must use the shared helpers in `lib/render-params.ts`:
+
+- `parseBoolTrue(params, key)` — for booleans that default ON (showHeadline, showCta, showBody, showEyebrow on most templates)
+- `parseBoolFalse(params, key)` — for booleans that default OFF (grayscale, darkMode)
+- `parseString(params, key, fallback)` — string with fallback
+- `parseNumberOrUndefined(params, key)` — for nullable numbers like headlineFontSize
+
+Never write inline `=== 'true'` or `!== 'false'` in render pages. The default for each boolean must be explicit in the parser call, not implicit in the comparison operator.
+
+**Null handling in export API:** Use `!= null` (not `!== undefined`) when checking params before adding to the URL. A `null` value passes `!== undefined` and gets serialized as the string `'null'`, which `parseFloat` converts to `NaN`.
 
 ---
 
@@ -414,6 +467,23 @@ function DeleteConfirmModal({
 2. On delete click: `setDeleteConfirm({ id, type })`
 3. On confirm: Execute delete, then `setDeleteConfirm(null)`
 4. On cancel: `setDeleteConfirm(null)`
+
+### Image Upload & Crop Pattern
+
+All image fields in editors use this two-state pattern:
+
+**No image uploaded:** Two side-by-side dashed-border boxes — "Upload" (drag-and-drop + file input) and "Choose from library" (opens ImageLibraryModal).
+
+**Image uploaded:** A thumbnail preview using the shared `ImagePreviewWithCrop` component (`components/shared/ImagePreviewWithCrop.tsx`). It shows:
+- The image with current zoom/position/grayscale applied
+- "Adjust" button (bottom-left) → opens `ImageCropModal` for zoom/pan
+- "×" remove button (top-right) → clears the image
+
+`ZoomableImage` (inline drag-to-pan) is deprecated. Do not use it for new templates.
+
+### Sortable Item Controls
+
+For any sortable/reorderable content (Stacker modules, carousel slides, FAQ pages): action buttons (drag handle, duplicate, delete) appear ABOVE the element on hover, not overlaid on content. Drag handles go in the left gutter or top-left — never centered over content where they block interaction.
 
 ### Scaling Large Templates in Preview (CSS Transform Gotcha)
 

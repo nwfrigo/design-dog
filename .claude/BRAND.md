@@ -25,7 +25,7 @@ This applies to ALL solution/category pill elements across all templates.
 
 ### 2. Logo: Use SVG component, NOT Figma div blocks
 
-Figma exports the Cority logo as a cluster of absolutely-positioned `<div>` elements. **Never use these.** Use our SVG logo component instead.
+Figma exports the Cority logo as a cluster of absolutely-positioned `<div>` elements. **Never use these.** Always use the shared `CorityLogo` component from `components/shared/CorityLogo.tsx`. It accepts `fill` (default `'#000000'`) and `height` (default `23`) props.
 
 ```tsx
 // ❌ WRONG — Figma logo as divs
@@ -35,9 +35,12 @@ Figma exports the Cority logo as a cluster of absolutely-positioned `<div>` elem
   // ... more positioned divs
 </div>
 
-// ✅ CORRECT — Use SVG logo component with appropriate color prop
-// Logo color is determined by the template — check the design spec
+// ✅ CORRECT — Import and use shared CorityLogo
+import { CorityLogo } from '@/components/shared/CorityLogo'
+<CorityLogo fill="#FFFFFF" height={36} />
 ```
+
+The component includes `flexShrink: 0` with explicit `width`/`height` on both the `<svg>` and its `style` prop. This prevents the logo from scaling down in flex containers. Logo size and position are always fixed — never allow flex layout to resize the logo.
 
 ### 3. CTA Arrow: Use consistent SVG arrow
 
@@ -70,6 +73,14 @@ Remove Figma-only CSS that browsers don't support:
 textBoxTrim: 'trim-both'
 textBoxEdge: 'cap alphabetic'
 ```
+
+### 7. Border-radius inside overflow:hidden
+
+Don't add `borderRadius` to child elements inside an `overflow: hidden` container. The parent already clips to its own radius. Adding inner radius creates visible gaps at the corners.
+
+### 8. Equal-height cards in flex rows
+
+Cards displayed side-by-side must stretch to match the tallest: `alignItems: 'stretch'` on the container + `flex: 1` on the content div. Without this, shorter cards leave background color gaps.
 
 ---
 
@@ -114,6 +125,8 @@ textBoxEdge: 'cap alphabetic'
 - `content-secondary` = `#7C7D80` — helper text, labels
 - `line-subtle` = `#494A4C` — borders, dividers
 - `interactive-hover` = `#202123` — hover backgrounds
+
+**Dark mode applies to ALL sub-components.** When adding dark mode, check footers, headers, locked modules, and any element rendered separately from the main content. These are easy to miss because they're in separate components.
 
 **❌ NEVER do this:**
 - Hardcode dark hex values: `bg-gray-900`, `bg-gray-800`, `text-white`, `border-gray-700` — these bypass the design system and break if tokens change
@@ -189,6 +202,21 @@ The `showSolutionSet` toggle controls visibility. Solution text and color dot ar
 
 ---
 
+## Interaction Patterns
+
+### Selected State Ring
+
+All selectable elements in editor UIs (Stacker modules, carousel slides, FAQ pages, queued assets) use the same Tailwind ring pattern:
+
+- **Selected:** `border-2 border-blue-500 ring-2 ring-blue-500/20`
+- **Unselected:** `border border-gray-200 dark:border-transparent`
+
+Do NOT use `ring-offset-2` — it gets clipped by parent containers with `overflow: hidden`.
+
+Reference: `components/shared/ToggleSwitch.tsx`, `StackerEditorScreen.tsx` SortableModuleItem.
+
+---
+
 ## Image Handling
 
 ### Image Editor Features
@@ -220,9 +248,17 @@ style={{
 }}
 ```
 
-### ZoomableImage Component
+### Image Crop Modal
 
-Import from `components/ZoomableImage`. Use for all image upload areas in the editor.
+Use `ImageCropModal` for all image zoom/pan editing. The modal's crop frame dimensions must match the actual image container aspect ratio in the template. When container sizes change dynamically (e.g., S/M/L variants), pass updated dimensions to the modal.
+
+The shared `ImagePreviewWithCrop` component (`components/shared/ImagePreviewWithCrop.tsx`) wraps the standard thumbnail + Adjust/Remove pattern. Use it instead of building inline previews.
+
+`ZoomableImage` is deprecated. Do not use it for new templates.
+
+### Empty Image Placeholders
+
+Image containers in templates must show a visible placeholder when no image is uploaded — not an empty void. Standard placeholder: `rgba(255,255,255,0.08)` background with a centered landscape icon at `rgba(255,255,255,0.25)`. This applies to any template with optional image areas.
 
 ### Image Library System
 

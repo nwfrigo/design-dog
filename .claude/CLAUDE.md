@@ -26,6 +26,8 @@ Before beginning any work, read all reference docs to understand the full system
 
 These files live alongside this one in `.claude/`. Always consult the relevant reference doc before making changes in that area. When doing UI or QA work, read LESSONS.md and silently apply any relevant lessons.
 
+**Graduation check:** After reading LESSONS.md, scan for items that have been validated across 2+ instances or are clearly universal rules. If any exist, propose them in `GRADUATED_PENDING.md` (see Lessons System below) and tell Nick before starting work: "I flagged X items for graduation — review when you get a chance."
+
 ---
 
 ## Reference Docs
@@ -111,6 +113,9 @@ npm run dev
 - Build check before commit: `npm run build`
 - Commit with descriptive message
 - Push to main
+
+### Build + Dev Server Conflict
+Running `npm run build` while the dev server is running overwrites `.next/` — the dev server serves stale chunk hashes, causing JS 404s. Puppeteer exports will time out because `#render-ready` never gets added. **Always restart the dev server after running a build.**
 
 ---
 

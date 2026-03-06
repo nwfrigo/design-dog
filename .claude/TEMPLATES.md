@@ -304,6 +304,10 @@ app/api/
 - `one-stat` — Single stat with description
 - `divider` — Horizontal line separator
 
+### AI Content Generation Constraints
+
+**AI must never generate content that looks like verified data.** Quote modules and Stats modules must only use verbatim source content — never AI-generated text. AI fabricates authoritative-looking statistics and attributed quotes that are entirely made up. When building AI prompts for module generation, explicitly exclude these module types from the candidate list.
+
 ### AI Content Generation
 
 Stacker uses AI to generate the initial document structure:
