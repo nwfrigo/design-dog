@@ -30,6 +30,7 @@ import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 import { Page1Cover } from '@/components/templates/SolutionOverviewPdf/Page1Cover'
 import { CoverPage as FaqCoverPage } from '@/components/templates/FaqPdf'
 import { StackerPdf } from '@/components/templates/StackerPdf'
+import { SocialCarousel } from '@/components/templates/SocialCarousel'
 import { STACKER_PLACEHOLDER_IMAGE_1x1 } from '@/lib/stacker-modules'
 import type { StackerModule } from '@/types'
 
@@ -245,6 +246,36 @@ export function TemplateRenderer({
           gridDetail2={{ type: 'data', text: '50 Speakers' }}
           gridDetail3={{ type: 'data', text: '3 Days' }}
           gridDetail4={{ type: 'cta', text: 'Register Now' }}
+        />
+      )
+
+    case 'social-carousel':
+      return (
+        <SocialCarousel
+          {...commonProps}
+          slide={{
+            id: 'preview',
+            slideType: 'cover-text',
+            backgroundStyle: '1',
+            eyebrow: '',
+            headline: 'Multi-Page Carousel Design',
+            subhead: '',
+            body: '',
+            metadata: '',
+            ctaText: '',
+            showEyebrow: false,
+            showHeadline: true,
+            showSubhead: false,
+            showBody: false,
+            showMetadata: false,
+            showCta: false,
+            headlineFontSize: null,
+            imageUrl: null,
+            imagePosition: { x: 0, y: 0 },
+            imageZoom: 1,
+            grayscale: false,
+          }}
+          logoColor="white"
         />
       )
 
