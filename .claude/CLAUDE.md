@@ -70,6 +70,17 @@ When a lesson has been validated across 2+ instances or is clearly a universal r
 
 Tags: `[ui]`, `[pattern]`, `[bug]`, `[export]`, `[dark-mode]`, `[template]`, `[state]`, `[perf]`, `[ux]`, `[a11y]`
 
+### Keeping LESSONS.md Clean
+
+LESSONS.md is an inbox, not an archive. Items should flow through it, not accumulate. Every item has exactly two exits:
+
+1. **Graduate** — generalize into a reusable principle and propose for a reference doc
+2. **Delete** — the specific fix has been applied and doesn't represent a recurring pattern
+
+If an item is "too specific to graduate," ask: has the fix already been shipped? If yes, delete it. If not, it's still active work, not a lesson. If it keeps coming up, it's actually a pattern — generalize it and graduate it.
+
+Do not let resolved, one-off items sit in LESSONS.md indefinitely.
+
 ---
 
 ## Environment Variables

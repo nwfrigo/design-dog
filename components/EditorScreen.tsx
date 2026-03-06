@@ -9,6 +9,7 @@ import { WebsiteWebinar } from './templates/WebsiteWebinar'
 import { WebsiteEventListing } from './templates/WebsiteEventListing'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
+import { SocialImageMeddbase } from './templates/SocialImageMeddbase'
 import { EmailProductRelease } from './templates/EmailProductRelease'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
@@ -49,6 +50,7 @@ import type { TemplateType } from '@/types'
 // Headline font size configuration per template
 const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: number; step: number }> = {
   'email-image': { default: 38, min: 16, max: 50, step: 2 },
+  'social-image-meddbase': { default: 84, min: 40, max: 120, step: 4 },
   'email-grid': { default: 38, min: 16, max: 50, step: 2 },
   'email-speakers': { default: 38, min: 16, max: 50, step: 2 },
   'email-dark-gradient': { default: 38, min: 16, max: 50, step: 2 },
@@ -399,7 +401,7 @@ export function EditorScreen() {
 
   // Calculate preview scale for large templates
   const getPreviewScale = () => {
-    if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-grid-detail') {
+    if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'social-grid-detail') {
       return 0.6 // Scale down 1200px to ~720px
     }
     if (currentTemplate === 'website-floating-banner') {
@@ -1100,7 +1102,7 @@ export function EditorScreen() {
           frameWidth={
             currentTemplate === 'website-thumbnail' ? 320 :
             currentTemplate === 'email-image' ? (layout === 'even' ? 250 : layout === 'more-image' ? 320 : 180) :
-            currentTemplate === 'social-image' ? (layout === 'even' ? 488 : layout === 'more-image' ? 600 : 376) :
+            (currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase') ? (layout === 'even' ? 488 : layout === 'more-image' ? 600 : 376) :
             currentTemplate === 'website-webinar' ? 333 :
             currentTemplate === 'website-press-release' ? 338 :
             currentTemplate === 'website-report' ? 320 :
@@ -1110,7 +1112,7 @@ export function EditorScreen() {
           frameHeight={
             currentTemplate === 'website-thumbnail' ? 386 :
             currentTemplate === 'email-image' ? 300 :
-            currentTemplate === 'social-image' ? 628 :
+            (currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase') ? 628 :
             currentTemplate === 'website-webinar' ? 450 :
             currentTemplate === 'website-press-release' ? 450 :
             currentTemplate === 'website-report' ? 386 :
@@ -1179,7 +1181,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -2087,7 +2089,7 @@ export function EditorScreen() {
             )}
 
             {/* Social Image and Email Image Layout Controls */}
-            {(currentTemplate === 'social-image' || currentTemplate === 'email-image') && (
+            {(currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image') && (
               <>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Layout</label>
@@ -2130,7 +2132,7 @@ export function EditorScreen() {
 
 
             {/* Image - Website Thumbnail (image variant), Email Image, Email Product Release, Social Image, Website Webinar (image variant), Website Press Release, and Website Report (image variant) */}
-            {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'email-product-release' || currentTemplate === 'social-image' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release' || (currentTemplate === 'website-report' && reportVariant === 'image')) && (
+            {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'email-product-release' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release' || (currentTemplate === 'website-report' && reportVariant === 'image')) && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
@@ -2214,7 +2216,7 @@ export function EditorScreen() {
           {contentMode === 'verbatim' && (
             <div className="space-y-4">
               {/* Eyebrow - not shown for email-image, social-image, solution-overview-pdf (they don't use it) */}
-              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'solution-overview-pdf' && (
+              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2257,7 +2259,7 @@ export function EditorScreen() {
                   <EyeIcon visible={showHeadline} onClick={() => setShowHeadline(!showHeadline)} />
                 </div>
                 {/* Rich text editor for social templates with rich text support */}
-                {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient') ? (
+                {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient') ? (
                   <SimpleRichTextEditor
                     content={verbatimCopy.headline}
                     onChange={(html) => setVerbatimCopy({ headline: html })}
@@ -2337,7 +2339,7 @@ export function EditorScreen() {
               )}
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2346,7 +2348,7 @@ export function EditorScreen() {
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
                   </div>
                   {/* Rich text editor for templates with rich text support */}
-                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'email-dark-gradient') ? (
+                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-dark-gradient') ? (
                     <div className={!showSubhead ? 'opacity-50' : ''}>
                       <SimpleRichTextEditor
                         content={verbatimCopy.subhead}
@@ -2391,7 +2393,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2566,7 +2568,7 @@ export function EditorScreen() {
               )}
 
               {/* Social Image Content Fields */}
-              {currentTemplate === 'social-image' && (
+              {(currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase') && (
                 <div className="space-y-4">
                   {/* Metadata */}
                   <div>
@@ -3721,6 +3723,29 @@ export function EditorScreen() {
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   showHeadline={showHeadline}
                   showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
+                  showSolutionSet={showSolutionSet}
+                  grayscale={grayscale}
+                  headlineFontSize={headlineFontSize ?? undefined}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'social-image-meddbase' && (
+                <SocialImageMeddbase
+                  headline={verbatimCopy.headline || 'Headline'}
+                  subhead={verbatimCopy.subhead}
+                  metadata={metadata}
+                  ctaText={ctaText}
+                  imageUrl={thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={thumbnailImagePosition}
+                  imageZoom={thumbnailImageZoom}
+                  layout={layout}
+                  solution={solution}
+                  showHeadline={showHeadline}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  showMetadata={showMetadata}
                   showCta={showCta}
                   showSolutionSet={showSolutionSet}
                   grayscale={grayscale}

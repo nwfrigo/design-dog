@@ -183,6 +183,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'website-floating-banner-mobile': 'website',
   'email-grid': 'email',
   'email-image': 'email',
+  'social-image-meddbase': 'social',
   'email-dark-gradient': 'email',
   'email-speakers': 'email',
   'email-product-release': 'email',

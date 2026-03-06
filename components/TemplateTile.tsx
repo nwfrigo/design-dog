@@ -9,6 +9,7 @@ import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type Typog
 // Import all template components
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
 import { EmailImage } from '@/components/templates/EmailImage'
+import { SocialImageMeddbase } from '@/components/templates/SocialImageMeddbase'
 import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
@@ -109,6 +110,24 @@ export function TemplateRenderer({
           solution="safety"
           logoColor="orange"
           showBody={false}
+          showCta={true}
+          showSolutionSet={true}
+        />
+      )
+
+    case 'social-image-meddbase':
+      return (
+        <SocialImageMeddbase
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          subhead=""
+          metadata="Day / Month | 00:00"
+          ctaText={PREVIEW_CONTENT.cta}
+          imageUrl={PLACEHOLDER_IMAGES.default}
+          layout="even"
+          solution="safety"
+          showSubhead={false}
+          showMetadata={true}
           showCta={true}
           showSolutionSet={true}
         />

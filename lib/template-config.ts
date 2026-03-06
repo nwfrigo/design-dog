@@ -94,6 +94,13 @@ const SOCIAL_TEMPLATES: TemplateInfo[] = [
     height: 628,
   },
   {
+    type: 'social-image-meddbase',
+    label: 'Image (Meddbase)',
+    dimensions: '1200 × 628px',
+    width: 1200,
+    height: 628,
+  },
+  {
     type: 'social-grid-detail',
     label: 'Grid Details',
     dimensions: '1200 × 628px',

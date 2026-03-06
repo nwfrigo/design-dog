@@ -16,6 +16,7 @@ import { EmailProductRelease } from './templates/EmailProductRelease'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { SocialBlueGradient } from './templates/SocialBlueGradient'
 import { SocialImage } from './templates/SocialImage'
+import { SocialImageMeddbase } from './templates/SocialImageMeddbase'
 import { SocialGridDetail, type GridDetailRow } from './templates/SocialGridDetail'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
 import { EmailSpeakers } from './templates/EmailSpeakers'
@@ -537,7 +538,7 @@ function QueueItem({
       textFields.push({ label: 'CTA', value: asset.ctaText })
     }
   }
-  if (asset.templateType === 'social-image') {
+  if (asset.templateType === 'social-image' || asset.templateType === 'social-image-meddbase') {
     if (asset.metadata && asset.showMetadata) {
       textFields.push({ label: 'Metadata', value: asset.metadata })
     }
@@ -804,6 +805,28 @@ function QueueItem({
                   layout={asset.layout || 'even'}
                   solution={asset.solution}
                   logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+                  showSubhead={asset.showSubhead && !!asset.subhead}
+                  showMetadata={asset.showMetadata !== false}
+                  showCta={asset.showCta !== false}
+                  showSolutionSet={asset.showSolutionSet !== false}
+                  grayscale={asset.grayscale}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {asset.templateType === 'social-image-meddbase' && (
+                <SocialImageMeddbase
+                  headline={asset.headline || 'Headline'}
+                  subhead={asset.subhead || ''}
+                  metadata={asset.metadata || 'Day / Month | 00:00'}
+                  ctaText={asset.ctaText || 'Learn More'}
+                  imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+                  imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+                  imageZoom={asset.thumbnailImageZoom || 1}
+                  layout={asset.layout || 'even'}
+                  solution={asset.solution}
                   showSubhead={asset.showSubhead && !!asset.subhead}
                   showMetadata={asset.showMetadata !== false}
                   showCta={asset.showCta !== false}
@@ -1395,6 +1418,28 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               layout={asset.layout || 'even'}
               solution={asset.solution}
               logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
+              showSubhead={asset.showSubhead && !!asset.subhead}
+              showMetadata={asset.showMetadata !== false}
+              showCta={asset.showCta !== false}
+              showSolutionSet={asset.showSolutionSet !== false}
+              grayscale={asset.grayscale}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'social-image-meddbase' && (
+            <SocialImageMeddbase
+              headline={asset.headline || 'Headline'}
+              subhead={asset.subhead || ''}
+              metadata={asset.metadata || 'Day / Month | 00:00'}
+              ctaText={asset.ctaText || 'Learn More'}
+              imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
+              imagePosition={asset.thumbnailImagePosition || { x: 0, y: 0 }}
+              imageZoom={asset.thumbnailImageZoom || 1}
+              layout={asset.layout || 'even'}
+              solution={asset.solution}
               showSubhead={asset.showSubhead && !!asset.subhead}
               showMetadata={asset.showMetadata !== false}
               showCta={asset.showCta !== false}
