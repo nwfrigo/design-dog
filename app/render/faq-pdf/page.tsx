@@ -3,6 +3,7 @@ import { FaqPdfRender } from './render-content'
 import type { FaqContentBlock } from '@/types'
 import type { SolutionCategory } from '@/config/solution-overview-assets'
 import type { Metadata } from 'next'
+import { parseString, parseNumber, parseBoolFalse } from '@/lib/render-params'
 
 interface FaqPage {
   id: string
@@ -15,7 +16,7 @@ export async function generateMetadata({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }): Promise<Metadata> {
-  const title = (searchParams.title as string) || 'FAQ'
+  const title = parseString(searchParams, 'title', 'FAQ')
   return {
     title: title,
   }
@@ -27,7 +28,7 @@ export default function FaqPdfRenderPage({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   // Parse URL params
-  const title = (searchParams.title as string) || 'FAQ'
+  const title = parseString(searchParams, 'title', 'FAQ')
   const pageIndexParam = searchParams.page as string
 
   // Parse page index - 'all' or a number
@@ -73,13 +74,13 @@ export default function FaqPdfRenderPage({
   }
 
   // Parse cover page params
-  const coverSubheader = (searchParams.coverSubheader as string) || 'Frequently Asked Questions'
-  const coverSolution = (searchParams.coverSolution as string) as SolutionCategory | 'none' || 'safety'
+  const coverSubheader = parseString(searchParams, 'coverSubheader', 'Frequently Asked Questions')
+  const coverSolution = parseString(searchParams, 'coverSolution', 'safety') as SolutionCategory | 'none'
   const coverImageUrl = searchParams.coverImageUrl as string | undefined
-  const coverImagePositionX = parseFloat(searchParams.coverImagePositionX as string) || 0
-  const coverImagePositionY = parseFloat(searchParams.coverImagePositionY as string) || 0
-  const coverImageZoom = parseFloat(searchParams.coverImageZoom as string) || 1
-  const coverImageGrayscale = searchParams.coverImageGrayscale === 'true'
+  const coverImagePositionX = parseNumber(searchParams, 'coverImagePositionX', 0)
+  const coverImagePositionY = parseNumber(searchParams, 'coverImagePositionY', 0)
+  const coverImageZoom = parseNumber(searchParams, 'coverImageZoom', 1)
+  const coverImageGrayscale = parseBoolFalse(searchParams, 'coverImageGrayscale')
 
   return (
     <div

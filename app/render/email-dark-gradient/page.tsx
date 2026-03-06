@@ -3,6 +3,7 @@ import { EmailDarkGradientRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,21 +13,22 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  // Parse params on server
-  const headline = (searchParams.headline as string) || 'Headline'
-  const eyebrow = (searchParams.eyebrow as string) || ''
-  const subheading = (searchParams.subheading as string) || ''
-  const body = (searchParams.body as string) || ''
-  const ctaText = (searchParams.ctaText as string) || 'Responsive'
-  const colorStyle = ((searchParams.colorStyle as string) || '1') as '1' | '2' | '3' | '4'
-  const alignment = ((searchParams.alignment as string) || 'left') as 'left' | 'center'
-  const ctaStyle = ((searchParams.ctaStyle as string) || 'link') as 'link' | 'button'
-  const showEyebrow = searchParams.showEyebrow === 'true'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showSubheading = searchParams.showSubheading === 'true'
-  const showBody = searchParams.showBody !== 'false'
-  const showCta = searchParams.showCta !== 'false'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const eyebrow = parseString(searchParams, 'eyebrow', '')
+  const subheading = parseString(searchParams, 'subheading', '')
+  const body = parseString(searchParams, 'body', '')
+  const ctaText = parseString(searchParams, 'ctaText', 'Responsive')
+  const colorStyle = parseEnum<'1' | '2' | '3' | '4'>(searchParams, 'colorStyle', '1')
+  const alignment = parseEnum<'left' | 'center'>(searchParams, 'alignment', 'left')
+  const ctaStyle = parseEnum<'link' | 'button'>(searchParams, 'ctaStyle', 'link')
+  // showEyebrow: default FALSE — eyebrow is hidden by default in email-dark-gradient
+  const showEyebrow = parseBoolFalse(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  // showSubheading: default FALSE — subheading is hidden by default
+  const showSubheading = parseBoolFalse(searchParams, 'showSubheading')
+  const showBody = parseBoolTrue(searchParams, 'showBody')
+  const showCta = parseBoolTrue(searchParams, 'showCta')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

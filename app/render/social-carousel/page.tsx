@@ -4,6 +4,7 @@ import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { CarouselSlide, CarouselSlideType, CarouselBackgroundStyle } from '@/types'
+import { parseString, parseEnum, parseNumber, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined, parseStringOrNull } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -13,12 +14,12 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const logoColor = ((searchParams.logoColor as string) || 'white') as 'orange' | 'white'
+  const logoColor = parseEnum<'orange' | 'white'>(searchParams, 'logoColor', 'white')
   const page = searchParams.page as string | undefined
 
-  // All slides mode — slidesData is a JSON array of CarouselSlide[]
+  // All slides mode -- slidesData is a JSON array of CarouselSlide[]
   if (page === 'all') {
-    const slidesDataRaw = (searchParams.slidesData as string) || '[]'
+    const slidesDataRaw = parseString(searchParams, 'slidesData', '[]')
     let slides: CarouselSlide[] = []
     try {
       slides = JSON.parse(decodeURIComponent(slidesDataRaw))
@@ -40,31 +41,32 @@ export default function RenderPage({
     )
   }
 
-  // Single slide mode — individual params
+  // Single slide mode -- individual params
+  const headlineFontSizeRaw = parseNumberOrUndefined(searchParams, 'headlineFontSize')
   const slide: CarouselSlide = {
-    id: (searchParams.slideId as string) || 'render',
-    slideType: ((searchParams.slideType as string) || 'cover-text') as CarouselSlideType,
-    backgroundStyle: ((searchParams.backgroundStyle as string) || '1') as CarouselBackgroundStyle,
-    eyebrow: (searchParams.eyebrow as string) || '',
-    headline: (searchParams.headline as string) || 'Headline',
-    subhead: (searchParams.subhead as string) || '',
-    body: (searchParams.body as string) || '',
-    metadata: (searchParams.metadata as string) || '',
-    ctaText: (searchParams.ctaText as string) || '',
-    showEyebrow: searchParams.showEyebrow !== 'false',
-    showHeadline: searchParams.showHeadline !== 'false',
-    showSubhead: searchParams.showSubhead !== 'false',
-    showBody: searchParams.showBody !== 'false',
-    showMetadata: searchParams.showMetadata !== 'false',
-    showCta: searchParams.showCta !== 'false',
-    headlineFontSize: searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : null,
-    imageUrl: (searchParams.imageUrl as string) || null,
+    id: parseString(searchParams, 'slideId', 'render'),
+    slideType: parseEnum(searchParams, 'slideType', 'cover-text') as CarouselSlideType,
+    backgroundStyle: parseEnum(searchParams, 'backgroundStyle', '1') as CarouselBackgroundStyle,
+    eyebrow: parseString(searchParams, 'eyebrow', ''),
+    headline: parseString(searchParams, 'headline', 'Headline'),
+    subhead: parseString(searchParams, 'subhead', ''),
+    body: parseString(searchParams, 'body', ''),
+    metadata: parseString(searchParams, 'metadata', ''),
+    ctaText: parseString(searchParams, 'ctaText', ''),
+    showEyebrow: parseBoolTrue(searchParams, 'showEyebrow'),
+    showHeadline: parseBoolTrue(searchParams, 'showHeadline'),
+    showSubhead: parseBoolTrue(searchParams, 'showSubhead'),
+    showBody: parseBoolTrue(searchParams, 'showBody'),
+    showMetadata: parseBoolTrue(searchParams, 'showMetadata'),
+    showCta: parseBoolTrue(searchParams, 'showCta'),
+    headlineFontSize: headlineFontSizeRaw !== undefined ? headlineFontSizeRaw : null,
+    imageUrl: parseStringOrNull(searchParams, 'imageUrl'),
     imagePosition: {
-      x: searchParams.imagePositionX ? parseFloat(searchParams.imagePositionX as string) : 0,
-      y: searchParams.imagePositionY ? parseFloat(searchParams.imagePositionY as string) : 0,
+      x: parseNumber(searchParams, 'imagePositionX', 0),
+      y: parseNumber(searchParams, 'imagePositionY', 0),
     },
-    imageZoom: searchParams.imageZoom ? parseFloat(searchParams.imageZoom as string) : 1,
-    grayscale: searchParams.grayscale === 'true',
+    imageZoom: parseNumber(searchParams, 'imageZoom', 1),
+    grayscale: parseBoolFalse(searchParams, 'grayscale'),
   }
 
   return (

@@ -24,14 +24,16 @@ import { WebsiteReport } from './templates/WebsiteReport'
 import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from './templates/WebsiteFloatingBannerMobile'
 import { Page1Cover, Page2Body, Page3BenefitsFeatures } from './templates/SolutionOverviewPdf'
-import { solutionCategories, heroImages, ctaOptions, benefitIcons, type SolutionCategory } from '@/config/solution-overview-assets'
+import { heroImages } from '@/config/solution-overview-assets'
 import { ImageLibraryModal } from './ImageLibraryModal'
-import { SolutionOverviewImageLibraryModal } from './SolutionOverviewImageLibraryModal'
-import { IconPickerModal, getIconByName } from './IconPickerModal'
+import { SolutionOverviewEditorControls } from './editors/SolutionOverviewEditor'
+import { SpeakerEditorControls } from './editors/SpeakerEditor'
 import { TemplateRenderer, PreviewModal } from './TemplateTile'
 import { ZoomableImage } from './ZoomableImage'
 import { ImageCropModal } from './ImageCropModal'
-import { SimpleRichTextEditor, isHtmlEmpty } from './SimpleRichTextEditor'
+import { SimpleRichTextEditor } from './SimpleRichTextEditor'
+import { buildExportParams, type ExportParamState } from '@/lib/export-params'
+import { EyeIcon } from './shared/EyeIcon'
 import type { TemplateInfo } from '@/lib/template-config'
 import {
   fetchColorsConfig,
@@ -40,6 +42,8 @@ import {
   type TypographyConfig
 } from '@/lib/brand-config'
 import { CHANNELS, TEMPLATE_DIMENSIONS, TEMPLATE_LABELS } from '@/lib/template-config'
+import { ToggleSwitch } from '@/components/shared/ToggleSwitch'
+import { ImagePreviewWithCrop } from '@/components/shared/ImagePreviewWithCrop'
 import type { TemplateType } from '@/types'
 
 // Headline font size configuration per template
@@ -63,31 +67,6 @@ const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: 
   'newsletter-blue-gradient': { default: 24, min: 12, max: 36, step: 1 },
   'newsletter-light': { default: 24, min: 12, max: 36, step: 1 },
   'social-carousel': { default: 112, min: 40, max: 140, step: 4 },
-}
-
-// Eye icon for visibility toggle
-function EyeIcon({ visible, onClick }: { visible: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors ${
-        visible ? 'text-gray-500' : 'text-gray-300'
-      }`}
-      title={visible ? 'Hide in preview' : 'Show in preview'}
-    >
-      {visible ? (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-        </svg>
-      )}
-    </button>
-  )
 }
 
 export function EditorScreen() {
@@ -389,18 +368,9 @@ export function EditorScreen() {
   const [selectingNewsletterImage, setSelectingNewsletterImage] = useState(false)
   const [selectingSOScreenshot, setSelectingSOScreenshot] = useState(false)
 
-  // Solution Overview hero image library modal state
-  const [showHeroImageLibrary, setShowHeroImageLibrary] = useState(false)
-
-  // Icon library modal state for benefit icons
-  const [showIconLibrary, setShowIconLibrary] = useState(false)
-  const [activeBenefitForIcon, setActiveBenefitForIcon] = useState<number | null>(null)
-
   // Image crop modal state
   const [showCropModal, setShowCropModal] = useState(false)
   const [showNewsletterCropModal, setShowNewsletterCropModal] = useState(false)
-  const [showSOHeroCropModal, setShowSOHeroCropModal] = useState(false)
-  const [showSOScreenshotCropModal, setShowSOScreenshotCropModal] = useState(false)
 
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
@@ -677,277 +647,107 @@ export function EditorScreen() {
     setIsExporting(true)
 
     try {
-      const exportParams: Record<string, unknown> = {
-        template: currentTemplate,
-        scale: exportScale,
+      const paramState: ExportParamState = {
         eyebrow,
-        headline: verbatimCopy.headline,
-        subhead: verbatimCopy.subhead,
-        body: verbatimCopy.body,
+        verbatimCopy,
         solution,
         logoColor,
         showEyebrow,
         showHeadline,
         headlineFontSize,
+        thumbnailImageUrl,
+        thumbnailImagePosition,
+        thumbnailImageZoom,
+        grayscale,
+        showSubhead,
+        showBody,
+        showCta,
+        showMetadata,
+        showSolutionSet,
+        showLightHeader,
+        showSubheading,
+        showGridDetail2,
+        showRow3,
+        showRow4,
+        showSpeaker1,
+        showSpeaker2,
+        showSpeaker3,
+        ctaText,
+        metadata,
+        subheading,
+        ebookVariant,
+        webinarVariant,
+        reportVariant,
+        eventListingVariant,
+        floatingBannerVariant,
+        floatingBannerMobileVariant,
+        floatingBannerMobileArrowType,
+        newsletterTopBannerVariant,
+        colorStyle,
+        headingSize,
+        alignment,
+        ctaStyle,
+        layout,
+        gridDetail1Text,
+        gridDetail2Text,
+        gridDetail3Type,
+        gridDetail3Text,
+        gridDetail4Type,
+        gridDetail4Text,
+        newsletterImageSize,
+        newsletterImageUrl,
+        newsletterImagePosition,
+        newsletterImageZoom,
+        speakerCount,
+        speaker1Name,
+        speaker1Role,
+        speaker1ImageUrl,
+        speaker1ImagePosition,
+        speaker1ImageZoom,
+        speaker2Name,
+        speaker2Role,
+        speaker2ImageUrl,
+        speaker2ImagePosition,
+        speaker2ImageZoom,
+        speaker3Name,
+        speaker3Role,
+        speaker3ImageUrl,
+        speaker3ImagePosition,
+        speaker3ImageZoom,
+        solutionOverviewSolution,
+        solutionOverviewSolutionName,
+        solutionOverviewTagline,
+        solutionOverviewHeroImageId,
+        solutionOverviewHeroImageUrl,
+        solutionOverviewHeroImagePosition,
+        solutionOverviewHeroImageZoom,
+        solutionOverviewPage2Header,
+        solutionOverviewSectionHeader,
+        solutionOverviewIntroParagraph,
+        solutionOverviewKeySolutions,
+        solutionOverviewQuoteText,
+        solutionOverviewQuoteName,
+        solutionOverviewQuoteTitle,
+        solutionOverviewQuoteCompany,
+        solutionOverviewStat1Value,
+        solutionOverviewStat1Label,
+        solutionOverviewStat2Value,
+        solutionOverviewStat2Label,
+        solutionOverviewStat3Value,
+        solutionOverviewStat3Label,
+        solutionOverviewStat4Value,
+        solutionOverviewStat4Label,
+        solutionOverviewStat5Value,
+        solutionOverviewStat5Label,
+        solutionOverviewBenefits,
+        solutionOverviewFeatures,
+        solutionOverviewScreenshotUrl,
+        solutionOverviewScreenshotPosition,
+        solutionOverviewScreenshotZoom,
+        solutionOverviewCtaOption,
       }
 
-      if (currentTemplate === 'website-thumbnail') {
-        exportParams.imageUrl = thumbnailImageUrl
-        exportParams.imagePositionX = thumbnailImagePosition.x
-        exportParams.imagePositionY = thumbnailImagePosition.y
-        exportParams.imageZoom = thumbnailImageZoom
-        exportParams.variant = ebookVariant
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.showCta = showCta
-        exportParams.ctaText = ctaText
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'website-press-release') {
-        exportParams.imageUrl = thumbnailImageUrl
-        exportParams.imagePositionX = thumbnailImagePosition.x
-        exportParams.imagePositionY = thumbnailImagePosition.y
-        exportParams.imageZoom = thumbnailImageZoom
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.showBody = showBody && !!verbatimCopy.body
-        exportParams.showCta = showCta
-        exportParams.ctaText = ctaText
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'website-event-listing') {
-        exportParams.variant = eventListingVariant
-        exportParams.gridDetail1Text = gridDetail1Text
-        exportParams.gridDetail2Text = gridDetail2Text
-        exportParams.gridDetail3Text = gridDetail3Text
-        exportParams.gridDetail4Text = gridDetail4Text
-        exportParams.showRow3 = showRow3
-        exportParams.showRow4 = showRow4
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.ctaText = ctaText
-      } else if (currentTemplate === 'email-grid') {
-        exportParams.subheading = subheading
-        exportParams.showLightHeader = showLightHeader
-        exportParams.showHeavyHeader = false
-        exportParams.showSubheading = showSubheading
-        exportParams.showBody = showBody
-        exportParams.showSolutionSet = showSolutionSet
-        exportParams.showGridDetail2 = showGridDetail2
-        exportParams.gridDetail1Type = 'data'
-        exportParams.gridDetail1Text = gridDetail1Text
-        exportParams.gridDetail2Type = 'data'
-        exportParams.gridDetail2Text = gridDetail2Text
-        exportParams.gridDetail3Type = gridDetail3Type
-        exportParams.gridDetail3Text = gridDetail3Text
-      } else if (currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient') {
-        exportParams.metadata = metadata
-        exportParams.ctaText = ctaText
-        exportParams.colorStyle = colorStyle
-        exportParams.headingSize = headingSize
-        exportParams.alignment = alignment
-        exportParams.ctaStyle = ctaStyle
-        // Both templates support rich text, use HTML empty check since content may contain tags
-        const subheadHasContent = !isHtmlEmpty(verbatimCopy.subhead)
-        const bodyHasContent = !isHtmlEmpty(verbatimCopy.body)
-        exportParams.showSubhead = showSubhead && subheadHasContent
-        exportParams.showBody = showBody && bodyHasContent
-        exportParams.showMetadata = showMetadata
-        exportParams.showCta = showCta
-      } else if (currentTemplate === 'social-image') {
-        exportParams.metadata = metadata
-        exportParams.ctaText = ctaText
-        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'
-        exportParams.imagePositionX = thumbnailImagePosition.x
-        exportParams.imagePositionY = thumbnailImagePosition.y
-        exportParams.imageZoom = thumbnailImageZoom
-        exportParams.layout = layout
-        // SocialImage supports rich text, use HTML empty check since content may contain tags
-        exportParams.showSubhead = showSubhead && !isHtmlEmpty(verbatimCopy.subhead)
-        exportParams.showMetadata = showMetadata
-        exportParams.showCta = showCta
-        exportParams.showSolutionSet = showSolutionSet
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'social-grid-detail') {
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.showSolutionSet = showSolutionSet
-        exportParams.gridDetail1Text = gridDetail1Text
-        exportParams.gridDetail2Text = gridDetail2Text
-        exportParams.gridDetail3Type = gridDetail3Type
-        exportParams.gridDetail3Text = gridDetail3Text
-        exportParams.gridDetail4Type = gridDetail4Type
-        exportParams.gridDetail4Text = gridDetail4Text
-        exportParams.showRow3 = showRow3
-        exportParams.showRow4 = showRow4
-      } else if (currentTemplate === 'email-image') {
-        exportParams.ctaText = ctaText
-        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'
-        exportParams.imagePositionX = thumbnailImagePosition.x
-        exportParams.imagePositionY = thumbnailImagePosition.y
-        exportParams.imageZoom = thumbnailImageZoom
-        exportParams.layout = layout
-        // EmailImage supports rich text, use HTML empty check
-        exportParams.showBody = showBody && !isHtmlEmpty(verbatimCopy.body)
-        exportParams.showCta = showCta
-        exportParams.showSolutionSet = showSolutionSet
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'email-dark-gradient') {
-        exportParams.ctaText = ctaText
-        exportParams.colorStyle = colorStyle
-        exportParams.alignment = alignment
-        exportParams.ctaStyle = ctaStyle
-        exportParams.showEyebrow = showEyebrow && !!eyebrow
-        // EmailDarkGradient supports rich text, use HTML empty check
-        exportParams.showSubheading = showSubhead && !isHtmlEmpty(verbatimCopy.subhead)
-        exportParams.showBody = showBody && !isHtmlEmpty(verbatimCopy.body)
-        exportParams.showCta = showCta
-      } else if (currentTemplate === 'email-speakers') {
-        exportParams.ctaText = ctaText
-        exportParams.showEyebrow = showEyebrow && !!eyebrow
-        // EmailSpeakers supports rich text, use HTML empty check
-        exportParams.showBody = showBody && !isHtmlEmpty(verbatimCopy.body)
-        exportParams.showCta = showCta
-        exportParams.showSolutionSet = showSolutionSet
-        exportParams.speakerCount = speakerCount
-        exportParams.speaker1Name = speaker1Name
-        exportParams.speaker1Role = speaker1Role
-        exportParams.speaker1ImageUrl = speaker1ImageUrl
-        exportParams.speaker1ImagePositionX = speaker1ImagePosition.x
-        exportParams.speaker1ImagePositionY = speaker1ImagePosition.y
-        exportParams.speaker1ImageZoom = speaker1ImageZoom
-        exportParams.speaker2Name = speaker2Name
-        exportParams.speaker2Role = speaker2Role
-        exportParams.speaker2ImageUrl = speaker2ImageUrl
-        exportParams.speaker2ImagePositionX = speaker2ImagePosition.x
-        exportParams.speaker2ImagePositionY = speaker2ImagePosition.y
-        exportParams.speaker2ImageZoom = speaker2ImageZoom
-        exportParams.speaker3Name = speaker3Name
-        exportParams.speaker3Role = speaker3Role
-        exportParams.speaker3ImageUrl = speaker3ImageUrl
-        exportParams.speaker3ImagePositionX = speaker3ImagePosition.x
-        exportParams.speaker3ImagePositionY = speaker3ImagePosition.y
-        exportParams.speaker3ImageZoom = speaker3ImageZoom
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'email-product-release') {
-        exportParams.eyebrow = eyebrow || 'Product Release'
-        exportParams.headline = verbatimCopy.headline || 'GX2 2026.1'
-        exportParams.imageUrl = thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'
-        exportParams.imagePositionX = thumbnailImagePosition.x
-        exportParams.imagePositionY = thumbnailImagePosition.y
-        exportParams.imageZoom = thumbnailImageZoom
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient') {
-        exportParams.ctaText = ctaText
-        exportParams.colorStyle = colorStyle
-        exportParams.imageSize = newsletterImageSize
-        exportParams.newsletterImageUrl = newsletterImageUrl
-        exportParams.newsletterImagePositionX = newsletterImagePosition.x
-        exportParams.newsletterImagePositionY = newsletterImagePosition.y
-        exportParams.newsletterImageZoom = newsletterImageZoom
-        exportParams.showEyebrow = showEyebrow && !!eyebrow
-        exportParams.showBody = showBody && !!verbatimCopy.body
-        exportParams.showCta = showCta
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'newsletter-light') {
-        exportParams.ctaText = ctaText
-        exportParams.imageSize = newsletterImageSize
-        exportParams.newsletterImageUrl = newsletterImageUrl
-        exportParams.newsletterImagePositionX = newsletterImagePosition.x
-        exportParams.newsletterImagePositionY = newsletterImagePosition.y
-        exportParams.newsletterImageZoom = newsletterImageZoom
-        exportParams.showEyebrow = showEyebrow && !!eyebrow
-        exportParams.showBody = showBody && !!verbatimCopy.body
-        exportParams.showCta = showCta
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'newsletter-top-banner') {
-        exportParams.variant = newsletterTopBannerVariant
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-      } else if (currentTemplate === 'website-report') {
-        exportParams.imageUrl = thumbnailImageUrl
-        exportParams.imagePositionX = thumbnailImagePosition.x
-        exportParams.imagePositionY = thumbnailImagePosition.y
-        exportParams.imageZoom = thumbnailImageZoom
-        exportParams.variant = reportVariant
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.showCta = showCta
-        exportParams.ctaText = ctaText
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'website-webinar') {
-        exportParams.variant = webinarVariant
-        exportParams.imageUrl = thumbnailImageUrl
-        exportParams.imagePositionX = thumbnailImagePosition.x
-        exportParams.imagePositionY = thumbnailImagePosition.y
-        exportParams.imageZoom = thumbnailImageZoom
-        exportParams.showEyebrow = showEyebrow && !!eyebrow
-        exportParams.showSubhead = showSubhead && !!verbatimCopy.subhead
-        exportParams.showBody = showBody && !!verbatimCopy.body
-        exportParams.showCta = showCta
-        exportParams.ctaText = ctaText
-        exportParams.speakerCount = speakerCount
-        exportParams.speaker1Name = speaker1Name
-        exportParams.speaker1Role = speaker1Role
-        exportParams.speaker1ImageUrl = speaker1ImageUrl
-        exportParams.speaker1ImagePositionX = speaker1ImagePosition.x
-        exportParams.speaker1ImagePositionY = speaker1ImagePosition.y
-        exportParams.speaker1ImageZoom = speaker1ImageZoom
-        exportParams.speaker2Name = speaker2Name
-        exportParams.speaker2Role = speaker2Role
-        exportParams.speaker2ImageUrl = speaker2ImageUrl
-        exportParams.speaker2ImagePositionX = speaker2ImagePosition.x
-        exportParams.speaker2ImagePositionY = speaker2ImagePosition.y
-        exportParams.speaker2ImageZoom = speaker2ImageZoom
-        exportParams.speaker3Name = speaker3Name
-        exportParams.speaker3Role = speaker3Role
-        exportParams.speaker3ImageUrl = speaker3ImageUrl
-        exportParams.speaker3ImagePositionX = speaker3ImagePosition.x
-        exportParams.speaker3ImagePositionY = speaker3ImagePosition.y
-        exportParams.speaker3ImageZoom = speaker3ImageZoom
-        exportParams.showSpeaker1 = showSpeaker1
-        exportParams.showSpeaker2 = showSpeaker2
-        exportParams.showSpeaker3 = showSpeaker3
-        exportParams.grayscale = grayscale
-      } else if (currentTemplate === 'website-floating-banner') {
-        exportParams.variant = floatingBannerVariant
-        exportParams.cta = ctaText
-      } else if (currentTemplate === 'website-floating-banner-mobile') {
-        exportParams.variant = floatingBannerMobileVariant
-        exportParams.arrowType = floatingBannerMobileArrowType
-        exportParams.cta = ctaText
-      } else if (currentTemplate === 'solution-overview-pdf') {
-        // Page 1 params
-        exportParams.solutionOverviewSolution = solutionOverviewSolution
-        exportParams.solutionName = solutionOverviewSolutionName
-        exportParams.tagline = solutionOverviewTagline
-        exportParams.page = 'all' // Export all pages for PDF
-        // Page 2 params
-        exportParams.heroImageId = solutionOverviewHeroImageId
-        exportParams.heroImageUrl = solutionOverviewHeroImageUrl
-        exportParams.heroImagePositionX = solutionOverviewHeroImagePosition.x
-        exportParams.heroImagePositionY = solutionOverviewHeroImagePosition.y
-        exportParams.heroImageZoom = solutionOverviewHeroImageZoom
-        exportParams.page2Header = solutionOverviewPage2Header
-        exportParams.sectionHeader = solutionOverviewSectionHeader
-        exportParams.introParagraph = solutionOverviewIntroParagraph
-        exportParams.keySolutions = solutionOverviewKeySolutions
-        exportParams.quoteText = solutionOverviewQuoteText
-        exportParams.quoteName = solutionOverviewQuoteName
-        exportParams.quoteTitle = solutionOverviewQuoteTitle
-        exportParams.quoteCompany = solutionOverviewQuoteCompany
-        // Page 2 Stats
-        exportParams.stat1Value = solutionOverviewStat1Value
-        exportParams.stat1Label = solutionOverviewStat1Label
-        exportParams.stat2Value = solutionOverviewStat2Value
-        exportParams.stat2Label = solutionOverviewStat2Label
-        exportParams.stat3Value = solutionOverviewStat3Value
-        exportParams.stat3Label = solutionOverviewStat3Label
-        exportParams.stat4Value = solutionOverviewStat4Value
-        exportParams.stat4Label = solutionOverviewStat4Label
-        exportParams.stat5Value = solutionOverviewStat5Value
-        exportParams.stat5Label = solutionOverviewStat5Label
-        // Page 3 params
-        exportParams.benefits = solutionOverviewBenefits
-        exportParams.features = solutionOverviewFeatures
-        exportParams.screenshotUrl = solutionOverviewScreenshotUrl
-        exportParams.screenshotPositionX = solutionOverviewScreenshotPosition.x
-        exportParams.screenshotPositionY = solutionOverviewScreenshotPosition.y
-        exportParams.screenshotZoom = solutionOverviewScreenshotZoom
-        exportParams.ctaOption = solutionOverviewCtaOption
-      }
+      const exportParams = buildExportParams(currentTemplate, exportScale, paramState)
 
       const response = await fetch('/api/export', {
         method: 'POST',
@@ -1289,39 +1089,6 @@ export function EditorScreen() {
         />
       )}
 
-      {/* Solution Overview Hero Image Library Modal */}
-      {showHeroImageLibrary && (
-        <SolutionOverviewImageLibraryModal
-          solution={solutionOverviewSolution}
-          onSelect={(url) => {
-            setSolutionOverviewHeroImageUrl(url)
-            setShowHeroImageLibrary(false)
-          }}
-          onClose={() => setShowHeroImageLibrary(false)}
-        />
-      )}
-
-      {/* Icon Picker Modal for benefit icons */}
-      {showIconLibrary && (
-        <IconPickerModal
-          value={activeBenefitForIcon !== null ? solutionOverviewBenefits[activeBenefitForIcon]?.icon : undefined}
-          onChange={(iconName) => {
-            if (activeBenefitForIcon !== null) {
-              const benefit = solutionOverviewBenefits[activeBenefitForIcon]
-              if (benefit) {
-                setSolutionOverviewBenefit(activeBenefitForIcon, { ...benefit, icon: iconName })
-              }
-            }
-            setShowIconLibrary(false)
-            setActiveBenefitForIcon(null)
-          }}
-          onClose={() => {
-            setShowIconLibrary(false)
-            setActiveBenefitForIcon(null)
-          }}
-        />
-      )}
-
       {/* Image Crop Modal */}
       {thumbnailImageUrl && (
         <ImageCropModal
@@ -1372,40 +1139,6 @@ export function EditorScreen() {
           onSave={(position, zoom) => {
             setNewsletterImagePosition(position)
             setNewsletterImageZoom(zoom)
-          }}
-        />
-      )}
-
-      {/* Solution Overview Hero Image Crop Modal */}
-      {solutionOverviewHeroImageUrl && (
-        <ImageCropModal
-          isOpen={showSOHeroCropModal}
-          onClose={() => setShowSOHeroCropModal(false)}
-          imageSrc={solutionOverviewHeroImageUrl}
-          frameWidth={382}
-          frameHeight={180}
-          initialPosition={solutionOverviewHeroImagePosition}
-          initialZoom={solutionOverviewHeroImageZoom}
-          onSave={(position, zoom) => {
-            setSolutionOverviewHeroImagePosition(position)
-            setSolutionOverviewHeroImageZoom(zoom)
-          }}
-        />
-      )}
-
-      {/* Solution Overview Screenshot Crop Modal */}
-      {solutionOverviewScreenshotUrl && (
-        <ImageCropModal
-          isOpen={showSOScreenshotCropModal}
-          onClose={() => setShowSOScreenshotCropModal(false)}
-          imageSrc={solutionOverviewScreenshotUrl}
-          frameWidth={230}
-          frameHeight={230}
-          initialPosition={solutionOverviewScreenshotPosition}
-          initialZoom={solutionOverviewScreenshotZoom}
-          onSave={(position, zoom) => {
-            setSolutionOverviewScreenshotPosition(position)
-            setSolutionOverviewScreenshotZoom(zoom)
           }}
         />
       )}
@@ -1681,45 +1414,17 @@ export function EditorScreen() {
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Image</label>
                     {newsletterImageUrl ? (
-                      <div className="relative">
-                        {/* Image preview - click to adjust */}
-                        <div
-                          onClick={() => setShowNewsletterCropModal(true)}
-                          className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
-                          style={{ width: 240, height: 135 }}
-                        >
-                          <img
-                            src={newsletterImageUrl}
-                            alt="Selected image"
-                            className="w-full h-full object-cover"
-                            style={{
-                              objectPosition: `${50 - newsletterImagePosition.x}% ${50 - newsletterImagePosition.y}%`,
-                              transform: newsletterImageZoom !== 1 ? `scale(${newsletterImageZoom})` : undefined,
-                            }}
-                          />
-                        </div>
-                        {/* Adjust button */}
-                        <button
-                          onClick={() => setShowNewsletterCropModal(true)}
-                          className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                        >
-                          Adjust
-                        </button>
-                        {/* Remove button */}
-                        <button
-                          onClick={() => {
-                            setNewsletterImageUrl(null)
-                            setNewsletterImageZoom(1)
-                            setNewsletterImagePosition({ x: 0, y: 0 })
-                          }}
-                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
-                          title="Remove image"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
+                      <ImagePreviewWithCrop
+                        imageUrl={newsletterImageUrl}
+                        imagePosition={newsletterImagePosition}
+                        imageZoom={newsletterImageZoom}
+                        onAdjust={() => setShowNewsletterCropModal(true)}
+                        onRemove={() => {
+                          setNewsletterImageUrl(null)
+                          setNewsletterImageZoom(1)
+                          setNewsletterImagePosition({ x: 0, y: 0 })
+                        }}
+                      />
                     ) : (
                       <div className="flex gap-2">
                         {/* Upload box */}
@@ -1834,45 +1539,17 @@ export function EditorScreen() {
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Image</label>
                     {newsletterImageUrl ? (
-                      <div className="relative">
-                        {/* Image preview - click to adjust */}
-                        <div
-                          onClick={() => setShowNewsletterCropModal(true)}
-                          className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
-                          style={{ width: 240, height: 135 }}
-                        >
-                          <img
-                            src={newsletterImageUrl}
-                            alt="Selected image"
-                            className="w-full h-full object-cover"
-                            style={{
-                              objectPosition: `${50 - newsletterImagePosition.x}% ${50 - newsletterImagePosition.y}%`,
-                              transform: newsletterImageZoom !== 1 ? `scale(${newsletterImageZoom})` : undefined,
-                            }}
-                          />
-                        </div>
-                        {/* Adjust button */}
-                        <button
-                          onClick={() => setShowNewsletterCropModal(true)}
-                          className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                        >
-                          Adjust
-                        </button>
-                        {/* Remove button */}
-                        <button
-                          onClick={() => {
-                            setNewsletterImageUrl(null)
-                            setNewsletterImageZoom(1)
-                            setNewsletterImagePosition({ x: 0, y: 0 })
-                          }}
-                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
-                          title="Remove image"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
+                      <ImagePreviewWithCrop
+                        imageUrl={newsletterImageUrl}
+                        imagePosition={newsletterImagePosition}
+                        imageZoom={newsletterImageZoom}
+                        onAdjust={() => setShowNewsletterCropModal(true)}
+                        onRemove={() => {
+                          setNewsletterImageUrl(null)
+                          setNewsletterImageZoom(1)
+                          setNewsletterImagePosition({ x: 0, y: 0 })
+                        }}
+                      />
                     ) : (
                       <div className="flex gap-2">
                         {/* Upload box */}
@@ -1963,45 +1640,17 @@ export function EditorScreen() {
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Image</label>
                     {newsletterImageUrl ? (
-                      <div className="relative">
-                        {/* Image preview - click to adjust */}
-                        <div
-                          onClick={() => setShowNewsletterCropModal(true)}
-                          className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
-                          style={{ width: 240, height: 135 }}
-                        >
-                          <img
-                            src={newsletterImageUrl}
-                            alt="Selected image"
-                            className="w-full h-full object-cover"
-                            style={{
-                              objectPosition: `${50 - newsletterImagePosition.x}% ${50 - newsletterImagePosition.y}%`,
-                              transform: newsletterImageZoom !== 1 ? `scale(${newsletterImageZoom})` : undefined,
-                            }}
-                          />
-                        </div>
-                        {/* Adjust button */}
-                        <button
-                          onClick={() => setShowNewsletterCropModal(true)}
-                          className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                        >
-                          Adjust
-                        </button>
-                        {/* Remove button */}
-                        <button
-                          onClick={() => {
-                            setNewsletterImageUrl(null)
-                            setNewsletterImageZoom(1)
-                            setNewsletterImagePosition({ x: 0, y: 0 })
-                          }}
-                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
-                          title="Remove image"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
+                      <ImagePreviewWithCrop
+                        imageUrl={newsletterImageUrl}
+                        imagePosition={newsletterImagePosition}
+                        imageZoom={newsletterImageZoom}
+                        onAdjust={() => setShowNewsletterCropModal(true)}
+                        onRemove={() => {
+                          setNewsletterImageUrl(null)
+                          setNewsletterImageZoom(1)
+                          setNewsletterImagePosition({ x: 0, y: 0 })
+                        }}
+                      />
                     ) : (
                       <div className="flex gap-2">
                         {/* Upload box */}
@@ -2275,699 +1924,83 @@ export function EditorScreen() {
 
             {/* Solution Overview PDF Controls */}
             {currentTemplate === 'solution-overview-pdf' && (
-              <div className="space-y-4">
-                {/* Page 1 Controls (Cover) */}
-                {solutionOverviewCurrentPage === 1 && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Cover Page</h4>
-
-                    {/* Solution Category */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Solution Category</label>
-                      <select
-                        value={solutionOverviewSolution}
-                        onChange={(e) => setSolutionOverviewSolution(e.target.value as SolutionCategory)}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {Object.entries(solutionCategories).map(([key, { label }]) => (
-                          <option key={key} value={key}>{label}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Solution Name */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Solution Name</label>
-                      <input
-                        type="text"
-                        value={solutionOverviewSolutionName}
-                        onChange={(e) => setSolutionOverviewSolutionName(e.target.value)}
-                        placeholder="Employee Health Essentials"
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      <div className="mt-1 text-xs text-gray-400 text-right">
-                        {solutionOverviewSolutionName.length}/60
-                      </div>
-                    </div>
-
-                    {/* Tagline */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Tagline</label>
-                      <input
-                        type="text"
-                        value={solutionOverviewTagline}
-                        onChange={(e) => setSolutionOverviewTagline(e.target.value)}
-                        placeholder="Built for Healthcare. Ready for You."
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      <div className="mt-1 text-xs text-gray-400 text-right">
-                        {solutionOverviewTagline.length}/80
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Page 2 Controls (Body) */}
-                {solutionOverviewCurrentPage === 2 && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Body Page</h4>
-
-                    {/* Hero Image Upload */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Hero Image</label>
-                      {!solutionOverviewHeroImageUrl ? (
-                        <div className="flex gap-2">
-                          {/* Upload box */}
-                          <div className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16 hover:border-gray-400 dark:hover:border-line-focus transition-colors">
-                            <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0]
-                                  if (file && file.type.startsWith('image/')) {
-                                    const reader = new FileReader()
-                                    reader.onload = () => {
-                                      setSolutionOverviewHeroImageUrl(reader.result as string)
-                                    }
-                                    reader.readAsDataURL(file)
-                                  }
-                                }}
-                                className="hidden"
-                              />
-                              <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                              </svg>
-                              Drop or upload
-                            </label>
-                          </div>
-                          {/* Library box */}
-                          <button
-                            onClick={() => setShowHeroImageLibrary(true)}
-                            className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
-                              hover:border-gray-400 dark:hover:border-line-focus transition-colors
-                              flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
-                          >
-                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Choose from library
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {/* Image preview - click to adjust */}
-                          <div className="relative">
-                            <div
-                              onClick={() => setShowSOHeroCropModal(true)}
-                              className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
-                              style={{ width: 280, height: 132 }}
-                            >
-                              <img
-                                src={solutionOverviewHeroImageUrl}
-                                alt="Hero image"
-                                className="w-full h-full object-cover"
-                                style={{
-                                  objectPosition: `${50 - solutionOverviewHeroImagePosition.x}% ${50 - solutionOverviewHeroImagePosition.y}%`,
-                                  transform: solutionOverviewHeroImageZoom !== 1 ? `scale(${solutionOverviewHeroImageZoom})` : undefined,
-                                }}
-                              />
-                            </div>
-                            {/* Adjust button */}
-                            <button
-                              onClick={() => setShowSOHeroCropModal(true)}
-                              className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                            >
-                              Adjust
-                            </button>
-                          </div>
-                          {/* Grayscale toggle */}
-                          <div className="flex items-center justify-between">
-                            <label className="text-xs text-gray-500">Grayscale</label>
-                            <button
-                              onClick={() => setSolutionOverviewHeroImageGrayscale(!solutionOverviewHeroImageGrayscale)}
-                              className={`relative w-9 h-5 rounded-full transition-colors ${
-                                solutionOverviewHeroImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                              }`}
-                            >
-                              <span
-                                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                                  solutionOverviewHeroImageGrayscale ? 'translate-x-4' : ''
-                                }`}
-                              />
-                            </button>
-                          </div>
-                          {/* Replace/Remove buttons */}
-                          <div className="flex gap-2">
-                            {/* Replace with upload */}
-                            <div className="flex-1 border border-gray-300 dark:border-line-subtle rounded-lg overflow-hidden">
-                              <label className="flex items-center justify-center gap-1 h-8 cursor-pointer text-xs text-gray-500 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors">
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0]
-                                    if (file && file.type.startsWith('image/')) {
-                                      const reader = new FileReader()
-                                      reader.onload = () => {
-                                        setSolutionOverviewHeroImageUrl(reader.result as string)
-                                        setSolutionOverviewHeroImagePosition({ x: 0, y: 0 })
-                                        setSolutionOverviewHeroImageZoom(1)
-                                      }
-                                      reader.readAsDataURL(file)
-                                    }
-                                  }}
-                                  className="hidden"
-                                />
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
-                                Upload new
-                              </label>
-                            </div>
-                            {/* Replace from library */}
-                            <button
-                              onClick={() => setShowHeroImageLibrary(true)}
-                              className="flex-1 flex items-center justify-center gap-1 h-8 border border-gray-300 dark:border-line-subtle rounded-lg text-xs text-gray-500 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors"
-                            >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              From library
-                            </button>
-                            {/* Remove button */}
-                            <button
-                              onClick={() => {
-                                setSolutionOverviewHeroImageUrl(null)
-                                setSolutionOverviewHeroImagePosition({ x: 0, y: 0 })
-                                setSolutionOverviewHeroImageZoom(1)
-                                setSolutionOverviewHeroImageGrayscale(false)
-                              }}
-                              className="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-line-subtle rounded-lg text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors"
-                              title="Remove image"
-                            >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Page 2 Header (H1 in header band) */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Page Header</label>
-                      <input
-                        type="text"
-                        value={solutionOverviewPage2Header}
-                        onChange={(e) => setSolutionOverviewPage2Header(e.target.value)}
-                        placeholder="Employee Health Essentials"
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      <div className="mt-1 text-xs text-gray-400 text-right">
-                        {solutionOverviewPage2Header.length}/60
-                      </div>
-                    </div>
-
-                    {/* Section Header */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Section Header</label>
-                      <textarea
-                        value={solutionOverviewSectionHeader}
-                        onChange={(e) => setSolutionOverviewSectionHeader(e.target.value)}
-                        placeholder="Streamline Employee Health.\nStrengthen Compliance."
-                        rows={2}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
-                      />
-                      <div className="mt-1 text-xs text-gray-400 text-right">
-                        {solutionOverviewSectionHeader.length}/80
-                      </div>
-                    </div>
-
-                    {/* Intro Paragraph */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Intro Paragraph</label>
-                      <textarea
-                        value={solutionOverviewIntroParagraph}
-                        onChange={(e) => setSolutionOverviewIntroParagraph(e.target.value)}
-                        placeholder="Enter introduction text..."
-                        rows={7}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
-                      />
-                      <div className={`mt-1 text-xs text-right ${solutionOverviewIntroParagraph.length > 500 ? 'text-orange-500' : 'text-gray-400'}`}>
-                        {solutionOverviewIntroParagraph.length}/500
-                      </div>
-                    </div>
-
-                    {/* Key Solutions */}
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-2">Key Solutions ({solutionOverviewKeySolutions.length} items)</label>
-                      <div className="space-y-2">
-                        {solutionOverviewKeySolutions.map((solution, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={solution}
-                              onChange={(e) => setSolutionOverviewKeySolution(index, e.target.value)}
-                              placeholder={`Solution ${index + 1}`}
-                              className="flex-1 px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            {solutionOverviewKeySolutions.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeSolutionOverviewKeySolution(index)}
-                                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                                title="Remove solution"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={addSolutionOverviewKeySolution}
-                        className="mt-2 flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 transition-colors"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add Key Solution
-                      </button>
-                    </div>
-
-                    {/* Quote Section */}
-                    <div className="border-t border-gray-200 dark:border-line-subtle pt-4">
-                      <label className="block text-xs text-gray-500 mb-2">Quote Section</label>
-
-                      {/* Quote Text */}
-                      <div className="mb-3">
-                        <label className="block text-xs text-gray-400 mb-1">Quote</label>
-                        <textarea
-                          value={solutionOverviewQuoteText}
-                          onChange={(e) => setSolutionOverviewQuoteText(e.target.value)}
-                          placeholder="Enter customer quote..."
-                          rows={4}
-                          className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
-                        />
-                        <div className={`mt-1 text-xs text-right ${solutionOverviewQuoteText.length > 350 ? 'text-orange-500' : 'text-gray-400'}`}>
-                          {solutionOverviewQuoteText.length}/350
-                        </div>
-                      </div>
-
-                      {/* Quote Attribution - vertical stack */}
-                      <div className="space-y-2">
-                        <div>
-                          <label className="block text-xs text-gray-400 mb-1">Name</label>
-                          <input
-                            type="text"
-                            value={solutionOverviewQuoteName}
-                            onChange={(e) => setSolutionOverviewQuoteName(e.target.value)}
-                            placeholder="Firstname Lastname"
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-400 mb-1">Title</label>
-                          <input
-                            type="text"
-                            value={solutionOverviewQuoteTitle}
-                            onChange={(e) => setSolutionOverviewQuoteTitle(e.target.value)}
-                            placeholder="Job Title"
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-400 mb-1">Organization</label>
-                          <input
-                            type="text"
-                            value={solutionOverviewQuoteCompany}
-                            onChange={(e) => setSolutionOverviewQuoteCompany(e.target.value)}
-                            placeholder="Company Name"
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Footer Stats Section */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary mb-3">Footer Stats</h4>
-                      <div className="grid grid-cols-5 gap-2">
-                        {/* Stat 1 */}
-                        <div className="space-y-1">
-                          <input
-                            type="text"
-                            value={solutionOverviewStat1Value}
-                            onChange={(e) => setSolutionOverviewStat1Value(e.target.value)}
-                            placeholder="20+"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                          <input
-                            type="text"
-                            value={solutionOverviewStat1Label}
-                            onChange={(e) => setSolutionOverviewStat1Label(e.target.value)}
-                            placeholder="Awards"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                        </div>
-                        {/* Stat 2 */}
-                        <div className="space-y-1">
-                          <input
-                            type="text"
-                            value={solutionOverviewStat2Value}
-                            onChange={(e) => setSolutionOverviewStat2Value(e.target.value)}
-                            placeholder="350+"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                          <input
-                            type="text"
-                            value={solutionOverviewStat2Label}
-                            onChange={(e) => setSolutionOverviewStat2Label(e.target.value)}
-                            placeholder="Experts"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                        </div>
-                        {/* Stat 3 */}
-                        <div className="space-y-1">
-                          <input
-                            type="text"
-                            value={solutionOverviewStat3Value}
-                            onChange={(e) => setSolutionOverviewStat3Value(e.target.value)}
-                            placeholder="100%"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                          <input
-                            type="text"
-                            value={solutionOverviewStat3Label}
-                            onChange={(e) => setSolutionOverviewStat3Label(e.target.value)}
-                            placeholder="Deployment"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                        </div>
-                        {/* Stat 4 */}
-                        <div className="space-y-1">
-                          <input
-                            type="text"
-                            value={solutionOverviewStat4Value}
-                            onChange={(e) => setSolutionOverviewStat4Value(e.target.value)}
-                            placeholder="2M+"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                          <input
-                            type="text"
-                            value={solutionOverviewStat4Label}
-                            onChange={(e) => setSolutionOverviewStat4Label(e.target.value)}
-                            placeholder="End Users"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                        </div>
-                        {/* Stat 5 */}
-                        <div className="space-y-1">
-                          <input
-                            type="text"
-                            value={solutionOverviewStat5Value}
-                            onChange={(e) => setSolutionOverviewStat5Value(e.target.value)}
-                            placeholder="1.2K"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                          <input
-                            type="text"
-                            value={solutionOverviewStat5Label}
-                            onChange={(e) => setSolutionOverviewStat5Label(e.target.value)}
-                            placeholder="Clients"
-                            className="w-full px-2 py-1.5 text-xs bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Page 3 Controls (Benefits & Features) */}
-                {solutionOverviewCurrentPage === 3 && (
-                  <div className="space-y-4">
-                    {/* Key Benefits Section */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Key Benefits</h4>
-                        <span className="text-xs text-gray-400">{solutionOverviewBenefits.length}/7</span>
-                      </div>
-                      <div className="space-y-3">
-                        {solutionOverviewBenefits.map((benefit, index) => (
-                          <div key={index} className="p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-2">
-                            {/* Row 1: Icon picker + Title + X button */}
-                            <div className="flex items-center gap-2">
-                              {/* Icon Picker - same height as input */}
-                              {(() => {
-                                const IconComponent = benefit.icon ? getIconByName(benefit.icon) : null
-                                return (
-                                  <button
-                                    onClick={() => {
-                                      setActiveBenefitForIcon(index)
-                                      setShowIconLibrary(true)
-                                    }}
-                                    className="flex-shrink-0 w-8 h-8 bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded flex items-center justify-center hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
-                                    title={benefit.icon ? `Icon: ${benefit.icon.replace(/-/g, ' ')}` : 'Select icon'}
-                                  >
-                                    {IconComponent ? (
-                                      <IconComponent className="w-4 h-4 text-gray-600 dark:text-content-secondary" />
-                                    ) : (
-                                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                                      </svg>
-                                    )}
-                                  </button>
-                                )
-                              })()}
-                              {/* Title input */}
-                              <input
-                                type="text"
-                                value={benefit.title}
-                                onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, title: e.target.value })}
-                                placeholder="Benefit title"
-                                className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              />
-                              {/* X button - only show when more than 3 benefits */}
-                              {solutionOverviewBenefits.length > 3 && (
-                                <button
-                                  onClick={() => removeSolutionOverviewBenefit(index)}
-                                  className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
-                                  title="Remove benefit"
-                                >
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                  </svg>
-                                </button>
-                              )}
-                            </div>
-                            {/* Row 2: Description - full width */}
-                            <textarea
-                              value={benefit.description}
-                              onChange={(e) => setSolutionOverviewBenefit(index, { ...benefit, description: e.target.value })}
-                              placeholder="Description"
-                              rows={4}
-                              className="w-full px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      {solutionOverviewBenefits.length < 7 && (
-                        <button
-                          onClick={addSolutionOverviewBenefit}
-                          className="mt-2 w-full px-3 py-2 text-sm text-blue-600 dark:text-blue-400 border border-dashed border-blue-300 dark:border-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                        >
-                          + Add Benefit
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Image */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary mb-2">Image</h4>
-                      {!solutionOverviewScreenshotUrl ? (
-                        <div className="flex gap-2">
-                          <label className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg cursor-pointer hover:border-blue-400 transition-colors">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0]
-                                if (file && file.type.startsWith('image/')) {
-                                  const reader = new FileReader()
-                                  reader.onload = () => {
-                                    setSolutionOverviewScreenshotUrl(reader.result as string)
-                                  }
-                                  reader.readAsDataURL(file)
-                                }
-                              }}
-                            />
-                            <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              <span className="text-sm">Upload</span>
-                            </div>
-                          </label>
-                          <button
-                            onClick={() => { setSelectingSOScreenshot(true); setShowImageLibrary(true) }}
-                            className="flex-1 aspect-[200/120] border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg cursor-pointer hover:border-blue-400 transition-colors flex flex-col items-center justify-center text-gray-400"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                            </svg>
-                            <span className="text-sm">Library</span>
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {/* Image preview - click to adjust */}
-                          <div className="relative">
-                            <div
-                              onClick={() => setShowSOScreenshotCropModal(true)}
-                              className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
-                              style={{ width: 168, height: 168 }}
-                            >
-                              <img
-                                src={solutionOverviewScreenshotUrl}
-                                alt="Image"
-                                className="w-full h-full object-cover"
-                                style={{
-                                  objectPosition: `${50 - solutionOverviewScreenshotPosition.x}% ${50 - solutionOverviewScreenshotPosition.y}%`,
-                                  transform: solutionOverviewScreenshotZoom !== 1 ? `scale(${solutionOverviewScreenshotZoom})` : undefined,
-                                }}
-                              />
-                            </div>
-                            {/* Adjust + Library buttons */}
-                            <button
-                              onClick={() => setShowSOScreenshotCropModal(true)}
-                              className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                            >
-                              Adjust
-                            </button>
-                            <button
-                              onClick={() => { setSelectingSOScreenshot(true); setShowImageLibrary(true) }}
-                              className="absolute bottom-1 left-16 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                            >
-                              Library
-                            </button>
-                            {/* Remove button */}
-                            <button
-                              onClick={() => {
-                                setSolutionOverviewScreenshotUrl(null)
-                                setSolutionOverviewScreenshotPosition({ x: 0, y: 0 })
-                                setSolutionOverviewScreenshotZoom(1)
-                                setSolutionOverviewScreenshotGrayscale(false)
-                              }}
-                              className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
-                              title="Remove image"
-                            >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </div>
-                          {/* Grayscale toggle */}
-                          <div className="flex items-center justify-between">
-                            <label className="text-xs text-gray-500">Grayscale</label>
-                            <button
-                              onClick={() => setSolutionOverviewScreenshotGrayscale(!solutionOverviewScreenshotGrayscale)}
-                              className={`relative w-9 h-5 rounded-full transition-colors ${
-                                solutionOverviewScreenshotGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                              }`}
-                            >
-                              <span
-                                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                                  solutionOverviewScreenshotGrayscale ? 'translate-x-4' : ''
-                                }`}
-                              />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Powerful Features Section */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Powerful Features</h4>
-                        <span className="text-xs text-gray-400">{solutionOverviewFeatures.length} features</span>
-                      </div>
-                      <div className="space-y-3">
-                        {solutionOverviewFeatures.map((feature, index) => (
-                          <div key={index} className="p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">
-                            <div className="flex items-start gap-2">
-                              <div className="flex-1 space-y-2">
-                                <input
-                                  type="text"
-                                  value={feature.title}
-                                  onChange={(e) => setSolutionOverviewFeature(index, { ...feature, title: e.target.value })}
-                                  placeholder="Feature title"
-                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                                <textarea
-                                  value={feature.description}
-                                  onChange={(e) => setSolutionOverviewFeature(index, { ...feature, description: e.target.value })}
-                                  placeholder="Description"
-                                  rows={3}
-                                  className="w-full px-2 py-1.5 text-sm bg-white dark:bg-surface-tertiary border border-gray-300 dark:border-line-subtle rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                                />
-                              </div>
-                              {solutionOverviewFeatures.length > 1 && (
-                                <button
-                                  onClick={() => removeSolutionOverviewFeature(index)}
-                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                  title="Remove feature"
-                                >
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                  </svg>
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <button
-                        onClick={addSolutionOverviewFeature}
-                        className="mt-2 w-full px-3 py-2 text-sm text-blue-600 dark:text-blue-400 border border-dashed border-blue-300 dark:border-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                      >
-                        + Add Feature
-                      </button>
-                    </div>
-
-                    {/* CTA Option */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-line-subtle space-y-3">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-content-secondary">Call to Action</h4>
-                      <select
-                        value={solutionOverviewCtaOption}
-                        onChange={(e) => setSolutionOverviewCtaOption(e.target.value as 'demo' | 'learn' | 'start' | 'contact')}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {ctaOptions.map((option) => (
-                          <option key={option.id} value={option.id}>{option.label}</option>
-                        ))}
-                      </select>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">CTA Link URL</label>
-                        <input
-                          type="url"
-                          value={solutionOverviewCtaUrl}
-                          onChange={(e) => setSolutionOverviewCtaUrl(e.target.value)}
-                          placeholder="https://cority.com/request-demo"
-                          className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                        />
-                        <p className="mt-1 text-xs text-gray-400">This link will be clickable in the exported PDF</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <SolutionOverviewEditorControls
+                solutionOverviewSolution={solutionOverviewSolution}
+                setSolutionOverviewSolution={setSolutionOverviewSolution}
+                solutionOverviewSolutionName={solutionOverviewSolutionName}
+                setSolutionOverviewSolutionName={setSolutionOverviewSolutionName}
+                solutionOverviewTagline={solutionOverviewTagline}
+                setSolutionOverviewTagline={setSolutionOverviewTagline}
+                solutionOverviewCurrentPage={solutionOverviewCurrentPage}
+                solutionOverviewHeroImageUrl={solutionOverviewHeroImageUrl}
+                setSolutionOverviewHeroImageUrl={setSolutionOverviewHeroImageUrl}
+                solutionOverviewHeroImagePosition={solutionOverviewHeroImagePosition}
+                setSolutionOverviewHeroImagePosition={setSolutionOverviewHeroImagePosition}
+                solutionOverviewHeroImageZoom={solutionOverviewHeroImageZoom}
+                setSolutionOverviewHeroImageZoom={setSolutionOverviewHeroImageZoom}
+                solutionOverviewHeroImageGrayscale={solutionOverviewHeroImageGrayscale}
+                setSolutionOverviewHeroImageGrayscale={setSolutionOverviewHeroImageGrayscale}
+                solutionOverviewPage2Header={solutionOverviewPage2Header}
+                setSolutionOverviewPage2Header={setSolutionOverviewPage2Header}
+                solutionOverviewSectionHeader={solutionOverviewSectionHeader}
+                setSolutionOverviewSectionHeader={setSolutionOverviewSectionHeader}
+                solutionOverviewIntroParagraph={solutionOverviewIntroParagraph}
+                setSolutionOverviewIntroParagraph={setSolutionOverviewIntroParagraph}
+                solutionOverviewKeySolutions={solutionOverviewKeySolutions}
+                setSolutionOverviewKeySolution={setSolutionOverviewKeySolution}
+                addSolutionOverviewKeySolution={addSolutionOverviewKeySolution}
+                removeSolutionOverviewKeySolution={removeSolutionOverviewKeySolution}
+                solutionOverviewQuoteText={solutionOverviewQuoteText}
+                setSolutionOverviewQuoteText={setSolutionOverviewQuoteText}
+                solutionOverviewQuoteName={solutionOverviewQuoteName}
+                setSolutionOverviewQuoteName={setSolutionOverviewQuoteName}
+                solutionOverviewQuoteTitle={solutionOverviewQuoteTitle}
+                setSolutionOverviewQuoteTitle={setSolutionOverviewQuoteTitle}
+                solutionOverviewQuoteCompany={solutionOverviewQuoteCompany}
+                setSolutionOverviewQuoteCompany={setSolutionOverviewQuoteCompany}
+                solutionOverviewStat1Value={solutionOverviewStat1Value}
+                setSolutionOverviewStat1Value={setSolutionOverviewStat1Value}
+                solutionOverviewStat1Label={solutionOverviewStat1Label}
+                setSolutionOverviewStat1Label={setSolutionOverviewStat1Label}
+                solutionOverviewStat2Value={solutionOverviewStat2Value}
+                setSolutionOverviewStat2Value={setSolutionOverviewStat2Value}
+                solutionOverviewStat2Label={solutionOverviewStat2Label}
+                setSolutionOverviewStat2Label={setSolutionOverviewStat2Label}
+                solutionOverviewStat3Value={solutionOverviewStat3Value}
+                setSolutionOverviewStat3Value={setSolutionOverviewStat3Value}
+                solutionOverviewStat3Label={solutionOverviewStat3Label}
+                setSolutionOverviewStat3Label={setSolutionOverviewStat3Label}
+                solutionOverviewStat4Value={solutionOverviewStat4Value}
+                setSolutionOverviewStat4Value={setSolutionOverviewStat4Value}
+                solutionOverviewStat4Label={solutionOverviewStat4Label}
+                setSolutionOverviewStat4Label={setSolutionOverviewStat4Label}
+                solutionOverviewStat5Value={solutionOverviewStat5Value}
+                setSolutionOverviewStat5Value={setSolutionOverviewStat5Value}
+                solutionOverviewStat5Label={solutionOverviewStat5Label}
+                setSolutionOverviewStat5Label={setSolutionOverviewStat5Label}
+                solutionOverviewBenefits={solutionOverviewBenefits}
+                setSolutionOverviewBenefit={setSolutionOverviewBenefit}
+                addSolutionOverviewBenefit={addSolutionOverviewBenefit}
+                removeSolutionOverviewBenefit={removeSolutionOverviewBenefit}
+                solutionOverviewFeatures={solutionOverviewFeatures}
+                setSolutionOverviewFeature={setSolutionOverviewFeature}
+                addSolutionOverviewFeature={addSolutionOverviewFeature}
+                removeSolutionOverviewFeature={removeSolutionOverviewFeature}
+                solutionOverviewScreenshotUrl={solutionOverviewScreenshotUrl}
+                setSolutionOverviewScreenshotUrl={setSolutionOverviewScreenshotUrl}
+                solutionOverviewScreenshotPosition={solutionOverviewScreenshotPosition}
+                setSolutionOverviewScreenshotPosition={setSolutionOverviewScreenshotPosition}
+                solutionOverviewScreenshotZoom={solutionOverviewScreenshotZoom}
+                setSolutionOverviewScreenshotZoom={setSolutionOverviewScreenshotZoom}
+                solutionOverviewScreenshotGrayscale={solutionOverviewScreenshotGrayscale}
+                setSolutionOverviewScreenshotGrayscale={setSolutionOverviewScreenshotGrayscale}
+                solutionOverviewCtaOption={solutionOverviewCtaOption}
+                setSolutionOverviewCtaOption={setSolutionOverviewCtaOption}
+                solutionOverviewCtaUrl={solutionOverviewCtaUrl}
+                setSolutionOverviewCtaUrl={setSolutionOverviewCtaUrl}
+                setShowImageLibrary={setShowImageLibrary}
+                setSelectingSOScreenshot={setSelectingSOScreenshot}
+              />
             )}
 
             {/* Social Dark Gradient and Social Blue Gradient Variant Controls */}
@@ -3101,44 +2134,16 @@ export function EditorScreen() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Image</label>
                 {thumbnailImageUrl ? (
-                  <div className="relative">
-                    {/* Image preview - click to adjust */}
-                    <div
-                      onClick={() => setShowCropModal(true)}
-                      className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 hover:border-blue-400 transition-colors"
-                      style={{ width: 240, height: 135 }}
-                    >
-                      <img
-                        src={thumbnailImageUrl}
-                        alt="Selected image"
-                        className="w-full h-full object-cover"
-                        style={{
-                          objectPosition: `${50 - thumbnailImagePosition.x}% ${50 - thumbnailImagePosition.y}%`,
-                          transform: thumbnailImageZoom !== 1 ? `scale(${thumbnailImageZoom})` : undefined,
-                        }}
-                      />
-                    </div>
-                    {/* Adjust button */}
-                    <button
-                      onClick={() => setShowCropModal(true)}
-                      className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                    >
-                      Adjust
-                    </button>
-                    {/* Remove button */}
-                    <button
-                      onClick={() => {
-                        setThumbnailImageUrl(null)
-                        setThumbnailImageSettings(currentTemplate, { position: { x: 0, y: 0 }, zoom: 1 })
-                      }}
-                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
-                      title="Remove image"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
+                  <ImagePreviewWithCrop
+                    imageUrl={thumbnailImageUrl}
+                    imagePosition={thumbnailImagePosition}
+                    imageZoom={thumbnailImageZoom}
+                    onAdjust={() => setShowCropModal(true)}
+                    onRemove={() => {
+                      setThumbnailImageUrl(null)
+                      setThumbnailImageSettings(currentTemplate, { position: { x: 0, y: 0 }, zoom: 1 })
+                    }}
+                  />
                 ) : (
                   <div className="flex gap-2">
                     {/* Upload box */}
@@ -3194,21 +2199,12 @@ export function EditorScreen() {
                 )}
                 {/* Grayscale toggle - only show when image is selected */}
                 {thumbnailImageUrl && (
-                  <div className="flex items-center justify-between mt-3">
-                    <label className="text-xs text-gray-500">Grayscale</label>
-                    <button
-                      onClick={() => setGrayscale(!grayscale)}
-                      className={`relative w-9 h-5 rounded-full transition-colors ${
-                        grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                          grayscale ? 'translate-x-4' : ''
-                        }`}
-                      />
-                    </button>
-                  </div>
+                  <ToggleSwitch
+                    label="Grayscale"
+                    checked={grayscale}
+                    onChange={() => setGrayscale(!grayscale)}
+                    className="mt-3"
+                  />
                 )}
               </div>
             )}
@@ -3741,192 +2737,46 @@ export function EditorScreen() {
 
               {/* Email Speakers and Website Webinar (speakers variant) Content Fields */}
               {(currentTemplate === 'email-speakers' || (currentTemplate === 'website-webinar' && webinarVariant === 'speakers')) && (
-                <div className="space-y-4">
-                  {/* CTA Text - only for email-speakers (website-webinar has its own CTA section) */}
-                  {currentTemplate === 'email-speakers' && (
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                          CTA Text
-                        </label>
-                        <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
-                      </div>
-                      <input
-                        type="text"
-                        value={ctaText}
-                        onChange={(e) => setCtaText(e.target.value)}
-                        placeholder="e.g., Responsive"
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
-                          bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                          focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                          ${!showCta ? 'opacity-50' : ''}`}
-                      />
-                    </div>
-                  )}
-
-                  {/* Speaker 1 */}
-                  <div className={`p-3 bg-gray-100 dark:bg-surface-secondary rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker1 ? 'opacity-50' : ''}`}>
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 1</label>
-                      {currentTemplate === 'website-webinar' && (
-                        <EyeIcon visible={showSpeaker1} onClick={() => setShowSpeaker1(!showSpeaker1)} />
-                      )}
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0">
-                        <div
-                          className="w-12 h-12 rounded-full bg-gray-300 dark:bg-surface-tertiary overflow-hidden cursor-pointer relative"
-                          onClick={() => { setActiveSpeakerForImage(1); setShowImageLibrary(true) }}
-                          style={{ backgroundImage: speaker1ImageUrl ? `url(${speaker1ImageUrl})` : undefined, backgroundSize: `${speaker1ImageZoom * 100}%`, backgroundPosition: `${50 + speaker1ImagePosition.x}% ${50 + speaker1ImagePosition.y}%` }}
-                        >
-                          {!speaker1ImageUrl && (
-                            <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-xs">+</div>
-                          )}
-                        </div>
-                        {speaker1ImageUrl && (
-                          <div className="mt-1 flex flex-col gap-1">
-                            <input
-                              type="range"
-                              min="1"
-                              max="3"
-                              step="0.1"
-                              value={speaker1ImageZoom}
-                              onChange={(e) => setSpeaker1ImageZoom(parseFloat(e.target.value))}
-                              className="w-12 h-1"
-                              title="Zoom"
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <input
-                          type="text"
-                          value={speaker1Name}
-                          onChange={(e) => setSpeaker1Name(e.target.value)}
-                          placeholder="Name"
-                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
-                        />
-                        <input
-                          type="text"
-                          value={speaker1Role}
-                          onChange={(e) => setSpeaker1Role(e.target.value)}
-                          placeholder="Role, Company"
-                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Speaker 2 */}
-                  {(currentTemplate === 'website-webinar' || speakerCount >= 2) && (
-                    <div className={`p-3 bg-gray-100 dark:bg-surface-secondary rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker2 ? 'opacity-50' : ''}`}>
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 2</label>
-                        {currentTemplate === 'website-webinar' && (
-                          <EyeIcon visible={showSpeaker2} onClick={() => setShowSpeaker2(!showSpeaker2)} />
-                        )}
-                      </div>
-                      <div className="flex gap-3">
-                        <div className="flex-shrink-0">
-                          <div
-                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-surface-tertiary overflow-hidden cursor-pointer relative"
-                            onClick={() => { setActiveSpeakerForImage(2); setShowImageLibrary(true) }}
-                            style={{ backgroundImage: speaker2ImageUrl ? `url(${speaker2ImageUrl})` : undefined, backgroundSize: `${speaker2ImageZoom * 100}%`, backgroundPosition: `${50 + speaker2ImagePosition.x}% ${50 + speaker2ImagePosition.y}%` }}
-                          >
-                            {!speaker2ImageUrl && (
-                              <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-xs">+</div>
-                            )}
-                          </div>
-                          {speaker2ImageUrl && (
-                            <div className="mt-1 flex flex-col gap-1">
-                              <input
-                                type="range"
-                                min="1"
-                                max="3"
-                                step="0.1"
-                                value={speaker2ImageZoom}
-                                onChange={(e) => setSpeaker2ImageZoom(parseFloat(e.target.value))}
-                                className="w-12 h-1"
-                                title="Zoom"
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <input
-                            type="text"
-                            value={speaker2Name}
-                            onChange={(e) => setSpeaker2Name(e.target.value)}
-                            placeholder="Name"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
-                          />
-                          <input
-                            type="text"
-                            value={speaker2Role}
-                            onChange={(e) => setSpeaker2Role(e.target.value)}
-                            placeholder="Role, Company"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Speaker 3 */}
-                  {(currentTemplate === 'website-webinar' || speakerCount >= 3) && (
-                    <div className={`p-3 bg-gray-100 dark:bg-surface-secondary rounded-lg space-y-3 ${currentTemplate === 'website-webinar' && !showSpeaker3 ? 'opacity-50' : ''}`}>
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Speaker 3</label>
-                        {currentTemplate === 'website-webinar' && (
-                          <EyeIcon visible={showSpeaker3} onClick={() => setShowSpeaker3(!showSpeaker3)} />
-                        )}
-                      </div>
-                      <div className="flex gap-3">
-                        <div className="flex-shrink-0">
-                          <div
-                            className="w-12 h-12 rounded-full bg-gray-300 dark:bg-surface-tertiary overflow-hidden cursor-pointer relative"
-                            onClick={() => { setActiveSpeakerForImage(3); setShowImageLibrary(true) }}
-                            style={{ backgroundImage: speaker3ImageUrl ? `url(${speaker3ImageUrl})` : undefined, backgroundSize: `${speaker3ImageZoom * 100}%`, backgroundPosition: `${50 + speaker3ImagePosition.x}% ${50 + speaker3ImagePosition.y}%` }}
-                          >
-                            {!speaker3ImageUrl && (
-                              <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-xs">+</div>
-                            )}
-                          </div>
-                          {speaker3ImageUrl && (
-                            <div className="mt-1 flex flex-col gap-1">
-                              <input
-                                type="range"
-                                min="1"
-                                max="3"
-                                step="0.1"
-                                value={speaker3ImageZoom}
-                                onChange={(e) => setSpeaker3ImageZoom(parseFloat(e.target.value))}
-                                className="w-12 h-1"
-                                title="Zoom"
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <input
-                            type="text"
-                            value={speaker3Name}
-                            onChange={(e) => setSpeaker3Name(e.target.value)}
-                            placeholder="Name"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
-                          />
-                          <input
-                            type="text"
-                            value={speaker3Role}
-                            onChange={(e) => setSpeaker3Role(e.target.value)}
-                            placeholder="Role, Company"
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-line-subtle rounded bg-white dark:bg-surface-primary"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <SpeakerEditorControls
+                  currentTemplate={currentTemplate}
+                  ctaText={ctaText}
+                  setCtaText={setCtaText}
+                  showCta={showCta}
+                  setShowCta={setShowCta}
+                  speakerCount={speakerCount}
+                  showSpeaker1={showSpeaker1}
+                  showSpeaker2={showSpeaker2}
+                  showSpeaker3={showSpeaker3}
+                  setShowSpeaker1={setShowSpeaker1}
+                  setShowSpeaker2={setShowSpeaker2}
+                  setShowSpeaker3={setShowSpeaker3}
+                  speaker1Name={speaker1Name}
+                  setSpeaker1Name={setSpeaker1Name}
+                  speaker1Role={speaker1Role}
+                  setSpeaker1Role={setSpeaker1Role}
+                  speaker1ImageUrl={speaker1ImageUrl}
+                  speaker1ImagePosition={speaker1ImagePosition}
+                  speaker1ImageZoom={speaker1ImageZoom}
+                  setSpeaker1ImageZoom={setSpeaker1ImageZoom}
+                  speaker2Name={speaker2Name}
+                  setSpeaker2Name={setSpeaker2Name}
+                  speaker2Role={speaker2Role}
+                  setSpeaker2Role={setSpeaker2Role}
+                  speaker2ImageUrl={speaker2ImageUrl}
+                  speaker2ImagePosition={speaker2ImagePosition}
+                  speaker2ImageZoom={speaker2ImageZoom}
+                  setSpeaker2ImageZoom={setSpeaker2ImageZoom}
+                  speaker3Name={speaker3Name}
+                  setSpeaker3Name={setSpeaker3Name}
+                  speaker3Role={speaker3Role}
+                  setSpeaker3Role={setSpeaker3Role}
+                  speaker3ImageUrl={speaker3ImageUrl}
+                  speaker3ImagePosition={speaker3ImagePosition}
+                  speaker3ImageZoom={speaker3ImageZoom}
+                  setSpeaker3ImageZoom={setSpeaker3ImageZoom}
+                  setActiveSpeakerForImage={setActiveSpeakerForImage}
+                  setShowImageLibrary={setShowImageLibrary}
+                />
               )}
 
               {/* Social Grid Detail Content Fields */}

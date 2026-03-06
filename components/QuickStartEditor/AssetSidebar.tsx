@@ -12,6 +12,7 @@ import {
   type ColorsConfig,
   type TypographyConfig
 } from '@/lib/brand-config'
+import { DeleteConfirmModal } from '@/components/shared/DeleteConfirmModal'
 
 // Import all template components
 import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
@@ -171,12 +172,12 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
       </div>
 
       {/* Delete Confirmation Modal */}
-      {deleteConfirmId && (
-        <DeleteConfirmModal
-          onConfirm={() => handleDeleteAsset(deleteConfirmId)}
-          onCancel={() => setDeleteConfirmId(null)}
-        />
-      )}
+      <DeleteConfirmModal
+        isOpen={deleteConfirmId !== null}
+        onConfirm={() => deleteConfirmId && handleDeleteAsset(deleteConfirmId)}
+        onCancel={() => setDeleteConfirmId(null)}
+        itemType="Asset"
+      />
 
       {/* Add Asset Modal */}
       {showAddAssetModal && (
@@ -191,42 +192,6 @@ export function AssetSidebar({ currentAssetId, onSelectAsset }: AssetSidebarProp
           recommendedAssets={kitConfig?.recommendedAssets || []}
         />
       )}
-    </div>
-  )
-}
-
-function DeleteConfirmModal({
-  onConfirm,
-  onCancel,
-}: {
-  onConfirm: () => void
-  onCancel: () => void
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-surface-primary rounded-xl shadow-xl max-w-sm w-full p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
-          Delete Asset?
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-content-secondary mb-6">
-          Are you sure you want to delete this asset? This action cannot be undone.
-        </p>
-        <div className="flex items-center justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
     </div>
   )
 }

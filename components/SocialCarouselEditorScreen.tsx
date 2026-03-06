@@ -7,6 +7,9 @@ import { SocialCarousel } from '@/components/templates/SocialCarousel'
 import { SimpleRichTextEditor } from '@/components/SimpleRichTextEditor'
 import { ImageCropModal } from '@/components/ImageCropModal'
 import { ImageLibraryModal } from '@/components/ImageLibraryModal'
+import { EyeIcon } from '@/components/shared/EyeIcon'
+import { ToggleSwitch } from '@/components/shared/ToggleSwitch'
+import { ImagePreviewWithCrop } from '@/components/shared/ImagePreviewWithCrop'
 import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
 import type { CarouselSlide, CarouselSlideType, CarouselBackgroundStyle } from '@/types'
 import {
@@ -25,6 +28,7 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { DeleteConfirmModal } from './shared/DeleteConfirmModal'
 
 // Layout type labels
 const SLIDE_TYPE_LABELS: Record<CarouselSlideType, string> = {
@@ -47,47 +51,6 @@ const BACKGROUND_IMAGES: Record<CarouselBackgroundStyle, string> = {
   '5': '/assets/backgrounds/carousel-dark-gradient-5.png',
   '6': '/assets/backgrounds/carousel-dark-gradient-6.png',
   '7': '/assets/backgrounds/carousel-dark-gradient-7.png',
-}
-
-// Eye icon for visibility toggle
-function EyeIcon({ visible, onClick }: { visible: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors ${
-        visible ? 'text-gray-500' : 'text-gray-300'
-      }`}
-      title={visible ? 'Hide in preview' : 'Show in preview'}
-    >
-      {visible ? (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-        </svg>
-      )}
-    </button>
-  )
-}
-
-// Delete confirmation modal
-function DeleteConfirmModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-surface-secondary rounded-xl p-6 max-w-sm mx-4 shadow-xl">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">Delete Slide</h3>
-        <p className="text-sm text-gray-600 dark:text-content-secondary mb-4">Are you sure you want to delete this slide? This action cannot be undone.</p>
-        <div className="flex gap-3 justify-end">
-          <button onClick={onCancel} className="px-4 py-2 text-sm rounded-lg bg-gray-100 dark:bg-surface-primary text-gray-600 dark:text-content-secondary hover:bg-gray-200 dark:hover:bg-interactive-hover">Cancel</button>
-          <button onClick={onConfirm} className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700">Delete</button>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 // Sortable carousel slide — all slides render at same displaySize
@@ -581,58 +544,23 @@ export function SocialCarouselEditorScreen() {
               <label className="text-xs font-medium text-gray-500 dark:text-content-secondary uppercase tracking-wide mb-2 block">Image</label>
               {currentSlide.imageUrl ? (
                 <div>
-                  {/* Image preview — click to adjust */}
-                  <div className="relative">
-                    <div
-                      onClick={() => setShowCropModal(true)}
-                      className="cursor-pointer overflow-hidden rounded-lg border border-gray-300 dark:border-line-subtle hover:border-blue-400 transition-colors"
-                      style={{ width: 272, height: 180 }}
-                    >
-                      <img
-                        src={currentSlide.imageUrl}
-                        alt="Selected image"
-                        className="w-full h-full object-cover"
-                        style={{
-                          objectPosition: `${50 - currentSlide.imagePosition.x}% ${50 - currentSlide.imagePosition.y}%`,
-                          transform: currentSlide.imageZoom !== 1 ? `scale(${currentSlide.imageZoom})` : undefined,
-                          filter: currentSlide.grayscale ? 'grayscale(100%)' : undefined,
-                        }}
-                      />
-                    </div>
-                    {/* Adjust button */}
-                    <button
-                      onClick={() => setShowCropModal(true)}
-                      className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/60 rounded text-white text-xs hover:bg-black/80 transition-colors z-20"
-                    >
-                      Adjust
-                    </button>
-                    {/* Remove button */}
-                    <button
-                      onClick={() => updateSlide({ imageUrl: null, imagePosition: { x: 0, y: 0 }, imageZoom: 1 })}
-                      className="absolute top-1 right-1 p-1 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
-                      title="Remove image"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
+                  <ImagePreviewWithCrop
+                    imageUrl={currentSlide.imageUrl}
+                    imagePosition={currentSlide.imagePosition}
+                    imageZoom={currentSlide.imageZoom}
+                    grayscale={currentSlide.grayscale}
+                    onAdjust={() => setShowCropModal(true)}
+                    onRemove={() => updateSlide({ imageUrl: null, imagePosition: { x: 0, y: 0 }, imageZoom: 1 })}
+                    width={272}
+                    height={180}
+                  />
                   {/* Grayscale toggle */}
-                  <div className="flex items-center justify-between mt-3">
-                    <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale</label>
-                    <button
-                      onClick={() => updateSlide({ grayscale: !currentSlide.grayscale })}
-                      className={`relative w-9 h-5 rounded-full transition-colors ${
-                        currentSlide.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                          currentSlide.grayscale ? 'translate-x-4' : ''
-                        }`}
-                      />
-                    </button>
-                  </div>
+                  <ToggleSwitch
+                    label="Grayscale"
+                    checked={currentSlide.grayscale}
+                    onChange={() => updateSlide({ grayscale: !currentSlide.grayscale })}
+                    className="mt-3"
+                  />
                 </div>
               ) : (
                 <div className="flex gap-2">
@@ -766,12 +694,12 @@ export function SocialCarouselEditorScreen() {
       </div>
 
       {/* Delete confirmation modal */}
-      {deleteConfirm && (
-        <DeleteConfirmModal
-          onConfirm={() => deleteSlide(deleteConfirm)}
-          onCancel={() => setDeleteConfirm(null)}
-        />
-      )}
+      <DeleteConfirmModal
+        isOpen={deleteConfirm !== null}
+        onConfirm={() => deleteConfirm && deleteSlide(deleteConfirm)}
+        onCancel={() => setDeleteConfirm(null)}
+        itemType="Slide"
+      />
 
       {/* Image Library Modal */}
       {showImageLibrary && (

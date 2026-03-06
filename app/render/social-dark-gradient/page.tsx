@@ -3,6 +3,7 @@ import { SocialDarkGradientRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseBoolTrue, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,25 +13,24 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  // Parse params on server
-  const eyebrow = (searchParams.eyebrow as string) || 'Eyebrow'
-  const headline = (searchParams.headline as string) || 'Headline'
-  const subhead = (searchParams.subhead as string) || ''
-  const body = (searchParams.body as string) || ''
-  const metadata = (searchParams.metadata as string) || 'Day / Month | 00:00'
-  const ctaText = (searchParams.ctaText as string) || 'Responsive'
-  const colorStyle = ((searchParams.colorStyle as string) || '1') as '1' | '2' | '3' | '4'
-  const headingSize = ((searchParams.headingSize as string) || 'L') as 'S' | 'M' | 'L'
-  const alignment = ((searchParams.alignment as string) || 'left') as 'left' | 'center'
-  const ctaStyle = ((searchParams.ctaStyle as string) || 'link') as 'link' | 'button'
-  const logoColor = ((searchParams.logoColor as string) || 'white') as 'orange' | 'white'
-  const showEyebrow = searchParams.showEyebrow !== 'false'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showSubhead = searchParams.showSubhead !== 'false'
-  const showBody = searchParams.showBody !== 'false'
-  const showMetadata = searchParams.showMetadata !== 'false'
-  const showCta = searchParams.showCta !== 'false'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const eyebrow = parseString(searchParams, 'eyebrow', 'Eyebrow')
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const subhead = parseString(searchParams, 'subhead', '')
+  const body = parseString(searchParams, 'body', '')
+  const metadata = parseString(searchParams, 'metadata', 'Day / Month | 00:00')
+  const ctaText = parseString(searchParams, 'ctaText', 'Responsive')
+  const colorStyle = parseEnum<'1' | '2' | '3' | '4'>(searchParams, 'colorStyle', '1')
+  const headingSize = parseEnum<'S' | 'M' | 'L'>(searchParams, 'headingSize', 'L')
+  const alignment = parseEnum<'left' | 'center'>(searchParams, 'alignment', 'left')
+  const ctaStyle = parseEnum<'link' | 'button'>(searchParams, 'ctaStyle', 'link')
+  const logoColor = parseEnum<'orange' | 'white'>(searchParams, 'logoColor', 'white')
+  const showEyebrow = parseBoolTrue(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const showSubhead = parseBoolTrue(searchParams, 'showSubhead')
+  const showBody = parseBoolTrue(searchParams, 'showBody')
+  const showMetadata = parseBoolTrue(searchParams, 'showMetadata')
+  const showCta = parseBoolTrue(searchParams, 'showCta')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

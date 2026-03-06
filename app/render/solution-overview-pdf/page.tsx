@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { SolutionOverviewPdfRender } from './render-content'
 import type { SolutionCategory } from '@/types'
+import { parseString, parseStringOrNull, parseNumber, parseBoolFalse, parseEnum } from '@/lib/render-params'
 
 export default function SolutionOverviewPdfRenderPage({
   searchParams,
@@ -8,26 +9,26 @@ export default function SolutionOverviewPdfRenderPage({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   // Parse URL params
-  const page = (searchParams.page as '1' | '2' | '3' | 'all') || '1'
-  const solution = (searchParams.solution as SolutionCategory) || 'health'
-  const solutionName = (searchParams.solutionName as string) || 'Employee Health Essentials'
-  const tagline = (searchParams.tagline as string) || 'Built for Healthcare. Ready for You.'
+  const page = parseEnum<'1' | '2' | '3' | 'all'>(searchParams, 'page', '1')
+  const solution = parseString(searchParams, 'solution', 'health') as SolutionCategory
+  const solutionName = parseString(searchParams, 'solutionName', 'Employee Health Essentials')
+  const tagline = parseString(searchParams, 'tagline', 'Built for Healthcare. Ready for You.')
 
   // Page 2 params
-  const heroImageId = (searchParams.heroImageId as string) || 'placeholder'
-  const heroImageUrl = (searchParams.heroImageUrl as string) || null
-  const heroImagePositionX = parseFloat((searchParams.heroImagePositionX as string) || '0')
-  const heroImagePositionY = parseFloat((searchParams.heroImagePositionY as string) || '0')
-  const heroImageZoom = parseFloat((searchParams.heroImageZoom as string) || '1')
-  const heroImageGrayscale = (searchParams.heroImageGrayscale as string) === 'true'
-  const page2Header = (searchParams.page2Header as string) || 'Employee Health Essentials'
-  const sectionHeader = (searchParams.sectionHeader as string) || 'Streamline Employee Health.\nStrengthen Compliance.'
-  const introParagraph = (searchParams.introParagraph as string) || 'Employee Health Essentials offers a streamlined, configurable solution for managing employee health across onboarding, clinic visits, compliance, and exposure tracking.\n\nFor faster deployment, lower admin burden, and stronger compliance — all in one package built for healthcare employee health teams.'
+  const heroImageId = parseString(searchParams, 'heroImageId', 'placeholder')
+  const heroImageUrl = parseStringOrNull(searchParams, 'heroImageUrl')
+  const heroImagePositionX = parseNumber(searchParams, 'heroImagePositionX', 0)
+  const heroImagePositionY = parseNumber(searchParams, 'heroImagePositionY', 0)
+  const heroImageZoom = parseNumber(searchParams, 'heroImageZoom', 1)
+  const heroImageGrayscale = parseBoolFalse(searchParams, 'heroImageGrayscale')
+  const page2Header = parseString(searchParams, 'page2Header', 'Employee Health Essentials')
+  const sectionHeader = parseString(searchParams, 'sectionHeader', 'Streamline Employee Health.\nStrengthen Compliance.')
+  const introParagraph = parseString(searchParams, 'introParagraph', 'Employee Health Essentials offers a streamlined, configurable solution for managing employee health across onboarding, clinic visits, compliance, and exposure tracking.\n\nFor faster deployment, lower admin burden, and stronger compliance — all in one package built for healthcare employee health teams.')
 
   // Parse key solutions - JSON array or default values
   let keySolutions: string[]
   try {
-    const parsed = JSON.parse((searchParams.keySolutions as string) || '[]')
+    const parsed = JSON.parse(parseString(searchParams, 'keySolutions', '[]'))
     keySolutions = Array.isArray(parsed) && parsed.length > 0
       ? parsed as string[]
       : ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking']
@@ -35,27 +36,27 @@ export default function SolutionOverviewPdfRenderPage({
     keySolutions = ['Clinic Visit Management', 'Candidate Onboarding', 'Exposure & Case Management', 'Immunity & Compliance Tracking']
   }
 
-  const quoteText = (searchParams.quoteText as string) || '"Cority\'s self-scheduling tool has transformed our hiring process. It has provided a more efficient way for candidates and employees to schedule appointments at their convenience, reducing administrative workload and improving overall efficiency."'
-  const quoteName = (searchParams.quoteName as string) || 'Mimi Alexander'
-  const quoteTitle = (searchParams.quoteTitle as string) || 'RN, Director of Employee Health Services'
-  const quoteCompany = (searchParams.quoteCompany as string) || 'Texas Health Resources'
+  const quoteText = parseString(searchParams, 'quoteText', '"Cority\'s self-scheduling tool has transformed our hiring process. It has provided a more efficient way for candidates and employees to schedule appointments at their convenience, reducing administrative workload and improving overall efficiency."')
+  const quoteName = parseString(searchParams, 'quoteName', 'Mimi Alexander')
+  const quoteTitle = parseString(searchParams, 'quoteTitle', 'RN, Director of Employee Health Services')
+  const quoteCompany = parseString(searchParams, 'quoteCompany', 'Texas Health Resources')
 
   // Page 2 footer stats
-  const stat1Value = (searchParams.stat1Value as string) || '20+'
-  const stat1Label = (searchParams.stat1Label as string) || 'Awards'
-  const stat2Value = (searchParams.stat2Value as string) || '350+'
-  const stat2Label = (searchParams.stat2Label as string) || 'Experts'
-  const stat3Value = (searchParams.stat3Value as string) || '100%'
-  const stat3Label = (searchParams.stat3Label as string) || 'Deployment'
-  const stat4Value = (searchParams.stat4Value as string) || '2M+'
-  const stat4Label = (searchParams.stat4Label as string) || 'End Users'
-  const stat5Value = (searchParams.stat5Value as string) || '1.2K'
-  const stat5Label = (searchParams.stat5Label as string) || 'Clients'
+  const stat1Value = parseString(searchParams, 'stat1Value', '20+')
+  const stat1Label = parseString(searchParams, 'stat1Label', 'Awards')
+  const stat2Value = parseString(searchParams, 'stat2Value', '350+')
+  const stat2Label = parseString(searchParams, 'stat2Label', 'Experts')
+  const stat3Value = parseString(searchParams, 'stat3Value', '100%')
+  const stat3Label = parseString(searchParams, 'stat3Label', 'Deployment')
+  const stat4Value = parseString(searchParams, 'stat4Value', '2M+')
+  const stat4Label = parseString(searchParams, 'stat4Label', 'End Users')
+  const stat5Value = parseString(searchParams, 'stat5Value', '1.2K')
+  const stat5Label = parseString(searchParams, 'stat5Label', 'Clients')
 
   // Page 3 params - benefits array or defaults
   let benefits
   try {
-    const parsedBenefits = JSON.parse((searchParams.benefits as string) || '[]')
+    const parsedBenefits = JSON.parse(parseString(searchParams, 'benefits', '[]'))
     benefits = Array.isArray(parsedBenefits) && parsedBenefits.length > 0
       ? parsedBenefits
       : [
@@ -74,7 +75,7 @@ export default function SolutionOverviewPdfRenderPage({
   // Page 3 params - features array or defaults
   let features
   try {
-    const parsedFeatures = JSON.parse((searchParams.features as string) || '[]')
+    const parsedFeatures = JSON.parse(parseString(searchParams, 'features', '[]'))
     features = Array.isArray(parsedFeatures) && parsedFeatures.length > 0
       ? parsedFeatures
       : [
@@ -92,13 +93,13 @@ export default function SolutionOverviewPdfRenderPage({
     ]
   }
 
-  const screenshotUrl = (searchParams.screenshotUrl as string) || null
-  const screenshotPositionX = parseFloat((searchParams.screenshotPositionX as string) || '0')
-  const screenshotPositionY = parseFloat((searchParams.screenshotPositionY as string) || '0')
-  const screenshotZoom = parseFloat((searchParams.screenshotZoom as string) || '1')
-  const screenshotGrayscale = (searchParams.screenshotGrayscale as string) === 'true'
-  const ctaOption = (searchParams.ctaOption as 'demo' | 'learn' | 'start' | 'contact') || 'demo'
-  const ctaUrl = (searchParams.ctaUrl as string) || ''
+  const screenshotUrl = parseStringOrNull(searchParams, 'screenshotUrl')
+  const screenshotPositionX = parseNumber(searchParams, 'screenshotPositionX', 0)
+  const screenshotPositionY = parseNumber(searchParams, 'screenshotPositionY', 0)
+  const screenshotZoom = parseNumber(searchParams, 'screenshotZoom', 1)
+  const screenshotGrayscale = parseBoolFalse(searchParams, 'screenshotGrayscale')
+  const ctaOption = parseEnum<'demo' | 'learn' | 'start' | 'contact'>(searchParams, 'ctaOption', 'demo')
+  const ctaUrl = parseString(searchParams, 'ctaUrl', '')
 
   return (
     <div

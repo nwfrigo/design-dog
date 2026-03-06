@@ -2,19 +2,7 @@
 
 import { CSSProperties } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
-
-// Arrow icon for CTA
-const ArrowIcon = ({ color = '#D35F0B', size = 14.67 }: { color?: string; size?: number }) => (
-  <svg width={size} height={size * 0.795} viewBox="0 0 22 17.5" fill="none">
-    <path
-      d="M13 1L21 8.75M21 8.75L13 16.5M21 8.75H1"
-      stroke={color}
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
+import { ArrowIcon } from '@/components/shared/ArrowIcon'
 
 export type FloatingBannerMobileVariant =
   | 'light'
@@ -224,7 +212,7 @@ export function WebsiteFloatingBannerMobile({
               {cta || 'Learn More'}
             </div>
           )}
-          <ArrowIcon color={styles.ctaArrowColor} size={14.67} />
+          <ArrowIcon color={styles.ctaArrowColor} width={14.67} height={14.67 * 0.795} />
         </div>
       </div>
     </div>

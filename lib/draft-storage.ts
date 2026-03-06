@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -24,7 +24,7 @@ export interface DraftState {
   // Design settings
   eyebrow: string
   solution: string
-  logoColor: 'black' | 'orange' | 'white'
+  logoColor: LogoColor
   showEyebrow: boolean
   showHeadline: boolean
   showSubhead: boolean
@@ -39,26 +39,26 @@ export interface DraftState {
   showGridDetail2: boolean
   gridDetail1Text: string
   gridDetail2Text: string
-  gridDetail3Type: 'data' | 'cta'
+  gridDetail3Type: GridDetailType
   gridDetail3Text: string
-  gridDetail4Type: 'data' | 'cta'
+  gridDetail4Type: GridDetailType
   gridDetail4Text: string
   showRow3: boolean
   showRow4: boolean
   metadata: string
   ctaText: string
-  colorStyle: '1' | '2' | '3' | '4'
-  headingSize: 'S' | 'M' | 'L'
-  alignment: 'left' | 'center'
-  ctaStyle: 'link' | 'button'
+  colorStyle: ColorStyle
+  headingSize: HeadingSize
+  alignment: TextAlignment
+  ctaStyle: CtaStyle
   showMetadata: boolean
   showCta: boolean
-  layout: 'even' | 'more-image' | 'more-text'
-  newsletterImageSize: 'none' | 'small' | 'large'
+  layout: ImageLayout
+  newsletterImageSize: NewsletterImageSize
   newsletterImageUrl: string | null
   newsletterImagePosition: { x: number; y: number }
   newsletterImageZoom: number
-  speakerCount: 1 | 2 | 3
+  speakerCount: SpeakerCount
   speaker1Name: string
   speaker1Role: string
   speaker1ImageUrl: string
@@ -75,23 +75,23 @@ export interface DraftState {
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
   // Website Webinar specific
-  webinarVariant: 'none' | 'image' | 'speakers'
+  webinarVariant: WebinarVariant
   showSpeaker1: boolean
   showSpeaker2: boolean
   showSpeaker3: boolean
   // Website eBook Listing specific
-  ebookVariant: 'image' | 'none'
+  ebookVariant: ImageVariant
   // Website Report specific
-  reportVariant: 'image' | 'none'
+  reportVariant: ImageVariant
   // Website Event Listing specific
-  eventListingVariant: 'orange' | 'light' | 'dark-gradient'
+  eventListingVariant: EventListingVariant
   // Website Floating Banner specific
-  floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
+  floatingBannerVariant: FloatingBannerVariant
   // Website Floating Banner Mobile specific
-  floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2'
-  floatingBannerMobileArrowType: 'text' | 'arrow'
+  floatingBannerMobileVariant: FloatingBannerMobileVariant
+  floatingBannerMobileArrowType: FloatingBannerMobileArrowType
   // Newsletter Top Banner specific
-  newsletterTopBannerVariant: 'dark' | 'light'
+  newsletterTopBannerVariant: NewsletterTopBannerVariant
   // Image effects
   grayscale: boolean
   // Manual text size
@@ -110,7 +110,7 @@ export interface DraftState {
   solutionOverviewSolution: SolutionCategory
   solutionOverviewSolutionName: string
   solutionOverviewTagline: string
-  solutionOverviewCurrentPage: 1 | 2 | 3
+  solutionOverviewCurrentPage: SolutionOverviewPage
   solutionOverviewHeroImageId: string
   solutionOverviewHeroImageUrl: string | null
   solutionOverviewHeroImagePosition: { x: number; y: number }
@@ -130,7 +130,7 @@ export interface DraftState {
   solutionOverviewScreenshotPosition: { x: number; y: number }
   solutionOverviewScreenshotZoom: number
   solutionOverviewScreenshotGrayscale: boolean
-  solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact'
+  solutionOverviewCtaOption: SolutionOverviewCtaOption
   solutionOverviewCtaUrl: string
   solutionOverviewStat1Value: string
   solutionOverviewStat1Label: string

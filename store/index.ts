@@ -1,9 +1,10 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
+import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset, generatedAssetToQueuedAsset } from '@/lib/asset-snapshot'
 
 const initialVerbatimCopy: CopyContent = {
   headline: '',
@@ -392,7 +393,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   solutionOverviewScreenshotPosition: { x: 0, y: 0 },
   solutionOverviewScreenshotZoom: 1,
   solutionOverviewScreenshotGrayscale: false,
-  solutionOverviewCtaOption: 'demo' as 'demo' | 'learn' | 'start' | 'contact',
+  solutionOverviewCtaOption: 'demo' as SolutionOverviewCtaOption,
   solutionOverviewCtaUrl: '',
   // Solution Overview PDF - Page 2 Stats
   solutionOverviewStat1Value: '20+',
@@ -469,9 +470,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   autoCreate: { ...initialAutoCreate },
   generatedAssets: {},
 
-  // Backwards compatibility alias
-  get quickStart() { return get().autoCreate },
-
   // Actions
   setCurrentScreen: (screen: AppScreen) => set({ currentScreen: screen }),
   setContentMode: (mode: ContentMode) => set({ contentMode: mode }),
@@ -500,7 +498,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   setEyebrow: (eyebrow: string) => set({ eyebrow }),
   setSolution: (solution: string) => set({ solution }),
-  setLogoColor: (color: 'black' | 'orange' | 'white') => set({ logoColor: color }),
+  setLogoColor: (color: LogoColor) => set({ logoColor: color }),
   setShowEyebrow: (show: boolean) => set({ showEyebrow: show }),
   setShowSubhead: (show: boolean) => set({ showSubhead: show }),
   setShowBody: (show: boolean) => set({ showBody: show }),
@@ -514,11 +512,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setShowGridDetail2: (show: boolean) => set({ showGridDetail2: show }),
   setGridDetail1Text: (text: string) => set({ gridDetail1Text: text }),
   setGridDetail2Text: (text: string) => set({ gridDetail2Text: text }),
-  setGridDetail3Type: (type: 'data' | 'cta') => set({ gridDetail3Type: type }),
+  setGridDetail3Type: (type: GridDetailType) => set({ gridDetail3Type: type }),
   setGridDetail3Text: (text: string) => set({ gridDetail3Text: text }),
 
   // Social Grid Detail specific actions
-  setGridDetail4Type: (type: 'data' | 'cta') => set({ gridDetail4Type: type }),
+  setGridDetail4Type: (type: GridDetailType) => set({ gridDetail4Type: type }),
   setGridDetail4Text: (text: string) => set({ gridDetail4Text: text }),
   setShowRow3: (show: boolean) => set({ showRow3: show }),
   setShowRow4: (show: boolean) => set({ showRow4: show }),
@@ -526,24 +524,24 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Social Dark Gradient specific actions
   setMetadata: (metadata: string) => set({ metadata }),
   setCtaText: (text: string) => set({ ctaText: text }),
-  setColorStyle: (style: '1' | '2' | '3' | '4') => set({ colorStyle: style }),
-  setHeadingSize: (size: 'S' | 'M' | 'L') => set({ headingSize: size }),
-  setAlignment: (alignment: 'left' | 'center') => set({ alignment }),
-  setCtaStyle: (style: 'link' | 'button') => set({ ctaStyle: style }),
+  setColorStyle: (style: ColorStyle) => set({ colorStyle: style }),
+  setHeadingSize: (size: HeadingSize) => set({ headingSize: size }),
+  setAlignment: (alignment: TextAlignment) => set({ alignment }),
+  setCtaStyle: (style: CtaStyle) => set({ ctaStyle: style }),
   setShowMetadata: (show: boolean) => set({ showMetadata: show }),
   setShowCta: (show: boolean) => set({ showCta: show }),
 
   // Social Image specific actions
-  setLayout: (layout: 'even' | 'more-image' | 'more-text') => set({ layout }),
+  setLayout: (layout: ImageLayout) => set({ layout }),
 
   // Newsletter Dark Gradient specific actions
-  setNewsletterImageSize: (newsletterImageSize: 'none' | 'small' | 'large') => set({ newsletterImageSize }),
+  setNewsletterImageSize: (newsletterImageSize: NewsletterImageSize) => set({ newsletterImageSize }),
   setNewsletterImageUrl: (newsletterImageUrl: string | null) => set({ newsletterImageUrl }),
   setNewsletterImagePosition: (newsletterImagePosition: { x: number; y: number }) => set({ newsletterImagePosition }),
   setNewsletterImageZoom: (newsletterImageZoom: number) => set({ newsletterImageZoom }),
 
   // Email Speakers specific actions
-  setSpeakerCount: (speakerCount: 1 | 2 | 3) => set({ speakerCount }),
+  setSpeakerCount: (speakerCount: SpeakerCount) => set({ speakerCount }),
   setSpeaker1Name: (speaker1Name: string) => set({ speaker1Name }),
   setSpeaker1Role: (speaker1Role: string) => set({ speaker1Role }),
   setSpeaker1ImageUrl: (speaker1ImageUrl: string) => set({ speaker1ImageUrl }),
@@ -560,23 +558,23 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setSpeaker3ImagePosition: (speaker3ImagePosition: { x: number; y: number }) => set({ speaker3ImagePosition }),
   setSpeaker3ImageZoom: (speaker3ImageZoom: number) => set({ speaker3ImageZoom }),
   // Website Webinar specific
-  setWebinarVariant: (webinarVariant: 'none' | 'image' | 'speakers') => set({ webinarVariant }),
+  setWebinarVariant: (webinarVariant: WebinarVariant) => set({ webinarVariant }),
   setShowSpeaker1: (showSpeaker1: boolean) => set({ showSpeaker1 }),
   setShowSpeaker2: (showSpeaker2: boolean) => set({ showSpeaker2 }),
   setShowSpeaker3: (showSpeaker3: boolean) => set({ showSpeaker3 }),
   // Website eBook Listing specific
-  setEbookVariant: (ebookVariant: 'image' | 'none') => set({ ebookVariant }),
+  setEbookVariant: (ebookVariant: ImageVariant) => set({ ebookVariant }),
   // Website Report specific
-  setReportVariant: (reportVariant: 'image' | 'none') => set({ reportVariant }),
+  setReportVariant: (reportVariant: ImageVariant) => set({ reportVariant }),
   // Website Event Listing specific
-  setEventListingVariant: (eventListingVariant: 'orange' | 'light' | 'dark-gradient') => set({ eventListingVariant }),
+  setEventListingVariant: (eventListingVariant: EventListingVariant) => set({ eventListingVariant }),
   // Website Floating Banner specific
-  setFloatingBannerVariant: (floatingBannerVariant: 'white' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => set({ floatingBannerVariant }),
+  setFloatingBannerVariant: (floatingBannerVariant: FloatingBannerVariant) => set({ floatingBannerVariant }),
   // Website Floating Banner Mobile specific
-  setFloatingBannerMobileVariant: (floatingBannerMobileVariant: 'light' | 'orange' | 'dark' | 'blue-gradient-1' | 'blue-gradient-2' | 'dark-gradient-1' | 'dark-gradient-2') => set({ floatingBannerMobileVariant }),
-  setFloatingBannerMobileArrowType: (floatingBannerMobileArrowType: 'text' | 'arrow') => set({ floatingBannerMobileArrowType }),
+  setFloatingBannerMobileVariant: (floatingBannerMobileVariant: FloatingBannerMobileVariant) => set({ floatingBannerMobileVariant }),
+  setFloatingBannerMobileArrowType: (floatingBannerMobileArrowType: FloatingBannerMobileArrowType) => set({ floatingBannerMobileArrowType }),
   // Newsletter Top Banner specific
-  setNewsletterTopBannerVariant: (newsletterTopBannerVariant: 'dark' | 'light') => set({ newsletterTopBannerVariant }),
+  setNewsletterTopBannerVariant: (newsletterTopBannerVariant: NewsletterTopBannerVariant) => set({ newsletterTopBannerVariant }),
   // Image effects
   setGrayscale: (grayscale: boolean) => set({ grayscale }),
   // Manual text size
@@ -586,7 +584,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setSolutionOverviewSolution: (solutionOverviewSolution: SolutionCategory) => set({ solutionOverviewSolution }),
   setSolutionOverviewSolutionName: (solutionOverviewSolutionName: string) => set({ solutionOverviewSolutionName }),
   setSolutionOverviewTagline: (solutionOverviewTagline: string) => set({ solutionOverviewTagline }),
-  setSolutionOverviewCurrentPage: (solutionOverviewCurrentPage: 1 | 2 | 3) => set({ solutionOverviewCurrentPage }),
+  setSolutionOverviewCurrentPage: (solutionOverviewCurrentPage: SolutionOverviewPage) => set({ solutionOverviewCurrentPage }),
   // Solution Overview PDF specific - Page 2
   setSolutionOverviewHeroImageId: (solutionOverviewHeroImageId: string) => set({ solutionOverviewHeroImageId }),
   setSolutionOverviewHeroImageUrl: (solutionOverviewHeroImageUrl: string | null) => set({ solutionOverviewHeroImageUrl }),
@@ -671,7 +669,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setSolutionOverviewScreenshotPosition: (solutionOverviewScreenshotPosition: { x: number; y: number }) => set({ solutionOverviewScreenshotPosition }),
   setSolutionOverviewScreenshotZoom: (solutionOverviewScreenshotZoom: number) => set({ solutionOverviewScreenshotZoom }),
   setSolutionOverviewScreenshotGrayscale: (solutionOverviewScreenshotGrayscale: boolean) => set({ solutionOverviewScreenshotGrayscale }),
-  setSolutionOverviewCtaOption: (solutionOverviewCtaOption: 'demo' | 'learn' | 'start' | 'contact') => set({ solutionOverviewCtaOption }),
+  setSolutionOverviewCtaOption: (solutionOverviewCtaOption: SolutionOverviewCtaOption) => set({ solutionOverviewCtaOption }),
   setSolutionOverviewCtaUrl: (solutionOverviewCtaUrl: string) => set({ solutionOverviewCtaUrl }),
   // Solution Overview PDF - Page 2 Stats setters
   setSolutionOverviewStat1Value: (solutionOverviewStat1Value: string) => set({ solutionOverviewStat1Value }),
@@ -1090,125 +1088,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     // Get per-template image settings using the correct template
     const imageSettings = state.thumbnailImageSettings[currentTemplate] ?? { position: { x: 0, y: 0 }, zoom: 1 }
 
-    const newAsset: QueuedAsset = {
-      id: `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      templateType: currentTemplate,
-      headline: state.verbatimCopy.headline,
-      subhead: state.verbatimCopy.subhead,
-      body: state.verbatimCopy.body,
-      eyebrow: state.eyebrow,
-      solution: state.solution,
-      logoColor: state.logoColor,
-      showEyebrow: state.showEyebrow,
-      showSubhead: state.showSubhead,
-      showBody: state.showBody,
-      showHeadline: state.showHeadline,
-      thumbnailImageUrl: state.thumbnailImageUrl,
-      thumbnailImagePosition: imageSettings.position,
-      thumbnailImageZoom: imageSettings.zoom,
-      subheading: state.subheading,
-      showLightHeader: state.showLightHeader,
-      showSubheading: state.showSubheading,
-      showSolutionSet: state.showSolutionSet,
-      showGridDetail2: state.showGridDetail2,
-      gridDetail1Text: state.gridDetail1Text,
-      gridDetail2Text: state.gridDetail2Text,
-      gridDetail3Type: state.gridDetail3Type,
-      gridDetail3Text: state.gridDetail3Text,
-      // Social Grid Detail fields
-      gridDetail4Type: state.gridDetail4Type,
-      gridDetail4Text: state.gridDetail4Text,
-      showRow3: state.showRow3,
-      showRow4: state.showRow4,
-      // Social Dark Gradient fields
-      metadata: state.metadata,
-      ctaText: state.ctaText,
-      colorStyle: state.colorStyle,
-      headingSize: state.headingSize,
-      alignment: state.alignment,
-      ctaStyle: state.ctaStyle,
-      showMetadata: state.showMetadata,
-      showCta: state.showCta,
-      // Social Image fields
-      layout: state.layout,
-      // Newsletter Dark Gradient fields
-      newsletterImageSize: state.newsletterImageSize,
-      newsletterImageUrl: state.newsletterImageUrl,
-      newsletterImagePosition: state.newsletterImagePosition,
-      newsletterImageZoom: state.newsletterImageZoom,
-      // Email Speakers fields
-      speakerCount: state.speakerCount,
-      speaker1Name: state.speaker1Name,
-      speaker1Role: state.speaker1Role,
-      speaker1ImageUrl: state.speaker1ImageUrl,
-      speaker1ImagePosition: state.speaker1ImagePosition,
-      speaker1ImageZoom: state.speaker1ImageZoom,
-      speaker2Name: state.speaker2Name,
-      speaker2Role: state.speaker2Role,
-      speaker2ImageUrl: state.speaker2ImageUrl,
-      speaker2ImagePosition: state.speaker2ImagePosition,
-      speaker2ImageZoom: state.speaker2ImageZoom,
-      speaker3Name: state.speaker3Name,
-      speaker3Role: state.speaker3Role,
-      speaker3ImageUrl: state.speaker3ImageUrl,
-      speaker3ImagePosition: state.speaker3ImagePosition,
-      speaker3ImageZoom: state.speaker3ImageZoom,
-      webinarVariant: state.webinarVariant,
-      showSpeaker1: state.showSpeaker1,
-      showSpeaker2: state.showSpeaker2,
-      showSpeaker3: state.showSpeaker3,
-      ebookVariant: state.ebookVariant,
-      reportVariant: state.reportVariant,
-      eventListingVariant: state.eventListingVariant,
-      floatingBannerVariant: state.floatingBannerVariant,
-      floatingBannerMobileVariant: state.floatingBannerMobileVariant,
-      floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
-      newsletterTopBannerVariant: state.newsletterTopBannerVariant,
-      grayscale: state.grayscale,
-      headlineFontSize: state.headlineFontSize,
-      // Solution Overview PDF specific - Page 1
-      solutionOverviewSolution: state.solutionOverviewSolution,
-      solutionOverviewSolutionName: state.solutionOverviewSolutionName,
-      solutionOverviewTagline: state.solutionOverviewTagline,
-      // Solution Overview PDF specific - Page 2
-      solutionOverviewHeroImageId: state.solutionOverviewHeroImageId,
-      solutionOverviewHeroImageUrl: state.solutionOverviewHeroImageUrl,
-      solutionOverviewHeroImagePosition: state.solutionOverviewHeroImagePosition,
-      solutionOverviewHeroImageZoom: state.solutionOverviewHeroImageZoom,
-      solutionOverviewHeroImageGrayscale: state.solutionOverviewHeroImageGrayscale,
-      solutionOverviewPage2Header: state.solutionOverviewPage2Header,
-      solutionOverviewSectionHeader: state.solutionOverviewSectionHeader,
-      solutionOverviewIntroParagraph: state.solutionOverviewIntroParagraph,
-      solutionOverviewKeySolutions: state.solutionOverviewKeySolutions,
-      solutionOverviewQuoteText: state.solutionOverviewQuoteText,
-      solutionOverviewQuoteName: state.solutionOverviewQuoteName,
-      solutionOverviewQuoteTitle: state.solutionOverviewQuoteTitle,
-      solutionOverviewQuoteCompany: state.solutionOverviewQuoteCompany,
-      // Solution Overview PDF specific - Page 3
-      solutionOverviewBenefits: state.solutionOverviewBenefits,
-      solutionOverviewFeatures: state.solutionOverviewFeatures,
-      solutionOverviewScreenshotUrl: state.solutionOverviewScreenshotUrl,
-      solutionOverviewScreenshotPosition: state.solutionOverviewScreenshotPosition,
-      solutionOverviewScreenshotZoom: state.solutionOverviewScreenshotZoom,
-      solutionOverviewScreenshotGrayscale: state.solutionOverviewScreenshotGrayscale,
-      solutionOverviewCtaOption: state.solutionOverviewCtaOption,
-      solutionOverviewCtaUrl: state.solutionOverviewCtaUrl,
-      // Solution Overview PDF specific - Page 2 Stats
-      solutionOverviewStat1Value: state.solutionOverviewStat1Value,
-      solutionOverviewStat1Label: state.solutionOverviewStat1Label,
-      solutionOverviewStat2Value: state.solutionOverviewStat2Value,
-      solutionOverviewStat2Label: state.solutionOverviewStat2Label,
-      solutionOverviewStat3Value: state.solutionOverviewStat3Value,
-      solutionOverviewStat3Label: state.solutionOverviewStat3Label,
-      solutionOverviewStat4Value: state.solutionOverviewStat4Value,
-      solutionOverviewStat4Label: state.solutionOverviewStat4Label,
-      solutionOverviewStat5Value: state.solutionOverviewStat5Value,
-      solutionOverviewStat5Label: state.solutionOverviewStat5Label,
-      // Social Carousel specific
-      carouselSlides: state.carouselSlides,
-      carouselCurrentSlideIndex: state.carouselCurrentSlideIndex,
-      sourceAssetIndex: state.currentAssetIndex,
-    }
+    const newAsset = snapshotToQueuedAsset(
+      state,
+      {
+        id: `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        sourceAssetIndex: state.currentAssetIndex,
+        templateType: currentTemplate,
+      },
+      imageSettings.position,
+      imageSettings.zoom,
+    )
     set({ exportQueue: [...state.exportQueue, newAsset] })
   },
 
@@ -1226,8 +1115,12 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     const asset = state.exportQueue.find((a) => a.id === id)
     if (!asset) return
 
+    // Restore all editable fields from the queued asset
+    const restored = restoreEditorSnapshot(asset as unknown as Record<string, unknown>)
+
     // Load the asset's settings into the editor state, including per-template image settings
     set({
+      ...restored,
       currentScreen: 'editor',
       templateType: asset.templateType,
       selectedAssets: [asset.templateType],
@@ -1238,14 +1131,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         body: asset.body,
         cta: '',
       },
-      eyebrow: asset.eyebrow,
-      solution: asset.solution,
-      logoColor: asset.logoColor,
-      showEyebrow: asset.showEyebrow,
-      showSubhead: asset.showSubhead,
-      showBody: asset.showBody,
-      showHeadline: asset.showHeadline,
-      thumbnailImageUrl: asset.thumbnailImageUrl,
       // Store per-template image settings
       thumbnailImageSettings: {
         ...state.thumbnailImageSettings,
@@ -1254,63 +1139,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           zoom: asset.thumbnailImageZoom,
         },
       },
-      subheading: asset.subheading,
-      showLightHeader: asset.showLightHeader,
-      showSubheading: asset.showSubheading,
-      showSolutionSet: asset.showSolutionSet,
-      showGridDetail2: asset.showGridDetail2,
-      gridDetail1Text: asset.gridDetail1Text,
-      gridDetail2Text: asset.gridDetail2Text,
-      gridDetail3Type: asset.gridDetail3Type,
-      gridDetail3Text: asset.gridDetail3Text,
-      // Social Grid Detail fields
-      gridDetail4Type: asset.gridDetail4Type,
-      gridDetail4Text: asset.gridDetail4Text,
-      showRow3: asset.showRow3,
-      showRow4: asset.showRow4,
-      // Social Dark Gradient fields
-      metadata: asset.metadata,
-      ctaText: asset.ctaText,
-      colorStyle: asset.colorStyle,
-      headingSize: asset.headingSize,
-      alignment: asset.alignment,
-      ctaStyle: asset.ctaStyle,
-      showMetadata: asset.showMetadata,
-      showCta: asset.showCta,
-      // Social Image fields
-      layout: asset.layout,
-      // Newsletter Dark Gradient fields
-      newsletterImageSize: asset.newsletterImageSize,
-      newsletterImageUrl: asset.newsletterImageUrl,
-      newsletterImagePosition: asset.newsletterImagePosition,
-      newsletterImageZoom: asset.newsletterImageZoom,
-      // Email Speakers fields
-      speakerCount: asset.speakerCount,
-      speaker1Name: asset.speaker1Name,
-      speaker1Role: asset.speaker1Role,
-      speaker1ImageUrl: asset.speaker1ImageUrl,
-      speaker1ImagePosition: asset.speaker1ImagePosition,
-      speaker1ImageZoom: asset.speaker1ImageZoom,
-      speaker2Name: asset.speaker2Name,
-      speaker2Role: asset.speaker2Role,
-      speaker2ImageUrl: asset.speaker2ImageUrl,
-      speaker2ImagePosition: asset.speaker2ImagePosition,
-      speaker2ImageZoom: asset.speaker2ImageZoom,
-      speaker3Name: asset.speaker3Name,
-      speaker3Role: asset.speaker3Role,
-      speaker3ImageUrl: asset.speaker3ImageUrl,
-      speaker3ImagePosition: asset.speaker3ImagePosition,
-      speaker3ImageZoom: asset.speaker3ImageZoom,
-      webinarVariant: asset.webinarVariant,
-      ebookVariant: asset.ebookVariant,
-      reportVariant: asset.reportVariant,
-      eventListingVariant: asset.eventListingVariant,
-      floatingBannerVariant: asset.floatingBannerVariant,
-      floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
-      floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
-      newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
-      grayscale: asset.grayscale,
-      headlineFontSize: asset.headlineFontSize ?? null,
       // Track that we're editing from queue
       editingQueueItemId: id,
     })
@@ -1328,121 +1156,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     // Get current image settings for this template
     const imageSettings = state.thumbnailImageSettings[state.templateType] || { position: { x: 0, y: 0 }, zoom: 1 }
 
-    // Build updated asset from current editor state
-    const updatedAsset: QueuedAsset = {
-      id: editingId,
-      sourceAssetIndex: originalItem.sourceAssetIndex,
-      templateType: state.templateType,
-      headline: state.verbatimCopy.headline,
-      subhead: state.verbatimCopy.subhead,
-      body: state.verbatimCopy.body,
-      eyebrow: state.eyebrow,
-      solution: state.solution,
-      logoColor: state.logoColor,
-      showEyebrow: state.showEyebrow,
-      showSubhead: state.showSubhead,
-      showBody: state.showBody,
-      showHeadline: state.showHeadline,
-      thumbnailImageUrl: state.thumbnailImageUrl,
-      thumbnailImagePosition: imageSettings.position,
-      thumbnailImageZoom: imageSettings.zoom,
-      subheading: state.subheading,
-      showLightHeader: state.showLightHeader,
-      showSubheading: state.showSubheading,
-      showSolutionSet: state.showSolutionSet,
-      showGridDetail2: state.showGridDetail2,
-      gridDetail1Text: state.gridDetail1Text,
-      gridDetail2Text: state.gridDetail2Text,
-      gridDetail3Type: state.gridDetail3Type,
-      gridDetail3Text: state.gridDetail3Text,
-      gridDetail4Type: state.gridDetail4Type,
-      gridDetail4Text: state.gridDetail4Text,
-      showRow3: state.showRow3,
-      showRow4: state.showRow4,
-      metadata: state.metadata,
-      ctaText: state.ctaText,
-      colorStyle: state.colorStyle,
-      headingSize: state.headingSize,
-      alignment: state.alignment,
-      ctaStyle: state.ctaStyle,
-      showMetadata: state.showMetadata,
-      showCta: state.showCta,
-      layout: state.layout,
-      newsletterImageSize: state.newsletterImageSize,
-      newsletterImageUrl: state.newsletterImageUrl,
-      newsletterImagePosition: state.newsletterImagePosition,
-      newsletterImageZoom: state.newsletterImageZoom,
-      speakerCount: state.speakerCount,
-      speaker1Name: state.speaker1Name,
-      speaker1Role: state.speaker1Role,
-      speaker1ImageUrl: state.speaker1ImageUrl,
-      speaker1ImagePosition: state.speaker1ImagePosition,
-      speaker1ImageZoom: state.speaker1ImageZoom,
-      speaker2Name: state.speaker2Name,
-      speaker2Role: state.speaker2Role,
-      speaker2ImageUrl: state.speaker2ImageUrl,
-      speaker2ImagePosition: state.speaker2ImagePosition,
-      speaker2ImageZoom: state.speaker2ImageZoom,
-      speaker3Name: state.speaker3Name,
-      speaker3Role: state.speaker3Role,
-      speaker3ImageUrl: state.speaker3ImageUrl,
-      speaker3ImagePosition: state.speaker3ImagePosition,
-      speaker3ImageZoom: state.speaker3ImageZoom,
-      webinarVariant: state.webinarVariant,
-      showSpeaker1: state.showSpeaker1,
-      showSpeaker2: state.showSpeaker2,
-      showSpeaker3: state.showSpeaker3,
-      ebookVariant: state.ebookVariant,
-      reportVariant: state.reportVariant,
-      eventListingVariant: state.eventListingVariant,
-      floatingBannerVariant: state.floatingBannerVariant,
-      floatingBannerMobileVariant: state.floatingBannerMobileVariant,
-      floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
-      newsletterTopBannerVariant: state.newsletterTopBannerVariant,
-      grayscale: state.grayscale,
-      headlineFontSize: state.headlineFontSize,
-      // Solution Overview PDF specific - Page 1
-      solutionOverviewSolution: state.solutionOverviewSolution,
-      solutionOverviewSolutionName: state.solutionOverviewSolutionName,
-      solutionOverviewTagline: state.solutionOverviewTagline,
-      // Solution Overview PDF specific - Page 2
-      solutionOverviewHeroImageId: state.solutionOverviewHeroImageId,
-      solutionOverviewHeroImageUrl: state.solutionOverviewHeroImageUrl,
-      solutionOverviewHeroImagePosition: state.solutionOverviewHeroImagePosition,
-      solutionOverviewHeroImageZoom: state.solutionOverviewHeroImageZoom,
-      solutionOverviewHeroImageGrayscale: state.solutionOverviewHeroImageGrayscale,
-      solutionOverviewPage2Header: state.solutionOverviewPage2Header,
-      solutionOverviewSectionHeader: state.solutionOverviewSectionHeader,
-      solutionOverviewIntroParagraph: state.solutionOverviewIntroParagraph,
-      solutionOverviewKeySolutions: state.solutionOverviewKeySolutions,
-      solutionOverviewQuoteText: state.solutionOverviewQuoteText,
-      solutionOverviewQuoteName: state.solutionOverviewQuoteName,
-      solutionOverviewQuoteTitle: state.solutionOverviewQuoteTitle,
-      solutionOverviewQuoteCompany: state.solutionOverviewQuoteCompany,
-      // Solution Overview PDF specific - Page 3
-      solutionOverviewBenefits: state.solutionOverviewBenefits,
-      solutionOverviewFeatures: state.solutionOverviewFeatures,
-      solutionOverviewScreenshotUrl: state.solutionOverviewScreenshotUrl,
-      solutionOverviewScreenshotPosition: state.solutionOverviewScreenshotPosition,
-      solutionOverviewScreenshotZoom: state.solutionOverviewScreenshotZoom,
-      solutionOverviewScreenshotGrayscale: state.solutionOverviewScreenshotGrayscale,
-      solutionOverviewCtaOption: state.solutionOverviewCtaOption,
-      solutionOverviewCtaUrl: state.solutionOverviewCtaUrl,
-      // Solution Overview PDF specific - Page 2 Stats
-      solutionOverviewStat1Value: state.solutionOverviewStat1Value,
-      solutionOverviewStat1Label: state.solutionOverviewStat1Label,
-      solutionOverviewStat2Value: state.solutionOverviewStat2Value,
-      solutionOverviewStat2Label: state.solutionOverviewStat2Label,
-      solutionOverviewStat3Value: state.solutionOverviewStat3Value,
-      solutionOverviewStat3Label: state.solutionOverviewStat3Label,
-      solutionOverviewStat4Value: state.solutionOverviewStat4Value,
-      solutionOverviewStat4Label: state.solutionOverviewStat4Label,
-      solutionOverviewStat5Value: state.solutionOverviewStat5Value,
-      solutionOverviewStat5Label: state.solutionOverviewStat5Label,
-      // Social Carousel specific
-      carouselSlides: state.carouselSlides,
-      carouselCurrentSlideIndex: state.carouselCurrentSlideIndex,
-    }
+    // Build updated asset from current editor state using snapshot helper
+    const updatedAsset = snapshotToQueuedAsset(
+      state,
+      {
+        id: editingId,
+        sourceAssetIndex: originalItem.sourceAssetIndex,
+        templateType: state.templateType,
+      },
+      imageSettings.position,
+      imageSettings.zoom,
+    )
 
     // Update the queue item and return to queue
     set({
@@ -1602,15 +1326,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       get().saveDraft()
     }
   },
-
-  // Backwards compatibility aliases
-  openQuickStartWizard: () => get().openAutoCreateWizard(),
-  closeQuickStartWizard: () => get().closeAutoCreateWizard(),
-  setQuickStartStep: (step: WizardStep) => get().setAutoCreateStep(step),
-  setQuickStartContentSource: (source: Partial<ContentSourceState>) => get().setAutoCreateContentSource(source),
-  setQuickStartAssets: (assets: TemplateType[]) => get().setAutoCreateAssets(assets),
-  toggleQuickStartAsset: (asset: TemplateType) => get().toggleAutoCreateAsset(asset),
-  resetQuickStart: () => get().resetAutoCreate(),
 
   // Auto-Create generation actions
   startAutoCreateGeneration: async () => {
@@ -1779,17 +1494,13 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     const asset = state.generatedAssets[assetId]
     if (!asset) return
 
+    // Restore all editable fields from the generated asset
+    const restored = restoreEditorSnapshot(asset as unknown as Record<string, unknown>)
+
     set({
+      ...restored,
       templateType: asset.templateType,
       verbatimCopy: { ...asset.copy },
-      eyebrow: asset.eyebrow,
-      solution: asset.solution,
-      logoColor: asset.logoColor,
-      showEyebrow: asset.showEyebrow,
-      showSubhead: asset.showSubhead,
-      showBody: asset.showBody,
-      showHeadline: asset.showHeadline,
-      thumbnailImageUrl: asset.thumbnailImageUrl,
       // Store per-template image settings
       thumbnailImageSettings: {
         ...state.thumbnailImageSettings,
@@ -1798,65 +1509,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
           zoom: asset.thumbnailImageZoom,
         },
       },
-      subheading: asset.subheading,
-      showLightHeader: asset.showLightHeader,
-      showSubheading: asset.showSubheading,
-      showSolutionSet: asset.showSolutionSet,
-      showGridDetail2: asset.showGridDetail2,
-      gridDetail1Text: asset.gridDetail1Text,
-      gridDetail2Text: asset.gridDetail2Text,
-      gridDetail3Type: asset.gridDetail3Type,
-      gridDetail3Text: asset.gridDetail3Text,
-      gridDetail4Type: asset.gridDetail4Type,
-      gridDetail4Text: asset.gridDetail4Text,
-      showRow3: asset.showRow3,
-      showRow4: asset.showRow4,
-      metadata: asset.metadata,
-      ctaText: asset.ctaText,
-      colorStyle: asset.colorStyle,
-      headingSize: asset.headingSize,
-      alignment: asset.alignment,
-      ctaStyle: asset.ctaStyle,
-      showMetadata: asset.showMetadata,
-      showCta: asset.showCta,
-      layout: asset.layout,
-      newsletterImageSize: asset.newsletterImageSize,
-      newsletterImageUrl: asset.newsletterImageUrl,
-      newsletterImagePosition: asset.newsletterImagePosition,
-      newsletterImageZoom: asset.newsletterImageZoom,
-      speakerCount: asset.speakerCount,
-      speaker1Name: asset.speaker1Name,
-      speaker1Role: asset.speaker1Role,
-      speaker1ImageUrl: asset.speaker1ImageUrl,
-      speaker1ImagePosition: asset.speaker1ImagePosition,
-      speaker1ImageZoom: asset.speaker1ImageZoom,
-      speaker2Name: asset.speaker2Name,
-      speaker2Role: asset.speaker2Role,
-      speaker2ImageUrl: asset.speaker2ImageUrl,
-      speaker2ImagePosition: asset.speaker2ImagePosition,
-      speaker2ImageZoom: asset.speaker2ImageZoom,
-      speaker3Name: asset.speaker3Name,
-      speaker3Role: asset.speaker3Role,
-      speaker3ImageUrl: asset.speaker3ImageUrl,
-      speaker3ImagePosition: asset.speaker3ImagePosition,
-      speaker3ImageZoom: asset.speaker3ImageZoom,
-      webinarVariant: asset.webinarVariant,
-      ebookVariant: asset.ebookVariant,
-      reportVariant: asset.reportVariant,
-      eventListingVariant: asset.eventListingVariant,
-      floatingBannerVariant: asset.floatingBannerVariant,
-      floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
-      floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
-      newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
-      grayscale: asset.grayscale,
-      headlineFontSize: asset.headlineFontSize ?? null,
       generatedVariations: asset.variations,
     })
-  },
-
-  saveCurrentAssetState: () => {
-    // This would be called to save edits back to generatedAssets
-    // Implementation depends on which asset is currently being edited
   },
 
   proceedToAutoCreateEditor: () => {
@@ -1877,9 +1531,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       })
     }
   },
-
-  // Backwards compatibility alias
-  proceedToQuickStartEditor: () => get().proceedToAutoCreateEditor(),
 
   // Retry a single failed asset
   retryFailedAsset: async (assetId: string) => {
@@ -2069,129 +1720,14 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     return newAssetIds
   },
 
-  // Backwards compatibility alias
-  startQuickStartGeneration: async () => get().startAutoCreateGeneration(),
-
   addAllGeneratedToQueue: () => {
     const state = get()
     const newQueueItems: QueuedAsset[] = []
 
     Object.values(state.generatedAssets).forEach((asset) => {
       if (asset.status === 'complete') {
-        newQueueItems.push({
-          id: `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          templateType: asset.templateType,
-          headline: asset.copy.headline,
-          subhead: asset.copy.subhead,
-          body: asset.copy.body,
-          eyebrow: asset.eyebrow,
-          solution: asset.solution,
-          logoColor: asset.logoColor,
-          showEyebrow: asset.showEyebrow,
-          showSubhead: asset.showSubhead,
-          showBody: asset.showBody,
-          showHeadline: asset.showHeadline,
-          thumbnailImageUrl: asset.thumbnailImageUrl,
-          thumbnailImagePosition: asset.thumbnailImagePosition,
-          thumbnailImageZoom: asset.thumbnailImageZoom,
-          subheading: asset.subheading,
-          showLightHeader: asset.showLightHeader,
-          showSubheading: asset.showSubheading,
-          showSolutionSet: asset.showSolutionSet,
-          showGridDetail2: asset.showGridDetail2,
-          gridDetail1Text: asset.gridDetail1Text,
-          gridDetail2Text: asset.gridDetail2Text,
-          gridDetail3Type: asset.gridDetail3Type,
-          gridDetail3Text: asset.gridDetail3Text,
-          gridDetail4Type: asset.gridDetail4Type,
-          gridDetail4Text: asset.gridDetail4Text,
-          showRow3: asset.showRow3,
-          showRow4: asset.showRow4,
-          metadata: asset.metadata,
-          ctaText: asset.ctaText,
-          colorStyle: asset.colorStyle,
-          headingSize: asset.headingSize,
-          alignment: asset.alignment,
-          ctaStyle: asset.ctaStyle,
-          showMetadata: asset.showMetadata,
-          showCta: asset.showCta,
-          layout: asset.layout,
-          newsletterImageSize: asset.newsletterImageSize,
-          newsletterImageUrl: asset.newsletterImageUrl,
-          newsletterImagePosition: asset.newsletterImagePosition,
-          newsletterImageZoom: asset.newsletterImageZoom,
-          speakerCount: asset.speakerCount,
-          speaker1Name: asset.speaker1Name,
-          speaker1Role: asset.speaker1Role,
-          speaker1ImageUrl: asset.speaker1ImageUrl,
-          speaker1ImagePosition: asset.speaker1ImagePosition,
-          speaker1ImageZoom: asset.speaker1ImageZoom,
-          speaker2Name: asset.speaker2Name,
-          speaker2Role: asset.speaker2Role,
-          speaker2ImageUrl: asset.speaker2ImageUrl,
-          speaker2ImagePosition: asset.speaker2ImagePosition,
-          speaker2ImageZoom: asset.speaker2ImageZoom,
-          speaker3Name: asset.speaker3Name,
-          speaker3Role: asset.speaker3Role,
-          speaker3ImageUrl: asset.speaker3ImageUrl,
-          speaker3ImagePosition: asset.speaker3ImagePosition,
-          speaker3ImageZoom: asset.speaker3ImageZoom,
-          webinarVariant: asset.webinarVariant,
-          showSpeaker1: asset.showSpeaker1,
-          showSpeaker2: asset.showSpeaker2,
-          showSpeaker3: asset.showSpeaker3,
-          ebookVariant: asset.ebookVariant,
-          eventListingVariant: asset.eventListingVariant,
-          reportVariant: asset.reportVariant,
-          floatingBannerVariant: asset.floatingBannerVariant,
-          floatingBannerMobileVariant: asset.floatingBannerMobileVariant,
-          floatingBannerMobileArrowType: asset.floatingBannerMobileArrowType,
-          newsletterTopBannerVariant: asset.newsletterTopBannerVariant,
-          grayscale: asset.grayscale,
-          headlineFontSize: asset.headlineFontSize ?? null,
-          // Solution Overview PDF specific - Page 1
-          solutionOverviewSolution: asset.solutionOverviewSolution,
-          solutionOverviewSolutionName: asset.solutionOverviewSolutionName,
-          solutionOverviewTagline: asset.solutionOverviewTagline,
-          // Solution Overview PDF specific - Page 2
-          solutionOverviewHeroImageId: asset.solutionOverviewHeroImageId,
-          solutionOverviewHeroImageUrl: asset.solutionOverviewHeroImageUrl,
-          solutionOverviewHeroImagePosition: asset.solutionOverviewHeroImagePosition,
-          solutionOverviewHeroImageZoom: asset.solutionOverviewHeroImageZoom,
-          solutionOverviewHeroImageGrayscale: asset.solutionOverviewHeroImageGrayscale,
-          solutionOverviewPage2Header: asset.solutionOverviewPage2Header,
-          solutionOverviewSectionHeader: asset.solutionOverviewSectionHeader,
-          solutionOverviewIntroParagraph: asset.solutionOverviewIntroParagraph,
-          solutionOverviewKeySolutions: asset.solutionOverviewKeySolutions,
-          solutionOverviewQuoteText: asset.solutionOverviewQuoteText,
-          solutionOverviewQuoteName: asset.solutionOverviewQuoteName,
-          solutionOverviewQuoteTitle: asset.solutionOverviewQuoteTitle,
-          solutionOverviewQuoteCompany: asset.solutionOverviewQuoteCompany,
-          // Solution Overview PDF specific - Page 3
-          solutionOverviewBenefits: asset.solutionOverviewBenefits,
-          solutionOverviewFeatures: asset.solutionOverviewFeatures,
-          solutionOverviewScreenshotUrl: asset.solutionOverviewScreenshotUrl,
-          solutionOverviewScreenshotPosition: asset.solutionOverviewScreenshotPosition,
-          solutionOverviewScreenshotZoom: asset.solutionOverviewScreenshotZoom,
-          solutionOverviewScreenshotGrayscale: asset.solutionOverviewScreenshotGrayscale,
-          solutionOverviewCtaOption: asset.solutionOverviewCtaOption,
-          solutionOverviewCtaUrl: asset.solutionOverviewCtaUrl || '',
-          // Solution Overview PDF specific - Page 2 Stats
-          solutionOverviewStat1Value: asset.solutionOverviewStat1Value,
-          solutionOverviewStat1Label: asset.solutionOverviewStat1Label,
-          solutionOverviewStat2Value: asset.solutionOverviewStat2Value,
-          solutionOverviewStat2Label: asset.solutionOverviewStat2Label,
-          solutionOverviewStat3Value: asset.solutionOverviewStat3Value,
-          solutionOverviewStat3Label: asset.solutionOverviewStat3Label,
-          solutionOverviewStat4Value: asset.solutionOverviewStat4Value,
-          solutionOverviewStat4Label: asset.solutionOverviewStat4Label,
-          solutionOverviewStat5Value: asset.solutionOverviewStat5Value,
-          solutionOverviewStat5Label: asset.solutionOverviewStat5Label,
-          // Social Carousel specific
-          carouselSlides: asset.carouselSlides || [],
-          carouselCurrentSlideIndex: asset.carouselCurrentSlideIndex ?? 0,
-          sourceAssetIndex: 0,
-        })
+        const queueId = `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        newQueueItems.push(generatedAssetToQueuedAsset(asset, queueId))
       }
     })
 

@@ -3,6 +3,7 @@ import { EmailSpeakersRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseNumber, parseInt_, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined, parseSpeakerParams } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,45 +13,25 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  // Parse params on server
-  const headline = (searchParams.headline as string) || 'Headline'
-  const eyebrow = (searchParams.eyebrow as string) || ''
-  const body = (searchParams.body as string) || ''
-  const ctaText = (searchParams.ctaText as string) || 'Responsive'
-  const solution = (searchParams.solution as string) || 'environmental'
-  const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
-  const showEyebrow = searchParams.showEyebrow === 'true'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showBody = searchParams.showBody !== 'false'
-  const showCta = searchParams.showCta !== 'false'
-  const showSolutionSet = searchParams.showSolutionSet !== 'false'
-  const speakerCount = (parseInt(searchParams.speakerCount as string) || 3) as 1 | 2 | 3
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const eyebrow = parseString(searchParams, 'eyebrow', '')
+  const body = parseString(searchParams, 'body', '')
+  const ctaText = parseString(searchParams, 'ctaText', 'Responsive')
+  const solution = parseString(searchParams, 'solution', 'environmental')
+  const logoColor = parseEnum<'black' | 'orange'>(searchParams, 'logoColor', 'black')
+  // showEyebrow: default FALSE — eyebrow is hidden by default in email-speakers
+  const showEyebrow = parseBoolFalse(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const showBody = parseBoolTrue(searchParams, 'showBody')
+  const showCta = parseBoolTrue(searchParams, 'showCta')
+  const showSolutionSet = parseBoolTrue(searchParams, 'showSolutionSet')
+  const speakerCount = parseInt_(searchParams, 'speakerCount', 3) as 1 | 2 | 3
 
-  // Speaker 1
-  const speaker1Name = (searchParams.speaker1Name as string) || 'Firstname Lastname'
-  const speaker1Role = (searchParams.speaker1Role as string) || 'Role, Company'
-  const speaker1ImageUrl = (searchParams.speaker1ImageUrl as string) || ''
-  const speaker1ImagePositionX = parseFloat(searchParams.speaker1ImagePositionX as string) || 0
-  const speaker1ImagePositionY = parseFloat(searchParams.speaker1ImagePositionY as string) || 0
-  const speaker1ImageZoom = parseFloat(searchParams.speaker1ImageZoom as string) || 1
-
-  // Speaker 2
-  const speaker2Name = (searchParams.speaker2Name as string) || 'Firstname Lastname'
-  const speaker2Role = (searchParams.speaker2Role as string) || 'Role, Company'
-  const speaker2ImageUrl = (searchParams.speaker2ImageUrl as string) || ''
-  const speaker2ImagePositionX = parseFloat(searchParams.speaker2ImagePositionX as string) || 0
-  const speaker2ImagePositionY = parseFloat(searchParams.speaker2ImagePositionY as string) || 0
-  const speaker2ImageZoom = parseFloat(searchParams.speaker2ImageZoom as string) || 1
-
-  // Speaker 3
-  const speaker3Name = (searchParams.speaker3Name as string) || 'Firstname Lastname'
-  const speaker3Role = (searchParams.speaker3Role as string) || 'Role, Company'
-  const speaker3ImageUrl = (searchParams.speaker3ImageUrl as string) || ''
-  const speaker3ImagePositionX = parseFloat(searchParams.speaker3ImagePositionX as string) || 0
-  const speaker3ImagePositionY = parseFloat(searchParams.speaker3ImagePositionY as string) || 0
-  const speaker3ImageZoom = parseFloat(searchParams.speaker3ImageZoom as string) || 1
-  const grayscale = searchParams.grayscale === 'true'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const speaker1 = parseSpeakerParams(searchParams, 1)
+  const speaker2 = parseSpeakerParams(searchParams, 2)
+  const speaker3 = parseSpeakerParams(searchParams, 3)
+  const grayscale = parseBoolFalse(searchParams, 'grayscale')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{
@@ -76,25 +57,25 @@ export default function RenderPage({
           showSolutionSet={showSolutionSet}
           speakerCount={speakerCount}
           speaker1={{
-            name: speaker1Name,
-            role: speaker1Role,
-            imageUrl: speaker1ImageUrl,
-            imagePosition: { x: speaker1ImagePositionX, y: speaker1ImagePositionY },
-            imageZoom: speaker1ImageZoom,
+            name: speaker1.name,
+            role: speaker1.role,
+            imageUrl: speaker1.imageUrl,
+            imagePosition: { x: speaker1.imagePositionX, y: speaker1.imagePositionY },
+            imageZoom: speaker1.imageZoom,
           }}
           speaker2={{
-            name: speaker2Name,
-            role: speaker2Role,
-            imageUrl: speaker2ImageUrl,
-            imagePosition: { x: speaker2ImagePositionX, y: speaker2ImagePositionY },
-            imageZoom: speaker2ImageZoom,
+            name: speaker2.name,
+            role: speaker2.role,
+            imageUrl: speaker2.imageUrl,
+            imagePosition: { x: speaker2.imagePositionX, y: speaker2.imagePositionY },
+            imageZoom: speaker2.imageZoom,
           }}
           speaker3={{
-            name: speaker3Name,
-            role: speaker3Role,
-            imageUrl: speaker3ImageUrl,
-            imagePosition: { x: speaker3ImagePositionX, y: speaker3ImagePositionY },
-            imageZoom: speaker3ImageZoom,
+            name: speaker3.name,
+            role: speaker3.role,
+            imageUrl: speaker3.imageUrl,
+            imagePosition: { x: speaker3.imagePositionX, y: speaker3.imagePositionY },
+            imageZoom: speaker3.imageZoom,
           }}
           grayscale={grayscale}
           headlineFontSize={headlineFontSize}

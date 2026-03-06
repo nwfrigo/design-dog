@@ -2,6 +2,7 @@
 // Layout: Logo, title block with subheader and solution pill, full-height image on right
 
 import { solutionCategories, type SolutionCategory } from '@/config/solution-overview-assets'
+import { SolutionPill } from '@/components/shared/SolutionPill'
 
 // Normalize special Unicode characters to ASCII equivalents
 // Prevents missing glyph issues in PDF export (Fakt Pro font doesn't have all Unicode chars)
@@ -136,46 +137,11 @@ export function CoverPage({
 
         {/* Solution Pill - only shown when solution is not 'none' */}
         {showSolutionPill && solutionColor && solutionLabel && (
-          <div
-            style={{
-              paddingLeft: 13,
-              paddingRight: 13,
-              paddingTop: 10.76,
-              paddingBottom: 10.76,
-              background: 'white',
-              borderRadius: 5.38,
-              border: '0.68px solid #D9D8D6',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 10.34,
-              display: 'inline-flex',
-              alignSelf: 'flex-start',
-            }}
-          >
-            {/* Color dot */}
-            <div
-              style={{
-                width: 7.86,
-                height: 7.86,
-                background: solutionColor,
-                borderRadius: 1.65,
-              }}
-            />
-            {/* Label */}
-            <div
-              style={{
-                color: 'black',
-                fontSize: 7.62,
-                fontFamily: 'Fakt Pro, sans-serif',
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 0.84,
-                wordWrap: 'break-word',
-              }}
-            >
-              {solutionLabel}
-            </div>
-          </div>
+          <SolutionPill
+            variant="faq-cover"
+            solutionColor={solutionColor}
+            solutionLabel={solutionLabel}
+          />
         )}
       </div>
 

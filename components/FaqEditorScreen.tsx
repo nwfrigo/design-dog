@@ -8,6 +8,7 @@ import { RichTextEditor } from './RichTextEditor'
 import { TableGridPicker } from './TableGridPicker'
 import { ZoomableImage } from './ZoomableImage'
 import { FaqCoverImageLibraryModal } from './FaqCoverImageLibraryModal'
+import { ToggleSwitch } from '@/components/shared/ToggleSwitch'
 import { solutionCategories, type SolutionCategory } from '@/config/solution-overview-assets'
 import {
   DndContext,
@@ -31,6 +32,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { FaqDraggableBlock } from './FaqDraggableBlock'
 import { StackerDropIndicator } from './StackerDropIndicator'
+import { DeleteConfirmModal } from './shared/DeleteConfirmModal'
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -894,51 +896,6 @@ function SortableBlockItem({
   )
 }
 
-// Delete Confirmation Modal
-function DeleteConfirmModal({
-  isOpen,
-  onConfirm,
-  onCancel,
-  itemType,
-  itemLabel,
-}: {
-  isOpen: boolean
-  onConfirm: () => void
-  onCancel: () => void
-  itemType: string
-  itemLabel?: string
-}) {
-  if (!isOpen) return null
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-surface-secondary rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
-          Delete {itemType}{itemLabel ? ` ${itemLabel}` : ''}?
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-content-secondary mb-6">
-          This action cannot be undone. Are you sure you want to delete this {itemType.toLowerCase()}?
-        </p>
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-content-secondary bg-gray-100 dark:bg-surface-tertiary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export function FaqEditorScreen() {
   const {
     setCurrentScreen,
@@ -1715,21 +1672,11 @@ export function FaqEditorScreen() {
                         </button>
                       </div>
                       {/* Grayscale toggle */}
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale</label>
-                        <button
-                          onClick={() => setCoverImageGrayscale(!coverImageGrayscale)}
-                          className={`relative w-9 h-5 rounded-full transition-colors ${
-                            coverImageGrayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                          }`}
-                        >
-                          <span
-                            className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                              coverImageGrayscale ? 'translate-x-4' : ''
-                            }`}
-                          />
-                        </button>
-                      </div>
+                      <ToggleSwitch
+                        label="Grayscale"
+                        checked={coverImageGrayscale}
+                        onChange={() => setCoverImageGrayscale(!coverImageGrayscale)}
+                      />
                       {/* Replace/Remove buttons */}
                       <div className="flex gap-2">
                         {/* Replace with upload */}

@@ -3,6 +3,7 @@ import { EmailGridRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,29 +13,32 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const headline = (searchParams.headline as string) || 'Headline'
-  const body = (searchParams.body as string) || 'This is your body copy. Lorem ipsum dolor sit am'
-  const eyebrow = (searchParams.eyebrow as string) || ''
-  const subheading = (searchParams.subheading as string) || ''
-  const solution = (searchParams.solution as string) || 'environmental'
-  const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const body = parseString(searchParams, 'body', 'This is your body copy. Lorem ipsum dolor sit am')
+  const eyebrow = parseString(searchParams, 'eyebrow', '')
+  const subheading = parseString(searchParams, 'subheading', '')
+  const solution = parseString(searchParams, 'solution', 'environmental')
+  const logoColor = parseEnum<'black' | 'orange'>(searchParams, 'logoColor', 'black')
 
-  const showEyebrow = searchParams.showEyebrow === 'true'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showLightHeader = searchParams.showLightHeader !== 'false'
-  const showHeavyHeader = searchParams.showHeavyHeader === 'true'
-  const showSubheading = searchParams.showSubheading === 'true'
-  const showBody = searchParams.showBody !== 'false'
-  const showSolutionSet = searchParams.showSolutionSet !== 'false'
-  const showGridDetail2 = searchParams.showGridDetail2 !== 'false'
+  // showEyebrow: default FALSE — eyebrow is hidden by default in email-grid
+  const showEyebrow = parseBoolFalse(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const showLightHeader = parseBoolTrue(searchParams, 'showLightHeader')
+  // showHeavyHeader: default FALSE — heavy header is off by default
+  const showHeavyHeader = parseBoolFalse(searchParams, 'showHeavyHeader')
+  // showSubheading: default FALSE — subheading is hidden by default
+  const showSubheading = parseBoolFalse(searchParams, 'showSubheading')
+  const showBody = parseBoolTrue(searchParams, 'showBody')
+  const showSolutionSet = parseBoolTrue(searchParams, 'showSolutionSet')
+  const showGridDetail2 = parseBoolTrue(searchParams, 'showGridDetail2')
 
-  const gridDetail1Type = ((searchParams.gridDetail1Type as string) || 'data') as 'data' | 'cta'
-  const gridDetail1Text = (searchParams.gridDetail1Text as string) || 'Date: January 1st, 2026'
-  const gridDetail2Type = ((searchParams.gridDetail2Type as string) || 'data') as 'data' | 'cta'
-  const gridDetail2Text = (searchParams.gridDetail2Text as string) || 'Date: January 1st, 2026'
-  const gridDetail3Type = ((searchParams.gridDetail3Type as string) || 'cta') as 'data' | 'cta'
-  const gridDetail3Text = (searchParams.gridDetail3Text as string) || 'Responsive'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const gridDetail1Type = parseEnum<'data' | 'cta'>(searchParams, 'gridDetail1Type', 'data')
+  const gridDetail1Text = parseString(searchParams, 'gridDetail1Text', 'Date: January 1st, 2026')
+  const gridDetail2Type = parseEnum<'data' | 'cta'>(searchParams, 'gridDetail2Type', 'data')
+  const gridDetail2Text = parseString(searchParams, 'gridDetail2Text', 'Date: January 1st, 2026')
+  const gridDetail3Type = parseEnum<'data' | 'cta'>(searchParams, 'gridDetail3Type', 'cta')
+  const gridDetail3Text = parseString(searchParams, 'gridDetail3Text', 'Responsive')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

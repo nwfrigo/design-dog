@@ -1,20 +1,9 @@
 'use client'
 
-import { CSSProperties, useState, useEffect } from 'react'
+import { CSSProperties } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
-
-// Arrow icon for CTA link - cobalt blue
-const ArrowIcon = ({ color = '#0080FF', size = 11 }: { color?: string; size?: number }) => (
-  <svg width={size} height={size * 0.795} viewBox="0 0 11 8.75" fill="none">
-    <path
-      d="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5"
-      stroke={color}
-      strokeWidth={0.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
+import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type ImageSize = 'none' | 'small' | 'large'
@@ -85,33 +74,7 @@ export function NewsletterBlueGradient({
   const textColor = '#FFFFFF'
   const ctaColor = '#0080FF' // Cobalt blue for arrow
 
-  // State for grayscale image (only used when grayscale is enabled)
-  const [grayscaleImageUrl, setGrayscaleImageUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!imageUrl || imageSize === 'none' || !grayscale) {
-      setGrayscaleImageUrl(null)
-      return
-    }
-
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width = img.width
-      canvas.height = img.height
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.drawImage(img, 0, 0)
-        ctx.globalCompositeOperation = 'saturation'
-        ctx.fillStyle = 'hsl(0, 0%, 50%)'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-        setGrayscaleImageUrl(canvas.toDataURL('image/jpeg', 0.9))
-      }
-    }
-    img.onerror = () => setGrayscaleImageUrl(null)
-    img.src = imageUrl
-  }, [imageUrl, imageSize, grayscale])
+  const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale && imageSize !== 'none')
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -234,7 +197,7 @@ export function NewsletterBlueGradient({
               }}>
                 {ctaText}
               </span>
-              <ArrowIcon color={ctaColor} size={11} />
+              <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
             </div>
           )}
         </div>

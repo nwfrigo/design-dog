@@ -3,6 +3,7 @@ import { SocialImageRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseNumber, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,24 +13,24 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const headline = (searchParams.headline as string) || 'Headline'
-  const subhead = (searchParams.subhead as string) || ''
-  const metadata = (searchParams.metadata as string) || 'Day / Month | 00:00'
-  const ctaText = (searchParams.ctaText as string) || 'Learn More'
-  const imageUrl = (searchParams.imageUrl as string) || '/assets/images/default_placeholder_image_1.png'
-  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
-  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
-  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
-  const layout = ((searchParams.layout as string) || 'even') as 'even' | 'more-image' | 'more-text'
-  const solution = (searchParams.solution as string) || 'environmental'
-  const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showSubhead = searchParams.showSubhead !== 'false'
-  const showMetadata = searchParams.showMetadata !== 'false'
-  const showCta = searchParams.showCta !== 'false'
-  const showSolutionSet = searchParams.showSolutionSet !== 'false'
-  const grayscale = searchParams.grayscale === 'true'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const subhead = parseString(searchParams, 'subhead', '')
+  const metadata = parseString(searchParams, 'metadata', 'Day / Month | 00:00')
+  const ctaText = parseString(searchParams, 'ctaText', 'Learn More')
+  const imageUrl = parseString(searchParams, 'imageUrl', '/assets/images/default_placeholder_image_1.png')
+  const imagePositionX = parseNumber(searchParams, 'imagePositionX', 0)
+  const imagePositionY = parseNumber(searchParams, 'imagePositionY', 0)
+  const imageZoom = parseNumber(searchParams, 'imageZoom', 1)
+  const layout = parseEnum<'even' | 'more-image' | 'more-text'>(searchParams, 'layout', 'even')
+  const solution = parseString(searchParams, 'solution', 'environmental')
+  const logoColor = parseEnum<'black' | 'orange'>(searchParams, 'logoColor', 'black')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const showSubhead = parseBoolTrue(searchParams, 'showSubhead')
+  const showMetadata = parseBoolTrue(searchParams, 'showMetadata')
+  const showCta = parseBoolTrue(searchParams, 'showCta')
+  const showSolutionSet = parseBoolTrue(searchParams, 'showSolutionSet')
+  const grayscale = parseBoolFalse(searchParams, 'grayscale')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

@@ -3,6 +3,7 @@ import { NewsletterTopBannerRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseBoolTrue, parseBoolFalse } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,13 +13,13 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  // Parse params on server
-  const eyebrow = (searchParams.eyebrow as string) || 'Month | Year'
-  const headline = (searchParams.headline as string) || 'EHS+ Newsletter'
-  const subhead = (searchParams.subhead as string) || ''
-  const variant = ((searchParams.variant as string) || 'dark') as 'dark' | 'light'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showSubhead = searchParams.showSubhead === 'true'
+  const eyebrow = parseString(searchParams, 'eyebrow', 'Month | Year')
+  const headline = parseString(searchParams, 'headline', 'EHS+ Newsletter')
+  const subhead = parseString(searchParams, 'subhead', '')
+  const variant = parseEnum<'dark' | 'light'>(searchParams, 'variant', 'dark')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  // showSubhead: default FALSE — subhead is hidden by default in newsletter-top-banner
+  const showSubhead = parseBoolFalse(searchParams, 'showSubhead')
 
   return (
     <div style={{

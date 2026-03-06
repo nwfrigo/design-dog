@@ -4,6 +4,7 @@ import { FloatingBannerVariant } from '@/components/templates/WebsiteFloatingBan
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -13,13 +14,14 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const eyebrow = (searchParams.eyebrow as string) || ''
-  const headline = (searchParams.headline as string) || 'Headline'
+  const eyebrow = parseString(searchParams, 'eyebrow', '')
+  const headline = parseString(searchParams, 'headline', 'Headline')
   const cta = (searchParams.cta as string) || (searchParams.ctaText as string) || 'Learn More'
-  const showEyebrow = searchParams.showEyebrow === 'true'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const variant = ((searchParams.variant as string) || 'dark') as FloatingBannerVariant
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  // showEyebrow: default FALSE — eyebrow is hidden by default in floating banner
+  const showEyebrow = parseBoolFalse(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const variant = parseEnum(searchParams, 'variant', 'dark') as FloatingBannerVariant
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

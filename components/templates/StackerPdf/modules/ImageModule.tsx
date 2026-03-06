@@ -2,25 +2,7 @@
 
 import { CSSProperties } from 'react'
 import { getStackerTheme } from '@/lib/stacker-theme'
-
-// Arrow SVG for CTA
-const ArrowIcon = ({ color = '#060015' }: { color?: string }) => (
-  <svg
-    width="11"
-    height="9"
-    viewBox="0 0 11 9"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M1 4.5H10M10 4.5L6.5 1M10 4.5L6.5 8"
-      stroke={color}
-      strokeWidth="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
+import { ArrowIcon } from '@/components/shared/ArrowIcon'
 
 const IMAGE_SIZE_WIDTHS: Record<'S' | 'M' | 'L', number> = {
   S: 200,
@@ -152,7 +134,7 @@ export function ImageModule({
   const ctaContent = (
     <>
       <span style={ctaTextStyle}>{cta || 'Learn More'}</span>
-      <ArrowIcon color={t.ctaColor} />
+      <ArrowIcon color={t.ctaColor} width={11} height={9} viewBox="0 0 11 9" pathD="M1 4.5H10M10 4.5L6.5 1M10 4.5L6.5 8" strokeWidth={1} />
     </>
   )
 

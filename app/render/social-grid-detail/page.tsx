@@ -4,6 +4,7 @@ import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { GridDetailRow } from '@/components/templates/SocialGridDetail'
+import { parseString, parseEnum, parseBoolTrue, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -13,31 +14,31 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const headline = (searchParams.headline as string) || 'Headline'
-  const subhead = (searchParams.subhead as string) || 'This is your subheader or description text. Keep it to two lines if you can.'
-  const eyebrow = (searchParams.eyebrow as string) || "Don't miss this."
-  const showEyebrow = searchParams.showEyebrow !== 'false'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showSubhead = searchParams.showSubhead !== 'false'
-  const showSolutionSet = searchParams.showSolutionSet !== 'false'
-  const solution = (searchParams.solution as string) || 'environmental'
-  const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
-  const showRow3 = searchParams.showRow3 !== 'false'
-  const showRow4 = searchParams.showRow4 !== 'false'
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const subhead = parseString(searchParams, 'subhead', 'This is your subheader or description text. Keep it to two lines if you can.')
+  const eyebrow = parseString(searchParams, 'eyebrow', "Don't miss this.")
+  const showEyebrow = parseBoolTrue(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const showSubhead = parseBoolTrue(searchParams, 'showSubhead')
+  const showSolutionSet = parseBoolTrue(searchParams, 'showSolutionSet')
+  const solution = parseString(searchParams, 'solution', 'environmental')
+  const logoColor = parseEnum<'black' | 'orange'>(searchParams, 'logoColor', 'black')
+  const showRow3 = parseBoolTrue(searchParams, 'showRow3')
+  const showRow4 = parseBoolTrue(searchParams, 'showRow4')
 
   // Grid details
-  const gridDetail1Text = (searchParams.gridDetail1Text as string) || 'Date: January 1st, 2026'
-  const gridDetail2Text = (searchParams.gridDetail2Text as string) || 'Time: Midnight, EST'
-  const gridDetail3Text = (searchParams.gridDetail3Text as string) || 'Place: Wherever'
-  const gridDetail3Type = ((searchParams.gridDetail3Type as string) || 'data') as 'data' | 'cta'
-  const gridDetail4Text = (searchParams.gridDetail4Text as string) || 'Join the event'
-  const gridDetail4Type = ((searchParams.gridDetail4Type as string) || 'cta') as 'data' | 'cta'
+  const gridDetail1Text = parseString(searchParams, 'gridDetail1Text', 'Date: January 1st, 2026')
+  const gridDetail2Text = parseString(searchParams, 'gridDetail2Text', 'Time: Midnight, EST')
+  const gridDetail3Text = parseString(searchParams, 'gridDetail3Text', 'Place: Wherever')
+  const gridDetail3Type = parseEnum<'data' | 'cta'>(searchParams, 'gridDetail3Type', 'data')
+  const gridDetail4Text = parseString(searchParams, 'gridDetail4Text', 'Join the event')
+  const gridDetail4Type = parseEnum<'data' | 'cta'>(searchParams, 'gridDetail4Type', 'cta')
 
   const gridDetail1: GridDetailRow = { type: 'data', text: gridDetail1Text }
   const gridDetail2: GridDetailRow = { type: 'data', text: gridDetail2Text }
   const gridDetail3: GridDetailRow = { type: gridDetail3Type, text: gridDetail3Text }
   const gridDetail4: GridDetailRow = { type: gridDetail4Type, text: gridDetail4Text }
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

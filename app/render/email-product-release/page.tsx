@@ -3,6 +3,7 @@ import { EmailProductReleaseRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseNumber, parseBoolFalse } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,14 +13,13 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  // Parse params on server
-  const eyebrow = (searchParams.eyebrow as string) || 'Product Release'
-  const headline = (searchParams.headline as string) || 'GX2 2026.1'
-  const imageUrl = (searchParams.imageUrl as string) || '/assets/images/default_placeholder_image_1.png'
-  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
-  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
-  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
-  const grayscale = searchParams.grayscale === 'true'
+  const eyebrow = parseString(searchParams, 'eyebrow', 'Product Release')
+  const headline = parseString(searchParams, 'headline', 'GX2 2026.1')
+  const imageUrl = parseString(searchParams, 'imageUrl', '/assets/images/default_placeholder_image_1.png')
+  const imagePositionX = parseNumber(searchParams, 'imagePositionX', 0)
+  const imagePositionY = parseNumber(searchParams, 'imagePositionY', 0)
+  const imageZoom = parseNumber(searchParams, 'imageZoom', 1)
+  const grayscale = parseBoolFalse(searchParams, 'grayscale')
 
   return (
     <div style={{

@@ -35,10 +35,9 @@ export default function StackerPdfRenderPage({
     console.error('Failed to parse moduleSpacing JSON:', e)
   }
 
-  // Parse footer visibility
+  // Parse footer visibility and dark mode
+  // These use '1' instead of 'true' — intentional, matches what the export API sends
   const footerHidden = searchParams.footerHidden === '1'
-
-  // Parse dark mode
   const darkMode = searchParams.darkMode === '1'
 
   // If no modules provided, use default placeholder

@@ -25,51 +25,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-
-// Delete Confirmation Modal
-function DeleteConfirmModal({
-  isOpen,
-  onConfirm,
-  onCancel,
-  itemType,
-  itemLabel,
-}: {
-  isOpen: boolean
-  onConfirm: () => void
-  onCancel: () => void
-  itemType: string
-  itemLabel?: string
-}) {
-  if (!isOpen) return null
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-surface-secondary rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-content-primary mb-2">
-          Delete {itemType}{itemLabel ? ` ${itemLabel}` : ''}?
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-content-secondary mb-6">
-          This action cannot be undone. Are you sure you want to delete this {itemType.toLowerCase()}?
-        </p>
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-content-secondary bg-gray-100 dark:bg-surface-tertiary rounded-lg hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+import { DeleteConfirmModal } from './shared/DeleteConfirmModal'
+import { ToggleSwitch } from './shared/ToggleSwitch'
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -477,21 +434,11 @@ function ModuleEditor({
       return (
         <div className="space-y-3">
           {/* Show Chips Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Category Chips</label>
-            <button
-              onClick={() => onUpdate({ showChips: !module.showChips })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showChips ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showChips ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Category Chips"
+            checked={module.showChips}
+            onChange={() => onUpdate({ showChips: !module.showChips })}
+          />
 
           {/* Category Toggles */}
           {module.showChips && (
@@ -578,21 +525,11 @@ function ModuleEditor({
           </div>
 
           {/* Subheader Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Subheader</label>
-            <button
-              onClick={() => onUpdate({ showSubheader: !module.showSubheader })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showSubheader ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showSubheader ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Subheader"
+            checked={module.showSubheader}
+            onChange={() => onUpdate({ showSubheader: !module.showSubheader })}
+          />
 
           {/* Subheader Text */}
           {module.showSubheader && (
@@ -609,21 +546,11 @@ function ModuleEditor({
           )}
 
           {/* CTA Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show CTA</label>
-            <button
-              onClick={() => onUpdate({ showCta: !module.showCta })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showCta ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showCta ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show CTA"
+            checked={module.showCta}
+            onChange={() => onUpdate({ showCta: !module.showCta })}
+          />
 
           {/* CTA Fields */}
           {module.showCta && (
@@ -657,21 +584,11 @@ function ModuleEditor({
       return (
         <div className="space-y-3">
           {/* Show Intro Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Intro</label>
-            <button
-              onClick={() => onUpdate({ showIntro: !module.showIntro })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showIntro ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showIntro ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Intro"
+            checked={module.showIntro}
+            onChange={() => onUpdate({ showIntro: !module.showIntro })}
+          />
 
           {/* Intro Text */}
           {module.showIntro && (
@@ -688,21 +605,11 @@ function ModuleEditor({
           )}
 
           {/* Show Body Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Body</label>
-            <button
-              onClick={() => onUpdate({ showBody: !module.showBody })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showBody ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Body"
+            checked={module.showBody}
+            onChange={() => onUpdate({ showBody: !module.showBody })}
+          />
 
           {/* Body Text */}
           {module.showBody && (
@@ -967,39 +874,19 @@ function ModuleEditor({
 
           {/* Grayscale Toggle - only show when image is uploaded */}
           {module.imageUrl && (
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale</label>
-              <button
-                onClick={() => onUpdate({ grayscale: !module.grayscale })}
-                className={`relative w-9 h-5 rounded-full transition-colors ${
-                  module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                    module.grayscale ? 'translate-x-4' : ''
-                  }`}
-                />
-              </button>
-            </div>
+            <ToggleSwitch
+              label="Grayscale"
+              checked={module.grayscale}
+              onChange={() => onUpdate({ grayscale: !module.grayscale })}
+            />
           )}
 
           {/* Show Eyebrow Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Eyebrow</label>
-            <button
-              onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showEyebrow ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Eyebrow"
+            checked={module.showEyebrow}
+            onChange={() => onUpdate({ showEyebrow: !module.showEyebrow })}
+          />
 
           {/* Eyebrow Text */}
           {module.showEyebrow && (
@@ -1016,21 +903,11 @@ function ModuleEditor({
           )}
 
           {/* Show Heading Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Heading</label>
-            <button
-              onClick={() => onUpdate({ showHeading: !module.showHeading })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showHeading ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Heading"
+            checked={module.showHeading}
+            onChange={() => onUpdate({ showHeading: !module.showHeading })}
+          />
 
           {/* Heading Text */}
           {module.showHeading && (
@@ -1047,21 +924,11 @@ function ModuleEditor({
           )}
 
           {/* Show Body Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Body</label>
-            <button
-              onClick={() => onUpdate({ showBody: !module.showBody })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showBody ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Body"
+            checked={module.showBody}
+            onChange={() => onUpdate({ showBody: !module.showBody })}
+          />
 
           {/* Body Text */}
           {module.showBody && (
@@ -1078,21 +945,11 @@ function ModuleEditor({
           )}
 
           {/* Show CTA Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show CTA</label>
-            <button
-              onClick={() => onUpdate({ showCta: !module.showCta })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showCta ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showCta ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show CTA"
+            checked={module.showCta}
+            onChange={() => onUpdate({ showCta: !module.showCta })}
+          />
 
           {/* CTA Fields */}
           {module.showCta && (
@@ -1265,39 +1122,19 @@ function ModuleEditor({
 
           {/* Grayscale Toggle - only show when image is uploaded */}
           {module.imageUrl && (
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale</label>
-              <button
-                onClick={() => onUpdate({ grayscale: !module.grayscale })}
-                className={`relative w-9 h-5 rounded-full transition-colors ${
-                  module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                    module.grayscale ? 'translate-x-4' : ''
-                  }`}
-                />
-              </button>
-            </div>
+            <ToggleSwitch
+              label="Grayscale"
+              checked={module.grayscale}
+              onChange={() => onUpdate({ grayscale: !module.grayscale })}
+            />
           )}
 
           {/* Show Eyebrow Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Eyebrow</label>
-            <button
-              onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showEyebrow ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Eyebrow"
+            checked={module.showEyebrow}
+            onChange={() => onUpdate({ showEyebrow: !module.showEyebrow })}
+          />
 
           {/* Eyebrow Text */}
           {module.showEyebrow && (
@@ -1314,21 +1151,11 @@ function ModuleEditor({
           )}
 
           {/* Show Heading Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Heading</label>
-            <button
-              onClick={() => onUpdate({ showHeading: !module.showHeading })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showHeading ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Heading"
+            checked={module.showHeading}
+            onChange={() => onUpdate({ showHeading: !module.showHeading })}
+          />
 
           {/* Heading Text */}
           {module.showHeading && (
@@ -1345,21 +1172,11 @@ function ModuleEditor({
           )}
 
           {/* Show Body Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Body</label>
-            <button
-              onClick={() => onUpdate({ showBody: !module.showBody })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showBody ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showBody ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Body"
+            checked={module.showBody}
+            onChange={() => onUpdate({ showBody: !module.showBody })}
+          />
 
           {/* Body Text */}
           {module.showBody && (
@@ -1452,21 +1269,11 @@ function ModuleEditor({
       return (
         <div className="space-y-4">
           {/* Show Heading Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Heading</label>
-            <button
-              onClick={() => onUpdate({ showHeading: !module.showHeading })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showHeading ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showHeading ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Heading"
+            checked={module.showHeading}
+            onChange={() => onUpdate({ showHeading: !module.showHeading })}
+          />
 
           {/* Heading Text */}
           {module.showHeading && (
@@ -1483,38 +1290,18 @@ function ModuleEditor({
           )}
 
           {/* Show Third Card Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Show Third Card</label>
-            <button
-              onClick={() => onUpdate({ showCard3: !module.showCard3 })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.showCard3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.showCard3 ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show Third Card"
+            checked={module.showCard3}
+            onChange={() => onUpdate({ showCard3: !module.showCard3 })}
+          />
 
           {/* Grayscale Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-gray-500 dark:text-content-secondary">Grayscale Images</label>
-            <button
-              onClick={() => onUpdate({ grayscale: !module.grayscale })}
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                module.grayscale ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  module.grayscale ? 'translate-x-4' : ''
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Grayscale Images"
+            checked={module.grayscale}
+            onChange={() => onUpdate({ grayscale: !module.grayscale })}
+          />
 
           {/* Cards */}
           {module.cards.slice(0, module.showCard3 ? 3 : 2).map((card, index) => (
@@ -1615,25 +1402,15 @@ function ModuleEditor({
               </div>
 
               {/* Show Eyebrow Toggle */}
-              <div className="flex items-center justify-between">
-                <label className="text-xs text-gray-500 dark:text-content-secondary">Show Eyebrow</label>
-                <button
-                  onClick={() => {
-                    const newCards = [...module.cards] as typeof module.cards
-                    newCards[index] = { ...card, showEyebrow: !card.showEyebrow }
-                    onUpdate({ cards: newCards })
-                  }}
-                  className={`relative w-9 h-5 rounded-full transition-colors ${
-                    card.showEyebrow ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                      card.showEyebrow ? 'translate-x-4' : ''
-                    }`}
-                  />
-                </button>
-              </div>
+              <ToggleSwitch
+                label="Show Eyebrow"
+                checked={card.showEyebrow}
+                onChange={() => {
+                  const newCards = [...module.cards] as typeof module.cards
+                  newCards[index] = { ...card, showEyebrow: !card.showEyebrow }
+                  onUpdate({ cards: newCards })
+                }}
+              />
 
               {/* Eyebrow Text */}
               {card.showEyebrow && (
@@ -1747,21 +1524,12 @@ function ModuleEditor({
       return (
         <div className="space-y-4">
           {/* Show 3rd Stat Toggle */}
-          <div className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-line-subtle">
-            <span className="text-xs text-gray-600 dark:text-content-secondary">Show 3rd Stat</span>
-            <button
-              onClick={() => onUpdate({ showStat3: !module.showStat3 })}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                module.showStat3 ? 'bg-blue-500' : 'bg-gray-300 dark:bg-surface-tertiary'
-              }`}
-            >
-              <span
-                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                  module.showStat3 ? 'translate-x-[18px]' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
+          <ToggleSwitch
+            label="Show 3rd Stat"
+            checked={module.showStat3}
+            onChange={() => onUpdate({ showStat3: !module.showStat3 })}
+            className="py-2 border-b border-gray-200 dark:border-line-subtle"
+          />
 
           {visibleStats.map((stat, index) => (
             <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { upload } from '@vercel/blob/client'
 import { useStore } from '@/store'
 import { KIT_CONFIGS } from '@/config/kit-configs'
+import { useThemeDetection } from '@/hooks/useThemeDetection'
 import type { AnalysisInfo, EditedContent, ExtractedContent } from '@/types'
 
 type FileType = 'pdf' | 'docx' | 'pptx' | 'txt' | 'md'
@@ -118,14 +119,7 @@ export function AutoCreateContentScreen() {
   const editedFields = new Set(contentSource.editedFields || [])
 
   // Theme detection
-  const [isDark, setIsDark] = useState(false)
-  useEffect(() => {
-    const checkTheme = () => setIsDark(document.documentElement.classList.contains('dark'))
-    checkTheme()
-    const observer = new MutationObserver(checkTheme)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
+  const isDark = useThemeDetection()
 
   // Auto-expand analysis if we have data on mount
   useEffect(() => {

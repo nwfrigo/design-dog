@@ -3,6 +3,7 @@ import { NewsletterLightRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseNumber, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined, parseStringOrNull } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,22 +13,21 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  // Parse params on server
-  const eyebrow = (searchParams.eyebrow as string) || 'EYEBROW'
-  const headline = (searchParams.headline as string) || 'Headline'
-  const body = (searchParams.body as string) || ''
-  const ctaText = (searchParams.ctaText as string) || 'Responsive'
-  const imageSize = ((searchParams.imageSize as string) || 'none') as 'none' | 'small' | 'large'
-  const imageUrl = (searchParams.imageUrl as string) || null
-  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
-  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
-  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
-  const showEyebrow = searchParams.showEyebrow !== 'false'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showBody = searchParams.showBody !== 'false'
-  const showCta = searchParams.showCta !== 'false'
-  const grayscale = searchParams.grayscale === 'true'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const eyebrow = parseString(searchParams, 'eyebrow', 'EYEBROW')
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const body = parseString(searchParams, 'body', '')
+  const ctaText = parseString(searchParams, 'ctaText', 'Responsive')
+  const imageSize = parseEnum<'none' | 'small' | 'large'>(searchParams, 'imageSize', 'none')
+  const imageUrl = parseStringOrNull(searchParams, 'imageUrl')
+  const imagePositionX = parseNumber(searchParams, 'imagePositionX', 0)
+  const imagePositionY = parseNumber(searchParams, 'imagePositionY', 0)
+  const imageZoom = parseNumber(searchParams, 'imageZoom', 1)
+  const showEyebrow = parseBoolTrue(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const showBody = parseBoolTrue(searchParams, 'showBody')
+  const showCta = parseBoolTrue(searchParams, 'showCta')
+  const grayscale = parseBoolFalse(searchParams, 'grayscale')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

@@ -3,6 +3,7 @@ import { WebsiteEventListingRender } from './render-content'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { parseString, parseEnum, parseBoolTrue, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -12,21 +13,21 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const eyebrow = (searchParams.eyebrow as string) || 'LIVE EVENT'
-  const headline = (searchParams.headline as string) || 'Headline'
-  const subhead = (searchParams.subhead as string) || 'This is your subheader or description text. Keep it to two lines if you can.'
+  const eyebrow = parseString(searchParams, 'eyebrow', 'LIVE EVENT')
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const subhead = parseString(searchParams, 'subhead', 'This is your subheader or description text. Keep it to two lines if you can.')
   const cta = (searchParams.ctaText as string) || (searchParams.cta as string) || 'Responsive'
-  const variant = ((searchParams.variant as string) || 'orange') as 'orange' | 'light' | 'dark-gradient'
-  const gridDetail1Text = (searchParams.gridDetail1Text as string) || 'Add Details or Hide Me'
-  const gridDetail2Text = (searchParams.gridDetail2Text as string) || 'Add Details or Hide Me'
-  const gridDetail3Text = (searchParams.gridDetail3Text as string) || 'Add Details or Hide Me'
-  const gridDetail4Text = (searchParams.gridDetail4Text as string) || 'Add Details or Hide Me'
-  const showRow3 = searchParams.showRow3 !== 'false'
-  const showRow4 = searchParams.showRow4 !== 'false'
-  const showEyebrow = searchParams.showEyebrow !== 'false'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showSubhead = searchParams.showSubhead !== 'false'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const variant = parseEnum<'orange' | 'light' | 'dark-gradient'>(searchParams, 'variant', 'orange')
+  const gridDetail1Text = parseString(searchParams, 'gridDetail1Text', 'Add Details or Hide Me')
+  const gridDetail2Text = parseString(searchParams, 'gridDetail2Text', 'Add Details or Hide Me')
+  const gridDetail3Text = parseString(searchParams, 'gridDetail3Text', 'Add Details or Hide Me')
+  const gridDetail4Text = parseString(searchParams, 'gridDetail4Text', 'Add Details or Hide Me')
+  const showRow3 = parseBoolTrue(searchParams, 'showRow3')
+  const showRow4 = parseBoolTrue(searchParams, 'showRow4')
+  const showEyebrow = parseBoolTrue(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const showSubhead = parseBoolTrue(searchParams, 'showSubhead')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{

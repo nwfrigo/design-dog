@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import { useStore } from '@/store'
 import { HeaderControls } from '@/components/HeaderControls'
+import { useThemeDetection } from '@/hooks/useThemeDetection'
 
 type FileType = 'pdf' | 'docx' | 'pptx' | 'txt' | 'md'
 
@@ -147,14 +148,7 @@ export function StackerSetupScreen() {
   const detectedUrl = detectUrl(textContent)
 
   // Theme detection
-  const [isDark, setIsDark] = useState(false)
-  useEffect(() => {
-    const checkTheme = () => setIsDark(document.documentElement.classList.contains('dark'))
-    checkTheme()
-    const observer = new MutationObserver(checkTheme)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
+  const isDark = useThemeDetection()
 
   // Auto-resize textarea
   useEffect(() => {

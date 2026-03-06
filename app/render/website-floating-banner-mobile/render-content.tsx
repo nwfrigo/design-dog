@@ -4,9 +4,10 @@ import { WebsiteFloatingBannerMobile, FloatingBannerMobileVariant, FloatingBanne
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { fetchColorsConfig, fetchTypographyConfig, ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { fromURLSearchParams, parseString, parseEnum, parseBoolTrue, parseNumberOrUndefined } from '@/lib/render-params'
 
 export function RenderContent() {
-  const searchParams = useSearchParams()
+  const rawParams = useSearchParams()
   const [colorsConfig, setColorsConfig] = useState<ColorsConfig | null>(null)
   const [typographyConfig, setTypographyConfig] = useState<TypographyConfig | null>(null)
   const [ready, setReady] = useState(false)
@@ -39,14 +40,16 @@ export function RenderContent() {
     return <div>Loading...</div>
   }
 
-  const eyebrow = searchParams.get('eyebrow') || 'Eyebrow'
-  const headline = searchParams.get('headline') || 'Headline'
-  const cta = searchParams.get('cta') || 'Learn More'
-  const showEyebrow = searchParams.get('showEyebrow') !== 'false'
-  const showHeadline = searchParams.get('showHeadline') !== 'false'
-  const variant = (searchParams.get('variant') || 'light') as FloatingBannerMobileVariant
-  const arrowType = (searchParams.get('arrowType') || 'text') as FloatingBannerMobileArrowType
-  const headlineFontSize = searchParams.get('headlineFontSize') ? parseFloat(searchParams.get('headlineFontSize')!) : undefined
+  const searchParams = fromURLSearchParams(rawParams)
+  const eyebrow = parseString(searchParams, 'eyebrow', 'Eyebrow')
+  const headline = parseString(searchParams, 'headline', 'Headline')
+  const cta = parseString(searchParams, 'cta', 'Learn More')
+  // showEyebrow: default TRUE — consistent with other banner templates
+  const showEyebrow = parseBoolTrue(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  const variant = parseEnum(searchParams, 'variant', 'light') as FloatingBannerMobileVariant
+  const arrowType = parseEnum(searchParams, 'arrowType', 'text') as FloatingBannerMobileArrowType
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <>

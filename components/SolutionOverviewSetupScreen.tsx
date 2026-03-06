@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import { useStore } from '@/store'
 import { HeaderControls } from '@/components/HeaderControls'
+import { useThemeDetection } from '@/hooks/useThemeDetection'
 import type { SolutionCategory, SolutionOverviewBenefit, SolutionOverviewFeature } from '@/types'
 import { solutionCategories, defaultSolutionOverviewContent } from '@/config/solution-overview-assets'
 
@@ -39,18 +40,9 @@ export function SolutionOverviewSetupScreen() {
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [isDark, setIsDark] = useState(false)
+  const isDark = useThemeDetection()
   const [isParsing, setIsParsing] = useState(false)
   const [parseError, setParseError] = useState<string | null>(null)
-
-  // Detect theme changes
-  useEffect(() => {
-    const checkTheme = () => setIsDark(document.documentElement.classList.contains('dark'))
-    checkTheme()
-    const observer = new MutationObserver(checkTheme)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
 
   // Unselected color based on theme
   const unselectedColor = isDark ? '#494A4C' : '#dddddd'

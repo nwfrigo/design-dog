@@ -4,6 +4,7 @@ import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { EbookVariant } from '@/components/templates/WebsiteThumbnail'
+import { parseString, parseEnum, parseNumber, parseBoolTrue, parseBoolFalse, parseNumberOrUndefined } from '@/lib/render-params'
 
 const colorsConfig = colorsJson as ColorsConfig
 const typographyConfig = typographyJson as TypographyConfig
@@ -13,24 +14,24 @@ export default function RenderPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const eyebrow = (searchParams.eyebrow as string) || 'EBOOK'
-  const headline = (searchParams.headline as string) || 'Lightweight header.'
-  const subhead = (searchParams.subhead as string) || ''
+  const eyebrow = parseString(searchParams, 'eyebrow', 'EBOOK')
+  const headline = parseString(searchParams, 'headline', 'Lightweight header.')
+  const subhead = parseString(searchParams, 'subhead', '')
   const cta = (searchParams.ctaText as string) || (searchParams.cta as string) || 'Responsive'
-  const solution = (searchParams.solution as string) || 'environmental'
-  const variant = ((searchParams.variant as string) || 'image') as EbookVariant
-  // Use placeholder if no imageUrl - Puppeteer will inject the real image for data URLs
-  const imageUrl = (searchParams.imageUrl as string) || '/assets/images/safer_is_stronger_sample_page.png'
-  const imagePositionX = parseFloat((searchParams.imagePositionX as string) || '0')
-  const imagePositionY = parseFloat((searchParams.imagePositionY as string) || '0')
-  const imageZoom = parseFloat((searchParams.imageZoom as string) || '1')
-  const showEyebrow = searchParams.showEyebrow !== 'false'
-  const showHeadline = searchParams.showHeadline !== 'false'
-  const showSubhead = searchParams.showSubhead === 'true'
-  const showCta = searchParams.showCta !== 'false'
-  const logoColor = ((searchParams.logoColor as string) || 'black') as 'black' | 'orange'
-  const grayscale = searchParams.grayscale === 'true'
-  const headlineFontSize = searchParams.headlineFontSize ? parseFloat(searchParams.headlineFontSize as string) : undefined
+  const solution = parseString(searchParams, 'solution', 'environmental')
+  const variant = parseEnum(searchParams, 'variant', 'image') as EbookVariant
+  const imageUrl = parseString(searchParams, 'imageUrl', '/assets/images/safer_is_stronger_sample_page.png')
+  const imagePositionX = parseNumber(searchParams, 'imagePositionX', 0)
+  const imagePositionY = parseNumber(searchParams, 'imagePositionY', 0)
+  const imageZoom = parseNumber(searchParams, 'imageZoom', 1)
+  const showEyebrow = parseBoolTrue(searchParams, 'showEyebrow')
+  const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
+  // showSubhead: default FALSE — subhead is hidden by default in website-thumbnail
+  const showSubhead = parseBoolFalse(searchParams, 'showSubhead')
+  const showCta = parseBoolTrue(searchParams, 'showCta')
+  const logoColor = parseEnum<'black' | 'orange'>(searchParams, 'logoColor', 'black')
+  const grayscale = parseBoolFalse(searchParams, 'grayscale')
+  const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
 
   return (
     <div style={{
