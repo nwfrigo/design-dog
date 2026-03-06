@@ -246,16 +246,18 @@ Every new editable prop must appear in all of these locations:
 3. `store/index.ts` — Add state field + setter to `AppState`
 4. `lib/draft-storage.ts` — Add to save/load if needed for draft persistence
 5. `lib/export-params.ts` — Add to the template's param builder function
-6. `app/api/export/route.ts` — Add to the template's export handler
-7. `app/render/{slug}/page.tsx` — Parse using `lib/render-params.ts` helpers
+6. `app/render/{slug}/page.tsx` — Parse using `lib/render-params.ts` helpers
+7. `components/ExportQueueScreen.tsx` — Add to `handleExportSingle` body (~line 98)
 
-The export API route is the #1 silent failure point — the editor preview renders correctly (React), but Puppeteer loads a separate render URL. If the param isn't in the query string, the export silently uses defaults.
+The export API route (`app/api/export/route.ts`) uses a generic forwarding loop — it auto-forwards all params from the request body to the render URL. No changes needed there when adding new props. The remaining manual forwarding layer is `ExportQueueScreen.handleExportSingle`, which builds its own request body with an explicit field list.
 
 ### Export Gotchas
 
 **Sub-pixel rendering in PDF exports:** Puppeteer renders sub-pixel CSS values inconsistently — borders appear thicker, rectangles distort, page breaks land wrong. Use `getBoundingClientRect().height` with `Math.ceil()` instead of `offsetHeight` (which rounds down). Reset `body { min-height: 0 }` before measuring page height (the root layout applies `min-h-screen`).
 
 **URLSearchParams auto-encoding:** `URLSearchParams.set()` auto-encodes values. Never pre-encode with `encodeURIComponent()` — it causes double-encoding (`%255B` instead of `%5B`). Pass raw strings.
+
+**Editor vs queue exports use different code paths:** Exporting from the editor calls `buildExportParams()` in `lib/export-params.ts`. Exporting from the queue calls `handleExportSingle` in `ExportQueueScreen.tsx`, which builds its own request body. Always test exports from both paths — a prop can work in one and silently fail in the other.
 
 ### Render Page Pattern
 
@@ -425,6 +427,14 @@ This is the largest file. Key patterns:
   // Image upload UI
 )}
 ```
+
+### Drag-to-Adjust Spacing Controls
+
+For templates that need user-adjustable spacing (e.g., pushing text up when CTA is hidden), use a padding-based approach rather than inserting/removing flex children. Adding a spacer div to a `justify-content: space-between` layout causes a visual "snap" — the layout redistributes abruptly when the child count changes.
+
+**Pattern:** Modify the container's padding dynamically based on the spacing value. Reference implementation: `BottomSpacingHandle` in `EditorScreen.tsx` and `effectiveBottomPadding` in `EmailDarkGradient.tsx`.
+
+**UI:** Pink pill drag handle with dashed guide lines and px readout, matching the Stacker module spacing handle style. Drag direction is inverted (drag up = increase spacing = push content up).
 
 ### Editor Toolbar Pattern (Multi-Page Collateral)
 
