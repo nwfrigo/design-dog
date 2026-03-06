@@ -22,6 +22,7 @@ export interface ExportParamState {
   showEyebrow: boolean
   showHeadline: boolean
   headlineFontSize: number | null
+  bottomSpacing: number
 
   // Image
   thumbnailImageUrl: string | null
@@ -302,6 +303,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSubheading: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showCta: s.showCta,
+    bottomSpacing: s.bottomSpacing,
   }),
 
   'email-speakers': (s) => ({

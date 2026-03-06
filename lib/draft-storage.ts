@@ -96,6 +96,7 @@ export interface DraftState {
   grayscale: boolean
   // Manual text size
   headlineFontSize?: number | null
+  bottomSpacing: number
   generatedVariations: { headlines: string[]; ctas: string[] } | null
   // FAQ PDF
   faqTitle: string
@@ -258,6 +259,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       newsletterTopBannerVariant: state.newsletterTopBannerVariant || 'dark',
       grayscale: state.grayscale ?? false,
       headlineFontSize: state.headlineFontSize ?? null,
+      bottomSpacing: state.bottomSpacing ?? 0,
       generatedVariations: state.generatedVariations || null,
       // FAQ PDF
       faqTitle: state.faqTitle || 'Title Goes Here',

@@ -322,6 +322,8 @@ export interface ManualAssetSettings {
   speaker3ImageZoom: number
   // Manual text size
   headlineFontSize: number | null
+  // Email Dark Gradient spacing
+  bottomSpacing: number
   // Template variant settings (must persist when switching assets)
   ebookVariant: ImageVariant
   reportVariant: ImageVariant
@@ -565,6 +567,8 @@ export interface GeneratedAsset {
   solutionOverviewStat5Label: string
   // Manual text size
   headlineFontSize: number | null
+  // Email Dark Gradient spacing
+  bottomSpacing: number
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
@@ -705,6 +709,8 @@ export interface QueuedAsset {
   solutionOverviewStat5Label: string
   // Manual text size
   headlineFontSize: number | null
+  // Email Dark Gradient spacing
+  bottomSpacing: number
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
@@ -870,6 +876,9 @@ export interface AppState {
   // Manual text size
   headlineFontSize: number | null
 
+  // Email Dark Gradient spacing
+  bottomSpacing: number
+
   // FAQ PDF state
   faqTitle: string
   faqCoverSubheader: string
@@ -998,6 +1007,8 @@ export interface AppState {
   setGrayscale: (grayscale: boolean) => void
   // Manual text size
   setHeadlineFontSize: (size: number | null) => void
+  // Email Dark Gradient spacing
+  setBottomSpacing: (spacing: number) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void
   setSolutionOverviewSolutionName: (name: string) => void

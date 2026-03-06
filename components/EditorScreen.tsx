@@ -71,6 +71,98 @@ const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: 
   'social-carousel': { default: 112, min: 40, max: 140, step: 4 },
 }
 
+// Bottom spacing drag handle for email-dark-gradient (reuses StackerSpacingHandle visual style)
+function BottomSpacingHandle({ spacing, onChange, scale }: {
+  spacing: number
+  onChange: (value: number) => void
+  scale: number
+}) {
+  const [isHovered, setIsHovered] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartY = useRef(0)
+  const dragStartSpacing = useRef(0)
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+    dragStartY.current = e.clientY
+    dragStartSpacing.current = spacing
+  }, [spacing])
+
+  useEffect(() => {
+    if (!isDragging) return
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaY = e.clientY - dragStartY.current
+      const deltaPx = deltaY / scale
+      // Negative delta = drag up = increase spacing (push text up from bottom)
+      const newSpacing = Math.round(Math.max(0, Math.min(100, dragStartSpacing.current - deltaPx)))
+      onChange(newSpacing)
+    }
+    const handleMouseUp = () => setIsDragging(false)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, onChange, scale])
+
+  const showUI = isHovered || isDragging
+  const minInteractiveHeight = 12
+
+  return (
+    <div
+      style={{
+        height: Math.max(spacing * scale, minInteractiveHeight),
+        marginTop: -(Math.max(spacing * scale, minInteractiveHeight)),
+        position: 'relative',
+        cursor: isDragging ? 'ns-resize' : 'default',
+        zIndex: 10,
+      }}
+      onClick={(e) => e.stopPropagation()}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => !isDragging && setIsHovered(false)}
+    >
+      {showUI && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          {/* Dashed guide lines */}
+          <div style={{ position: 'absolute', top: 0, left: 8, right: 8, borderTop: '1px dashed #EC4899', opacity: 0.5 }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 8, right: 8, borderTop: '1px dashed #EC4899', opacity: 0.5 }} />
+          {/* Pink pill with px value */}
+          <div
+            onMouseDown={handleMouseDown}
+            style={{
+              pointerEvents: 'auto',
+              cursor: 'ns-resize',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3,
+              padding: '2px 8px',
+              borderRadius: 9999,
+              backgroundColor: '#EC4899',
+              color: 'white',
+              fontSize: 10,
+              fontWeight: 600,
+              fontFamily: 'system-ui, sans-serif',
+              lineHeight: 1,
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+            }}
+          >
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" style={{ flexShrink: 0 }}>
+              <path d="M4 0L6 2.5H2L4 0Z" fill="currentColor" />
+              <path d="M4 8L6 5.5H2L4 8Z" fill="currentColor" />
+            </svg>
+            {spacing}px
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function EditorScreen() {
   const {
     selectedAssets,
@@ -241,6 +333,9 @@ export function EditorScreen() {
     // Manual text size
     headlineFontSize,
     setHeadlineFontSize,
+    // Email Dark Gradient spacing
+    bottomSpacing,
+    setBottomSpacing,
     // Solution Overview PDF - Page 1
     solutionOverviewSolution,
     setSolutionOverviewSolution,
@@ -657,6 +752,7 @@ export function EditorScreen() {
         showEyebrow,
         showHeadline,
         headlineFontSize,
+        bottomSpacing,
         thumbnailImageUrl,
         thumbnailImagePosition,
         thumbnailImageZoom,
@@ -3784,6 +3880,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  bottomSpacing={showCta ? 0 : bottomSpacing}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3926,6 +4023,15 @@ export function EditorScreen() {
               )}
               </div>
               </div>
+
+              {/* Bottom spacing handle for email-dark-gradient when CTA is hidden */}
+              {currentTemplate === 'email-dark-gradient' && !showCta && (
+                <BottomSpacingHandle
+                  spacing={bottomSpacing}
+                  onChange={setBottomSpacing}
+                  scale={previewScale}
+                />
+              )}
             </div>
             )}
 

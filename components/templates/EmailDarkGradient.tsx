@@ -24,6 +24,7 @@ export interface EmailDarkGradientProps {
   showBody: boolean
   showCta: boolean
   headlineFontSize?: number
+  bottomSpacing?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -67,6 +68,7 @@ export function EmailDarkGradient({
   showBody,
   showCta,
   headlineFontSize,
+  bottomSpacing = 0,
   colors,
   typography,
   scale = 1,
@@ -90,13 +92,16 @@ export function EmailDarkGradient({
     transformOrigin: 'top left',
   }
 
+  // When CTA is hidden, bottomSpacing adds extra bottom padding to push text up
+  const effectiveBottomPadding = 32 + (!showCta ? bottomSpacing : 0)
+
   const contentStyle: CSSProperties = {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    padding: 32,
+    padding: `32px 32px ${effectiveBottomPadding}px 32px`,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -258,6 +263,7 @@ export function EmailDarkGradient({
             )}
           </div>
         )}
+
       </div>
     </div>
   )

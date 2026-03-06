@@ -19,6 +19,7 @@ interface Props {
   showBody: boolean
   showCta: boolean
   headlineFontSize?: number
+  bottomSpacing?: number
   colors: ColorsConfig
   typography: TypographyConfig
 }
@@ -59,6 +60,7 @@ export function EmailDarkGradientRender(props: Props) {
         showBody={props.showBody}
         showCta={props.showCta}
         headlineFontSize={props.headlineFontSize}
+        bottomSpacing={props.bottomSpacing}
         colors={props.colors}
         typography={props.typography}
         scale={1}

@@ -180,6 +180,10 @@ export function ExportQueueScreen() {
           grayscale: asset.grayscale,
           // Manual text size
           headlineFontSize: asset.headlineFontSize,
+          // Custom spacing
+          bottomSpacing: asset.bottomSpacing,
+          // Headline visibility
+          showHeadline: asset.showHeadline,
         }),
       })
 
@@ -875,6 +879,7 @@ function QueueItem({
                   showBody={asset.showBody && !!asset.body}
                   showCta={asset.showCta !== false}
                   headlineFontSize={asset.headlineFontSize ?? undefined}
+                  bottomSpacing={(asset.showCta !== false) ? 0 : (asset.bottomSpacing ?? 0)}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -1488,6 +1493,7 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showBody={asset.showBody && !!asset.body}
               showCta={asset.showCta !== false}
               headlineFontSize={asset.headlineFontSize ?? undefined}
+              bottomSpacing={(asset.showCta !== false) ? 0 : (asset.bottomSpacing ?? 0)}
               colors={colorsConfig}
               typography={typographyConfig}
               scale={1}

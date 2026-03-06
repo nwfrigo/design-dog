@@ -29,6 +29,7 @@ export default function RenderPage({
   const showBody = parseBoolTrue(searchParams, 'showBody')
   const showCta = parseBoolTrue(searchParams, 'showCta')
   const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
+  const bottomSpacing = parseNumberOrUndefined(searchParams, 'bottomSpacing')
 
   return (
     <div style={{
@@ -55,6 +56,7 @@ export default function RenderPage({
           showBody={showBody}
           showCta={showCta}
           headlineFontSize={headlineFontSize}
+          bottomSpacing={bottomSpacing}
           colors={colorsConfig}
           typography={typographyConfig}
         />

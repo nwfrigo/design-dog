@@ -86,243 +86,88 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const {
-      template = 'website-thumbnail',
-      scale = 2,
-      // Common fields
-      eyebrow,
-      headline,
-      subhead,
-      body: bodyText,
-      solution,
-      logoColor,
-      showEyebrow,
-      showSubhead,
-      showBody,
-      // Website thumbnail specific
-      imageUrl,
-      imagePositionX,
-      imagePositionY,
-      imageZoom,
-      ebookVariant,
-      // Email grid specific
-      subheading,
-      showLightHeader,
-      showHeavyHeader,
-      showSubheading,
-      showSolutionSet,
-      showGridDetail2,
-      gridDetail1Type,
-      gridDetail1Text,
-      gridDetail2Type,
-      gridDetail2Text,
-      gridDetail3Type,
-      gridDetail3Text,
-      // Social dark gradient specific
-      metadata,
-      ctaText,
-      colorStyle,
-      headingSize,
-      alignment,
-      ctaStyle,
-      showMetadata,
-      showCta,
-      // Social image specific
-      layout,
-      // Social grid detail specific
-      gridDetail4Type,
-      gridDetail4Text,
-      showRow3,
-      showRow4,
-      // Email speakers specific
-      speakerCount,
-      speaker1Name,
-      speaker1Role,
-      speaker1ImageUrl,
-      speaker1ImagePositionX,
-      speaker1ImagePositionY,
-      speaker1ImageZoom,
-      speaker2Name,
-      speaker2Role,
-      speaker2ImageUrl,
-      speaker2ImagePositionX,
-      speaker2ImagePositionY,
-      speaker2ImageZoom,
-      speaker3Name,
-      speaker3Role,
-      speaker3ImageUrl,
-      speaker3ImagePositionX,
-      speaker3ImagePositionY,
-      speaker3ImageZoom,
-      // Newsletter specific
-      imageSize,
-      // Image effects
-      grayscale,
-    } = body
+    const template = body.template || 'website-thumbnail'
+    const scale = body.scale || 2
 
-    // Build query params for render page
+    // ---------------------------------------------------------------
+    // Generic param forwarding
+    // ---------------------------------------------------------------
+    // Instead of manually destructuring and forwarding each field,
+    // iterate all body keys and forward them automatically.
+    // This ensures new editor params always reach the render page
+    // without requiring changes to this file.
+
     const params = new URLSearchParams()
 
-    // Common params
-    if (eyebrow) params.set('eyebrow', eyebrow)
-    if (headline) params.set('headline', headline)
-    if (subhead) params.set('subhead', subhead)
-    if (bodyText) params.set('body', bodyText)
-    if (solution) params.set('solution', solution)
-    if (logoColor) params.set('logoColor', logoColor)
-    if (showEyebrow !== undefined) params.set('showEyebrow', String(showEyebrow))
-    if (showSubhead !== undefined) params.set('showSubhead', String(showSubhead))
-    if (showBody !== undefined) params.set('showBody', String(showBody))
+    // Keys consumed by the route itself, never forwarded to the render page
+    const ROUTE_ONLY_KEYS = new Set([
+      'template', 'scale', 'format', 'filename', 'numPages', 'numSlides',
+    ])
 
-    // Website thumbnail specific
-    // Only pass imageUrl via query params if it's a regular URL (not a data URL or blob URL)
-    // Data URLs are too large for query params and will be injected via Puppeteer
-    // Blob URLs are inaccessible to Puppeteer (different browser context)
-    if (imageUrl && !imageUrl.startsWith('data:') && !imageUrl.startsWith('blob:')) {
-      params.set('imageUrl', imageUrl)
+    // Keys that require special processing (handled in dedicated blocks below)
+    const COMPLEX_KEYS = new Set([
+      // FAQ: pages need data URL stripping + double encoding
+      'pages',
+      // Stacker: modules need data URL stripping + double encoding
+      'modules', 'moduleSpacing', 'footerHidden', 'darkMode',
+      // FAQ cover: object needs splitting to X/Y params
+      'coverImagePosition',
+      // Carousel: only forwarded when exporting all slides
+      'slidesData',
+      // Newsletter: keys are remapped to generic image* names
+      'newsletterImageUrl', 'newsletterImagePositionX', 'newsletterImagePositionY', 'newsletterImageZoom',
+    ])
+
+    for (const [key, value] of Object.entries(body)) {
+      if (ROUTE_ONLY_KEYS.has(key)) continue
+      if (COMPLEX_KEYS.has(key)) continue
+      if (value == null) continue
+      // Data/blob URLs can't be passed via query params — they're injected via Puppeteer
+      if (typeof value === 'string' && (value.startsWith('data:') || value.startsWith('blob:'))) continue
+
+      if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+        params.set(key, JSON.stringify(value))
+      } else {
+        params.set(key, String(value))
+      }
     }
-    if (imagePositionX !== undefined) params.set('imagePositionX', String(imagePositionX))
-    if (imagePositionY !== undefined) params.set('imagePositionY', String(imagePositionY))
-    if (imageZoom !== undefined) params.set('imageZoom', String(imageZoom))
-    if (ebookVariant) params.set('variant', ebookVariant)
 
-    // Email grid specific
-    if (subheading) params.set('subheading', subheading)
-    if (showLightHeader !== undefined) params.set('showLightHeader', String(showLightHeader))
-    if (showHeavyHeader !== undefined) params.set('showHeavyHeader', String(showHeavyHeader))
-    if (showSubheading !== undefined) params.set('showSubheading', String(showSubheading))
-    if (showSolutionSet !== undefined) params.set('showSolutionSet', String(showSolutionSet))
-    if (showGridDetail2 !== undefined) params.set('showGridDetail2', String(showGridDetail2))
-    if (gridDetail1Type) params.set('gridDetail1Type', gridDetail1Type)
-    if (gridDetail1Text) params.set('gridDetail1Text', gridDetail1Text)
-    if (gridDetail2Type) params.set('gridDetail2Type', gridDetail2Type)
-    if (gridDetail2Text) params.set('gridDetail2Text', gridDetail2Text)
-    if (gridDetail3Type) params.set('gridDetail3Type', gridDetail3Type)
-    if (gridDetail3Text) params.set('gridDetail3Text', gridDetail3Text)
+    // ---------------------------------------------------------------
+    // Special-case handling
+    // ---------------------------------------------------------------
 
-    // Social dark gradient specific
-    if (metadata) params.set('metadata', metadata)
-    if (ctaText) params.set('ctaText', ctaText)
-    if (colorStyle) params.set('colorStyle', colorStyle)
-    if (headingSize) params.set('headingSize', headingSize)
-    if (alignment) params.set('alignment', alignment)
-    if (ctaStyle) params.set('ctaStyle', ctaStyle)
-    if (showMetadata !== undefined) params.set('showMetadata', String(showMetadata))
-    if (showCta !== undefined) params.set('showCta', String(showCta))
-
-    // Social image specific
-    if (layout) params.set('layout', layout)
-
-    // Social grid detail specific
-    if (gridDetail4Type) params.set('gridDetail4Type', gridDetail4Type)
-    if (gridDetail4Text) params.set('gridDetail4Text', gridDetail4Text)
-    if (showRow3 !== undefined) params.set('showRow3', String(showRow3))
-    if (showRow4 !== undefined) params.set('showRow4', String(showRow4))
-
-    // Email speakers specific
-    if (speakerCount !== undefined) params.set('speakerCount', String(speakerCount))
-    if (speaker1Name) params.set('speaker1Name', speaker1Name)
-    if (speaker1Role) params.set('speaker1Role', speaker1Role)
-    if (speaker1ImageUrl) params.set('speaker1ImageUrl', speaker1ImageUrl)
-    if (speaker1ImagePositionX !== undefined) params.set('speaker1ImagePositionX', String(speaker1ImagePositionX))
-    if (speaker1ImagePositionY !== undefined) params.set('speaker1ImagePositionY', String(speaker1ImagePositionY))
-    if (speaker1ImageZoom !== undefined) params.set('speaker1ImageZoom', String(speaker1ImageZoom))
-    if (speaker2Name) params.set('speaker2Name', speaker2Name)
-    if (speaker2Role) params.set('speaker2Role', speaker2Role)
-    if (speaker2ImageUrl) params.set('speaker2ImageUrl', speaker2ImageUrl)
-    if (speaker2ImagePositionX !== undefined) params.set('speaker2ImagePositionX', String(speaker2ImagePositionX))
-    if (speaker2ImagePositionY !== undefined) params.set('speaker2ImagePositionY', String(speaker2ImagePositionY))
-    if (speaker2ImageZoom !== undefined) params.set('speaker2ImageZoom', String(speaker2ImageZoom))
-    if (speaker3Name) params.set('speaker3Name', speaker3Name)
-    if (speaker3Role) params.set('speaker3Role', speaker3Role)
-    if (speaker3ImageUrl) params.set('speaker3ImageUrl', speaker3ImageUrl)
-    if (speaker3ImagePositionX !== undefined) params.set('speaker3ImagePositionX', String(speaker3ImagePositionX))
-    if (speaker3ImagePositionY !== undefined) params.set('speaker3ImagePositionY', String(speaker3ImagePositionY))
-    if (speaker3ImageZoom !== undefined) params.set('speaker3ImageZoom', String(speaker3ImageZoom))
-
-    // Newsletter specific - only override image params for newsletter templates
-    const isNewsletterTemplate = template.startsWith('newsletter-')
-    if (imageSize) params.set('imageSize', imageSize)
-    // For newsletter templates, pass newsletterImageUrl as imageUrl (for non-data URLs)
-    if (isNewsletterTemplate && body.newsletterImageUrl && !body.newsletterImageUrl.startsWith('data:') && !body.newsletterImageUrl.startsWith('blob:')) {
-      params.set('imageUrl', body.newsletterImageUrl)
+    // Newsletter templates: remap newsletterImage* → image* for render page
+    if (template.startsWith('newsletter-')) {
+      if (body.newsletterImageUrl && !body.newsletterImageUrl.startsWith('data:') && !body.newsletterImageUrl.startsWith('blob:')) {
+        params.set('imageUrl', body.newsletterImageUrl)
+      }
+      if (body.newsletterImagePositionX != null) params.set('imagePositionX', String(body.newsletterImagePositionX))
+      if (body.newsletterImagePositionY != null) params.set('imagePositionY', String(body.newsletterImagePositionY))
+      if (body.newsletterImageZoom != null) params.set('imageZoom', String(body.newsletterImageZoom))
     }
-    if (isNewsletterTemplate && body.newsletterImagePositionX !== undefined) params.set('imagePositionX', String(body.newsletterImagePositionX))
-    if (isNewsletterTemplate && body.newsletterImagePositionY !== undefined) params.set('imagePositionY', String(body.newsletterImagePositionY))
-    if (isNewsletterTemplate && body.newsletterImageZoom !== undefined) params.set('imageZoom', String(body.newsletterImageZoom))
 
-    // Website webinar specific
-    if (body.variant) params.set('variant', body.variant)
-    if (body.showSpeaker1 !== undefined) params.set('showSpeaker1', String(body.showSpeaker1))
-    if (body.showSpeaker2 !== undefined) params.set('showSpeaker2', String(body.showSpeaker2))
-    if (body.showSpeaker3 !== undefined) params.set('showSpeaker3', String(body.showSpeaker3))
-
-    // Website floating banner specific
-    if (body.cta) params.set('cta', body.cta)
-
-    // Image effects
-    if (grayscale !== undefined) params.set('grayscale', String(grayscale))
-
-    // Manual text size
-    if (body.headlineFontSize != null) params.set('headlineFontSize', String(body.headlineFontSize))
-
-    // Solution Overview PDF specific - Page 1
-    if (body.solutionName) params.set('solutionName', body.solutionName)
-    if (body.tagline) params.set('tagline', body.tagline)
-    if (body.page) params.set('page', body.page)
-    // Solution Overview PDF specific - Page 2
-    if (body.heroImageId) params.set('heroImageId', body.heroImageId)
-    // Skip data URLs for hero image - they'll be injected via page.evaluate()
-    if (body.heroImageUrl && !body.heroImageUrl.startsWith('data:') && !body.heroImageUrl.startsWith('blob:')) {
-      params.set('heroImageUrl', body.heroImageUrl)
+    // FAQ cover image position: object → flat X/Y params
+    if (body.coverImagePosition) {
+      params.set('coverImagePositionX', String(body.coverImagePosition.x || 0))
+      params.set('coverImagePositionY', String(body.coverImagePosition.y || 0))
     }
-    if (body.heroImagePositionX !== undefined) params.set('heroImagePositionX', String(body.heroImagePositionX))
-    if (body.heroImagePositionY !== undefined) params.set('heroImagePositionY', String(body.heroImagePositionY))
-    if (body.heroImageZoom !== undefined) params.set('heroImageZoom', String(body.heroImageZoom))
-    if (body.page2Header) params.set('page2Header', body.page2Header)
-    if (body.sectionHeader) params.set('sectionHeader', body.sectionHeader)
-    if (body.introParagraph) params.set('introParagraph', body.introParagraph)
-    if (body.keySolutions) params.set('keySolutions', JSON.stringify(body.keySolutions))
-    if (body.quoteText) params.set('quoteText', body.quoteText)
-    if (body.quoteName) params.set('quoteName', body.quoteName)
-    if (body.quoteTitle) params.set('quoteTitle', body.quoteTitle)
-    if (body.quoteCompany) params.set('quoteCompany', body.quoteCompany)
-    // Solution Overview PDF specific - Page 3
-    if (body.benefits) params.set('benefits', JSON.stringify(body.benefits))
-    if (body.features) params.set('features', JSON.stringify(body.features))
-    // Skip data URLs for screenshot - they'll be injected via page.evaluate()
-    if (body.screenshotUrl && !body.screenshotUrl.startsWith('data:') && !body.screenshotUrl.startsWith('blob:')) {
-      params.set('screenshotUrl', body.screenshotUrl)
-    }
-    if (body.screenshotPositionX !== undefined) params.set('screenshotPositionX', String(body.screenshotPositionX))
-    if (body.screenshotPositionY !== undefined) params.set('screenshotPositionY', String(body.screenshotPositionY))
-    if (body.screenshotZoom !== undefined) params.set('screenshotZoom', String(body.screenshotZoom))
-    if (body.ctaOption) params.set('ctaOption', body.ctaOption)
-    if (body.ctaUrl) params.set('ctaUrl', body.ctaUrl)
-    // Solution Overview PDF - Page 2 footer stats
-    if (body.stat1Value) params.set('stat1Value', body.stat1Value)
-    if (body.stat1Label) params.set('stat1Label', body.stat1Label)
-    if (body.stat2Value) params.set('stat2Value', body.stat2Value)
-    if (body.stat2Label) params.set('stat2Label', body.stat2Label)
-    if (body.stat3Value) params.set('stat3Value', body.stat3Value)
-    if (body.stat3Label) params.set('stat3Label', body.stat3Label)
-    if (body.stat4Value) params.set('stat4Value', body.stat4Value)
-    if (body.stat4Label) params.set('stat4Label', body.stat4Label)
-    if (body.stat5Value) params.set('stat5Value', body.stat5Value)
-    if (body.stat5Label) params.set('stat5Label', body.stat5Label)
-    // Solution Overview PDF - grayscale settings
-    if (body.heroImageGrayscale !== undefined) params.set('heroImageGrayscale', String(body.heroImageGrayscale))
-    if (body.screenshotGrayscale !== undefined) params.set('screenshotGrayscale', String(body.screenshotGrayscale))
 
-    // FAQ PDF specific - strip data URLs from image blocks to avoid URL length limits
-    // They'll be injected via page.evaluate() after loading
+    // Stacker flags: truthy → '1' encoding
+    if (body.footerHidden) params.set('footerHidden', '1')
+    if (body.darkMode) params.set('darkMode', '1')
+
+    // Carousel slidesData: only forwarded when exporting all slides as PDF
+    if (body.slidesData && body.page === 'all') {
+      params.set('slidesData', body.slidesData)
+    }
+
+    // FAQ PDF: strip data URLs from image blocks (they'll be injected via Puppeteer)
     interface FaqImageData {
       blockId: string
       imageUrl: string
     }
     const faqImageData: FaqImageData[] = []
 
-    if (body.title) params.set('title', body.title)
     if (body.pages) {
       // Process pages to extract data URL images
       const pagesForUrl = (body.pages as Array<{ id: string; blocks: Array<{ type: string; id: string; imageUrl?: string }> }>).map((page) => {
@@ -337,22 +182,8 @@ export async function POST(request: NextRequest) {
       })
       params.set('pages', encodeURIComponent(JSON.stringify(pagesForUrl)))
     }
-    // FAQ PDF cover page
-    if (body.coverSolution) params.set('coverSolution', body.coverSolution)
-    if (body.coverSubheader) params.set('coverSubheader', body.coverSubheader)
-    // Skip data URLs for cover image - they'll be injected via page.evaluate()
-    if (body.coverImageUrl && !body.coverImageUrl.startsWith('data:') && !body.coverImageUrl.startsWith('blob:')) {
-      params.set('coverImageUrl', body.coverImageUrl)
-    }
-    if (body.coverImagePosition) {
-      params.set('coverImagePositionX', String(body.coverImagePosition.x || 0))
-      params.set('coverImagePositionY', String(body.coverImagePosition.y || 0))
-    }
-    if (body.coverImageZoom !== undefined) params.set('coverImageZoom', String(body.coverImageZoom))
-    if (body.coverImageGrayscale !== undefined) params.set('coverImageGrayscale', String(body.coverImageGrayscale))
 
-    // Stacker PDF specific - strip data URLs to avoid URL length limits
-    // They'll be injected via page.evaluate() after loading
+    // Stacker PDF: strip data URLs from modules (they'll be injected via Puppeteer)
     interface StackerImageData {
       moduleId: string
       imageUrl: string
@@ -387,29 +218,6 @@ export async function POST(request: NextRequest) {
       // Pass module spacing if provided
       if (body.moduleSpacing && Object.keys(body.moduleSpacing).length > 0) {
         params.set('moduleSpacing', encodeURIComponent(JSON.stringify(body.moduleSpacing)))
-      }
-      if (body.footerHidden) {
-        params.set('footerHidden', '1')
-      }
-      if (body.darkMode) {
-        params.set('darkMode', '1')
-      }
-    }
-
-    // Social Carousel specific
-    if (template === 'social-carousel') {
-      if (body.slideType) params.set('slideType', body.slideType)
-      if (body.backgroundStyle) params.set('backgroundStyle', body.backgroundStyle)
-      if (body.showEyebrow !== undefined) params.set('showEyebrow', String(body.showEyebrow))
-      if (body.showHeadline !== undefined) params.set('showHeadline', String(body.showHeadline))
-      if (body.showSubhead !== undefined) params.set('showSubhead', String(body.showSubhead))
-      if (body.showBody !== undefined) params.set('showBody', String(body.showBody))
-      if (body.showMetadata !== undefined) params.set('showMetadata', String(body.showMetadata))
-      if (body.showCta !== undefined) params.set('showCta', String(body.showCta))
-      if (body.headlineFontSize != null) params.set('headlineFontSize', String(body.headlineFontSize))
-      if (body.page === 'all') {
-        params.set('page', 'all')
-        if (body.slidesData) params.set('slidesData', body.slidesData)
       }
     }
 
@@ -516,11 +324,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Inject main image (thumbnailImageUrl)
-    if (imageUrl && imageUrl.startsWith('data:')) {
-      await injectDataUrlImage(imageUrl, 'img[data-export-image="true"]')
+    if (body.imageUrl && body.imageUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.imageUrl, 'img[data-export-image="true"]')
 
       // Apply grayscale filter directly if enabled (canvas conversion won't work on injected images)
-      if (grayscale) {
+      if (body.grayscale) {
         await page.evaluate(() => {
           const img = document.querySelector('img[data-export-image="true"]') as HTMLImageElement
           if (img) {
@@ -582,7 +390,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Additional delay for rendering
-    const hasDataUrlImages = (imageUrl && imageUrl.startsWith('data:')) ||
+    const hasDataUrlImages = (body.imageUrl && body.imageUrl.startsWith('data:')) ||
         (body.speaker1ImageUrl && body.speaker1ImageUrl.startsWith('data:')) ||
         (body.speaker2ImageUrl && body.speaker2ImageUrl.startsWith('data:')) ||
         (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) ||
@@ -598,7 +406,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Extra delay for grayscale canvas conversion
-    if (grayscale) {
+    if (body.grayscale) {
       await new Promise(resolve => setTimeout(resolve, 500))
     }
 

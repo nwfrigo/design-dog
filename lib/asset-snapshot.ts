@@ -107,6 +107,8 @@ const SNAPSHOT_FIELDS = [
   // Image effects
   'grayscale',
   'headlineFontSize',
+  // Email Dark Gradient spacing
+  'bottomSpacing',
   // Solution Overview - Page 1
   'solutionOverviewSolution',
   'solutionOverviewSolutionName',
