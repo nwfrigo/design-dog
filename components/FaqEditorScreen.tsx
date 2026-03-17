@@ -2005,6 +2005,7 @@ export function FaqEditorScreen() {
                             spacing={spacing}
                             onChange={handleSpacingChange}
                             scale={pdfPreviewZoom / 100}
+                            align="left"
                           />
                         )}
                         renderBlockWrapper={(block, children, index) => {

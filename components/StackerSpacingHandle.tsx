@@ -7,9 +7,10 @@ export interface StackerSpacingHandleProps {
   spacing: number
   onChange: (moduleId: string, spacing: number) => void
   scale: number // preview zoom factor (e.g., 1.0 for 100%)
+  align?: 'center' | 'left' // pill position (default: center)
 }
 
-export function StackerSpacingHandle({ moduleId, spacing, onChange, scale }: StackerSpacingHandleProps) {
+export function StackerSpacingHandle({ moduleId, spacing, onChange, scale, align = 'center' }: StackerSpacingHandleProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartY = useRef(0)
@@ -72,7 +73,8 @@ export function StackerSpacingHandle({ moduleId, spacing, onChange, scale }: Sta
             inset: 0,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: align === 'left' ? 'flex-start' : 'center',
+            paddingLeft: align === 'left' ? 8 : 0,
             pointerEvents: 'none',
           }}
         >
