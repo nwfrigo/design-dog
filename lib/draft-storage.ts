@@ -107,6 +107,7 @@ export interface DraftState {
   faqCoverImagePosition: { x: number; y: number }
   faqCoverImageZoom: number
   faqCoverImageGrayscale: boolean
+  faqBlockSpacing: Record<string, number>
   // Solution Overview PDF
   solutionOverviewSolution: SolutionCategory
   solutionOverviewSolutionName: string
@@ -270,6 +271,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       faqCoverImagePosition: state.faqCoverImagePosition || { x: 0, y: 0 },
       faqCoverImageZoom: state.faqCoverImageZoom ?? 1,
       faqCoverImageGrayscale: state.faqCoverImageGrayscale ?? false,
+      faqBlockSpacing: state.faqBlockSpacing ?? {},
       // Solution Overview PDF
       solutionOverviewSolution: state.solutionOverviewSolution || 'health',
       solutionOverviewSolutionName: state.solutionOverviewSolutionName || 'Solution Name Goes Here',

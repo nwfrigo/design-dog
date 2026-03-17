@@ -16,6 +16,7 @@ export function FaqExportScreen() {
     faqCoverImagePosition,
     faqCoverImageZoom,
     faqCoverImageGrayscale,
+    faqBlockSpacing,
   } = useStore()
 
   // Local UI state
@@ -57,6 +58,7 @@ export function FaqExportScreen() {
         coverImagePosition: faqCoverImagePosition,
         coverImageZoom: faqCoverImageZoom,
         coverImageGrayscale: faqCoverImageGrayscale,
+        blockSpacing: faqBlockSpacing,
       }
 
       const response = await fetch('/api/export', {
@@ -186,6 +188,7 @@ export function FaqExportScreen() {
                       blocks={page.blocks}
                       pageNumber={idx + 2}
                       scale={1}
+                      blockSpacing={faqBlockSpacing}
                     />
                   </div>
                 </div>

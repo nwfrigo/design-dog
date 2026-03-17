@@ -82,6 +82,20 @@ export default function FaqPdfRenderPage({
   const coverImageZoom = parseNumber(searchParams, 'coverImageZoom', 1)
   const coverImageGrayscale = parseBoolFalse(searchParams, 'coverImageGrayscale')
 
+  // Parse block spacing
+  let blockSpacing: Record<string, number> = {}
+  try {
+    const spacingJson = searchParams.blockSpacing as string
+    if (spacingJson) {
+      const parsed = JSON.parse(decodeURIComponent(spacingJson))
+      if (parsed && typeof parsed === 'object') {
+        blockSpacing = parsed
+      }
+    }
+  } catch (e) {
+    console.error('Failed to parse blockSpacing JSON:', e)
+  }
+
   return (
     <div
       style={{
@@ -103,6 +117,7 @@ export default function FaqPdfRenderPage({
           coverImagePosition={{ x: coverImagePositionX, y: coverImagePositionY }}
           coverImageZoom={coverImageZoom}
           coverImageGrayscale={coverImageGrayscale}
+          blockSpacing={blockSpacing}
         />
       </Suspense>
     </div>

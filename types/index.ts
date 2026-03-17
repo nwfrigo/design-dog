@@ -888,6 +888,7 @@ export interface AppState {
   faqCoverImagePosition: { x: number; y: number }
   faqCoverImageZoom: number
   faqCoverImageGrayscale: boolean
+  faqBlockSpacing: Record<string, number>
 
   // Stacker PDF state
   stackerGeneratedModules: StackerModule[] | null
@@ -1067,6 +1068,7 @@ export interface AppState {
   setFaqCoverImagePosition: (position: { x: number; y: number }) => void
   setFaqCoverImageZoom: (zoom: number) => void
   setFaqCoverImageGrayscale: (grayscale: boolean) => void
+  setFaqBlockSpacing: (spacing: Record<string, number>) => void
   resetFaqToDefaults: () => void
 
   // Stacker PDF actions

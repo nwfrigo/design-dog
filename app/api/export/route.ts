@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       // FAQ: pages need data URL stripping + double encoding
       'pages',
       // Stacker: modules need data URL stripping + double encoding
-      'modules', 'moduleSpacing', 'footerHidden', 'darkMode',
+      'modules', 'moduleSpacing', 'footerHidden', 'darkMode', 'blockSpacing',
       // FAQ cover: object needs splitting to X/Y params
       'coverImagePosition',
       // Carousel: only forwarded when exporting all slides
@@ -181,6 +181,11 @@ export async function POST(request: NextRequest) {
         return { ...page, blocks: processedBlocks }
       })
       params.set('pages', encodeURIComponent(JSON.stringify(pagesForUrl)))
+    }
+
+    // FAQ block spacing
+    if (body.blockSpacing && Object.keys(body.blockSpacing).length > 0) {
+      params.set('blockSpacing', encodeURIComponent(JSON.stringify(body.blockSpacing)))
     }
 
     // Stacker PDF: strip data URLs from modules (they'll be injected via Puppeteer)

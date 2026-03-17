@@ -33,6 +33,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { FaqDraggableBlock } from './FaqDraggableBlock'
 import { StackerDropIndicator } from './StackerDropIndicator'
 import { DeleteConfirmModal } from './shared/DeleteConfirmModal'
+import { StackerSpacingHandle } from './StackerSpacingHandle'
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -453,9 +454,11 @@ const BLOCK_MARGIN_BOTTOM = 24 // Each block has marginBottom: 24
 function BlockMeasurer({
   blocks,
   onMeasured,
+  blockSpacing,
 }: {
   blocks: FaqContentBlock[]
   onMeasured: (heights: Map<string, number>) => void
+  blockSpacing?: Record<string, number>
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -474,7 +477,8 @@ function BlockMeasurer({
       blockElements?.forEach(el => {
         const blockId = el.getAttribute('data-block-id')
         if (blockId) {
-          heights.set(blockId, el.getBoundingClientRect().height + BLOCK_MARGIN_BOTTOM)
+          const spacing = blockSpacing?.[blockId] ?? BLOCK_MARGIN_BOTTOM
+          heights.set(blockId, el.getBoundingClientRect().height + spacing)
         }
       })
 
@@ -482,7 +486,7 @@ function BlockMeasurer({
     }
 
     measure()
-  }, [blocks, onMeasured])
+  }, [blocks, blockSpacing, onMeasured])
 
   // Render blocks in the same style as ContentPage for accurate measurement
   const renderBlock = (block: FaqContentBlock) => {
@@ -916,7 +920,21 @@ export function FaqEditorScreen() {
     setFaqCoverImageGrayscale: setCoverImageGrayscale,
     faqCoverSubheader: coverSubheader,
     setFaqCoverSubheader: setCoverSubheader,
+    faqBlockSpacing: storeBlockSpacing,
+    setFaqBlockSpacing: setStoreBlockSpacing,
   } = useStore()
+
+  // Block spacing — local state for responsive drag, synced to store
+  const [blockSpacing, setBlockSpacing] = useState<Record<string, number>>(storeBlockSpacing)
+
+  // Sync local blockSpacing to store for draft persistence
+  useEffect(() => {
+    setStoreBlockSpacing(blockSpacing)
+  }, [blockSpacing, setStoreBlockSpacing])
+
+  const handleSpacingChange = useCallback((blockId: string, spacing: number) => {
+    setBlockSpacing(prev => ({ ...prev, [blockId]: spacing }))
+  }, [])
 
   // Local UI state (not persisted)
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
@@ -1477,7 +1495,7 @@ export function FaqEditorScreen() {
       )}
 
       {/* Hidden block measurer for auto-pagination */}
-      <BlockMeasurer blocks={allBlocks} onMeasured={handleBlocksMeasured} />
+      <BlockMeasurer blocks={allBlocks} onMeasured={handleBlocksMeasured} blockSpacing={blockSpacing} />
 
       {/* Title Tab - matches SO editor pattern */}
       <div className="flex items-center border-b border-gray-200 dark:border-line-subtle">
@@ -1979,6 +1997,16 @@ export function FaqEditorScreen() {
                         blocks={currentPage?.blocks || []}
                         pageNumber={currentPageIndex + 2}
                         scale={1}
+                        blockSpacing={blockSpacing}
+                        renderSpacerBetween={(blockId, spacing) => (
+                          <StackerSpacingHandle
+                            key={`spacer-${blockId}`}
+                            moduleId={blockId}
+                            spacing={spacing}
+                            onChange={handleSpacingChange}
+                            scale={pdfPreviewZoom / 100}
+                          />
+                        )}
                         renderBlockWrapper={(block, children, index) => {
                           const isOverAbove = previewOverId === block.id && previewActiveId !== block.id
                           return (
@@ -2208,6 +2236,7 @@ export function FaqEditorScreen() {
                 blocks={currentPage?.blocks || []}
                 pageNumber={currentPageIndex + 2}
                 scale={1}
+                blockSpacing={blockSpacing}
               />
             )}
           </div>
@@ -2295,6 +2324,7 @@ export function FaqEditorScreen() {
                       blocks={page.blocks}
                       pageNumber={idx + 2}
                       scale={1}
+                      blockSpacing={blockSpacing}
                     />
                   </div>
                 </div>

@@ -420,6 +420,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   faqCoverImagePosition: { x: 0, y: 0 },
   faqCoverImageZoom: 1,
   faqCoverImageGrayscale: false,
+  faqBlockSpacing: {} as Record<string, number>,
 
   // Stacker PDF state
   stackerGeneratedModules: null,
@@ -698,6 +699,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setFaqCoverImagePosition: (faqCoverImagePosition: { x: number; y: number }) => set({ faqCoverImagePosition }),
   setFaqCoverImageZoom: (faqCoverImageZoom: number) => set({ faqCoverImageZoom }),
   setFaqCoverImageGrayscale: (faqCoverImageGrayscale: boolean) => set({ faqCoverImageGrayscale }),
+  setFaqBlockSpacing: (spacing: Record<string, number>) => set({ faqBlockSpacing: spacing }),
   resetFaqToDefaults: () => set({
     faqTitle: 'Title Goes Here',
     faqCoverSubheader: 'Frequently Asked Questions',
@@ -707,6 +709,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     faqCoverImagePosition: { x: 0, y: 0 },
     faqCoverImageZoom: 1,
     faqCoverImageGrayscale: false,
+    faqBlockSpacing: {},
   }),
 
   // Stacker PDF actions
@@ -1924,6 +1927,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       faqCoverImagePosition: state.faqCoverImagePosition,
       faqCoverImageZoom: state.faqCoverImageZoom,
       faqCoverImageGrayscale: state.faqCoverImageGrayscale,
+      faqBlockSpacing: state.faqBlockSpacing,
       // Solution Overview PDF
       solutionOverviewSolution: state.solutionOverviewSolution,
       solutionOverviewSolutionName: state.solutionOverviewSolutionName,
@@ -2065,6 +2069,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       faqCoverImagePosition: draft.faqCoverImagePosition ?? { x: 0, y: 0 },
       faqCoverImageZoom: draft.faqCoverImageZoom ?? 1,
       faqCoverImageGrayscale: draft.faqCoverImageGrayscale ?? false,
+      faqBlockSpacing: draft.faqBlockSpacing ?? {},
       // Solution Overview PDF
       solutionOverviewSolution: draft.solutionOverviewSolution ?? 'health',
       solutionOverviewSolutionName: draft.solutionOverviewSolutionName ?? 'Solution Name Goes Here',

@@ -21,6 +21,7 @@ export interface FaqPdfRenderProps {
   coverImagePosition: { x: number; y: number }
   coverImageZoom: number
   coverImageGrayscale: boolean
+  blockSpacing?: Record<string, number>
 }
 
 export function FaqPdfRender({
@@ -33,6 +34,7 @@ export function FaqPdfRender({
   coverImagePosition,
   coverImageZoom,
   coverImageGrayscale,
+  blockSpacing,
 }: FaqPdfRenderProps) {
   const [ready, setReady] = useState(false)
 
@@ -56,6 +58,7 @@ export function FaqPdfRender({
       blocks={pageData.blocks}
       pageNumber={index + 2} // +2 because cover is page 1
       scale={1}
+      blockSpacing={blockSpacing}
     />
   )
 

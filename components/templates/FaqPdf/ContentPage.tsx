@@ -51,6 +51,10 @@ export interface ContentPageProps {
   renderBlockWrapper?: (block: FaqContentBlock, children: ReactNode, index: number) => ReactNode
   // Optional content to render after blocks (used by editor for "Add Content" button)
   renderFooterContent?: () => ReactNode
+  // Inter-block spacing (keyed by block ID, default 24px)
+  blockSpacing?: Record<string, number>
+  // Optional interactive spacer between blocks (used by editor for drag handles)
+  renderSpacerBetween?: (blockId: string, spacing: number) => ReactNode
 }
 
 export function ContentPage({
@@ -60,6 +64,8 @@ export function ContentPage({
   scale = 1,
   renderBlockWrapper,
   renderFooterContent,
+  blockSpacing,
+  renderSpacerBetween,
 }: ContentPageProps) {
   // Render a content block
   const renderBlock = (block: FaqContentBlock) => {
@@ -74,7 +80,6 @@ export function ContentPage({
               fontFamily: 'Fakt Pro, sans-serif',
               fontWeight: 350,
               wordWrap: 'break-word',
-              marginBottom: 24,
             }}
           >
             {normalizeText(block.text)}
@@ -92,7 +97,6 @@ export function ContentPage({
               alignItems: 'flex-start',
               gap: 12,
               display: 'flex',
-              marginBottom: 24,
             }}
           >
             {/* Question - medium weight, not editable styling */}
@@ -143,7 +147,6 @@ export function ContentPage({
             key={block.id}
             style={{
               width: 492,
-              marginBottom: 24,
             }}
           >
             <table
@@ -194,7 +197,6 @@ export function ContentPage({
             style={{
               width: imgWidth,
               height: imgHeight,
-              marginBottom: 24,
               backgroundColor: '#f5f5f5',
               borderRadius: 4,
               overflow: 'hidden',
@@ -326,9 +328,24 @@ export function ContentPage({
       >
         {blocks.map((block, index) => {
           const renderedBlock = renderBlock(block)
-          return renderBlockWrapper
+          const wrapped = renderBlockWrapper
             ? renderBlockWrapper(block, renderedBlock, index)
             : renderedBlock
+
+          // Add spacer after each block except the last
+          const isLast = index === blocks.length - 1
+          const spacing = blockSpacing?.[block.id] ?? 24
+
+          return (
+            <div key={`block-wrapper-${block.id}`}>
+              {wrapped}
+              {!isLast && (
+                renderSpacerBetween
+                  ? renderSpacerBetween(block.id, spacing)
+                  : <div style={{ height: spacing }} />
+              )}
+            </div>
+          )
         })}
         {renderFooterContent && renderFooterContent()}
       </div>
