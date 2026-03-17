@@ -43,8 +43,8 @@ export function FaqDraggableBlock({
   const contentStyle: CSSProperties = {
     position: 'relative',
     borderRadius: 4,
-    outline: isSelected ? '2px solid #3B82F6' : 'none',
-    outlineOffset: 2,
+    outline: isSelected ? '1px solid #3B82F6' : 'none',
+    outlineOffset: 4,
     cursor: 'pointer',
   }
 
@@ -106,7 +106,7 @@ export function FaqDraggableBlock({
 
       <div
         style={contentStyle}
-        onClick={() => onSelect(blockId)}
+        onClick={(e) => { e.stopPropagation(); onSelect(blockId) }}
       >
         {children}
 

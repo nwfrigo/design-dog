@@ -1970,6 +1970,7 @@ export function FaqEditorScreen() {
                     position: 'relative',
                     overflow: 'hidden',
                   }}
+                  onClick={() => setSelectedBlockId(null)}
                 >
                   <div style={{
                     position: 'absolute',
