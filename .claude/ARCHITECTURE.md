@@ -200,7 +200,7 @@ useEffect(() => {
 
 | Type | Location | Examples |
 |------|----------|----------|
-| SVG icons, UI primitives | `components/shared/` | CorityLogo, ArrowIcon, ToggleSwitch, DeleteConfirmModal |
+| SVG icons, UI primitives | `components/shared/` | CorityLogo, ArrowIcon, ToggleSwitch, EyeIcon, DeleteConfirmModal |
 | Template-specific editors | `components/editors/` | SolutionOverviewEditor, SpeakerEditor |
 | Custom hooks | `hooks/` | useGrayscaleImage, useThemeDetection |
 | Utilities & constants | `lib/` | asset-snapshot, render-params, export-params |
@@ -494,6 +494,49 @@ All image fields in editors use this two-state pattern:
 ### Sortable Item Controls
 
 For any sortable/reorderable content (Stacker modules, carousel slides, FAQ pages): action buttons (drag handle, duplicate, delete) appear ABOVE the element on hover, not overlaid on content. Drag handles go in the left gutter or top-left — never centered over content where they block interaction.
+
+### Show/Hide Toggle Pattern (EyeIcon)
+
+All optional fields in editors use the `EyeIcon` component (`components/shared/EyeIcon.tsx`) for show/hide toggles. This pattern is used across Email templates and Stacker modules.
+
+**Editor behavior:** The field stays visible but dims with `opacity-50` when toggled off. Fields are never hidden in the editor — users can always see and edit all content.
+
+**Render behavior:** Template render components conditionally hide the element with `{showField && <Element />}`. The toggle controls output visibility, not editor visibility.
+
+**Layout pattern:**
+```tsx
+<div className={!module.showBody ? 'opacity-50' : ''}>
+  <div className="flex items-center justify-between mb-1">
+    <label className="text-xs text-gray-500 dark:text-content-secondary">Body</label>
+    <EyeIcon visible={module.showBody} onClick={() => onUpdate({ showBody: !module.showBody })} />
+  </div>
+  <RichTextEditor content={module.body} onChange={(html) => onUpdate({ body: html })} />
+</div>
+```
+
+**Multi-card modules:** For module-level toggles that affect all cards (e.g., `showTitles`, `showDescriptions`), the eye icon appears only on the first card's field label (`index === 0`).
+
+**When NOT to use EyeIcon:** Use `ToggleSwitch` for non-visibility settings like Grayscale. EyeIcon is specifically for "show/hide in rendered output."
+
+### Rich Text for Body Fields
+
+All body/description text fields in editors MUST use `RichTextEditor` (`components/RichTextEditor.tsx`) — never plain `<textarea>`. This provides bold, italic, underline, bullet/ordered lists, indent/outdent, and links.
+
+**Two editor components exist:**
+- `RichTextEditor` — Full toolbar (B, I, U, lists, indent, link). Use for all body/description fields.
+- `SimpleRichTextEditor` — Bold + italic only. Use only for very short inline text (e.g., social carousel slide text).
+
+**Which fields get rich text:** Any field where a user might want formatting — body, description, subheader, answer. Short single-value fields (titles, eyebrows, CTAs, stat values, labels) stay as plain `<input>` or `<textarea>`.
+
+**Render side:** Template components receiving rich text must render with `dangerouslySetInnerHTML={{ __html: value }}` and include scoped CSS for lists, links, and paragraph spacing. Use the `stacker-rich-text` class pattern (see `StackerPdf/index.tsx`) or per-block scoped styles (see FAQ `ContentPage.tsx`).
+
+**Scoped CSS required:**
+- `p { margin: 0; }` — prevent double paragraph spacing
+- `ul { list-style-type: disc; padding-left: 16px; }` — bullet lists
+- `ol { list-style-type: decimal; padding-left: 16px; }` — numbered lists
+- `a { color: #D35F0B; text-decoration: none; }` — brand orange links
+
+**Backward compatible:** Plain text strings render correctly in `dangerouslySetInnerHTML`, so no migration is needed when upgrading a field from textarea to rich text. Type definitions stay as `string` (HTML strings are valid strings).
 
 ### Scaling Large Templates in Preview (CSS Transform Gotcha)
 

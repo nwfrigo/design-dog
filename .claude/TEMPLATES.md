@@ -276,7 +276,9 @@ components/templates/StackerPdf/
 components/
 ├── StackerSetupScreen.tsx      # PDF/text input → AI generation
 ├── StackerEditorScreen.tsx     # Module editing + drag-and-drop
-└── StackerPreviewEditor.tsx    # Preview with drop zones
+├── StackerPreviewEditor.tsx    # Preview with drop zones + add module modal
+├── StackerSpacingHandle.tsx    # Drag-to-adjust spacing + inline add module button
+└── StackerExportScreen.tsx     # Review and export
 
 lib/
 └── stacker-modules.ts          # Module registry for AI prompts
@@ -327,10 +329,12 @@ Stacker uses AI to generate the initial document structure:
 - **Drag-and-drop reordering** in preview area (dnd-kit)
 - **Delete confirmation modal** for all modules
 - **Icon picker** for Simple Cards (Lucide icons)
-- **Show/hide toggles** for optional elements (3rd stat, 3rd card, etc.)
+- **EyeIcon show/hide toggles** on most fields across all content modules (fields dim in editor, hide in render output — see pattern in ARCHITECTURE.md)
 - **Preview/Review & Export toolbar** matching FAQ/SO pattern
 - **Zoom controls** (75%-200%)
 - **Fullscreen preview** modal
+- **Insert module between** existing modules via inline Add Module button in spacing handle (opens same modal, splices at position)
+- **Rich text editing** for all body/description fields (TipTap-based `RichTextEditor` with bold, italic, underline, lists, links)
 
 ---
 
@@ -339,16 +343,18 @@ Stacker uses AI to generate the initial document structure:
 1. [ ] Create template component in `components/templates/`
 2. [ ] Apply Figma override rules (border not outline, SVG logo, remove unsupported CSS) — see BRAND.md
 3. [ ] Only expose text fields that exist in the design
-4. [ ] Add render-content and page in `app/render/{slug}/`
-5. [ ] Register in `config/template-config.ts`
-6. [ ] Add to `types/index.ts` TemplateType union
-7. [ ] Add editor controls in `EditorScreen.tsx`
-8. [ ] Add export params in `handleExport`
-9. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
-10. [ ] Add template-specific state to store if needed (variants, etc.)
-11. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence in ARCHITECTURE.md)
-12. [ ] Add to image upload condition if template has images
-13. [ ] Pass grayscale prop if template has images
-14. [ ] Test export works end-to-end
-15. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
-16. [ ] Build check: `npm run build`
+4. [ ] Use `RichTextEditor` for body/description fields (not `<textarea>`) — see Rich Text pattern in ARCHITECTURE.md
+5. [ ] Add render-content and page in `app/render/{slug}/`
+6. [ ] Register in `config/template-config.ts`
+7. [ ] Add to `types/index.ts` TemplateType union
+8. [ ] Add editor controls in `EditorScreen.tsx`
+9. [ ] Add export params in `handleExport`
+10. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
+11. [ ] Add template-specific state to store if needed (variants, etc.)
+12. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence in ARCHITECTURE.md)
+13. [ ] Add to image upload condition if template has images
+14. [ ] Pass grayscale prop if template has images
+15. [ ] Register in `ExportQueueScreen.tsx` in THREE places: text fields extraction, queue thumbnail rendering, and preview modal rendering
+16. [ ] Test export works end-to-end
+17. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
+18. [ ] Build check: `npm run build`
