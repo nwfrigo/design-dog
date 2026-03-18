@@ -5,8 +5,6 @@ import { useStore } from '@/store'
 import { StackerPreviewEditor } from './StackerPreviewEditor'
 import type { StackerModule } from '@/types'
 
-type ExportFormat = 'png' | 'pdf'
-
 export function StackerExportScreen() {
   const {
     setCurrentScreen,
@@ -25,7 +23,6 @@ export function StackerExportScreen() {
   const [isExporting, setIsExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const [exportSuccess, setExportSuccess] = useState(false)
-  const [exportFormat, setExportFormat] = useState<ExportFormat>('pdf')
 
   // Editable filename (initialized from document title)
   const [filename, setFilename] = useState('')
@@ -67,7 +64,7 @@ export function StackerExportScreen() {
         moduleSpacing: stackerModuleSpacing,
         footerHidden: stackerFooterHidden,
         darkMode: stackerDarkMode,
-        format: exportFormat,
+        format: 'pdf',
         filename: finalFilename,
       }
 
@@ -87,7 +84,7 @@ export function StackerExportScreen() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${finalFilename}.${exportFormat}`
+      a.download = `${finalFilename}.pdf`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -146,7 +143,7 @@ export function StackerExportScreen() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Export {exportFormat.toUpperCase()}
+                Export PDF
               </>
             )}
           </button>
@@ -192,39 +189,6 @@ export function StackerExportScreen() {
           <div className="sticky top-0 space-y-6">
             {/* Document Info */}
             <div className="p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg space-y-4">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-content-primary">
-                Export Settings
-              </h3>
-
-              {/* Format Selector */}
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-2">
-                  Format
-                </label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setExportFormat('pdf')}
-                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
-                      exportFormat === 'pdf'
-                        ? 'bg-blue-500 text-white border-blue-500'
-                        : 'bg-white dark:bg-surface-primary text-gray-700 dark:text-content-secondary border-gray-300 dark:border-line-subtle hover:border-gray-400 dark:hover:border-line-focus'
-                    }`}
-                  >
-                    PDF
-                  </button>
-                  <button
-                    onClick={() => setExportFormat('png')}
-                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
-                      exportFormat === 'png'
-                        ? 'bg-blue-500 text-white border-blue-500'
-                        : 'bg-white dark:bg-surface-primary text-gray-700 dark:text-content-secondary border-gray-300 dark:border-line-subtle hover:border-gray-400 dark:hover:border-line-focus'
-                    }`}
-                  >
-                    PNG
-                  </button>
-                </div>
-              </div>
-
               {/* Filename */}
               <div>
                 <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">
@@ -240,23 +204,7 @@ export function StackerExportScreen() {
                       rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="stacker-document"
                   />
-                  <span className="text-sm text-gray-500 dark:text-content-secondary">.{exportFormat}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Export Info */}
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <div className="flex gap-3">
-                <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div className="text-sm text-blue-700 dark:text-blue-300">
-                  {exportFormat === 'pdf' ? (
-                    <>Your document will be exported as a PDF, ideal for printing or sharing as a document.</>
-                  ) : (
-                    <>Your document will be exported as a high-resolution PNG image, suitable for sharing or embedding in presentations.</>
-                  )}
+                  <span className="text-sm text-gray-500 dark:text-content-secondary">.pdf</span>
                 </div>
               </div>
             </div>

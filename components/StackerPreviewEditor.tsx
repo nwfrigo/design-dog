@@ -93,6 +93,7 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
       return {
         id, type: 'bullet-three',
         heading: '',
+        showHeading: true,
         columns: [
           { label: 'Challenges', bullets: ['Manual processes', 'Data silos', 'Compliance gaps'] },
           { label: 'Solutions', bullets: ['Automation', 'Integration', 'Real-time tracking'] },
@@ -121,6 +122,9 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
     case 'three-card':
       return {
         id, type: 'three-card',
+        showIcons: true,
+        showTitles: true,
+        showDescriptions: true,
         cards: [
           { icon: 'shield-check', title: 'Safety First', description: 'Proactive hazard identification' },
           { icon: 'clipboard-check', title: 'Compliance', description: 'Automated tracking' },
@@ -136,7 +140,7 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
           { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Risk Assessment', body: 'Identify and mitigate risks' },
           { imageUrl: STACKER_PLACEHOLDER_IMAGE_16x9, imagePan: { x: 0, y: 0 }, imageZoom: 1, eyebrow: 'Feature', showEyebrow: true, title: 'Audit Management', body: 'Streamline your audits' },
         ],
-        showCard3: true, grayscale: false,
+        showCard3: true, showTitles: true, showBodies: true, grayscale: false,
       }
     case 'quote':
       return {
@@ -153,12 +157,15 @@ function getSampleModule(type: StackerModule['type']): StackerModule {
           { value: '$2M', label: 'Annual savings' },
         ],
         showStat3: true,
+        showLabels: true,
       }
     case 'one-stat':
       return {
         id, type: 'one-stat',
-        value: '99.9%', label: 'Uptime guaranteed',
-        eyebrow: 'Reliability', body: 'Our platform ensures your critical safety systems are always available.',
+        value: '99.9%', showValue: true,
+        label: 'Uptime guaranteed', showLabel: true,
+        eyebrow: 'Reliability', showEyebrow: true,
+        body: 'Our platform ensures your critical safety systems are always available.', showBody: true,
       }
     default:
       return { id, type: 'divider' }
@@ -171,8 +178,8 @@ export interface StackerPreviewEditorProps {
   onModulesChange: (modules: StackerModule[]) => void
   onSelectModule: (moduleId: string) => void
   onDeleteModule: (moduleId: string) => void
-  onAddModule: (type: StackerModule['type']) => void
-  onAddModuleWithAI?: (type: StackerModule['type']) => void
+  onAddModule: (type: StackerModule['type'], afterModuleId?: string) => void
+  onAddModuleWithAI?: (type: StackerModule['type'], afterModuleId?: string) => void
   hasSourceContent?: boolean
   isGeneratingModule?: boolean
   previewZoom: number
@@ -370,6 +377,7 @@ export function StackerPreviewEditor({
   const [addMenuStep, setAddMenuStep] = useState<'choice' | 'select-blank' | 'select-ai'>('choice')
   const [previewingModule, setPreviewingModule] = useState<StackerModule['type'] | null>(null)
   const [generatingModuleType, setGeneratingModuleType] = useState<string | null>(null)
+  const [insertAfterModuleId, setInsertAfterModuleId] = useState<string | null>(null)
   const wasGenerating = useRef(false)
 
   // Reset step when modal opens
@@ -377,6 +385,8 @@ export function StackerPreviewEditor({
     if (showAddMenu) {
       setAddMenuStep('choice')
       setGeneratingModuleType(null)
+    } else {
+      setInsertAfterModuleId(null)
     }
   }, [showAddMenu])
 
@@ -492,24 +502,6 @@ export function StackerPreviewEditor({
     )
   }, [selectedModuleId, onSelectModule, onDeleteModule, onDuplicateModule, onToggleFooterVisibility, isFooterHidden, overId, activeId, modules.length, readOnly])
 
-  // Render add module tile inside the document
-  const renderAddModuleTile = useCallback(() => (
-    <div className="relative">
-      <button
-        onClick={() => setShowAddMenu(true)}
-        className="w-full py-4 rounded-md border border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 group"
-      >
-        <div className="flex items-center justify-center gap-2">
-          <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          <span className="text-xs font-medium text-gray-400 group-hover:text-blue-500 transition-colors">
-            Add Module
-          </span>
-        </div>
-      </button>
-    </div>
-  ), [])
 
   return (
     <DndContext
@@ -546,9 +538,13 @@ export function StackerPreviewEditor({
                 spacing={spacing}
                 onChange={onSpacingChange}
                 scale={previewZoom / 100}
+                onAddModule={() => {
+                  setInsertAfterModuleId(moduleId)
+                  setShowAddMenu(true)
+                }}
               />
             ) : undefined}
-            renderFooterContent={readOnly ? undefined : renderAddModuleTile}
+            renderFooterContent={undefined}
             darkMode={darkMode}
           />
         </div>
@@ -686,7 +682,7 @@ export function StackerPreviewEditor({
                         <div
                           className="relative bg-white cursor-pointer overflow-hidden"
                           onClick={() => {
-                            onAddModule(info.type)
+                            onAddModule(info.type, insertAfterModuleId ?? undefined)
                             setShowAddMenu(false)
                           }}
                           style={{ height: scaledHeight, padding }}
@@ -741,7 +737,7 @@ export function StackerPreviewEditor({
                           onClick={() => {
                             if (!isGeneratingModule && onAddModuleWithAI) {
                               setGeneratingModuleType(info.type)
-                              onAddModuleWithAI(info.type)
+                              onAddModuleWithAI(info.type, insertAfterModuleId ?? undefined)
                             }
                           }}
                           style={{ height: scaledHeight, padding }}
@@ -818,7 +814,7 @@ export function StackerPreviewEditor({
                 </span>
                 <button
                   onClick={() => {
-                    onAddModule(previewingModule)
+                    onAddModule(previewingModule, insertAfterModuleId ?? undefined)
                     setPreviewingModule(null)
                     setShowAddMenu(false)
                   }}

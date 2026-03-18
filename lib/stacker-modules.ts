@@ -311,6 +311,7 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         id,
         type: 'bullet-three',
         heading: (data.heading as string) || '',
+        showHeading: data.showHeading !== false,
         columns,
       }
     }
@@ -375,6 +376,9 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
       return {
         id,
         type: 'three-card',
+        showIcons: true,
+        showTitles: true,
+        showDescriptions: true,
         cards,
       }
     }
@@ -414,6 +418,8 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         type: 'image-cards',
         heading: (data.heading as string) || '',
         showHeading: data.showHeading !== false,
+        showTitles: true,
+        showBodies: true,
         cards: imageCards,
         showCard3: data.showCard3 !== false,
         grayscale: false,
@@ -451,6 +457,7 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
         type: 'three-stats',
         stats: processedStats,
         showStat3: data.showStat3 !== false,
+        showLabels: true,
       }
     }
 
@@ -458,10 +465,14 @@ export function createModuleFromAI(type: string, data: Record<string, unknown>):
       return {
         id,
         type: 'one-stat',
-        value: (data.value as string) || '100+', // Default to meaningful value
+        value: (data.value as string) || '100+',
         label: (data.label as string) || 'Key metric',
         eyebrow: (data.eyebrow as string) || '',
         body: (data.body as string) || '',
+        showValue: true,
+        showLabel: true,
+        showEyebrow: true,
+        showBody: true,
       }
 
     case 'footer':

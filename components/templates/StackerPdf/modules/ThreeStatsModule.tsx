@@ -11,6 +11,7 @@ export interface StatData {
 export interface ThreeStatsModuleProps {
   stats: [StatData, StatData, StatData]
   showStat3?: boolean
+  showLabels?: boolean
   scale?: number
   darkMode?: boolean
 }
@@ -18,6 +19,7 @@ export interface ThreeStatsModuleProps {
 export function ThreeStatsModule({
   stats,
   showStat3 = true,
+  showLabels = true,
   scale = 1,
   darkMode,
 }: ThreeStatsModuleProps) {
@@ -67,7 +69,7 @@ export function ThreeStatsModule({
       {visibleStats.map((stat, index) => (
         <div key={index} style={statStyle}>
           <div style={valueStyle}>{stat.value}</div>
-          <div style={labelStyle}>{stat.label}</div>
+          {showLabels && <div style={labelStyle}>{stat.label}</div>}
         </div>
       ))}
     </div>

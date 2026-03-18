@@ -8,9 +8,10 @@ export interface StackerSpacingHandleProps {
   onChange: (moduleId: string, spacing: number) => void
   scale: number // preview zoom factor (e.g., 1.0 for 100%)
   align?: 'center' | 'left' // pill position (default: center)
+  onAddModule?: () => void // callback to open add-module modal for insertion after this module
 }
 
-export function StackerSpacingHandle({ moduleId, spacing, onChange, scale, align = 'center' }: StackerSpacingHandleProps) {
+export function StackerSpacingHandle({ moduleId, spacing, onChange, scale, align = 'center', onAddModule }: StackerSpacingHandleProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartY = useRef(0)
@@ -73,8 +74,8 @@ export function StackerSpacingHandle({ moduleId, spacing, onChange, scale, align
             inset: 0,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: align === 'left' ? 'flex-start' : 'center',
-            paddingLeft: align === 'left' ? 8 : 0,
+            justifyContent: 'center',
+            gap: 6,
             pointerEvents: 'none',
           }}
         >
@@ -100,7 +101,50 @@ export function StackerSpacingHandle({ moduleId, spacing, onChange, scale, align
             }}
           />
 
-          {/* Pink pill with px value */}
+          {/* Add Module button (left) */}
+          {onAddModule && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onAddModule()
+              }}
+              style={{
+                pointerEvents: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '2px 10px',
+                border: '1px dashed #D1D5DB',
+                borderRadius: 9999,
+                background: 'white',
+                cursor: 'pointer',
+                transition: 'all 150ms',
+                fontSize: 10,
+                fontWeight: 500,
+                fontFamily: 'system-ui, sans-serif',
+                color: '#9CA3AF',
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#60A5FA'
+                e.currentTarget.style.background = 'rgba(239, 246, 255, 1)'
+                e.currentTarget.style.color = '#3B82F6'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#D1D5DB'
+                e.currentTarget.style.background = 'white'
+                e.currentTarget.style.color = '#9CA3AF'
+              }}
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M12 4v16m8-8H4" />
+              </svg>
+              {spacing >= 16 && <span>Add Module</span>}
+            </button>
+          )}
+
+          {/* Pink pill with px value (right) */}
           <div
             onMouseDown={handleMouseDown}
             style={{

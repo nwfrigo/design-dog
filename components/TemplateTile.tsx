@@ -543,6 +543,9 @@ export function TemplateRenderer({
         {
           id: 'preview-cards',
           type: 'three-card',
+          showIcons: true,
+          showTitles: true,
+          showDescriptions: true,
           cards: [
             { icon: 'zap', title: 'Card 1', description: 'Description for card 1' },
             { icon: 'shield-check', title: 'Card 2', description: 'Description for card 2' },

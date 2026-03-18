@@ -5,6 +5,7 @@ import { getStackerTheme } from '@/lib/stacker-theme'
 
 export interface BulletListModuleProps {
   heading: string
+  showHeading?: boolean
   columns: [
     { label: string; bullets: string[] },
     { label: string; bullets: string[] },
@@ -17,6 +18,7 @@ export interface BulletListModuleProps {
 
 export function BulletListModule({
   heading,
+  showHeading = true,
   columns,
   accentColor = '#000000',
   scale = 1,
@@ -24,6 +26,7 @@ export function BulletListModule({
 }: BulletListModuleProps) {
   const fontFamily = '"Fakt Pro", system-ui, sans-serif'
   const t = getStackerTheme(darkMode)
+  const effectiveAccent = darkMode && accentColor === '#000000' ? '#D35F0B' : accentColor
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -36,7 +39,7 @@ export function BulletListModule({
   }
 
   const headingStyle: CSSProperties = {
-    color: accentColor,
+    color: effectiveAccent,
     fontSize: 18,
     fontWeight: 350,
     wordWrap: 'break-word',
@@ -79,7 +82,7 @@ export function BulletListModule({
   const bulletDotStyle: CSSProperties = {
     width: 6,
     height: 6,
-    background: accentColor,
+    background: effectiveAccent,
     borderRadius: 1.76,
     flexShrink: 0,
   }
@@ -95,7 +98,7 @@ export function BulletListModule({
 
   return (
     <div style={containerStyle}>
-      {heading && (
+      {showHeading && heading && (
         <div style={headingStyle}>{heading}</div>
       )}
 

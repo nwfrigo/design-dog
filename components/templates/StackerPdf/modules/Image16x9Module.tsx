@@ -130,7 +130,7 @@ export function Image16x9Module({
         )}
 
         {showBody && body && (
-          <div style={bodyStyle}>{body}</div>
+          <div style={bodyStyle} className="stacker-rich-text" dangerouslySetInnerHTML={{ __html: body }} />
         )}
       </div>
     </div>

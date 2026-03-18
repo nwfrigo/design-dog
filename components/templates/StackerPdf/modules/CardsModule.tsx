@@ -12,12 +12,18 @@ export interface CardData {
 
 export interface CardsModuleProps {
   cards: [CardData, CardData, CardData]
+  showIcons?: boolean
+  showTitles?: boolean
+  showDescriptions?: boolean
   scale?: number
   darkMode?: boolean
 }
 
 export function CardsModule({
   cards,
+  showIcons = true,
+  showTitles = true,
+  showDescriptions = true,
   scale = 1,
   darkMode,
 }: CardsModuleProps) {
@@ -72,13 +78,15 @@ export function CardsModule({
         const IconComponent = getIconByName(card.icon)
         return (
           <div key={index} style={cardStyle}>
-            <div style={iconContainerStyle}>
-              {IconComponent && (
-                <IconComponent size={17} strokeWidth={1.5} color={t.iconColor} />
-              )}
-            </div>
-            <div style={titleStyle}>{card.title}</div>
-            <div style={descriptionStyle}>{card.description}</div>
+            {showIcons && (
+              <div style={iconContainerStyle}>
+                {IconComponent && (
+                  <IconComponent size={17} strokeWidth={1.5} color={t.iconColor} />
+                )}
+              </div>
+            )}
+            {showTitles && <div style={titleStyle}>{card.title}</div>}
+            {showDescriptions && <div style={descriptionStyle} className="stacker-rich-text" dangerouslySetInnerHTML={{ __html: card.description }} />}
           </div>
         )
       })}

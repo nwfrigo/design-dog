@@ -18,6 +18,8 @@ export interface ImageCardsModuleProps {
   showHeading: boolean
   cards: [ImageCardData, ImageCardData, ImageCardData]
   showCard3: boolean
+  showTitles?: boolean
+  showBodies?: boolean
   grayscale: boolean
   scale?: number
   darkMode?: boolean
@@ -28,6 +30,8 @@ export function ImageCardsModule({
   showHeading,
   cards,
   showCard3,
+  showTitles = true,
+  showBodies = true,
   grayscale,
   scale = 1,
   darkMode,
@@ -147,8 +151,8 @@ export function ImageCardsModule({
               {card.showEyebrow && card.eyebrow && (
                 <div style={eyebrowStyle}>{card.eyebrow}</div>
               )}
-              <div style={titleStyle}>{card.title}</div>
-              <div style={bodyStyle}>{card.body}</div>
+              {showTitles && <div style={titleStyle}>{card.title}</div>}
+              {showBodies && <div style={bodyStyle} className="stacker-rich-text" dangerouslySetInnerHTML={{ __html: card.body }} />}
             </div>
           </div>
         ))}

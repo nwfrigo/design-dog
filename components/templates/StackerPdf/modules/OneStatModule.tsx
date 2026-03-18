@@ -8,6 +8,10 @@ export interface OneStatModuleProps {
   label: string
   eyebrow: string
   body: string
+  showValue?: boolean
+  showLabel?: boolean
+  showEyebrow?: boolean
+  showBody?: boolean
   scale?: number
   darkMode?: boolean
 }
@@ -17,6 +21,10 @@ export function OneStatModule({
   label,
   eyebrow,
   body,
+  showValue = true,
+  showLabel = true,
+  showEyebrow = true,
+  showBody = true,
   scale = 1,
   darkMode,
 }: OneStatModuleProps) {
@@ -91,12 +99,12 @@ export function OneStatModule({
   return (
     <div style={containerStyle}>
       <div style={statContainerStyle}>
-        <div style={valueStyle}>{value}</div>
-        <div style={labelStyle}>{label}</div>
+        {showValue && <div style={valueStyle}>{value}</div>}
+        {showLabel && <div style={labelStyle}>{label}</div>}
       </div>
       <div style={textContainerStyle}>
-        <div style={eyebrowStyle}>{eyebrow}</div>
-        <div style={bodyStyle}>{body}</div>
+        {showEyebrow && <div style={eyebrowStyle}>{eyebrow}</div>}
+        {showBody && <div style={bodyStyle} className="stacker-rich-text" dangerouslySetInnerHTML={{ __html: body }} />}
       </div>
     </div>
   )

@@ -56,9 +56,7 @@ export function ParagraphModule({
         </div>
       )}
       {showBody && body && (
-        <div style={bodyStyle}>
-          {body}
-        </div>
+        <div style={bodyStyle} className="stacker-rich-text" dangerouslySetInnerHTML={{ __html: body }} />
       )}
     </div>
   )

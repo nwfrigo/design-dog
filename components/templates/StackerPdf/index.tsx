@@ -139,6 +139,9 @@ function RenderModule({ module, scale = 1, accentColor, darkMode }: { module: St
       return (
         <CardsModule
           cards={module.cards}
+          showIcons={module.showIcons}
+          showTitles={module.showTitles}
+          showDescriptions={module.showDescriptions}
           scale={scale}
           darkMode={darkMode}
         />
@@ -151,6 +154,8 @@ function RenderModule({ module, scale = 1, accentColor, darkMode }: { module: St
           showHeading={module.showHeading}
           cards={module.cards}
           showCard3={module.showCard3}
+          showTitles={module.showTitles}
+          showBodies={module.showBodies}
           grayscale={module.grayscale}
           scale={scale}
           darkMode={darkMode}
@@ -174,6 +179,7 @@ function RenderModule({ module, scale = 1, accentColor, darkMode }: { module: St
         <ThreeStatsModule
           stats={module.stats}
           showStat3={module.showStat3}
+          showLabels={module.showLabels}
           scale={scale}
           darkMode={darkMode}
         />
@@ -186,6 +192,10 @@ function RenderModule({ module, scale = 1, accentColor, darkMode }: { module: St
           label={module.label}
           eyebrow={module.eyebrow}
           body={module.body}
+          showValue={module.showValue}
+          showLabel={module.showLabel}
+          showEyebrow={module.showEyebrow}
+          showBody={module.showBody}
           scale={scale}
           darkMode={darkMode}
         />
@@ -213,6 +223,7 @@ function RenderModule({ module, scale = 1, accentColor, darkMode }: { module: St
       return (
         <BulletListModule
           heading={module.heading}
+          showHeading={module.showHeading}
           columns={module.columns}
           accentColor={accentColor}
           scale={scale}
@@ -261,6 +272,13 @@ export function StackerPdf({ modules, scale = 1, moduleSpacing, renderModuleWrap
 
   return (
     <div style={documentStyle}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .stacker-rich-text p { margin: 0; }
+        .stacker-rich-text ul { list-style-type: disc; padding-left: 16px; margin: 4px 0; }
+        .stacker-rich-text ol { list-style-type: decimal; padding-left: 16px; margin: 4px 0; }
+        .stacker-rich-text li { margin: 2px 0; }
+        .stacker-rich-text a { color: #D35F0B; text-decoration: none; }
+      `}} />
       <div style={contentStyle}>
         {/* Render all non-footer modules with spacers between them */}
         {nonFooterModules.map((module, index) => {

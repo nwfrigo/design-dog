@@ -95,9 +95,7 @@ export function HeaderModule({
         </div>
 
         {showSubheader && subheader && (
-          <div style={subheaderStyle}>
-            {subheader}
-          </div>
+          <div style={subheaderStyle} className="stacker-rich-text" dangerouslySetInnerHTML={{ __html: subheader }} />
         )}
       </div>
 

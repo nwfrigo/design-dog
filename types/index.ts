@@ -112,6 +112,7 @@ export interface StackerParagraphModule extends StackerBaseModule {
 export interface StackerBulletThreeModule extends StackerBaseModule {
   type: 'bullet-three'
   heading: string
+  showHeading: boolean
   columns: [
     { label: string; bullets: string[] },
     { label: string; bullets: string[] },
@@ -160,6 +161,9 @@ export interface StackerDividerModule extends StackerBaseModule {
 
 export interface StackerThreeCardModule extends StackerBaseModule {
   type: 'three-card'
+  showIcons: boolean
+  showTitles: boolean
+  showDescriptions: boolean
   cards: [
     { icon: string; title: string; description: string },
     { icon: string; title: string; description: string },
@@ -181,6 +185,8 @@ export interface StackerImageCardsModule extends StackerBaseModule {
   type: 'image-cards'
   heading: string
   showHeading: boolean
+  showTitles: boolean
+  showBodies: boolean
   cards: [StackerImageCardData, StackerImageCardData, StackerImageCardData]
   showCard3: boolean
   grayscale: boolean
@@ -202,6 +208,7 @@ export interface StackerThreeStatsModule extends StackerBaseModule {
     { value: string; label: string }
   ]
   showStat3: boolean
+  showLabels: boolean
 }
 
 export interface StackerOneStatModule extends StackerBaseModule {
@@ -210,6 +217,10 @@ export interface StackerOneStatModule extends StackerBaseModule {
   label: string
   eyebrow: string
   body: string
+  showValue: boolean
+  showLabel: boolean
+  showEyebrow: boolean
+  showBody: boolean
 }
 
 export interface StackerFooterModule extends StackerBaseModule {

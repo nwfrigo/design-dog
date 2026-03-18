@@ -27,6 +27,8 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { DeleteConfirmModal } from './shared/DeleteConfirmModal'
 import { ToggleSwitch } from './shared/ToggleSwitch'
+import { EyeIcon } from './shared/EyeIcon'
+import { RichTextEditor } from './RichTextEditor'
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -86,6 +88,7 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
         id,
         type: 'bullet-three',
         heading: 'Lorem ipsum dolor sit amet',
+        showHeading: true,
         columns: [
           { label: 'Column 1', bullets: ['First bullet', 'Second bullet', 'Third bullet'] },
           { label: 'Column 2', bullets: ['First bullet', 'Second bullet', 'Third bullet'] },
@@ -138,6 +141,9 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
       return {
         id,
         type: 'three-card',
+        showIcons: true,
+        showTitles: true,
+        showDescriptions: true,
         cards: [
           { icon: 'zap', title: 'Card 1', description: 'Description for card 1' },
           { icon: 'shield-check', title: 'Card 2', description: 'Description for card 2' },
@@ -180,6 +186,8 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
           },
         ],
         showCard3: true,
+        showTitles: true,
+        showBodies: true,
         grayscale: false,
       }
     case 'quote':
@@ -201,15 +209,20 @@ function createDefaultModule(type: StackerModule['type']): StackerModule {
           { value: '0,000', label: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' },
         ],
         showStat3: true,
+        showLabels: true,
       }
     case 'one-stat':
       return {
         id,
         type: 'one-stat',
         value: '0,000',
+        showValue: true,
         label: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+        showLabel: true,
         eyebrow: 'Firstname Lastname',
+        showEyebrow: true,
         body: 'Suspendisse potenti. Pellentesque imperdiet at odio tincidunt vehicula. Donec vel felis erat. Praesent iaculis malesuada neque at mattis.',
+        showBody: true,
       }
     case 'footer':
       return {
@@ -433,42 +446,36 @@ function ModuleEditor({
     case 'logo-chip':
       return (
         <div className="space-y-3">
-          {/* Show Chips Toggle */}
-          <ToggleSwitch
-            label="Show Category Chips"
-            checked={module.showChips}
-            onChange={() => onUpdate({ showChips: !module.showChips })}
-          />
-
           {/* Category Toggles */}
-          {module.showChips && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-2">Active Categories</label>
-              <div className="flex flex-wrap gap-2">
-                {categoryOptions.map((cat) => {
-                  const isActive = module.activeCategories.includes(cat)
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        const newCategories = isActive
-                          ? module.activeCategories.filter(c => c !== cat)
-                          : [...module.activeCategories, cat]
-                        onUpdate({ activeCategories: newCategories as SolutionCategory[] })
-                      }}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${
-                        isActive
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </button>
-                  )
-                })}
-              </div>
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Active Categories</label>
+              <EyeIcon visible={module.showChips} onClick={() => onUpdate({ showChips: !module.showChips })} />
             </div>
-          )}
+            <div className={`flex flex-wrap gap-2 ${!module.showChips ? 'opacity-50' : ''}`}>
+              {categoryOptions.map((cat) => {
+                const isActive = module.activeCategories.includes(cat)
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      const newCategories = isActive
+                        ? module.activeCategories.filter(c => c !== cat)
+                        : [...module.activeCategories, cat]
+                      onUpdate({ activeCategories: newCategories as SolutionCategory[] })
+                    }}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      isActive
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 dark:bg-surface-tertiary text-gray-600 dark:text-content-secondary'
+                    }`}
+                  >
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
         </div>
       )
 
@@ -524,37 +531,28 @@ function ModuleEditor({
             </div>
           </div>
 
-          {/* Subheader Toggle */}
-          <ToggleSwitch
-            label="Show Subheader"
-            checked={module.showSubheader}
-            onChange={() => onUpdate({ showSubheader: !module.showSubheader })}
-          />
-
-          {/* Subheader Text */}
-          {module.showSubheader && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Subheader</label>
-              <textarea
-                value={module.subheader}
-                onChange={(e) => onUpdate({ subheader: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={2}
+          {/* Subheader */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Subheader</label>
+              <EyeIcon visible={module.showSubheader} onClick={() => onUpdate({ showSubheader: !module.showSubheader })} />
+            </div>
+            <div className={!module.showSubheader ? 'opacity-50' : ''}>
+              <RichTextEditor
+                content={module.subheader}
+                onChange={(html) => onUpdate({ subheader: html })}
                 placeholder="Enter subheader"
               />
             </div>
-          )}
+          </div>
 
-          {/* CTA Toggle */}
-          <ToggleSwitch
-            label="Show CTA"
-            checked={module.showCta}
-            onChange={() => onUpdate({ showCta: !module.showCta })}
-          />
-
-          {/* CTA Fields */}
-          {module.showCta && (
-            <div className="space-y-2">
+          {/* CTA */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">CTA</label>
+              <EyeIcon visible={module.showCta} onClick={() => onUpdate({ showCta: !module.showCta })} />
+            </div>
+            <div className={`space-y-2 ${!module.showCta ? 'opacity-50' : ''}`}>
               <div>
                 <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">CTA Text</label>
                 <input
@@ -576,54 +574,42 @@ function ModuleEditor({
                 />
               </div>
             </div>
-          )}
+          </div>
         </div>
       )
 
     case 'paragraph':
       return (
         <div className="space-y-3">
-          {/* Show Intro Toggle */}
-          <ToggleSwitch
-            label="Show Intro"
-            checked={module.showIntro}
-            onChange={() => onUpdate({ showIntro: !module.showIntro })}
-          />
+          {/* Intro */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Intro (18pt)</label>
+              <EyeIcon visible={module.showIntro} onClick={() => onUpdate({ showIntro: !module.showIntro })} />
+            </div>
+            <textarea
+              value={module.intro}
+              onChange={(e) => onUpdate({ intro: e.target.value })}
+              className={`w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none ${!module.showIntro ? 'opacity-50' : ''}`}
+              rows={2}
+              placeholder="Enter intro text"
+            />
+          </div>
 
-          {/* Intro Text */}
-          {module.showIntro && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Intro (18pt)</label>
-              <textarea
-                value={module.intro}
-                onChange={(e) => onUpdate({ intro: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={2}
-                placeholder="Enter intro text"
+          {/* Body */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Body (12pt)</label>
+              <EyeIcon visible={module.showBody} onClick={() => onUpdate({ showBody: !module.showBody })} />
+            </div>
+            <div className={!module.showBody ? 'opacity-50' : ''}>
+              <RichTextEditor
+                content={module.body}
+                onChange={(html) => onUpdate({ body: html })}
+                placeholder="Enter body text with formatting..."
               />
             </div>
-          )}
-
-          {/* Show Body Toggle */}
-          <ToggleSwitch
-            label="Show Body"
-            checked={module.showBody}
-            onChange={() => onUpdate({ showBody: !module.showBody })}
-          />
-
-          {/* Body Text */}
-          {module.showBody && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body (12pt)</label>
-              <textarea
-                value={module.body}
-                onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={4}
-                placeholder="Enter body text"
-              />
-            </div>
-          )}
+          </div>
         </div>
       )
 
@@ -639,12 +625,15 @@ function ModuleEditor({
         <div className="space-y-4">
           {/* Heading */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Heading</label>
+              <EyeIcon visible={module.showHeading} onClick={() => onUpdate({ showHeading: !module.showHeading })} />
+            </div>
             <input
               type="text"
               value={module.heading}
               onChange={(e) => onUpdate({ heading: e.target.value })}
-              className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
+              className={`w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary ${!module.showHeading ? 'opacity-50' : ''}`}
               placeholder="Enter heading"
             />
           </div>
@@ -881,79 +870,58 @@ function ModuleEditor({
             />
           )}
 
-          {/* Show Eyebrow Toggle */}
-          <ToggleSwitch
-            label="Show Eyebrow"
-            checked={module.showEyebrow}
-            onChange={() => onUpdate({ showEyebrow: !module.showEyebrow })}
-          />
-
-          {/* Eyebrow Text */}
-          {module.showEyebrow && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
-              <input
-                type="text"
-                value={module.eyebrow}
-                onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
-                placeholder="Enter eyebrow"
-              />
+          {/* Eyebrow */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Eyebrow</label>
+              <EyeIcon visible={module.showEyebrow} onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })} />
             </div>
-          )}
+            <input
+              type="text"
+              value={module.eyebrow}
+              onChange={(e) => onUpdate({ eyebrow: e.target.value })}
+              className={`w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary ${!module.showEyebrow ? 'opacity-50' : ''}`}
+              placeholder="Enter eyebrow"
+            />
+          </div>
 
-          {/* Show Heading Toggle */}
-          <ToggleSwitch
-            label="Show Heading"
-            checked={module.showHeading}
-            onChange={() => onUpdate({ showHeading: !module.showHeading })}
-          />
-
-          {/* Heading Text */}
-          {module.showHeading && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
-              <textarea
-                value={module.heading}
-                onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={2}
-                placeholder="Enter heading"
-              />
+          {/* Heading */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Heading</label>
+              <EyeIcon visible={module.showHeading} onClick={() => onUpdate({ showHeading: !module.showHeading })} />
             </div>
-          )}
+            <textarea
+              value={module.heading}
+              onChange={(e) => onUpdate({ heading: e.target.value })}
+              className={`w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none ${!module.showHeading ? 'opacity-50' : ''}`}
+              rows={2}
+              placeholder="Enter heading"
+            />
+          </div>
 
-          {/* Show Body Toggle */}
-          <ToggleSwitch
-            label="Show Body"
-            checked={module.showBody}
-            onChange={() => onUpdate({ showBody: !module.showBody })}
-          />
-
-          {/* Body Text */}
-          {module.showBody && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
-              <textarea
-                value={module.body}
-                onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={3}
+          {/* Body */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Body</label>
+              <EyeIcon visible={module.showBody} onClick={() => onUpdate({ showBody: !module.showBody })} />
+            </div>
+            <div className={!module.showBody ? 'opacity-50' : ''}>
+              <RichTextEditor
+                content={module.body}
+                onChange={(html) => onUpdate({ body: html })}
                 placeholder="Enter body text"
               />
             </div>
-          )}
+          </div>
 
-          {/* Show CTA Toggle */}
-          <ToggleSwitch
-            label="Show CTA"
-            checked={module.showCta}
-            onChange={() => onUpdate({ showCta: !module.showCta })}
-          />
-
-          {/* CTA Fields */}
-          {module.showCta && (
-            <div className="space-y-2">
+          {/* CTA */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">CTA</label>
+              <EyeIcon visible={module.showCta} onClick={() => onUpdate({ showCta: !module.showCta })} />
+            </div>
+            <div className={`space-y-2 ${!module.showCta ? 'opacity-50' : ''}`}>
               <div>
                 <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">CTA Text</label>
                 <input
@@ -975,7 +943,7 @@ function ModuleEditor({
                 />
               </div>
             </div>
-          )}
+          </div>
         </div>
       )
 
@@ -1129,68 +1097,50 @@ function ModuleEditor({
             />
           )}
 
-          {/* Show Eyebrow Toggle */}
-          <ToggleSwitch
-            label="Show Eyebrow"
-            checked={module.showEyebrow}
-            onChange={() => onUpdate({ showEyebrow: !module.showEyebrow })}
-          />
-
-          {/* Eyebrow Text */}
-          {module.showEyebrow && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
-              <input
-                type="text"
-                value={module.eyebrow}
-                onChange={(e) => onUpdate({ eyebrow: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
-                placeholder="Enter eyebrow"
-              />
+          {/* Eyebrow */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Eyebrow</label>
+              <EyeIcon visible={module.showEyebrow} onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })} />
             </div>
-          )}
+            <input
+              type="text"
+              value={module.eyebrow}
+              onChange={(e) => onUpdate({ eyebrow: e.target.value })}
+              className={`w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary ${!module.showEyebrow ? 'opacity-50' : ''}`}
+              placeholder="Enter eyebrow"
+            />
+          </div>
 
-          {/* Show Heading Toggle */}
-          <ToggleSwitch
-            label="Show Heading"
-            checked={module.showHeading}
-            onChange={() => onUpdate({ showHeading: !module.showHeading })}
-          />
-
-          {/* Heading Text */}
-          {module.showHeading && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
-              <textarea
-                value={module.heading}
-                onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={2}
-                placeholder="Enter heading"
-              />
+          {/* Heading */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Heading</label>
+              <EyeIcon visible={module.showHeading} onClick={() => onUpdate({ showHeading: !module.showHeading })} />
             </div>
-          )}
+            <textarea
+              value={module.heading}
+              onChange={(e) => onUpdate({ heading: e.target.value })}
+              className={`w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none ${!module.showHeading ? 'opacity-50' : ''}`}
+              rows={2}
+              placeholder="Enter heading"
+            />
+          </div>
 
-          {/* Show Body Toggle */}
-          <ToggleSwitch
-            label="Show Body"
-            checked={module.showBody}
-            onChange={() => onUpdate({ showBody: !module.showBody })}
-          />
-
-          {/* Body Text */}
-          {module.showBody && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
-              <textarea
-                value={module.body}
-                onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={3}
+          {/* Body */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Body</label>
+              <EyeIcon visible={module.showBody} onClick={() => onUpdate({ showBody: !module.showBody })} />
+            </div>
+            <div className={!module.showBody ? 'opacity-50' : ''}>
+              <RichTextEditor
+                content={module.body}
+                onChange={(html) => onUpdate({ body: html })}
                 placeholder="Enter body text"
               />
             </div>
-          )}
+          </div>
         </div>
       )
 
@@ -1204,8 +1154,11 @@ function ModuleEditor({
               </div>
 
               {/* Icon */}
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Icon</label>
+              <div className={!module.showIcons ? 'opacity-50' : ''}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-content-secondary">Icon</label>
+                  {index === 0 && <EyeIcon visible={module.showIcons} onClick={() => onUpdate({ showIcons: !module.showIcons })} />}
+                </div>
                 <div className="flex items-center gap-2">
                   <IconPicker
                     value={card.icon}
@@ -1230,8 +1183,11 @@ function ModuleEditor({
               </div>
 
               {/* Title */}
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Title</label>
+              <div className={!module.showTitles ? 'opacity-50' : ''}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-content-secondary">Title</label>
+                  {index === 0 && <EyeIcon visible={module.showTitles} onClick={() => onUpdate({ showTitles: !module.showTitles })} />}
+                </div>
                 <textarea
                   value={card.title}
                   onChange={(e) => {
@@ -1246,17 +1202,18 @@ function ModuleEditor({
               </div>
 
               {/* Description */}
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Description</label>
-                <textarea
-                  value={card.description}
-                  onChange={(e) => {
+              <div className={!module.showDescriptions ? 'opacity-50' : ''}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-content-secondary">Description</label>
+                  {index === 0 && <EyeIcon visible={module.showDescriptions} onClick={() => onUpdate({ showDescriptions: !module.showDescriptions })} />}
+                </div>
+                <RichTextEditor
+                  content={card.description}
+                  onChange={(html) => {
                     const newCards = [...module.cards] as [typeof card, typeof card, typeof card]
-                    newCards[index] = { ...card, description: e.target.value }
+                    newCards[index] = { ...card, description: html }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                  rows={3}
                   placeholder="Enter card description"
                 />
               </div>
@@ -1268,33 +1225,26 @@ function ModuleEditor({
     case 'image-cards':
       return (
         <div className="space-y-4">
-          {/* Show Heading Toggle */}
-          <ToggleSwitch
-            label="Show Heading"
-            checked={module.showHeading}
-            onChange={() => onUpdate({ showHeading: !module.showHeading })}
-          />
-
-          {/* Heading Text */}
-          {module.showHeading && (
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Heading</label>
-              <textarea
-                value={module.heading}
-                onChange={(e) => onUpdate({ heading: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={2}
-                placeholder="Enter heading"
-              />
+          {/* Heading */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-500 dark:text-content-secondary">Heading</label>
+              <EyeIcon visible={module.showHeading} onClick={() => onUpdate({ showHeading: !module.showHeading })} />
             </div>
-          )}
+            <textarea
+              value={module.heading}
+              onChange={(e) => onUpdate({ heading: e.target.value })}
+              className={`w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none ${!module.showHeading ? 'opacity-50' : ''}`}
+              rows={2}
+              placeholder="Enter heading"
+            />
+          </div>
 
-          {/* Show Third Card Toggle */}
-          <ToggleSwitch
-            label="Show Third Card"
-            checked={module.showCard3}
-            onChange={() => onUpdate({ showCard3: !module.showCard3 })}
-          />
+          {/* Show Third Card */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-content-secondary">Third Card</label>
+            <EyeIcon visible={module.showCard3} onClick={() => onUpdate({ showCard3: !module.showCard3 })} />
+          </div>
 
           {/* Grayscale Toggle */}
           <ToggleSwitch
@@ -1401,38 +1351,35 @@ function ModuleEditor({
                 )}
               </div>
 
-              {/* Show Eyebrow Toggle */}
-              <ToggleSwitch
-                label="Show Eyebrow"
-                checked={card.showEyebrow}
-                onChange={() => {
-                  const newCards = [...module.cards] as typeof module.cards
-                  newCards[index] = { ...card, showEyebrow: !card.showEyebrow }
-                  onUpdate({ cards: newCards })
-                }}
-              />
-
-              {/* Eyebrow Text */}
-              {card.showEyebrow && (
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
-                  <input
-                    type="text"
-                    value={card.eyebrow}
-                    onChange={(e) => {
-                      const newCards = [...module.cards] as typeof module.cards
-                      newCards[index] = { ...card, eyebrow: e.target.value }
-                      onUpdate({ cards: newCards })
-                    }}
-                    className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
-                    placeholder="Eyebrow text"
-                  />
+              {/* Eyebrow */}
+              <div className={!card.showEyebrow ? 'opacity-50' : ''}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-content-secondary">Eyebrow</label>
+                  <EyeIcon visible={card.showEyebrow} onClick={() => {
+                    const newCards = [...module.cards] as typeof module.cards
+                    newCards[index] = { ...card, showEyebrow: !card.showEyebrow }
+                    onUpdate({ cards: newCards })
+                  }} />
                 </div>
-              )}
+                <input
+                  type="text"
+                  value={card.eyebrow}
+                  onChange={(e) => {
+                    const newCards = [...module.cards] as typeof module.cards
+                    newCards[index] = { ...card, eyebrow: e.target.value }
+                    onUpdate({ cards: newCards })
+                  }}
+                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary"
+                  placeholder="Eyebrow text"
+                />
+              </div>
 
               {/* Title */}
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Title</label>
+              <div className={!module.showTitles ? 'opacity-50' : ''}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-content-secondary">Title</label>
+                  {index === 0 && <EyeIcon visible={module.showTitles} onClick={() => onUpdate({ showTitles: !module.showTitles })} />}
+                </div>
                 <input
                   type="text"
                   value={card.title}
@@ -1447,17 +1394,18 @@ function ModuleEditor({
               </div>
 
               {/* Body */}
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
-                <textarea
-                  value={card.body}
-                  onChange={(e) => {
+              <div className={!module.showBodies ? 'opacity-50' : ''}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-content-secondary">Body</label>
+                  {index === 0 && <EyeIcon visible={module.showBodies} onClick={() => onUpdate({ showBodies: !module.showBodies })} />}
+                </div>
+                <RichTextEditor
+                  content={card.body}
+                  onChange={(html) => {
                     const newCards = [...module.cards] as typeof module.cards
-                    newCards[index] = { ...card, body: e.target.value }
+                    newCards[index] = { ...card, body: html }
                     onUpdate({ cards: newCards })
                   }}
-                  className="w-full px-2 py-1.5 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                  rows={2}
                   placeholder="Card body text"
                 />
               </div>
@@ -1523,13 +1471,11 @@ function ModuleEditor({
       const visibleStats = module.showStat3 ? module.stats : module.stats.slice(0, 2)
       return (
         <div className="space-y-4">
-          {/* Show 3rd Stat Toggle */}
-          <ToggleSwitch
-            label="Show 3rd Stat"
-            checked={module.showStat3}
-            onChange={() => onUpdate({ showStat3: !module.showStat3 })}
-            className="py-2 border-b border-gray-200 dark:border-line-subtle"
-          />
+          {/* 3rd Stat toggle */}
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-gray-500 dark:text-content-secondary">3rd Stat</label>
+            <EyeIcon visible={module.showStat3} onClick={() => onUpdate({ showStat3: !module.showStat3 })} />
+          </div>
 
           {visibleStats.map((stat, index) => (
             <div key={index} className="space-y-2 p-3 bg-gray-50 dark:bg-surface-secondary rounded-lg">
@@ -1554,8 +1500,11 @@ function ModuleEditor({
               </div>
 
               {/* Label */}
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Label</label>
+              <div className={!module.showLabels ? 'opacity-50' : ''}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-500 dark:text-content-secondary">Label</label>
+                  {index === 0 && <EyeIcon visible={module.showLabels} onClick={() => onUpdate({ showLabels: !module.showLabels })} />}
+                </div>
                 <textarea
                   value={stat.label}
                   onChange={(e) => {
@@ -1584,8 +1533,11 @@ function ModuleEditor({
             </div>
 
             {/* Value */}
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Value</label>
+            <div className={!module.showValue ? 'opacity-50' : ''}>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs text-gray-500 dark:text-content-secondary">Value</label>
+                <EyeIcon visible={module.showValue} onClick={() => onUpdate({ showValue: !module.showValue })} />
+              </div>
               <input
                 type="text"
                 value={module.value}
@@ -1596,8 +1548,11 @@ function ModuleEditor({
             </div>
 
             {/* Label */}
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Label</label>
+            <div className={!module.showLabel ? 'opacity-50' : ''}>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs text-gray-500 dark:text-content-secondary">Label</label>
+                <EyeIcon visible={module.showLabel} onClick={() => onUpdate({ showLabel: !module.showLabel })} />
+              </div>
               <textarea
                 value={module.label}
                 onChange={(e) => onUpdate({ label: e.target.value })}
@@ -1615,8 +1570,11 @@ function ModuleEditor({
             </div>
 
             {/* Eyebrow */}
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Eyebrow</label>
+            <div className={!module.showEyebrow ? 'opacity-50' : ''}>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs text-gray-500 dark:text-content-secondary">Eyebrow</label>
+                <EyeIcon visible={module.showEyebrow} onClick={() => onUpdate({ showEyebrow: !module.showEyebrow })} />
+              </div>
               <input
                 type="text"
                 value={module.eyebrow}
@@ -1627,13 +1585,14 @@ function ModuleEditor({
             </div>
 
             {/* Body */}
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Body</label>
-              <textarea
-                value={module.body}
-                onChange={(e) => onUpdate({ body: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-surface-primary border border-gray-300 dark:border-line-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-content-primary resize-none"
-                rows={3}
+            <div className={!module.showBody ? 'opacity-50' : ''}>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs text-gray-500 dark:text-content-secondary">Body</label>
+                <EyeIcon visible={module.showBody} onClick={() => onUpdate({ showBody: !module.showBody })} />
+              </div>
+              <RichTextEditor
+                content={module.body}
+                onChange={(html) => onUpdate({ body: html })}
                 placeholder="Description text"
               />
             </div>
@@ -1934,15 +1893,40 @@ export function StackerEditorScreen() {
   }, [])
 
   // Add content module (blank)
-  const addModule = useCallback((type: StackerModule['type']) => {
+  const addModule = useCallback((type: StackerModule['type'], afterModuleId?: string) => {
     const newModule = createDefaultModule(type)
-    setContentModules(prev => [...prev, newModule])
+    setContentModules(prev => {
+      if (afterModuleId) {
+        const index = prev.findIndex(m => m.id === afterModuleId)
+        if (index !== -1) {
+          const next = [...prev]
+          next.splice(index + 1, 0, newModule)
+          return next
+        }
+      }
+      return [...prev, newModule]
+    })
     // Auto-expand the new module (accordion - only this one)
     setExpandedModules(new Set([newModule.id]))
   }, [])
 
   // Add content module via AI generation
-  const addModuleWithAI = useCallback(async (type: StackerModule['type']) => {
+  const insertModule = useCallback((module: StackerModule, afterModuleId?: string) => {
+    setContentModules(prev => {
+      if (afterModuleId) {
+        const index = prev.findIndex(m => m.id === afterModuleId)
+        if (index !== -1) {
+          const next = [...prev]
+          next.splice(index + 1, 0, module)
+          return next
+        }
+      }
+      return [...prev, module]
+    })
+    setExpandedModules(new Set([module.id]))
+  }, [])
+
+  const addModuleWithAI = useCallback(async (type: StackerModule['type'], afterModuleId?: string) => {
     if (!stackerSourceContent) return
 
     setIsGeneratingModule(true)
@@ -1972,16 +1956,14 @@ export function StackerEditorScreen() {
 
       const result = await response.json()
       if (result.module) {
-        setContentModules(prev => [...prev, result.module])
-        setExpandedModules(new Set([result.module.id]))
+        insertModule(result.module, afterModuleId)
       } else {
         throw new Error('No module in response')
       }
     } catch {
       // Fallback: insert blank module + show toast
       const fallbackModule = createDefaultModule(type)
-      setContentModules(prev => [...prev, fallbackModule])
-      setExpandedModules(new Set([fallbackModule.id]))
+      insertModule(fallbackModule, afterModuleId)
 
       // Show failure toast
       if (aiToastTimeout.current) clearTimeout(aiToastTimeout.current)
@@ -1998,7 +1980,7 @@ export function StackerEditorScreen() {
     } finally {
       setIsGeneratingModule(false)
     }
-  }, [stackerSourceContent, contentModules, aiToastTimeout])
+  }, [stackerSourceContent, contentModules, aiToastTimeout, insertModule])
 
   // Duplicate a content module (deep clone with new ID, insert after original)
   const duplicateModule = useCallback((moduleId: string) => {
