@@ -267,12 +267,21 @@ export interface FaqQABlock {
   answer: string  // HTML string for rich text
 }
 
+export interface MergedRegion {
+  row: number      // Top-left row
+  col: number      // Top-left col
+  rowSpan: number  // Rows spanned
+  colSpan: number  // Cols spanned
+}
+
 export interface FaqTableBlock {
   type: 'table'
   id: string
   rows: number
   cols: number
   data: string[][]
+  mergedCells?: MergedRegion[]  // Flexible cell merging (replaces mergedRows)
+  mergedRows?: number[]  // Legacy — auto-migrated to mergedCells on load
 }
 
 export interface FaqImageBlock {

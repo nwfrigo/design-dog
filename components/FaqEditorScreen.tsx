@@ -3,7 +3,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
 import { ContentPage, CoverPage } from './templates/FaqPdf'
-import type { FaqContentBlock, FaqPage } from '@/types'
+import type { FaqContentBlock, FaqPage, MergedRegion } from '@/types'
+import { buildCellMap, getSelectionRect, expandSelectionToContainMerges, migrateMergedRows } from '@/lib/table-merge-utils'
 import { RichTextEditor } from './RichTextEditor'
 import { TableGridPicker } from './TableGridPicker'
 import { ZoomableImage } from './ZoomableImage'
@@ -660,6 +661,351 @@ function BlockMeasurer({
   )
 }
 
+// Table Block Editor with cell selection and merge support
+function TableBlockEditor({
+  block,
+  onUpdate,
+  updateTableCell,
+  onMergeCells,
+  onUnmergeCells,
+}: {
+  block: { rows: number; cols: number; data: string[][]; mergedCells?: MergedRegion[] }
+  onUpdate: (updates: Partial<{ rows: number; cols: number; data: string[][]; mergedCells?: MergedRegion[] }>) => void
+  updateTableCell: (rowIndex: number, colIndex: number, value: string) => void
+  onMergeCells?: (mergedCells: MergedRegion[]) => void
+  onUnmergeCells?: (mergedCells: MergedRegion[]) => void
+}) {
+  const [selectionStart, setSelectionStart] = useState<{ row: number; col: number } | null>(null)
+  const [selectionEnd, setSelectionEnd] = useState<{ row: number; col: number } | null>(null)
+  const [isSelecting, setIsSelecting] = useState(false)
+  // Which cell is in text-edit mode (double-click to enter, like Excel)
+  const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null)
+
+  const mergedCells = block.mergedCells || []
+  const cellMap = buildCellMap(block.rows, block.cols, mergedCells)
+
+  // Compute expanded selection rect (accounting for partially overlapped merges)
+  const selectionRect = selectionStart && selectionEnd
+    ? expandSelectionToContainMerges(
+        getSelectionRect(selectionStart, selectionEnd),
+        mergedCells
+      )
+    : null
+
+  // Check if a cell is in the current selection
+  const isCellSelected = (row: number, col: number) => {
+    if (!selectionRect) return false
+    return (
+      row >= selectionRect.minRow && row <= selectionRect.maxRow &&
+      col >= selectionRect.minCol && col <= selectionRect.maxCol
+    )
+  }
+
+  // Count selected cells and determine merge state
+  const selectionSpansMultiple = selectionRect
+    ? (selectionRect.maxRow - selectionRect.minRow + 1) * (selectionRect.maxCol - selectionRect.minCol + 1) > 1
+    : false
+
+  const selectionRowCount = selectionRect ? selectionRect.maxRow - selectionRect.minRow + 1 : 0
+  const selectionColCount = selectionRect ? selectionRect.maxCol - selectionRect.minCol + 1 : 0
+
+  // Check if selection covers exactly one existing merge
+  const selectionCoversExactlyOneMerge = selectionRect && mergedCells.length > 0
+    ? mergedCells.some(m =>
+        m.row === selectionRect.minRow && m.col === selectionRect.minCol &&
+        m.row + m.rowSpan - 1 === selectionRect.maxRow &&
+        m.col + m.colSpan - 1 === selectionRect.maxCol
+      )
+    : false
+
+  // Handle merge
+  const handleMerge = () => {
+    if (!selectionRect || !onMergeCells) return
+    const { minRow, maxRow, minCol, maxCol } = selectionRect
+
+    // Remove any merges fully contained in the selection
+    const remaining = mergedCells.filter(m => {
+      const mEndRow = m.row + m.rowSpan - 1
+      const mEndCol = m.col + m.colSpan - 1
+      const fullyContained =
+        m.row >= minRow && mEndRow <= maxRow &&
+        m.col >= minCol && mEndCol <= maxCol
+      return !fullyContained
+    })
+
+    // Add new merge region
+    remaining.push({
+      row: minRow,
+      col: minCol,
+      rowSpan: maxRow - minRow + 1,
+      colSpan: maxCol - minCol + 1,
+    })
+
+    onMergeCells(remaining)
+    setSelectionStart(null)
+    setSelectionEnd(null)
+  }
+
+  // Handle unmerge
+  const handleUnmerge = () => {
+    if (!selectionRect || !onUnmergeCells) return
+    const updated = mergedCells.filter(m =>
+      !(m.row === selectionRect.minRow && m.col === selectionRect.minCol &&
+        m.row + m.rowSpan - 1 === selectionRect.maxRow &&
+        m.col + m.colSpan - 1 === selectionRect.maxCol)
+    )
+    onUnmergeCells(updated)
+    setSelectionStart(null)
+    setSelectionEnd(null)
+  }
+
+  // Handle row removal with merge shrinking
+  const handleRemoveRow = () => {
+    if (block.rows <= 1) return
+    const lastRow = block.rows - 1
+    const newData = block.data.slice(0, -1)
+    // Shrink or remove merges that touch the last row
+    const updatedMerges = mergedCells
+      .map(m => {
+        if (m.row + m.rowSpan - 1 >= lastRow) {
+          const newRowSpan = lastRow - m.row
+          if (newRowSpan <= 0) return null // merge starts at or beyond last row — remove
+          if (newRowSpan === 1 && m.colSpan === 1) return null // shrunk to 1×1
+          return { ...m, rowSpan: newRowSpan }
+        }
+        return m
+      })
+      .filter((m): m is MergedRegion => m !== null)
+    onUpdate({ rows: block.rows - 1, data: newData, mergedCells: updatedMerges.length > 0 ? updatedMerges : undefined })
+    setSelectionStart(null)
+    setSelectionEnd(null)
+  }
+
+  // Handle column removal with merge shrinking
+  const handleRemoveCol = () => {
+    if (block.cols <= 1) return
+    const lastCol = block.cols - 1
+    const newData = block.data.map(row => row.slice(0, -1))
+    const updatedMerges = mergedCells
+      .map(m => {
+        if (m.col + m.colSpan - 1 >= lastCol) {
+          const newColSpan = lastCol - m.col
+          if (newColSpan <= 0) return null
+          if (newColSpan === 1 && m.rowSpan === 1) return null
+          return { ...m, colSpan: newColSpan }
+        }
+        return m
+      })
+      .filter((m): m is MergedRegion => m !== null)
+    onUpdate({ cols: block.cols - 1, data: newData, mergedCells: updatedMerges.length > 0 ? updatedMerges : undefined })
+    setSelectionStart(null)
+    setSelectionEnd(null)
+  }
+
+  // Clear selection / exit edit mode on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (editingCell) {
+          setEditingCell(null)
+          // Blur any focused textarea
+          if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+        } else {
+          setSelectionStart(null)
+          setSelectionEnd(null)
+          setIsSelecting(false)
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [editingCell])
+
+  // Stop selecting on global mouseup
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (isSelecting) setIsSelecting(false)
+    }
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => window.removeEventListener('mouseup', handleMouseUp)
+  }, [isSelecting])
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-content-secondary">
+        <span>{block.rows} × {block.cols} table</span>
+        <button
+          type="button"
+          onClick={() => {
+            const newRows = block.rows + 1
+            const newData = [...block.data, Array(block.cols).fill('')]
+            onUpdate({ rows: newRows, data: newData })
+          }}
+          className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
+        >
+          + Row
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const newCols = block.cols + 1
+            const newData = block.data.map(row => [...row, ''])
+            onUpdate({ cols: newCols, data: newData })
+          }}
+          className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
+        >
+          + Col
+        </button>
+        {block.rows > 1 && (
+          <button type="button" onClick={handleRemoveRow}
+            className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
+          >
+            - Row
+          </button>
+        )}
+        {block.cols > 1 && (
+          <button type="button" onClick={handleRemoveCol}
+            className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
+          >
+            - Col
+          </button>
+        )}
+      </div>
+
+      {/* Merge toolbar — always visible, buttons enable when selection qualifies */}
+      <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg text-xs">
+        <span className={`font-medium ${selectionSpansMultiple ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-content-secondary'}`}>
+          {selectionSpansMultiple
+            ? `${selectionRowCount} × ${selectionColCount} selected`
+            : 'Select cells to merge'}
+        </span>
+        <div className="flex-1" />
+        {selectionCoversExactlyOneMerge ? (
+          <button
+            type="button"
+            onClick={handleUnmerge}
+            className="px-2 py-1 bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded text-gray-700 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors"
+          >
+            Unmerge Cells
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleMerge}
+            disabled={!selectionSpansMultiple}
+            className={`px-2 py-1 rounded transition-colors ${
+              selectionSpansMultiple
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-gray-200 dark:bg-surface-tertiary text-gray-400 dark:text-content-secondary cursor-not-allowed'
+            }`}
+          >
+            Merge Cells
+          </button>
+        )}
+      </div>
+
+      <div
+        className="border border-gray-300 dark:border-line-subtle rounded-lg overflow-hidden select-none cursor-cell"
+        onMouseLeave={() => {
+          if (isSelecting) setIsSelecting(false)
+        }}
+      >
+        <table className="w-full">
+          <tbody>
+            {block.data.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, colIndex) => {
+                  const info = cellMap[rowIndex]?.[colIndex]
+                  if (!info || info.type === 'hidden') return null
+
+                  const isAnchor = info.type === 'anchor'
+                  const selected = isCellSelected(rowIndex, colIndex)
+                  // For merged cells, check if any cell in the region is selected
+                  const mergeSelected = isAnchor && selectionRect
+                    ? (() => {
+                        for (let r = rowIndex; r < rowIndex + info.rowSpan; r++) {
+                          for (let c = colIndex; c < colIndex + info.colSpan; c++) {
+                            if (isCellSelected(r, c)) return true
+                          }
+                        }
+                        return false
+                      })()
+                    : selected
+
+                  const isEditing = editingCell?.row === rowIndex && editingCell?.col === colIndex
+
+                  return (
+                    <td
+                      key={colIndex}
+                      rowSpan={isAnchor ? info.rowSpan : undefined}
+                      colSpan={isAnchor ? info.colSpan : undefined}
+                      className={`border border-gray-300 dark:border-line-subtle p-0 relative ${
+                        mergeSelected
+                          ? 'bg-blue-100 dark:bg-blue-900/30'
+                          : 'bg-gray-100 dark:bg-surface-primary'
+                      }`}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        // Exit any current edit
+                        setEditingCell(null)
+                        setSelectionStart({ row: rowIndex, col: colIndex })
+                        setSelectionEnd({ row: rowIndex, col: colIndex })
+                        setIsSelecting(true)
+                      }}
+                      onMouseMove={() => {
+                        if (isSelecting) {
+                          setSelectionEnd({ row: rowIndex, col: colIndex })
+                        }
+                      }}
+                      onMouseUp={() => {
+                        if (isSelecting) setIsSelecting(false)
+                      }}
+                      onDoubleClick={() => {
+                        setEditingCell({ row: rowIndex, col: colIndex })
+                        setSelectionStart(null)
+                        setSelectionEnd(null)
+                      }}
+                    >
+                      <textarea
+                        value={isAnchor ? (row[colIndex] || '') : cell}
+                        onChange={(e) => updateTableCell(rowIndex, colIndex, e.target.value)}
+                        onInput={(e) => {
+                          const target = e.target as HTMLTextAreaElement
+                          target.style.height = 'auto'
+                          target.style.height = target.scrollHeight + 'px'
+                        }}
+                        ref={(el) => {
+                          if (el) {
+                            el.style.height = 'auto'
+                            el.style.height = el.scrollHeight + 'px'
+                            // Auto-focus when entering edit mode
+                            if (isEditing) el.focus()
+                          }
+                        }}
+                        onBlur={() => {
+                          if (isEditing) setEditingCell(null)
+                        }}
+                        style={{ pointerEvents: isEditing ? 'auto' : 'none' }}
+                        className={`w-full px-2 py-1.5 text-xs text-gray-900 dark:text-content-primary border-0 focus:outline-none resize-none overflow-hidden ${
+                          isEditing
+                            ? 'bg-white dark:bg-surface-primary ring-1 ring-inset ring-blue-500'
+                            : 'bg-transparent cursor-cell'
+                        }`}
+                        placeholder={isEditing ? 'Type here...' : ''}
+                        rows={1}
+                      />
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 // Sortable Block Item Component
 function SortableBlockItem({
   block,
@@ -670,6 +1016,8 @@ function SortableBlockItem({
   onDelete,
   updateTableCell,
   onRequestFullscreen,
+  onMergeCells,
+  onUnmergeCells,
 }: {
   block: FaqContentBlock
   blockIndex: number
@@ -679,6 +1027,8 @@ function SortableBlockItem({
   onDelete: () => void
   updateTableCell: (rowIndex: number, colIndex: number, value: string) => void
   onRequestFullscreen?: () => void
+  onMergeCells?: (mergedCells: MergedRegion[]) => void
+  onUnmergeCells?: (mergedCells: MergedRegion[]) => void
 }) {
   const {
     attributes,
@@ -707,62 +1057,66 @@ function SortableBlockItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white dark:bg-surface-secondary border border-gray-200 dark:border-transparent rounded-lg overflow-hidden ${
-        isDragging ? 'shadow-lg' : ''
-      }`}
+      className={`relative group ${isDragging ? 'shadow-lg' : ''}`}
     >
-      {/* Collapsed Header - Always visible */}
-      <div
-        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors"
-        onClick={onToggleExpand}
+      {/* Drag handle — left side, 6-dot grip, visible on hover (Stacker pattern) */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="absolute -left-5 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-5 h-7 bg-white dark:bg-surface-secondary rounded-md shadow-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Drag Handle */}
-        <button
-          {...attributes}
-          {...listeners}
-          className="p-1 text-gray-400 dark:text-content-secondary hover:text-gray-600 dark:hover:text-content-primary cursor-grab active:cursor-grabbing"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-
-        {/* Block Type Label */}
-        <div className="flex-1 flex items-center gap-2 min-w-0">
-          <span className="text-sm font-medium text-gray-700 dark:text-content-secondary uppercase tracking-wide flex-shrink-0">
-            {BLOCK_LABELS[block.type] || block.type}
-          </span>
-          {block.type === 'qa' && block.question && (
-            <span className="text-sm text-gray-500 dark:text-content-secondary truncate">
-              {block.question}
-            </span>
-          )}
-        </div>
-
-        {/* Expand/Collapse Icon */}
-        <svg
-          className={`w-4 h-4 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+          <circle cx="3" cy="3" r="1.5" fill="#9CA3AF" />
+          <circle cx="7" cy="3" r="1.5" fill="#9CA3AF" />
+          <circle cx="3" cy="8" r="1.5" fill="#9CA3AF" />
+          <circle cx="7" cy="8" r="1.5" fill="#9CA3AF" />
+          <circle cx="3" cy="13" r="1.5" fill="#9CA3AF" />
+          <circle cx="7" cy="13" r="1.5" fill="#9CA3AF" />
         </svg>
+      </button>
 
-        {/* Delete Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete()
-          }}
-          className="p-1 text-gray-500 hover:text-red-400 transition-colors"
+      <div className="bg-white dark:bg-surface-secondary border border-gray-200 dark:border-transparent rounded-lg overflow-hidden">
+        {/* Collapsed Header - Always visible */}
+        <div
+          className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors"
+          onClick={onToggleExpand}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          {/* Block Type Label */}
+          <div className="flex-1 flex items-center gap-2 min-w-0">
+            <span className="text-sm font-medium text-gray-700 dark:text-content-secondary uppercase tracking-wide flex-shrink-0">
+              {BLOCK_LABELS[block.type] || block.type}
+            </span>
+            {block.type === 'qa' && block.question && (
+              <span className="text-sm text-gray-500 dark:text-content-secondary truncate">
+                {block.question}
+              </span>
+            )}
+          </div>
+
+          {/* Expand/Collapse Icon */}
+          <svg
+            className={`w-4 h-4 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
-        </button>
-      </div>
+
+          {/* Delete Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete()
+            }}
+            className="p-1 text-gray-500 hover:text-red-400 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
 
       {/* Expanded Content */}
       {isExpanded && (
@@ -811,81 +1165,13 @@ function SortableBlockItem({
           )}
 
           {block.type === 'table' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-content-secondary">
-                <span>{block.rows} × {block.cols} table</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newRows = block.rows + 1
-                    const newData = [...block.data, Array(block.cols).fill('')]
-                    onUpdate({ rows: newRows, data: newData })
-                  }}
-                  className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
-                >
-                  + Row
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newCols = block.cols + 1
-                    const newData = block.data.map(row => [...row, ''])
-                    onUpdate({ cols: newCols, data: newData })
-                  }}
-                  className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
-                >
-                  + Col
-                </button>
-                {block.rows > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newRows = block.rows - 1
-                      const newData = block.data.slice(0, -1)
-                      onUpdate({ rows: newRows, data: newData })
-                    }}
-                    className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
-                  >
-                    - Row
-                  </button>
-                )}
-                {block.cols > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newCols = block.cols - 1
-                      const newData = block.data.map(row => row.slice(0, -1))
-                      onUpdate({ cols: newCols, data: newData })
-                    }}
-                    className="px-2 py-0.5 bg-gray-200 dark:bg-surface-tertiary rounded hover:bg-gray-300 dark:hover:bg-interactive-hover transition-colors text-gray-700 dark:text-content-secondary"
-                  >
-                    - Col
-                  </button>
-                )}
-              </div>
-
-              <div className="border border-gray-300 dark:border-line-subtle rounded-lg overflow-hidden">
-                <table className="w-full">
-                  <tbody>
-                    {block.data.map((row, rowIndex) => (
-                      <tr key={rowIndex}>
-                        {row.map((cell, colIndex) => (
-                          <td key={colIndex} className="border border-gray-300 dark:border-line-subtle p-0">
-                            <input
-                              type="text"
-                              value={cell}
-                              onChange={(e) => updateTableCell(rowIndex, colIndex, e.target.value)}
-                              className="w-full px-2 py-1.5 text-xs bg-gray-100 dark:bg-surface-primary text-gray-900 dark:text-content-primary border-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
-                              placeholder="..."
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <TableBlockEditor
+              block={block}
+              onUpdate={onUpdate}
+              updateTableCell={updateTableCell}
+              onMergeCells={onMergeCells}
+              onUnmergeCells={onUnmergeCells}
+            />
           )}
 
           {block.type === 'image' && (
@@ -896,6 +1182,7 @@ function SortableBlockItem({
           )}
         </div>
       )}
+      </div>
     </div>
   )
 }
@@ -923,6 +1210,25 @@ export function FaqEditorScreen() {
     faqBlockSpacing: storeBlockSpacing,
     setFaqBlockSpacing: setStoreBlockSpacing,
   } = useStore()
+
+  // Migrate legacy mergedRows → mergedCells on mount
+  useEffect(() => {
+    let migrated = false
+    const migratedPages = pages.map(page => ({
+      ...page,
+      blocks: page.blocks.map(block => {
+        if (block.type === 'table' && block.mergedRows && block.mergedRows.length > 0 && !block.mergedCells) {
+          migrated = true
+          const mergedCells = migrateMergedRows(block.mergedRows, block.cols)
+          const { mergedRows: _, ...rest } = block
+          return { ...rest, mergedCells }
+        }
+        return block
+      }),
+    }))
+    if (migrated) setPages(migratedPages)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Run once on mount
 
   // Block spacing — local state for responsive drag, synced to store
   const [blockSpacing, setBlockSpacing] = useState<Record<string, number>>(storeBlockSpacing)
@@ -1430,6 +1736,20 @@ export function FaqEditorScreen() {
     }))
   }, [currentPageIndex, pages, setPages])
 
+  // Update mergedCells for a table block (used by merge/unmerge actions)
+  const updateBlockMergedCells = useCallback((blockId: string, mergedCells: MergedRegion[]) => {
+    setPages(pages.map((page, idx) => {
+      if (idx !== currentPageIndex) return page
+      return {
+        ...page,
+        blocks: page.blocks.map(block => {
+          if (block.id !== blockId || block.type !== 'table') return block
+          return { ...block, mergedCells: mergedCells.length > 0 ? mergedCells : undefined }
+        }),
+      }
+    }))
+  }, [currentPageIndex, pages, setPages])
+
   // Page management
   const addPage = useCallback(() => {
     setPages([...pages, { id: generateId(), blocks: [] }])
@@ -1793,6 +2113,12 @@ export function FaqEditorScreen() {
                               })}
                               updateTableCell={(rowIndex, colIndex, value) =>
                                 updateTableCell(block.id, rowIndex, colIndex, value)
+                              }
+                              onMergeCells={(mergedCells) =>
+                                updateBlockMergedCells(block.id, mergedCells)
+                              }
+                              onUnmergeCells={(mergedCells) =>
+                                updateBlockMergedCells(block.id, mergedCells)
                               }
                               onRequestFullscreen={block.type === 'qa' ? () => setFullscreenEditBlock({
                                 blockId: block.id,

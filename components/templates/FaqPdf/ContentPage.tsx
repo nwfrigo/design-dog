@@ -3,6 +3,7 @@
 
 import type { ReactNode } from 'react'
 import type { FaqContentBlock } from '@/types'
+import { buildCellMap } from '@/lib/table-merge-utils'
 
 // Normalize special Unicode characters to ASCII equivalents
 // Prevents missing glyph issues in PDF export (Fakt Pro font doesn't have all Unicode chars)
@@ -20,6 +21,19 @@ function normalizeText(text: string): string {
     .replace(/\u2026/g, '...')  // horizontal ellipsis → three dots
     // Other common replacements
     .replace(/\u2212/g, '-')  // minus sign → hyphen
+}
+
+// Render text with \n as <br /> line breaks
+function renderMultilineText(text: string): ReactNode {
+  const normalized = normalizeText(text)
+  const lines = normalized.split('\n')
+  if (lines.length === 1) return normalized
+  return lines.map((line, i) => (
+    <span key={i}>
+      {line}
+      {i < lines.length - 1 && <br />}
+    </span>
+  ))
 }
 
 // Re-export for convenience
@@ -141,7 +155,8 @@ export function ContentPage({
           </div>
         )
 
-      case 'table':
+      case 'table': {
+        const cellMap = buildCellMap(block.rows, block.cols, block.mergedCells)
         return (
           <div
             key={block.id}
@@ -163,27 +178,40 @@ export function ContentPage({
               <tbody>
                 {block.data.map((row, rowIndex) => (
                   <tr key={rowIndex}>
-                    {row.map((cell, cellIndex) => (
-                      <td
-                        key={cellIndex}
-                        style={{
-                          border: '0.5px solid #89888B',
-                          padding: 8,
-                          verticalAlign: 'top',
-                          color: 'black',
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
-                        }}
-                      >
-                        {normalizeText(cell)}
-                      </td>
-                    ))}
+                    {row.map((cell, colIndex) => {
+                      const info = cellMap[rowIndex]?.[colIndex]
+                      if (!info || info.type === 'hidden') return null
+
+                      const isAnchor = info.type === 'anchor'
+                      // Full-width merges (section headers) get gray background
+                      const isFullWidthMerge = isAnchor && info.colSpan === block.cols && info.rowSpan === 1
+
+                      return (
+                        <td
+                          key={colIndex}
+                          rowSpan={isAnchor ? info.rowSpan : undefined}
+                          colSpan={isAnchor ? info.colSpan : undefined}
+                          style={{
+                            border: '0.5px solid #89888B',
+                            padding: 8,
+                            verticalAlign: 'top',
+                            color: 'black',
+                            backgroundColor: isFullWidthMerge ? '#F3F4F6' : undefined,
+                            wordWrap: 'break-word',
+                            overflowWrap: 'break-word',
+                          }}
+                        >
+                          {renderMultilineText(cell)}
+                        </td>
+                      )
+                    })}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )
+      }
 
       case 'image': {
         // Calculate dimensions based on displayWidth percentage
