@@ -12,7 +12,7 @@ export type CtaStyle = 'link' | 'button'
 export interface EmailDarkGradientProps {
   headline: string
   eyebrow?: string
-  subheading?: string
+  subhead?: string
   body: string
   ctaText: string
   colorStyle: ColorStyle
@@ -20,7 +20,7 @@ export interface EmailDarkGradientProps {
   ctaStyle: CtaStyle
   showEyebrow?: boolean
   showHeadline?: boolean
-  showSubheading?: boolean
+  showSubhead?: boolean
   showBody: boolean
   showCta: boolean
   headlineFontSize?: number
@@ -56,7 +56,7 @@ const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
 export function EmailDarkGradient({
   headline,
   eyebrow,
-  subheading,
+  subhead,
   body,
   ctaText,
   colorStyle,
@@ -64,7 +64,7 @@ export function EmailDarkGradient({
   ctaStyle,
   showEyebrow = false,
   showHeadline = true,
-  showSubheading = false,
+  showSubhead = false,
   showBody,
   showCta,
   headlineFontSize,
@@ -79,7 +79,7 @@ export function EmailDarkGradient({
 
   // Determine if content is empty for conditional rendering
   const hasHeadline = !isHtmlEmpty(headline)
-  const hasSubheading = !isHtmlEmpty(subheading)
+  const hasSubhead = !isHtmlEmpty(subhead)
   const hasBody = !isHtmlEmpty(body)
 
   const containerStyle: CSSProperties = {
@@ -179,7 +179,7 @@ export function EmailDarkGradient({
           )}
 
           {/* Subheading - supports rich text (bold, italic, line breaks) */}
-          {showSubheading && hasSubheading && (
+          {showSubhead && hasSubhead && (
             <div
               className="rich-text-white"
               style={{
@@ -188,7 +188,7 @@ export function EmailDarkGradient({
                 fontWeight: 350,
                 lineHeight: 1.4,
               }}
-              dangerouslySetInnerHTML={{ __html: subheading! }}
+              dangerouslySetInnerHTML={{ __html: subhead! }}
             />
           )}
 

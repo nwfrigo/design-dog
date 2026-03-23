@@ -736,14 +736,14 @@ function AssetPreviewRenderer({
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
           eyebrow={asset.eyebrow}
-          subheading={copy.subhead}
+          subhead={copy.subhead}
           body={copy.body || 'This is your body copy.'}
           ctaText={asset.ctaText || 'Responsive'}
           colorStyle={asset.colorStyle || '1'}
           alignment={asset.alignment || 'left'}
           ctaStyle={asset.ctaStyle || 'link'}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
-          showSubheading={asset.showSubhead && !!copy.subhead}
+          showSubhead={asset.showSubhead && !!copy.subhead}
           showBody={asset.showBody && !!copy.body}
           showCta={asset.showCta !== false}
         />

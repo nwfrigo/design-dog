@@ -4003,7 +4003,7 @@ export function EditorScreen() {
                 <EmailDarkGradient
                   headline={verbatimCopy.headline || 'Headline'}
                   eyebrow={eyebrow}
-                  subheading={verbatimCopy.subhead}
+                  subhead={verbatimCopy.subhead}
                   body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
                   ctaText={ctaText}
                   colorStyle={colorStyle}
@@ -4011,7 +4011,7 @@ export function EditorScreen() {
                   ctaStyle={ctaStyle}
                   showEyebrow={showEyebrow && !!eyebrow}
                   showHeadline={showHeadline}
-                  showSubheading={showSubhead && !!verbatimCopy.subhead}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   headlineFontSize={headlineFontSize ?? undefined}

@@ -7,7 +7,7 @@ import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 interface Props {
   headline: string
   eyebrow?: string
-  subheading?: string
+  subhead?: string
   body: string
   ctaText: string
   colorStyle: '1' | '2' | '3' | '4'
@@ -15,7 +15,7 @@ interface Props {
   ctaStyle: 'link' | 'button'
   showEyebrow?: boolean
   showHeadline?: boolean
-  showSubheading?: boolean
+  showSubhead?: boolean
   showBody: boolean
   showCta: boolean
   headlineFontSize?: number
@@ -48,7 +48,7 @@ export function EmailDarkGradientRender(props: Props) {
       <EmailDarkGradient
         headline={props.headline}
         eyebrow={props.eyebrow}
-        subheading={props.subheading}
+        subhead={props.subhead}
         body={props.body}
         ctaText={props.ctaText}
         colorStyle={props.colorStyle}
@@ -56,7 +56,7 @@ export function EmailDarkGradientRender(props: Props) {
         ctaStyle={props.ctaStyle}
         showEyebrow={props.showEyebrow}
         showHeadline={props.showHeadline}
-        showSubheading={props.showSubheading}
+        showSubhead={props.showSubhead}
         showBody={props.showBody}
         showCta={props.showCta}
         headlineFontSize={props.headlineFontSize}

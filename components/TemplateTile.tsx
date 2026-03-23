@@ -150,14 +150,14 @@ export function TemplateRenderer({
           {...commonProps}
           headline={PREVIEW_CONTENT.headline}
           eyebrow={PREVIEW_CONTENT.eyebrow}
-          subheading={PREVIEW_CONTENT.subhead}
+          subhead={PREVIEW_CONTENT.subhead}
           body={PREVIEW_CONTENT.body}
           ctaText={PREVIEW_CONTENT.cta}
           colorStyle="1"
           alignment="left"
           ctaStyle="link"
           showEyebrow={true}
-          showSubheading={false}
+          showSubhead={false}
           showBody={false}
           showCta={true}
         />

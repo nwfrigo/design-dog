@@ -15,7 +15,7 @@ export default function RenderPage({
 }) {
   const headline = parseString(searchParams, 'headline', 'Headline')
   const eyebrow = parseString(searchParams, 'eyebrow', '')
-  const subheading = parseString(searchParams, 'subheading', '')
+  const subhead = parseString(searchParams, 'subhead', '')
   const body = parseString(searchParams, 'body', '')
   const ctaText = parseString(searchParams, 'ctaText', 'Responsive')
   const colorStyle = parseEnum<'1' | '2' | '3' | '4'>(searchParams, 'colorStyle', '1')
@@ -24,8 +24,8 @@ export default function RenderPage({
   // showEyebrow: default FALSE — eyebrow is hidden by default in email-dark-gradient
   const showEyebrow = parseBoolFalse(searchParams, 'showEyebrow')
   const showHeadline = parseBoolTrue(searchParams, 'showHeadline')
-  // showSubheading: default FALSE — subheading is hidden by default
-  const showSubheading = parseBoolFalse(searchParams, 'showSubheading')
+  // showSubhead: default FALSE — subhead is hidden by default
+  const showSubhead = parseBoolFalse(searchParams, 'showSubhead')
   const showBody = parseBoolTrue(searchParams, 'showBody')
   const showCta = parseBoolTrue(searchParams, 'showCta')
   const headlineFontSize = parseNumberOrUndefined(searchParams, 'headlineFontSize')
@@ -44,7 +44,7 @@ export default function RenderPage({
         <EmailDarkGradientRender
           headline={headline}
           eyebrow={eyebrow}
-          subheading={subheading}
+          subhead={subhead}
           body={body}
           ctaText={ctaText}
           colorStyle={colorStyle}
@@ -52,7 +52,7 @@ export default function RenderPage({
           ctaStyle={ctaStyle}
           showEyebrow={showEyebrow}
           showHeadline={showHeadline}
-          showSubheading={showSubheading}
+          showSubhead={showSubhead}
           showBody={showBody}
           showCta={showCta}
           headlineFontSize={headlineFontSize}

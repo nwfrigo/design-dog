@@ -306,7 +306,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     alignment: s.alignment,
     ctaStyle: s.ctaStyle,
     showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showSubheading: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
+    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showCta: s.showCta,
     bottomSpacing: s.bottomSpacing,
