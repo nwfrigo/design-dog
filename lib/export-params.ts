@@ -9,6 +9,7 @@
  */
 
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
+import type { QueuedAsset } from '@/types'
 
 // The shape of all the state the builders can draw from.
 // This is intentionally a flat bag — it mirrors the store + local state
@@ -490,4 +491,127 @@ export function buildExportParams(
 
   // Fallback: just return common params
   return common
+}
+
+/**
+ * Build export params directly from a QueuedAsset.
+ * Converts the flat QueuedAsset fields into the ExportParamState shape
+ * that buildExportParams expects, then delegates to it.
+ *
+ * Used by ExportQueueScreen to avoid duplicating field mapping.
+ */
+export function buildExportParamsFromAsset(
+  asset: QueuedAsset,
+  exportScale: number
+): Record<string, unknown> {
+  const a = asset as unknown as Record<string, unknown>
+  const state: ExportParamState = {
+    eyebrow: (a.eyebrow as string) || '',
+    verbatimCopy: {
+      headline: (a.headline as string) || '',
+      subhead: (a.subhead as string) || '',
+      body: (a.body as string) || '',
+    },
+    solution: (a.solution as string) || '',
+    logoColor: (a.logoColor as string) || 'black',
+    showEyebrow: a.showEyebrow !== false,
+    showHeadline: a.showHeadline !== false,
+    headlineFontSize: (a.headlineFontSize as number | null) ?? null,
+    bottomSpacing: (a.bottomSpacing as number) ?? 0,
+    thumbnailImageUrl: (a.thumbnailImageUrl as string | null) ?? null,
+    thumbnailImagePosition: (a.thumbnailImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
+    thumbnailImageZoom: (a.thumbnailImageZoom as number) ?? 1,
+    grayscale: (a.grayscale as boolean) ?? false,
+    showSubhead: a.showSubhead !== false,
+    showBody: a.showBody !== false,
+    showCta: a.showCta !== false,
+    showMetadata: a.showMetadata !== false,
+    showSolutionSet: a.showSolutionSet !== false,
+    showLightHeader: a.showLightHeader !== false,
+    showSubheading: (a.showSubheading as boolean) ?? false,
+    showGridDetail2: a.showGridDetail2 !== false,
+    showRow3: a.showRow3 !== false,
+    showRow4: a.showRow4 !== false,
+    showSpeaker1: a.showSpeaker1 !== false,
+    showSpeaker2: a.showSpeaker2 !== false,
+    showSpeaker3: a.showSpeaker3 !== false,
+    ctaText: (a.ctaText as string) || '',
+    metadata: (a.metadata as string) || '',
+    subheading: (a.subheading as string) || '',
+    ebookVariant: (a.ebookVariant as string) || 'image',
+    webinarVariant: (a.webinarVariant as string) || 'image',
+    reportVariant: (a.reportVariant as string) || 'image',
+    eventListingVariant: (a.eventListingVariant as string) || 'orange',
+    floatingBannerVariant: (a.floatingBannerVariant as string) || 'dark',
+    floatingBannerMobileVariant: (a.floatingBannerMobileVariant as string) || 'light',
+    floatingBannerMobileArrowType: (a.floatingBannerMobileArrowType as string) || 'text',
+    newsletterTopBannerVariant: (a.newsletterTopBannerVariant as string) || 'dark',
+    colorStyle: (a.colorStyle as string) || '1',
+    headingSize: (a.headingSize as string) || 'L',
+    alignment: (a.alignment as string) || 'left',
+    ctaStyle: (a.ctaStyle as string) || 'link',
+    layout: (a.layout as string) || 'even',
+    gridDetail1Text: (a.gridDetail1Text as string) || '',
+    gridDetail2Text: (a.gridDetail2Text as string) || '',
+    gridDetail3Type: (a.gridDetail3Type as string) || 'cta',
+    gridDetail3Text: (a.gridDetail3Text as string) || '',
+    gridDetail4Type: (a.gridDetail4Type as string) || 'cta',
+    gridDetail4Text: (a.gridDetail4Text as string) || '',
+    newsletterImageSize: (a.newsletterImageSize as string) || 'none',
+    newsletterImageUrl: (a.newsletterImageUrl as string | null) ?? null,
+    newsletterImagePosition: (a.newsletterImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
+    newsletterImageZoom: (a.newsletterImageZoom as number) ?? 1,
+    speakerCount: (a.speakerCount as number) || 3,
+    speaker1Name: (a.speaker1Name as string) || '',
+    speaker1Role: (a.speaker1Role as string) || '',
+    speaker1ImageUrl: (a.speaker1ImageUrl as string) || '',
+    speaker1ImagePosition: (a.speaker1ImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
+    speaker1ImageZoom: (a.speaker1ImageZoom as number) || 1,
+    speaker2Name: (a.speaker2Name as string) || '',
+    speaker2Role: (a.speaker2Role as string) || '',
+    speaker2ImageUrl: (a.speaker2ImageUrl as string) || '',
+    speaker2ImagePosition: (a.speaker2ImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
+    speaker2ImageZoom: (a.speaker2ImageZoom as number) || 1,
+    speaker3Name: (a.speaker3Name as string) || '',
+    speaker3Role: (a.speaker3Role as string) || '',
+    speaker3ImageUrl: (a.speaker3ImageUrl as string) || '',
+    speaker3ImagePosition: (a.speaker3ImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
+    speaker3ImageZoom: (a.speaker3ImageZoom as number) || 1,
+    solutionOverviewSolution: (a.solutionOverviewSolution as string) || '',
+    solutionOverviewSolutionName: (a.solutionOverviewSolutionName as string) || '',
+    solutionOverviewTagline: (a.solutionOverviewTagline as string) || '',
+    solutionOverviewHeroImageId: (a.solutionOverviewHeroImageId as string) || '',
+    solutionOverviewHeroImageUrl: (a.solutionOverviewHeroImageUrl as string | null) ?? null,
+    solutionOverviewHeroImagePosition: (a.solutionOverviewHeroImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
+    solutionOverviewHeroImageZoom: (a.solutionOverviewHeroImageZoom as number) || 1,
+    solutionOverviewPage2Header: (a.solutionOverviewPage2Header as string) || '',
+    solutionOverviewSectionHeader: (a.solutionOverviewSectionHeader as string) || '',
+    solutionOverviewIntroParagraph: (a.solutionOverviewIntroParagraph as string) || '',
+    solutionOverviewKeySolutions: (a.solutionOverviewKeySolutions as string[]) || [],
+    solutionOverviewQuoteText: (a.solutionOverviewQuoteText as string) || '',
+    solutionOverviewQuoteName: (a.solutionOverviewQuoteName as string) || '',
+    solutionOverviewQuoteTitle: (a.solutionOverviewQuoteTitle as string) || '',
+    solutionOverviewQuoteCompany: (a.solutionOverviewQuoteCompany as string) || '',
+    solutionOverviewStat1Value: (a.solutionOverviewStat1Value as string) || '',
+    solutionOverviewStat1Label: (a.solutionOverviewStat1Label as string) || '',
+    solutionOverviewStat2Value: (a.solutionOverviewStat2Value as string) || '',
+    solutionOverviewStat2Label: (a.solutionOverviewStat2Label as string) || '',
+    solutionOverviewStat3Value: (a.solutionOverviewStat3Value as string) || '',
+    solutionOverviewStat3Label: (a.solutionOverviewStat3Label as string) || '',
+    solutionOverviewStat4Value: (a.solutionOverviewStat4Value as string) || '',
+    solutionOverviewStat4Label: (a.solutionOverviewStat4Label as string) || '',
+    solutionOverviewStat5Value: (a.solutionOverviewStat5Value as string) || '',
+    solutionOverviewStat5Label: (a.solutionOverviewStat5Label as string) || '',
+    solutionOverviewBenefits: (a.solutionOverviewBenefits as Array<{ title: string; description: string; icon?: string }>) || [],
+    solutionOverviewFeatures: (a.solutionOverviewFeatures as Array<{ title: string; description: string }>) || [],
+    solutionOverviewScreenshotUrl: (a.solutionOverviewScreenshotUrl as string | null) ?? null,
+    solutionOverviewScreenshotPosition: (a.solutionOverviewScreenshotPosition as { x: number; y: number }) || { x: 0, y: 0 },
+    solutionOverviewScreenshotZoom: (a.solutionOverviewScreenshotZoom as number) || 1,
+    solutionOverviewCtaOption: (a.solutionOverviewCtaOption as string) || 'demo',
+    customerLibraryVariant: (a.customerLibraryVariant as string) || 'dark',
+    qrCodeUrl: (a.thumbnailImageUrl as string | null) ?? null,
+    showFooterText: a.showSubhead !== false,
+  }
+
+  return buildExportParams(asset.templateType, exportScale, state)
 }
