@@ -96,6 +96,7 @@ export function NewsletterLight({
 
   return (
     <div style={containerStyle}>
+      <style>{`.nl-rich-text p { margin: 0; }`}</style>
       {/* Content */}
       <div style={contentStyle}>
         {/* Text Content Area */}
@@ -133,28 +134,24 @@ export function NewsletterLight({
 
             {/* Headline */}
             {showHeadline && (
-              <div style={{
+              <div className="nl-rich-text" style={{
                 alignSelf: 'stretch',
                 color: textColor,
                 fontSize: headlineFontSize ?? 24,
                 fontWeight: 350,
                 lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
-              }}>
-                {headline || 'Headline'}
-              </div>
+              }} dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
             )}
 
             {/* Body */}
             {showBody && body && (
-              <div style={{
+              <div className="nl-rich-text" style={{
                 alignSelf: 'stretch',
                 color: textColor,
                 fontSize: 12,
                 fontWeight: 350,
                 lineHeight: '16px',
-              }}>
-                {body}
-              </div>
+              }} dangerouslySetInnerHTML={{ __html: body }} />
             )}
           </div>
 

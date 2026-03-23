@@ -2440,7 +2440,7 @@ export function EditorScreen() {
                   <EyeIcon visible={showHeadline} onClick={() => setShowHeadline(!showHeadline)} />
                 </div>
                 {/* Rich text editor for social templates with rich text support */}
-                {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'customer-library') ? (
+                {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'customer-library' || currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient' || currentTemplate === 'newsletter-light') ? (
                   <SimpleRichTextEditor
                     content={verbatimCopy.headline}
                     onChange={(html) => setVerbatimCopy({ headline: html })}
@@ -2583,7 +2583,7 @@ export function EditorScreen() {
                     <EyeIcon visible={showBody} onClick={() => setShowBody(!showBody)} />
                   </div>
                   {/* Rich text editor for templates with rich text support */}
-                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient') ? (
+                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient' || currentTemplate === 'newsletter-light') ? (
                     <div className={!showBody ? 'opacity-50' : ''}>
                       <SimpleRichTextEditor
                         content={verbatimCopy.body}
