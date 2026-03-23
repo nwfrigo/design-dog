@@ -242,7 +242,7 @@ Every new editable prop must appear in all of these locations:
 3. `store/index.ts` — Add state field + setter to `AppState`
 4. `lib/draft-storage.ts` — Add to save/load if needed for draft persistence
 5. `lib/export-params.ts` — Add to the template's param builder function
-6. `app/render/{slug}/page.tsx` — Parse using `lib/render-params.ts` helpers
+6. `lib/template-registry.tsx` — Add to the template's `renderSchema.fields` (the dynamic render route at `app/render/[slug]/page.tsx` parses fields automatically from the schema — no separate render page needed)
 
 The export API route (`app/api/export/route.ts`) uses a generic forwarding loop — it auto-forwards all params from the request body to the render URL. No changes needed there when adding new props. Queue exports use `buildExportParamsFromAsset()` in `lib/export-params.ts`, which delegates to the same `buildExportParams()` builders — no separate field list to maintain.
 
@@ -487,6 +487,34 @@ All image fields in editors use this two-state pattern:
 - "×" remove button (top-right) → clears the image
 
 `ZoomableImage` (inline drag-to-pan) is deprecated. Do not use it for new templates.
+
+### Image Upload: Vercel Blob Required (Critical)
+
+**All user-uploaded images must go through Vercel Blob**, not `FileReader.readAsDataURL`. Data URLs are multi-megabyte base64 strings that exceed the API body size limit when sent through the export pipeline, causing silent export failures or missing images.
+
+**The pattern:**
+```tsx
+import { upload } from '@vercel/blob/client'
+
+// Upload to Blob, store the public URL
+const blob = await upload(filename, file, {
+  access: 'public',
+  handleUploadUrl: '/api/upload-image',
+})
+setImageUrl(blob.url)  // Store public URL, not data URL
+```
+
+**Fallback for local dev:** If `BLOB_READ_WRITE_TOKEN` is missing, fall back to `FileReader.readAsDataURL`. This works for preview but images may fail in export.
+
+**Where this applies:**
+- `EditorScreen.tsx` — main image upload (`handleImageUpload`), newsletter image upload (`handleNewsletterImageUpload`), QR code upload
+- `ImageLibraryModal.tsx` — user upload tab
+- `FaqCoverImageLibraryModal.tsx` — user upload tab
+- `SolutionOverviewImageLibraryModal.tsx` — user upload tab
+
+**Why library images work without Blob:** Library images are pre-existing public URLs (`/assets/image-library/images/...`) — they're short strings that fit in the API body and get forwarded as URL params to the render page. Only user-uploaded images need Blob because they'd otherwise be data URLs.
+
+**Never use `readAsDataURL` directly for image uploads** in new code. Always use the Blob-first pattern with data URL fallback.
 
 ### Sortable Item Controls
 

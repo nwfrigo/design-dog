@@ -5,10 +5,10 @@
 
 ---
 
-## Existing Templates (as of Feb 2026)
+## Existing Templates (as of Mar 2026)
 
 ### Email
-- `email-dark-gradient` — EmailDarkGradient
+- `email-dark-gradient` — EmailDarkGradient (rich text headline/body)
 - `email-grid` — EmailGrid
 - `email-image` — EmailImage (has image upload + grayscale)
 - `email-speakers` — EmailSpeakers (up to 3 speaker avatars)
@@ -24,21 +24,22 @@
 - `website-thumbnail` — WebsiteThumbnail (ebook featured image, variants: image/none)
 - `website-press-release` — WebsitePressRelease (has image upload + grayscale)
 - `website-webinar` — WebsiteWebinar (variants: image/none, up to 3 speakers)
-- `website-event-listing` — WebsiteEventListing (variants via toggle)
+- `website-event-listing` — WebsiteEventListing (3 colorway variants: orange/light/dark)
 - `website-report` — WebsiteReport (variants: image/none, image on LEFT)
 - `website-floating-banner` — WebsiteFloatingBanner (2256×100px, 7 style variants)
 - `website-floating-banner-mobile` — WebsiteFloatingBannerMobile (390×100px, mobile version)
 
 ### Newsletter
-- `newsletter-dark-gradient` — NewsletterDarkGradient (has image + grayscale)
-- `newsletter-blue-gradient` — NewsletterBlueGradient (has image + grayscale)
-- `newsletter-light` — NewsletterLight (has image + grayscale)
+- `newsletter-dark-gradient` — NewsletterDarkGradient (has image + grayscale, rich text headline/body)
+- `newsletter-blue-gradient` — NewsletterBlueGradient (has image + grayscale, rich text headline/body)
+- `newsletter-light` — NewsletterLight (has image + grayscale, rich text headline/body)
 - `newsletter-top-banner` — NewsletterTopBanner
 
-### Collateral (Multi-Page PDFs)
+### Collateral
 - `solution-overview-pdf` — SolutionOverviewPdf (3-page Letter PDF, 612×792px per page)
 - `faq-pdf` — FaqPdf (dynamic page count, Q&A format with tables support)
 - `stacker-pdf` — StackerPdf (modular document builder with drag-and-drop)
+- `customer-library` — CustomerLibrary (590×330px, 3 colorway variants: orange/dark/light, QR code upload, rich text headline/body)
 
 ---
 
