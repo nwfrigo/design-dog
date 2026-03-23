@@ -352,10 +352,89 @@ Stacker uses AI to generate the initial document structure:
 9. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
 10. [ ] Add template-specific state to store if needed (variants, etc.)
 11. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence in ARCHITECTURE.md)
-12. [ ] Add to image upload condition if template has images
+12. [ ] Add to image upload condition if template has images (use Vercel Blob upload — see ARCHITECTURE.md)
 13. [ ] Pass grayscale prop if template has images
-14. [ ] Add entry to `lib/template-registry.tsx`: component, renderProps, queueTextFields, **and renderSchema** (fields, dimensions, background, assembleProps) — this single entry handles ExportQueueScreen rendering AND the render page (no separate `app/render/{slug}/` files needed)
+14. [ ] Add entry to `lib/template-registry.tsx` — see "Registry Entry Guide" below
 15. [ ] Add template dimensions to `app/api/export/route.ts` TEMPLATE_DIMENSIONS
 16. [ ] Test export works end-to-end (from both editor and queue)
 17. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
 18. [ ] Build check: `npm run build`
+
+### Registry Entry Guide (`lib/template-registry.tsx`)
+
+Step 14 is the most important. A single registry entry replaces what used to require 3 separate blocks in ExportQueueScreen + 2 render page files. The entry has four parts:
+
+**1. `component`** — the imported React component from `components/templates/`.
+
+**2. `renderProps`** — maps a `QueuedAsset` to the component's props for queue thumbnail and preview modal rendering. Include default values for empty fields:
+```tsx
+renderProps: (asset, colors, typography) => ({
+  headline: asset.headline || 'Headline',
+  eyebrow: asset.eyebrow || '',
+  variant: asset.myVariant || 'default',
+  // Image fields from the asset
+  imageUrl: asset.thumbnailImageUrl || undefined,
+  imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
+  imageZoom: asset.thumbnailImageZoom || 1,
+  // Show/hide toggles — gate on content existence
+  showEyebrow: asset.showEyebrow && !!asset.eyebrow,
+  showBody: asset.showBody && !!asset.body,
+  // Always pass brand config
+  colors, typography, scale: 1,
+})
+```
+
+**3. `queueTextFields`** — template-specific text fields shown on queue cards (beyond the shared headline/eyebrow/subhead/body). Most templates use `[]`. Only add fields unique to this template:
+```tsx
+queueTextFields: [
+  { key: 'metadata', label: 'Metadata', showKey: 'showMetadata' },
+  { key: 'ctaText', label: 'CTA', showKey: 'showCta' },
+]
+```
+
+**4. `renderSchema`** — declarative field definitions that drive the dynamic render route at `app/render/[slug]/page.tsx`. **No separate render page files needed.** The schema declares dimensions, background, fields (with parser types and defaults), and optional post-parse assembly:
+```tsx
+renderSchema: {
+  width: 800,
+  height: 450,
+  background: '#F9F9F9',
+  // Or dynamic: dynamicBackground: (p) => p.variant === 'dark' ? '#060015' : '#F9F9F9',
+  fields: [
+    { param: 'headline', parser: 'string', default: 'Headline' },
+    { param: 'eyebrow', parser: 'string', default: '' },
+    { param: 'variant', parser: 'enum', default: 'default' },
+    { param: 'showEyebrow', parser: 'boolTrue' },     // default ON
+    { param: 'showBody', parser: 'boolFalse' },        // default OFF
+    { param: 'grayscale', parser: 'boolFalse' },
+    { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+    { param: 'imageUrl', parser: 'string', default: '/assets/images/placeholder.png' },
+    { param: 'imagePositionX', parser: 'number', default: 0 },
+    { param: 'imagePositionY', parser: 'number', default: 0 },
+    { param: 'imageZoom', parser: 'number', default: 1 },
+  ],
+  // assembleProps: post-parse transforms for complex fields
+  assembleProps: (parsed) => ({
+    imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
+  }),
+}
+```
+
+**Parser types:** Match the helpers in `lib/render-params.ts`:
+| Parser | Use for | Default behavior |
+|--------|---------|-----------------|
+| `'string'` | Text fields | Empty string if absent |
+| `'boolTrue'` | Toggles that default ON (showHeadline, showCta) | `true` if absent |
+| `'boolFalse'` | Toggles that default OFF (grayscale, showSubhead on some templates) | `false` if absent |
+| `'number'` | Numeric with fallback (imagePositionX, imageZoom) | Uses `default` value |
+| `'numberOrUndefined'` | Nullable numbers (headlineFontSize) | `undefined` if absent |
+| `'enum'` | Constrained strings (variant, colorStyle) | Uses `default` value |
+| `'stringOrNull'` | Optional URLs (imageUrl that may be null) | `null` if absent |
+| `'int'` | Integer values (speakerCount) | Uses `default` value |
+
+**`assembleProps` patterns** (use when the component expects objects, not flat params):
+- **Image position:** `{ imagePosition: { x: parsed.imagePositionX, y: parsed.imagePositionY } }`
+- **CTA dual-key fallback:** `{ cta: (raw.ctaText as string) || (raw.cta as string) || 'Default' }` (for website templates that accept both `cta` and `ctaText`)
+- **Speaker assembly:** Use `parseSpeakerParams` from `lib/render-params.ts` to build speaker objects from flat URL params
+- **Grid detail objects:** `{ gridDetail1: { type: 'data', text: parsed.gridDetail1Text } }`
+
+**Reference:** Look at an existing similar template's registry entry as a starting point. For a simple template, copy `customer-library`. For one with images, copy `website-thumbnail`. For speakers, copy `email-speakers`.
