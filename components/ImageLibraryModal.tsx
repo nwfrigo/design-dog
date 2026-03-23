@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { upload } from '@vercel/blob/client'
 
 export interface LibraryImage {
   id: string
@@ -22,7 +23,8 @@ export function ImageLibraryModal({ onSelect, onClose }: ImageLibraryModalProps)
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Handle file upload
+  // Handle file upload — uses Vercel Blob to avoid 413 Payload Too Large
+  // errors when exporting. Falls back to data URL for local dev without token.
   const handleFileUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       return
@@ -30,17 +32,28 @@ export function ImageLibraryModal({ onSelect, onClose }: ImageLibraryModalProps)
 
     setIsUploading(true)
 
-    // Convert to data URL for immediate use
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string
+    try {
+      const ext = file.name.split('.').pop() || file.type.split('/')[1] || 'png'
+      const filename = `images/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
+      const blob = await upload(filename, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-image',
+      })
       setIsUploading(false)
-      onSelect(dataUrl)
+      onSelect(blob.url)
+    } catch {
+      // Fallback to data URL for local development without Blob token
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        setIsUploading(false)
+        onSelect(dataUrl)
+      }
+      reader.onerror = () => {
+        setIsUploading(false)
+      }
+      reader.readAsDataURL(file)
     }
-    reader.onerror = () => {
-      setIsUploading(false)
-    }
-    reader.readAsDataURL(file)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

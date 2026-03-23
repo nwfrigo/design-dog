@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { upload } from '@vercel/blob/client'
 import type { SolutionCategory } from '@/types'
 import {
   getHeroImagesForSolution,
@@ -40,7 +41,7 @@ export function SolutionOverviewImageLibraryModal({
     ? ['environmental', 'health', 'quality', 'safety', 'sustainability'] as const
     : [solution, ...(['environmental', 'health', 'quality', 'safety', 'sustainability'] as const).filter(c => c !== solution)]
 
-  // Handle file upload
+  // Handle file upload — uses Vercel Blob to avoid 413 Payload Too Large
   const handleFileUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       return
@@ -48,16 +49,27 @@ export function SolutionOverviewImageLibraryModal({
 
     setIsUploading(true)
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string
+    try {
+      const ext = file.name.split('.').pop() || file.type.split('/')[1] || 'png'
+      const filename = `images/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
+      const blob = await upload(filename, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-image',
+      })
       setIsUploading(false)
-      onSelect(dataUrl)
+      onSelect(blob.url)
+    } catch {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        setIsUploading(false)
+        onSelect(dataUrl)
+      }
+      reader.onerror = () => {
+        setIsUploading(false)
+      }
+      reader.readAsDataURL(file)
     }
-    reader.onerror = () => {
-      setIsUploading(false)
-    }
-    reader.readAsDataURL(file)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
