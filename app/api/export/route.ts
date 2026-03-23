@@ -81,6 +81,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'faq-pdf': { width: 612, height: 792 },
   'stacker-pdf': { width: 612, height: 2000 }, // Dynamic height, this is a fallback
   'social-carousel': { width: 1080, height: 1080 },
+  'customer-library': { width: 590, height: 330 },
 }
 
 export async function POST(request: NextRequest) {
@@ -365,6 +366,11 @@ export async function POST(request: NextRequest) {
     }
     if (body.screenshotUrl && body.screenshotUrl.startsWith('data:')) {
       await injectDataUrlImage(body.screenshotUrl, 'img[data-so-screenshot="true"]')
+    }
+
+    // Inject Customer Library QR code
+    if (body.qrCodeUrl && body.qrCodeUrl.startsWith('data:')) {
+      await injectDataUrlImage(body.qrCodeUrl, 'img[data-qr-code="true"]')
     }
 
     // Inject FAQ cover image

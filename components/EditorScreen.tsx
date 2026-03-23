@@ -7,6 +7,7 @@ import { WebsiteThumbnail } from './templates/WebsiteThumbnail'
 import { WebsitePressRelease } from './templates/WebsitePressRelease'
 import { WebsiteWebinar } from './templates/WebsiteWebinar'
 import { WebsiteEventListing } from './templates/WebsiteEventListing'
+import { CustomerLibrary } from './templates/CustomerLibrary'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialImageMeddbase } from './templates/SocialImageMeddbase'
@@ -58,6 +59,7 @@ const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: 
   'website-press-release': { default: 35, min: 16, max: 50, step: 2 },
   'website-webinar': { default: 35, min: 16, max: 54, step: 2 },
   'website-event-listing': { default: 58, min: 30, max: 80, step: 2 },
+  'customer-library': { default: 37, min: 20, max: 54, step: 2 },
   'website-report': { default: 35, min: 16, max: 54, step: 2 },
   'website-floating-banner': { default: 33, min: 16, max: 44, step: 1 },
   'website-floating-banner-mobile': { default: 14, min: 8, max: 20, step: 1 },
@@ -316,6 +318,9 @@ export function EditorScreen() {
     // Website Event Listing
     eventListingVariant,
     setEventListingVariant,
+    // Customer Library
+    customerLibraryVariant,
+    setCustomerLibraryVariant,
     // Website Floating Banner
     floatingBannerVariant,
     setFloatingBannerVariant,
@@ -777,6 +782,9 @@ export function EditorScreen() {
         webinarVariant,
         reportVariant,
         eventListingVariant,
+        customerLibraryVariant,
+        qrCodeUrl: thumbnailImageUrl,
+        showFooterText: showSubhead,
         floatingBannerVariant,
         floatingBannerMobileVariant,
         floatingBannerMobileArrowType,
@@ -1277,7 +1285,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1333,7 +1341,7 @@ export function EditorScreen() {
               )}
 
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, Website Floating Banner, or Solution Overview PDF */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release') && (
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -1923,6 +1931,30 @@ export function EditorScreen() {
               </div>
             )}
 
+            {/* Customer Library Controls */}
+            {currentTemplate === 'customer-library' && (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Style</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
+                    {(['orange', 'dark', 'light'] as const).map((variant) => (
+                      <button
+                        key={variant}
+                        onClick={() => setCustomerLibraryVariant(variant)}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                          customerLibraryVariant === variant
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            : 'text-gray-600 dark:text-content-secondary'
+                        }`}
+                      >
+                        {variant === 'orange' ? 'Orange' : variant === 'dark' ? 'Dark' : 'Light'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Website Report Controls */}
             {currentTemplate === 'website-report' && (
               <div className="space-y-3">
@@ -2306,6 +2338,59 @@ export function EditorScreen() {
                 )}
               </div>
             )}
+
+            {/* QR Code - Customer Library (upload only, no library) */}
+            {currentTemplate === 'customer-library' && !thumbnailImageUrl && (
+              <div className="space-y-3">
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">QR Code</label>
+                <div
+                  className="border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation() }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    const file = e.dataTransfer.files[0]
+                    if (file && file.type.startsWith('image/')) {
+                      const reader = new FileReader()
+                      reader.onload = () => setThumbnailImageUrl(reader.result as string)
+                      reader.readAsDataURL(file)
+                    }
+                  }}
+                  onClick={() => {
+                    const input = document.createElement('input')
+                    input.type = 'file'
+                    input.accept = 'image/*'
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0]
+                      if (file) {
+                        const reader = new FileReader()
+                        reader.onload = () => setThumbnailImageUrl(reader.result as string)
+                        reader.readAsDataURL(file)
+                      }
+                    }
+                    input.click()
+                  }}
+                >
+                  <div className="text-gray-400 dark:text-content-secondary text-sm">Upload QR Code</div>
+                  <div className="text-gray-300 dark:text-content-secondary text-xs mt-1">Drag & drop or click to upload</div>
+                </div>
+              </div>
+            )}
+
+            {currentTemplate === 'customer-library' && thumbnailImageUrl && (
+              <div className="space-y-3">
+                <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">QR Code</label>
+                <div className="relative inline-block">
+                  <img src={thumbnailImageUrl} alt="QR Code" className="w-24 h-24 object-contain border border-gray-200 dark:border-line-subtle rounded" />
+                  <button
+                    onClick={() => setThumbnailImageUrl(null)}
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
+                  >
+                    &times;
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Direct Edit Mode */}
@@ -2355,7 +2440,7 @@ export function EditorScreen() {
                   <EyeIcon visible={showHeadline} onClick={() => setShowHeadline(!showHeadline)} />
                 </div>
                 {/* Rich text editor for social templates with rich text support */}
-                {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient') ? (
+                {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'customer-library') ? (
                   <SimpleRichTextEditor
                     content={verbatimCopy.headline}
                     onChange={(html) => setVerbatimCopy({ headline: html })}
@@ -2489,7 +2574,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -3090,6 +3175,38 @@ export function EditorScreen() {
                   </div>
                 </div>
               )}
+
+              {/* Customer Library Content Fields */}
+              {currentTemplate === 'customer-library' && (
+                <div className="space-y-3">
+                  {/* Body (Scan QR text) */}
+                  <div className={!showBody ? 'opacity-50' : ''}>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs text-gray-500 dark:text-content-secondary">Body</label>
+                      <EyeIcon visible={showBody} onClick={() => setShowBody(!showBody)} />
+                    </div>
+                    <SimpleRichTextEditor
+                      content={verbatimCopy.body}
+                      onChange={(html) => setVerbatimCopy({ ...verbatimCopy, body: html })}
+                      placeholder="Body text"
+                      singleLine={false}
+                    />
+                  </div>
+                  {/* Footer Text (mapped to subhead) */}
+                  <div className={!showSubhead ? 'opacity-50' : ''}>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs text-gray-500 dark:text-content-secondary">Footer Text</label>
+                      <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
+                    </div>
+                    <textarea
+                      value={verbatimCopy.subhead}
+                      onChange={(e) => setVerbatimCopy({ ...verbatimCopy, subhead: e.target.value })}
+                      className="w-full p-2 text-sm border border-gray-200 dark:border-line-subtle rounded bg-white dark:bg-surface-secondary text-gray-900 dark:text-content-primary"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -3657,6 +3774,24 @@ export function EditorScreen() {
                   showEyebrow={showEyebrow}
                   showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
+                  headlineFontSize={headlineFontSize ?? undefined}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'customer-library' && (
+                <CustomerLibrary
+                  headline={verbatimCopy.headline || 'Chemical Library'}
+                  eyebrow={eyebrow || 'Chemical Safety Data Sheet Library'}
+                  body={verbatimCopy.body || 'Lorem ipsum'}
+                  footerText={verbatimCopy.subhead || 'Lorem ipsum'}
+                  variant={customerLibraryVariant}
+                  qrCodeUrl={thumbnailImageUrl || undefined}
+                  showHeadline={showHeadline}
+                  showEyebrow={showEyebrow}
+                  showBody={showBody}
+                  showFooterText={showSubhead}
                   headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}

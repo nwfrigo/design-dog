@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -85,6 +85,8 @@ export interface DraftState {
   reportVariant: ImageVariant
   // Website Event Listing specific
   eventListingVariant: EventListingVariant
+  // Customer Library specific
+  customerLibraryVariant: CustomerLibraryVariant
   // Website Floating Banner specific
   floatingBannerVariant: FloatingBannerVariant
   // Website Floating Banner Mobile specific
@@ -254,6 +256,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       ebookVariant: state.ebookVariant || 'image',
       reportVariant: state.reportVariant || 'image',
       eventListingVariant: state.eventListingVariant || 'orange',
+      customerLibraryVariant: state.customerLibraryVariant || 'dark',
       floatingBannerVariant: state.floatingBannerVariant || 'dark',
       floatingBannerMobileVariant: state.floatingBannerMobileVariant || 'light',
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType || 'text',

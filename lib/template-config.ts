@@ -265,6 +265,13 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
             width: 612,
             height: 792,
           },
+          {
+            type: 'customer-library',
+            label: 'Customer Library',
+            dimensions: '590 × 330px',
+            width: 590,
+            height: 330,
+          },
         ],
       },
     ],
@@ -302,8 +309,16 @@ export const CHANNELS: ChannelConfig[] = [
   },
 ]
 
-// Flat list of all templates (for backwards compatibility)
-export const ALL_TEMPLATES: TemplateInfo[] = CHANNELS.flatMap(channel => channel.templates)
+// Flat list of all templates (includes collateral single-page templates for lookups)
+const COLLATERAL_SINGLE_PAGE: TemplateInfo[] = DISTRIBUTION_CHANNELS
+  .flatMap(ch => ch.subChannels)
+  .flatMap(sc => sc.templates)
+  .filter(t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type))
+
+export const ALL_TEMPLATES: TemplateInfo[] = [
+  ...CHANNELS.flatMap(channel => channel.templates),
+  ...COLLATERAL_SINGLE_PAGE,
+]
 
 // Quick lookup by template type
 export const TEMPLATE_INFO: Record<TemplateType, TemplateInfo> = Object.fromEntries(

@@ -97,6 +97,8 @@ const SNAPSHOT_FIELDS = [
   'reportVariant',
   // Website Event Listing
   'eventListingVariant',
+  // Customer Library
+  'customerLibraryVariant',
   // Website Floating Banner
   'floatingBannerVariant',
   // Website Floating Banner Mobile

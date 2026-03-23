@@ -199,6 +199,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'solution-overview-pdf': 'collateral',
   'faq-pdf': 'collateral',
   'stacker-pdf': 'collateral',
+  'customer-library': 'website',
 }
 
 /**

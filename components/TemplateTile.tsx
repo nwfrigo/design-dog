@@ -21,6 +21,7 @@ import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
 import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
+import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import { WebsiteReport } from '@/components/templates/WebsiteReport'
 import { WebsiteFloatingBanner } from '@/components/templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloatingBannerMobile'
@@ -563,6 +564,24 @@ export function TemplateRenderer({
       ]
       return <StackerPdf modules={previewModules} scale={scale} />
     }
+
+    case 'customer-library':
+      return (
+        <CustomerLibrary
+          headline="Chemical Library"
+          eyebrow="Chemical Safety Data Sheet Library"
+          body="Lorem ipsum"
+          footerText="Lorem ipsum"
+          variant="dark"
+          showHeadline={true}
+          showEyebrow={true}
+          showBody={true}
+          showFooterText={true}
+          colors={colors}
+          typography={typography}
+          scale={scale}
+        />
+      )
 
     default:
       return null

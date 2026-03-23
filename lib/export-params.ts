@@ -97,6 +97,11 @@ export interface ExportParamState {
   speaker3ImagePosition: { x: number; y: number }
   speaker3ImageZoom: number
 
+  // Customer Library
+  customerLibraryVariant: string
+  qrCodeUrl: string | null
+  showFooterText: boolean
+
   // Solution Overview PDF
   solutionOverviewSolution: string
   solutionOverviewSolutionName: string
@@ -403,6 +408,17 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     variant: s.floatingBannerMobileVariant,
     arrowType: s.floatingBannerMobileArrowType,
     cta: s.ctaText,
+  }),
+
+  'customer-library': (s) => ({
+    variant: s.customerLibraryVariant,
+    footerText: s.verbatimCopy.subhead,
+    qrCodeUrl: s.thumbnailImageUrl,
+    hasQrCode: !!s.thumbnailImageUrl,
+    showHeadline: s.showHeadline,
+    showEyebrow: s.showEyebrow && !!s.eyebrow,
+    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showFooterText: s.showSubhead && !!s.verbatimCopy.subhead,
   }),
 
   'solution-overview-pdf': (s) => ({

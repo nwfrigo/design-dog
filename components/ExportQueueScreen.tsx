@@ -8,6 +8,7 @@ import { WebsitePressRelease } from './templates/WebsitePressRelease'
 import { WebsiteWebinar } from './templates/WebsiteWebinar'
 import { WebsiteReport } from './templates/WebsiteReport'
 import { WebsiteEventListing } from './templates/WebsiteEventListing'
+import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import { WebsiteFloatingBanner } from './templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from './templates/WebsiteFloatingBannerMobile'
 import { EmailGrid, type GridDetail } from './templates/EmailGrid'
@@ -147,6 +148,7 @@ export function ExportQueueScreen() {
           variant: asset.templateType === 'website-floating-banner' ? asset.floatingBannerVariant
             : asset.templateType === 'website-floating-banner-mobile' ? asset.floatingBannerMobileVariant
             : asset.templateType === 'website-event-listing' ? asset.eventListingVariant
+            : asset.templateType === 'customer-library' ? asset.customerLibraryVariant
             : asset.templateType === 'website-report' ? asset.reportVariant
             : asset.templateType === 'website-thumbnail' ? asset.ebookVariant
             : asset.templateType === 'newsletter-top-banner' ? asset.newsletterTopBannerVariant
@@ -184,6 +186,12 @@ export function ExportQueueScreen() {
           bottomSpacing: asset.bottomSpacing,
           // Headline visibility
           showHeadline: asset.showHeadline,
+          // Customer library specific
+          customerLibraryVariant: asset.customerLibraryVariant,
+          qrCodeUrl: asset.thumbnailImageUrl,
+          hasQrCode: !!asset.thumbnailImageUrl,
+          footerText: asset.subhead,
+          showFooterText: asset.showSubhead && !!asset.subhead,
         }),
       })
 
@@ -1042,6 +1050,24 @@ function QueueItem({
                   scale={1}
                 />
               )}
+              {asset.templateType === 'customer-library' && (
+                <CustomerLibrary
+                  headline={asset.headline || 'Chemical Library'}
+                  eyebrow={asset.eyebrow || 'Chemical Safety Data Sheet Library'}
+                  body={asset.body || 'Lorem ipsum'}
+                  footerText={asset.subhead || 'Lorem ipsum'}
+                  variant={asset.customerLibraryVariant || 'dark'}
+                  qrCodeUrl={asset.thumbnailImageUrl || undefined}
+                  showHeadline={asset.showHeadline}
+                  showEyebrow={asset.showEyebrow}
+                  showBody={asset.showBody && !!asset.body}
+                  showFooterText={asset.showSubhead && !!asset.subhead}
+                  headlineFontSize={asset.headlineFontSize ?? undefined}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
               {asset.templateType === 'website-floating-banner' && (
                 <WebsiteFloatingBanner
                   eyebrow={asset.eyebrow || 'EYEBROW'}
@@ -1650,6 +1676,24 @@ function PreviewModal({ asset, onClose, colorsConfig, typographyConfig }: Previe
               showRow4={asset.showRow4}
               showEyebrow={asset.showEyebrow}
               showSubhead={asset.showSubhead && !!asset.subhead}
+              headlineFontSize={asset.headlineFontSize ?? undefined}
+              colors={colorsConfig}
+              typography={typographyConfig}
+              scale={1}
+            />
+          )}
+          {asset.templateType === 'customer-library' && (
+            <CustomerLibrary
+              headline={asset.headline || 'Chemical Library'}
+              eyebrow={asset.eyebrow || 'Chemical Safety Data Sheet Library'}
+              body={asset.body || 'Lorem ipsum'}
+              footerText={asset.subhead || 'Lorem ipsum'}
+              variant={asset.customerLibraryVariant || 'dark'}
+              qrCodeUrl={asset.thumbnailImageUrl || undefined}
+              showHeadline={asset.showHeadline}
+              showEyebrow={asset.showEyebrow}
+              showBody={asset.showBody && !!asset.body}
+              showFooterText={asset.showSubhead && !!asset.subhead}
               headlineFontSize={asset.headlineFontSize ?? undefined}
               colors={colorsConfig}
               typography={typographyConfig}
