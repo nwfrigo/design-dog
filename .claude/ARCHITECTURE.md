@@ -16,14 +16,9 @@ Every template requires these files:
    - Receives all content via props
    - Uses brand config for colors/typography
 
-2. **Render content:** `app/render/{template-slug}/render-content.tsx`
-   - Server-side render component for PNG export
-   - Accepts URL search params
-   - Must mirror template component exactly
+2. **Render schema** in `lib/template-registry.tsx` — declares fields, parsers, defaults, and dimensions. The dynamic route at `app/render/[slug]/page.tsx` auto-generates the render page from this schema. No separate render page or render-content file needed for most templates.
 
-3. **Render page:** `app/render/{template-slug}/page.tsx`
-   - Next.js page that wraps render-content
-   - Handles param parsing
+   For templates with custom render logic (multi-page PDFs, carousel), keep individual `app/render/{slug}/page.tsx` and `render-content.tsx` files.
 
 4. **Registration:** Update these files:
    - `lib/template-config.ts` — add template type and metadata
@@ -261,7 +256,11 @@ The export API route (`app/api/export/route.ts`) uses a generic forwarding loop 
 
 ### Render Page Pattern
 
-Each render page at `app/render/{slug}/page.tsx` parses URL params and passes them to the template component. All param parsing must use the shared helpers in `lib/render-params.ts`:
+Most templates use a **dynamic render route** at `app/render/[slug]/page.tsx`. This route reads the `renderSchema` from `lib/template-registry.tsx` and auto-parses URL params based on the field definitions. Adding a new render page means adding a `renderSchema` to the registry entry — no separate page file needed.
+
+**Custom render pages** are kept for templates with complex logic beyond standard param parsing: `solution-overview-pdf`, `faq-pdf`, `stacker-pdf`, `social-carousel`, `website-floating-banner-mobile`.
+
+All param parsing (both dynamic and custom pages) must use the shared helpers in `lib/render-params.ts`:
 
 - `parseBoolTrue(params, key)` — for booleans that default ON (showHeadline, showCta, showBody, showEyebrow on most templates)
 - `parseBoolFalse(params, key)` — for booleans that default OFF (grayscale, darkMode)
