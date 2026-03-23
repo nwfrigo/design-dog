@@ -26,12 +26,13 @@ Every template requires these files:
    - Handles param parsing
 
 4. **Registration:** Update these files:
-   - `config/template-config.ts` — add template type and metadata
+   - `lib/template-config.ts` — add template type and metadata
    - `types/index.ts` — add to `TemplateType` union
+   - `lib/template-registry.tsx` — add entry (component, renderProps, queueTextFields) for queue/preview rendering
    - `components/EditorScreen.tsx` — add editor controls and preview
    - `components/AssetSelectionScreen.tsx` / `TemplateTile.tsx` — add to homepage grid
    - `store/index.ts` — add any template-specific state
-   - `app/api/export/route.ts` — add export handler
+   - `app/api/export/route.ts` — add template dimensions
 
 ### Template Props Pattern
 
@@ -200,10 +201,10 @@ useEffect(() => {
 
 | Type | Location | Examples |
 |------|----------|----------|
-| SVG icons, UI primitives | `components/shared/` | CorityLogo, ArrowIcon, ToggleSwitch, EyeIcon, DeleteConfirmModal |
+| SVG icons, UI primitives | `components/shared/` | CorityLogo, ArrowIcon, ToggleSwitch, EyeIcon, DeleteConfirmModal, TemplateRenderer |
 | Template-specific editors | `components/editors/` | SolutionOverviewEditor, SpeakerEditor |
 | Custom hooks | `hooks/` | useGrayscaleImage, useThemeDetection |
-| Utilities & constants | `lib/` | asset-snapshot, render-params, export-params |
+| Utilities, constants, registries | `lib/` | asset-snapshot, render-params, export-params, template-registry, template-config |
 
 ### Extract-on-Second-Use
 
@@ -211,7 +212,7 @@ When you copy-paste a component, hook, or utility into a second file, extract it
 
 ### Registry Over Switch
 
-When a function dispatches to template-specific logic (export params, form sections, modals), use a registry (`Record<TemplateType, Handler>`) instead of a switch statement. Adding a new template should mean adding one registry entry, not inserting a case into a growing switch. Reference: `lib/export-params.ts`.
+When a function dispatches to template-specific logic (export params, form sections, modals), use a registry (`Record<TemplateType, Handler>`) instead of a switch statement. Adding a new template should mean adding one registry entry, not inserting a case into a growing switch. References: `lib/export-params.ts` (export param builders), `lib/template-registry.tsx` (component + props + queue text fields).
 
 ### File Size Limits
 
@@ -247,9 +248,8 @@ Every new editable prop must appear in all of these locations:
 4. `lib/draft-storage.ts` — Add to save/load if needed for draft persistence
 5. `lib/export-params.ts` — Add to the template's param builder function
 6. `app/render/{slug}/page.tsx` — Parse using `lib/render-params.ts` helpers
-7. `components/ExportQueueScreen.tsx` — Add to `handleExportSingle` body (~line 98)
 
-The export API route (`app/api/export/route.ts`) uses a generic forwarding loop — it auto-forwards all params from the request body to the render URL. No changes needed there when adding new props. The remaining manual forwarding layer is `ExportQueueScreen.handleExportSingle`, which builds its own request body with an explicit field list.
+The export API route (`app/api/export/route.ts`) uses a generic forwarding loop — it auto-forwards all params from the request body to the render URL. No changes needed there when adding new props. Queue exports use `buildExportParamsFromAsset()` in `lib/export-params.ts`, which delegates to the same `buildExportParams()` builders — no separate field list to maintain.
 
 ### Export Gotchas
 
@@ -257,7 +257,7 @@ The export API route (`app/api/export/route.ts`) uses a generic forwarding loop 
 
 **URLSearchParams auto-encoding:** `URLSearchParams.set()` auto-encodes values. Never pre-encode with `encodeURIComponent()` — it causes double-encoding (`%255B` instead of `%5B`). Pass raw strings.
 
-**Editor vs queue exports use different code paths:** Exporting from the editor calls `buildExportParams()` in `lib/export-params.ts`. Exporting from the queue calls `handleExportSingle` in `ExportQueueScreen.tsx`, which builds its own request body. Always test exports from both paths — a prop can work in one and silently fail in the other.
+**Editor and queue exports now share the same builders:** Both paths use `buildExportParams()` in `lib/export-params.ts`. The editor calls it directly; the queue calls `buildExportParamsFromAsset()` which converts a `QueuedAsset` into `ExportParamState` and delegates to the same function. Adding a field to a builder function covers both paths automatically.
 
 ### Render Page Pattern
 
@@ -276,12 +276,11 @@ Never write inline `=== 'true'` or `!== 'false'` in render pages. The default fo
 
 ## Image Settings: Editor ↔ Queue ↔ Export Consistency
 
-**The Core Rule:** Image settings (position, zoom, grayscale) must flow through **four locations** to ensure editor preview, queue preview, and exported PNG all match:
+**The Core Rule:** Image settings (position, zoom, grayscale) must flow through **three locations** to ensure editor preview, queue preview, and exported PNG all match:
 
 1. **`addToQueue`** (store/index.ts) — captures settings when asset is queued
-2. **`handleExportSingle`** (ExportQueueScreen.tsx) — sends settings to export API
-3. **Queue thumbnail** (ExportQueueScreen.tsx) — displays preview in queue list
-4. **Queue preview modal** (ExportQueueScreen.tsx) — displays full-size preview
+2. **`lib/export-params.ts`** — the template's builder function sends settings to the export API (used by both editor and queue exports)
+3. **`lib/template-registry.tsx`** — the template's `renderProps` function passes settings for queue thumbnail and preview modal rendering (via `TemplateRenderer`)
 
 If any location is missing props, you'll see discrepancies between what the user sees and what exports.
 
@@ -309,9 +308,8 @@ If any location is missing props, you'll see discrepancies between what the user
 
 **Checklist for adding/modifying image support:**
 - [ ] `addToQueue` captures the image settings
-- [ ] `handleExportSingle` passes them to the export API
-- [ ] Queue thumbnail component receives `imagePosition`, `imageZoom`, `grayscale`
-- [ ] Queue preview modal receives the same props
+- [ ] Template builder in `lib/export-params.ts` includes image params (used by both editor and queue exports)
+- [ ] Template `renderProps` in `lib/template-registry.tsx` passes image settings for queue thumbnail and preview
 
 Test by: uploading an image → adjusting zoom/pan/grayscale → adding to queue → verify thumbnail matches → export from queue → verify PNG matches.
 

@@ -345,16 +345,17 @@ Stacker uses AI to generate the initial document structure:
 3. [ ] Only expose text fields that exist in the design
 4. [ ] Use `RichTextEditor` for body/description fields (not `<textarea>`) — see Rich Text pattern in ARCHITECTURE.md
 5. [ ] Add render-content and page in `app/render/{slug}/`
-6. [ ] Register in `config/template-config.ts`
+6. [ ] Register in `lib/template-config.ts`
 7. [ ] Add to `types/index.ts` TemplateType union
 8. [ ] Add editor controls in `EditorScreen.tsx`
-9. [ ] Add export params in `handleExport`
+9. [ ] Add export param builder in `lib/export-params.ts`
 10. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
 11. [ ] Add template-specific state to store if needed (variants, etc.)
 12. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence in ARCHITECTURE.md)
 13. [ ] Add to image upload condition if template has images
 14. [ ] Pass grayscale prop if template has images
-15. [ ] Register in `ExportQueueScreen.tsx` in THREE places: text fields extraction, queue thumbnail rendering, and preview modal rendering
-16. [ ] Test export works end-to-end
-17. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
-18. [ ] Build check: `npm run build`
+15. [ ] Add entry to `lib/template-registry.tsx` (component, renderProps, queueTextFields) — this is the ONLY change needed for ExportQueueScreen to work with the new template
+16. [ ] Add template dimensions to `app/api/export/route.ts` TEMPLATE_DIMENSIONS
+17. [ ] Test export works end-to-end (from both editor and queue)
+18. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
+19. [ ] Build check: `npm run build`
