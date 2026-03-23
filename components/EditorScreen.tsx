@@ -686,6 +686,24 @@ export function EditorScreen() {
     }
   }, [setThumbnailImageUrl])
 
+  // Newsletter image upload — same Blob pattern as main image to avoid 413 errors
+  const handleNewsletterImageUpload = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) return
+    try {
+      const ext = file.name.split('.').pop() || file.type.split('/')[1] || 'png'
+      const filename = `images/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
+      const blob = await upload(filename, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-image',
+      })
+      setNewsletterImageUrl(blob.url)
+    } catch {
+      const reader = new FileReader()
+      reader.onload = () => setNewsletterImageUrl(reader.result as string)
+      reader.readAsDataURL(file)
+    }
+  }, [setNewsletterImageUrl])
+
   const handleImageDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault()
     setIsImageDragging(false)
@@ -1543,11 +1561,7 @@ export function EditorScreen() {
                               accept="image/*"
                               onChange={(e) => {
                                 const file = e.target.files?.[0]
-                                if (file) {
-                                  const reader = new FileReader()
-                                  reader.onload = () => setNewsletterImageUrl(reader.result as string)
-                                  reader.readAsDataURL(file)
-                                }
+                                if (file) handleNewsletterImageUpload(file)
                               }}
                               className="hidden"
                             />
@@ -1668,11 +1682,7 @@ export function EditorScreen() {
                               accept="image/*"
                               onChange={(e) => {
                                 const file = e.target.files?.[0]
-                                if (file) {
-                                  const reader = new FileReader()
-                                  reader.onload = () => setNewsletterImageUrl(reader.result as string)
-                                  reader.readAsDataURL(file)
-                                }
+                                if (file) handleNewsletterImageUpload(file)
                               }}
                               className="hidden"
                             />
@@ -1769,11 +1779,7 @@ export function EditorScreen() {
                               accept="image/*"
                               onChange={(e) => {
                                 const file = e.target.files?.[0]
-                                if (file) {
-                                  const reader = new FileReader()
-                                  reader.onload = () => setNewsletterImageUrl(reader.result as string)
-                                  reader.readAsDataURL(file)
-                                }
+                                if (file) handleNewsletterImageUpload(file)
                               }}
                               className="hidden"
                             />
