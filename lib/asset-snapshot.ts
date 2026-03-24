@@ -109,6 +109,7 @@ const SNAPSHOT_FIELDS = [
   // Image effects
   'grayscale',
   'headlineFontSize',
+  'subheadFontSize',
   // Email Dark Gradient spacing
   'bottomSpacing',
   // Solution Overview - Page 1
@@ -196,8 +197,8 @@ export function restoreEditorSnapshot(source: Record<string, unknown>): Partial<
   const partial: Record<string, unknown> = {}
   for (const field of SNAPSHOT_FIELDS) {
     if (field in source) {
-      // Special case: headlineFontSize may be undefined in old data, normalize to null
-      if (field === 'headlineFontSize') {
+      // Special case: headlineFontSize/subheadFontSize may be undefined in old data, normalize to null
+      if (field === 'headlineFontSize' || field === 'subheadFontSize') {
         partial[field] = source[field] ?? null
       } else {
         partial[field] = source[field]
@@ -262,7 +263,7 @@ export function generatedAssetToQueuedAsset(
   for (const field of SNAPSHOT_FIELDS) {
     if (field in asset) {
       // Normalize specific fields to match original behavior
-      if (field === 'headlineFontSize') {
+      if (field === 'headlineFontSize' || field === 'subheadFontSize') {
         partial[field] = (asset as unknown as Record<string, unknown>)[field] ?? null
       } else if (field === 'solutionOverviewCtaUrl') {
         partial[field] = (asset as unknown as Record<string, unknown>)[field] || ''

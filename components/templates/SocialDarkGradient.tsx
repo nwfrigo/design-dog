@@ -29,6 +29,7 @@ export interface SocialDarkGradientProps {
   showMetadata: boolean
   showCta: boolean
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -94,6 +95,7 @@ export function SocialDarkGradient({
   showMetadata,
   showCta,
   headlineFontSize,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -214,7 +216,7 @@ export function SocialDarkGradient({
                 className="rich-text-white"
                 style={{
                   color: textColor,
-                  fontSize: SUBHEAD_SIZES[headingSize],
+                  fontSize: subheadFontSize ?? SUBHEAD_SIZES[headingSize],
                   fontWeight: 300,
                   lineHeight: 1.3,
                 }}

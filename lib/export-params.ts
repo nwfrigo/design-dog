@@ -23,6 +23,7 @@ export interface ExportParamState {
   showEyebrow: boolean
   showHeadline: boolean
   headlineFontSize: number | null
+  subheadFontSize: number | null
   bottomSpacing: number
 
   // Image
@@ -481,6 +482,7 @@ export function buildExportParams(
     showEyebrow: state.showEyebrow,
     showHeadline: state.showHeadline,
     headlineFontSize: state.headlineFontSize,
+    subheadFontSize: state.subheadFontSize,
   }
 
   const builder = BUILDERS[template]
@@ -517,6 +519,7 @@ export function buildExportParamsFromAsset(
     showEyebrow: a.showEyebrow !== false,
     showHeadline: a.showHeadline !== false,
     headlineFontSize: (a.headlineFontSize as number | null) ?? null,
+    subheadFontSize: (a.subheadFontSize as number | null) ?? null,
     bottomSpacing: (a.bottomSpacing as number) ?? 0,
     thumbnailImageUrl: (a.thumbnailImageUrl as string | null) ?? null,
     thumbnailImagePosition: (a.thumbnailImagePosition as { x: number; y: number }) || { x: 0, y: 0 },

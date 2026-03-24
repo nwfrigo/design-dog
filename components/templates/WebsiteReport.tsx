@@ -25,6 +25,7 @@ export interface WebsiteReportProps {
   showCta: boolean
   grayscale?: boolean
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -46,6 +47,7 @@ export function WebsiteReport({
   showCta,
   grayscale = false,
   headlineFontSize: headlineFontSizeProp,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -204,7 +206,7 @@ export function WebsiteReport({
                 style={{
                   alignSelf: 'stretch',
                   color: 'white',
-                  fontSize: 20,
+                  fontSize: subheadFontSize ?? 20,
                   fontWeight: 350,
                 }}
               >

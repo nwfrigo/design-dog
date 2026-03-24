@@ -27,6 +27,7 @@ export interface SocialImageProps {
   showSolutionSet: boolean
   grayscale?: boolean
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -73,6 +74,7 @@ export function SocialImage({
   showSolutionSet,
   grayscale = false,
   headlineFontSize,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -171,7 +173,7 @@ export function SocialImage({
                 className="rich-text-dark"
                 style={{
                   color: textColor,
-                  fontSize: 36,
+                  fontSize: subheadFontSize ?? 36,
                   fontWeight: 300,
                   lineHeight: 1.3,
                 }}

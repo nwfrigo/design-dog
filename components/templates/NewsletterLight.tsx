@@ -22,6 +22,7 @@ export interface NewsletterLightProps {
   showCta: boolean
   grayscale?: boolean
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -56,6 +57,7 @@ export function NewsletterLight({
   showCta,
   grayscale = false,
   headlineFontSize,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -148,7 +150,7 @@ export function NewsletterLight({
               <div className="nl-rich-text" style={{
                 alignSelf: 'stretch',
                 color: textColor,
-                fontSize: 12,
+                fontSize: subheadFontSize ?? 12,
                 fontWeight: 350,
                 lineHeight: '16px',
               }} dangerouslySetInnerHTML={{ __html: subhead }} />

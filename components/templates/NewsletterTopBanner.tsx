@@ -22,6 +22,7 @@ export interface NewsletterTopBannerProps {
   variant: TopBannerVariant
   showHeadline?: boolean
   showSubhead: boolean
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -34,6 +35,7 @@ export function NewsletterTopBanner({
   variant = 'dark',
   showHeadline = true,
   showSubhead,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -215,7 +217,7 @@ export function NewsletterTopBanner({
               <div style={{
                 alignSelf: 'stretch',
                 color: textColor,
-                fontSize: 22,
+                fontSize: subheadFontSize ?? 22,
                 fontFamily: 'Fakt Pro',
                 fontWeight: '350',
                 wordWrap: 'break-word',

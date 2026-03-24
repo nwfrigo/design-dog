@@ -25,6 +25,7 @@ export interface WebsitePressReleaseProps {
   grayscale?: boolean
   logoColor: 'black' | 'orange'
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -48,6 +49,7 @@ export function WebsitePressRelease({
   grayscale = false,
   logoColor,
   headlineFontSize,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -199,7 +201,7 @@ export function WebsitePressRelease({
                 style={{
                   alignSelf: 'stretch',
                   color: colors.ui.textPrimary,
-                  fontSize: 22,
+                  fontSize: subheadFontSize ?? 22,
                   fontWeight: 350,
                 }}
               >

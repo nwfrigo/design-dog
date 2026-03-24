@@ -98,6 +98,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -122,6 +123,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'logoColor', parser: 'enum', default: 'black' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed, raw) => ({
         cta: (raw.ctaText as string) || (raw.cta as string) || 'Responsive',
@@ -149,6 +151,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -174,6 +177,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'logoColor', parser: 'enum', default: 'black' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed, raw) => ({
         cta: (raw.ctaText as string) || (raw.cta as string) || 'Responsive',
@@ -208,6 +212,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showSpeaker3: asset.showSpeaker3,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -236,6 +241,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showSpeaker3', parser: 'boolTrue' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed, raw) => {
         const searchParams = raw as SearchParams
@@ -419,6 +425,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showMetadata: asset.showMetadata,
       showCta: asset.showCta,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -448,6 +455,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showMetadata', parser: 'boolTrue' },
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
     },
   },
@@ -471,6 +479,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showMetadata: asset.showMetadata,
       showCta: asset.showCta,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -499,6 +508,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showMetadata', parser: 'boolTrue' },
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
     },
   },
@@ -522,6 +532,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showSolutionSet: asset.showSolutionSet !== false,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -551,6 +562,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showSolutionSet', parser: 'boolTrue' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
@@ -576,6 +588,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showSolutionSet: asset.showSolutionSet !== false,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -604,6 +617,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showSolutionSet', parser: 'boolTrue' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
@@ -686,6 +700,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showBody: asset.showBody && !!asset.body,
       showCta: asset.showCta !== false,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       bottomSpacing: (asset.showCta !== false) ? 0 : (asset.bottomSpacing ?? 0),
       colors, typography, scale: 1,
     }),
@@ -709,6 +724,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showBody', parser: 'boolTrue' },
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
         { param: 'bottomSpacing', parser: 'numberOrUndefined' },
       ],
     },
@@ -787,6 +803,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta !== false,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -811,6 +828,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
@@ -835,6 +853,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta !== false,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -859,6 +878,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
@@ -882,6 +902,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta !== false,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -905,6 +926,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
@@ -956,6 +978,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta,
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -979,6 +1002,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
       ],
       assembleProps: (parsed, raw) => ({
         cta: (raw.ctaText as string) || (raw.cta as string) || 'Responsive',

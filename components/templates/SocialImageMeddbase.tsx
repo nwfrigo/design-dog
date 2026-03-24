@@ -26,6 +26,7 @@ export interface SocialImageMeddbaseProps {
   showSolutionSet: boolean
   grayscale?: boolean
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -71,6 +72,7 @@ export function SocialImageMeddbase({
   showSolutionSet,
   grayscale = false,
   headlineFontSize,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -168,7 +170,7 @@ export function SocialImageMeddbase({
                 className="rich-text-dark"
                 style={{
                   color: textColor,
-                  fontSize: 36,
+                  fontSize: subheadFontSize ?? 36,
                   fontWeight: 300,
                   lineHeight: 1.3,
                 }}

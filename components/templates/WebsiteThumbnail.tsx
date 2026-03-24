@@ -78,6 +78,7 @@ export interface WebsiteThumbnailProps {
   logoColor: 'black' | 'orange'
   grayscale?: boolean
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -100,6 +101,7 @@ export function WebsiteThumbnail({
   logoColor,
   grayscale = false,
   headlineFontSize: headlineFontSizeProp,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -230,7 +232,7 @@ export function WebsiteThumbnail({
                 style={{
                   alignSelf: 'stretch',
                   color: colors.ui.textPrimary,
-                  fontSize: 20,
+                  fontSize: subheadFontSize ?? 20,
                   fontWeight: 350,
                 }}
               >

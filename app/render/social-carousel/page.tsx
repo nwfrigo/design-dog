@@ -43,6 +43,7 @@ export default function RenderPage({
 
   // Single slide mode -- individual params
   const headlineFontSizeRaw = parseNumberOrUndefined(searchParams, 'headlineFontSize')
+  const subheadFontSizeRaw = parseNumberOrUndefined(searchParams, 'subheadFontSize')
   const slide: CarouselSlide = {
     id: parseString(searchParams, 'slideId', 'render'),
     slideType: parseEnum(searchParams, 'slideType', 'cover-text') as CarouselSlideType,
@@ -60,6 +61,7 @@ export default function RenderPage({
     showMetadata: parseBoolTrue(searchParams, 'showMetadata'),
     showCta: parseBoolTrue(searchParams, 'showCta'),
     headlineFontSize: headlineFontSizeRaw !== undefined ? headlineFontSizeRaw : null,
+    subheadFontSize: subheadFontSizeRaw !== undefined ? subheadFontSizeRaw : null,
     imageUrl: parseStringOrNull(searchParams, 'imageUrl'),
     imagePosition: {
       x: parseNumber(searchParams, 'imagePositionX', 0),

@@ -290,6 +290,7 @@ export function TemplateRenderer({
             showMetadata: false,
             showCta: false,
             headlineFontSize: null,
+            subheadFontSize: null,
             imageUrl: null,
             imagePosition: { x: 0, y: 0 },
             imageZoom: 1,

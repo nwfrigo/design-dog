@@ -43,6 +43,7 @@ export interface CarouselSlide {
   showMetadata: boolean
   showCta: boolean
   headlineFontSize: number | null
+  subheadFontSize: number | null
   imageUrl: string | null
   imagePosition: { x: number; y: number }
   imageZoom: number
@@ -343,6 +344,7 @@ export interface ManualAssetSettings {
   speaker3ImageZoom: number
   // Manual text size
   headlineFontSize: number | null
+  subheadFontSize: number | null
   // Email Dark Gradient spacing
   bottomSpacing: number
   // Template variant settings (must persist when switching assets)
@@ -592,6 +594,7 @@ export interface GeneratedAsset {
   solutionOverviewStat5Label: string
   // Manual text size
   headlineFontSize: number | null
+  subheadFontSize: number | null
   // Email Dark Gradient spacing
   bottomSpacing: number
   // Social Carousel specific
@@ -736,6 +739,7 @@ export interface QueuedAsset {
   solutionOverviewStat5Label: string
   // Manual text size
   headlineFontSize: number | null
+  subheadFontSize: number | null
   // Email Dark Gradient spacing
   bottomSpacing: number
   // Social Carousel specific
@@ -904,6 +908,7 @@ export interface AppState {
 
   // Manual text size
   headlineFontSize: number | null
+  subheadFontSize: number | null
 
   // Email Dark Gradient spacing
   bottomSpacing: number
@@ -1039,6 +1044,7 @@ export interface AppState {
   setGrayscale: (grayscale: boolean) => void
   // Manual text size
   setHeadlineFontSize: (size: number | null) => void
+  setSubheadFontSize: (size: number | null) => void
   // Email Dark Gradient spacing
   setBottomSpacing: (spacing: number) => void
   // Solution Overview PDF specific - Page 1

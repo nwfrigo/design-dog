@@ -42,6 +42,7 @@ export interface WebsiteWebinarProps {
   showSpeaker2?: boolean
   showSpeaker3?: boolean
   headlineFontSize?: number
+  subheadFontSize?: number
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -128,6 +129,7 @@ export function WebsiteWebinar({
   showSpeaker2 = true,
   showSpeaker3 = true,
   headlineFontSize: headlineFontSizeProp,
+  subheadFontSize,
   colors,
   typography,
   scale = 1,
@@ -294,7 +296,7 @@ export function WebsiteWebinar({
                 style={{
                   alignSelf: 'stretch',
                   color: 'white',
-                  fontSize: 22,
+                  fontSize: subheadFontSize ?? 22,
                   fontWeight: 350,
                 }}
               >

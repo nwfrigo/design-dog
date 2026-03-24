@@ -73,6 +73,22 @@ const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: 
   'social-carousel': { default: 112, min: 40, max: 140, step: 4 },
 }
 
+const SUBHEAD_SIZE_CONFIG: Record<string, { default: number; min: number; max: number; step: number }> = {
+  'social-dark-gradient': { default: 36, min: 20, max: 48, step: 2 },
+  'social-blue-gradient': { default: 36, min: 20, max: 48, step: 2 },
+  'social-image': { default: 36, min: 20, max: 48, step: 2 },
+  'social-image-meddbase': { default: 36, min: 20, max: 48, step: 2 },
+  'email-dark-gradient': { default: 24, min: 12, max: 36, step: 1 },
+  'website-thumbnail': { default: 20, min: 12, max: 30, step: 1 },
+  'website-press-release': { default: 22, min: 12, max: 32, step: 1 },
+  'website-webinar': { default: 22, min: 12, max: 32, step: 1 },
+  'website-report': { default: 20, min: 12, max: 30, step: 1 },
+  'newsletter-dark-gradient': { default: 12, min: 8, max: 20, step: 1 },
+  'newsletter-blue-gradient': { default: 12, min: 8, max: 20, step: 1 },
+  'newsletter-light': { default: 12, min: 8, max: 20, step: 1 },
+  'newsletter-top-banner': { default: 22, min: 12, max: 32, step: 1 },
+}
+
 // Bottom spacing drag handle for email-dark-gradient (reuses StackerSpacingHandle visual style)
 function BottomSpacingHandle({ spacing, onChange, scale }: {
   spacing: number
@@ -338,6 +354,8 @@ export function EditorScreen() {
     // Manual text size
     headlineFontSize,
     setHeadlineFontSize,
+    subheadFontSize,
+    setSubheadFontSize,
     // Email Dark Gradient spacing
     bottomSpacing,
     setBottomSpacing,
@@ -775,6 +793,7 @@ export function EditorScreen() {
         showEyebrow,
         showHeadline,
         headlineFontSize,
+        subheadFontSize,
         bottomSpacing,
         thumbnailImageUrl,
         thumbnailImagePosition,
@@ -2541,6 +2560,19 @@ export function EditorScreen() {
                         content={verbatimCopy.subhead}
                         onChange={(html) => setVerbatimCopy({ subhead: html })}
                         placeholder="Supporting subheadline"
+                        singleLine={false}
+                        onFontSizeUp={SUBHEAD_SIZE_CONFIG[currentTemplate] ? () => {
+                          const cfg = SUBHEAD_SIZE_CONFIG[currentTemplate]
+                          const effective = subheadFontSize ?? cfg.default
+                          setSubheadFontSize(Math.min(effective + cfg.step, cfg.max))
+                        } : undefined}
+                        onFontSizeDown={SUBHEAD_SIZE_CONFIG[currentTemplate] ? () => {
+                          const cfg = SUBHEAD_SIZE_CONFIG[currentTemplate]
+                          const effective = subheadFontSize ?? cfg.default
+                          setSubheadFontSize(Math.max(effective - cfg.step, cfg.min))
+                        } : undefined}
+                        fontSizeAtMax={SUBHEAD_SIZE_CONFIG[currentTemplate] ? (subheadFontSize ?? SUBHEAD_SIZE_CONFIG[currentTemplate].default) >= SUBHEAD_SIZE_CONFIG[currentTemplate].max : false}
+                        fontSizeAtMin={SUBHEAD_SIZE_CONFIG[currentTemplate] ? (subheadFontSize ?? SUBHEAD_SIZE_CONFIG[currentTemplate].default) <= SUBHEAD_SIZE_CONFIG[currentTemplate].min : false}
                       />
                     </div>
                   ) : (
@@ -3685,6 +3717,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -3709,6 +3742,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -3759,6 +3793,7 @@ export function EditorScreen() {
                   showSpeaker3={showSpeaker3}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3821,6 +3856,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3871,6 +3907,7 @@ export function EditorScreen() {
                   showMetadata={showMetadata}
                   showCta={showCta}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3895,6 +3932,7 @@ export function EditorScreen() {
                   showMetadata={showMetadata}
                   showCta={showCta}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3919,6 +3957,7 @@ export function EditorScreen() {
                   showSolutionSet={showSolutionSet}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -3987,6 +4026,7 @@ export function EditorScreen() {
                   showSolutionSet={showSolutionSet}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4021,6 +4061,7 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   bottomSpacing={showCta ? 0 : bottomSpacing}
                   colors={colorsConfig}
                   typography={typographyConfig}
@@ -4044,6 +4085,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4066,6 +4108,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4087,6 +4130,7 @@ export function EditorScreen() {
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  subheadFontSize={subheadFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
