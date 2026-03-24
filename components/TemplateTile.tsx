@@ -427,13 +427,13 @@ export function TemplateRenderer({
           {...commonProps}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
-          body={PREVIEW_CONTENT.body}
+          subhead={PREVIEW_CONTENT.subhead}
           ctaText={PREVIEW_CONTENT.cta}
           colorStyle="1"
           imageSize="none"
           imageUrl={null}
           showEyebrow={true}
-          showBody={false}
+          showSubhead={false}
           showCta={true}
         />
       )
@@ -444,13 +444,13 @@ export function TemplateRenderer({
           {...commonProps}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
-          body={PREVIEW_CONTENT.body}
+          subhead={PREVIEW_CONTENT.subhead}
           ctaText={PREVIEW_CONTENT.cta}
           colorStyle="1"
           imageSize="none"
           imageUrl={null}
           showEyebrow={true}
-          showBody={false}
+          showSubhead={false}
           showCta={true}
         />
       )
@@ -461,12 +461,12 @@ export function TemplateRenderer({
           {...commonProps}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
-          body={PREVIEW_CONTENT.body}
+          subhead={PREVIEW_CONTENT.subhead}
           ctaText={PREVIEW_CONTENT.cta}
           imageSize="none"
           imageUrl={null}
           showEyebrow={true}
-          showBody={false}
+          showSubhead={false}
           showCta={true}
         />
       )

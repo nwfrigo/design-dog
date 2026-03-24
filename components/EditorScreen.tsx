@@ -2526,7 +2526,7 @@ export function EditorScreen() {
               )}
 
               {/* Subhead / Subheading */}
-              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') && (
+              {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner' || currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient' || currentTemplate === 'newsletter-light') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2535,7 +2535,7 @@ export function EditorScreen() {
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
                   </div>
                   {/* Rich text editor for templates with rich text support */}
-                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-dark-gradient') ? (
+                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient' || currentTemplate === 'newsletter-light') ? (
                     <div className={!showSubhead ? 'opacity-50' : ''}>
                       <SimpleRichTextEditor
                         content={verbatimCopy.subhead}
@@ -2580,7 +2580,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2589,7 +2589,7 @@ export function EditorScreen() {
                     <EyeIcon visible={showBody} onClick={() => setShowBody(!showBody)} />
                   </div>
                   {/* Rich text editor for templates with rich text support */}
-                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient' || currentTemplate === 'newsletter-light') ? (
+                  {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient') ? (
                     <div className={!showBody ? 'opacity-50' : ''}>
                       <SimpleRichTextEditor
                         content={verbatimCopy.body}
@@ -4031,7 +4031,7 @@ export function EditorScreen() {
                 <NewsletterDarkGradient
                   eyebrow={eyebrow}
                   headline={verbatimCopy.headline || 'Headline'}
-                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                  subhead={verbatimCopy.subhead || ''}
                   ctaText={ctaText}
                   colorStyle={colorStyle}
                   imageSize={newsletterImageSize}
@@ -4040,7 +4040,7 @@ export function EditorScreen() {
                   imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
                   showHeadline={showHeadline}
-                  showBody={showBody && !!verbatimCopy.body}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
@@ -4053,7 +4053,7 @@ export function EditorScreen() {
                 <NewsletterBlueGradient
                   eyebrow={eyebrow}
                   headline={verbatimCopy.headline || 'Headline'}
-                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                  subhead={verbatimCopy.subhead || ''}
                   ctaText={ctaText}
                   colorStyle={colorStyle}
                   imageSize={newsletterImageSize}
@@ -4062,7 +4062,7 @@ export function EditorScreen() {
                   imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
                   showHeadline={showHeadline}
-                  showBody={showBody && !!verbatimCopy.body}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
@@ -4075,7 +4075,7 @@ export function EditorScreen() {
                 <NewsletterLight
                   eyebrow={eyebrow}
                   headline={verbatimCopy.headline || 'Headline'}
-                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                  subhead={verbatimCopy.subhead || ''}
                   ctaText={ctaText}
                   imageSize={newsletterImageSize}
                   imageUrl={newsletterImageUrl}
@@ -4083,7 +4083,7 @@ export function EditorScreen() {
                   imageZoom={newsletterImageZoom}
                   showEyebrow={showEyebrow && !!eyebrow}
                   showHeadline={showHeadline}
-                  showBody={showBody && !!verbatimCopy.body}
+                  showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showCta={showCta}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}

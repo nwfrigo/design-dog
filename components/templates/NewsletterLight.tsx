@@ -10,7 +10,7 @@ export type ImageSize = 'none' | 'small' | 'large'
 export interface NewsletterLightProps {
   eyebrow: string
   headline: string
-  body: string
+  subhead: string
   ctaText: string
   imageSize: ImageSize
   imageUrl: string | null
@@ -18,7 +18,7 @@ export interface NewsletterLightProps {
   imageZoom?: number
   showEyebrow: boolean
   showHeadline?: boolean
-  showBody: boolean
+  showSubhead: boolean
   showCta: boolean
   grayscale?: boolean
   headlineFontSize?: number
@@ -44,7 +44,7 @@ const IMAGE_WIDTHS: Record<ImageSize, number> = {
 export function NewsletterLight({
   eyebrow,
   headline,
-  body,
+  subhead,
   ctaText,
   imageSize,
   imageUrl,
@@ -52,7 +52,7 @@ export function NewsletterLight({
   imageZoom = 1,
   showEyebrow,
   showHeadline = true,
-  showBody,
+  showSubhead,
   showCta,
   grayscale = false,
   headlineFontSize,
@@ -144,14 +144,14 @@ export function NewsletterLight({
             )}
 
             {/* Body */}
-            {showBody && body && (
+            {showSubhead && subhead && (
               <div className="nl-rich-text" style={{
                 alignSelf: 'stretch',
                 color: textColor,
                 fontSize: 12,
                 fontWeight: 350,
                 lineHeight: '16px',
-              }} dangerouslySetInnerHTML={{ __html: body }} />
+              }} dangerouslySetInnerHTML={{ __html: subhead }} />
             )}
           </div>
 

@@ -794,13 +794,13 @@ function AssetPreviewRenderer({
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
-          body={copy.body || 'This is your body copy.'}
+          subhead={copy.subhead || ''}
           ctaText={asset.ctaText || 'Responsive'}
           colorStyle={asset.colorStyle || '1'}
           imageSize={asset.newsletterImageSize || 'none'}
           imageUrl={asset.newsletterImageUrl || null}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
-          showBody={asset.showBody && !!copy.body}
+          showSubhead={asset.showSubhead && !!copy.subhead}
           showCta={asset.showCta !== false}
         />
       )
@@ -811,13 +811,13 @@ function AssetPreviewRenderer({
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
-          body={copy.body || 'This is your body copy.'}
+          subhead={copy.subhead || ''}
           ctaText={asset.ctaText || 'Responsive'}
           colorStyle={asset.colorStyle || '1'}
           imageSize={asset.newsletterImageSize || 'none'}
           imageUrl={asset.newsletterImageUrl || null}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
-          showBody={asset.showBody && !!copy.body}
+          showSubhead={asset.showSubhead && !!copy.subhead}
           showCta={asset.showCta !== false}
         />
       )
@@ -828,12 +828,12 @@ function AssetPreviewRenderer({
           eyebrow={asset.eyebrow}
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
-          body={copy.body || 'This is your body copy.'}
+          subhead={copy.subhead || ''}
           ctaText={asset.ctaText || 'Responsive'}
           imageSize={asset.newsletterImageSize || 'none'}
           imageUrl={asset.newsletterImageUrl || null}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
-          showBody={asset.showBody && !!copy.body}
+          showSubhead={asset.showSubhead && !!copy.subhead}
           showCta={asset.showCta !== false}
         />
       )

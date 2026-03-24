@@ -11,7 +11,7 @@ export type ImageSize = 'none' | 'small' | 'large'
 export interface NewsletterBlueGradientProps {
   eyebrow: string
   headline: string
-  body: string
+  subhead: string
   ctaText: string
   colorStyle: ColorStyle
   imageSize: ImageSize
@@ -20,7 +20,7 @@ export interface NewsletterBlueGradientProps {
   imageZoom?: number
   showEyebrow: boolean
   showHeadline?: boolean
-  showBody: boolean
+  showSubhead: boolean
   showCta: boolean
   grayscale?: boolean
   headlineFontSize?: number
@@ -53,7 +53,7 @@ const IMAGE_WIDTHS: Record<ImageSize, number> = {
 export function NewsletterBlueGradient({
   eyebrow,
   headline,
-  body,
+  subhead,
   ctaText,
   colorStyle,
   imageSize,
@@ -62,7 +62,7 @@ export function NewsletterBlueGradient({
   imageZoom = 1,
   showEyebrow,
   showHeadline = true,
-  showBody,
+  showSubhead,
   showCta,
   grayscale = false,
   headlineFontSize,
@@ -166,14 +166,14 @@ export function NewsletterBlueGradient({
             )}
 
             {/* Body */}
-            {showBody && body && (
+            {showSubhead && subhead && (
               <div className="nl-rich-text" style={{
                 alignSelf: 'stretch',
                 color: textColor,
                 fontSize: 12,
                 fontWeight: 350,
                 lineHeight: '16px',
-              }} dangerouslySetInnerHTML={{ __html: body }} />
+              }} dangerouslySetInnerHTML={{ __html: subhead }} />
             )}
           </div>
 
