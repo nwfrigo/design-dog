@@ -522,9 +522,8 @@ export async function POST(request: NextRequest) {
 
       // Track export (fire-and-forget)
       trackExport(template)
-      uploadThumbnail(Buffer.from(screenshot), template).then((thumbnailUrl) => {
-        logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl })
-      })
+      logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale })
+      uploadThumbnail(Buffer.from(screenshot), template).catch(() => {})
 
       return new NextResponse(Buffer.from(screenshot), {
         headers: {
@@ -579,9 +578,8 @@ export async function POST(request: NextRequest) {
 
     // Track export (fire-and-forget)
     trackExport(template)
-    uploadThumbnail(Buffer.from(screenshot), template).then((thumbnailUrl) => {
-      logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl })
-    })
+    logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale })
+    uploadThumbnail(Buffer.from(screenshot), template).catch(() => {})
 
     // Return the image
     return new NextResponse(Buffer.from(screenshot), {
