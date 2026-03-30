@@ -42,6 +42,7 @@ export default function AdminPage() {
   const [filterTemplate, setFilterTemplate] = useState('')
   const [filterSearch, setFilterSearch] = useState('')
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
+  const [lightboxIsPdf, setLightboxIsPdf] = useState(false)
   const [totalRange, setTotalRange] = useState<'today' | 'thisWeek' | 'allTime'>('allTime')
 
   const limit = 25
@@ -181,14 +182,27 @@ export default function AdminPage() {
       {lightboxUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setLightboxUrl(null)}
+          onClick={() => { setLightboxUrl(null); setLightboxIsPdf(false) }}
         >
-          <img
-            src={lightboxUrl}
-            alt="Export preview"
-            className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {lightboxIsPdf ? (
+            <div
+              className="w-[90vw] h-[90vh] rounded-lg shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <embed
+                src={lightboxUrl}
+                type="application/pdf"
+                className="w-full h-full"
+              />
+            </div>
+          ) : (
+            <img
+              src={lightboxUrl}
+              alt="Export preview"
+              className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
         </div>
       )}
 
@@ -359,13 +373,20 @@ export default function AdminPage() {
                 logs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors">
                     <td className="px-4 py-3">
-                      {log.thumbnail_url ? (
-                        <button onClick={() => setLightboxUrl(log.thumbnail_url)}>
+                      {log.thumbnail_url && log.format !== 'pdf' ? (
+                        <button onClick={() => { setLightboxUrl(log.thumbnail_url); setLightboxIsPdf(false) }}>
                           <img
                             src={log.thumbnail_url}
                             alt={log.template_type}
                             className="w-20 h-auto rounded border border-gray-100 dark:border-line-subtle hover:opacity-80 transition-opacity"
                           />
+                        </button>
+                      ) : log.thumbnail_url && log.format === 'pdf' ? (
+                        <button
+                          onClick={() => { setLightboxUrl(log.thumbnail_url); setLightboxIsPdf(true) }}
+                          className="w-20 h-12 rounded border border-gray-100 dark:border-line-subtle bg-gray-50 dark:bg-surface-primary flex items-center justify-center hover:bg-gray-100 dark:hover:bg-interactive-hover transition-colors group"
+                        >
+                          <span className="text-xs font-medium text-blue-600 dark:text-blue-400 group-hover:underline">PDF</span>
                         </button>
                       ) : (
                         <div className="w-20 h-12 rounded border border-gray-100 dark:border-line-subtle bg-gray-50 dark:bg-surface-primary flex items-center justify-center text-gray-300 dark:text-content-secondary text-xs">

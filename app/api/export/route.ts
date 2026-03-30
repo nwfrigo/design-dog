@@ -5,6 +5,19 @@ import { trackExport } from '@/lib/usage-tracking'
 import { logExport } from '@/lib/db'
 import { put } from '@vercel/blob'
 
+async function uploadPdf(buffer: Buffer, template: string): Promise<string | undefined> {
+  try {
+    const { url } = await put(
+      `monitoring/${Date.now()}-${template}.pdf`,
+      buffer,
+      { access: 'public', contentType: 'application/pdf' }
+    )
+    return url
+  } catch {
+    return undefined
+  }
+}
+
 async function uploadThumbnail(buffer: Buffer, template: string): Promise<string | undefined> {
   try {
     const { url } = await put(
@@ -495,11 +508,12 @@ export async function POST(request: NextRequest) {
 
         await browser.close()
 
-        // Track export (fire-and-forget)
         trackExport(template)
-        logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: body.format || 'pdf', scale })
+        const stackerPdfBuf = Buffer.from(pdfBuffer)
+        const stackerPdfUrl = await uploadPdf(stackerPdfBuf, template)
+        await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: body.format || 'pdf', scale, thumbnailUrl: stackerPdfUrl })
 
-        return new NextResponse(Buffer.from(pdfBuffer), {
+        return new NextResponse(stackerPdfBuf, {
           headers: {
             'Content-Type': 'application/pdf',
             'Content-Disposition': `attachment; filename="${stackerFilename}.pdf"`,
@@ -547,16 +561,17 @@ export async function POST(request: NextRequest) {
 
       await browser.close()
 
-      // Track export (fire-and-forget)
       trackExport(template)
-      logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.title || body.headline || body.eyebrow, solution: body.solution, format: 'pdf', scale })
+      const faqPdfBuf = Buffer.from(pdfBuffer)
+      const faqPdfUrl = await uploadPdf(faqPdfBuf, template)
+      await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.title || body.headline || body.eyebrow, solution: body.solution, format: 'pdf', scale, thumbnailUrl: faqPdfUrl })
 
       // Use document title for FAQ PDF filename, sanitized for filesystem
       const faqFilename = body.title
         ? `${body.title.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '-')}.pdf`
         : 'faq.pdf'
       const filename = isCarouselPdf ? 'social-carousel.pdf' : isFaqPdf ? faqFilename : (isStackerPdf ? (body.filename || 'stacker.pdf') : 'solution-overview.pdf')
-      return new NextResponse(Buffer.from(pdfBuffer), {
+      return new NextResponse(faqPdfBuf, {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename="${filename}"`,
