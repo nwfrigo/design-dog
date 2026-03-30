@@ -233,6 +233,7 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   // Social Carousel specific
   carouselSlides: [createDefaultCarouselSlide('cover-text')],
   carouselCurrentSlideIndex: 0,
+
   // FAQ PDF specific
   faqTitle: 'Title Goes Here',
   faqCoverSubheader: 'Frequently Asked Questions',
@@ -473,6 +474,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Social Carousel state
   carouselSlides: [createDefaultCarouselSlide('cover-text')],
   carouselCurrentSlideIndex: 0,
+
+  // User identity (for export tracking)
+  exportedBy: null,
 
   // Export queue
   exportQueue: [],
@@ -739,6 +743,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Social Carousel actions
   setCarouselSlides: (slides: CarouselSlide[]) => set({ carouselSlides: slides }),
   setCarouselCurrentSlideIndex: (index: number) => set({ carouselCurrentSlideIndex: index }),
+
+  // User identity
+  setExportedBy: (name: string | null) => set({ exportedBy: name }),
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => set({ selectedAssets: assets }),

@@ -7,6 +7,7 @@ import { ContentPage, CoverPage } from './templates/FaqPdf'
 export function FaqExportScreen() {
   const {
     setCurrentScreen,
+    exportedBy,
     // FAQ state from Zustand store
     faqTitle,
     faqCoverSubheader,
@@ -64,7 +65,7 @@ export function FaqExportScreen() {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportParams),
+        body: JSON.stringify({ ...exportParams, exportedBy }),
       })
 
       if (!response.ok) {

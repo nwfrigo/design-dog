@@ -944,6 +944,9 @@ export interface AppState {
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
 
+  // User identity (for export tracking)
+  exportedBy: string | null
+
   // Actions
   setCurrentScreen: (screen: AppScreen) => void
   setContentMode: (mode: ContentMode) => void
@@ -1125,6 +1128,9 @@ export interface AppState {
   // Social Carousel actions
   setCarouselSlides: (slides: CarouselSlide[]) => void
   setCarouselCurrentSlideIndex: (index: number) => void
+
+  // User identity
+  setExportedBy: (name: string | null) => void
 
   // Multi-asset actions
   setSelectedAssets: (assets: TemplateType[]) => void

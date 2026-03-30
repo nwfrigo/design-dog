@@ -8,6 +8,7 @@ import { heroImages } from '@/config/solution-overview-assets'
 export function SolutionOverviewExportScreen() {
   const {
     setCurrentScreen,
+    exportedBy,
     // Solution Overview state
     solutionOverviewSolution,
     solutionOverviewSolutionName,
@@ -120,7 +121,7 @@ export function SolutionOverviewExportScreen() {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportParams),
+        body: JSON.stringify({ ...exportParams, exportedBy }),
       })
 
       if (!response.ok) {

@@ -9,12 +9,24 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { DraftBanner } from '@/components/DraftBanner'
 import { Header } from '@/components/Header'
 import { ReportBugModal, ReportBugLink } from '@/components/ReportBugModal'
+import { NamePickerModal, getStoredUser, clearStoredUser, UserBadge } from '@/components/NamePickerModal'
 
 function HomeContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { currentScreen, setCurrentScreen } = useStore()
+  const { currentScreen, setCurrentScreen, exportedBy, setExportedBy } = useStore()
   const [showBugModal, setShowBugModal] = useState(false)
+  const [showNamePicker, setShowNamePicker] = useState(false)
+
+  // Check for stored user identity on mount
+  useEffect(() => {
+    const stored = getStoredUser()
+    if (stored) {
+      setExportedBy(stored)
+    } else {
+      setShowNamePicker(true)
+    }
+  }, [setExportedBy])
 
   // Handle redirect message
   const message = searchParams.get('message')
@@ -45,8 +57,22 @@ function HomeContent() {
     setCurrentScreen('select')
   }
 
+  const handleNameSelect = (name: string) => {
+    setExportedBy(name)
+    setShowNamePicker(false)
+  }
+
+  const handleChangeUser = () => {
+    clearStoredUser()
+    setExportedBy(null)
+    setShowNamePicker(true)
+  }
+
   return (
     <main className="min-h-screen bg-white dark:bg-surface-primary">
+      {/* Name picker gate */}
+      {showNamePicker && <NamePickerModal onSelect={handleNameSelect} />}
+
       {/* Draft Banner */}
       {isSelectScreen && <DraftBanner />}
 
@@ -68,7 +94,14 @@ function HomeContent() {
         onLogoClick={handleLogoClick}
         rightContent={
           <div className="flex items-center gap-3">
+            {exportedBy && <UserBadge name={exportedBy} onChange={handleChangeUser} />}
             <ReportBugLink onClick={() => setShowBugModal(true)} />
+            <a
+              href="/admin"
+              className="text-xs text-gray-500 dark:text-content-secondary hover:text-gray-700 dark:hover:text-content-primary transition-colors"
+            >
+              Admin
+            </a>
             <ThemeToggle />
           </div>
         }

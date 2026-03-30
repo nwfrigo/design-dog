@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium-min'
 import { trackExport } from '@/lib/usage-tracking'
+import { logExport } from '@/lib/db'
+import { put } from '@vercel/blob'
+
+async function uploadThumbnail(buffer: Buffer, template: string): Promise<string | undefined> {
+  try {
+    const { url } = await put(
+      `monitoring/${Date.now()}-${template}.png`,
+      buffer,
+      { access: 'public', contentType: 'image/png' }
+    )
+    return url
+  } catch {
+    return undefined
+  }
+}
 
 // Remote Chromium binary for Vercel serverless (official Sparticuz release)
 // Must match the @sparticuz/chromium-min version (v143.0.4)
@@ -103,6 +118,7 @@ export async function POST(request: NextRequest) {
     // Keys consumed by the route itself, never forwarded to the render page
     const ROUTE_ONLY_KEYS = new Set([
       'template', 'scale', 'format', 'filename', 'numPages', 'numSlides',
+      'exportedBy',
     ])
 
     // Keys that require special processing (handled in dedicated blocks below)
@@ -481,6 +497,7 @@ export async function POST(request: NextRequest) {
 
         // Track export (fire-and-forget)
         trackExport(template)
+        logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: body.format || 'pdf', scale })
 
         return new NextResponse(Buffer.from(pdfBuffer), {
           headers: {
@@ -505,6 +522,9 @@ export async function POST(request: NextRequest) {
 
       // Track export (fire-and-forget)
       trackExport(template)
+      uploadThumbnail(Buffer.from(screenshot), template).then((thumbnailUrl) => {
+        logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl })
+      })
 
       return new NextResponse(Buffer.from(screenshot), {
         headers: {
@@ -529,6 +549,7 @@ export async function POST(request: NextRequest) {
 
       // Track export (fire-and-forget)
       trackExport(template)
+      logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.title || body.headline || body.eyebrow, solution: body.solution, format: 'pdf', scale })
 
       // Use document title for FAQ PDF filename, sanitized for filesystem
       const faqFilename = body.title
@@ -558,6 +579,9 @@ export async function POST(request: NextRequest) {
 
     // Track export (fire-and-forget)
     trackExport(template)
+    uploadThumbnail(Buffer.from(screenshot), template).then((thumbnailUrl) => {
+      logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl })
+    })
 
     // Return the image
     return new NextResponse(Buffer.from(screenshot), {

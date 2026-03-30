@@ -26,6 +26,7 @@ export function ExportQueueScreen() {
     selectedAssets,
     setSelectedAssets,
     goToAsset,
+    exportedBy,
   } = useStore()
 
   const [exportingId, setExportingId] = useState<string | null>(null)
@@ -78,7 +79,7 @@ export function ExportQueueScreen() {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportParams),
+        body: JSON.stringify({ ...exportParams, exportedBy }),
       })
 
       if (!response.ok) throw new Error('Export failed')

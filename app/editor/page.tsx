@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
 import { hasDraft } from '@/lib/draft-storage'
+import { getStoredUser } from '@/components/NamePickerModal'
 import { EditorLayout } from '@/components/EditorLayout'
 import { EditorScreen } from '@/components/EditorScreen'
 import { AutoCreateEditor } from '@/components/QuickStartEditor'
@@ -20,9 +21,15 @@ import { SocialCarouselEditorScreen } from '@/components/SocialCarouselEditorScr
 
 export default function EditorPage() {
   const router = useRouter()
-  const { loadDraft, generatedAssets, selectedAssets, currentScreen, setCurrentScreen } = useStore()
+  const { loadDraft, generatedAssets, selectedAssets, currentScreen, setCurrentScreen, setExportedBy } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const [hasValidDraft, setHasValidDraft] = useState(false)
+
+  useEffect(() => {
+    // Restore user identity from localStorage
+    const stored = getStoredUser()
+    if (stored) setExportedBy(stored)
+  }, [setExportedBy])
 
   useEffect(() => {
     // Check for draft and load it

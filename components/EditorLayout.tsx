@@ -174,6 +174,12 @@ export function EditorLayout({ children }: EditorLayoutProps) {
         </button>
       )}
       <ReportBugLink onClick={() => setShowBugModal(true)} />
+      <a
+        href="/admin"
+        className="text-xs text-gray-500 dark:text-content-secondary hover:text-gray-700 dark:hover:text-content-primary transition-colors"
+      >
+        Admin
+      </a>
       <ThemeToggle />
     </>
   )

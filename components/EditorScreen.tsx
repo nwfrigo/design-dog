@@ -451,6 +451,8 @@ export function EditorScreen() {
     templateType,
     // Generated assets (for auto-create mode detection)
     generatedAssets,
+    // User identity
+    exportedBy,
   } = useStore()
 
   // Check if we're in auto-create mode (sidebar handles navigation, not tabs)
@@ -895,7 +897,7 @@ export function EditorScreen() {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportParams),
+        body: JSON.stringify({ ...exportParams, exportedBy }),
       })
 
       if (!response.ok) {

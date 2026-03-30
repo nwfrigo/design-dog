@@ -168,6 +168,7 @@ export function SocialCarouselEditorScreen() {
     setCarouselSlides,
     setCarouselCurrentSlideIndex,
     setCurrentScreen,
+    exportedBy,
   } = useStore()
 
   // Local state synced to store
@@ -332,6 +333,7 @@ export function SocialCarouselEditorScreen() {
           imageZoom: slide.imageZoom,
           grayscale: slide.grayscale,
           logoColor,
+          exportedBy,
         }),
       })
 
@@ -365,6 +367,7 @@ export function SocialCarouselEditorScreen() {
           slidesData: JSON.stringify(slides),
           logoColor,
           numSlides: slides.length,
+          exportedBy,
         }),
       })
 

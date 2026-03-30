@@ -345,6 +345,11 @@ Both flows MUST use the same pattern.
 | `/api/parse-faq` | Word docs | FAQ content extraction |
 | `/api/generate-stacker` | N/A | AI module generation for Stacker |
 | `/api/report-bug` | N/A | Bug report submission (Resend email) |
+| `/api/team-members` | N/A | GET: list team members; POST: add new name |
+| `/api/admin/auth` | N/A | Admin login — checks `ADMIN_PASSWORD`, sets `dd-admin` cookie |
+| `/api/admin/exports` | N/A | Paginated export log with filters (admin only) |
+| `/api/admin/stats` | N/A | Aggregate export stats (admin only) |
+| `/api/admin/seed` | N/A | Creates DB tables + adds `thumbnail_url` column; safe to re-run |
 
 ### Upload Flow (Both Modes)
 
@@ -399,6 +404,76 @@ Claude may fail to process certain PDFs with "Could not process PDF" error:
 4. **Token must not be commented** — `# BLOB_READ_WRITE_TOKEN` won't work
 5. **Restart dev server** after adding env vars
 6. **Word docs use different endpoint** — `/api/upload-doc` for .docx files, NOT `/api/upload-pdf` (which validates for PDF only)
+
+---
+
+## Export Monitoring
+
+### Overview
+
+Every export is logged to a Neon Postgres database with metadata: who exported it, which template, headline/solution text, format, scale, and a thumbnail URL. The data is visible at `/admin`.
+
+### Database (`lib/db.ts`)
+
+Two tables live in Neon Postgres (provisioned via Vercel Marketplace, env var `POSTGRES_URL`):
+
+- **`export_logs`** — one row per export. Fields: `id`, `template_type`, `exported_by`, `headline`, `solution`, `format`, `scale`, `thumbnail_url`, `created_at`
+- **`team_members`** — the roster of known users. Fields: `id`, `name`, `created_at`
+
+Key functions:
+- `logExport(params)` — inserts one row; called fire-and-forget from the export API (never `await`ed in the main path)
+- `getExportStats()` — returns `{ total, today, thisWeek, byTemplate, byPerson, dailyCounts }`
+- `getExportLogs(filters)` — paginated query with optional filters
+- `getTeamMembers()` / `addTeamMember(name)` — team member CRUD
+
+**Schema changes:** Add new columns via `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` in `app/api/admin/seed/route.ts`. The seed endpoint is idempotent — safe to re-run in production to apply migrations.
+
+### Export Attribution (`exportedBy`)
+
+`exportedBy: string | null` lives in the Zustand store and all 6 export-screen components spread it into the fetch body. The export API route (`app/api/export/route.ts`) reads it from the request body, uploads a PNG thumbnail to Vercel Blob (fire-and-forget), then calls `logExport()`.
+
+- **Fire-and-forget:** `uploadThumbnail().then(thumbnailUrl => logExport(...)).catch(() => {})` — never blocks the export download
+- **PDFs:** No thumbnail uploaded; `thumbnail_url` is stored as `null`
+- **`exportedBy` is in `ROUTE_ONLY_KEYS`** — it's consumed by the API route and NOT forwarded as a render param
+
+All 4 export paths in the route must call `logExport`:
+1. Stacker PDF
+2. Stacker PNG
+3. FAQ/SO PDF
+4. Default PNG (all other templates)
+
+### Identity System (Name Picker)
+
+- **`components/NamePickerModal.tsx`** — full-screen gate on first load; no skip option
+- **localStorage key:** `design-dog-user` — persists across sessions; picker only shown when key is absent
+- **`UserBadge`** component — shown in the header after sign-in; click to re-open picker
+- **`components/NamePickerModal.tsx` also exports:** `getStoredUser()`, `clearStoredUser()`
+- **"+ add" flow:** POST to `/api/team-members` → name saved to DB → available to all users on next load
+
+Identity is restored from localStorage in `app/editor/page.tsx` on mount via `setExportedBy`.
+
+### Admin Dashboard (`/admin`)
+
+- **Route:** `app/admin/page.tsx`
+- **Auth:** `middleware.ts` checks for `dd-admin` httpOnly cookie (24hr). No cookie → redirects to `?login=1`. Password checked against `ADMIN_PASSWORD` env var.
+- **Stats cards:** Total exports (dropdown: today/this week/all time), Most Active user
+- **Chart:** Horizontal bar chart of exports by template name
+- **Table:** Paginated export log with thumbnail lightbox, name/template/format filters
+- **Thumbnails:** PNG exports show a Vercel Blob thumbnail in a lightbox; PDFs show a placeholder
+
+### Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `POSTGRES_URL` | Neon Postgres connection string (pooled) — auto-set by Vercel Marketplace |
+| `ADMIN_PASSWORD` | Password for `/admin` login — set manually in Vercel dashboard |
+
+### First-Time Setup
+
+1. Add Neon Postgres via Vercel Marketplace → `POSTGRES_URL` is auto-provisioned
+2. Set `ADMIN_PASSWORD` in Vercel env vars
+3. Hit `/api/admin/seed` once (POST with password) to create tables
+4. Re-run seed after schema changes (it uses `ADD COLUMN IF NOT EXISTS`)
 
 ---
 

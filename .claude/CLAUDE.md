@@ -86,25 +86,43 @@ Do not let resolved, one-off items sit in LESSONS.md indefinitely.
 ## Environment Variables
 
 - `ANTHROPIC_API_KEY` — for AI copy generation
-- `BLOB_READ_WRITE_TOKEN` — for PDF uploads (Vercel Blob)
+- `BLOB_READ_WRITE_TOKEN` — for PDF uploads and export thumbnails (Vercel Blob)
 - `RESEND_API_KEY` — for feature request emails
+- `POSTGRES_URL` — Neon Postgres connection string; auto-provisioned by Vercel Marketplace
+- `ADMIN_PASSWORD` — password for the `/admin` dashboard; set manually in Vercel dashboard
 - Restart dev server after adding env vars
 - Vercel requires redeploy after adding environment variables
 
 ### Local Development
 
-**Required:** `BLOB_READ_WRITE_TOKEN` in `.env.local`
+**Required:** `BLOB_READ_WRITE_TOKEN` and `POSTGRES_URL` in `.env.local`
 
-Get token from: Vercel Dashboard → Project → Storage → Blob Store → Tokens
+`POSTGRES_URL` is auto-injected when Neon is linked via Vercel Marketplace. Pull it with:
+```bash
+npx vercel@latest env pull .env.local
+```
+
+Get blob token from: Vercel Dashboard → Project → Storage → Blob Store → Tokens
 
 ```bash
 # .env.local
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxxxx
+POSTGRES_URL=postgresql://...
 ```
 
 **Common error:** `Vercel Blob: Failed to retrieve the client token`
 - Cause: Token missing or commented out (check for `#` prefix)
 - Fix: Add/uncomment token, restart dev server
+
+### Admin Dashboard
+
+`/admin` is password-protected via an httpOnly cookie (`dd-admin`, 24hr expiry). After first deploy or DB schema changes, hit the seed endpoint once:
+```bash
+curl -X POST https://your-domain.vercel.app/api/admin/seed \
+  -H "Content-Type: application/json" \
+  -d '{"password":"YOUR_ADMIN_PASSWORD"}'
+```
+The seed route is idempotent — safe to re-run at any time.
 
 ---
 

@@ -8,6 +8,7 @@ import type { StackerModule } from '@/types'
 export function StackerExportScreen() {
   const {
     setCurrentScreen,
+    exportedBy,
     // Stacker state
     stackerLogoChipModule,
     stackerHeaderModule,
@@ -71,7 +72,7 @@ export function StackerExportScreen() {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportParams),
+        body: JSON.stringify({ ...exportParams, exportedBy }),
       })
 
       if (!response.ok) {
