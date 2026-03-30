@@ -520,12 +520,13 @@ export async function POST(request: NextRequest) {
 
       await browser.close()
 
-      // Track export (fire-and-forget)
+      // Upload thumbnail and log export — both awaited so nothing is lost when the function terminates
       trackExport(template)
-      logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale })
-      uploadThumbnail(Buffer.from(screenshot), template).catch(() => {})
+      const screenshotBuf1 = Buffer.from(screenshot)
+      const thumbnailUrl1 = await uploadThumbnail(screenshotBuf1, template)
+      await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl1 })
 
-      return new NextResponse(Buffer.from(screenshot), {
+      return new NextResponse(screenshotBuf1, {
         headers: {
           'Content-Type': 'image/png',
           'Content-Disposition': `attachment; filename="${stackerFilename}.png"`,
@@ -576,13 +577,14 @@ export async function POST(request: NextRequest) {
 
     await browser.close()
 
-    // Track export (fire-and-forget)
+    // Upload thumbnail and log export — both awaited so nothing is lost when the function terminates
     trackExport(template)
-    logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale })
-    uploadThumbnail(Buffer.from(screenshot), template).catch(() => {})
+    const screenshotBuf2 = Buffer.from(screenshot)
+    const thumbnailUrl2 = await uploadThumbnail(screenshotBuf2, template)
+    await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl2 })
 
     // Return the image
-    return new NextResponse(Buffer.from(screenshot), {
+    return new NextResponse(screenshotBuf2, {
       headers: {
         'Content-Type': 'image/png',
         'Content-Disposition': `attachment; filename="design-${scale}x.png"`,
