@@ -13,6 +13,7 @@ import { SocialImageMeddbase } from '@/components/templates/SocialImageMeddbase'
 import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
+import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -131,6 +132,20 @@ export function TemplateRenderer({
           showMetadata={true}
           showCta={true}
           showSolutionSet={true}
+        />
+      )
+
+    case 'email-cority-connect-2026':
+      return (
+        <EmailCorityConnect2026
+          {...commonProps}
+          headline={PREVIEW_CONTENT.headline}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          backgroundVariant="dark-blue-1"
+          showHeadline={true}
+          showBody={true}
+          showCta={true}
         />
       )
 
