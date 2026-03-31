@@ -141,6 +141,15 @@ export interface ExportParamState {
   // Email EHS Accelerate Banner
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Invitation
+  invitationHeader: string
+  invitationHeadline: string
+  invitationEventTitle: string
+  invitationEventDate: string
+  invitationEventLocation: string
+  invitationEventTime: string
+  invitationEventTimeNote: string
+  invitationBody: string
 }
 
 type ExportParamBuilder = (s: ExportParamState) => Record<string, unknown>
@@ -338,6 +347,17 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   'email-ehs-accelerate-banner': (s) => ({
     eventDate: s.eventDate || '',
     eventLocation: s.eventLocation || '',
+  }),
+
+  'email-ehs-accelerate-invitation': (s) => ({
+    invitationHeader: s.invitationHeader || '',
+    invitationHeadline: s.invitationHeadline || '',
+    invitationEventTitle: s.invitationEventTitle || '',
+    invitationEventDate: s.invitationEventDate || '',
+    invitationEventLocation: s.invitationEventLocation || '',
+    invitationEventTime: s.invitationEventTime || '',
+    invitationEventTimeNote: s.invitationEventTimeNote || '',
+    invitationBody: s.invitationBody || '',
   }),
 
   'email-product-release': (s) => ({
@@ -634,6 +654,14 @@ export function buildExportParamsFromAsset(
     ccBackgroundVariant: (a.ccBackgroundVariant as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) || 'dark-blue-1',
     eventDate: (a.eventDate as string) || '',
     eventLocation: (a.eventLocation as string) || '',
+    invitationHeader: (a.invitationHeader as string) || '',
+    invitationHeadline: (a.invitationHeadline as string) || '',
+    invitationEventTitle: (a.invitationEventTitle as string) || '',
+    invitationEventDate: (a.invitationEventDate as string) || '',
+    invitationEventLocation: (a.invitationEventLocation as string) || '',
+    invitationEventTime: (a.invitationEventTime as string) || '',
+    invitationEventTimeNote: (a.invitationEventTimeNote as string) || '',
+    invitationBody: (a.invitationBody as string) || '',
   }
 
   return buildExportParams(asset.templateType, exportScale, state)

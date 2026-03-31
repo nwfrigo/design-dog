@@ -18,6 +18,7 @@ import { EmailImage } from '@/components/templates/EmailImage'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
+import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -425,6 +426,46 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       fields: [
         { param: 'eventDate', parser: 'string', default: 'Thursday, 13th November' },
         { param: 'eventLocation', parser: 'string', default: 'London, UK' },
+      ],
+    },
+  },
+
+  'email-ehs-accelerate-invitation': {
+    component: EmailEhsAccelerateInvitation,
+    renderProps: (asset, colors, typography) => ({
+      invitationHeader: asset.invitationHeader || "You're Invited",
+      invitationHeadline: asset.invitationHeadline || 'Exclusive EHS+ Leader Workshop',
+      invitationEventTitle: asset.invitationEventTitle || 'EHS+ Accelerate: Tech Convergence Workshop',
+      invitationEventDate: asset.invitationEventDate || '13 November',
+      invitationEventLocation: asset.invitationEventLocation || 'London, England',
+      invitationEventTime: asset.invitationEventTime || '10:00–14:30',
+      invitationEventTimeNote: asset.invitationEventTimeNote || 'Lunch Included',
+      invitationBody: asset.invitationBody || '',
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [
+      { key: 'invitationHeader', label: 'Header' },
+      { key: 'invitationHeadline', label: 'Headline' },
+      { key: 'invitationEventTitle', label: 'Event Title' },
+      { key: 'invitationEventDate', label: 'Date' },
+      { key: 'invitationEventLocation', label: 'Location' },
+      { key: 'invitationEventTime', label: 'Time' },
+      { key: 'invitationEventTimeNote', label: 'Time Note' },
+      { key: 'invitationBody', label: 'Body (HTML)' },
+    ],
+    renderSchema: {
+      width: 420,
+      height: 595,
+      background: '#ffffff',
+      fields: [
+        { param: 'invitationHeader', parser: 'string', default: "You're Invited" },
+        { param: 'invitationHeadline', parser: 'string', default: 'Exclusive EHS+ Leader Workshop' },
+        { param: 'invitationEventTitle', parser: 'string', default: 'EHS+ Accelerate: Tech Convergence Workshop' },
+        { param: 'invitationEventDate', parser: 'string', default: '13 November' },
+        { param: 'invitationEventLocation', parser: 'string', default: 'London, England' },
+        { param: 'invitationEventTime', parser: 'string', default: '10:00–14:30' },
+        { param: 'invitationEventTimeNote', parser: 'string', default: 'Lunch Included' },
+        { param: 'invitationBody', parser: 'string', default: '' },
       ],
     },
   },

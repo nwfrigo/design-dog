@@ -1,5 +1,5 @@
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
 
 // Shared variant/setting union types (extracted to avoid repeating inline unions)
 export type LogoColor = 'black' | 'orange' | 'white'
@@ -409,6 +409,15 @@ export interface ManualAssetSettings {
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Invitation specific
+  invitationHeader: string
+  invitationHeadline: string
+  invitationEventTitle: string
+  invitationEventDate: string
+  invitationEventLocation: string
+  invitationEventTime: string
+  invitationEventTimeNote: string
+  invitationBody: string
 }
 
 // App Flow Types
@@ -610,6 +619,15 @@ export interface GeneratedAsset {
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Invitation specific
+  invitationHeader: string
+  invitationHeadline: string
+  invitationEventTitle: string
+  invitationEventDate: string
+  invitationEventLocation: string
+  invitationEventTime: string
+  invitationEventTimeNote: string
+  invitationBody: string
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -760,6 +778,15 @@ export interface QueuedAsset {
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Invitation specific
+  invitationHeader: string
+  invitationHeadline: string
+  invitationEventTitle: string
+  invitationEventDate: string
+  invitationEventLocation: string
+  invitationEventTime: string
+  invitationEventTimeNote: string
+  invitationBody: string
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -966,6 +993,16 @@ export interface AppState {
   eventDate: string
   eventLocation: string
 
+  // Email EHS Accelerate Invitation
+  invitationHeader: string
+  invitationHeadline: string
+  invitationEventTitle: string
+  invitationEventDate: string
+  invitationEventLocation: string
+  invitationEventTime: string
+  invitationEventTimeNote: string
+  invitationBody: string
+
   // User identity (for export tracking)
   exportedBy: string | null
 
@@ -1153,6 +1190,16 @@ export interface AppState {
   setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => void
   setEventDate: (date: string) => void
   setEventLocation: (location: string) => void
+
+  // Email EHS Accelerate Invitation setters
+  setInvitationHeader: (v: string) => void
+  setInvitationHeadline: (v: string) => void
+  setInvitationEventTitle: (v: string) => void
+  setInvitationEventDate: (v: string) => void
+  setInvitationEventLocation: (v: string) => void
+  setInvitationEventTime: (v: string) => void
+  setInvitationEventTimeNote: (v: string) => void
+  setInvitationBody: (v: string) => void
 
   // User identity
   setExportedBy: (name: string | null) => void

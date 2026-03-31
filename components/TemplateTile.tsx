@@ -15,6 +15,7 @@ import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
+import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -156,6 +157,21 @@ export function TemplateRenderer({
           {...commonProps}
           eventDate="Thursday, 13th November"
           eventLocation="London, UK"
+        />
+      )
+
+    case 'email-ehs-accelerate-invitation':
+      return (
+        <EmailEhsAccelerateInvitation
+          {...commonProps}
+          invitationHeader="You're Invited"
+          invitationHeadline="Exclusive EHS+ Leader Workshop"
+          invitationEventTitle="EHS+ Accelerate: Tech Convergence Workshop"
+          invitationEventDate="13 November"
+          invitationEventLocation="London, England"
+          invitationEventTime="10:00–14:30"
+          invitationEventTimeNote="Lunch Included"
+          invitationBody=""
         />
       )
 

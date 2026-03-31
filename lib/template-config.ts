@@ -82,6 +82,13 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     width: 600,
     height: 373,
   },
+  {
+    type: 'email-ehs-accelerate-invitation',
+    label: 'EHS+ Accelerate Invitation',
+    dimensions: '420 × 595px',
+    width: 420,
+    height: 595,
+  },
 ]
 
 // Template definitions for social

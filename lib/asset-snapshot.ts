@@ -158,6 +158,15 @@ const SNAPSHOT_FIELDS = [
   // Email EHS Accelerate Banner
   'eventDate',
   'eventLocation',
+  // Email EHS Accelerate Invitation
+  'invitationHeader',
+  'invitationHeadline',
+  'invitationEventTitle',
+  'invitationEventDate',
+  'invitationEventLocation',
+  'invitationEventTime',
+  'invitationEventTimeNote',
+  'invitationBody',
 ] as const
 
 // Type for the shared field keys
