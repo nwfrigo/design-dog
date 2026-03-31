@@ -15,7 +15,7 @@ Tags: [ui], [pattern], [bug], [export], [dark-mode], [template], [state], [perf]
 
 - [state] `exportedBy` and other top-level store fields must be placed in the main `create()` block in `store/index.ts`, not inside helper functions like `getDefaultAssetSettings()`. Putting state in the wrong location causes TypeScript to see it as missing from `AppState`.
 
-- [pattern] Fire-and-forget DB logging in the export API: never `await` `logExport()` in the main response path. Use `.then(thumbnailUrl => logExport(...)).catch(() => {})` so a DB failure never blocks or delays the user's export download.
+- [pattern] Export API logging must be fully awaited — NOT fire-and-forget. Vercel serverless functions terminate the moment the HTTP response is sent, killing any unresolved `.then()` chains. Both `uploadThumbnail()`/`uploadPdf()` and `logExport()` must be `await`ed before the `return new NextResponse(...)`. The latency cost (~1s blob upload) is acceptable because Puppeteer already dominates at 3–8s.
 
 - [ux] Identity/user-facing utility UI (name picker modal, user badge chip) should use `text-xs font-mono text-gray-400 dark:text-content-secondary` — matching the about blurb tone — to keep it subtle and out of the way. These elements are infrastructure, not primary UI.
 

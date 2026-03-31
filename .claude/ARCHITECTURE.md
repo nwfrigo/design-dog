@@ -430,10 +430,11 @@ Key functions:
 
 ### Export Attribution (`exportedBy`)
 
-`exportedBy: string | null` lives in the Zustand store and all 6 export-screen components spread it into the fetch body. The export API route (`app/api/export/route.ts`) reads it from the request body, uploads a PNG thumbnail to Vercel Blob (fire-and-forget), then calls `logExport()`.
+`exportedBy: string | null` lives in the Zustand store and all 6 export-screen components spread it into the fetch body. The export API route (`app/api/export/route.ts`) reads it from the request body, uploads a thumbnail/PDF blob to Vercel Blob, then calls `logExport()`.
 
-- **Fire-and-forget:** `uploadThumbnail().then(thumbnailUrl => logExport(...)).catch(() => {})` — never blocks the export download
-- **PDFs:** No thumbnail uploaded; `thumbnail_url` is stored as `null`
+- **Awaited — not fire-and-forget:** Both the blob upload and `logExport()` are fully `await`ed before the HTTP response is returned. This is required because Vercel serverless functions terminate immediately after the response is sent, killing any unresolved `.then()` chains. Using fire-and-forget here causes silent data loss.
+- **PNG exports:** Upload a screenshot thumbnail to Vercel Blob; `thumbnail_url` stores the blob URL. Admin shows the thumbnail in a lightbox.
+- **PDF exports:** Upload the actual PDF buffer to Vercel Blob; `thumbnail_url` stores the PDF blob URL. Admin shows a native `<embed>` lightbox for multi-page viewing.
 - **`exportedBy` is in `ROUTE_ONLY_KEYS`** — it's consumed by the API route and NOT forwarded as a render param
 
 All 4 export paths in the route must call `logExport`:
@@ -459,7 +460,7 @@ Identity is restored from localStorage in `app/editor/page.tsx` on mount via `se
 - **Stats cards:** Total exports (dropdown: today/this week/all time), Most Active user
 - **Chart:** Horizontal bar chart of exports by template name
 - **Table:** Paginated export log with thumbnail lightbox, name/template/format filters
-- **Thumbnails:** PNG exports show a Vercel Blob thumbnail in a lightbox; PDFs show a placeholder
+- **Thumbnails:** PNG exports show a Vercel Blob thumbnail in a click-to-open lightbox; PDF exports show a clickable "PDF" button that opens the actual PDF in a native `<embed>` lightbox (multi-page, browser-native navigation)
 
 ### Environment Variables
 
