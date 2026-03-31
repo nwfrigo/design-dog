@@ -136,6 +136,8 @@ export interface ExportParamState {
   solutionOverviewScreenshotPosition: { x: number; y: number }
   solutionOverviewScreenshotZoom: number
   solutionOverviewCtaOption: string
+  // Email Cority Connect 2026
+  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
 }
 
 type ExportParamBuilder = (s: ExportParamState) => Record<string, unknown>
@@ -321,6 +323,13 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSolutionSet: s.showSolutionSet,
     ...buildSpeakerParams(s),
     grayscale: s.grayscale,
+  }),
+
+  'email-cority-connect-2026': (s) => ({
+    backgroundVariant: s.ccBackgroundVariant || 'dark-blue-1',
+    ctaText: s.ctaText,
+    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showCta: s.showCta,
   }),
 
   'email-product-release': (s) => ({
@@ -614,6 +623,7 @@ export function buildExportParamsFromAsset(
     customerLibraryVariant: (a.customerLibraryVariant as string) || 'dark',
     qrCodeUrl: (a.thumbnailImageUrl as string | null) ?? null,
     showFooterText: a.showSubhead !== false,
+    ccBackgroundVariant: (a.ccBackgroundVariant as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) || 'dark-blue-1',
   }
 
   return buildExportParams(asset.templateType, exportScale, state)

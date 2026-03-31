@@ -23,3 +23,6 @@ Tags: [ui], [pattern], [bug], [export], [dark-mode], [template], [state], [perf]
 
 - [pattern] Admin stat cards: use `flex flex-wrap gap-4` container + `w-fit min-w-[160px]` on each card rather than a CSS grid. Grid forces cards to fill the row width; flex lets them hug their content naturally.
 
+## 2026-03-31
+- [pattern] Major backend feature shipped: admin/monitor system with team identity (team code gate + name picker), Vercel Postgres database (team_members, drafts, activity_log tables), export thumbnail storage to Vercel Blob, shared activity feed, and export gallery. See Team-Identity-Feature-Request.docx in project root for full spec. Key architectural decisions: team code as env var (TEAM_ACCESS_CODE), name-based identity with long-lived cookies, localStorage kept as fallback alongside database persistence, auto-save debounce preserved for DB writes.
+

@@ -16,6 +16,7 @@ import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloat
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
 import { EmailImage } from '@/components/templates/EmailImage'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
+import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -402,6 +403,39 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
       }),
+    },
+  },
+
+  'email-cority-connect-2026': {
+    component: EmailCorityConnect2026,
+    renderProps: (asset, colors, typography) => ({
+      headline: asset.headline || 'Lightweight header.',
+      body: asset.body || '',
+      ctaText: asset.ctaText || 'Register Now',
+      backgroundVariant: asset.ccBackgroundVariant || 'dark-blue-1',
+      showHeadline: asset.showHeadline !== false,
+      showBody: asset.showBody && !!asset.body,
+      showCta: asset.showCta !== false,
+      headlineFontSize: asset.headlineFontSize ?? undefined,
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [
+      { key: 'ctaText', label: 'CTA', showKey: 'showCta' },
+    ],
+    renderSchema: {
+      width: 640,
+      height: 370,
+      background: '#060015',
+      fields: [
+        { param: 'headline', parser: 'string', default: 'Lightweight header.' },
+        { param: 'body', parser: 'string', default: '' },
+        { param: 'ctaText', parser: 'string', default: 'Register Now' },
+        { param: 'backgroundVariant', parser: 'enum', default: 'dark-blue-1' },
+        { param: 'showHeadline', parser: 'boolTrue' },
+        { param: 'showBody', parser: 'boolTrue' },
+        { param: 'showCta', parser: 'boolTrue' },
+        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+      ],
     },
   },
 

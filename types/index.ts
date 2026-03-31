@@ -1,5 +1,5 @@
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
 
 // Shared variant/setting union types (extracted to avoid repeating inline unions)
 export type LogoColor = 'black' | 'orange' | 'white'
@@ -404,6 +404,8 @@ export interface ManualAssetSettings {
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
+  // Email Cority Connect 2026 specific
+  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
 }
 
 // App Flow Types
@@ -600,6 +602,8 @@ export interface GeneratedAsset {
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
+  // Email Cority Connect 2026 specific
+  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -745,6 +749,8 @@ export interface QueuedAsset {
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
+  // Email Cority Connect 2026 specific
+  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -944,6 +950,9 @@ export interface AppState {
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
 
+  // Email Cority Connect 2026
+  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+
   // User identity (for export tracking)
   exportedBy: string | null
 
@@ -1128,6 +1137,7 @@ export interface AppState {
   // Social Carousel actions
   setCarouselSlides: (slides: CarouselSlide[]) => void
   setCarouselCurrentSlideIndex: (index: number) => void
+  setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => void
 
   // User identity
   setExportedBy: (name: string | null) => void

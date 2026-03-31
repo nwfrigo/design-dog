@@ -153,6 +153,8 @@ const SNAPSHOT_FIELDS = [
   // Social Carousel
   'carouselSlides',
   'carouselCurrentSlideIndex',
+  // Email Cority Connect 2026
+  'ccBackgroundVariant',
 ] as const
 
 // Type for the shared field keys

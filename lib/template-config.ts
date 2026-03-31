@@ -68,6 +68,13 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     width: 640,
     height: 164,
   },
+  {
+    type: 'email-cority-connect-2026',
+    label: 'Cority Connect 2026',
+    dimensions: '640 × 370px',
+    width: 640,
+    height: 370,
+  },
 ]
 
 // Template definitions for social

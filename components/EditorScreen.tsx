@@ -12,6 +12,8 @@ import { EmailGrid, type GridDetail } from './templates/EmailGrid'
 import { EmailImage } from './templates/EmailImage'
 import { SocialImageMeddbase } from './templates/SocialImageMeddbase'
 import { EmailProductRelease } from './templates/EmailProductRelease'
+import { EmailCorityConnect2026 } from './templates/EmailCorityConnect2026'
+import type { CCBackgroundVariant } from './templates/EmailCorityConnect2026'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
 import { EmailSpeakers } from './templates/EmailSpeakers'
@@ -71,6 +73,7 @@ const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: 
   'newsletter-blue-gradient': { default: 24, min: 12, max: 36, step: 1 },
   'newsletter-light': { default: 24, min: 12, max: 36, step: 1 },
   'social-carousel': { default: 112, min: 40, max: 140, step: 4 },
+  'email-cority-connect-2026': { default: 38, min: 16, max: 50, step: 2 },
 }
 
 const SUBHEAD_SIZE_CONFIG: Record<string, { default: number; min: number; max: number; step: number }> = {
@@ -439,6 +442,9 @@ export function EditorScreen() {
     setSolutionOverviewCtaOption,
     solutionOverviewCtaUrl,
     setSolutionOverviewCtaUrl,
+    // Email Cority Connect 2026
+    ccBackgroundVariant,
+    setCcBackgroundVariant,
     // Queue
     addToQueue,
     exportQueue,
@@ -890,6 +896,7 @@ export function EditorScreen() {
         solutionOverviewScreenshotPosition,
         solutionOverviewScreenshotZoom,
         solutionOverviewCtaOption,
+        ccBackgroundVariant: ccBackgroundVariant || 'dark-blue-1',
       }
 
       const exportParams = buildExportParams(currentTemplate, exportScale, paramState)
@@ -1324,7 +1331,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1380,7 +1387,7 @@ export function EditorScreen() {
               )}
 
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, Website Floating Banner, or Solution Overview PDF */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library') && (
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -2079,6 +2086,95 @@ export function EditorScreen() {
               </div>
             )}
 
+            {/* Email Cority Connect 2026 Controls */}
+            {currentTemplate === 'email-cority-connect-2026' && (
+              <div className="space-y-3">
+                {/* Mode: dark / light */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Mode</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
+                    {(['dark', 'light'] as const).map((mode) => {
+                      const isCurrent = (ccBackgroundVariant || 'dark-blue-1').startsWith(mode)
+                      return (
+                        <button
+                          key={mode}
+                          onClick={() => {
+                            const parts = (ccBackgroundVariant || 'dark-blue-1').split('-')
+                            const color = parts[1] as 'blue' | 'orange'
+                            const num = parts[2]
+                            setCcBackgroundVariant(`${mode}-${color}-${num}` as CCBackgroundVariant)
+                          }}
+                          className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                            isCurrent
+                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                              : 'text-gray-600 dark:text-content-secondary'
+                          }`}
+                        >
+                          {mode === 'dark' ? 'Dark' : 'Light'}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Color: blue / orange */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Color</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
+                    {(['blue', 'orange'] as const).map((color) => {
+                      const parts = (ccBackgroundVariant || 'dark-blue-1').split('-')
+                      const isCurrent = parts[1] === color
+                      return (
+                        <button
+                          key={color}
+                          onClick={() => {
+                            const mode = parts[0] as 'dark' | 'light'
+                            const num = parts[2]
+                            setCcBackgroundVariant(`${mode}-${color}-${num}` as CCBackgroundVariant)
+                          }}
+                          className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                            isCurrent
+                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                              : 'text-gray-600 dark:text-content-secondary'
+                          }`}
+                        >
+                          {color === 'blue' ? 'Blue' : 'Orange'}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Background number: 1–4 */}
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Background</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
+                    {([1, 2, 3, 4] as const).map((num) => {
+                      const parts = (ccBackgroundVariant || 'dark-blue-1').split('-')
+                      const isCurrent = parts[2] === String(num)
+                      return (
+                        <button
+                          key={num}
+                          onClick={() => {
+                            const mode = parts[0] as 'dark' | 'light'
+                            const color = parts[1] as 'blue' | 'orange'
+                            setCcBackgroundVariant(`${mode}-${color}-${num}` as CCBackgroundVariant)
+                          }}
+                          className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                            isCurrent
+                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                              : 'text-gray-600 dark:text-content-secondary'
+                          }`}
+                        >
+                          {num}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Solution Overview PDF Controls */}
             {currentTemplate === 'solution-overview-pdf' && (
               <SolutionOverviewEditorControls
@@ -2423,8 +2519,8 @@ export function EditorScreen() {
           {/* Direct Edit Mode */}
           {contentMode === 'verbatim' && (
             <div className="space-y-4">
-              {/* Eyebrow - not shown for email-image, social-image, solution-overview-pdf (they don't use it) */}
-              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && (
+              {/* Eyebrow - not shown for email-image, social-image, solution-overview-pdf, email-cority-connect-2026 (they don't use it) */}
+              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -4042,6 +4138,21 @@ export function EditorScreen() {
                   imagePosition={thumbnailImagePosition}
                   imageZoom={thumbnailImageZoom}
                   grayscale={grayscale}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-cority-connect-2026' && (
+                <EmailCorityConnect2026
+                  headline={verbatimCopy.headline || 'Lightweight header.'}
+                  body={verbatimCopy.body || ''}
+                  ctaText={ctaText}
+                  backgroundVariant={ccBackgroundVariant || 'dark-blue-1'}
+                  showHeadline={showHeadline}
+                  showBody={showBody && !!verbatimCopy.body}
+                  showCta={showCta}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

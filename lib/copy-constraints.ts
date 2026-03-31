@@ -200,6 +200,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'faq-pdf': 'collateral',
   'stacker-pdf': 'collateral',
   'customer-library': 'website',
+  'email-cority-connect-2026': 'email',
 }
 
 /**
