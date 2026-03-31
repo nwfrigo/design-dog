@@ -138,6 +138,9 @@ export interface ExportParamState {
   solutionOverviewCtaOption: string
   // Email Cority Connect 2026
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  // Email EHS Accelerate Banner
+  eventDate: string
+  eventLocation: string
 }
 
 type ExportParamBuilder = (s: ExportParamState) => Record<string, unknown>
@@ -330,6 +333,11 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     ctaText: s.ctaText,
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showCta: s.showCta,
+  }),
+
+  'email-ehs-accelerate-banner': (s) => ({
+    eventDate: s.eventDate || '',
+    eventLocation: s.eventLocation || '',
   }),
 
   'email-product-release': (s) => ({
@@ -624,6 +632,8 @@ export function buildExportParamsFromAsset(
     qrCodeUrl: (a.thumbnailImageUrl as string | null) ?? null,
     showFooterText: a.showSubhead !== false,
     ccBackgroundVariant: (a.ccBackgroundVariant as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) || 'dark-blue-1',
+    eventDate: (a.eventDate as string) || '',
+    eventLocation: (a.eventLocation as string) || '',
   }
 
   return buildExportParams(asset.templateType, exportScale, state)

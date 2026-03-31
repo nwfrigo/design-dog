@@ -14,6 +14,7 @@ import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
+import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -146,6 +147,15 @@ export function TemplateRenderer({
           showHeadline={true}
           showBody={true}
           showCta={true}
+        />
+      )
+
+    case 'email-ehs-accelerate-banner':
+      return (
+        <EmailEhsAccelerateBanner
+          {...commonProps}
+          eventDate="Thursday, 13th November"
+          eventLocation="London, UK"
         />
       )
 

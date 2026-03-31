@@ -17,6 +17,7 @@ import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
 import { EmailImage } from '@/components/templates/EmailImage'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
+import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -403,6 +404,28 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
       }),
+    },
+  },
+
+  'email-ehs-accelerate-banner': {
+    component: EmailEhsAccelerateBanner,
+    renderProps: (asset, colors, typography) => ({
+      eventDate: asset.eventDate || 'Thursday, 13th November',
+      eventLocation: asset.eventLocation || 'London, UK',
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [
+      { key: 'eventDate', label: 'Date' },
+      { key: 'eventLocation', label: 'Location' },
+    ],
+    renderSchema: {
+      width: 600,
+      height: 373,
+      background: '#ffffff',
+      fields: [
+        { param: 'eventDate', parser: 'string', default: 'Thursday, 13th November' },
+        { param: 'eventLocation', parser: 'string', default: 'London, UK' },
+      ],
     },
   },
 

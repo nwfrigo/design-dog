@@ -235,6 +235,9 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   carouselCurrentSlideIndex: 0,
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: 'dark-blue-1' as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant,
+  // Email EHS Accelerate Banner specific
+  eventDate: '',
+  eventLocation: '',
 
   // FAQ PDF specific
   faqTitle: 'Title Goes Here',
@@ -479,6 +482,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   // Email Cority Connect 2026
   ccBackgroundVariant: 'dark-blue-1' as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant,
+  // Email EHS Accelerate Banner
+  eventDate: '',
+  eventLocation: '',
 
   // User identity (for export tracking)
   exportedBy: null,
@@ -749,6 +755,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setCarouselSlides: (slides: CarouselSlide[]) => set({ carouselSlides: slides }),
   setCarouselCurrentSlideIndex: (index: number) => set({ carouselCurrentSlideIndex: index }),
   setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => set({ ccBackgroundVariant: variant }),
+  setEventDate: (date: string) => set({ eventDate: date }),
+  setEventLocation: (location: string) => set({ eventLocation: location }),
 
   // User identity
   setExportedBy: (name: string | null) => set({ exportedBy: name }),
@@ -765,7 +773,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, bottomSpacing, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, bottomSpacing, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant, eventDate, eventLocation } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -867,6 +875,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         carouselCurrentSlideIndex,
         // Email Cority Connect 2026
         ccBackgroundVariant,
+        // Email EHS Accelerate Banner
+        eventDate,
+        eventLocation,
       }
       const updatedSettings = {
         ...manualAssetSettings,
@@ -966,6 +977,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         carouselCurrentSlideIndex: targetTemplateDefaults.carouselCurrentSlideIndex,
         // Email Cority Connect 2026
         ccBackgroundVariant: targetTemplateDefaults.ccBackgroundVariant,
+        // Email EHS Accelerate Banner
+        eventDate: targetTemplateDefaults.eventDate,
+        eventLocation: targetTemplateDefaults.eventLocation,
       }
       const targetSettings = updatedSettings[index] || defaultSettings
 
@@ -1072,6 +1086,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         carouselCurrentSlideIndex: targetSettings.carouselCurrentSlideIndex,
         // Email Cority Connect 2026
         ccBackgroundVariant: targetSettings.ccBackgroundVariant,
+        // Email EHS Accelerate Banner
+        eventDate: targetSettings.eventDate,
+        eventLocation: targetSettings.eventLocation,
         // Reset generation state when switching assets - each asset has its own generation context
         pdfContent: null,
         generationContext: '',
