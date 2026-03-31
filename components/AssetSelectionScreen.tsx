@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
 import { DISTRIBUTION_CHANNELS, type TemplateInfo } from '@/lib/template-config'
@@ -9,7 +9,7 @@ import { QuickStartWizard } from '@/components/QuickStartWizard'
 import { KIT_LIST } from '@/config/kit-configs'
 
 // Filter chip options
-type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm'
+type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm' | 'event:cority-connect' | 'event:ehs-accelerate'
 
 const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -18,6 +18,20 @@ const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
   { id: 'sales-pm', label: 'Collateral' },
   { id: 'social', label: 'Social' },
   { id: 'newsletter', label: 'Newsletter' },
+]
+
+// Events dropdown config
+const EVENTS: { id: FilterType; label: string; templates: string[] }[] = [
+  {
+    id: 'event:cority-connect',
+    label: 'Cority Connect',
+    templates: ['email-cority-connect-2026'],
+  },
+  {
+    id: 'event:ehs-accelerate',
+    label: 'EHS+ Accelerate',
+    templates: ['email-ehs-accelerate-banner'],
+  },
 ]
 
 // Extended template info with channel
@@ -170,6 +184,19 @@ export function AssetSelectionScreen() {
 
   // Filter state
   const [activeFilter, setActiveFilter] = useState<FilterType>('all')
+  const [eventsDropdownOpen, setEventsDropdownOpen] = useState(false)
+  const eventsRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (eventsRef.current && !eventsRef.current.contains(e.target as Node)) {
+        setEventsDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Get all templates with channel info
   const allTemplates = useMemo(() => getAllTemplatesWithChannels(), [])
@@ -177,6 +204,12 @@ export function AssetSelectionScreen() {
   // Filter templates based on active filter
   const filteredTemplates = useMemo(() => {
     if (activeFilter === 'all') return allTemplates
+
+    if (activeFilter.startsWith('event:')) {
+      const event = EVENTS.find(e => e.id === activeFilter)
+      if (!event) return allTemplates
+      return allTemplates.filter(t => event.templates.includes(t.type))
+    }
 
     return allTemplates.filter(template => {
       switch (activeFilter) {
@@ -238,9 +271,17 @@ export function AssetSelectionScreen() {
   // Get filter label for results count
   const getFilterLabel = () => {
     if (activeFilter === 'all') return ''
+    if (activeFilter.startsWith('event:')) {
+      const event = EVENTS.find(e => e.id === activeFilter)
+      return event ? ` in ${event.label}` : ''
+    }
     const filter = FILTER_OPTIONS.find(f => f.id === activeFilter)
     return filter ? ` in ${filter.label}` : ''
   }
+
+  // Derived helpers for Events chip
+  const isEventsActive = activeFilter.startsWith('event:')
+  const activeEventLabel = isEventsActive ? EVENTS.find(e => e.id === activeFilter)?.label : null
 
   return (
     <div className="flex min-h-[calc(100vh-120px)] gap-8">
@@ -259,7 +300,7 @@ export function AssetSelectionScreen() {
             {FILTER_OPTIONS.map((filter) => (
               <button
                 key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
+                onClick={() => { setActiveFilter(filter.id); setEventsDropdownOpen(false) }}
                 className={`
                   px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border
                   ${activeFilter === filter.id
@@ -271,6 +312,48 @@ export function AssetSelectionScreen() {
                 {filter.label}
               </button>
             ))}
+
+            {/* Events dropdown chip */}
+            <div className="relative" ref={eventsRef}>
+              <button
+                onClick={() => setEventsDropdownOpen(prev => !prev)}
+                className={`
+                  flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border
+                  ${isEventsActive
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'text-gray-500 dark:text-content-secondary border-gray-200 dark:border-line-subtle hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
+                  }
+                `}
+              >
+                {activeEventLabel ? `Events: ${activeEventLabel}` : 'Events'}
+                <svg
+                  className={`w-3 h-3 transition-transform ${eventsDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {eventsDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 z-20 min-w-[160px] bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg shadow-lg overflow-hidden">
+                  {EVENTS.map((event) => (
+                    <button
+                      key={event.id}
+                      onClick={() => { setActiveFilter(event.id); setEventsDropdownOpen(false) }}
+                      className={`
+                        w-full text-left px-3 py-2 text-xs font-medium transition-colors
+                        ${activeFilter === event.id
+                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                          : 'text-gray-700 dark:text-content-primary hover:bg-gray-50 dark:hover:bg-surface-tertiary'
+                        }
+                      `}
+                    >
+                      {event.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -293,7 +376,13 @@ export function AssetSelectionScreen() {
               onNavigateToEditor={() => handleNavigateToEditor(template.type)}
             />
           ))}
-          <RequestTemplateTile channelName={activeFilter === 'all' ? 'new' : FILTER_OPTIONS.find(f => f.id === activeFilter)?.label || 'new'} />
+          <RequestTemplateTile channelName={
+            activeFilter === 'all'
+              ? 'new'
+              : activeFilter.startsWith('event:')
+                ? EVENTS.find(e => e.id === activeFilter)?.label || 'new'
+                : FILTER_OPTIONS.find(f => f.id === activeFilter)?.label || 'new'
+          } />
         </div>
 
         {/* Footer with selection summary and continue button */}
