@@ -14,6 +14,7 @@ import { SocialImageMeddbase } from './templates/SocialImageMeddbase'
 import { EmailProductRelease } from './templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from './templates/EmailCorityConnect2026'
 import type { CCBackgroundVariant } from './templates/EmailCorityConnect2026'
+import { EmailEhsAccelerateBanner } from './templates/EmailEhsAccelerateBanner'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
 import { EmailSpeakers } from './templates/EmailSpeakers'
@@ -445,6 +446,11 @@ export function EditorScreen() {
     // Email Cority Connect 2026
     ccBackgroundVariant,
     setCcBackgroundVariant,
+    // Email EHS Accelerate Banner
+    eventDate,
+    setEventDate,
+    eventLocation,
+    setEventLocation,
     // Queue
     addToQueue,
     exportQueue,
@@ -897,6 +903,8 @@ export function EditorScreen() {
         solutionOverviewScreenshotZoom,
         solutionOverviewCtaOption,
         ccBackgroundVariant: ccBackgroundVariant || 'dark-blue-1',
+        eventDate: eventDate || '',
+        eventLocation: eventLocation || '',
       }
 
       const exportParams = buildExportParams(currentTemplate, exportScale, paramState)
@@ -1331,7 +1339,7 @@ export function EditorScreen() {
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1387,7 +1395,7 @@ export function EditorScreen() {
               )}
 
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, Website Floating Banner, or Solution Overview PDF */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026') && (
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -2520,7 +2528,7 @@ export function EditorScreen() {
           {contentMode === 'verbatim' && (
             <div className="space-y-4">
               {/* Eyebrow - not shown for email-image, social-image, solution-overview-pdf, email-cority-connect-2026 (they don't use it) */}
-              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && (
+              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2553,8 +2561,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* Headline - not shown for solution-overview-pdf (has its own fields) */}
-              {currentTemplate !== 'solution-overview-pdf' && (
+              {/* Headline - not shown for solution-overview-pdf or email-ehs-accelerate-banner (fixed text) */}
+              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-banner' && (
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2710,7 +2718,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-banner' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2779,6 +2787,40 @@ export function EditorScreen() {
                       bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                </div>
+              )}
+
+              {/* Event Details - Email EHS Accelerate Banner */}
+              {currentTemplate === 'email-ehs-accelerate-banner' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Date
+                    </label>
+                    <input
+                      type="text"
+                      value={eventDate}
+                      onChange={(e) => setEventDate(e.target.value)}
+                      placeholder="e.g., Thursday, 13th November"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      value={eventLocation}
+                      onChange={(e) => setEventLocation(e.target.value)}
+                      placeholder="e.g., London, UK"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -4175,6 +4217,15 @@ export function EditorScreen() {
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-ehs-accelerate-banner' && (
+                <EmailEhsAccelerateBanner
+                  eventDate={eventDate}
+                  eventLocation={eventLocation}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

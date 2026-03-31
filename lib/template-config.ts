@@ -75,6 +75,13 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     width: 640,
     height: 370,
   },
+  {
+    type: 'email-ehs-accelerate-banner',
+    label: 'EHS+ Accelerate Workshop',
+    dimensions: '600 × 373px',
+    width: 600,
+    height: 373,
+  },
 ]
 
 // Template definitions for social

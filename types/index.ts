@@ -1,5 +1,5 @@
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
 
 // Shared variant/setting union types (extracted to avoid repeating inline unions)
 export type LogoColor = 'black' | 'orange' | 'white'
@@ -406,6 +406,9 @@ export interface ManualAssetSettings {
   carouselCurrentSlideIndex: number
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  // Email EHS Accelerate Banner specific
+  eventDate: string
+  eventLocation: string
 }
 
 // App Flow Types
@@ -604,6 +607,9 @@ export interface GeneratedAsset {
   carouselCurrentSlideIndex: number
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  // Email EHS Accelerate Banner specific
+  eventDate: string
+  eventLocation: string
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -751,6 +757,9 @@ export interface QueuedAsset {
   carouselCurrentSlideIndex: number
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  // Email EHS Accelerate Banner specific
+  eventDate: string
+  eventLocation: string
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -953,6 +962,10 @@ export interface AppState {
   // Email Cority Connect 2026
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
 
+  // Email EHS Accelerate Banner
+  eventDate: string
+  eventLocation: string
+
   // User identity (for export tracking)
   exportedBy: string | null
 
@@ -1138,6 +1151,8 @@ export interface AppState {
   setCarouselSlides: (slides: CarouselSlide[]) => void
   setCarouselCurrentSlideIndex: (index: number) => void
   setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => void
+  setEventDate: (date: string) => void
+  setEventLocation: (location: string) => void
 
   // User identity
   setExportedBy: (name: string | null) => void

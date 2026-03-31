@@ -155,6 +155,9 @@ const SNAPSHOT_FIELDS = [
   'carouselCurrentSlideIndex',
   // Email Cority Connect 2026
   'ccBackgroundVariant',
+  // Email EHS Accelerate Banner
+  'eventDate',
+  'eventLocation',
 ] as const
 
 // Type for the shared field keys
