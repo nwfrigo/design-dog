@@ -72,11 +72,9 @@ export function EmailCorityConnect2026({
   const containerStyle: CSSProperties = {
     width: 640,
     height: 370,
-    padding: 32,
+    // No padding here — padding lives on the inner content div to avoid
+    // box-sizing ambiguity inflating the outer height in the export renderer.
     position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
     overflow: 'hidden',
     fontFamily,
     transform: `scale(${scale})`,
@@ -102,16 +100,24 @@ export function EmailCorityConnect2026({
         }}
       />
 
-      {/* Content layer — sits above the background */}
+      {/* Content layer — sits above the background, carries the padding */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        padding: 32,
+        display: 'flex',
+        alignItems: 'center',
+        zIndex: 1,
+      }}>
+
+      {/* Inner layout: logo + text, full height */}
       <div style={{
         width: 480,
-        alignSelf: 'stretch',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        position: 'relative', // ensure stacking above background
-        zIndex: 1,
         overflow: 'hidden',
       }}>
 
@@ -171,6 +177,8 @@ export function EmailCorityConnect2026({
             <ArrowIcon color="#0080FF" width={16.5} height={13.13} />
           </div>
         )}
+      </div>
+      {/* close content layer (absolute inset) */}
       </div>
     </div>
   )

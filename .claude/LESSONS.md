@@ -24,5 +24,7 @@ Tags: [ui], [pattern], [bug], [export], [dark-mode], [template], [state], [perf]
 - [pattern] Admin stat cards: use `flex flex-wrap gap-4` container + `w-fit min-w-[160px]` on each card rather than a CSS grid. Grid forces cards to fill the row width; flex lets them hug their content naturally.
 
 ## 2026-03-31
+- [export] Never put `padding` on the outer container element of a template (the one with the explicit `width`/`height`). The Puppeteer render environment may resolve `height` as content-box, making the element `height + padding*2` pixels tall and adding whitespace to the exported PNG. Always put padding on an inner child div, leaving the outer container with only `width`, `height`, and `overflow: hidden`. This matches the pattern used by all existing templates (EmailDarkGradient, EmailProductRelease, etc.).
+
 - [pattern] Major backend feature shipped: admin/monitor system with team identity (team code gate + name picker), Vercel Postgres database (team_members, drafts, activity_log tables), export thumbnail storage to Vercel Blob, shared activity feed, and export gallery. See Team-Identity-Feature-Request.docx in project root for full spec. Key architectural decisions: team code as env var (TEAM_ACCESS_CODE), name-based identity with long-lived cookies, localStorage kept as fallback alongside database persistence, auto-save debounce preserved for DB writes.
 
