@@ -341,7 +341,13 @@ Stacker uses AI to generate the initial document structure:
 
 ## Checklist: Adding a New Template
 
-1. [ ] Create template component in `components/templates/`
+**Component file requirements (non-negotiable):**
+- [ ] First line is `'use client'` — required for the `[slug]` render route to pass the component across the Server→Client boundary into `GenericRenderContent`. Missing this causes a runtime crash on Vercel.
+- [ ] Use plain `<img>` — never `import Image from 'next/image'`. `next/image` routes through Vercel's optimization service, which Puppeteer's `networkidle2` waits on and times out.
+- [ ] Set `fontFamily` from `typography`: `const fontFamily = \`"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}\`` and apply it to the outer container. Never use `var(--font-fakt)` or any CSS variable — these are Next.js runtime-only and unavailable in Puppeteer, causing wrong/default fonts in exports.
+- [ ] No padding on outer container — padding inflates height in Puppeteer. Use an inner wrapper for spacing.
+
+1. [ ] Create template component in `components/templates/` (apply all four component requirements above)
 2. [ ] Apply Figma override rules (border not outline, SVG logo, remove unsupported CSS) — see BRAND.md
 3. [ ] Only expose text fields that exist in the design
 4. [ ] Use `RichTextEditor` for body/description fields (not `<textarea>`) — see Rich Text pattern in ARCHITECTURE.md
