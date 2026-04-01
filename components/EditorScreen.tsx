@@ -1362,10 +1362,11 @@ export function EditorScreen() {
           )}
 
           {/* Template Options */}
+          {currentTemplate !== 'email-ehs-accelerate-invitation' && (
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && (
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
@@ -1421,7 +1422,7 @@ export function EditorScreen() {
               )}
 
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, Website Floating Banner, or Solution Overview PDF */}
-              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation') && (
+              {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner') && (
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">Category</label>
                   <div className="relative">
@@ -2549,6 +2550,7 @@ export function EditorScreen() {
               </div>
             )}
           </div>
+          )}
 
           {/* Direct Edit Mode */}
           {contentMode === 'verbatim' && (

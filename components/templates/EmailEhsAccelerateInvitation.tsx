@@ -83,11 +83,11 @@ export function EmailEhsAccelerateInvitation({
       {/* Event details bar */}
       <div style={{
         position: 'absolute', left: 28, top: 201,
-        display: 'flex', alignItems: 'flex-start', gap: 12,
+        display: 'flex', alignItems: 'flex-start', gap: 18,
       }}>
         {/* Event title */}
         <div style={{
-          width: 108,
+          maxWidth: 118,
           color: '#060015', fontSize: 8, fontFamily: 'var(--font-fakt)', fontWeight: 400,
           textTransform: 'uppercase', lineHeight: '9.92px',
         }}>
@@ -158,8 +158,13 @@ export function EmailEhsAccelerateInvitation({
       <style>{`
         .ehs-invite-body p { margin: 0 0 6px 0; }
         .ehs-invite-body p:last-child { margin-bottom: 0; }
-        .ehs-invite-body ul { margin: 4px 0 6px 0; padding-left: 14px; }
-        .ehs-invite-body li { margin: 2px 0; }
+        .ehs-invite-body ul, .ehs-invite-body ol { margin: 4px 0 6px 0; padding-left: 0; list-style: none; }
+        .ehs-invite-body ul li { position: relative; padding-left: 10px; margin: 2px 0; }
+        .ehs-invite-body ul li::before { content: '•'; position: absolute; left: 0; top: 0; }
+        .ehs-invite-body ol { counter-reset: item; }
+        .ehs-invite-body ol li { position: relative; padding-left: 14px; margin: 2px 0; counter-increment: item; }
+        .ehs-invite-body ol li::before { content: counter(item) '.'; position: absolute; left: 0; top: 0; }
+        .ehs-invite-body li p { display: inline; margin: 0; }
         .ehs-invite-body strong { font-weight: 500; }
       `}</style>
     </div>
