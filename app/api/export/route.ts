@@ -98,6 +98,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'email-product-release': { width: 640, height: 164 },
   'email-cority-connect-2026': { width: 640, height: 370 },
   'email-ehs-accelerate-banner': { width: 600, height: 373 },
+  'email-ehs-accelerate-invitation': { width: 420, height: 595 },
   'social-dark-gradient': { width: 1200, height: 628 },
   'social-blue-gradient': { width: 1200, height: 628 },
   'social-image': { width: 1200, height: 628 },

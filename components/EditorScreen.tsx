@@ -15,6 +15,8 @@ import { EmailProductRelease } from './templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from './templates/EmailCorityConnect2026'
 import type { CCBackgroundVariant } from './templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateBanner } from './templates/EmailEhsAccelerateBanner'
+import { EmailEhsAccelerateInvitation } from './templates/EmailEhsAccelerateInvitation'
+import { RichTextEditor } from './RichTextEditor'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
 import { EmailSpeakers } from './templates/EmailSpeakers'
@@ -451,6 +453,22 @@ export function EditorScreen() {
     setEventDate,
     eventLocation,
     setEventLocation,
+    invitationHeader,
+    setInvitationHeader,
+    invitationHeadline,
+    setInvitationHeadline,
+    invitationEventTitle,
+    setInvitationEventTitle,
+    invitationEventDate,
+    setInvitationEventDate,
+    invitationEventLocation,
+    setInvitationEventLocation,
+    invitationEventTime,
+    setInvitationEventTime,
+    invitationEventTimeNote,
+    setInvitationEventTimeNote,
+    invitationBody,
+    setInvitationBody,
     // Queue
     addToQueue,
     exportQueue,
@@ -905,6 +923,14 @@ export function EditorScreen() {
         ccBackgroundVariant: ccBackgroundVariant || 'dark-blue-1',
         eventDate: eventDate || '',
         eventLocation: eventLocation || '',
+        invitationHeader: invitationHeader || '',
+        invitationHeadline: invitationHeadline || '',
+        invitationEventTitle: invitationEventTitle || '',
+        invitationEventDate: invitationEventDate || '',
+        invitationEventLocation: invitationEventLocation || '',
+        invitationEventTime: invitationEventTime || '',
+        invitationEventTimeNote: invitationEventTimeNote || '',
+        invitationBody: invitationBody || '',
       }
 
       const exportParams = buildExportParams(currentTemplate, exportScale, paramState)
@@ -1336,6 +1362,7 @@ export function EditorScreen() {
           )}
 
           {/* Template Options */}
+          {currentTemplate !== 'email-ehs-accelerate-invitation' && (
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
@@ -2523,12 +2550,13 @@ export function EditorScreen() {
               </div>
             )}
           </div>
+          )}
 
           {/* Direct Edit Mode */}
           {contentMode === 'verbatim' && (
             <div className="space-y-4">
               {/* Eyebrow - not shown for email-image, social-image, solution-overview-pdf, email-cority-connect-2026 (they don't use it) */}
-              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && (
+              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2562,7 +2590,7 @@ export function EditorScreen() {
               )}
 
               {/* Headline - not shown for solution-overview-pdf or email-ehs-accelerate-banner (fixed text) */}
-              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-banner' && (
+              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && (
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2718,7 +2746,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-banner' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2819,6 +2847,115 @@ export function EditorScreen() {
                       className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Invitation Fields - EHS Accelerate Invitation */}
+              {currentTemplate === 'email-ehs-accelerate-invitation' && (
+                <div className="space-y-3">
+                  {/* Header */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Header</label>
+                    <input
+                      type="text"
+                      value={invitationHeader}
+                      onChange={(e) => setInvitationHeader(e.target.value)}
+                      placeholder="You're Invited"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  {/* Headline */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Headline</label>
+                    <input
+                      type="text"
+                      value={invitationHeadline}
+                      onChange={(e) => setInvitationHeadline(e.target.value)}
+                      placeholder="Exclusive EHS+ Leader Workshop"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  {/* Event Details */}
+                  <div className="pt-2 border-t border-gray-200 dark:border-line-subtle">
+                    <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Event Details</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Event Title</label>
+                        <input
+                          type="text"
+                          value={invitationEventTitle}
+                          onChange={(e) => setInvitationEventTitle(e.target.value)}
+                          placeholder="EHS+ Accelerate: Tech Convergence Workshop"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                            bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                            focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Date</label>
+                          <input
+                            type="text"
+                            value={invitationEventDate}
+                            onChange={(e) => setInvitationEventDate(e.target.value)}
+                            placeholder="13 November"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Location</label>
+                          <input
+                            type="text"
+                            value={invitationEventLocation}
+                            onChange={(e) => setInvitationEventLocation(e.target.value)}
+                            placeholder="London, England"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Time</label>
+                          <input
+                            type="text"
+                            value={invitationEventTime}
+                            onChange={(e) => setInvitationEventTime(e.target.value)}
+                            placeholder="10:00–14:30"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Note</label>
+                          <input
+                            type="text"
+                            value={invitationEventTimeNote}
+                            onChange={(e) => setInvitationEventTimeNote(e.target.value)}
+                            placeholder="Lunch Included"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Body (rich text) */}
+                  <div className="pt-2 border-t border-gray-200 dark:border-line-subtle">
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Body Text</label>
+                    <RichTextEditor
+                      content={invitationBody}
+                      onChange={setInvitationBody}
+                      placeholder="Enter invitation body text..."
                     />
                   </div>
                 </div>
@@ -4226,6 +4363,21 @@ export function EditorScreen() {
                 <EmailEhsAccelerateBanner
                   eventDate={eventDate}
                   eventLocation={eventLocation}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-ehs-accelerate-invitation' && (
+                <EmailEhsAccelerateInvitation
+                  invitationHeader={invitationHeader}
+                  invitationHeadline={invitationHeadline}
+                  invitationEventTitle={invitationEventTitle}
+                  invitationEventDate={invitationEventDate}
+                  invitationEventLocation={invitationEventLocation}
+                  invitationEventTime={invitationEventTime}
+                  invitationEventTimeNote={invitationEventTimeNote}
+                  invitationBody={invitationBody}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
