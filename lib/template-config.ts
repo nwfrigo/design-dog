@@ -6,6 +6,7 @@ export interface TemplateInfo {
   dimensions: string
   width: number
   height: number
+  channelLabel?: string // Override the subchannel label shown on the tile
 }
 
 export interface ChannelConfig {
@@ -88,6 +89,7 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     dimensions: '420 × 595px',
     width: 420,
     height: 595,
+    channelLabel: 'Event Invitation',
   },
 ]
 

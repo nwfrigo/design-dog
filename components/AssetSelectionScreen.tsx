@@ -59,7 +59,7 @@ function getAllTemplatesWithChannels(): TemplateWithChannel[] {
         templatesByChannel[subChannel.id].push({
           ...template,
           channel: subChannel.id,
-          channelLabel: subChannel.label,
+          channelLabel: template.channelLabel ?? subChannel.label,
         })
       }
     }
