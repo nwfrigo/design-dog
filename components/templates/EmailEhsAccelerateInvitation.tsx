@@ -28,12 +28,14 @@ export function EmailEhsAccelerateInvitation({
   invitationEventTime,
   invitationEventTimeNote,
   invitationBody,
+  typography,
   scale = 1,
 }: EmailEhsAccelerateInvitationProps) {
   const bodyHtml = invitationBody || DEFAULT_BODY
+  const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
   return (
-    <div style={{ width: 420, height: 595, position: 'relative', overflow: 'hidden', background: 'white', transform: `scale(${scale})`, transformOrigin: 'top left' }}>
+    <div style={{ width: 420, height: 595, position: 'relative', overflow: 'hidden', background: 'white', fontFamily, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
       {/* Background image */}
       <img
         src="/assets/backgrounds/ehs_accelerate_invitation_background.png"
@@ -65,7 +67,7 @@ export function EmailEhsAccelerateInvitation({
       {/* "You're Invited" header */}
       <div style={{
         position: 'absolute', left: 28, top: 36,
-        color: '#060015', fontSize: 18, fontFamily: 'var(--font-fakt)', fontWeight: 350, lineHeight: '16.92px',
+        color: '#060015', fontSize: 18, fontWeight: 350, lineHeight: '16.92px',
       }}>
         {invitationHeader || "You're Invited"}
       </div>
@@ -73,7 +75,7 @@ export function EmailEhsAccelerateInvitation({
       {/* Main headline */}
       <div style={{
         position: 'absolute', width: 250, left: 26, top: 65,
-        color: '#060015', fontSize: 40.93, fontFamily: 'var(--font-fakt)', fontWeight: 350, lineHeight: '38.47px',
+        color: '#060015', fontSize: 40.93, fontWeight: 350, lineHeight: '38.47px',
         wordWrap: 'break-word',
       }}>
         {invitationHeadline || 'Exclusive EHS+ Leader Workshop'}
@@ -87,7 +89,7 @@ export function EmailEhsAccelerateInvitation({
         {/* Event title */}
         <div style={{
           maxWidth: 118,
-          color: '#060015', fontSize: 8, fontFamily: 'var(--font-fakt)', fontWeight: 400,
+          color: '#060015', fontSize: 8, fontWeight: 400,
           textTransform: 'uppercase', lineHeight: '9.92px',
         }}>
           {invitationEventTitle || 'EHS+ Accelerate: Tech Convergence Workshop'}
@@ -98,7 +100,7 @@ export function EmailEhsAccelerateInvitation({
 
         {/* Date + Location */}
         <div style={{
-          color: '#060015', fontSize: 8, fontFamily: 'var(--font-fakt)', fontWeight: 400,
+          color: '#060015', fontSize: 8, fontWeight: 400,
           textTransform: 'uppercase', lineHeight: '9.92px',
         }}>
           {invitationEventDate || '13 November'}<br />
@@ -110,7 +112,7 @@ export function EmailEhsAccelerateInvitation({
 
         {/* Time + Note */}
         <div style={{
-          color: '#060015', fontSize: 8, fontFamily: 'var(--font-fakt)', fontWeight: 400,
+          color: '#060015', fontSize: 8, fontWeight: 400,
           textTransform: 'uppercase', lineHeight: '9.92px',
         }}>
           {invitationEventTime || '10:00–14:30'}<br />
@@ -130,7 +132,7 @@ export function EmailEhsAccelerateInvitation({
           className="ehs-invite-body"
           style={{
             position: 'absolute', left: 13, top: 19, width: 337,
-            color: '#060015', fontSize: 10, fontFamily: 'var(--font-fakt)', fontWeight: 350,
+            color: '#060015', fontSize: 10, fontWeight: 350,
             lineHeight: '13.9px',
           }}
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
@@ -143,7 +145,7 @@ export function EmailEhsAccelerateInvitation({
           background: '#F1F3F4', borderRadius: 4,
           display: 'inline-flex', alignItems: 'center', gap: 6,
         }}>
-          <span style={{ color: 'black', fontSize: 10, fontFamily: 'var(--font-fakt)', fontWeight: 350, lineHeight: '10px' }}>
+          <span style={{ color: 'black', fontSize: 10, fontWeight: 350, lineHeight: '10px' }}>
             RSVP
           </span>
           {/* Arrow icon */}
