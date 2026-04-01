@@ -303,7 +303,7 @@ export async function POST(request: NextRequest) {
     // Navigate to render page
     console.log('Navigating to:', renderUrl)
     await page.goto(renderUrl, {
-      waitUntil: 'load',
+      waitUntil: 'domcontentloaded',
       timeout: 30000,
     })
 
