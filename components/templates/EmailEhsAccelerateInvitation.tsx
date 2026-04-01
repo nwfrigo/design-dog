@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
@@ -34,11 +33,9 @@ export function EmailEhsAccelerateInvitation({
   return (
     <div style={{ width: 420, height: 595, position: 'relative', overflow: 'hidden', background: 'white', transform: `scale(${scale})`, transformOrigin: 'top left' }}>
       {/* Background image */}
-      <Image
+      <img
         src="/assets/backgrounds/ehs_accelerate_invitation_background.png"
         alt=""
-        width={420}
-        height={595}
         style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', objectFit: 'cover' }}
       />
 
