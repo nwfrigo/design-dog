@@ -1,3 +1,5 @@
+'use client'
+
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 
