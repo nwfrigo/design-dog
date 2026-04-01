@@ -29,6 +29,8 @@ Every template requires these files:
    - `store/index.ts` — add any template-specific state
    - `app/api/export/route.ts` — add template dimensions
 
+5. **Event-scoped templates:** If the template belongs to a specific event (e.g. EHS+ Accelerate, Cority Connect), add it to the `EVENTS` array in `components/AssetSelectionScreen.tsx` instead of the standard channel grid. Each entry is `{ id: 'event:slug', label: 'Event Name', templates: ['template-slug'] }`. The Events chip appears in the filter bar and shows a dropdown of event names; selecting one filters to only that event's templates. The `FilterType` union in `types/index.ts` must include the new `'event:slug'` string.
+
 ### Template Props Pattern
 
 All templates follow this prop pattern:

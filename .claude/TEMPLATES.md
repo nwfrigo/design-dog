@@ -14,6 +14,11 @@
 - `email-speakers` — EmailSpeakers (up to 3 speaker avatars)
 - `email-product-release` — EmailProductRelease
 
+### Events (event-scoped, grouped under Events filter in AssetSelectionScreen)
+- `email-cority-connect-2026` — EmailCorityConnect2026 (640×370px; Cority Connect event)
+- `email-ehs-accelerate-banner` — EmailEhsAccelerateBanner (600×373px; EHS+ Accelerate event)
+- `email-ehs-accelerate-invitation` — EmailEhsAccelerateInvitation (420×595px; EHS+ Accelerate event; full rich text body)
+
 ### Social
 - `social-dark-gradient` — SocialDarkGradient
 - `social-blue-gradient` — SocialBlueGradient
