@@ -61,34 +61,6 @@ export function EmailEhsAccelerateSignature({
         }}
       />
 
-      {/* Orange radial gradient orb — bottom-left */}
-      <div style={{
-        width: 297,
-        height: 297,
-        left: -104,
-        top: -44,
-        position: 'absolute',
-        opacity: 0.50,
-        background: 'radial-gradient(ellipse 50% 50% at 50% 50%, #F78534 14%, rgba(252,196,119,0.87) 35%, rgba(252,196,119,0.64) 60%, rgba(252,196,119,0.36) 76%, rgba(252,196,119,0) 100%)',
-        borderRadius: 9999,
-        filter: 'blur(12.37px)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* Blue radial gradient orb — top-right */}
-      <div style={{
-        width: 320,
-        height: 320,
-        left: 229,
-        top: -204,
-        position: 'absolute',
-        opacity: 0.50,
-        background: 'radial-gradient(ellipse 50% 50% at 50% 50%, #0022FF 0%, rgba(0,34,255,0.30) 58%, rgba(0,34,255,0.10) 80%, rgba(0,34,255,0) 100%)',
-        borderRadius: 9999,
-        filter: 'blur(0.91px)',
-        pointerEvents: 'none',
-      }} />
-
       {/* Logo — top left */}
       <div style={{
         position: 'absolute',
@@ -135,14 +107,15 @@ export function EmailEhsAccelerateSignature({
         </div>
       )}
 
-      {/* CTA — bottom right */}
+      {/* CTA — bottom right, right-aligned with event details block above */}
       {showCta && (
         <div style={{
           position: 'absolute',
-          left: 328,
+          left: 252,
+          width: 126,
           top: 75,
-          display: 'inline-flex',
-          justifyContent: 'center',
+          display: 'flex',
+          justifyContent: 'flex-end',
           alignItems: 'center',
           gap: 4,
         }}>

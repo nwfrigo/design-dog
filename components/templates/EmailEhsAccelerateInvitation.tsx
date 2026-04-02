@@ -43,22 +43,6 @@ export function EmailEhsAccelerateInvitation({
         style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', objectFit: 'cover' }}
       />
 
-      {/* Orange orb */}
-      <div style={{
-        width: 802, height: 802, left: -349, top: 114,
-        position: 'absolute', opacity: 0.50,
-        background: 'radial-gradient(ellipse 50% 50% at 50% 50%, #F78534 14%, rgba(252,196,119,0.87) 35%, rgba(252,196,119,0.64) 60%, rgba(252,196,119,0.36) 76%, rgba(252,196,119,0) 100%)',
-        borderRadius: 9999, filter: 'blur(33.4px)',
-      }} />
-
-      {/* Blue orb */}
-      <div style={{
-        width: 579, height: 579, left: 189, top: -308,
-        position: 'absolute', opacity: 0.50,
-        background: 'radial-gradient(ellipse 50% 50% at 50% 50%, #0022FF 0%, rgba(0,34,255,0.30) 58%, rgba(0,34,255,0.10) 80%, rgba(0,34,255,0) 100%)',
-        borderRadius: 9999, filter: 'blur(2px)',
-      }} />
-
       {/* EHS+ Accelerate Logo (top right) */}
       <div style={{ position: 'absolute', left: 256, top: 27, width: 136, height: 44, overflow: 'hidden' }}>
         <EhsAccelerateLogo width={136} />

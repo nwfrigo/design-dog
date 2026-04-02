@@ -51,34 +51,6 @@ export function EmailEhsAccelerateBanner({
         }}
       />
 
-      {/* Orange radial gradient orb — bottom-left */}
-      <div style={{
-        width: 802,
-        height: 802,
-        left: -343,
-        top: 22,
-        position: 'absolute',
-        opacity: 0.5,
-        background: 'radial-gradient(ellipse 50% 50% at 50% 50%, #F78534 14%, rgba(252,196,119,0.87) 35%, rgba(252,196,119,0.64) 60%, rgba(252,196,119,0.36) 76%, rgba(252,196,119,0) 100%)',
-        borderRadius: 9999,
-        filter: 'blur(33.4px)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* Blue radial gradient orb — top-right */}
-      <div style={{
-        width: 579,
-        height: 579,
-        left: 293,
-        top: -316,
-        position: 'absolute',
-        opacity: 0.5,
-        background: 'radial-gradient(ellipse 50% 50% at 50% 50%, #0022FF 0%, rgba(0,34,255,0.3) 58%, rgba(0,34,255,0.1) 80%, rgba(0,34,255,0) 100%)',
-        borderRadius: 9999,
-        filter: 'blur(2px)',
-        pointerEvents: 'none',
-      }} />
-
       {/* Logo — top left */}
       <div style={{
         position: 'absolute',
