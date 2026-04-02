@@ -23,6 +23,9 @@ Tags: [ui], [pattern], [bug], [export], [dark-mode], [template], [state], [perf]
 
 - [pattern] Admin stat cards: use `flex flex-wrap gap-4` container + `w-fit min-w-[160px]` on each card rather than a CSS grid. Grid forces cards to fill the row width; flex lets them hug their content naturally.
 
+## 2026-04-02
+- [template] Do NOT add CSS gradient orb `<div>`s to templates that use a background image already containing the gradient. Overlaying orbs on top of a gradient background image doubles saturation and makes the render darker/more saturated than the Figma source. Check the background asset first — if the gradient is baked in, rely on the image alone. This applies to all EHS+ Accelerate templates (banner, invitation, signature) and any future templates using pre-rendered gradient backgrounds.
+
 ## 2026-03-31
 - [export] Never put `padding` on the outer container element of a template (the one with the explicit `width`/`height`). The Puppeteer render environment may resolve `height` as content-box, making the element `height + padding*2` pixels tall and adding whitespace to the exported PNG. Always put padding on an inner child div, leaving the outer container with only `width`, `height`, and `overflow: hidden`. This matches the pattern used by all existing templates (EmailDarkGradient, EmailProductRelease, etc.).
 
