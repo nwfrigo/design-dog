@@ -24,6 +24,8 @@ Tags: [ui], [pattern], [bug], [export], [dark-mode], [template], [state], [perf]
 - [pattern] Admin stat cards: use `flex flex-wrap gap-4` container + `w-fit min-w-[160px]` on each card rather than a CSS grid. Grid forces cards to fill the row width; flex lets them hug their content naturally.
 
 ## 2026-04-02
+- [template] **Recurring miss:** Always add a `case` for every new template to `TemplateTile.tsx` so it renders a preview in the homepage grid. This step is on the checklist (step 9) but keeps getting skipped. Do not consider a new template "done" until the tile is visible on the homepage.
+
 - [template] Do NOT add CSS gradient orb `<div>`s to templates that use a background image already containing the gradient. Overlaying orbs on top of a gradient background image doubles saturation and makes the render darker/more saturated than the Figma source. Check the background asset first — if the gradient is baked in, rely on the image alone. This applies to all EHS+ Accelerate templates (banner, invitation, signature) and any future templates using pre-rendered gradient backgrounds.
 
 ## 2026-03-31
