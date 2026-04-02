@@ -18,6 +18,7 @@
 - `email-cority-connect-2026` — EmailCorityConnect2026 (640×370px; Cority Connect event)
 - `email-ehs-accelerate-banner` — EmailEhsAccelerateBanner (600×373px; EHS+ Accelerate event)
 - `email-ehs-accelerate-invitation` — EmailEhsAccelerateInvitation (420×595px; EHS+ Accelerate event; full rich text body)
+- `email-ehs-accelerate-signature` — EmailEhsAccelerateSignature (400×100px; EHS+ Accelerate event; email signature banner)
 
 ### Social
 - `social-dark-gradient` — SocialDarkGradient

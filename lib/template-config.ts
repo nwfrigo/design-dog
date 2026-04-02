@@ -91,6 +91,14 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     height: 595,
     channelLabel: 'Event Invitation',
   },
+  {
+    type: 'email-ehs-accelerate-signature',
+    label: 'EHS+ Accelerate Email Signature',
+    dimensions: '400 × 100px',
+    width: 400,
+    height: 100,
+    channelLabel: 'Email Signature',
+  },
 ]
 
 // Template definitions for social

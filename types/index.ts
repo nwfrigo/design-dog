@@ -1,5 +1,5 @@
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'email-ehs-accelerate-signature' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
 
 // Shared variant/setting union types (extracted to avoid repeating inline unions)
 export type LogoColor = 'black' | 'orange' | 'white'
@@ -409,6 +409,8 @@ export interface ManualAssetSettings {
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Signature specific
+  signatureWorkshopName: string
   // Email EHS Accelerate Invitation specific
   invitationHeader: string
   invitationHeadline: string
@@ -619,6 +621,8 @@ export interface GeneratedAsset {
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Signature specific
+  signatureWorkshopName: string
   // Email EHS Accelerate Invitation specific
   invitationHeader: string
   invitationHeadline: string
@@ -778,6 +782,8 @@ export interface QueuedAsset {
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Signature specific
+  signatureWorkshopName: string
   // Email EHS Accelerate Invitation specific
   invitationHeader: string
   invitationHeadline: string
@@ -992,6 +998,7 @@ export interface AppState {
   // Email EHS Accelerate Banner
   eventDate: string
   eventLocation: string
+  signatureWorkshopName: string
 
   // Email EHS Accelerate Invitation
   invitationHeader: string
@@ -1190,6 +1197,7 @@ export interface AppState {
   setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => void
   setEventDate: (date: string) => void
   setEventLocation: (location: string) => void
+  setSignatureWorkshopName: (name: string) => void
 
   // Email EHS Accelerate Invitation setters
   setInvitationHeader: (v: string) => void

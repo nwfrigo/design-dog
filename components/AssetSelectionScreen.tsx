@@ -30,7 +30,7 @@ const EVENTS: { id: FilterType; label: string; templates: string[] }[] = [
   {
     id: 'event:ehs-accelerate',
     label: 'EHS+ Accelerate',
-    templates: ['email-ehs-accelerate-banner', 'email-ehs-accelerate-invitation'],
+    templates: ['email-ehs-accelerate-banner', 'email-ehs-accelerate-invitation', 'email-ehs-accelerate-signature'],
   },
 ]
 

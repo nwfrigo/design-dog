@@ -16,6 +16,7 @@ import { EmailCorityConnect2026 } from './templates/EmailCorityConnect2026'
 import type { CCBackgroundVariant } from './templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateBanner } from './templates/EmailEhsAccelerateBanner'
 import { EmailEhsAccelerateInvitation } from './templates/EmailEhsAccelerateInvitation'
+import { EmailEhsAccelerateSignature } from './templates/EmailEhsAccelerateSignature'
 import { RichTextEditor } from './RichTextEditor'
 import { SocialDarkGradient } from './templates/SocialDarkGradient'
 import { EmailDarkGradient } from './templates/EmailDarkGradient'
@@ -453,6 +454,9 @@ export function EditorScreen() {
     setEventDate,
     eventLocation,
     setEventLocation,
+    // Email EHS Accelerate Signature
+    signatureWorkshopName,
+    setSignatureWorkshopName,
     invitationHeader,
     setInvitationHeader,
     invitationHeadline,
@@ -923,6 +927,7 @@ export function EditorScreen() {
         ccBackgroundVariant: ccBackgroundVariant || 'dark-blue-1',
         eventDate: eventDate || '',
         eventLocation: eventLocation || '',
+        signatureWorkshopName: signatureWorkshopName || '',
         invitationHeader: invitationHeader || '',
         invitationHeadline: invitationHeadline || '',
         invitationEventTitle: invitationEventTitle || '',
@@ -1362,7 +1367,7 @@ export function EditorScreen() {
           )}
 
           {/* Template Options */}
-          {currentTemplate !== 'email-ehs-accelerate-invitation' && (
+          {currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
@@ -2556,7 +2561,7 @@ export function EditorScreen() {
           {contentMode === 'verbatim' && (
             <div className="space-y-4">
               {/* Eyebrow - not shown for email-image, social-image, solution-overview-pdf, email-cority-connect-2026 (they don't use it) */}
-              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && (
+              {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2590,7 +2595,7 @@ export function EditorScreen() {
               )}
 
               {/* Headline - not shown for solution-overview-pdf or email-ehs-accelerate-banner (fixed text) */}
-              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && (
+              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2746,7 +2751,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -2821,6 +2826,54 @@ export function EditorScreen() {
               {/* Event Details - Email EHS Accelerate Banner */}
               {currentTemplate === 'email-ehs-accelerate-banner' && (
                 <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Date
+                    </label>
+                    <input
+                      type="text"
+                      value={eventDate}
+                      onChange={(e) => setEventDate(e.target.value)}
+                      placeholder="e.g., Thursday, 13th November"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      value={eventLocation}
+                      onChange={(e) => setEventLocation(e.target.value)}
+                      placeholder="e.g., London, UK"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Signature Fields - EHS Accelerate Email Signature */}
+              {currentTemplate === 'email-ehs-accelerate-signature' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Workshop Name
+                    </label>
+                    <input
+                      type="text"
+                      value={signatureWorkshopName}
+                      onChange={(e) => setSignatureWorkshopName(e.target.value)}
+                      placeholder="e.g., Exclusive EHS+ Leader Workshop"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                       Date
@@ -4361,6 +4414,16 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'email-ehs-accelerate-banner' && (
                 <EmailEhsAccelerateBanner
+                  eventDate={eventDate}
+                  eventLocation={eventLocation}
+                  colors={colorsConfig}
+                  typography={typographyConfig}
+                  scale={1}
+                />
+              )}
+              {currentTemplate === 'email-ehs-accelerate-signature' && (
+                <EmailEhsAccelerateSignature
+                  workshopName={signatureWorkshopName}
                   eventDate={eventDate}
                   eventLocation={eventLocation}
                   colors={colorsConfig}

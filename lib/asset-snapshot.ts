@@ -158,6 +158,8 @@ const SNAPSHOT_FIELDS = [
   // Email EHS Accelerate Banner
   'eventDate',
   'eventLocation',
+  // Email EHS Accelerate Signature
+  'signatureWorkshopName',
   // Email EHS Accelerate Invitation
   'invitationHeader',
   'invitationHeadline',

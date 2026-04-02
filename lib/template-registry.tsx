@@ -19,6 +19,7 @@ import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
+import { EmailEhsAccelerateSignature } from '@/components/templates/EmailEhsAccelerateSignature'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -425,6 +426,31 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       background: '#ffffff',
       fields: [
         { param: 'eventDate', parser: 'string', default: 'Thursday, 13th November' },
+        { param: 'eventLocation', parser: 'string', default: 'London, UK' },
+      ],
+    },
+  },
+
+  'email-ehs-accelerate-signature': {
+    component: EmailEhsAccelerateSignature,
+    renderProps: (asset, colors, typography) => ({
+      workshopName: asset.signatureWorkshopName || 'Exclusive EHS+ Leader Workshop',
+      eventDate: asset.eventDate || 'Thursday,  13th November',
+      eventLocation: asset.eventLocation || 'London, UK',
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [
+      { key: 'signatureWorkshopName', label: 'Workshop' },
+      { key: 'eventDate', label: 'Date' },
+      { key: 'eventLocation', label: 'Location' },
+    ],
+    renderSchema: {
+      width: 400,
+      height: 100,
+      background: '#ffffff',
+      fields: [
+        { param: 'workshopName', parser: 'string', default: 'Exclusive EHS+ Leader Workshop' },
+        { param: 'eventDate', parser: 'string', default: 'Thursday,  13th November' },
         { param: 'eventLocation', parser: 'string', default: 'London, UK' },
       ],
     },

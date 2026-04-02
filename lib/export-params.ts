@@ -141,6 +141,8 @@ export interface ExportParamState {
   // Email EHS Accelerate Banner
   eventDate: string
   eventLocation: string
+  // Email EHS Accelerate Signature
+  signatureWorkshopName: string
   // Email EHS Accelerate Invitation
   invitationHeader: string
   invitationHeadline: string
@@ -345,6 +347,12 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   }),
 
   'email-ehs-accelerate-banner': (s) => ({
+    eventDate: s.eventDate || '',
+    eventLocation: s.eventLocation || '',
+  }),
+
+  'email-ehs-accelerate-signature': (s) => ({
+    workshopName: s.signatureWorkshopName || '',
     eventDate: s.eventDate || '',
     eventLocation: s.eventLocation || '',
   }),
@@ -654,6 +662,7 @@ export function buildExportParamsFromAsset(
     ccBackgroundVariant: (a.ccBackgroundVariant as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) || 'dark-blue-1',
     eventDate: (a.eventDate as string) || '',
     eventLocation: (a.eventLocation as string) || '',
+    signatureWorkshopName: (a.signatureWorkshopName as string) || '',
     invitationHeader: (a.invitationHeader as string) || '',
     invitationHeadline: (a.invitationHeadline as string) || '',
     invitationEventTitle: (a.invitationEventTitle as string) || '',

@@ -203,6 +203,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'email-cority-connect-2026': 'email',
   'email-ehs-accelerate-banner': 'email',
   'email-ehs-accelerate-invitation': 'email',
+  'email-ehs-accelerate-signature': 'email',
 }
 
 /**
