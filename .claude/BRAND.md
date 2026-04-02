@@ -140,7 +140,7 @@ Cards displayed side-by-side must stretch to match the tallest: `alignItems: 'st
 - Primary font: Fakt Pro
 - Loaded via @font-face
 - Weight variations: 350 (light), 500 (medium)
-- Eyebrow: 12px, uppercase, letter-spacing 1.32px
+- Eyebrow: 14px, uppercase, letter-spacing 1.32px
 - CTA: 18.75px, weight 500
 
 ---

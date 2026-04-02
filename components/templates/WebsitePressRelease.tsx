@@ -161,7 +161,7 @@ export function WebsitePressRelease({
               style={{
                 alignSelf: 'stretch',
                 color: colors.ui.textPrimary,
-                fontSize: 12.50,
+                fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
                 letterSpacing: 1.38,

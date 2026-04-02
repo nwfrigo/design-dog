@@ -147,7 +147,7 @@ export function WebsiteEventListing({
               style={{
                 alignSelf: 'stretch',
                 color: variantColors.textColor,
-                fontSize: 12.50,
+                fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
                 letterSpacing: 1.38,
@@ -252,7 +252,7 @@ export function WebsiteEventListing({
                   style={{
                     textAlign: 'center',
                     color: variantColors.textColor,
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: 350,
                   }}
                 >
@@ -264,7 +264,7 @@ export function WebsiteEventListing({
               <div
                 style={{
                   color: variantColors.textColor,
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: 350,
                 }}
               >

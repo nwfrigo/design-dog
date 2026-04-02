@@ -168,7 +168,7 @@ export function WebsiteFloatingBannerMobile({
           {showEyebrow && eyebrow && (
             <div style={{
               color: styles.textColor,
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: 500,
               textTransform: 'uppercase',
               letterSpacing: 1.32,

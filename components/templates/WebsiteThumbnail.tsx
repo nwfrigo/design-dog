@@ -192,7 +192,7 @@ export function WebsiteThumbnail({
               style={{
                 alignSelf: 'stretch',
                 color: colors.ui.textPrimary,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
                 letterSpacing: 1.32,

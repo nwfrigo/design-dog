@@ -166,7 +166,7 @@ export function WebsiteReport({
               style={{
                 alignSelf: 'stretch',
                 color: 'white',
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
                 letterSpacing: 1.32,
