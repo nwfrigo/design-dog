@@ -457,6 +457,10 @@ export function EditorScreen() {
     // Email EHS Accelerate Signature
     signatureWorkshopName,
     setSignatureWorkshopName,
+    showSignatureWorkshopName,
+    setShowSignatureWorkshopName,
+    showSignatureEventDetails,
+    setShowSignatureEventDetails,
     invitationHeader,
     setInvitationHeader,
     invitationHeadline,
@@ -928,6 +932,8 @@ export function EditorScreen() {
         eventDate: eventDate || '',
         eventLocation: eventLocation || '',
         signatureWorkshopName: signatureWorkshopName || '',
+        showSignatureWorkshopName,
+        showSignatureEventDetails,
         invitationHeader: invitationHeader || '',
         invitationHeadline: invitationHeadline || '',
         invitationEventTitle: invitationEventTitle || '',
@@ -2860,9 +2866,10 @@ export function EditorScreen() {
               {/* Signature Fields - EHS Accelerate Email Signature */}
               {currentTemplate === 'email-ehs-accelerate-signature' && (
                 <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                  <div className={!showSignatureWorkshopName ? 'opacity-50' : ''}>
+                    <label className="flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                       Workshop Name
+                      <EyeIcon visible={showSignatureWorkshopName} onClick={() => setShowSignatureWorkshopName(!showSignatureWorkshopName)} />
                     </label>
                     <input
                       type="text"
@@ -2874,9 +2881,10 @@ export function EditorScreen() {
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                      Date
+                  <div className={!showSignatureEventDetails ? 'opacity-50' : ''}>
+                    <label className="flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Event Details
+                      <EyeIcon visible={showSignatureEventDetails} onClick={() => setShowSignatureEventDetails(!showSignatureEventDetails)} />
                     </label>
                     <input
                       type="text"
@@ -2885,18 +2893,28 @@ export function EditorScreen() {
                       placeholder="e.g., Thursday, 13th November"
                       className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                      Location
-                    </label>
                     <input
                       type="text"
                       value={eventLocation}
                       onChange={(e) => setEventLocation(e.target.value)}
                       placeholder="e.g., London, UK"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className={!showCta ? 'opacity-50' : ''}>
+                    <label className="flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      CTA
+                      <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
+                    </label>
+                    <input
+                      type="text"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                      placeholder="e.g., Join Us"
                       className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -4426,6 +4444,10 @@ export function EditorScreen() {
                   workshopName={signatureWorkshopName}
                   eventDate={eventDate}
                   eventLocation={eventLocation}
+                  ctaText={ctaText}
+                  showWorkshopName={showSignatureWorkshopName}
+                  showEventDetails={showSignatureEventDetails}
+                  showCta={showCta}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

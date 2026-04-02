@@ -9,6 +9,10 @@ export interface EmailEhsAccelerateSignatureProps {
   eventDate: string
   eventLocation: string
   workshopName: string
+  ctaText: string
+  showWorkshopName: boolean
+  showEventDetails: boolean
+  showCta: boolean
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -18,6 +22,10 @@ export function EmailEhsAccelerateSignature({
   eventDate,
   eventLocation,
   workshopName,
+  ctaText,
+  showWorkshopName,
+  showEventDetails,
+  showCta,
   typography,
   scale = 1,
 }: EmailEhsAccelerateSignatureProps) {
@@ -92,57 +100,63 @@ export function EmailEhsAccelerateSignature({
       </div>
 
       {/* Event date + location — top right */}
-      <div style={{
-        width: 126,
-        position: 'absolute',
-        left: 252,
-        top: 20,
-        textAlign: 'right',
-        color: 'black',
-        fontSize: 11,
-        fontWeight: 350,
-        lineHeight: '13.20px',
-        wordWrap: 'break-word',
-      }}>
-        {eventDate || 'Thursday,  13th November'}<br />
-        {eventLocation || 'London, UK'}
-      </div>
-
-      {/* Workshop name — bottom left (editable) */}
-      <div style={{
-        width: 237,
-        position: 'absolute',
-        left: 15,
-        top: 71,
-        color: '#060015',
-        fontSize: 15,
-        fontWeight: 350,
-        lineHeight: '15.60px',
-        wordWrap: 'break-word',
-      }}>
-        {workshopName || 'Exclusive EHS+ Leader Workshop'}
-      </div>
-
-      {/* Join Us CTA — bottom right (fixed) */}
-      <div style={{
-        position: 'absolute',
-        left: 328,
-        top: 75,
-        display: 'inline-flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 4,
-      }}>
-        <span style={{
-          color: '#060015',
+      {showEventDetails && (
+        <div style={{
+          width: 126,
+          position: 'absolute',
+          left: 252,
+          top: 20,
+          textAlign: 'right',
+          color: 'black',
           fontSize: 11,
           fontWeight: 350,
-          lineHeight: '11px',
+          lineHeight: '13.20px',
+          wordWrap: 'break-word',
         }}>
-          Join Us
-        </span>
-        <ArrowIcon color="#060015" width={10} height={6} strokeWidth={1.2} />
-      </div>
+          {eventDate || 'Thursday,  13th November'}<br />
+          {eventLocation || 'London, UK'}
+        </div>
+      )}
+
+      {/* Workshop name — bottom left */}
+      {showWorkshopName && (
+        <div style={{
+          width: 237,
+          position: 'absolute',
+          left: 15,
+          top: 71,
+          color: '#060015',
+          fontSize: 15,
+          fontWeight: 350,
+          lineHeight: '15.60px',
+          wordWrap: 'break-word',
+        }}>
+          {workshopName || 'Exclusive EHS+ Leader Workshop'}
+        </div>
+      )}
+
+      {/* CTA — bottom right */}
+      {showCta && (
+        <div style={{
+          position: 'absolute',
+          left: 328,
+          top: 75,
+          display: 'inline-flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 4,
+        }}>
+          <span style={{
+            color: '#060015',
+            fontSize: 11,
+            fontWeight: 350,
+            lineHeight: '11px',
+          }}>
+            {ctaText || 'Join Us'}
+          </span>
+          <ArrowIcon color="#060015" width={10} height={6} strokeWidth={1.2} />
+        </div>
+      )}
 
     </div>
   )

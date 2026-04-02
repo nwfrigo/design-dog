@@ -240,6 +240,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   eventLocation: '',
   // Email EHS Accelerate Signature specific
   signatureWorkshopName: '',
+  showSignatureWorkshopName: true,
+  showSignatureEventDetails: true,
   // Email EHS Accelerate Invitation specific
   invitationHeader: '',
   invitationHeadline: '',
@@ -498,6 +500,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   eventLocation: '',
   // Email EHS Accelerate Signature
   signatureWorkshopName: '',
+  showSignatureWorkshopName: true,
+  showSignatureEventDetails: true,
   // Email EHS Accelerate Invitation
   invitationHeader: '',
   invitationHeadline: '',
@@ -780,6 +784,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setEventDate: (date: string) => set({ eventDate: date }),
   setEventLocation: (location: string) => set({ eventLocation: location }),
   setSignatureWorkshopName: (name: string) => set({ signatureWorkshopName: name }),
+  setShowSignatureWorkshopName: (show: boolean) => set({ showSignatureWorkshopName: show }),
+  setShowSignatureEventDetails: (show: boolean) => set({ showSignatureEventDetails: show }),
   setInvitationHeader: (v: string) => set({ invitationHeader: v }),
   setInvitationHeadline: (v: string) => set({ invitationHeadline: v }),
   setInvitationEventTitle: (v: string) => set({ invitationEventTitle: v }),
@@ -804,7 +810,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, bottomSpacing, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, bottomSpacing, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -911,6 +917,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         eventLocation,
         // Email EHS Accelerate Signature
         signatureWorkshopName,
+        showSignatureWorkshopName,
+        showSignatureEventDetails,
         // Email EHS Accelerate Invitation
         invitationHeader,
         invitationHeadline,
@@ -1023,6 +1031,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         eventDate: targetTemplateDefaults.eventDate,
         eventLocation: targetTemplateDefaults.eventLocation,
         signatureWorkshopName: targetTemplateDefaults.signatureWorkshopName,
+        showSignatureWorkshopName: targetTemplateDefaults.showSignatureWorkshopName,
+        showSignatureEventDetails: targetTemplateDefaults.showSignatureEventDetails,
         invitationHeader: targetTemplateDefaults.invitationHeader,
         invitationHeadline: targetTemplateDefaults.invitationHeadline,
         invitationEventTitle: targetTemplateDefaults.invitationEventTitle,
@@ -1141,6 +1151,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         eventDate: targetSettings.eventDate,
         eventLocation: targetSettings.eventLocation,
         signatureWorkshopName: targetSettings.signatureWorkshopName,
+        showSignatureWorkshopName: targetSettings.showSignatureWorkshopName,
+        showSignatureEventDetails: targetSettings.showSignatureEventDetails,
         invitationHeader: targetSettings.invitationHeader,
         invitationHeadline: targetSettings.invitationHeadline,
         invitationEventTitle: targetSettings.invitationEventTitle,

@@ -143,6 +143,8 @@ export interface ExportParamState {
   eventLocation: string
   // Email EHS Accelerate Signature
   signatureWorkshopName: string
+  showSignatureWorkshopName: boolean
+  showSignatureEventDetails: boolean
   // Email EHS Accelerate Invitation
   invitationHeader: string
   invitationHeadline: string
@@ -355,6 +357,10 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     workshopName: s.signatureWorkshopName || '',
     eventDate: s.eventDate || '',
     eventLocation: s.eventLocation || '',
+    ctaText: s.ctaText || '',
+    showWorkshopName: s.showSignatureWorkshopName,
+    showEventDetails: s.showSignatureEventDetails,
+    showCta: s.showCta,
   }),
 
   'email-ehs-accelerate-invitation': (s) => ({
@@ -663,6 +669,8 @@ export function buildExportParamsFromAsset(
     eventDate: (a.eventDate as string) || '',
     eventLocation: (a.eventLocation as string) || '',
     signatureWorkshopName: (a.signatureWorkshopName as string) || '',
+    showSignatureWorkshopName: (a.showSignatureWorkshopName as boolean) ?? true,
+    showSignatureEventDetails: (a.showSignatureEventDetails as boolean) ?? true,
     invitationHeader: (a.invitationHeader as string) || '',
     invitationHeadline: (a.invitationHeadline as string) || '',
     invitationEventTitle: (a.invitationEventTitle as string) || '',

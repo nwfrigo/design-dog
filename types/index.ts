@@ -411,6 +411,8 @@ export interface ManualAssetSettings {
   eventLocation: string
   // Email EHS Accelerate Signature specific
   signatureWorkshopName: string
+  showSignatureWorkshopName: boolean
+  showSignatureEventDetails: boolean
   // Email EHS Accelerate Invitation specific
   invitationHeader: string
   invitationHeadline: string
@@ -623,6 +625,8 @@ export interface GeneratedAsset {
   eventLocation: string
   // Email EHS Accelerate Signature specific
   signatureWorkshopName: string
+  showSignatureWorkshopName: boolean
+  showSignatureEventDetails: boolean
   // Email EHS Accelerate Invitation specific
   invitationHeader: string
   invitationHeadline: string
@@ -784,6 +788,8 @@ export interface QueuedAsset {
   eventLocation: string
   // Email EHS Accelerate Signature specific
   signatureWorkshopName: string
+  showSignatureWorkshopName: boolean
+  showSignatureEventDetails: boolean
   // Email EHS Accelerate Invitation specific
   invitationHeader: string
   invitationHeadline: string
@@ -999,6 +1005,8 @@ export interface AppState {
   eventDate: string
   eventLocation: string
   signatureWorkshopName: string
+  showSignatureWorkshopName: boolean
+  showSignatureEventDetails: boolean
 
   // Email EHS Accelerate Invitation
   invitationHeader: string
@@ -1198,6 +1206,8 @@ export interface AppState {
   setEventDate: (date: string) => void
   setEventLocation: (location: string) => void
   setSignatureWorkshopName: (name: string) => void
+  setShowSignatureWorkshopName: (show: boolean) => void
+  setShowSignatureEventDetails: (show: boolean) => void
 
   // Email EHS Accelerate Invitation setters
   setInvitationHeader: (v: string) => void
