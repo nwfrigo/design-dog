@@ -338,6 +338,14 @@ export const CHANNELS: ChannelConfig[] = [
     label: 'Newsletter Banners',
     templates: NEWSLETTER_TEMPLATES.map(t => ({ ...t, label: `Newsletter - ${t.label}` })),
   },
+  {
+    id: 'collateral',
+    label: 'Collateral',
+    templates: DISTRIBUTION_CHANNELS
+      .find(ch => ch.id === 'collateral')!
+      .subChannels.flatMap(sc => sc.templates)
+      .filter(t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type)),
+  },
 ]
 
 // Flat list of all templates (includes collateral single-page templates for lookups)
