@@ -4,6 +4,7 @@ import { CSSProperties } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export type ImageSize = 'none' | 'small' | 'large'
 
@@ -26,6 +27,7 @@ export interface NewsletterLightProps {
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
+  theme?: TemplateTheme
 }
 
 // Text content width based on image size
@@ -61,11 +63,13 @@ export function NewsletterLight({
   colors,
   typography,
   scale = 1,
+  theme = 'light',
 }: NewsletterLightProps) {
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const textColor = '#060015' // Dark text on light background
-  const ctaColor = '#0080FF' // Cobalt blue for arrow
-  const backgroundColor = '#FFFFFF'
+  const themeColors = TEMPLATE_THEMES[theme]
+  const textColor = themeColors.textPrimary
+  const ctaColor = themeColors.buttonSecondaryText
+  const backgroundColor = themeColors.backgroundPrimary
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale && imageSize !== 'none')
 

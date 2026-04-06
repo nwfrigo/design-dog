@@ -91,6 +91,25 @@ Cards displayed side-by-side must stretch to match the tallest: `alignItems: 'st
 - Solution pill border: `#0080FF`
 - Brand orange (primary): `#D35F0B`
 
+### Template Theme System
+
+Template colors (background, text, logo, CTA, pill) are driven by `lib/template-themes.ts` — the single source of truth. Templates receive a `theme` prop (`'light' | 'dark'`) and look up resolved hex values from `TEMPLATE_THEMES[theme]`.
+
+| Token | Light | Dark |
+|-------|-------|------|
+| `backgroundPrimary` | `#FFFFFF` | `#060015` |
+| `textPrimary` | `#000000` | `#FFFFFF` |
+| `buttonSecondaryText` | `#060015` | `#FFFFFF` |
+| `borderFocus` | `#D9D8D6` | `#0080FF` |
+| `bgCategoryChip` | `#FFFFFF` | `#060621` |
+| `logoFill` | `#000000` | `#FFFFFF` |
+
+**Logo color** on themed templates is derived from the theme (`themeColors.logoFill`), not the `logoColor` prop. The logo picker is hidden for themed templates.
+
+**Solution pill colors** (dot colors) are static across all themes. Only the pill's background, border, and text color change with theme.
+
+For the full rollout process, see `.claude/THEME-ROLLOUT.md`.
+
 ### Solution Category Colors
 - Environmental: `#49763E`
 - Health: `#00767F`
@@ -199,6 +218,8 @@ The solution pill shows which Cority solution the asset is for (Safety, Industri
 ```
 
 The `showSolutionSet` toggle controls visibility. Solution text and color dot are dynamic based on the `solution` prop.
+
+**Themed templates** must pass `background`, `border`, and `textColor` props to `SolutionPill` from `themeColors` — the pill's variant presets have hardcoded colors that won't flip with theme unless overridden by props. Props take priority over variant hardcodes (resolution order: `prop ?? variant ?? fallback`).
 
 ---
 

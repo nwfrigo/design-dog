@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme } from '@/types'
 import type { KitType } from '@/config/kit-configs'
 import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
@@ -171,6 +171,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   floatingBannerMobileArrowType: 'text' as const,
   // Newsletter Top Banner specific
   newsletterTopBannerVariant: 'dark' as const,
+  // Template theme
+  theme: 'light' as const,
   // Image effects
   grayscale: false,
   // Manual text size
@@ -377,6 +379,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   floatingBannerMobileArrowType: 'text',
   // Newsletter Top Banner specific
   newsletterTopBannerVariant: 'dark',
+  // Template theme
+  theme: 'light',
   // Image effects
   grayscale: false,
   // Manual text size
@@ -630,6 +634,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setFloatingBannerMobileArrowType: (floatingBannerMobileArrowType: FloatingBannerMobileArrowType) => set({ floatingBannerMobileArrowType }),
   // Newsletter Top Banner specific
   setNewsletterTopBannerVariant: (newsletterTopBannerVariant: NewsletterTopBannerVariant) => set({ newsletterTopBannerVariant }),
+  setTheme: (theme: TemplateTheme) => set({ theme }),
   // Image effects
   setGrayscale: (grayscale: boolean) => set({ grayscale }),
   // Manual text size
@@ -810,7 +815,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, bottomSpacing, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, bottomSpacing, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -864,6 +869,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         floatingBannerMobileVariant,
         floatingBannerMobileArrowType,
         newsletterTopBannerVariant,
+        theme,
         showSpeaker1,
         showSpeaker2,
         showSpeaker3,
@@ -980,6 +986,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         floatingBannerMobileVariant: targetTemplateDefaults.floatingBannerMobileVariant,
         floatingBannerMobileArrowType: targetTemplateDefaults.floatingBannerMobileArrowType,
         newsletterTopBannerVariant: targetTemplateDefaults.newsletterTopBannerVariant,
+        theme: targetTemplateDefaults.theme,
         showSpeaker1: targetTemplateDefaults.showSpeaker1,
         showSpeaker2: targetTemplateDefaults.showSpeaker2,
         showSpeaker3: targetTemplateDefaults.showSpeaker3,
@@ -1099,6 +1106,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         floatingBannerMobileVariant: targetSettings.floatingBannerMobileVariant,
         floatingBannerMobileArrowType: targetSettings.floatingBannerMobileArrowType,
         newsletterTopBannerVariant: targetSettings.newsletterTopBannerVariant,
+        theme: targetSettings.theme,
         showSpeaker1: targetSettings.showSpeaker1,
         showSpeaker2: targetSettings.showSpeaker2,
         showSpeaker3: targetSettings.showSpeaker3,
@@ -1954,6 +1962,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileVariant: 'light',
       floatingBannerMobileArrowType: 'text',
       newsletterTopBannerVariant: 'dark',
+      theme: 'light',
       grayscale: false,
       exportQueue: [],
       // Auto-Create defaults
@@ -2037,6 +2046,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       floatingBannerMobileVariant: state.floatingBannerMobileVariant,
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType,
       newsletterTopBannerVariant: state.newsletterTopBannerVariant,
+      theme: state.theme,
       grayscale: state.grayscale,
       headlineFontSize: state.headlineFontSize,
       subheadFontSize: state.subheadFontSize,

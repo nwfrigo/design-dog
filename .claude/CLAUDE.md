@@ -38,6 +38,7 @@ These files live alongside this one in `.claude/`. Always consult the relevant r
 | `TEMPLATES.md` | Full template catalog, multi-page collateral (SO, FAQ, Stacker), module types, "adding a new template" checklist, template-specific gotchas |
 | `BRAND.md` | Brand colors, typography, Figma override rules, solution pills, image handling, image libraries, template dimensions, dark mode colors |
 | `LESSONS.md` | Running log of QA feedback, error patterns, and design decisions — applied silently, graduated with approval |
+| `THEME-ROLLOUT.md` | Theme system (light/dark) — per-template checklist, gotchas, defaults table, SolutionPill resolution order |
 | `GRADUATED_PENDING.md` | Queue of lessons proposed for promotion into reference docs — awaiting Nick's review |
 
 ---

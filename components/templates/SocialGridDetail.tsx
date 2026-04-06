@@ -5,6 +5,7 @@ import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export interface GridDetailRow {
   type: 'data' | 'cta'
@@ -35,6 +36,9 @@ export interface SocialGridDetailProps {
   gridDetail3: GridDetailRow
   gridDetail4: GridDetailRow
 
+  // Theme
+  theme?: TemplateTheme
+
   // Text sizing
   headlineFontSize?: number
 
@@ -60,18 +64,20 @@ export function SocialGridDetail({
   gridDetail2,
   gridDetail3,
   gridDetail4,
+  theme = 'light',
   headlineFontSize,
   colors,
   typography,
   scale = 1,
 }: SocialGridDetailProps) {
+  const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
-  const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
+  const logoFill = themeColors.logoFill
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const borderColor = colors.ui.borderHighContrast || '#000000'
-  const textColor = colors.ui.textPrimary
+  const borderColor = themeColors.borderFocus
+  const textColor = themeColors.textPrimary
 
   // Build visible grid details based on toggle states
   const visibleGridDetails: GridDetailRow[] = [gridDetail1, gridDetail2]
@@ -81,7 +87,7 @@ export function SocialGridDetail({
   const containerStyle: CSSProperties = {
     width: 1200,
     height: 628,
-    background: '#ffffff',
+    background: themeColors.backgroundPrimary,
     display: 'flex',
     alignItems: 'center',
     gap: 64,
@@ -112,7 +118,7 @@ export function SocialGridDetail({
             gap: 16,
           }}>
             <span style={{
-              color: '#0080FF',
+              color: themeColors.buttonSecondaryText,
               fontSize: 24,
               fontWeight: 500,
               lineHeight: '24px',
@@ -120,7 +126,7 @@ export function SocialGridDetail({
             }}>
               {detail.text || 'Join the event'}
             </span>
-            <ArrowIcon color="#0080FF" width={22} height={18} viewBox="0 0 22 18" pathD="M13 1L21 9M21 9L13 17M21 9H1" />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={22} height={18} viewBox="0 0 22 18" pathD="M13 1L21 9M21 9L13 17M21 9H1" />
           </div>
         </div>
       )
@@ -167,9 +173,9 @@ export function SocialGridDetail({
               variant="social"
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
-              textColor={textColor}
-              background="#ffffff"
-              border={`1.25px solid ${colors.ui.border}`}
+              textColor={themeColors.textPrimary}
+              background={themeColors.bgCategoryChip}
+              border={`1.25px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>

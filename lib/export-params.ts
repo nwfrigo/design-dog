@@ -66,6 +66,7 @@ export interface ExportParamState {
   alignment: string
   ctaStyle: string
   layout: string
+  theme?: string
 
   // Grid detail fields
   gridDetail1Text: string
@@ -199,6 +200,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
     showCta: s.showCta,
     ctaText: s.ctaText,
+    theme: s.theme,
   }),
 
   'website-press-release': (s) => ({
@@ -207,6 +209,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showBody: s.showBody && !!s.verbatimCopy.body,
     showCta: s.showCta,
     ctaText: s.ctaText,
+    theme: s.theme,
   }),
 
   'website-event-listing': (s) => ({
@@ -235,6 +238,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gridDetail2Text: s.gridDetail2Text,
     gridDetail3Type: s.gridDetail3Type,
     gridDetail3Text: s.gridDetail3Text,
+    theme: s.theme,
   }),
 
   'social-dark-gradient': (s) => ({
@@ -276,6 +280,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showCta: s.showCta,
     showSolutionSet: s.showSolutionSet,
     grayscale: s.grayscale,
+    theme: s.theme,
   }),
 
   'social-grid-detail': (s) => ({
@@ -289,6 +294,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gridDetail4Text: s.gridDetail4Text,
     showRow3: s.showRow3,
     showRow4: s.showRow4,
+    theme: s.theme,
   }),
 
   'email-image': (s) => ({
@@ -302,6 +308,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showCta: s.showCta,
     showSolutionSet: s.showSolutionSet,
     grayscale: s.grayscale,
+    theme: s.theme,
   }),
 
   'social-image-meddbase': (s) => ({
@@ -339,6 +346,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSolutionSet: s.showSolutionSet,
     ...buildSpeakerParams(s),
     grayscale: s.grayscale,
+    theme: s.theme,
   }),
 
   'email-cority-connect-2026': (s) => ({
@@ -423,6 +431,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showCta: s.showCta,
     grayscale: s.grayscale,
+    theme: s.theme,
   }),
 
   'newsletter-top-banner': (s) => ({
@@ -436,6 +445,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
     showCta: s.showCta,
     ctaText: s.ctaText,
+    theme: s.theme,
   }),
 
   'website-webinar': (s) => ({
@@ -450,6 +460,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSpeaker1: s.showSpeaker1,
     showSpeaker2: s.showSpeaker2,
     showSpeaker3: s.showSpeaker3,
+    theme: s.theme,
   }),
 
   'website-floating-banner': (s) => ({
@@ -600,6 +611,7 @@ export function buildExportParamsFromAsset(
     floatingBannerMobileVariant: (a.floatingBannerMobileVariant as string) || 'light',
     floatingBannerMobileArrowType: (a.floatingBannerMobileArrowType as string) || 'text',
     newsletterTopBannerVariant: (a.newsletterTopBannerVariant as string) || 'dark',
+    theme: (a.theme as string) || 'light',
     colorStyle: (a.colorStyle as string) || '1',
     headingSize: (a.headingSize as string) || 'L',
     alignment: (a.alignment as string) || 'left',

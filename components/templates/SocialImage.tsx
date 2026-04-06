@@ -6,6 +6,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export type LayoutVariant = 'even' | 'more-image' | 'more-text'
 
@@ -26,6 +27,7 @@ export interface SocialImageProps {
   showCta: boolean
   showSolutionSet: boolean
   grayscale?: boolean
+  theme?: TemplateTheme
   headlineFontSize?: number
   subheadFontSize?: number
   colors: ColorsConfig
@@ -73,15 +75,17 @@ export function SocialImage({
   showCta,
   showSolutionSet,
   grayscale = false,
+  theme = 'light',
   headlineFontSize,
   subheadFontSize,
   colors,
   typography,
   scale = 1,
 }: SocialImageProps) {
+  const themeColors = TEMPLATE_THEMES[theme]
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
-  const textColor = colors.ui.textPrimary
+  const logoFill = themeColors.logoFill
+  const textColor = themeColors.textPrimary
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
@@ -96,7 +100,7 @@ export function SocialImage({
   const containerStyle: CSSProperties = {
     width: 1200,
     height: 628,
-    background: '#ffffff',
+    background: themeColors.backgroundPrimary,
     display: 'flex',
     alignItems: 'center',
     gap: 64,
@@ -133,9 +137,9 @@ export function SocialImage({
               variant="social"
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
-              textColor={textColor}
-              background={colors.ui.surface}
-              border={`1.25px solid ${colors.ui.border}`}
+              textColor={themeColors.textPrimary}
+              background={themeColors.bgCategoryChip}
+              border={`1.25px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>
@@ -211,7 +215,7 @@ export function SocialImage({
             }}>
               {ctaText}
             </span>
-            <ArrowIcon color={colors.brand.primary} width={22} height={22 * 0.8} />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={22} height={22 * 0.8} />
           </div>
         )}
       </div>
@@ -223,7 +227,7 @@ export function SocialImage({
         position: 'relative',
         overflow: 'hidden',
         flexShrink: 0,
-        background: '#ffffff',
+        background: themeColors.backgroundPrimary,
       }}>
         {/* Image */}
         <img

@@ -6,6 +6,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export type ReportVariant = 'image' | 'none'
 
@@ -24,6 +25,7 @@ export interface WebsiteReportProps {
   showSubhead: boolean
   showCta: boolean
   grayscale?: boolean
+  theme?: TemplateTheme
   headlineFontSize?: number
   subheadFontSize?: number
   colors: ColorsConfig
@@ -46,12 +48,14 @@ export function WebsiteReport({
   showSubhead,
   showCta,
   grayscale = false,
+  theme = 'dark',
   headlineFontSize: headlineFontSizeProp,
   subheadFontSize,
   colors,
   typography,
   scale = 1,
 }: WebsiteReportProps) {
+  const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
@@ -72,7 +76,7 @@ export function WebsiteReport({
     height: 450,
     padding: 32,
     position: 'relative',
-    background: '#060015',
+    background: themeColors.backgroundPrimary,
     overflow: 'hidden',
     fontFamily,
     transform: `scale(${scale})`,
@@ -136,7 +140,7 @@ export function WebsiteReport({
             gap: 49.70,
           }}
         >
-          <CorityLogo fill="#FFFFFF" height={28} />
+          <CorityLogo fill={themeColors.logoFill} height={28} />
 
           {/* Solution Pill */}
           {solution !== 'none' && (
@@ -144,6 +148,9 @@ export function WebsiteReport({
               variant="website-dark"
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
+              textColor={themeColors.textPrimary}
+              background={themeColors.bgCategoryChip}
+              border={`0.79px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>
@@ -165,7 +172,7 @@ export function WebsiteReport({
             <div
               style={{
                 alignSelf: 'stretch',
-                color: 'white',
+                color: themeColors.textPrimary,
                 fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
@@ -191,7 +198,7 @@ export function WebsiteReport({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: 'white',
+                  color: themeColors.textPrimary,
                   fontSize: headlineSize,
                   fontWeight: 350,
                   lineHeight: headlineLineHeight,
@@ -205,7 +212,7 @@ export function WebsiteReport({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: 'white',
+                  color: themeColors.textPrimary,
                   fontSize: subheadFontSize ?? 20,
                   fontWeight: 350,
                 }}
@@ -229,7 +236,7 @@ export function WebsiteReport({
             <span
               style={{
                 textAlign: 'center',
-                color: 'white',
+                color: themeColors.buttonSecondaryText,
                 fontSize: 18.75,
                 fontWeight: 500,
                 lineHeight: '18.75px',
@@ -237,7 +244,7 @@ export function WebsiteReport({
             >
               {cta}
             </span>
-            <ArrowIcon width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
           </div>
         )}
       </div>

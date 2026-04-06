@@ -6,6 +6,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export interface WebsitePressReleaseProps {
   eyebrow: string
@@ -23,6 +24,7 @@ export interface WebsitePressReleaseProps {
   showBody: boolean
   showCta: boolean
   grayscale?: boolean
+  theme?: TemplateTheme
   logoColor: 'black' | 'orange'
   headlineFontSize?: number
   subheadFontSize?: number
@@ -47,6 +49,7 @@ export function WebsitePressRelease({
   showBody,
   showCta,
   grayscale = false,
+  theme = 'light',
   logoColor,
   headlineFontSize,
   subheadFontSize,
@@ -54,10 +57,11 @@ export function WebsitePressRelease({
   typography,
   scale = 1,
 }: WebsitePressReleaseProps) {
+  const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
-  const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
+  const logoFill = themeColors.logoFill
 
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
@@ -68,7 +72,7 @@ export function WebsitePressRelease({
     height: 450,
     padding: 33.33,
     position: 'relative',
-    background: '#F9F9F9',
+    background: themeColors.backgroundPrimary,
     overflow: 'hidden',
     fontFamily,
     transform: `scale(${scale})`,
@@ -139,7 +143,9 @@ export function WebsitePressRelease({
               variant="website-press-release"
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
-              textColor={colors.ui.textPrimary}
+              textColor={themeColors.textPrimary}
+              background={themeColors.bgCategoryChip}
+              border={`1px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>
@@ -160,7 +166,7 @@ export function WebsitePressRelease({
             <div
               style={{
                 alignSelf: 'stretch',
-                color: colors.ui.textPrimary,
+                color: themeColors.textPrimary,
                 fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
@@ -186,7 +192,7 @@ export function WebsitePressRelease({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: colors.ui.textPrimary,
+                  color: themeColors.textPrimary,
                   fontSize: headlineFontSize ?? 35.42,
                   fontWeight: 350,
                   lineHeight: `${(headlineFontSize ?? 35.42) * (50.20 / 35.42)}px`,
@@ -200,7 +206,7 @@ export function WebsitePressRelease({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: colors.ui.textPrimary,
+                  color: themeColors.textPrimary,
                   fontSize: subheadFontSize ?? 22,
                   fontWeight: 350,
                 }}
@@ -215,7 +221,7 @@ export function WebsitePressRelease({
             <div
               style={{
                 alignSelf: 'stretch',
-                color: colors.ui.textPrimary,
+                color: themeColors.textPrimary,
                 fontSize: 14.58,
                 fontWeight: 350,
               }}
@@ -238,7 +244,7 @@ export function WebsitePressRelease({
             <span
               style={{
                 textAlign: 'center',
-                color: '#060015',
+                color: themeColors.buttonSecondaryText,
                 fontSize: 18.75,
                 fontWeight: 500,
                 lineHeight: '18.75px',
@@ -246,7 +252,7 @@ export function WebsitePressRelease({
             >
               {cta}
             </span>
-            <ArrowIcon color="#060015" width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
           </div>
         )}
       </div>

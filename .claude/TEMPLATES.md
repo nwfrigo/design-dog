@@ -9,9 +9,9 @@
 
 ### Email
 - `email-dark-gradient` — EmailDarkGradient (rich text headline/body)
-- `email-grid` — EmailGrid
-- `email-image` — EmailImage (has image upload + grayscale)
-- `email-speakers` — EmailSpeakers (up to 3 speaker avatars)
+- `email-grid` — EmailGrid (**themed**: light/dark)
+- `email-image` — EmailImage (has image upload + grayscale, **themed**: light/dark)
+- `email-speakers` — EmailSpeakers (up to 3 speaker avatars, **themed**: light/dark)
 - `email-product-release` — EmailProductRelease
 
 ### Events (event-scoped, grouped under Events filter in AssetSelectionScreen)
@@ -23,22 +23,22 @@
 ### Social
 - `social-dark-gradient` — SocialDarkGradient
 - `social-blue-gradient` — SocialBlueGradient
-- `social-image` — SocialImage (has image upload + grayscale)
-- `social-grid-detail` — SocialGridDetail
+- `social-image` — SocialImage (has image upload + grayscale, **themed**: light/dark)
+- `social-grid-detail` — SocialGridDetail (**themed**: light/dark)
 
 ### Website
-- `website-thumbnail` — WebsiteThumbnail (ebook featured image, variants: image/none)
-- `website-press-release` — WebsitePressRelease (has image upload + grayscale)
-- `website-webinar` — WebsiteWebinar (variants: image/none, up to 3 speakers)
+- `website-thumbnail` — WebsiteThumbnail (ebook featured image, variants: image/none, **themed**: light/dark)
+- `website-press-release` — WebsitePressRelease (has image upload + grayscale, **themed**: light/dark)
+- `website-webinar` — WebsiteWebinar (variants: image/none, up to 3 speakers, **themed**: light/dark)
 - `website-event-listing` — WebsiteEventListing (3 colorway variants: orange/light/dark)
-- `website-report` — WebsiteReport (variants: image/none, image on LEFT)
+- `website-report` — WebsiteReport (variants: image/none, image on LEFT, **themed**: light/dark)
 - `website-floating-banner` — WebsiteFloatingBanner (2256×100px, 7 style variants)
 - `website-floating-banner-mobile` — WebsiteFloatingBannerMobile (390×100px, mobile version)
 
 ### Newsletter
 - `newsletter-dark-gradient` — NewsletterDarkGradient (has image + grayscale, rich text headline/body)
 - `newsletter-blue-gradient` — NewsletterBlueGradient (has image + grayscale, rich text headline/body)
-- `newsletter-light` — NewsletterLight (has image + grayscale, rich text headline/body)
+- `newsletter-light` — NewsletterLight (has image + grayscale, rich text headline/body, **themed**: light/dark)
 - `newsletter-top-banner` — NewsletterTopBanner
 
 ### Collateral
@@ -364,13 +364,14 @@ Stacker uses AI to generate the initial document structure:
 9. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
 10. [ ] Add template-specific state to store if needed (variants, etc.)
 11. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence in ARCHITECTURE.md)
-12. [ ] Add to image upload condition if template has images (use Vercel Blob upload — see ARCHITECTURE.md)
-13. [ ] Pass grayscale prop if template has images
-14. [ ] Add entry to `lib/template-registry.tsx` — see "Registry Entry Guide" below
-15. [ ] Add template dimensions to `app/api/export/route.ts` TEMPLATE_DIMENSIONS
-16. [ ] Test export works end-to-end (from both editor and queue)
-17. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
-18. [ ] Build check: `npm run build`
+12. [ ] **If template supports theming:** Follow the full process in `.claude/THEME-ROLLOUT.md` — add `theme` prop to component, use `TEMPLATE_THEMES[theme]` for all colors, add `theme` to registry renderProps + renderSchema, add `theme: s.theme` to export-params builder, pass `theme={theme}` to EditorScreen preview, add to theme picker condition, hide logo picker. The `theme` field is already wired globally in the store/snapshot/types pipeline.
+13. [ ] Add to image upload condition if template has images (use Vercel Blob upload — see ARCHITECTURE.md)
+14. [ ] Pass grayscale prop if template has images
+15. [ ] Add entry to `lib/template-registry.tsx` — see "Registry Entry Guide" below
+16. [ ] Add template dimensions to `app/api/export/route.ts` TEMPLATE_DIMENSIONS
+17. [ ] Test export works end-to-end (from both editor and queue)
+18. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
+19. [ ] Build check: `npm run build`
 
 ### Registry Entry Guide (`lib/template-registry.tsx`)
 

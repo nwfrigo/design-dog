@@ -5,6 +5,7 @@ import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export interface GridDetail {
   type: 'data' | 'cta'
@@ -44,6 +45,7 @@ export interface EmailGridProps {
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
+  theme?: TemplateTheme
 }
 
 export function EmailGrid({
@@ -68,13 +70,15 @@ export function EmailGrid({
   colors,
   typography,
   scale = 1,
+  theme = 'light',
 }: EmailGridProps) {
+  const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
-  const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
+  const logoFill = themeColors.logoFill
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const borderColor = colors.ui.borderHighContrast || '#000000'
+  const borderColor = themeColors.borderFocus
 
   // Determine which grid details to show
   const visibleGridDetails = showGridDetail2
@@ -84,7 +88,7 @@ export function EmailGrid({
   const containerStyle: CSSProperties = {
     width: 640,
     height: 300,
-    background: colors.ui.surface,
+    background: themeColors.backgroundPrimary,
     display: 'flex',
     alignItems: 'flex-start',
     gap: 24,
@@ -114,14 +118,14 @@ export function EmailGrid({
             gap: 12,
           }}>
             <span style={{
-              color: '#060015',
+              color: themeColors.buttonSecondaryText,
               fontSize: 18,
               fontWeight: 300,
               lineHeight: '18px',
             }}>
               {detail.text}
             </span>
-            <ArrowIcon color="#060015" width={17} height={13} viewBox="0 0 17 13" pathD="M10 1L16 6.5M16 6.5L10 12M16 6.5H0" strokeLinecap="butt" strokeLinejoin="miter" />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={13} viewBox="0 0 17 13" pathD="M10 1L16 6.5M16 6.5L10 12M16 6.5H0" strokeLinecap="butt" strokeLinejoin="miter" />
           </div>
         </div>
       )
@@ -131,7 +135,7 @@ export function EmailGrid({
     return (
       <div key={index} style={rowStyle}>
         <span style={{
-          color: colors.ui.textPrimary,
+          color: themeColors.textPrimary,
           fontSize: 18,
           fontWeight: 300,
         }}>
@@ -167,9 +171,9 @@ export function EmailGrid({
               variant="email-grid"
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
-              textColor={colors.ui.textPrimary}
-              background={colors.ui.surface}
-              border={`0.79px solid ${colors.ui.border}`}
+              textColor={themeColors.textPrimary}
+              background={themeColors.bgCategoryChip}
+              border={`0.79px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>
@@ -184,7 +188,7 @@ export function EmailGrid({
           {/* Eyebrow */}
           {showEyebrow && eyebrow && (
             <div style={{
-              color: colors.ui.textPrimary,
+              color: themeColors.textPrimary,
               fontSize: 10,
               fontWeight: 500,
               textTransform: 'uppercase',
@@ -197,7 +201,7 @@ export function EmailGrid({
           {/* Headline */}
           {showLightHeader && showHeadline && (
             <div style={{
-              color: colors.ui.textPrimary,
+              color: themeColors.textPrimary,
               fontSize: headlineFontSize ?? 38,
               fontWeight: 300,
               lineHeight: `${(headlineFontSize ?? 38) * (48 / 38)}px`,
@@ -209,7 +213,7 @@ export function EmailGrid({
           {/* Subheading */}
           {showSubheading && subheading && (
             <div style={{
-              color: colors.ui.textPrimary,
+              color: themeColors.textPrimary,
               fontSize: 20,
               fontWeight: 300,
               lineHeight: 1.3,
@@ -221,7 +225,7 @@ export function EmailGrid({
           {/* Body */}
           {showBody && (
             <div style={{
-              color: colors.ui.textPrimary,
+              color: themeColors.textPrimary,
               fontSize: 18,
               fontWeight: 300,
             }}>

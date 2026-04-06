@@ -6,6 +6,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 // Simple zoom/pan image component
 function ZoomPanImage({
@@ -77,6 +78,7 @@ export interface WebsiteThumbnailProps {
   showCta: boolean
   logoColor: 'black' | 'orange'
   grayscale?: boolean
+  theme?: TemplateTheme
   headlineFontSize?: number
   subheadFontSize?: number
   colors: ColorsConfig
@@ -100,6 +102,7 @@ export function WebsiteThumbnail({
   showCta,
   logoColor,
   grayscale = false,
+  theme = 'light',
   headlineFontSize: headlineFontSizeProp,
   subheadFontSize,
   colors,
@@ -108,10 +111,11 @@ export function WebsiteThumbnail({
 }: WebsiteThumbnailProps) {
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale)
 
+  const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
-  const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
+  const logoFill = themeColors.logoFill
 
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
@@ -126,7 +130,7 @@ export function WebsiteThumbnail({
     height: 450,
     padding: 32,
     position: 'relative',
-    background: '#F9F9F9',
+    background: themeColors.backgroundPrimary,
     overflow: 'hidden',
     fontFamily,
     transform: `scale(${scale})`,
@@ -169,7 +173,9 @@ export function WebsiteThumbnail({
               variant="website-light"
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
-              textColor={colors.ui.textPrimary}
+              textColor={themeColors.textPrimary}
+              background={themeColors.bgCategoryChip}
+              border={`1px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>
@@ -191,7 +197,7 @@ export function WebsiteThumbnail({
             <div
               style={{
                 alignSelf: 'stretch',
-                color: colors.ui.textPrimary,
+                color: themeColors.textPrimary,
                 fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
@@ -217,7 +223,7 @@ export function WebsiteThumbnail({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: colors.ui.textPrimary,
+                  color: themeColors.textPrimary,
                   fontSize: headlineSize,
                   fontWeight: 350,
                   lineHeight: headlineLineHeight,
@@ -231,7 +237,7 @@ export function WebsiteThumbnail({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: colors.ui.textPrimary,
+                  color: themeColors.textPrimary,
                   fontSize: subheadFontSize ?? 20,
                   fontWeight: 350,
                 }}
@@ -255,7 +261,7 @@ export function WebsiteThumbnail({
             <span
               style={{
                 textAlign: 'center',
-                color: '#060015',
+                color: themeColors.buttonSecondaryText,
                 fontSize: 18.75,
                 fontWeight: 500,
                 lineHeight: '18.75px',
@@ -263,7 +269,7 @@ export function WebsiteThumbnail({
             >
               {cta}
             </span>
-            <ArrowIcon color="#060015" width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
           </div>
         )}
       </div>

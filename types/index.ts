@@ -21,6 +21,7 @@ export type NewsletterTopBannerVariant = 'dark' | 'light'
 export type SolutionOverviewCtaOption = 'demo' | 'learn' | 'start' | 'contact'
 export type CustomerLibraryVariant = 'orange' | 'dark' | 'light'
 export type SolutionOverviewPage = 1 | 2 | 3
+export type TemplateTheme = 'light' | 'dark'
 
 // Social Carousel Types
 export type CarouselSlideType = 'cover-text' | 'cover-image' | 'text' | 'text-image' | 'outro'
@@ -358,6 +359,7 @@ export interface ManualAssetSettings {
   floatingBannerMobileVariant: FloatingBannerMobileVariant
   floatingBannerMobileArrowType: FloatingBannerMobileArrowType
   newsletterTopBannerVariant: NewsletterTopBannerVariant
+  theme: TemplateTheme
   showSpeaker1: boolean
   showSpeaker2: boolean
   showSpeaker3: boolean
@@ -569,6 +571,8 @@ export interface GeneratedAsset {
   floatingBannerMobileArrowType: FloatingBannerMobileArrowType
   // Newsletter Top Banner specific
   newsletterTopBannerVariant: NewsletterTopBannerVariant
+  // Template theme
+  theme: TemplateTheme
   // Image effects
   grayscale: boolean
   // Solution Overview PDF specific - Page 1
@@ -733,6 +737,8 @@ export interface QueuedAsset {
   floatingBannerMobileArrowType: FloatingBannerMobileArrowType
   // Newsletter Top Banner specific
   newsletterTopBannerVariant: NewsletterTopBannerVariant
+  // Template theme
+  theme: TemplateTheme
   // Image effects
   grayscale: boolean
   // Solution Overview PDF specific - Page 1
@@ -918,6 +924,8 @@ export interface AppState {
   floatingBannerMobileArrowType: FloatingBannerMobileArrowType
   // Newsletter Top Banner specific
   newsletterTopBannerVariant: NewsletterTopBannerVariant
+  // Template theme
+  theme: TemplateTheme
   // Image effects
   grayscale: boolean
   // Solution Overview PDF specific - Page 1
@@ -1117,6 +1125,7 @@ export interface AppState {
   setFloatingBannerMobileArrowType: (arrowType: FloatingBannerMobileArrowType) => void
   // Newsletter Top Banner specific
   setNewsletterTopBannerVariant: (variant: NewsletterTopBannerVariant) => void
+  setTheme: (theme: TemplateTheme) => void
   // Image effects
   setGrayscale: (grayscale: boolean) => void
   // Manual text size

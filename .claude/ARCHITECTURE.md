@@ -63,8 +63,11 @@ interface TemplateNameProps {
   // Variant (if template has variants)
   variant: 'image' | 'none'  // or other variant names
 
-  // Logo
+  // Logo (ignored on themed templates — theme drives logo color)
   logoColor: 'white' | 'black' | 'orange'
+
+  // Theme (if template supports theming — see lib/template-themes.ts)
+  theme?: 'light' | 'dark'
 
   // Brand config
   colors: ColorsConfig
@@ -118,6 +121,8 @@ When adding a new template with variants:
 3. Add to `types/index.ts` AppState interface
 4. Add to draft-storage save/load
 5. Add to `EditorScreen.tsx` store destructure
+
+**Theme support** uses a shared `theme` field (already in the store/types/snapshot pipeline) rather than per-template variant fields. If the new template supports theming, follow `.claude/THEME-ROLLOUT.md` — no new store fields needed, just wire the `theme` prop through the template component, registry, export-params, and EditorScreen preview.
 
 ### Variant Persistence (Critical for New Templates)
 
@@ -484,6 +489,20 @@ Identity is restored from localStorage in `app/editor/page.tsx` on mount via `se
 
 This is the largest file. Key patterns:
 
+### Editor Layout
+
+The editor has a two-column layout:
+
+**Left sidebar (340px):** Generate button → text fields (headline, body, CTA, etc.) → divider → template options (theme, category, layout, image upload, variant pickers). Text fields come first so users see content editing immediately.
+
+**Right column:** Template preview (centered) → toolbar below preview → queue save/cancel (if editing from queue).
+
+**Toolbar (below preview):** A contained pill bar centered under the preview with: Preview (opens lightbox) | Add to Queue | Scale selector (1x/2x/3x) | Export. This toolbar is only for single-page templates — multi-page collateral (SO, FAQ, Stacker) uses a separate toolbar pattern above the preview (see Editor Toolbar Pattern below).
+
+**Preview lightbox:** The Preview button opens the current template at native 1x size in a fullscreen dark overlay. Uses `TEMPLATE_REGISTRY[currentTemplate].renderProps()` with the full store state (`useStore.getState()`) to render the live template. ESC key or click-outside to close.
+
+**Generate button:** An inline button above the text fields (blue border + sparkle icon + "Generate" text). Clicking it switches `contentMode` to `'generate'`, showing the AI generation panel (describe prompt + PDF upload). After generation completes, it auto-switches back to `'verbatim'` with generated text. The generate panel has a "back to editing" link to return without generating.
+
 ### Adding Controls for New Templates
 
 1. Add template-specific state variables to store destructure
@@ -502,6 +521,13 @@ This is the largest file. Key patterns:
   // Image upload UI
 )}
 ```
+
+### Editor Styling Conventions
+
+- **Field labels:** `text-xs font-light font-mono` (monospace, lowercase, 12px) with `text-gray-500 dark:text-content-secondary`
+- **Input fields:** `rounded` (4px border radius), `border-gray-300 dark:border-[#494a4c]`
+- **Toggle buttons (theme, layout, variant):** Container uses `bg-gray-200 dark:bg-surface-tertiary rounded-lg`. Selected state adds `dark:border dark:border-[#494a4c]` on top of the standard active styling.
+- **Logo picker:** Hidden for themed templates (theme drives logo color). Add template to the exclusion list when adding theme support.
 
 ### Drag-to-Adjust Spacing Controls
 

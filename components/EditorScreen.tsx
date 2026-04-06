@@ -41,6 +41,7 @@ import { ZoomableImage } from './ZoomableImage'
 import { ImageCropModal } from './ImageCropModal'
 import { SimpleRichTextEditor } from './SimpleRichTextEditor'
 import { buildExportParams, type ExportParamState } from '@/lib/export-params'
+import { TEMPLATE_REGISTRY } from '@/lib/template-registry'
 import { EyeIcon } from './shared/EyeIcon'
 import type { TemplateInfo } from '@/lib/template-config'
 import {
@@ -355,6 +356,9 @@ export function EditorScreen() {
     // Newsletter Top Banner
     newsletterTopBannerVariant,
     setNewsletterTopBannerVariant,
+    // Template theme
+    theme,
+    setTheme,
     // Image effects
     grayscale,
     setGrayscale,
@@ -534,6 +538,18 @@ export function EditorScreen() {
 
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
+
+  // Editor preview lightbox
+  const [showPreviewLightbox, setShowPreviewLightbox] = useState(false)
+
+  useEffect(() => {
+    if (!showPreviewLightbox) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowPreviewLightbox(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showPreviewLightbox])
 
   // Cancel confirmation modal state (for edit-from-queue mode)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
@@ -866,6 +882,7 @@ export function EditorScreen() {
         floatingBannerMobileVariant,
         floatingBannerMobileArrowType,
         newsletterTopBannerVariant,
+        theme,
         colorStyle,
         headingSize,
         alignment,
@@ -1343,43 +1360,16 @@ export function EditorScreen() {
       <div className="flex gap-8 h-[calc(100vh-180px)]">
         {/* Left: Editor */}
         <div className="w-[340px] flex-shrink-0 space-y-5 overflow-y-auto">
-          {/* Mode Toggle - hidden for solution-overview-pdf */}
-          {currentTemplate !== 'solution-overview-pdf' && (
-            <div className="flex gap-1 p-1 bg-gray-100 dark:bg-surface-secondary rounded-lg">
-              <button
-                onClick={() => setContentMode('verbatim')}
-                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                  contentMode === 'verbatim'
-                    ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
-                    : 'text-gray-600 dark:text-content-secondary hover:text-gray-900'
-                }`}
-              >
-                Direct Edit
-              </button>
-              <button
-                onClick={() => setContentMode('generate')}
-                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
-                  contentMode === 'generate'
-                    ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
-                    : 'text-gray-600 dark:text-content-secondary hover:text-gray-900'
-                }`}
-              >
-                <svg className="w-4 h-4" viewBox="0 0 18 17" fill="none">
-                  <path d="M9 0C9 0 9.25863 4.53698 11.2274 6.39636C13.1961 8.25574 18 8.5 18 8.5C18 8.5 13.1961 8.74426 11.2274 10.6036C9.25863 12.463 9 17 9 17C9 17 8.74137 12.463 6.77261 10.6036C4.80386 8.74426 0 8.5 0 8.5C0 8.5 4.80386 8.25574 6.77261 6.39636C8.74137 4.53698 9 0 9 0Z" fill="#D35F0B"/>
-                </svg>
-                Generate
-              </button>
-            </div>
-          )}
+          {/* Mode Toggle removed — Generate button is now inline above the first text field */}
 
           {/* Template Options */}
           {currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
-          <div className="space-y-3 p-4 bg-gray-50 dark:bg-surface-secondary rounded-lg">
+          <div className="space-y-3">
             <div className="flex gap-3">
               {/* Logo Color - Orange/White for Social Dark, none for Social Blue (always white), none for Email Dark Gradient (always white), none for Newsletter templates, none for Website Webinar (always white), none for Website Event Listing (variant-driven), none for Website Floating Banner (variant-driven), Black/Orange for others */}
-              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && (
+              {currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-webinar' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-report' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-image' && currentTemplate !== 'email-grid' && currentTemplate !== 'email-speakers' && currentTemplate !== 'social-image' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-thumbnail' && currentTemplate !== 'website-press-release' && (
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Logo</label>
+                <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Logo</label>
                 {currentTemplate === 'social-dark-gradient' ? (
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
@@ -1397,7 +1387,7 @@ export function EditorScreen() {
                       onClick={() => setLogoColor('white')}
                       className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         logoColor === 'white'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1410,7 +1400,7 @@ export function EditorScreen() {
                       onClick={() => setLogoColor('black')}
                       className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         logoColor === 'black'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1432,15 +1422,37 @@ export function EditorScreen() {
               </div>
               )}
 
+              {/* Theme Picker - for themed templates */}
+              {(currentTemplate === 'email-image' || currentTemplate === 'email-grid' || currentTemplate === 'email-speakers' || currentTemplate === 'social-image' || currentTemplate === 'social-grid-detail' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-press-release' || currentTemplate === 'website-webinar' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-light') && (
+                <div className="flex-1">
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Theme</label>
+                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
+                    {(['light', 'dark'] as const).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTheme(t)}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                          theme === t
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
+                            : 'text-gray-600 dark:text-content-secondary'
+                        }`}
+                      >
+                        {t === 'light' ? 'Light' : 'Dark'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Category - Not shown for Social Dark Gradient, Social Blue Gradient, Email Dark Gradient, Newsletter templates, Website Event Listing, Website Floating Banner, or Solution Overview PDF */}
               {(currentTemplate !== 'social-dark-gradient' && currentTemplate !== 'social-blue-gradient' && currentTemplate !== 'email-dark-gradient' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner') && (
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">Category</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Category</label>
                   <div className="relative">
                     <select
                       value={solution}
                       onChange={(e) => setSolution(e.target.value)}
-                      className="w-full px-3 py-2 pr-8 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 pr-8 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary appearance-none cursor-pointer"
                     >
                       {solutionOptions.map(({ key, label }) => (
@@ -1465,7 +1477,7 @@ export function EditorScreen() {
               <>
                 {/* Color Style */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Color Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Color Style</label>
                   <div className="flex gap-2">
                     {(['1', '2', '3', '4'] as const).map((style) => (
                       <button
@@ -1489,13 +1501,13 @@ export function EditorScreen() {
 
                 {/* Alignment */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Alignment</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Alignment</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setAlignment('left')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'left'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1505,7 +1517,7 @@ export function EditorScreen() {
                       onClick={() => setAlignment('center')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'center'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1516,13 +1528,13 @@ export function EditorScreen() {
 
                 {/* CTA Style */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">CTA Style</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setCtaStyle('link')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'link'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1532,7 +1544,7 @@ export function EditorScreen() {
                       onClick={() => setCtaStyle('button')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'button'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1548,7 +1560,7 @@ export function EditorScreen() {
               <>
                 {/* Color Style */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Background</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Background</label>
                   <div className="flex gap-2">
                     {(['1', '2', '3', '4'] as const).map((style) => (
                       <button
@@ -1572,13 +1584,13 @@ export function EditorScreen() {
 
                 {/* Image Size */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Image Size</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setNewsletterImageSize('none')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1588,7 +1600,7 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('small')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1598,7 +1610,7 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('large')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1610,7 +1622,7 @@ export function EditorScreen() {
                 {/* Image Upload - only show when image size is not 'none' */}
                 {newsletterImageSize !== 'none' && (
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Image</label>
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image</label>
                     {newsletterImageUrl ? (
                       <ImagePreviewWithCrop
                         imageUrl={newsletterImageUrl}
@@ -1669,7 +1681,7 @@ export function EditorScreen() {
               <>
                 {/* Color Style */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Background</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Background</label>
                   <div className="flex gap-2">
                     {(['1', '2', '3', '4'] as const).map((style) => (
                       <button
@@ -1693,13 +1705,13 @@ export function EditorScreen() {
 
                 {/* Image Size */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Image Size</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setNewsletterImageSize('none')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1709,7 +1721,7 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('small')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1719,7 +1731,7 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('large')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1731,7 +1743,7 @@ export function EditorScreen() {
                 {/* Image Upload - only show when image size is not 'none' */}
                 {newsletterImageSize !== 'none' && (
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Image</label>
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image</label>
                     {newsletterImageUrl ? (
                       <ImagePreviewWithCrop
                         imageUrl={newsletterImageUrl}
@@ -1790,13 +1802,13 @@ export function EditorScreen() {
               <>
                 {/* Image Size */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Image Size</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setNewsletterImageSize('none')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1806,7 +1818,7 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('small')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1816,7 +1828,7 @@ export function EditorScreen() {
                       onClick={() => setNewsletterImageSize('large')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -1828,7 +1840,7 @@ export function EditorScreen() {
                 {/* Image Upload - only show when image size is not 'none' */}
                 {newsletterImageSize !== 'none' && (
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Image</label>
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image</label>
                     {newsletterImageUrl ? (
                       <ImagePreviewWithCrop
                         imageUrl={newsletterImageUrl}
@@ -1887,7 +1899,7 @@ export function EditorScreen() {
               <>
                 {/* Dark/Light Variant */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Theme</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Theme</label>
                   <div className="flex gap-2">
                     {(['dark', 'light'] as const).map((variant) => (
                       <button
@@ -1916,7 +1928,7 @@ export function EditorScreen() {
               <div className="space-y-3">
                 {/* Speaker Count */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Number of Speakers</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Number of Speakers</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {([1, 2, 3] as const).map((count) => (
                       <button
@@ -1924,7 +1936,7 @@ export function EditorScreen() {
                         onClick={() => setSpeakerCount(count)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           speakerCount === count
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                             : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
@@ -1941,7 +1953,7 @@ export function EditorScreen() {
               <div className="space-y-3">
                 {/* Variant */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Layout</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Layout</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['image', 'none'] as const).map((variant) => (
                       <button
@@ -1949,7 +1961,7 @@ export function EditorScreen() {
                         onClick={() => setEbookVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           ebookVariant === variant
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                             : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
@@ -1966,7 +1978,7 @@ export function EditorScreen() {
               <div className="space-y-3">
                 {/* Variant */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Right Side Content</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Right Side Content</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['none', 'image', 'speakers'] as const).map((variant) => (
                       <button
@@ -1974,7 +1986,7 @@ export function EditorScreen() {
                         onClick={() => setWebinarVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           webinarVariant === variant
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                             : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
@@ -1991,7 +2003,7 @@ export function EditorScreen() {
               <div className="space-y-3">
                 {/* Variant */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Style</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['orange', 'light', 'dark-gradient'] as const).map((variant) => (
                       <button
@@ -1999,7 +2011,7 @@ export function EditorScreen() {
                         onClick={() => setEventListingVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           eventListingVariant === variant
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                             : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
@@ -2023,7 +2035,7 @@ export function EditorScreen() {
                         onClick={() => setCustomerLibraryVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           customerLibraryVariant === variant
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                             : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
@@ -2040,7 +2052,7 @@ export function EditorScreen() {
               <div className="space-y-3">
                 {/* Variant */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Layout</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Layout</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['image', 'none'] as const).map((variant) => (
                       <button
@@ -2048,7 +2060,7 @@ export function EditorScreen() {
                         onClick={() => setReportVariant(variant)}
                         className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           reportVariant === variant
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                             : 'text-gray-600 dark:text-content-secondary'
                         }`}
                       >
@@ -2065,11 +2077,11 @@ export function EditorScreen() {
               <div className="space-y-3">
                 {/* Variant */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Style</label>
                   <select
                     value={floatingBannerVariant}
                     onChange={(e) => setFloatingBannerVariant(e.target.value as typeof floatingBannerVariant)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-[#494a4c] rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="white">White</option>
                     <option value="orange">Orange</option>
@@ -2088,11 +2100,11 @@ export function EditorScreen() {
               <div className="space-y-3">
                 {/* Variant */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Style</label>
                   <select
                     value={floatingBannerMobileVariant}
                     onChange={(e) => setFloatingBannerMobileVariant(e.target.value as typeof floatingBannerMobileVariant)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-line-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-surface-secondary border border-gray-300 dark:border-[#494a4c] rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="light">Light</option>
                     <option value="orange">Orange</option>
@@ -2105,13 +2117,13 @@ export function EditorScreen() {
                 </div>
                 {/* Arrow Type */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">CTA Style</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setFloatingBannerMobileArrowType('text')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         floatingBannerMobileArrowType === 'text'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2121,7 +2133,7 @@ export function EditorScreen() {
                       onClick={() => setFloatingBannerMobileArrowType('arrow')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         floatingBannerMobileArrowType === 'arrow'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2152,7 +2164,7 @@ export function EditorScreen() {
                           }}
                           className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                             isCurrent
-                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                               : 'text-gray-600 dark:text-content-secondary'
                           }`}
                         >
@@ -2180,7 +2192,7 @@ export function EditorScreen() {
                           }}
                           className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                             isCurrent
-                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                               : 'text-gray-600 dark:text-content-secondary'
                           }`}
                         >
@@ -2208,7 +2220,7 @@ export function EditorScreen() {
                           }}
                           className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                             isCurrent
-                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                              ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                               : 'text-gray-600 dark:text-content-secondary'
                           }`}
                         >
@@ -2307,7 +2319,7 @@ export function EditorScreen() {
               <>
                 {/* Color Style */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Color Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Color Style</label>
                   <div className="flex gap-2">
                     {(['1', '2', '3', '4'] as const).map((style) => (
                       <button
@@ -2331,13 +2343,13 @@ export function EditorScreen() {
 
                 {/* Alignment */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Alignment</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Alignment</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setAlignment('left')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'left'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2347,7 +2359,7 @@ export function EditorScreen() {
                       onClick={() => setAlignment('center')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         alignment === 'center'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2358,13 +2370,13 @@ export function EditorScreen() {
 
                 {/* CTA Style */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">CTA Style</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">CTA Style</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setCtaStyle('link')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'link'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2374,7 +2386,7 @@ export function EditorScreen() {
                       onClick={() => setCtaStyle('button')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                         ctaStyle === 'button'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2389,13 +2401,13 @@ export function EditorScreen() {
             {(currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image') && (
               <>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Layout</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Layout</label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     <button
                       onClick={() => setLayout('more-text')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         layout === 'more-text'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2405,7 +2417,7 @@ export function EditorScreen() {
                       onClick={() => setLayout('even')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         layout === 'even'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2415,7 +2427,7 @@ export function EditorScreen() {
                       onClick={() => setLayout('more-image')}
                       className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
                         layout === 'more-image'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm'
+                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
                           : 'text-gray-600 dark:text-content-secondary'
                       }`}
                     >
@@ -2431,7 +2443,7 @@ export function EditorScreen() {
             {/* Image - Website Thumbnail (image variant), Email Image, Email Product Release, Social Image, Website Webinar (image variant), Website Press Release, and Website Report (image variant) */}
             {((currentTemplate === 'website-thumbnail' && ebookVariant === 'image') || currentTemplate === 'email-image' || currentTemplate === 'email-product-release' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || (currentTemplate === 'website-webinar' && webinarVariant === 'image') || currentTemplate === 'website-press-release' || (currentTemplate === 'website-report' && reportVariant === 'image')) && (
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Image</label>
+                <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image</label>
                 {thumbnailImageUrl ? (
                   <ImagePreviewWithCrop
                     imageUrl={thumbnailImageUrl}
@@ -2566,11 +2578,26 @@ export function EditorScreen() {
           {/* Direct Edit Mode */}
           {contentMode === 'verbatim' && (
             <div className="space-y-4">
+              {/* Inline Generate button — replaces the old Direct Edit / Generate toggle */}
+              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
+                <button
+                  onClick={() => setContentMode('generate')}
+                  className="inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-900 dark:text-white
+                    border border-blue-600 rounded
+                    hover:bg-blue-600/10 transition-colors"
+                >
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+                  </svg>
+                  Generate
+                </button>
+              )}
+
               {/* Eyebrow - not shown for email-image, social-image, solution-overview-pdf, email-cority-connect-2026 (they don't use it) */}
               {currentTemplate !== 'email-image' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-cority-connect-2026' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       Eyebrow
                     </label>
                     <EyeIcon visible={showEyebrow} onClick={() => setShowEyebrow(!showEyebrow)} />
@@ -2580,7 +2607,7 @@ export function EditorScreen() {
                     value={eyebrow}
                     onChange={(e) => setEyebrow(e.target.value)}
                     placeholder={currentTemplate === 'email-product-release' ? 'Product Release' : 'e.g., EBOOK, WEBINAR'}
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                       bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showEyebrow ? 'opacity-50' : ''}`}
@@ -2592,7 +2619,7 @@ export function EditorScreen() {
               {currentTemplate === 'email-grid' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       Light Header
                     </label>
                     <EyeIcon visible={showLightHeader} onClick={() => setShowLightHeader(!showLightHeader)} />
@@ -2604,7 +2631,7 @@ export function EditorScreen() {
               {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                     Headline
                   </label>
                   <EyeIcon visible={showHeadline} onClick={() => setShowHeadline(!showHeadline)} />
@@ -2636,7 +2663,7 @@ export function EditorScreen() {
                       value={verbatimCopy.headline}
                       onChange={(e) => setVerbatimCopy({ headline: e.target.value })}
                       placeholder="Headline"
-                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -2693,7 +2720,7 @@ export function EditorScreen() {
               {(currentTemplate === 'website-thumbnail' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner' || currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient' || currentTemplate === 'newsletter-light') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       {(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') ? 'Subheader' : 'Subhead'}
                     </label>
                     <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
@@ -2726,7 +2753,7 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
                       placeholder={(currentTemplate === 'website-webinar' || currentTemplate === 'website-press-release' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-top-banner') ? 'Subheader text' : 'Supporting subheadline'}
                       rows={2}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showSubhead ? 'opacity-50' : ''}`}
@@ -2738,7 +2765,7 @@ export function EditorScreen() {
               {currentTemplate === 'email-grid' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       Subheading
                     </label>
                     <EyeIcon visible={showSubheading} onClick={() => setShowSubheading(!showSubheading)} />
@@ -2748,7 +2775,7 @@ export function EditorScreen() {
                     value={subheading}
                     onChange={(e) => setSubheading(e.target.value)}
                     placeholder="Optional subheading"
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                       bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showSubheading ? 'opacity-50' : ''}`}
@@ -2760,7 +2787,7 @@ export function EditorScreen() {
               {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       Body Copy
                     </label>
                     <EyeIcon visible={showBody} onClick={() => setShowBody(!showBody)} />
@@ -2780,7 +2807,7 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ body: e.target.value })}
                       placeholder="Body text"
                       rows={3}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showBody ? 'opacity-50' : ''}`}
@@ -2793,7 +2820,7 @@ export function EditorScreen() {
               {(currentTemplate === 'website-webinar' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-press-release' || currentTemplate === 'website-report') && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       CTA Text
                     </label>
                     <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -2803,7 +2830,7 @@ export function EditorScreen() {
                     value={ctaText}
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="e.g., Responsive"
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                       bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showCta ? 'opacity-50' : ''}`}
@@ -2814,7 +2841,7 @@ export function EditorScreen() {
               {/* CTA Text - Website Floating Banner (no show/hide toggle) */}
               {(currentTemplate === 'website-floating-banner' || currentTemplate === 'website-floating-banner-mobile') && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
                     CTA Text
                   </label>
                   <input
@@ -2822,7 +2849,7 @@ export function EditorScreen() {
                     value={ctaText}
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="e.g., Learn More"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                       bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -2833,7 +2860,7 @@ export function EditorScreen() {
               {currentTemplate === 'email-ehs-accelerate-banner' && (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
                       Date
                     </label>
                     <input
@@ -2841,13 +2868,13 @@ export function EditorScreen() {
                       value={eventDate}
                       onChange={(e) => setEventDate(e.target.value)}
                       placeholder="e.g., Thursday, 13th November"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
                       Location
                     </label>
                     <input
@@ -2855,7 +2882,7 @@ export function EditorScreen() {
                       value={eventLocation}
                       onChange={(e) => setEventLocation(e.target.value)}
                       placeholder="e.g., London, UK"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -2867,7 +2894,7 @@ export function EditorScreen() {
               {currentTemplate === 'email-ehs-accelerate-signature' && (
                 <div className="space-y-3">
                   <div className={!showSignatureWorkshopName ? 'opacity-50' : ''}>
-                    <label className="flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <label className="flex items-center justify-between text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
                       Workshop Name
                       <EyeIcon visible={showSignatureWorkshopName} onClick={() => setShowSignatureWorkshopName(!showSignatureWorkshopName)} />
                     </label>
@@ -2876,13 +2903,13 @@ export function EditorScreen() {
                       value={signatureWorkshopName}
                       onChange={(e) => setSignatureWorkshopName(e.target.value)}
                       placeholder="e.g., Exclusive EHS+ Leader Workshop"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div className={!showSignatureEventDetails ? 'opacity-50' : ''}>
-                    <label className="flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <label className="flex items-center justify-between text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
                       Event Details
                       <EyeIcon visible={showSignatureEventDetails} onClick={() => setShowSignatureEventDetails(!showSignatureEventDetails)} />
                     </label>
@@ -2891,7 +2918,7 @@ export function EditorScreen() {
                       value={eventDate}
                       onChange={(e) => setEventDate(e.target.value)}
                       placeholder="e.g., Thursday, 13th November"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
                     />
@@ -2900,13 +2927,13 @@ export function EditorScreen() {
                       value={eventLocation}
                       onChange={(e) => setEventLocation(e.target.value)}
                       placeholder="e.g., London, UK"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div className={!showCta ? 'opacity-50' : ''}>
-                    <label className="flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <label className="flex items-center justify-between text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
                       CTA
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
                     </label>
@@ -2915,7 +2942,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Join Us"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -2928,33 +2955,33 @@ export function EditorScreen() {
                 <div className="space-y-3">
                   {/* Header */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Header</label>
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Header</label>
                     <input
                       type="text"
                       value={invitationHeader}
                       onChange={(e) => setInvitationHeader(e.target.value)}
                       placeholder="You're Invited"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   {/* Headline */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Headline</label>
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Headline</label>
                     <input
                       type="text"
                       value={invitationHeadline}
                       onChange={(e) => setInvitationHeadline(e.target.value)}
                       placeholder="Exclusive EHS+ Leader Workshop"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   {/* Event Details */}
                   <div className="pt-2 border-t border-gray-200 dark:border-line-subtle">
-                    <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Event Details</h4>
+                    <h4 className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-2">Event Details</h4>
                     <div className="space-y-2">
                       <div>
                         <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Event Title</label>
@@ -2963,7 +2990,7 @@ export function EditorScreen() {
                           value={invitationEventTitle}
                           onChange={(e) => setInvitationEventTitle(e.target.value)}
                           placeholder="EHS+ Accelerate: Tech Convergence Workshop"
-                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                             bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                             focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
@@ -2976,7 +3003,7 @@ export function EditorScreen() {
                             value={invitationEventDate}
                             onChange={(e) => setInvitationEventDate(e.target.value)}
                             placeholder="13 November"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                               bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                               focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
@@ -2988,7 +3015,7 @@ export function EditorScreen() {
                             value={invitationEventLocation}
                             onChange={(e) => setInvitationEventLocation(e.target.value)}
                             placeholder="London, England"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                               bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                               focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
@@ -3000,7 +3027,7 @@ export function EditorScreen() {
                             value={invitationEventTime}
                             onChange={(e) => setInvitationEventTime(e.target.value)}
                             placeholder="10:00–14:30"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                               bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                               focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
@@ -3012,7 +3039,7 @@ export function EditorScreen() {
                             value={invitationEventTimeNote}
                             onChange={(e) => setInvitationEventTimeNote(e.target.value)}
                             placeholder="Lunch Included"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                               bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                               focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
@@ -3022,7 +3049,7 @@ export function EditorScreen() {
                   </div>
                   {/* Body (rich text) */}
                   <div className="pt-2 border-t border-gray-200 dark:border-line-subtle">
-                    <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Body Text</label>
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-2">Body Text</label>
                     <RichTextEditor
                       content={invitationBody}
                       onChange={setInvitationBody}
@@ -3036,7 +3063,7 @@ export function EditorScreen() {
               {currentTemplate === 'email-cority-connect-2026' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       CTA Text
                     </label>
                     <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3046,7 +3073,7 @@ export function EditorScreen() {
                     value={ctaText}
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="e.g., Learn More"
-                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                    className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                       bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent
                       ${!showCta ? 'opacity-50' : ''}`}
@@ -3057,16 +3084,16 @@ export function EditorScreen() {
               {/* Grid Details - Email Grid only */}
               {currentTemplate === 'email-grid' && (
                 <div className="space-y-3 pt-3 border-t border-gray-200 dark:border-line-subtle">
-                  <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide">Grid Details</h4>
+                  <h4 className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">Grid Details</h4>
 
                   {/* Detail 1 - Always data */}
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Detail 1 (Data)</label>
+                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Detail 1 (Data)</label>
                     <input
                       type="text"
                       value={gridDetail1Text}
                       onChange={(e) => setGridDetail1Text(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary"
                     />
                   </div>
@@ -3081,7 +3108,7 @@ export function EditorScreen() {
                       type="text"
                       value={gridDetail2Text}
                       onChange={(e) => setGridDetail2Text(e.target.value)}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary ${!showGridDetail2 ? 'opacity-50' : ''}`}
                     />
                   </div>
@@ -3104,7 +3131,7 @@ export function EditorScreen() {
                       type="text"
                       value={gridDetail3Text}
                       onChange={(e) => setGridDetail3Text(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary"
                     />
                   </div>
@@ -3117,7 +3144,7 @@ export function EditorScreen() {
                   {/* Metadata */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         Metadata
                       </label>
                       <EyeIcon visible={showMetadata} onClick={() => setShowMetadata(!showMetadata)} />
@@ -3127,7 +3154,7 @@ export function EditorScreen() {
                       value={metadata}
                       onChange={(e) => setMetadata(e.target.value)}
                       placeholder="e.g., Day / Month | 00:00"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showMetadata ? 'opacity-50' : ''}`}
@@ -3137,7 +3164,7 @@ export function EditorScreen() {
                   {/* CTA Text */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         CTA Text
                       </label>
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3147,7 +3174,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Learn More"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
@@ -3162,7 +3189,7 @@ export function EditorScreen() {
                   {/* Metadata */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         Metadata
                       </label>
                       <EyeIcon visible={showMetadata} onClick={() => setShowMetadata(!showMetadata)} />
@@ -3172,7 +3199,7 @@ export function EditorScreen() {
                       value={metadata}
                       onChange={(e) => setMetadata(e.target.value)}
                       placeholder="e.g., Day / Month | 00:00"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showMetadata ? 'opacity-50' : ''}`}
@@ -3182,7 +3209,7 @@ export function EditorScreen() {
                   {/* CTA Text */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         CTA Text
                       </label>
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3192,7 +3219,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Learn More"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
@@ -3207,7 +3234,7 @@ export function EditorScreen() {
                   {/* CTA Text */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         CTA Text
                       </label>
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3217,7 +3244,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
@@ -3232,7 +3259,7 @@ export function EditorScreen() {
                   {/* CTA Text */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         CTA Text
                       </label>
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3242,7 +3269,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
@@ -3257,7 +3284,7 @@ export function EditorScreen() {
                   {/* CTA Text */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         CTA Text
                       </label>
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3267,7 +3294,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
@@ -3282,7 +3309,7 @@ export function EditorScreen() {
                   {/* CTA Text */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         CTA Text
                       </label>
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3292,7 +3319,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
@@ -3307,7 +3334,7 @@ export function EditorScreen() {
                   {/* CTA Text */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         CTA Text
                       </label>
                       <EyeIcon visible={showCta} onClick={() => setShowCta(!showCta)} />
@@ -3317,7 +3344,7 @@ export function EditorScreen() {
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value)}
                       placeholder="e.g., Responsive"
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                         ${!showCta ? 'opacity-50' : ''}`}
@@ -3376,7 +3403,7 @@ export function EditorScreen() {
                   {/* Subhead */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         Subhead
                       </label>
                       <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
@@ -3386,7 +3413,7 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
                       placeholder="This is your subheader or description text..."
                       rows={2}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showSubhead ? 'opacity-50' : ''}`}
@@ -3395,7 +3422,7 @@ export function EditorScreen() {
 
                   {/* Grid Details */}
                   <div className="space-y-3">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       Grid Details
                     </label>
 
@@ -3407,7 +3434,7 @@ export function EditorScreen() {
                         value={gridDetail1Text}
                         onChange={(e) => setGridDetail1Text(e.target.value)}
                         placeholder="Date: January 1st, 2026"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
@@ -3421,7 +3448,7 @@ export function EditorScreen() {
                         value={gridDetail2Text}
                         onChange={(e) => setGridDetail2Text(e.target.value)}
                         placeholder="Time: Midnight, EST"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
@@ -3449,7 +3476,7 @@ export function EditorScreen() {
                         value={gridDetail3Text}
                         onChange={(e) => setGridDetail3Text(e.target.value)}
                         placeholder={gridDetail3Type === 'cta' ? 'Join the event' : 'Place: Wherever'}
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow3 ? 'opacity-50' : ''}`}
@@ -3478,7 +3505,7 @@ export function EditorScreen() {
                         value={gridDetail4Text}
                         onChange={(e) => setGridDetail4Text(e.target.value)}
                         placeholder={gridDetail4Type === 'cta' ? 'Join the event' : 'Additional info'}
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow4 ? 'opacity-50' : ''}`}
@@ -3494,7 +3521,7 @@ export function EditorScreen() {
                   {/* Subhead */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                         Subhead
                       </label>
                       <EyeIcon visible={showSubhead} onClick={() => setShowSubhead(!showSubhead)} />
@@ -3504,7 +3531,7 @@ export function EditorScreen() {
                       onChange={(e) => setVerbatimCopy({ subhead: e.target.value })}
                       placeholder="This is your subheader or description text..."
                       rows={2}
-                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                      className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                         bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                         focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none
                         ${!showSubhead ? 'opacity-50' : ''}`}
@@ -3513,7 +3540,7 @@ export function EditorScreen() {
 
                   {/* Grid Details */}
                   <div className="space-y-3">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                       Grid Details
                     </label>
 
@@ -3525,7 +3552,7 @@ export function EditorScreen() {
                         value={gridDetail1Text}
                         onChange={(e) => setGridDetail1Text(e.target.value)}
                         placeholder="Add Details or Hide Me"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
@@ -3542,7 +3569,7 @@ export function EditorScreen() {
                         value={gridDetail2Text}
                         onChange={(e) => setGridDetail2Text(e.target.value)}
                         placeholder="Add Details or Hide Me"
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow3 ? 'opacity-50' : ''}`}
@@ -3560,7 +3587,7 @@ export function EditorScreen() {
                         value={gridDetail3Text}
                         onChange={(e) => setGridDetail3Text(e.target.value)}
                         placeholder="Add Details or Hide Me"
-                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${!showRow4 ? 'opacity-50' : ''}`}
@@ -3575,7 +3602,7 @@ export function EditorScreen() {
                         value={gridDetail4Text}
                         onChange={(e) => setGridDetail4Text(e.target.value)}
                         placeholder="Join the event"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
@@ -3621,8 +3648,18 @@ export function EditorScreen() {
           {/* Generate Mode */}
           {contentMode === 'generate' && (
             <div className="space-y-4">
+              <button
+                onClick={() => setContentMode('verbatim')}
+                className="inline-flex items-center gap-1 text-xs font-mono text-gray-500 dark:text-content-secondary
+                  hover:text-gray-700 dark:hover:text-content-primary transition-colors"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                back to editing
+              </button>
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
                   What are you promoting?
                 </label>
                 <textarea
@@ -3630,7 +3667,7 @@ export function EditorScreen() {
                   onChange={(e) => setGenerationContext(e.target.value)}
                   placeholder="Describe the content, product, or offer..."
                   rows={5}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                     bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                     focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
@@ -3718,8 +3755,8 @@ export function EditorScreen() {
 
         {/* Right: Preview with Actions */}
         <div className="flex-1 flex flex-col overflow-y-auto">
-          {/* Action Bar - above preview */}
-          <div className="flex items-center justify-between mb-4">
+          {/* Action Bar - above preview (only shown for solution-overview-pdf) */}
+          <div className={`flex items-center justify-between mb-4 ${currentTemplate !== 'solution-overview-pdf' ? 'hidden' : ''}`}>
             <div className="flex items-center gap-2">
               {/* Scale Selector - hide for solution-overview-pdf */}
               {currentTemplate !== 'solution-overview-pdf' && (
@@ -3926,20 +3963,9 @@ export function EditorScreen() {
             )}
           </div>
 
-          {/* Queue feedback toast */}
-          {showQueuedFeedback && (
-            <div className="mb-3 flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200
-              dark:border-green-800 rounded-md text-green-700 dark:text-green-400 text-xs">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Added to queue ({exportQueue.length} total)
-            </div>
-          )}
-
           {/* Preview */}
           <div
-            className={`flex items-start flex-1 bg-gray-100 dark:bg-transparent rounded-xl p-6 ${
+            className={`flex items-start bg-gray-100 dark:bg-transparent rounded-xl p-6 ${
               currentTemplate === 'website-floating-banner' || currentTemplate === 'website-floating-banner-mobile' ? 'justify-start' : 'justify-center'
             }`}
           >
@@ -4089,6 +4115,7 @@ export function EditorScreen() {
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4114,6 +4141,7 @@ export function EditorScreen() {
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4164,6 +4192,7 @@ export function EditorScreen() {
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4227,6 +4256,7 @@ export function EditorScreen() {
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4252,6 +4282,7 @@ export function EditorScreen() {
                   gridDetail2={gridDetail2}
                   gridDetail3={gridDetail3}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4328,6 +4359,7 @@ export function EditorScreen() {
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4351,6 +4383,7 @@ export function EditorScreen() {
                   gridDetail3={{ type: gridDetail3Type, text: gridDetail3Text }}
                   gridDetail4={{ type: gridDetail4Type, text: gridDetail4Text }}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4373,6 +4406,7 @@ export function EditorScreen() {
                   showSolutionSet={showSolutionSet}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4554,6 +4588,7 @@ export function EditorScreen() {
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4609,6 +4644,7 @@ export function EditorScreen() {
                   }}
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
+                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
@@ -4664,6 +4700,137 @@ export function EditorScreen() {
               </div>
             )}
           </div>
+
+          {/* Toolbar - below preview for single-page templates */}
+          {currentTemplate !== 'solution-overview-pdf' && (
+            <div className="mt-4 flex items-center justify-center">
+              <div className="inline-flex items-center gap-1.5 p-1.5 border border-gray-200 dark:border-[#494a4c] rounded-md">
+                {/* Preview button */}
+                <button
+                  onClick={() => setShowPreviewLightbox(true)}
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 dark:text-content-secondary
+                    bg-white dark:bg-surface-primary rounded hover:bg-gray-50 dark:hover:bg-interactive-hover
+                    border border-gray-200 dark:border-[#494a4c] transition-colors"
+                >
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" />
+                  </svg>
+                  Preview
+                </button>
+
+                {/* Add to Queue button */}
+                {!isEditingFromQueue && (
+                  <button
+                    onClick={() => {
+                      addToQueue()
+                      setShowQueuedFeedback(true)
+                      setTimeout(() => setShowQueuedFeedback(false), 2000)
+                    }}
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 dark:text-content-secondary whitespace-nowrap
+                      bg-white dark:bg-surface-primary rounded hover:bg-gray-50 dark:hover:bg-interactive-hover
+                      border border-gray-200 dark:border-[#494a4c] transition-colors"
+                  >
+                    <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 12H3" /><path d="M16 6H3" /><path d="M16 18H3" /><path d="M18 9v6" /><path d="M21 12h-6" />
+                    </svg>
+                    Add to Queue
+                  </button>
+                )}
+
+                {/* Scale selector */}
+                <div className="relative">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowScaleDropdown(!showScaleDropdown) }}
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 dark:text-content-secondary
+                      bg-white dark:bg-surface-primary rounded hover:bg-gray-50 dark:hover:bg-interactive-hover
+                      border border-gray-200 dark:border-[#494a4c] transition-colors"
+                  >
+                    {exportScale}x
+                    <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showScaleDropdown && (
+                    <div className="absolute bottom-full left-0 mb-1 w-16 bg-white dark:bg-surface-secondary border border-gray-200
+                      dark:border-[#494a4c] rounded shadow-lg overflow-hidden z-10">
+                      {[1, 2, 3].map((scale) => (
+                        <button
+                          key={scale}
+                          onClick={(e) => { e.stopPropagation(); setExportScale(scale); setShowScaleDropdown(false) }}
+                          className={`w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-interactive-hover
+                            ${exportScale === scale ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-gray-600 dark:text-content-secondary'}`}
+                        >
+                          {scale}x
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Export button */}
+                <button
+                  onClick={handleExport}
+                  disabled={isExporting}
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-900 dark:text-white
+                    border border-blue-600 rounded hover:bg-blue-600/10 transition-colors
+                    disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isExporting ? (
+                    <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" />
+                    </svg>
+                  )}
+                  Export
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Queue feedback toast */}
+          {showQueuedFeedback && (
+            <div className="mt-2 flex items-center justify-center">
+              <div className="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200
+                dark:border-green-800 rounded-md text-green-700 dark:text-green-400 text-xs">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Added to queue ({exportQueue.length} total)
+              </div>
+            </div>
+          )}
+
+          {/* Preview lightbox — uses the registry to render the live template at native size */}
+          {showPreviewLightbox && colorsConfig && typographyConfig && (() => {
+            const entry = TEMPLATE_REGISTRY[currentTemplate]
+            if (!entry) return null
+            const storeState = useStore.getState()
+            const asset = {
+              ...storeState,
+              templateType: currentTemplate,
+              headline: verbatimCopy.headline || 'Headline',
+              subhead: verbatimCopy.subhead || '',
+              body: verbatimCopy.body || '',
+            } as Record<string, unknown>
+            const props = entry.renderProps(asset as never, colorsConfig, typographyConfig)
+            const Component = entry.component
+            return (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-pointer"
+                onClick={() => setShowPreviewLightbox(false)}
+              >
+                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                  <div className="shadow-2xl rounded overflow-hidden">
+                    <Component {...props} />
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Cancel confirmation modal */}
           {showCancelConfirm && (

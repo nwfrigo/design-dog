@@ -6,6 +6,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export interface WebinarSpeakerInfo {
   name: string
@@ -34,6 +35,7 @@ export interface WebsiteWebinarProps {
   showBody: boolean
   showCta: boolean
   grayscale?: boolean
+  theme?: TemplateTheme
   speakerCount: 1 | 2 | 3
   speaker1: WebinarSpeakerInfo
   speaker2: WebinarSpeakerInfo
@@ -121,6 +123,7 @@ export function WebsiteWebinar({
   showBody,
   showCta,
   grayscale = false,
+  theme = 'dark',
   speakerCount = 3,
   speaker1,
   speaker2,
@@ -134,6 +137,7 @@ export function WebsiteWebinar({
   typography,
   scale = 1,
 }: WebsiteWebinarProps) {
+  const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.safety
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
@@ -155,7 +159,7 @@ export function WebsiteWebinar({
     padding: 33.33,
     paddingRight: variant === 'image' ? 0 : 33.33, // No right padding for image variant so image goes to edge
     position: 'relative',
-    background: '#060015',
+    background: themeColors.backgroundPrimary,
     overflow: 'hidden',
     fontFamily,
     transform: `scale(${scale})`,
@@ -227,7 +231,7 @@ export function WebsiteWebinar({
             gap: 49.70,
           }}
         >
-          <CorityLogo fill="#FFFFFF" height={29} />
+          <CorityLogo fill={themeColors.logoFill} height={29} />
 
           {/* Solution Pill */}
           {solution !== 'none' && (
@@ -235,6 +239,9 @@ export function WebsiteWebinar({
               variant="website-dark"
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
+              textColor={themeColors.textPrimary}
+              background={themeColors.bgCategoryChip}
+              border={`0.79px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>
@@ -255,7 +262,7 @@ export function WebsiteWebinar({
             <div
               style={{
                 alignSelf: 'stretch',
-                color: 'white',
+                color: themeColors.textPrimary,
                 fontSize: 14,
                 fontWeight: 500,
                 textTransform: 'uppercase',
@@ -281,7 +288,7 @@ export function WebsiteWebinar({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: 'white',
+                  color: themeColors.textPrimary,
                   fontSize: headlineFontSize,
                   fontWeight: 350,
                   lineHeight: headlineLineHeight,
@@ -295,7 +302,7 @@ export function WebsiteWebinar({
               <div
                 style={{
                   alignSelf: 'stretch',
-                  color: 'white',
+                  color: themeColors.textPrimary,
                   fontSize: subheadFontSize ?? 22,
                   fontWeight: 350,
                 }}
@@ -310,7 +317,7 @@ export function WebsiteWebinar({
             <div
               style={{
                 alignSelf: 'stretch',
-                color: 'white',
+                color: themeColors.textPrimary,
                 fontSize: 14.58,
                 fontWeight: 350,
               }}
@@ -333,7 +340,7 @@ export function WebsiteWebinar({
             <span
               style={{
                 textAlign: 'center',
-                color: 'white',
+                color: themeColors.buttonSecondaryText,
                 fontSize: 18.75,
                 fontWeight: 500,
                 lineHeight: '18.75px',
@@ -341,7 +348,7 @@ export function WebsiteWebinar({
             >
               {cta}
             </span>
-            <ArrowIcon color="#0080FF" width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
           </div>
         )}
       </div>
@@ -354,10 +361,10 @@ export function WebsiteWebinar({
             alignSelf: 'stretch',
             paddingLeft: 20,
             paddingRight: 20,
-            background: '#060621',
+            background: themeColors.bgCategoryChip,
             overflow: 'hidden',
             borderRadius: 7,
-            border: '0.75px solid #0080FF',
+            border: `0.75px solid ${themeColors.borderFocus}`,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
@@ -396,7 +403,7 @@ export function WebsiteWebinar({
                 <div
                   style={{
                     alignSelf: 'stretch',
-                    color: 'white',
+                    color: themeColors.textPrimary,
                     fontSize: 18,
                     fontWeight: 350,
                   }}
@@ -406,7 +413,7 @@ export function WebsiteWebinar({
                 <div
                   style={{
                     alignSelf: 'stretch',
-                    color: 'white',
+                    color: themeColors.textPrimary,
                     fontSize: 12,
                     fontWeight: 350,
                     lineHeight: '16px',

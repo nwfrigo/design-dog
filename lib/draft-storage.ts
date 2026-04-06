@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -94,6 +94,8 @@ export interface DraftState {
   floatingBannerMobileArrowType: FloatingBannerMobileArrowType
   // Newsletter Top Banner specific
   newsletterTopBannerVariant: NewsletterTopBannerVariant
+  // Template theme
+  theme: TemplateTheme
   // Image effects
   grayscale: boolean
   // Manual text size
@@ -262,6 +264,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       floatingBannerMobileVariant: state.floatingBannerMobileVariant || 'light',
       floatingBannerMobileArrowType: state.floatingBannerMobileArrowType || 'text',
       newsletterTopBannerVariant: state.newsletterTopBannerVariant || 'dark',
+      theme: state.theme || 'light',
       grayscale: state.grayscale ?? false,
       headlineFontSize: state.headlineFontSize ?? null,
       subheadFontSize: state.subheadFontSize ?? null,

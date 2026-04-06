@@ -106,6 +106,8 @@ const SNAPSHOT_FIELDS = [
   'floatingBannerMobileArrowType',
   // Newsletter Top Banner
   'newsletterTopBannerVariant',
+  // Template theme (light/dark)
+  'theme',
   // Image effects
   'grayscale',
   'headlineFontSize',

@@ -6,6 +6,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 
 export type LayoutVariant = 'even' | 'more-image' | 'more-text'
 
@@ -28,6 +29,7 @@ export interface EmailImageProps {
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
+  theme?: TemplateTheme
 }
 
 // Text area widths for each layout variant (image fills the rest)
@@ -78,10 +80,12 @@ export function EmailImage({
   colors,
   typography,
   scale = 1,
+  theme = 'light',
 }: EmailImageProps) {
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const logoFill = logoColor === 'orange' ? colors.brand.primary : colors.brand.black
-  const textColor = colors.ui.textPrimary
+  const themeColors = TEMPLATE_THEMES[theme]
+  const logoFill = themeColors.logoFill
+  const textColor = themeColors.textPrimary
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
   const solutionLabel = solutionConfig.label
@@ -101,7 +105,7 @@ export function EmailImage({
   const containerStyle: CSSProperties = {
     width: 640,
     height: 300,
-    background: colors.ui.surface,
+    background: themeColors.backgroundPrimary,
     position: 'relative',
     display: 'inline-flex',
     justifyContent: 'flex-start',
@@ -145,8 +149,8 @@ export function EmailImage({
               solutionColor={solutionColor}
               solutionLabel={solutionLabel}
               textColor={textColor}
-              background={colors.ui.surface}
-              border={`0.79px solid ${colors.ui.border}`}
+              background={themeColors.bgCategoryChip}
+              border={`0.79px solid ${themeColors.borderFocus}`}
             />
           )}
         </div>
@@ -200,14 +204,14 @@ export function EmailImage({
           }}>
             <span style={{
               textAlign: 'center',
-              color: '#060015',
+              color: themeColors.buttonSecondaryText,
               fontSize: 18,
               fontWeight: 500,
               lineHeight: '18px',
             }}>
               {ctaText}
             </span>
-            <ArrowIcon color="#060015" width={16.5} height={16.5 * 0.8} />
+            <ArrowIcon color={themeColors.buttonSecondaryText} width={16.5} height={16.5 * 0.8} />
           </div>
         )}
       </div>

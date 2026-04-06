@@ -151,9 +151,9 @@ export function SolutionPill({
 }: SolutionPillProps) {
   const v = VARIANTS[variant]
 
-  const resolvedTextColor = v.textColor ?? textColor ?? '#060015'
-  const resolvedBackground = v.background ?? background ?? '#FFFFFF'
-  const resolvedBorder = v.border ?? border ?? '1px solid #D9D8D6'
+  const resolvedTextColor = textColor ?? v.textColor ?? '#060015'
+  const resolvedBackground = background ?? v.background ?? '#FFFFFF'
+  const resolvedBorder = border ?? v.border ?? '1px solid #D9D8D6'
 
   return (
     <div
