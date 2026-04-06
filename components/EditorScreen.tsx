@@ -1425,7 +1425,7 @@ export function EditorScreen() {
               {/* Theme Picker - for themed templates */}
               {(currentTemplate === 'email-image' || currentTemplate === 'email-grid' || currentTemplate === 'email-speakers' || currentTemplate === 'social-image' || currentTemplate === 'social-grid-detail' || currentTemplate === 'website-thumbnail' || currentTemplate === 'website-press-release' || currentTemplate === 'website-webinar' || currentTemplate === 'website-report' || currentTemplate === 'newsletter-light') && (
                 <div className="flex-1">
-                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Theme</label>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Theme <span className="text-[#FF0000]">(NEW)</span></label>
                   <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
                     {(['light', 'dark'] as const).map((t) => (
                       <button
