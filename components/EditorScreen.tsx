@@ -2635,7 +2635,9 @@ export function EditorScreen() {
                   <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
                     Headline
                   </label>
-                  <EyeIcon visible={showHeadline} onClick={() => setShowHeadline(!showHeadline)} />
+                  {currentTemplate !== 'email-ehs-accelerate-banner' && (
+                    <EyeIcon visible={showHeadline} onClick={() => setShowHeadline(!showHeadline)} />
+                  )}
                 </div>
                 {/* Rich text editor for social templates with rich text support */}
                 {(currentTemplate === 'social-blue-gradient' || currentTemplate === 'social-dark-gradient' || currentTemplate === 'social-image' || currentTemplate === 'social-image-meddbase' || currentTemplate === 'email-image' || currentTemplate === 'email-speakers' || currentTemplate === 'email-dark-gradient' || currentTemplate === 'customer-library' || currentTemplate === 'newsletter-dark-gradient' || currentTemplate === 'newsletter-blue-gradient' || currentTemplate === 'newsletter-light') ? (
@@ -4487,6 +4489,7 @@ export function EditorScreen() {
                 <EmailEhsAccelerateBanner
                   headline={verbatimCopy.headline}
                   body={verbatimCopy.body}
+                  showBody={showBody}
                   ctaText={ctaText}
                   headlineFontSize={headlineFontSize ?? undefined}
                   eventDate={eventDate}

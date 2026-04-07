@@ -359,6 +359,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   'email-ehs-accelerate-banner': (s) => ({
     headline: s.verbatimCopy.headline || '',
     body: s.verbatimCopy.body || '',
+    showBody: s.showBody,
     ctaText: s.ctaText || '',
     headlineFontSize: s.headlineFontSize ?? undefined,
     eventDate: s.eventDate || '',

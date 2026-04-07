@@ -424,6 +424,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     renderProps: (asset, colors, typography) => ({
       headline: asset.headline || 'In-Person. Exclusive.',
       body: asset.body || 'Join senior EHS+ leaders to modernize how you stay ahead of operating risks.',
+      showBody: asset.showBody !== false,
       ctaText: asset.ctaText || 'Join Us',
       headlineFontSize: asset.headlineFontSize ?? undefined,
       eventDate: asset.eventDate || 'Thursday, 13th November',
@@ -444,6 +445,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       fields: [
         { param: 'headline', parser: 'string', default: 'In-Person. Exclusive.' },
         { param: 'body', parser: 'string', default: 'Join senior EHS+ leaders to modernize how you stay ahead of operating risks.' },
+        { param: 'showBody', parser: 'boolTrue', default: true },
         { param: 'ctaText', parser: 'string', default: 'Join Us' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'eventDate', parser: 'string', default: 'Thursday, 13th November' },

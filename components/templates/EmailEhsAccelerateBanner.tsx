@@ -8,6 +8,7 @@ import { ArrowIcon } from '@/components/shared/ArrowIcon'
 export interface EmailEhsAccelerateBannerProps {
   headline?: string
   body?: string
+  showBody?: boolean
   ctaText?: string
   headlineFontSize?: number
   eventDate: string
@@ -20,6 +21,7 @@ export interface EmailEhsAccelerateBannerProps {
 export function EmailEhsAccelerateBanner({
   headline,
   body,
+  showBody = true,
   ctaText,
   headlineFontSize,
   eventDate,
@@ -91,19 +93,21 @@ export function EmailEhsAccelerateBanner({
       </div>
 
       {/* Body copy — right side */}
-      <div style={{
-        width: 204,
-        position: 'absolute',
-        left: 350,
-        top: 194,
-        color: 'black',
-        fontSize: 17,
-        fontWeight: 350,
-        lineHeight: '21.76px',
-        wordWrap: 'break-word',
-      }}>
-        {bodyText}
-      </div>
+      {showBody && (
+        <div style={{
+          width: 204,
+          position: 'absolute',
+          left: 350,
+          top: 194,
+          color: 'black',
+          fontSize: 17,
+          fontWeight: 350,
+          lineHeight: '21.76px',
+          wordWrap: 'break-word',
+        }}>
+          {bodyText}
+        </div>
+      )}
 
       {/* Bottom info bar */}
       <div style={{
