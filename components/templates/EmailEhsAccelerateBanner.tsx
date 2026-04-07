@@ -79,7 +79,7 @@ export function EmailEhsAccelerateBanner({
 
       {/* Main headline — "In-Person. Exclusive." */}
       <div style={{
-        width: 349,
+        width: 300,
         position: 'absolute',
         left: 28,
         top: 149,
