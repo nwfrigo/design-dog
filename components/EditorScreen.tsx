@@ -67,6 +67,7 @@ const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: 
   'website-webinar': { default: 35, min: 16, max: 54, step: 2 },
   'website-event-listing': { default: 58, min: 30, max: 80, step: 2 },
   'customer-library': { default: 37, min: 20, max: 54, step: 2 },
+  'email-ehs-accelerate-banner': { default: 63.6, min: 32, max: 80, step: 2 },
   'website-report': { default: 35, min: 16, max: 54, step: 2 },
   'website-floating-banner': { default: 33, min: 16, max: 44, step: 1 },
   'website-floating-banner-mobile': { default: 14, min: 8, max: 20, step: 1 },
@@ -2627,8 +2628,8 @@ export function EditorScreen() {
                 </div>
               )}
 
-              {/* Headline - not shown for solution-overview-pdf or email-ehs-accelerate-banner (fixed text) */}
-              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
+              {/* Headline - not shown for solution-overview-pdf (fixed text) */}
+              {currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
@@ -2784,7 +2785,7 @@ export function EditorScreen() {
               )}
 
               {/* Body - not shown for templates that don't use it */}
-              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-banner' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
+              {currentTemplate !== 'website-thumbnail' && currentTemplate !== 'social-image' && currentTemplate !== 'social-image-meddbase' && currentTemplate !== 'social-grid-detail' && currentTemplate !== 'website-event-listing' && currentTemplate !== 'website-floating-banner' && currentTemplate !== 'website-floating-banner-mobile' && currentTemplate !== 'newsletter-top-banner' && currentTemplate !== 'newsletter-dark-gradient' && currentTemplate !== 'newsletter-blue-gradient' && currentTemplate !== 'newsletter-light' && currentTemplate !== 'solution-overview-pdf' && currentTemplate !== 'email-product-release' && currentTemplate !== 'customer-library' && currentTemplate !== 'email-ehs-accelerate-invitation' && currentTemplate !== 'email-ehs-accelerate-signature' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary">
@@ -2849,6 +2850,24 @@ export function EditorScreen() {
                     value={ctaText}
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="e.g., Learn More"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
+                      bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              )}
+
+              {/* CTA Text - Email EHS Accelerate Banner */}
+              {currentTemplate === 'email-ehs-accelerate-banner' && (
+                <div>
+                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">
+                    CTA Text
+                  </label>
+                  <input
+                    type="text"
+                    value={ctaText}
+                    onChange={(e) => setCtaText(e.target.value)}
+                    placeholder="e.g., Join Us"
                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                       bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -4466,6 +4485,10 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'email-ehs-accelerate-banner' && (
                 <EmailEhsAccelerateBanner
+                  headline={verbatimCopy.headline}
+                  body={verbatimCopy.body}
+                  ctaText={ctaText}
+                  headlineFontSize={headlineFontSize ?? undefined}
                   eventDate={eventDate}
                   eventLocation={eventLocation}
                   colors={colorsConfig}

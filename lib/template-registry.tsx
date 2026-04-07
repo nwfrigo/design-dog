@@ -422,11 +422,18 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
   'email-ehs-accelerate-banner': {
     component: EmailEhsAccelerateBanner,
     renderProps: (asset, colors, typography) => ({
+      headline: asset.headline || 'In-Person. Exclusive.',
+      body: asset.body || 'Join senior EHS+ leaders to modernize how you stay ahead of operating risks.',
+      ctaText: asset.ctaText || 'Join Us',
+      headlineFontSize: asset.headlineFontSize ?? undefined,
       eventDate: asset.eventDate || 'Thursday, 13th November',
       eventLocation: asset.eventLocation || 'London, UK',
       colors, typography, scale: 1,
     }),
     queueTextFields: [
+      { key: 'headline', label: 'Headline' },
+      { key: 'body', label: 'Body' },
+      { key: 'ctaText', label: 'CTA' },
       { key: 'eventDate', label: 'Date' },
       { key: 'eventLocation', label: 'Location' },
     ],
@@ -435,6 +442,10 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       height: 373,
       background: '#ffffff',
       fields: [
+        { param: 'headline', parser: 'string', default: 'In-Person. Exclusive.' },
+        { param: 'body', parser: 'string', default: 'Join senior EHS+ leaders to modernize how you stay ahead of operating risks.' },
+        { param: 'ctaText', parser: 'string', default: 'Join Us' },
+        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'eventDate', parser: 'string', default: 'Thursday, 13th November' },
         { param: 'eventLocation', parser: 'string', default: 'London, UK' },
       ],

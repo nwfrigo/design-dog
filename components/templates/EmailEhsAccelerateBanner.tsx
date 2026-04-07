@@ -6,6 +6,10 @@ import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 
 export interface EmailEhsAccelerateBannerProps {
+  headline?: string
+  body?: string
+  ctaText?: string
+  headlineFontSize?: number
   eventDate: string
   eventLocation: string
   colors: ColorsConfig
@@ -14,11 +18,20 @@ export interface EmailEhsAccelerateBannerProps {
 }
 
 export function EmailEhsAccelerateBanner({
+  headline,
+  body,
+  ctaText,
+  headlineFontSize,
   eventDate,
   eventLocation,
   typography,
   scale = 1,
 }: EmailEhsAccelerateBannerProps) {
+  const headlineText = headline || 'In-Person. Exclusive.'
+  const bodyText = body || 'Join senior EHS+ leaders to modernize how you stay ahead of operating risks.'
+  const ctaLabel = ctaText || 'Join Us'
+  const hlSize = headlineFontSize ?? 63.6
+  const hlLineHeight = hlSize * 0.94 // preserve original 59.79/63.6 ratio
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
   // Outer container: no padding — padding on outer inflates height in Puppeteer (see LESSONS.md).
@@ -69,12 +82,12 @@ export function EmailEhsAccelerateBanner({
         left: 28,
         top: 149,
         color: 'black',
-        fontSize: 63.6,
+        fontSize: hlSize,
         fontWeight: 350,
-        lineHeight: '59.79px',
+        lineHeight: `${hlLineHeight}px`,
         wordWrap: 'break-word',
       }}>
-        In-Person. Exclusive.
+        {headlineText}
       </div>
 
       {/* Body copy — right side */}
@@ -89,7 +102,7 @@ export function EmailEhsAccelerateBanner({
         lineHeight: '21.76px',
         wordWrap: 'break-word',
       }}>
-        Join senior EHS+ leaders to modernize how you stay ahead of operating risks.
+        {bodyText}
       </div>
 
       {/* Bottom info bar */}
@@ -132,7 +145,7 @@ export function EmailEhsAccelerateBanner({
           {eventLocation || 'London, UK'}
         </span>
 
-        {/* Join Us CTA — fixed */}
+        {/* CTA — auto-sizes to text length; grows leftward */}
         <div style={{
           paddingLeft: 17,
           paddingRight: 17,
@@ -150,8 +163,9 @@ export function EmailEhsAccelerateBanner({
             fontSize: 14,
             fontWeight: 350,
             lineHeight: '14px',
+            whiteSpace: 'nowrap',
           }}>
-            Join Us
+            {ctaLabel}
           </span>
           <ArrowIcon color="black" width={14} height={8.75} strokeWidth={1.2} />
         </div>
