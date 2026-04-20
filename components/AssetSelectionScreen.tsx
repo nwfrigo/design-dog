@@ -9,7 +9,7 @@ import { QuickStartWizard } from '@/components/QuickStartWizard'
 import { KIT_LIST } from '@/config/kit-configs'
 
 // Filter chip options
-type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm' | 'event:cority-connect' | 'event:ehs-accelerate'
+type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm' | 'event:cority-connect' | 'event:ehs-accelerate' | 'event:cority-customer-exchange'
 
 const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -30,7 +30,12 @@ const EVENTS: { id: FilterType; label: string; templates: string[] }[] = [
   {
     id: 'event:ehs-accelerate',
     label: 'EHS+ Accelerate',
-    templates: ['email-ehs-accelerate-banner', 'email-ehs-accelerate-invitation', 'email-ehs-accelerate-signature'],
+    templates: ['email-ehs-accelerate-banner', 'email-ehs-accelerate-invitation', 'email-ehs-accelerate-signature', 'social-ehs-accelerate', 'website-ehs-accelerate-listing'],
+  },
+  {
+    id: 'event:cority-customer-exchange',
+    label: 'Cority Customer Exchange',
+    templates: ['email-cority-customer-exchange-banner', 'email-cority-customer-exchange-signature'],
   },
 ]
 

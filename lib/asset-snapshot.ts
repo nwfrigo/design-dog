@@ -173,6 +173,11 @@ const SNAPSHOT_FIELDS = [
   'invitationEventTime',
   'invitationEventTimeNote',
   'invitationBody',
+  // Email Cority Customer Exchange Signature
+  'cceEventTime',
+  'showCceEventDate',
+  'showCceEventLocation',
+  'showCceEventTime',
 ] as const
 
 // Type for the shared field keys

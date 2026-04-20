@@ -10,6 +10,7 @@ import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { WebsiteReport } from '@/components/templates/WebsiteReport'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
+import { WebsiteEhsAccelerateListing } from '@/components/templates/WebsiteEhsAccelerateListing'
 import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import { WebsiteFloatingBanner } from '@/components/templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloatingBannerMobile'
@@ -20,11 +21,14 @@ import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnec
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { EmailEhsAccelerateSignature } from '@/components/templates/EmailEhsAccelerateSignature'
+import { EmailCorityCustomerExchangeSignature } from '@/components/templates/EmailCorityCustomerExchangeSignature'
+import { EmailCorityCustomerExchangeBanner } from '@/components/templates/EmailCorityCustomerExchangeBanner'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
 import { SocialImageMeddbase } from '@/components/templates/SocialImageMeddbase'
 import { SocialGridDetail, type GridDetailRow } from '@/components/templates/SocialGridDetail'
+import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
 import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
@@ -488,6 +492,77 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     },
   },
 
+  'email-cority-customer-exchange-banner': {
+    component: EmailCorityCustomerExchangeBanner,
+    renderProps: (asset, colors, typography) => ({
+      headline: asset.headline || 'Join us Thursday, May 7th in Brussels.',
+      body: asset.body || 'An invite-only, in-person workshop for EHSQ and Sustainability leaders',
+      ctaText: asset.ctaText || 'Join us',
+      colorStyle: (asset.colorStyle || '1') as '1' | '2' | '3' | '4',
+      showHeadline: asset.showHeadline !== false,
+      showBody: asset.showBody && !!asset.body,
+      showCta: asset.showCta !== false,
+      headlineFontSize: asset.headlineFontSize ?? undefined,
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [
+      { key: 'headline', label: 'Headline' },
+      { key: 'body', label: 'Body', isHtml: true },
+      { key: 'ctaText', label: 'CTA' },
+    ],
+    renderSchema: {
+      width: 640,
+      height: 300,
+      background: '#060015',
+      fields: [
+        { param: 'headline', parser: 'string', default: 'Join us Thursday, May 7th in Brussels.' },
+        { param: 'body', parser: 'string', default: 'An invite-only, in-person workshop for EHSQ and Sustainability leaders' },
+        { param: 'ctaText', parser: 'string', default: 'Join us' },
+        { param: 'colorStyle', parser: 'enum', default: '1' },
+        { param: 'showHeadline', parser: 'boolTrue', default: true },
+        { param: 'showBody', parser: 'boolTrue', default: true },
+        { param: 'showCta', parser: 'boolTrue', default: true },
+        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+      ],
+    },
+  },
+
+  'email-cority-customer-exchange-signature': {
+    component: EmailCorityCustomerExchangeSignature,
+    renderProps: (asset, colors, typography) => ({
+      eventDate: asset.eventDate || 'Thursday, May 7th',
+      eventLocation: asset.eventLocation || 'Brussels, Belgium',
+      eventTime: asset.cceEventTime || '10:00–16:00',
+      ctaText: asset.ctaText || 'Join Us',
+      showEventDate: asset.showCceEventDate !== false,
+      showEventLocation: asset.showCceEventLocation !== false,
+      showEventTime: asset.showCceEventTime !== false,
+      showCta: asset.showCta !== false,
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [
+      { key: 'eventDate', label: 'Date' },
+      { key: 'eventLocation', label: 'Location' },
+      { key: 'cceEventTime', label: 'Time' },
+      { key: 'ctaText', label: 'CTA' },
+    ],
+    renderSchema: {
+      width: 400,
+      height: 100,
+      background: '#060015',
+      fields: [
+        { param: 'eventDate', parser: 'string', default: 'Thursday, May 7th' },
+        { param: 'eventLocation', parser: 'string', default: 'Brussels, Belgium' },
+        { param: 'eventTime', parser: 'string', default: '10:00–16:00' },
+        { param: 'ctaText', parser: 'string', default: 'Join Us' },
+        { param: 'showEventDate', parser: 'boolTrue', default: true },
+        { param: 'showEventLocation', parser: 'boolTrue', default: true },
+        { param: 'showEventTime', parser: 'boolTrue', default: true },
+        { param: 'showCta', parser: 'boolTrue', default: true },
+      ],
+    },
+  },
+
   'email-ehs-accelerate-invitation': {
     component: EmailEhsAccelerateInvitation,
     renderProps: (asset, colors, typography) => ({
@@ -841,6 +916,41 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         gridDetail3: { type: parsed.gridDetail3Type, text: parsed.gridDetail3Text },
         gridDetail4: { type: parsed.gridDetail4Type, text: parsed.gridDetail4Text },
       }),
+    },
+  },
+
+  'social-ehs-accelerate': {
+    component: SocialEhsAccelerate,
+    renderProps: (asset, colors, typography) => ({
+      headline: asset.headline || 'Room for a great headline.',
+      subhead: asset.subhead || 'This is your subheader or description text. Keep it to two lines if you can.',
+      ctaText: asset.ctaText || 'Responsive',
+      showHeadline: asset.showHeadline !== false,
+      showSubhead: asset.showSubhead && !!asset.subhead,
+      showCta: asset.showCta !== false,
+      headlineFontSize: asset.headlineFontSize ?? undefined,
+      subheadFontSize: asset.subheadFontSize ?? undefined,
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [
+      { key: 'headline', label: 'Headline' },
+      { key: 'subhead', label: 'Subhead' },
+      { key: 'ctaText', label: 'CTA' },
+    ],
+    renderSchema: {
+      width: 1200,
+      height: 628,
+      background: '#FFFFFF',
+      fields: [
+        { param: 'headline', parser: 'string', default: 'Room for a great headline.' },
+        { param: 'subhead', parser: 'string', default: 'This is your subheader or description text. Keep it to two lines if you can.' },
+        { param: 'ctaText', parser: 'string', default: 'Responsive' },
+        { param: 'showHeadline', parser: 'boolTrue', default: true },
+        { param: 'showSubhead', parser: 'boolTrue', default: true },
+        { param: 'showCta', parser: 'boolTrue', default: true },
+        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
+      ],
     },
   },
 
@@ -1221,6 +1331,46 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       assembleProps: (parsed, raw) => ({
         cta: (raw.ctaText as string) || (raw.cta as string) || 'Responsive',
       }),
+    },
+  },
+
+  'website-ehs-accelerate-listing': {
+    component: WebsiteEhsAccelerateListing,
+    renderProps: (asset, colors, typography) => ({
+      eyebrow: asset.eyebrow || 'LIVE EVENT',
+      headline: asset.headline || 'Headline',
+      subhead: asset.subhead,
+      gridDetail1Text: asset.gridDetail1Text || 'Add Details or Hide Me',
+      gridDetail2Text: asset.gridDetail2Text || 'Add Details or Hide Me',
+      gridDetail3Text: asset.gridDetail3Text || 'Add Details or Hide Me',
+      gridDetail4Text: asset.gridDetail4Text || 'Add Details or Hide Me',
+      showRow3: asset.showRow3,
+      showRow4: asset.showRow4,
+      showEyebrow: asset.showEyebrow,
+      showSubhead: asset.showSubhead && !!asset.subhead,
+      headlineFontSize: asset.headlineFontSize ?? undefined,
+      colors, typography, scale: 1,
+    }),
+    queueTextFields: [],
+    renderSchema: {
+      width: 800,
+      height: 450,
+      background: '#FFFFFF',
+      fields: [
+        { param: 'eyebrow', parser: 'string', default: 'LIVE EVENT' },
+        { param: 'headline', parser: 'string', default: 'Headline' },
+        { param: 'subhead', parser: 'string', default: 'This is your subheader or description text. Keep it to two lines if you can.' },
+        { param: 'gridDetail1Text', parser: 'string', default: 'Add Details or Hide Me' },
+        { param: 'gridDetail2Text', parser: 'string', default: 'Add Details or Hide Me' },
+        { param: 'gridDetail3Text', parser: 'string', default: 'Add Details or Hide Me' },
+        { param: 'gridDetail4Text', parser: 'string', default: 'Add Details or Hide Me' },
+        { param: 'showRow3', parser: 'boolTrue' },
+        { param: 'showRow4', parser: 'boolTrue' },
+        { param: 'showEyebrow', parser: 'boolTrue' },
+        { param: 'showHeadline', parser: 'boolTrue' },
+        { param: 'showSubhead', parser: 'boolTrue' },
+        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
+      ],
     },
   },
 

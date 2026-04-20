@@ -1,5 +1,5 @@
 // Copy Types
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'email-ehs-accelerate-signature' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-ehs-accelerate-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'email-ehs-accelerate-signature' | 'email-cority-customer-exchange-signature' | 'email-cority-customer-exchange-banner' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'social-ehs-accelerate' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library'
 
 // Shared variant/setting union types (extracted to avoid repeating inline unions)
 export type LogoColor = 'black' | 'orange' | 'white'
@@ -424,6 +424,11 @@ export interface ManualAssetSettings {
   invitationEventTime: string
   invitationEventTimeNote: string
   invitationBody: string
+  // Email Cority Customer Exchange Signature specific
+  cceEventTime: string
+  showCceEventDate: boolean
+  showCceEventLocation: boolean
+  showCceEventTime: boolean
 }
 
 // App Flow Types
@@ -640,6 +645,11 @@ export interface GeneratedAsset {
   invitationEventTime: string
   invitationEventTimeNote: string
   invitationBody: string
+  // Email Cority Customer Exchange Signature specific
+  cceEventTime: string
+  showCceEventDate: boolean
+  showCceEventLocation: boolean
+  showCceEventTime: boolean
 }
 
 // Per-template image settings for decoupled zoom/pan
@@ -805,6 +815,11 @@ export interface QueuedAsset {
   invitationEventTime: string
   invitationEventTimeNote: string
   invitationBody: string
+  // Email Cority Customer Exchange Signature specific
+  cceEventTime: string
+  showCceEventDate: boolean
+  showCceEventLocation: boolean
+  showCceEventTime: boolean
   // For editing - track which asset index this came from
   sourceAssetIndex: number
 }
@@ -1026,6 +1041,12 @@ export interface AppState {
   invitationEventTimeNote: string
   invitationBody: string
 
+  // Email Cority Customer Exchange Signature
+  cceEventTime: string
+  showCceEventDate: boolean
+  showCceEventLocation: boolean
+  showCceEventTime: boolean
+
   // User identity (for export tracking)
   exportedBy: string | null
 
@@ -1227,6 +1248,10 @@ export interface AppState {
   setInvitationEventTime: (v: string) => void
   setInvitationEventTimeNote: (v: string) => void
   setInvitationBody: (v: string) => void
+  setCceEventTime: (time: string) => void
+  setShowCceEventDate: (show: boolean) => void
+  setShowCceEventLocation: (show: boolean) => void
+  setShowCceEventTime: (show: boolean) => void
 
   // User identity
   setExportedBy: (name: string | null) => void
