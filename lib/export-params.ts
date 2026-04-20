@@ -155,6 +155,11 @@ export interface ExportParamState {
   invitationEventTime: string
   invitationEventTimeNote: string
   invitationBody: string
+  // Email Cority Customer Exchange Signature
+  cceEventTime: string
+  showCceEventDate: boolean
+  showCceEventLocation: boolean
+  showCceEventTime: boolean
 }
 
 type ExportParamBuilder = (s: ExportParamState) => Record<string, unknown>
@@ -224,6 +229,16 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     ctaText: s.ctaText,
   }),
 
+  'website-ehs-accelerate-listing': (s) => ({
+    gridDetail1Text: s.gridDetail1Text,
+    gridDetail2Text: s.gridDetail2Text,
+    gridDetail3Text: s.gridDetail3Text,
+    gridDetail4Text: s.gridDetail4Text,
+    showRow3: s.showRow3,
+    showRow4: s.showRow4,
+    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
+  }),
+
   'email-grid': (s) => ({
     subheading: s.subheading,
     showLightHeader: s.showLightHeader,
@@ -281,6 +296,17 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSolutionSet: s.showSolutionSet,
     grayscale: s.grayscale,
     theme: s.theme,
+  }),
+
+  'social-ehs-accelerate': (s) => ({
+    headline: s.verbatimCopy.headline || '',
+    subhead: s.verbatimCopy.subhead || '',
+    ctaText: s.ctaText || '',
+    showHeadline: s.showHeadline,
+    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
+    showCta: s.showCta,
+    headlineFontSize: s.headlineFontSize ?? undefined,
+    subheadFontSize: s.subheadFontSize ?? undefined,
   }),
 
   'social-grid-detail': (s) => ({
@@ -385,6 +411,28 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     invitationEventTime: s.invitationEventTime || '',
     invitationEventTimeNote: s.invitationEventTimeNote || '',
     invitationBody: s.invitationBody || '',
+  }),
+
+  'email-cority-customer-exchange-banner': (s) => ({
+    headline: s.verbatimCopy.headline || '',
+    body: s.verbatimCopy.body || '',
+    ctaText: s.ctaText || '',
+    colorStyle: s.colorStyle,
+    showHeadline: s.showHeadline,
+    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showCta: s.showCta,
+    headlineFontSize: s.headlineFontSize ?? undefined,
+  }),
+
+  'email-cority-customer-exchange-signature': (s) => ({
+    eventDate: s.eventDate || '',
+    eventLocation: s.eventLocation || '',
+    eventTime: s.cceEventTime || '',
+    ctaText: s.ctaText || '',
+    showEventDate: s.showCceEventDate,
+    showEventLocation: s.showCceEventLocation,
+    showEventTime: s.showCceEventTime,
+    showCta: s.showCta,
   }),
 
   'email-product-release': (s) => ({
@@ -696,6 +744,10 @@ export function buildExportParamsFromAsset(
     invitationEventTime: (a.invitationEventTime as string) || '',
     invitationEventTimeNote: (a.invitationEventTimeNote as string) || '',
     invitationBody: (a.invitationBody as string) || '',
+    cceEventTime: (a.cceEventTime as string) || '',
+    showCceEventDate: (a.showCceEventDate as boolean) ?? true,
+    showCceEventLocation: (a.showCceEventLocation as boolean) ?? true,
+    showCceEventTime: (a.showCceEventTime as boolean) ?? true,
   }
 
   return buildExportParams(asset.templateType, exportScale, state)

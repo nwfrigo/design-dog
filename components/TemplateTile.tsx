@@ -17,14 +17,18 @@ import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnec
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { EmailEhsAccelerateSignature } from '@/components/templates/EmailEhsAccelerateSignature'
+import { EmailCorityCustomerExchangeSignature } from '@/components/templates/EmailCorityCustomerExchangeSignature'
+import { EmailCorityCustomerExchangeBanner } from '@/components/templates/EmailCorityCustomerExchangeBanner'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { SocialImage } from '@/components/templates/SocialImage'
 import { SocialGridDetail } from '@/components/templates/SocialGridDetail'
+import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
 import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
 import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
+import { WebsiteEhsAccelerateListing } from '@/components/templates/WebsiteEhsAccelerateListing'
 import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import { WebsiteReport } from '@/components/templates/WebsiteReport'
 import { WebsiteFloatingBanner } from '@/components/templates/WebsiteFloatingBanner'
@@ -190,6 +194,35 @@ export function TemplateRenderer({
         />
       )
 
+    case 'email-cority-customer-exchange-banner':
+      return (
+        <EmailCorityCustomerExchangeBanner
+          {...commonProps}
+          headline="Join us Thursday, May 7th in Brussels."
+          body="An invite-only, in-person workshop for EHSQ and Sustainability leaders"
+          ctaText="Join us"
+          colorStyle="1"
+          showHeadline={true}
+          showBody={true}
+          showCta={true}
+        />
+      )
+
+    case 'email-cority-customer-exchange-signature':
+      return (
+        <EmailCorityCustomerExchangeSignature
+          {...commonProps}
+          eventDate="Thursday, May 7th"
+          eventLocation="Brussels, Belgium"
+          eventTime="10:00–16:00"
+          ctaText="Join Us"
+          showEventDate={true}
+          showEventLocation={true}
+          showEventTime={true}
+          showCta={true}
+        />
+      )
+
     case 'email-product-release':
       return (
         <EmailProductRelease
@@ -301,6 +334,19 @@ export function TemplateRenderer({
           showMetadata={false}
           showCta={true}
           showSolutionSet={true}
+        />
+      )
+
+    case 'social-ehs-accelerate':
+      return (
+        <SocialEhsAccelerate
+          {...commonProps}
+          headline="Room for a great headline."
+          subhead="This is your subheader or description text. Keep it to two lines if you can."
+          ctaText="Responsive"
+          showHeadline={true}
+          showSubhead={true}
+          showCta={true}
         />
       )
 
@@ -425,6 +471,24 @@ export function TemplateRenderer({
           subhead={PREVIEW_CONTENT.subhead}
           cta="Join the event"
           variant="orange"
+          gridDetail1Text="Date: January 15, 2026"
+          gridDetail2Text="Time: 2:00 PM EST"
+          gridDetail3Text="Location: Virtual"
+          gridDetail4Text="Register Now"
+          showRow3={true}
+          showRow4={true}
+          showEyebrow={true}
+          showSubhead={false}
+        />
+      )
+
+    case 'website-ehs-accelerate-listing':
+      return (
+        <WebsiteEhsAccelerateListing
+          {...commonProps}
+          eyebrow="LIVE EVENT"
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
           gridDetail1Text="Date: January 15, 2026"
           gridDetail2Text="Time: 2:00 PM EST"
           gridDetail3Text="Location: Virtual"

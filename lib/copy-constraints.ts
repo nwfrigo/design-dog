@@ -192,6 +192,8 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'social-image': 'social',
   'social-grid-detail': 'social',
   'social-carousel': 'social',
+  'social-ehs-accelerate': 'social',
+  'website-ehs-accelerate-listing': 'website',
   'newsletter-dark-gradient': 'newsletter',
   'newsletter-blue-gradient': 'newsletter',
   'newsletter-light': 'newsletter',
@@ -204,6 +206,8 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'email-ehs-accelerate-banner': 'email',
   'email-ehs-accelerate-invitation': 'email',
   'email-ehs-accelerate-signature': 'email',
+  'email-cority-customer-exchange-signature': 'email',
+  'email-cority-customer-exchange-banner': 'email',
 }
 
 /**

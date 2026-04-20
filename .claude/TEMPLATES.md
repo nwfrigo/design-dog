@@ -19,6 +19,10 @@
 - `email-ehs-accelerate-banner` — EmailEhsAccelerateBanner (600×373px; EHS+ Accelerate event)
 - `email-ehs-accelerate-invitation` — EmailEhsAccelerateInvitation (420×595px; EHS+ Accelerate event; full rich text body)
 - `email-ehs-accelerate-signature` — EmailEhsAccelerateSignature (400×100px; EHS+ Accelerate event; email signature banner)
+- `social-ehs-accelerate` — SocialEhsAccelerate (1200×628px; EHS+ Accelerate event; light bg with `<EhsAccelerateLogo>`, headline/subhead/CTA only — no eyebrow/body/metadata/variants)
+- `website-ehs-accelerate-listing` — WebsiteEhsAccelerateListing (800×450px; EHS+ Accelerate event; full-canvas bg image with opaque white right grid panel; mirrors `website-event-listing` minus colorway variants)
+- `email-cority-customer-exchange-signature` — EmailCorityCustomerExchangeSignature (400×100px; Cority Customer Exchange event; bg image + coded `rgba(6,0,21,0.70)` right panel; date/location/time/CTA each with independent EyeIcon)
+- `email-cority-customer-exchange-banner` — EmailCorityCustomerExchangeBanner (640×300px; Cority Customer Exchange event; left dark panel with `<CorityCustomerExchangeStackedLogo>`, right content uses `justify-content: flex-end` so CTA pins bottom; reuses `colorStyle` field but picker is restricted to variants 2-4 with stale-`'1'` coercion in EditorScreen)
 
 ### Social
 - `social-dark-gradient` — SocialDarkGradient

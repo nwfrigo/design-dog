@@ -99,6 +99,21 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     height: 100,
     channelLabel: 'Email Signature',
   },
+  {
+    type: 'email-cority-customer-exchange-signature',
+    label: 'Cority Customer Exchange Email Signature',
+    dimensions: '400 × 100px',
+    width: 400,
+    height: 100,
+    channelLabel: 'Email Signature',
+  },
+  {
+    type: 'email-cority-customer-exchange-banner',
+    label: 'Cority Customer Exchange Email Banner',
+    dimensions: '640 × 300px',
+    width: 640,
+    height: 300,
+  },
 ]
 
 // Template definitions for social
@@ -145,6 +160,13 @@ const SOCIAL_TEMPLATES: TemplateInfo[] = [
     width: 1080,
     height: 1080,
   },
+  {
+    type: 'social-ehs-accelerate',
+    label: 'EHS+ Accelerate Social',
+    dimensions: '1200 × 628px',
+    width: 1200,
+    height: 628,
+  },
 ]
 
 // Template definitions for website
@@ -173,6 +195,13 @@ const WEBSITE_TEMPLATES: TemplateInfo[] = [
   {
     type: 'website-event-listing',
     label: 'Event Listing Featured Image',
+    dimensions: '800 × 450px',
+    width: 800,
+    height: 450,
+  },
+  {
+    type: 'website-ehs-accelerate-listing',
+    label: 'EHS+ Accelerate Event Listing',
     dimensions: '800 × 450px',
     width: 800,
     height: 450,
