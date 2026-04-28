@@ -55,19 +55,19 @@ export function NamePickerModal({ onSelect }: NamePickerModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-white dark:bg-surface-secondary rounded-xl shadow-2xl w-full max-w-xs mx-4 p-5">
-        <p className="text-xs font-mono text-gray-400 dark:text-content-secondary mb-3 leading-relaxed">
+      <div className="bg-white dark:bg-surface-secondary rounded-xl shadow-2xl w-full max-w-xs mx-4 p-5 max-h-[90vh] flex flex-col">
+        <p className="text-xs font-mono text-gray-400 dark:text-content-secondary mb-3 leading-relaxed shrink-0">
           select or add your name
         </p>
 
         {isLoading ? (
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center py-4 shrink-0">
             <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <>
             {!isAddingNew ? (
-              <div className="space-y-1.5 mb-4">
+              <div className="space-y-1.5 mb-4 flex-1 min-h-0 overflow-y-auto pr-1 -mr-1">
                 {members.map((member) => (
                   <button
                     key={member.id}
@@ -92,7 +92,7 @@ export function NamePickerModal({ onSelect }: NamePickerModalProps) {
                 </button>
               </div>
             ) : (
-              <div className="mb-4">
+              <div className="mb-4 shrink-0">
                 <button
                   onClick={() => {
                     setIsAddingNew(false)
@@ -123,7 +123,7 @@ export function NamePickerModal({ onSelect }: NamePickerModalProps) {
             <button
               onClick={handleConfirm}
               disabled={!canSubmit || isSubmitting}
-              className="w-full py-2 rounded-lg bg-blue-600 text-white text-xs font-mono hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="w-full py-2 rounded-lg bg-blue-600 text-white text-xs font-mono hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
             >
               {isSubmitting ? 'saving...' : 'continue'}
             </button>
