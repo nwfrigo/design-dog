@@ -10,6 +10,7 @@ export {
 export type { IconButtonProps, SectionGap } from './shell'
 export { EditbarText } from './EditbarText'
 export type { EditbarTextProps } from './EditbarText'
+export { EditbarCta } from './EditbarCta'
 export { EditbarSpacer } from './EditbarSpacer'
 export { EditbarColor } from './EditbarColor'
 export { EditbarImage } from './EditbarImage'

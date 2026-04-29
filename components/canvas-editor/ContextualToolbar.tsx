@@ -4,10 +4,11 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import type { EditableKind } from './types'
-import { EditbarText, EditbarColor, EditbarImage } from './editbar'
+import { EditbarText, EditbarCta, EditbarColor, EditbarImage } from './editbar'
 
 const EDITBAR_BY_KIND: Record<EditableKind, () => ReactNode> = {
   text: () => <EditbarText />,
+  cta: () => <EditbarCta />,
   // Spacers have their own drag-pill affordance on canvas — no toolbar needed.
   spacer: () => null,
   color: () => <EditbarColor />,

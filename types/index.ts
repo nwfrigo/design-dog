@@ -351,6 +351,10 @@ export interface ManualAssetSettings {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
+  // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
+  // headline-line-height tweak follows the headline content across reuses.
+  lineHeights: Record<string, number>
   // Template variant settings (must persist when switching assets)
   ebookVariant: ImageVariant
   reportVariant: ImageVariant
@@ -629,6 +633,10 @@ export interface GeneratedAsset {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
+  // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
+  // headline-line-height tweak follows the headline content across reuses.
+  lineHeights: Record<string, number>
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
@@ -801,6 +809,10 @@ export interface QueuedAsset {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
+  // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
+  // headline-line-height tweak follows the headline content across reuses.
+  lineHeights: Record<string, number>
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
@@ -998,6 +1010,10 @@ export interface AppState {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
+  // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
+  // headline-line-height tweak follows the headline content across reuses.
+  lineHeights: Record<string, number>
 
   // FAQ PDF state
   faqTitle: string
@@ -1165,6 +1181,7 @@ export interface AppState {
   setStackAlign: (stackAlign: StackAlign) => void
   // Email Dark Gradient inter-block gaps
   setEmailDarkGradientGap: (gapKey: string, value: number) => void
+  setLineHeight: (contentKey: string, value: number) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void
   setSolutionOverviewSolutionName: (name: string) => void

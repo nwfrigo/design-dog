@@ -150,6 +150,8 @@ export async function POST(request: NextRequest) {
       'modules', 'moduleSpacing', 'footerHidden', 'darkMode', 'blockSpacing',
       // Email Dark Gradient: inter-block gaps record (JSON-encoded)
       'gaps',
+      // Per-content-type line-height overrides record (JSON-encoded)
+      'lineHeights',
       // FAQ cover: object needs splitting to X/Y params
       'coverImagePosition',
       // Carousel: only forwarded when exporting all slides
@@ -269,6 +271,11 @@ export async function POST(request: NextRequest) {
     // Email Dark Gradient inter-block gaps
     if (body.gaps && typeof body.gaps === 'object' && Object.keys(body.gaps).length > 0) {
       params.set('gaps', encodeURIComponent(JSON.stringify(body.gaps)))
+    }
+
+    // Per-content-type line-height overrides
+    if (body.lineHeights && typeof body.lineHeights === 'object' && Object.keys(body.lineHeights).length > 0) {
+      params.set('lineHeights', encodeURIComponent(JSON.stringify(body.lineHeights)))
     }
 
     // Get the base URL from the request

@@ -1,10 +1,17 @@
-# On-Canvas Editor — Plan
+# Stage & Bench Editor — Plan
 
 > Branch: `feature-drag-editor`
-> Status: Phases 0–2.5b complete · Phase 3 next (substrate adoption: `<Editable>` + commands + toolbar)
+> Status: Phase 3 in progress · contextual toolbar shipped, Bench prototype shipped on EmailDarkGradient
 > Pilot template: EmailDarkGradient
 
-This document is the planning artifact for moving Design Dog's editor from "sidebar form + passive preview" to "click an element on the design and edit it directly," while keeping templates structurally rigid. It absorbs lessons from the Milo project (canvas editor) and the existing Stacker spacing-handle implementation.
+This document is the planning artifact for moving Design Dog's editor from "sidebar form + passive preview" to **Stage & Bench**: click any element on the design (the **Stage**) to edit it directly via a contextual toolbar; toggle visibility off and the slot parks on the **Bench** — a vertical chip rail in the negative space beside the Stage. Drag a chip back onto the Stage to restore the slot. Templates remain structurally rigid; users edit *content within* declared slots, not layout. The substrate (`components/canvas-editor/`) absorbs lessons from the Milo canvas editor and the existing Stacker spacing-handle implementation.
+
+**Vocabulary**:
+- **Stage** — the design itself; the editable surface where slots are "in play."
+- **Bench** — the rail of parked/hidden slots, anchored to the preview pad's negative space (portaled out of the Stage's scaled-transform tree).
+- **Toolbar** — the contextual editor that follows selection on the Stage (`EditbarText`, `EditbarImage`, `EditbarColor`).
+- **Slot** — a template-declared editable element (`email-dark-gradient.headline`, etc.).
+- **VisibilityRegistry** — the per-template slot table that drives both Bench chips and the toolbar's eye-off button.
 
 ---
 

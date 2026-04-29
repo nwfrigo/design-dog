@@ -6,6 +6,23 @@ import { useStore } from '@/store'
 import { SpacingHandle } from './canvas-editor/handles/SpacingHandle'
 import { CanvasEditorProvider } from './canvas-editor/CanvasEditorProvider'
 import { Editable } from './canvas-editor/Editable'
+import { Bench } from './canvas-editor/Bench'
+import {
+  VisibilityRegistryProvider,
+  SLOT_DRAG_MIME,
+} from './canvas-editor/VisibilityRegistry'
+import { SizeRegistryProvider } from './canvas-editor/SizeRegistry'
+import { ContentRegistryProvider } from './canvas-editor/ContentRegistry'
+import { LineHeightRegistryProvider } from './canvas-editor/LineHeightRegistry'
+import {
+  getEmailDarkGradientSlots,
+  getEmailDarkGradientSizes,
+  getEmailDarkGradientContents,
+  getEmailDarkGradientLineHeights,
+} from './canvas-editor/template-configs/email-dark-gradient'
+import { StageBar } from './canvas-editor/stage-bar/StageBar'
+import { StageBarActions } from './canvas-editor/stage-bar/StageBarActions'
+import { isStageBenchTemplate } from './canvas-editor/migrated-templates'
 import { ContextualToolbar } from './canvas-editor/ContextualToolbar'
 import { SelectionRing } from './canvas-editor/SelectionRing'
 import { InlineTextEdit } from './canvas-editor/InlineTextEdit'
@@ -298,6 +315,8 @@ export function EditorScreen() {
     // Email Dark Gradient inter-block gaps
     emailDarkGradientGaps,
     setEmailDarkGradientGap,
+    lineHeights,
+    setLineHeight,
     // Solution Overview PDF - Page 1
     solutionOverviewSolution,
     setSolutionOverviewSolution,
@@ -800,6 +819,7 @@ export function EditorScreen() {
         subheadFontSize,
         stackAlign,
         emailDarkGradientGaps,
+        lineHeights,
         thumbnailImageUrl,
         thumbnailImagePosition,
         thumbnailImageZoom,
@@ -1311,7 +1331,9 @@ export function EditorScreen() {
       )}
 
       <div className="flex gap-8 h-[calc(100vh-180px)]">
-        {/* Left: Editor */}
+        {/* Left: Editor — collapsed for Stage & Bench templates in manual mode (Q1).
+            Auto-create still keeps its sidebar (asset navigation lives there). */}
+        {(isAutoCreateMode || !isStageBenchTemplate(currentTemplate)) && (
         <div className="w-[340px] flex-shrink-0 space-y-5 overflow-y-auto">
           {/* Mode Toggle removed — Generate button is now inline above the first text field */}
 
@@ -3871,6 +3893,7 @@ export function EditorScreen() {
           )}
 
         </div>
+        )}
 
         {/* Right: Preview with Actions */}
         <div className="flex-1 flex flex-col overflow-y-auto">
@@ -4082,9 +4105,33 @@ export function EditorScreen() {
             )}
           </div>
 
+          {/* Stage Bar — canvas-wide controls for migrated templates. Renders nothing for legacy templates. */}
+          {isStageBenchTemplate(currentTemplate) && (
+            <StageBar
+              template={currentTemplate}
+              onGenerate={() => setContentMode('generate')}
+              actions={
+                <StageBarActions
+                  isExporting={isExporting}
+                  isEditingFromQueue={isEditingFromQueue}
+                  exportScale={exportScale}
+                  onPreview={() => setShowPreviewLightbox(true)}
+                  onAddToQueue={() => {
+                    addToQueue()
+                    setShowQueuedFeedback(true)
+                    setTimeout(() => setShowQueuedFeedback(false), 2000)
+                  }}
+                  onSetExportScale={setExportScale}
+                  onExport={handleExport}
+                />
+              }
+            />
+          )}
+
           {/* Preview */}
           <div
-            className={`flex items-start bg-gray-100 dark:bg-transparent rounded-xl p-6 ${
+            data-canvas-preview-pad
+            className={`relative flex items-start bg-gray-100 dark:bg-transparent rounded-xl p-6 ${
               currentTemplate === 'website-floating-banner' || currentTemplate === 'website-floating-banner-mobile' ? 'justify-start' : 'justify-center'
             }`}
           >
@@ -4693,6 +4740,53 @@ export function EditorScreen() {
               )}
               {currentTemplate === 'email-dark-gradient' && (
                 <CanvasEditorProvider mode="edit">
+                  <VisibilityRegistryProvider
+                    slots={getEmailDarkGradientSlots({
+                      showEyebrow, showHeadline, showSubhead, showBody, showCta,
+                      setShowEyebrow, setShowHeadline, setShowSubhead, setShowBody, setShowCta,
+                    })}
+                  >
+                  <SizeRegistryProvider
+                    sizes={getEmailDarkGradientSizes({
+                      headlineFontSize, subheadFontSize,
+                      setHeadlineFontSize, setSubheadFontSize,
+                    })}
+                  >
+                  <ContentRegistryProvider
+                    contents={getEmailDarkGradientContents({
+                      eyebrow,
+                      headlineHtml: verbatimCopy.headline || '',
+                      subheadHtml: verbatimCopy.subhead || '',
+                      bodyHtml: verbatimCopy.body || '',
+                      ctaText,
+                      setEyebrow,
+                      setHeadlineHtml: (v) => setVerbatimCopy({ headline: v }),
+                      setSubheadHtml: (v) => setVerbatimCopy({ subhead: v }),
+                      setBodyHtml: (v) => setVerbatimCopy({ body: v }),
+                      setCtaText,
+                    })}
+                  >
+                  <LineHeightRegistryProvider
+                    lineHeights={getEmailDarkGradientLineHeights({ lineHeights, setLineHeight })}
+                  >
+                  <div
+                    onDragOver={(e) => {
+                      if (!Array.from(e.dataTransfer.types).includes(SLOT_DRAG_MIME)) return
+                      e.preventDefault()
+                      e.dataTransfer.dropEffect = 'move'
+                    }}
+                    onDrop={(e) => {
+                      const path = e.dataTransfer.getData(SLOT_DRAG_MIME)
+                      if (!path) return
+                      e.preventDefault()
+                      const slotKey = path.split('.').slice(1).join('.')
+                      if (slotKey === 'eyebrow')  setShowEyebrow(true)
+                      if (slotKey === 'headline') setShowHeadline(true)
+                      if (slotKey === 'subhead')  setShowSubhead(true)
+                      if (slotKey === 'body')     setShowBody(true)
+                      if (slotKey === 'cta')      setShowCta(true)
+                    }}
+                  >
                   <EmailDarkGradient
                     headline={verbatimCopy.headline || 'Headline'}
                     eyebrow={eyebrow}
@@ -4711,6 +4805,7 @@ export function EditorScreen() {
                     subheadFontSize={subheadFontSize ?? undefined}
                     stackAlign={stackAlign}
                     gaps={emailDarkGradientGaps}
+                    lineHeights={lineHeights}
                     renderSpacerBetween={(key, value) => (
                       <Editable
                         templateId="email-dark-gradient"
@@ -4730,13 +4825,13 @@ export function EditorScreen() {
                       </Editable>
                     )}
                     renderBlock={(blockId, content) => {
-                      const slotConfig: Record<EmailDarkGradientBlockId, { storeKey: string; kind: 'text' | 'image' }> = {
+                      const slotConfig: Record<EmailDarkGradientBlockId, { storeKey: string; kind: 'text' | 'image' | 'cta' }> = {
                         logo: { storeKey: 'logo', kind: 'image' },
                         eyebrow: { storeKey: 'eyebrow', kind: 'text' },
                         headline: { storeKey: 'verbatimCopy.headline', kind: 'text' },
                         subhead: { storeKey: 'verbatimCopy.subhead', kind: 'text' },
                         body: { storeKey: 'verbatimCopy.body', kind: 'text' },
-                        cta: { storeKey: 'ctaText', kind: 'text' },
+                        cta: { storeKey: 'ctaText', kind: 'cta' },
                       }
                       const cfg = slotConfig[blockId]
                       return (
@@ -4783,8 +4878,14 @@ export function EditorScreen() {
                     typography={typographyConfig}
                     scale={1}
                   />
+                  </div>
+                  <Bench />
                   <ContextualToolbar />
                   <SelectionRing />
+                  </LineHeightRegistryProvider>
+                  </ContentRegistryProvider>
+                  </SizeRegistryProvider>
+                  </VisibilityRegistryProvider>
                 </CanvasEditorProvider>
               )}
               {currentTemplate === 'newsletter-dark-gradient' && (
@@ -4955,8 +5056,9 @@ export function EditorScreen() {
             )}
           </div>
 
-          {/* Toolbar - below preview for single-page templates */}
-          {currentTemplate !== 'solution-overview-pdf' && (
+          {/* Toolbar - below preview for single-page templates.
+              Hidden for Stage & Bench templates — those render the same actions in the Stage Bar above. */}
+          {currentTemplate !== 'solution-overview-pdf' && !isStageBenchTemplate(currentTemplate) && (
             <div className="mt-4 flex items-center justify-center">
               <div className="inline-flex items-center gap-1.5 p-1.5 border border-gray-200 dark:border-[#494a4c] rounded-md">
                 {/* Preview button */}

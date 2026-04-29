@@ -103,6 +103,7 @@ export interface DraftState {
   subheadFontSize?: number | null
   stackAlign: StackAlign
   emailDarkGradientGaps: Record<string, number>
+  lineHeights: Record<string, number>
   generatedVariations: { headlines: string[]; ctas: string[] } | null
   // FAQ PDF
   faqTitle: string
@@ -271,6 +272,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       subheadFontSize: state.subheadFontSize ?? null,
       stackAlign: state.stackAlign ?? 'top',
       emailDarkGradientGaps: state.emailDarkGradientGaps ?? {},
+      lineHeights: state.lineHeights ?? {},
       generatedVariations: state.generatedVariations || null,
       // FAQ PDF
       faqTitle: state.faqTitle || 'Title Goes Here',

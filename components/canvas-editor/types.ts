@@ -1,4 +1,4 @@
-export type EditableKind = 'text' | 'image' | 'spacer' | 'color' | 'pill' | 'group'
+export type EditableKind = 'text' | 'cta' | 'image' | 'spacer' | 'color' | 'pill' | 'group'
 
 export type EditorMode = 'edit' | 'export'
 

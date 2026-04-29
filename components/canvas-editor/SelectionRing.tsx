@@ -7,6 +7,7 @@ import type { EditableKind } from './types'
 
 const RING_COLOR_BY_KIND: Record<EditableKind, string> = {
   text: '#3B82F6',
+  cta: '#3B82F6',
   image: '#8B5CF6',
   spacer: '#EC4899',
   color: '#F59E0B',

@@ -31,6 +31,8 @@ export interface EmailDarkGradientProps {
   stackAlign?: StackAlign
   /** Sparse gap overrides keyed as `gap-{prev}-to-{next}`. Falls back to DEFAULT_GAP per slot. */
   gaps?: Record<string, number>
+  /** Sparse line-height overrides keyed by content type ('headline' | 'subhead' | 'body'). Falls back to per-slot defaults below. */
+  lineHeights?: Record<string, number>
   /** Optional render-prop for spacer slots. Receives the gap key and current value. Editor passes a drag handle; export passes nothing → falls back to a plain div. */
   renderSpacerBetween?: (gapKey: string, value: number, prevId: EmailDarkGradientBlockId, nextId: EmailDarkGradientBlockId) => ReactNode
   /** Optional render-prop wrapping each block (after chrome). Editor passes a wrapper that adds selection affordances; export passes nothing → block renders as-is. */
@@ -70,6 +72,24 @@ const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
   '3': '/assets/backgrounds/social-dark-gradient-3.png',
   '4': '/assets/backgrounds/social-dark-gradient-4.png',
 }
+
+/** Default line-heights per content slot. Imported by both this template's
+ *  render (fallback when no override is set) and the Stage & Bench config
+ *  registry (slider default value). Single source of truth. */
+export const EMAIL_DARK_GRADIENT_LINE_HEIGHT_DEFAULTS = {
+  headline: 1.26,
+  subhead: 1.4,
+  body: 1.4,
+} as const
+
+/** Figma-style leading-trim: collapse the half-leading above the first line so
+ *  the glyph cap aligns with the block's top edge. Uses CSS `text-box-trim`
+ *  (Chrome 133+ / Safari 18.2+, ~2025). Browsers without support fall back to
+ *  default CSS half-leading distribution; can revisit if Firefox usage matters. */
+const TRIM_TOP_LEADING = {
+  textBoxTrim: 'trim-start',
+  textBoxEdge: 'cap alphabetic',
+} as const
 
 const DEFAULT_GAP = 24
 
@@ -128,6 +148,7 @@ export function EmailDarkGradient({
   subheadFontSize,
   stackAlign = 'top',
   gaps,
+  lineHeights,
   renderSpacerBetween,
   renderBlock,
   renderInlineEditor,
@@ -221,7 +242,8 @@ export function EmailDarkGradient({
             color: textColor,
             fontSize: headlineFontSize ?? 38,
             fontWeight: 350,
-            lineHeight: 1.26,
+            lineHeight: lineHeights?.headline ?? EMAIL_DARK_GRADIENT_LINE_HEIGHT_DEFAULTS.headline,
+            ...TRIM_TOP_LEADING,
             textAlign,
             maxWidth: textBlockMaxWidth,
           }}
@@ -241,7 +263,8 @@ export function EmailDarkGradient({
             color: textColor,
             fontSize: subheadFontSize ?? 24,
             fontWeight: 350,
-            lineHeight: 1.4,
+            lineHeight: lineHeights?.subhead ?? EMAIL_DARK_GRADIENT_LINE_HEIGHT_DEFAULTS.subhead,
+            ...TRIM_TOP_LEADING,
             textAlign,
             maxWidth: textBlockMaxWidth,
           }}
@@ -261,7 +284,8 @@ export function EmailDarkGradient({
             color: textColor,
             fontSize: 18,
             fontWeight: 350,
-            lineHeight: 1.4,
+            lineHeight: lineHeights?.body ?? EMAIL_DARK_GRADIENT_LINE_HEIGHT_DEFAULTS.body,
+            ...TRIM_TOP_LEADING,
             textAlign,
             maxWidth: textBlockMaxWidth,
           }}

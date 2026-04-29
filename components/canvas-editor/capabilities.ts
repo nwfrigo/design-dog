@@ -11,6 +11,10 @@ const NONE: CapabilitySet = {
 
 export const DEFAULTS_BY_KIND: Record<EditableKind, CapabilitySet> = {
   text: { ...NONE, canEditText: true, canRecolor: true },
+  // CTA is a constrained text variant: editable copy, but no Bold/Italic; gains
+  // Style (Link/Button) and arrow-color in EditbarCta — not exposed via the
+  // generic CapabilitySet. Bench hide is provided by VisibilityRegistry.
+  cta: { ...NONE, canEditText: true, canRecolor: true },
   image: { ...NONE, canSwapImage: true, canCropImage: true },
   spacer: { ...NONE, canDragSpacing: true },
   color: { ...NONE, canRecolor: true },

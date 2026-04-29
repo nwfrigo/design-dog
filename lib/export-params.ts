@@ -26,6 +26,7 @@ export interface ExportParamState {
   subheadFontSize: number | null
   stackAlign: StackAlign
   emailDarkGradientGaps: Record<string, number>
+  lineHeights: Record<string, number>
 
   // Image
   thumbnailImageUrl: string | null
@@ -364,6 +365,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showCta: s.showCta,
     stackAlign: s.stackAlign,
     gaps: s.emailDarkGradientGaps,
+    lineHeights: s.lineHeights,
   }),
 
   'email-speakers': (s) => ({
@@ -639,6 +641,7 @@ export function buildExportParamsFromAsset(
     subheadFontSize: (a.subheadFontSize as number | null) ?? null,
     stackAlign: (a.stackAlign as StackAlign) ?? 'top',
     emailDarkGradientGaps: (a.emailDarkGradientGaps as Record<string, number>) ?? {},
+    lineHeights: (a.lineHeights as Record<string, number>) ?? {},
     thumbnailImageUrl: (a.thumbnailImageUrl as string | null) ?? null,
     thumbnailImagePosition: (a.thumbnailImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
     thumbnailImageZoom: (a.thumbnailImageZoom as number) ?? 1,
