@@ -1,13 +1,16 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, Fragment, ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type Alignment = 'left' | 'center'
 export type CtaStyle = 'link' | 'button'
+
+export type EmailDarkGradientBlockId = 'logo' | 'eyebrow' | 'headline' | 'subhead' | 'body' | 'cta'
 
 export interface EmailDarkGradientProps {
   headline: string
@@ -25,33 +28,86 @@ export interface EmailDarkGradientProps {
   showCta: boolean
   headlineFontSize?: number
   subheadFontSize?: number
-  bottomSpacing?: number
+  stackAlign?: StackAlign
+  /** Sparse gap overrides keyed as `gap-{prev}-to-{next}`. Falls back to DEFAULT_GAP per slot. */
+  gaps?: Record<string, number>
+  /** Optional render-prop for spacer slots. Receives the gap key and current value. Editor passes a drag handle; export passes nothing → falls back to a plain div. */
+  renderSpacerBetween?: (gapKey: string, value: number, prevId: EmailDarkGradientBlockId, nextId: EmailDarkGradientBlockId) => ReactNode
+  /** Optional render-prop wrapping each block (after chrome). Editor passes a wrapper that adds selection affordances; export passes nothing → block renders as-is. */
+  renderBlock?: (blockId: EmailDarkGradientBlockId, content: ReactNode) => ReactNode
+  /**
+   * Optional render-prop for swapping the *inner* text content of a block, leaving its chrome
+   * (background, icons, padding) intact. Editor returns an in-place text editor when the block
+   * is being edited; otherwise returns the supplied default. This is what preserves the white
+   * CTA pill background during text editing.
+   */
+  renderInlineEditor?: (blockId: EmailDarkGradientBlockId, defaultInner: ReactNode) => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
 
-// Check if HTML content is effectively empty (handles <p></p> etc.)
 function isHtmlEmpty(html: string | undefined): boolean {
   if (!html) return true
   const stripped = html.replace(/<[^>]*>/g, '').trim()
   return stripped === ''
 }
 
-// Inline styles for rich text elements (white text on dark background)
+// Normalize <b> and <i> alongside <strong>/<em> — execCommand is browser-dependent
+// and may insert either tag. Without normalization, <b> renders at the browser default
+// (bolder of parent's 350 ≈ 400) instead of the brand's 500, producing a multi-step
+// weight cycle on bold-toggle.
 const RICH_TEXT_STYLES = `
-  .rich-text-white strong { font-weight: 500; }
-  .rich-text-white em { font-style: italic; }
+  .rich-text-white strong, .rich-text-white b { font-weight: 500; }
+  .rich-text-white em, .rich-text-white i { font-style: italic; }
   .rich-text-white p { margin: 0; }
   .rich-text-white p + p { margin-top: 0.3em; }
 `
 
-// Using same background images as social-dark-gradient
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
   '1': '/assets/backgrounds/social-dark-gradient-1.png',
   '2': '/assets/backgrounds/social-dark-gradient-2.png',
   '3': '/assets/backgrounds/social-dark-gradient-3.png',
   '4': '/assets/backgrounds/social-dark-gradient-4.png',
+}
+
+const DEFAULT_GAP = 24
+
+export function gapKey(prevId: EmailDarkGradientBlockId, nextId: EmailDarkGradientBlockId): string {
+  return `gap-${prevId}-to-${nextId}`
+}
+
+const STACK_JUSTIFY: Record<StackAlign, CSSProperties['justifyContent']> = {
+  top: 'flex-start',
+  center: 'center',
+  bottom: 'flex-end',
+}
+
+type Block = {
+  id: Exclude<EmailDarkGradientBlockId, 'logo'>
+  visible: boolean
+  /** What renders inside the chrome by default (typically the text/HTML content). */
+  defaultInner: ReactNode
+  /** Wraps the inner content in the block's visual chrome (typography styling, button background, icons). */
+  renderChrome: (inner: ReactNode) => ReactNode
+}
+
+function renderSpacer(
+  prevId: EmailDarkGradientBlockId,
+  nextId: EmailDarkGradientBlockId,
+  gaps: Record<string, number> | undefined,
+  renderSpacerBetween: EmailDarkGradientProps['renderSpacerBetween'],
+): ReactNode {
+  const key = gapKey(prevId, nextId)
+  const value = gaps?.[key] ?? DEFAULT_GAP
+  if (renderSpacerBetween) {
+    return (
+      <div style={{ width: '100%', flexShrink: 0 }} key={key}>
+        {renderSpacerBetween(key, value, prevId, nextId)}
+      </div>
+    )
+  }
+  return <div key={key} style={{ height: value, width: '100%', flexShrink: 0 }} />
 }
 
 export function EmailDarkGradient({
@@ -70,19 +126,23 @@ export function EmailDarkGradient({
   showCta,
   headlineFontSize,
   subheadFontSize,
-  bottomSpacing = 0,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
   colors,
   typography,
   scale = 1,
 }: EmailDarkGradientProps) {
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const textColor = '#FFFFFF'
-  const ctaColor = '#0080FF' // Cobalt blue for arrow
+  const ctaColor = '#0080FF'
 
-  // Determine if content is empty for conditional rendering
   const hasHeadline = !isHtmlEmpty(headline)
   const hasSubhead = !isHtmlEmpty(subhead)
   const hasBody = !isHtmlEmpty(body)
+  const hasCta = !!ctaText
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -94,37 +154,170 @@ export function EmailDarkGradient({
     transformOrigin: 'top left',
   }
 
-  // When CTA is hidden, bottomSpacing adds extra bottom padding to push text up
-  const effectiveBottomPadding = 32 + (!showCta ? bottomSpacing : 0)
-
-  const contentStyle: CSSProperties = {
+  const overlayStyle: CSSProperties = {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    padding: `32px 32px ${effectiveBottomPadding}px 32px`,
+    padding: 32,
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
     alignItems: alignment === 'center' ? 'center' : 'flex-start',
   }
 
-  const textBlockStyle: CSSProperties = {
+  const logoRowStyle: CSSProperties = {
+    width: '100%',
+    display: 'flex',
+    justifyContent: alignment === 'center' ? 'center' : 'flex-start',
+    flexShrink: 0,
+  }
+
+  const logoToContentGap = gaps?.[gapKey('logo', 'eyebrow')] ?? DEFAULT_GAP
+
+  const stackContainerStyle: CSSProperties = {
+    flex: 1,
+    minHeight: 0,
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: STACK_JUSTIFY[stackAlign],
     alignItems: alignment === 'center' ? 'center' : 'flex-start',
-    gap: 24,
-    textAlign: alignment === 'center' ? 'center' : 'left',
-    maxWidth: alignment === 'center' ? 460 : 480,
   }
+
+  const textBlockMaxWidth = alignment === 'center' ? 460 : 480
+  const textBlockAlign = alignment === 'center' ? 'center' : 'flex-start'
+  const textAlign = alignment === 'center' ? ('center' as const) : ('left' as const)
+
+  const blocks: Block[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div
+          style={{
+            color: textColor,
+            fontSize: 14,
+            fontWeight: 500,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            textAlign,
+            maxWidth: textBlockMaxWidth,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />,
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: headlineFontSize ?? 38,
+            fontWeight: 350,
+            lineHeight: 1.26,
+            textAlign,
+            maxWidth: textBlockMaxWidth,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && hasSubhead,
+      defaultInner: <div dangerouslySetInnerHTML={{ __html: subhead! }} />,
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: subheadFontSize ?? 24,
+            fontWeight: 350,
+            lineHeight: 1.4,
+            textAlign,
+            maxWidth: textBlockMaxWidth,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'body',
+      visible: showBody && hasBody,
+      defaultInner: <div dangerouslySetInnerHTML={{ __html: body }} />,
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: 18,
+            fontWeight: 350,
+            lineHeight: 1.4,
+            textAlign,
+            maxWidth: textBlockMaxWidth,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'cta',
+      visible: showCta && hasCta,
+      defaultInner: ctaText,
+      renderChrome: (inner) =>
+        ctaStyle === 'link' ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ color: textColor, fontSize: 18, fontWeight: 500, lineHeight: 1 }}>
+              {inner}
+            </div>
+            <ArrowIcon
+              color={ctaColor}
+              width={16.5}
+              height={16.5 * 0.795}
+              viewBox="0 0 16.5 13.12"
+              pathD="M9.75 0.75L15.75 6.56M15.75 6.56L9.75 12.37M15.75 6.56H0.75"
+              strokeWidth={1.12}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              height: 45,
+              paddingLeft: 30,
+              paddingRight: 30,
+              paddingTop: 17,
+              paddingBottom: 17,
+              background: '#FFFFFF',
+              borderRadius: 22.5,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{ color: '#060015', fontSize: 16, fontWeight: 500, lineHeight: 1.33 }}>
+              {inner}
+            </div>
+          </div>
+        ),
+    },
+  ]
+
+  const visible = blocks.filter((b) => b.visible)
 
   return (
     <div style={containerStyle}>
-      {/* Rich text styles for HTML content */}
       <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
-      {/* Background Image */}
       <img
         src={BACKGROUND_IMAGES[colorStyle]}
         alt=""
@@ -138,134 +331,40 @@ export function EmailDarkGradient({
         }}
       />
 
-      {/* Content Overlay */}
-      <div style={contentStyle}>
-        {/* Logo */}
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: alignment === 'center' ? 'center' : 'flex-start'
-        }}>
-          <CorityLogo fill="#FFFFFF" height={23} />
-        </div>
-
-        {/* Text Content */}
-        <div style={textBlockStyle}>
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div
-              style={{
-                color: textColor,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline - supports rich text (bold, italic, line breaks) */}
-          {showHeadline && (
-            <div
-              className="rich-text-white"
-              style={{
-                color: textColor,
-                fontSize: headlineFontSize ?? 38,
-                fontWeight: 350,
-                lineHeight: 1.26,
-              }}
-              dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
-            />
-          )}
-
-          {/* Subheading - supports rich text (bold, italic, line breaks) */}
-          {showSubhead && hasSubhead && (
-            <div
-              className="rich-text-white"
-              style={{
-                color: textColor,
-                fontSize: subheadFontSize ?? 24,
-                fontWeight: 350,
-                lineHeight: 1.4,
-              }}
-              dangerouslySetInnerHTML={{ __html: subhead! }}
-            />
-          )}
-
-          {/* Body - supports rich text (bold, italic, line breaks) */}
-          {showBody && hasBody && (
-            <div
-              className="rich-text-white"
-              style={{
-                color: textColor,
-                fontSize: 18,
-                fontWeight: 350,
-                lineHeight: 1.4,
-              }}
-              dangerouslySetInnerHTML={{ __html: body }}
-            />
-          )}
-        </div>
-
-        {/* CTA */}
-        {showCta && ctaText && (
-          <div style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: alignment === 'center' ? 'center' : 'flex-start'
-          }}>
-            {ctaStyle === 'link' ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                }}
-              >
-                <span
-                  style={{
-                    color: textColor,
-                    fontSize: 18,
-                    fontWeight: 500,
-                    lineHeight: 1,
-                  }}
-                >
-                  {ctaText}
-                </span>
-                <ArrowIcon color={ctaColor} width={16.5} height={16.5 * 0.795} viewBox="0 0 16.5 13.12" pathD="M9.75 0.75L15.75 6.56M15.75 6.56L9.75 12.37M15.75 6.56H0.75" strokeWidth={1.12} />
-              </div>
-            ) : (
-              <div
-                style={{
-                  height: 45,
-                  paddingLeft: 30,
-                  paddingRight: 30,
-                  paddingTop: 17,
-                  paddingBottom: 17,
-                  background: '#FFFFFF',
-                  borderRadius: 22.5,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span
-                  style={{
-                    color: '#060015',
-                    fontSize: 16,
-                    fontWeight: 500,
-                    lineHeight: 1.33,
-                  }}
-                >
-                  {ctaText}
-                </span>
-              </div>
-            )}
+      <div style={overlayStyle}>
+        {renderBlock ? renderBlock('logo', <div style={logoRowStyle}><CorityLogo fill="#FFFFFF" height={23} /></div>) : (
+          <div style={logoRowStyle}>
+            <CorityLogo fill="#FFFFFF" height={23} />
           </div>
         )}
 
+        {visible.length > 0 && stackAlign === 'top' &&
+          renderSpacer('logo', visible[0].id, gaps, renderSpacerBetween)}
+
+        <div style={stackContainerStyle}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: textBlockAlign,
+              width: '100%',
+              maxWidth: textBlockMaxWidth,
+            }}
+          >
+            {visible.map((block, i) => {
+              const inner = renderInlineEditor
+                ? renderInlineEditor(block.id, block.defaultInner)
+                : block.defaultInner
+              const rendered = block.renderChrome(inner)
+              return (
+                <Fragment key={block.id}>
+                  {renderBlock ? renderBlock(block.id, rendered) : rendered}
+                  {i < visible.length - 1 && renderSpacer(block.id, visible[i + 1].id, gaps, renderSpacerBetween)}
+                </Fragment>
+              )
+            })}
+          </div>
+        </div>
       </div>
     </div>
   )

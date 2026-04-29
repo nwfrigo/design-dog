@@ -148,6 +148,8 @@ export async function POST(request: NextRequest) {
       'pages',
       // Stacker: modules need data URL stripping + double encoding
       'modules', 'moduleSpacing', 'footerHidden', 'darkMode', 'blockSpacing',
+      // Email Dark Gradient: inter-block gaps record (JSON-encoded)
+      'gaps',
       // FAQ cover: object needs splitting to X/Y params
       'coverImagePosition',
       // Carousel: only forwarded when exporting all slides
@@ -262,6 +264,11 @@ export async function POST(request: NextRequest) {
       if (body.moduleSpacing && Object.keys(body.moduleSpacing).length > 0) {
         params.set('moduleSpacing', encodeURIComponent(JSON.stringify(body.moduleSpacing)))
       }
+    }
+
+    // Email Dark Gradient inter-block gaps
+    if (body.gaps && typeof body.gaps === 'object' && Object.keys(body.gaps).length > 0) {
+      params.set('gaps', encodeURIComponent(JSON.stringify(body.gaps)))
     }
 
     // Get the base URL from the request

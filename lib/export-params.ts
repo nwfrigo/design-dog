@@ -9,7 +9,7 @@
  */
 
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
-import type { QueuedAsset } from '@/types'
+import type { QueuedAsset, StackAlign } from '@/types'
 
 // The shape of all the state the builders can draw from.
 // This is intentionally a flat bag — it mirrors the store + local state
@@ -24,7 +24,8 @@ export interface ExportParamState {
   showHeadline: boolean
   headlineFontSize: number | null
   subheadFontSize: number | null
-  bottomSpacing: number
+  stackAlign: StackAlign
+  emailDarkGradientGaps: Record<string, number>
 
   // Image
   thumbnailImageUrl: string | null
@@ -361,7 +362,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showCta: s.showCta,
-    bottomSpacing: s.bottomSpacing,
+    stackAlign: s.stackAlign,
+    gaps: s.emailDarkGradientGaps,
   }),
 
   'email-speakers': (s) => ({
@@ -635,7 +637,8 @@ export function buildExportParamsFromAsset(
     showHeadline: a.showHeadline !== false,
     headlineFontSize: (a.headlineFontSize as number | null) ?? null,
     subheadFontSize: (a.subheadFontSize as number | null) ?? null,
-    bottomSpacing: (a.bottomSpacing as number) ?? 0,
+    stackAlign: (a.stackAlign as StackAlign) ?? 'top',
+    emailDarkGradientGaps: (a.emailDarkGradientGaps as Record<string, number>) ?? {},
     thumbnailImageUrl: (a.thumbnailImageUrl as string | null) ?? null,
     thumbnailImagePosition: (a.thumbnailImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
     thumbnailImageZoom: (a.thumbnailImageZoom as number) ?? 1,

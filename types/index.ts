@@ -6,6 +6,7 @@ export type LogoColor = 'black' | 'orange' | 'white'
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type HeadingSize = 'S' | 'M' | 'L'
 export type TextAlignment = 'left' | 'center'
+export type StackAlign = 'top' | 'center' | 'bottom'
 export type CtaStyle = 'link' | 'button'
 export type ImageLayout = 'even' | 'more-image' | 'more-text'
 export type NewsletterImageSize = 'none' | 'small' | 'large'
@@ -346,8 +347,10 @@ export interface ManualAssetSettings {
   // Manual text size
   headlineFontSize: number | null
   subheadFontSize: number | null
-  // Email Dark Gradient spacing
-  bottomSpacing: number
+  // Email Dark Gradient stack alignment
+  stackAlign: StackAlign
+  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
+  emailDarkGradientGaps: Record<string, number>
   // Template variant settings (must persist when switching assets)
   ebookVariant: ImageVariant
   reportVariant: ImageVariant
@@ -622,8 +625,10 @@ export interface GeneratedAsset {
   // Manual text size
   headlineFontSize: number | null
   subheadFontSize: number | null
-  // Email Dark Gradient spacing
-  bottomSpacing: number
+  // Email Dark Gradient stack alignment
+  stackAlign: StackAlign
+  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
+  emailDarkGradientGaps: Record<string, number>
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
@@ -792,8 +797,10 @@ export interface QueuedAsset {
   // Manual text size
   headlineFontSize: number | null
   subheadFontSize: number | null
-  // Email Dark Gradient spacing
-  bottomSpacing: number
+  // Email Dark Gradient stack alignment
+  stackAlign: StackAlign
+  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
+  emailDarkGradientGaps: Record<string, number>
   // Social Carousel specific
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
@@ -987,8 +994,10 @@ export interface AppState {
   headlineFontSize: number | null
   subheadFontSize: number | null
 
-  // Email Dark Gradient spacing
-  bottomSpacing: number
+  // Email Dark Gradient stack alignment
+  stackAlign: StackAlign
+  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
+  emailDarkGradientGaps: Record<string, number>
 
   // FAQ PDF state
   faqTitle: string
@@ -1152,8 +1161,10 @@ export interface AppState {
   // Manual text size
   setHeadlineFontSize: (size: number | null) => void
   setSubheadFontSize: (size: number | null) => void
-  // Email Dark Gradient spacing
-  setBottomSpacing: (spacing: number) => void
+  // Email Dark Gradient stack alignment
+  setStackAlign: (stackAlign: StackAlign) => void
+  // Email Dark Gradient inter-block gaps
+  setEmailDarkGradientGap: (gapKey: string, value: number) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void
   setSolutionOverviewSolutionName: (name: string) => void

@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, StackAlign } from '@/types'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
@@ -101,7 +101,8 @@ export interface DraftState {
   // Manual text size
   headlineFontSize?: number | null
   subheadFontSize?: number | null
-  bottomSpacing: number
+  stackAlign: StackAlign
+  emailDarkGradientGaps: Record<string, number>
   generatedVariations: { headlines: string[]; ctas: string[] } | null
   // FAQ PDF
   faqTitle: string
@@ -268,7 +269,8 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       grayscale: state.grayscale ?? false,
       headlineFontSize: state.headlineFontSize ?? null,
       subheadFontSize: state.subheadFontSize ?? null,
-      bottomSpacing: state.bottomSpacing ?? 0,
+      stackAlign: state.stackAlign ?? 'top',
+      emailDarkGradientGaps: state.emailDarkGradientGaps ?? {},
       generatedVariations: state.generatedVariations || null,
       // FAQ PDF
       faqTitle: state.faqTitle || 'Title Goes Here',

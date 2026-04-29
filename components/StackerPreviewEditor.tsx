@@ -24,7 +24,7 @@ import { STACKER_PLACEHOLDER_IMAGE_1x1, STACKER_PLACEHOLDER_IMAGE_16x9 } from '@
 import { StackerPdf } from './templates/StackerPdf'
 import { StackerDraggableModule } from './StackerDraggableModule'
 import { StackerDropIndicator } from './StackerDropIndicator'
-import { StackerSpacingHandle } from './StackerSpacingHandle'
+import { SpacingHandle } from './canvas-editor/handles/SpacingHandle'
 
 // Module types for rendering in overlay
 import { LogoChipModule } from './templates/StackerPdf/modules/LogoChipModule'
@@ -532,11 +532,10 @@ export function StackerPreviewEditor({
             moduleSpacing={moduleSpacing}
             renderModuleWrapper={renderModuleWrapper}
             renderSpacerBetween={!readOnly && onSpacingChange ? (moduleId, spacing) => (
-              <StackerSpacingHandle
+              <SpacingHandle
                 key={`spacer-${moduleId}`}
-                moduleId={moduleId}
                 spacing={spacing}
-                onChange={onSpacingChange}
+                onChange={(value) => onSpacingChange(moduleId, value)}
                 scale={previewZoom / 100}
                 onAddModule={() => {
                   setInsertAfterModuleId(moduleId)

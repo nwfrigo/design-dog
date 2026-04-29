@@ -112,8 +112,10 @@ const SNAPSHOT_FIELDS = [
   'grayscale',
   'headlineFontSize',
   'subheadFontSize',
-  // Email Dark Gradient spacing
-  'bottomSpacing',
+  // Email Dark Gradient stack alignment
+  'stackAlign',
+  // Email Dark Gradient inter-block gaps
+  'emailDarkGradientGaps',
   // Solution Overview - Page 1
   'solutionOverviewSolution',
   'solutionOverviewSolutionName',

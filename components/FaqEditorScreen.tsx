@@ -34,7 +34,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { FaqDraggableBlock } from './FaqDraggableBlock'
 import { StackerDropIndicator } from './StackerDropIndicator'
 import { DeleteConfirmModal } from './shared/DeleteConfirmModal'
-import { StackerSpacingHandle } from './StackerSpacingHandle'
+import { SpacingHandle } from './canvas-editor/handles/SpacingHandle'
 
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 9)
@@ -2326,13 +2326,11 @@ export function FaqEditorScreen() {
                         scale={1}
                         blockSpacing={blockSpacing}
                         renderSpacerBetween={(blockId, spacing) => (
-                          <StackerSpacingHandle
+                          <SpacingHandle
                             key={`spacer-${blockId}`}
-                            moduleId={blockId}
                             spacing={spacing}
-                            onChange={handleSpacingChange}
+                            onChange={(value) => handleSpacingChange(blockId, value)}
                             scale={pdfPreviewZoom / 100}
-                            align="left"
                           />
                         )}
                         renderBlockWrapper={(block, children, index) => {

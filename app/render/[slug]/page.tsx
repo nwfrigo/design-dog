@@ -14,6 +14,7 @@ import {
   parseEnum,
   parseStringOrNull,
   parseInt_,
+  parseJsonRecord,
   type SearchParams,
 } from '@/lib/render-params'
 
@@ -41,6 +42,8 @@ function parseField(searchParams: SearchParams, field: RenderField): unknown {
       return parseStringOrNull(searchParams, field.param)
     case 'int':
       return parseInt_(searchParams, field.param, (field.default as number) ?? 0)
+    case 'jsonRecord':
+      return parseJsonRecord(searchParams, field.param)
     default:
       return parseString(searchParams, field.param, '')
   }

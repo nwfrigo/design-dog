@@ -76,6 +76,21 @@ export function parseEnum<T extends string>(params: SearchParams, key: string, f
   return ((params[key] as string) || fallback) as T
 }
 
+export function parseJsonRecord<V = unknown>(
+  params: SearchParams,
+  key: string,
+): Record<string, V> {
+  const raw = params[key] as string | undefined
+  if (!raw) return {}
+  try {
+    const decoded = decodeURIComponent(raw)
+    const parsed = JSON.parse(decoded)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Composite helpers
 // ---------------------------------------------------------------------------

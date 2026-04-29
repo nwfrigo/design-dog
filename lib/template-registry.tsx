@@ -40,7 +40,7 @@ import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 // Render Schema — declarative field definitions for dynamic render route
 // ---------------------------------------------------------------------------
 
-type FieldParser = 'string' | 'boolTrue' | 'boolFalse' | 'number' | 'numberOrUndefined' | 'enum' | 'stringOrNull' | 'int'
+type FieldParser = 'string' | 'boolTrue' | 'boolFalse' | 'number' | 'numberOrUndefined' | 'enum' | 'stringOrNull' | 'int' | 'jsonRecord'
 
 export interface RenderField {
   /** URL param name */
@@ -971,7 +971,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta !== false,
       headlineFontSize: asset.headlineFontSize ?? undefined,
       subheadFontSize: asset.subheadFontSize ?? undefined,
-      bottomSpacing: (asset.showCta !== false) ? 0 : (asset.bottomSpacing ?? 0),
+      stackAlign: (asset.stackAlign as 'top' | 'center' | 'bottom') ?? 'top',
+      gaps: (asset.emailDarkGradientGaps as Record<string, number>) ?? {},
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -995,7 +996,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'subheadFontSize', parser: 'numberOrUndefined' },
-        { param: 'bottomSpacing', parser: 'numberOrUndefined' },
+        { param: 'stackAlign', parser: 'enum', default: 'top' },
+        { param: 'gaps', parser: 'jsonRecord' },
       ],
     },
   },
