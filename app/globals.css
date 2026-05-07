@@ -62,6 +62,65 @@
 :root {
   --foreground: #171717;
   --background: #ffffff;
+
+  /* Light-mode token set — mirrors the Figma Tokens collection's Light mode.
+   * Existing components use `bg-gray-X dark:bg-surface-Y` patterns (gray wins
+   * in light), so adding these tokens here is non-breaking — they only become
+   * load-bearing for components that opt in via `bg-surface-primary` (no
+   * `dark:` prefix). Stage & Bench components do exactly that. */
+
+  /* Surface */
+  --surface-primary: 255 255 255;        /* white */
+  --surface-secondary: 242 242 243;      /* neutral/50 */
+  --surface-tertiary: 229 229 230;       /* neutral/100 */
+  --surface-inverse: 22 23 25;           /* neutral/900 */
+
+  /* Content (text) */
+  --content-primary: 22 23 25;           /* neutral/900 */
+  --content-secondary: 87 88 91;         /* neutral/600 */
+  --content-tertiary: 189 190 192;       /* neutral/250 */
+  --content-inverse: 242 242 243;        /* neutral/50 */
+  --content-destructive: 235 50 50;
+  --content-success: 84 213 113;
+  --content-warning: 234 166 24;
+
+  /* Line / border */
+  --line-subtle: 189 190 192;            /* neutral/250 */
+  --line-focus: 52 53 56;                /* neutral/700 */
+  --line-destructive: 235 50 50;
+
+  /* Buttons */
+  --btn-primary-bg: 22 23 25;
+  --btn-primary-bg-hover: 32 33 35;
+  --btn-primary-bg-disabled: 189 190 192;
+  --btn-primary-text: 242 242 243;
+  --btn-secondary-bg: 255 255 255;
+  --btn-secondary-bg-hover: 242 242 243;
+  --btn-secondary-text: 22 23 25;
+  --btn-secondary-border: 189 190 192;
+  --btn-ghost-text: 87 88 91;
+
+  /* Interactive */
+  --interactive-hover: 242 242 243;
+  --interactive-active: 189 190 192;
+
+  /* Icon — used by SelectorPrimitive and similar atoms.
+   * focus = bright/full strength; subtle = dimmed (active cell when icon dim
+   * communicates "already chosen"). */
+  --icon-focus: 22 23 25;                /* neutral/900 */
+  --icon-subtle: 156 158 160;            /* neutral/400 = #9D9EA0 */
+
+  /* Elevation — light mode = subtle drop shadow (offset down). Mirrors the
+   * Figma Tokens collection's elevation/* variables. */
+  --elevation-sm-y: 1px;
+  --elevation-sm-blur: 2px;
+  --elevation-sm-color: rgba(0, 0, 0, 0.06);
+  --elevation-md-y: 2px;
+  --elevation-md-blur: 8px;
+  --elevation-md-color: rgba(0, 0, 0, 0.10);
+  --elevation-lg-y: 4px;
+  --elevation-lg-blur: 16px;
+  --elevation-lg-color: rgba(0, 0, 0, 0.14);
 }
 
 /* Class-based dark mode (not system preference) */
@@ -103,6 +162,21 @@ html.dark {
   /* Interactive tokens */
   --interactive-hover: 32 33 35;     /* neutral/800 #202123 */
   --interactive-active: 87 88 91;    /* neutral/600 #57585B */
+
+  /* Icon */
+  --icon-focus: 242 242 243;         /* neutral/50  #F2F2F3 */
+  --icon-subtle: 87 88 91;           /* neutral/600 #57585B */
+
+  /* Elevation — dark mode = soft white glow (offset 0, larger blur). */
+  --elevation-sm-y: 0px;
+  --elevation-sm-blur: 6px;
+  --elevation-sm-color: rgba(255, 255, 255, 0.06);
+  --elevation-md-y: 0px;
+  --elevation-md-blur: 12px;
+  --elevation-md-color: rgba(255, 255, 255, 0.10);
+  --elevation-lg-y: 0px;
+  --elevation-lg-blur: 24px;
+  --elevation-lg-color: rgba(255, 255, 255, 0.14);
 }
 
 body {

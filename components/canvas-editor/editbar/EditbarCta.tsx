@@ -1,15 +1,17 @@
 'use client'
 
-import { Link2, Square, AArrowUp, AArrowDown, Palette, EyeOff } from 'lucide-react'
+import { AArrowUp, AArrowDown, Palette, EyeOff } from 'lucide-react'
 import {
   EditbarRoot,
   EditbarSection,
   EditbarDivider,
   EditbarIconButton,
+  EditbarSegmented,
 } from './shell'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import { useSlotVisibility } from '../VisibilityRegistry'
 import { useStore } from '@/store'
+import type { CtaStyle } from '@/types'
 
 /**
  * EditbarCta — contextual toolbar for `kind: 'cta'` slots.
@@ -35,22 +37,15 @@ export function EditbarCta() {
   return (
     <EditbarRoot ariaLabel="CTA formatting">
       <EditbarSection gap="default">
-        <EditbarIconButton
-          ariaLabel="Style: Link"
-          size="sm"
-          active={ctaStyle === 'link'}
-          onClick={() => setCtaStyle('link')}
-        >
-          <Link2 size={18} />
-        </EditbarIconButton>
-        <EditbarIconButton
-          ariaLabel="Style: Button"
-          size="sm"
-          active={ctaStyle === 'button'}
-          onClick={() => setCtaStyle('button')}
-        >
-          <Square size={18} />
-        </EditbarIconButton>
+        <EditbarSegmented<CtaStyle>
+          ariaLabel="CTA Style"
+          value={ctaStyle}
+          onChange={setCtaStyle}
+          options={[
+            { value: 'link', label: 'Link' },
+            { value: 'button', label: 'Button' },
+          ]}
+        />
       </EditbarSection>
       <EditbarDivider />
       <EditbarSection gap="default">

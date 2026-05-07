@@ -26,10 +26,10 @@ export function StageBarColorStyle() {
             type="button"
             onClick={() => setColorStyle(style)}
             aria-label={`Color style ${style}`}
-            className={`w-7 h-7 rounded border-2 overflow-hidden transition-all ${
+            className={`w-7 h-7 rounded border-2 overflow-hidden transition-colors ${
               colorStyle === style
-                ? 'border-blue-500 ring-1 ring-blue-200'
-                : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
+                ? 'border-blue-500'
+                : 'border-gray-200 dark:border-[#494a4c] hover:border-gray-400 dark:hover:border-[#7c7d80]'
             }`}
           >
             <img

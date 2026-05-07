@@ -49,6 +49,17 @@ const config: Config = {
           hover: 'rgb(var(--interactive-hover) / <alpha-value>)',
           active: 'rgb(var(--interactive-active) / <alpha-value>)',
         },
+        icon: {
+          focus: 'rgb(var(--icon-focus) / <alpha-value>)',
+          subtle: 'rgb(var(--icon-subtle) / <alpha-value>)',
+        },
+      },
+      boxShadow: {
+        // Mode-aware: light = drop shadow, dark = soft glow. Driven by CSS
+        // variables defined in globals.css (:root + html.dark).
+        'elevation-sm': '0 var(--elevation-sm-y) var(--elevation-sm-blur) var(--elevation-sm-color)',
+        'elevation-md': '0 var(--elevation-md-y) var(--elevation-md-blur) var(--elevation-md-color)',
+        'elevation-lg': '0 var(--elevation-lg-y) var(--elevation-lg-blur) var(--elevation-lg-color)',
       },
     },
   },

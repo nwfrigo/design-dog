@@ -23,6 +23,7 @@ import {
 import { StageBar } from './canvas-editor/stage-bar/StageBar'
 import { StageBarActions } from './canvas-editor/stage-bar/StageBarActions'
 import { isStageBenchTemplate } from './canvas-editor/migrated-templates'
+import { StageBenchEditor } from './canvas-editor/StageBenchEditor'
 import { ContextualToolbar } from './canvas-editor/ContextualToolbar'
 import { SelectionRing } from './canvas-editor/SelectionRing'
 import { InlineTextEdit } from './canvas-editor/InlineTextEdit'
@@ -1001,8 +1002,9 @@ export function EditorScreen() {
 
   return (
     <div className="space-y-6">
-      {/* Tab Navigation - only show in regular mode, not auto-create mode */}
-      {!isAutoCreateMode && (
+      {/* Tab Navigation - only show in regular mode, not auto-create mode.
+          Hidden for Stage & Bench templates — the new shell renders its own tabs in the header. */}
+      {!isAutoCreateMode && !isStageBenchTemplate(currentTemplate) && (
         <div className="flex items-center border-b border-gray-200 dark:border-line-subtle">
           <div className="flex">
             {selectedAssets.map((asset, index) => (
@@ -1330,6 +1332,66 @@ export function EditorScreen() {
         />
       )}
 
+      {/* Preview lightbox — uses the registry to render the live template at native size.
+          Sibling to the layout branch so it works in both legacy and Stage & Bench paths. */}
+      {showPreviewLightbox && colorsConfig && typographyConfig && (() => {
+        const entry = TEMPLATE_REGISTRY[currentTemplate]
+        if (!entry) return null
+        const storeState = useStore.getState()
+        const asset = {
+          ...storeState,
+          templateType: currentTemplate,
+          headline: verbatimCopy.headline || 'Headline',
+          subhead: verbatimCopy.subhead || '',
+          body: verbatimCopy.body || '',
+        } as Record<string, unknown>
+        const props = entry.renderProps(asset as never, colorsConfig, typographyConfig)
+        const Component = entry.component
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-pointer"
+            onClick={() => setShowPreviewLightbox(false)}
+          >
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <div className="shadow-2xl rounded overflow-hidden">
+                <Component {...props} />
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {isStageBenchTemplate(currentTemplate) && !isAutoCreateMode ? (
+        <StageBenchEditor
+          currentTemplate={currentTemplate}
+          selectedAssets={selectedAssets}
+          currentAssetIndex={currentAssetIndex}
+          isExporting={isExporting}
+          isEditingFromQueue={isEditingFromQueue}
+          colorsConfig={colorsConfig}
+          typographyConfig={typographyConfig}
+          onExport={handleExport}
+          onAddToQueue={() => {
+            addToQueue()
+            setShowQueuedFeedback(true)
+            setTimeout(() => setShowQueuedFeedback(false), 2000)
+          }}
+          onPreview={() => setShowPreviewLightbox(true)}
+          onAddAsset={() => {
+            setPendingAssets([])
+            setShowAddAssetModal(true)
+          }}
+          onGoToAsset={goToAsset}
+          onDeleteAsset={(idx) => {
+            const newAssets = selectedAssets.filter((_, i) => i !== idx)
+            setSelectedAssets(newAssets)
+            if (currentAssetIndex >= newAssets.length) {
+              goToAsset(newAssets.length - 1)
+            }
+          }}
+          getAssetLabel={getAssetLabel}
+        />
+      ) : (
       <div className="flex gap-8 h-[calc(100vh-180px)]">
         {/* Left: Editor — collapsed for Stage & Bench templates in manual mode (Q1).
             Auto-create still keeps its sidebar (asset navigation lives there). */}
@@ -5160,34 +5222,6 @@ export function EditorScreen() {
             </div>
           )}
 
-          {/* Preview lightbox — uses the registry to render the live template at native size */}
-          {showPreviewLightbox && colorsConfig && typographyConfig && (() => {
-            const entry = TEMPLATE_REGISTRY[currentTemplate]
-            if (!entry) return null
-            const storeState = useStore.getState()
-            const asset = {
-              ...storeState,
-              templateType: currentTemplate,
-              headline: verbatimCopy.headline || 'Headline',
-              subhead: verbatimCopy.subhead || '',
-              body: verbatimCopy.body || '',
-            } as Record<string, unknown>
-            const props = entry.renderProps(asset as never, colorsConfig, typographyConfig)
-            const Component = entry.component
-            return (
-              <div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-pointer"
-                onClick={() => setShowPreviewLightbox(false)}
-              >
-                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                  <div className="shadow-2xl rounded overflow-hidden">
-                    <Component {...props} />
-                  </div>
-                </div>
-              </div>
-            )
-          })()}
-
           {/* Cancel confirmation modal */}
           {showCancelConfirm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -5383,6 +5417,7 @@ export function EditorScreen() {
           )}
         </div>
       </div>
+      )}
     </div>
   )
 }

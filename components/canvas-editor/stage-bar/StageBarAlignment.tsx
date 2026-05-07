@@ -15,7 +15,7 @@ export function StageBarAlignment() {
       <span className="text-[10px] font-mono uppercase tracking-wide text-gray-500 dark:text-content-secondary mr-1">
         Align
       </span>
-      <div className="flex gap-0.5 p-0.5 bg-gray-100 dark:bg-surface-tertiary rounded-md">
+      <div className="inline-flex gap-0.5 p-0.5 bg-gray-100 dark:bg-surface-tertiary rounded border border-gray-200 dark:border-[#494a4c]">
         {(['left', 'center'] as const).map((option) => (
           <button
             key={option}

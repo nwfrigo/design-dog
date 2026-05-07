@@ -210,3 +210,69 @@ export const popoverSurfaceStyle: CSSProperties = {
   fontFamily: EDITBAR_TOKENS.fontFamily,
   color: EDITBAR_TOKENS.iconDefault,
 }
+
+/**
+ * Labeled segmented toggle for the editbar — words inside the switch.
+ * Matches the dark editbar palette: subtle inset backdrop, active cell goes
+ * darker (toward black) with white text, inactive stays muted.
+ */
+export interface EditbarSegmentedOption<T extends string> {
+  value: T
+  label: string
+}
+
+export function EditbarSegmented<T extends string>({
+  value,
+  onChange,
+  options,
+  ariaLabel,
+}: {
+  value: T
+  onChange: (next: T) => void
+  options: readonly EditbarSegmentedOption<T>[]
+  ariaLabel?: string
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label={ariaLabel}
+      style={{
+        display: 'inline-flex',
+        gap: 2,
+        padding: 2,
+        borderRadius: EDITBAR_TOKENS.radius,
+        background: 'rgba(255,255,255,0.04)',
+      }}
+    >
+      {options.map((opt) => {
+        const active = value === opt.value
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            aria-label={opt.label}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => onChange(opt.value)}
+            style={{
+              minWidth: 48,
+              padding: '4px 10px',
+              borderRadius: Math.max(EDITBAR_TOKENS.radius - 1, 2),
+              border: 'none',
+              background: active ? '#000' : 'transparent',
+              color: active ? EDITBAR_TOKENS.iconActive : EDITBAR_TOKENS.iconDefault,
+              fontFamily: EDITBAR_TOKENS.fontFamily,
+              fontSize: EDITBAR_TOKENS.fontSize,
+              fontWeight: active ? 600 : 400,
+              cursor: 'pointer',
+              transition: 'color 120ms, background 120ms',
+            }}
+          >
+            {opt.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
