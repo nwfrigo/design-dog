@@ -17,7 +17,9 @@ import { EditbarRoot, EDITBAR_TOKENS } from './shell'
 const TRACK_HEIGHT = 2
 const THUMB_SIZE = 12
 const TRACK_WIDTH = 72
-const THUMB_COLOR = '#0080FF'
+// Theme-aware: dark thumb on light surface, light thumb on dark surface.
+// Same token as the Toggle's thumb so the slider and toggle share visual.
+const THUMB_COLOR = 'rgb(var(--line-focus))'
 
 export interface EditbarSliderProps {
   value?: number
@@ -126,7 +128,8 @@ export function EditbarSlider({
             height: THUMB_SIZE,
             borderRadius: '50%',
             background: THUMB_COLOR,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+            // Theme-aware lift, matches BenchChip / EditbarRoot
+            boxShadow: '0 var(--elevation-sm-y) var(--elevation-sm-blur) var(--elevation-sm-color)',
           }}
         />
       </div>

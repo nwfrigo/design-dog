@@ -3,38 +3,42 @@
 /**
  * Editbar shell primitives — shared across every contextual toolbar.
  *
- * Tokens mirror the Design Dog Figma file (toolbar_text / toolbar_image /
- * toolbar_slider, node family 277:2731+). Single source of truth — when a
- * token changes in Figma, update it here and every editbar restyles.
+ * Tokens mirror the Design Dog Figma file (toolbar_text / toolbar_cta /
+ * toolbar_image / toolbar_slider, node family 277:3029, 367:360, etc.).
+ * All color tokens reference CSS variables so the toolbar swaps with the
+ * app-chrome theme — light mode renders on a white surface with neutral
+ * text, dark mode on a near-black surface with soft text.
  */
 
 import type { CSSProperties, ReactNode } from 'react'
 import { GripVertical } from 'lucide-react'
 
 export const EDITBAR_TOKENS = {
-  // Surfaces
-  bg: '#161719',
-  border: '#494a4c',
+  // Surfaces — theme-aware. Each value is `rgb(var(--token))` so the
+  // computed style swaps when html.dark toggles.
+  bg: 'rgb(var(--surface-primary))',
+  border: 'rgb(var(--line-subtle))',
   borderThin: 0.5,
-  // Icon colors (resolved from Figma variables: text/secondary, text/primary, text/tertiary)
-  iconDefault: '#7c7d80',     // text/secondary — resting
-  iconActive: '#ffffff',      // text/primary — hover + selected/active
-  iconDisabled: '#343538',    // text/tertiary — non-interactive
-  iconDestructive: '#eb3232',
+  // Icon colors — semantic content tokens. Active/hover lifts to primary
+  // (highest-contrast against the surface); disabled drops to tertiary.
+  iconDefault: 'rgb(var(--content-secondary))',
+  iconActive: 'rgb(var(--content-primary))',
+  iconDisabled: 'rgb(var(--content-tertiary))',
+  iconDestructive: 'rgb(var(--content-destructive))',
   // Text
-  textPrimary: '#ffffff',
-  textSecondary: '#7c7d80',
+  textPrimary: 'rgb(var(--content-primary))',
+  textSecondary: 'rgb(var(--content-secondary))',
   // Spacing scale
   space1: 4,
   space2: 8,
-  space3: 12,                 // section gap (between groups)
-  space4: 16,                 // within-section icon gap
+  space3: 12,                 // horizontal padding, section gap
+  space4: 16,                 // within-section icon gap (matches Figma)
   space5: 20,
-  // Sizes
-  height: 36,                 // editbar height (fixed)
-  radius: 4,                  // outer corner radius
+  // Sizes — fixed by Figma spec
+  height: 36,
+  radius: 4,                  // radius/sm
   iconSize: 24,               // grip / large icons
-  iconSizeSm: 18,             // inline action icons (B I A↑ A↓ ↕)
+  iconSizeSm: 18,             // inline action icons (eye-off, B, I, A↑ A↓, ↕)
   fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
   fontSize: 11,
 } as const
@@ -61,7 +65,9 @@ export function EditbarRoot({
         padding: `${EDITBAR_TOKENS.space1}px ${EDITBAR_TOKENS.space3}px`,
         fontFamily: EDITBAR_TOKENS.fontFamily,
         fontSize: EDITBAR_TOKENS.fontSize,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
+        // Theme-aware lift: light mode = subtle drop shadow, dark mode =
+        // soft glow. Same elevation tokens as BenchChip for consistency.
+        boxShadow: '0 var(--elevation-md-y) var(--elevation-md-blur) var(--elevation-md-color)',
         userSelect: 'none',
         WebkitUserSelect: 'none',
         color: EDITBAR_TOKENS.textPrimary,
@@ -206,73 +212,7 @@ export const popoverSurfaceStyle: CSSProperties = {
   border: `${EDITBAR_TOKENS.borderThin}px solid ${EDITBAR_TOKENS.border}`,
   borderRadius: EDITBAR_TOKENS.radius,
   padding: EDITBAR_TOKENS.space3,
-  boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
+  boxShadow: '0 var(--elevation-md-y) var(--elevation-md-blur) var(--elevation-md-color)',
   fontFamily: EDITBAR_TOKENS.fontFamily,
   color: EDITBAR_TOKENS.iconDefault,
-}
-
-/**
- * Labeled segmented toggle for the editbar — words inside the switch.
- * Matches the dark editbar palette: subtle inset backdrop, active cell goes
- * darker (toward black) with white text, inactive stays muted.
- */
-export interface EditbarSegmentedOption<T extends string> {
-  value: T
-  label: string
-}
-
-export function EditbarSegmented<T extends string>({
-  value,
-  onChange,
-  options,
-  ariaLabel,
-}: {
-  value: T
-  onChange: (next: T) => void
-  options: readonly EditbarSegmentedOption<T>[]
-  ariaLabel?: string
-}) {
-  return (
-    <div
-      role="radiogroup"
-      aria-label={ariaLabel}
-      style={{
-        display: 'inline-flex',
-        gap: 2,
-        padding: 2,
-        borderRadius: EDITBAR_TOKENS.radius,
-        background: 'rgba(255,255,255,0.04)',
-      }}
-    >
-      {options.map((opt) => {
-        const active = value === opt.value
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            aria-label={opt.label}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => onChange(opt.value)}
-            style={{
-              minWidth: 48,
-              padding: '4px 10px',
-              borderRadius: Math.max(EDITBAR_TOKENS.radius - 1, 2),
-              border: 'none',
-              background: active ? '#000' : 'transparent',
-              color: active ? EDITBAR_TOKENS.iconActive : EDITBAR_TOKENS.iconDefault,
-              fontFamily: EDITBAR_TOKENS.fontFamily,
-              fontSize: EDITBAR_TOKENS.fontSize,
-              fontWeight: active ? 600 : 400,
-              cursor: 'pointer',
-              transition: 'color 120ms, background 120ms',
-            }}
-          >
-            {opt.label}
-          </button>
-        )
-      })}
-    </div>
-  )
 }

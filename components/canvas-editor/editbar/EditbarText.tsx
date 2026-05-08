@@ -184,65 +184,76 @@ export function EditbarText({ noDragHandle = true }: EditbarTextProps) {
     size.set(Math.max(size.value - size.step, size.min))
   }
 
+  // Layout matches Figma node 277:3029 — eye-off first (with divider),
+  // then bold / italic / size↑ / size↓ / line-height. Visibility lives at
+  // the start because it's the most consequential action ("send to bench"
+  // / undo this slot's placement) and gets a divider for emphasis.
   const actions = (
-    <EditbarSection gap="default">
-      <EditbarIconButton
-        ariaLabel="Bold"
-        size="sm"
-        active={boldActive}
-        disabled={!supportsRichText && !isEditing}
-        onClick={onBold}
-      >
-        <Bold size={18} />
-      </EditbarIconButton>
-      <EditbarIconButton
-        ariaLabel="Italic"
-        size="sm"
-        active={italicActive}
-        disabled={!supportsRichText && !isEditing}
-        onClick={onItalic}
-      >
-        <Italic size={18} />
-      </EditbarIconButton>
-      <EditbarIconButton
-        ariaLabel="Increase font size"
-        size="sm"
-        disabled={!size || size.value >= size.max}
-        onClick={onSizeUp}
-      >
-        <AArrowUp size={18} />
-      </EditbarIconButton>
-      <EditbarIconButton
-        ariaLabel="Decrease font size"
-        size="sm"
-        disabled={!size || size.value <= size.min}
-        onClick={onSizeDown}
-      >
-        <AArrowDown size={18} />
-      </EditbarIconButton>
-      <EditbarIconButton
-        ariaLabel="Line spacing"
-        size="sm"
-        active={lineHeightOpen}
-        disabled={!lineHeight}
-        onClick={() => setLineHeightOpen((v) => !v)}
-      >
-        <MoveVertical size={18} />
-      </EditbarIconButton>
+    <>
       {visibility && (
-        <EditbarIconButton
-          ariaLabel={`Hide ${visibility.label}`}
-          size="sm"
-          onClick={() => {
-            visibility.hide()
-            setEditingPath(null)
-            clearSelection()
-          }}
-        >
-          <EyeOff size={18} />
-        </EditbarIconButton>
+        <>
+          <EditbarSection gap="default">
+            <EditbarIconButton
+              ariaLabel={`Hide ${visibility.label}`}
+              size="sm"
+              onClick={() => {
+                visibility.hide()
+                setEditingPath(null)
+                clearSelection()
+              }}
+            >
+              <EyeOff size={18} />
+            </EditbarIconButton>
+          </EditbarSection>
+          <EditbarDivider />
+        </>
       )}
-    </EditbarSection>
+      <EditbarSection gap="default">
+        <EditbarIconButton
+          ariaLabel="Bold"
+          size="sm"
+          active={boldActive}
+          disabled={!supportsRichText && !isEditing}
+          onClick={onBold}
+        >
+          <Bold size={18} />
+        </EditbarIconButton>
+        <EditbarIconButton
+          ariaLabel="Italic"
+          size="sm"
+          active={italicActive}
+          disabled={!supportsRichText && !isEditing}
+          onClick={onItalic}
+        >
+          <Italic size={18} />
+        </EditbarIconButton>
+        <EditbarIconButton
+          ariaLabel="Increase font size"
+          size="sm"
+          disabled={!size || size.value >= size.max}
+          onClick={onSizeUp}
+        >
+          <AArrowUp size={18} />
+        </EditbarIconButton>
+        <EditbarIconButton
+          ariaLabel="Decrease font size"
+          size="sm"
+          disabled={!size || size.value <= size.min}
+          onClick={onSizeDown}
+        >
+          <AArrowDown size={18} />
+        </EditbarIconButton>
+        <EditbarIconButton
+          ariaLabel="Line spacing"
+          size="sm"
+          active={lineHeightOpen}
+          disabled={!lineHeight}
+          onClick={() => setLineHeightOpen((v) => !v)}
+        >
+          <MoveVertical size={18} />
+        </EditbarIconButton>
+      </EditbarSection>
+    </>
   )
 
   return (

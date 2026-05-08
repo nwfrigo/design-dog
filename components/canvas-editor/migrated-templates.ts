@@ -11,6 +11,8 @@ import type { TemplateType } from '@/types'
 
 export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'email-dark-gradient',
+  'email-speakers',
+  'website-press-release',
 ])
 
 export function isStageBenchTemplate(template: TemplateType): boolean {

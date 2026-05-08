@@ -121,6 +121,11 @@
   --elevation-lg-y: 4px;
   --elevation-lg-blur: 16px;
   --elevation-lg-color: rgba(0, 0, 0, 0.14);
+
+  /* Scrim — translucent overlay used to dim a region during a drag, modal,
+   * or other "this region is being affected" signal. Light app-chrome →
+   * light scrim; dark app-chrome → dark scrim (set in html.dark below). */
+  --scrim-overlay: rgba(255, 255, 255, 0.60);
 }
 
 /* Class-based dark mode (not system preference) */
@@ -177,6 +182,9 @@ html.dark {
   --elevation-lg-y: 0px;
   --elevation-lg-blur: 24px;
   --elevation-lg-color: rgba(255, 255, 255, 0.14);
+
+  /* Scrim — dark overlay on dark app surfaces. */
+  --scrim-overlay: rgba(0, 0, 0, 0.80);
 }
 
 body {
@@ -197,4 +205,29 @@ body {
 /* Keyboard shortcuts hint */
 .kbd {
   @apply inline-flex items-center px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-surface-secondary rounded border border-gray-200 dark:border-line-subtle;
+}
+
+/* Bench chip pickup tilt — applied on press to the *inner* element so the
+ * draggable outer element's bounds stay stable. Rotating the outer element
+ * shifts its rect mid-press, which can prevent HTML5 DnD from initiating
+ * a drag (cursor-relative-to-bounds gets confused). With the transform on
+ * inner only, the visual tilt still appears (and is captured by the
+ * browser's drag-image snapshot of the source) without breaking drag.
+ * The transform transition is set inline by BenchChip so it can compose
+ * with the opacity transition (and snap instantly when ghosting). */
+.bench-chip-inner {
+  box-shadow: 0 var(--elevation-md-y) var(--elevation-md-blur) var(--elevation-md-color);
+}
+.bench-chip:active .bench-chip-inner,
+.bench-chip--floating .bench-chip-inner {
+  transform: rotate(-6deg) scale(1.02);
+}
+
+/* Ghost the source while an Editable is being dragged. <Editable> is
+ * display: contents, so the visible child is the immediate descendant —
+ * opacity:0 on it makes the block disappear in place while the cursor
+ * follower carries on. Generic across all stage-bench templates. */
+[data-editable-dragging="true"] > * {
+  opacity: 0;
+  transition: opacity 100ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }

@@ -1,12 +1,42 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, Fragment, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+
+export type EmailSpeakersBlockId =
+  | 'eyebrow'
+  | 'headline'
+  | 'body'
+  | 'cta'
+  | 'solutionPill'
+  | 'speaker1'
+  | 'speaker2'
+  | 'speaker3'
+
+/** Logical IDs for vertical-stack endpoints (left column only). 'logo' is
+ *  the always-on header anchor; solutionPill renders alongside it. */
+type EmailSpeakersStackId = 'logo' | 'eyebrow' | 'headline' | 'body' | 'cta'
+
+const DEFAULT_GAP = 24
+
+export function emailSpeakersGapKey(
+  prevId: EmailSpeakersStackId,
+  nextId: EmailSpeakersStackId,
+): string {
+  return `gap-${prevId}-to-${nextId}`
+}
+
+const STACK_JUSTIFY: Record<StackAlign, CSSProperties['justifyContent']> = {
+  top: 'flex-start',
+  center: 'center',
+  bottom: 'flex-end',
+}
 
 export interface SpeakerInfo {
   name: string
@@ -30,14 +60,65 @@ export interface EmailSpeakersProps {
   showSolutionSet: boolean
   grayscale?: boolean
   theme?: TemplateTheme
+  /** Legacy: number of speakers to show, top-N. When `showSpeaker1/2/3`
+   *  are passed (Stage & Bench mode), each speaker's visibility is
+   *  independent and `speakerCount` is ignored. */
   speakerCount: 1 | 2 | 3
+  showSpeaker1?: boolean
+  showSpeaker2?: boolean
+  showSpeaker3?: boolean
   speaker1: SpeakerInfo
   speaker2: SpeakerInfo
   speaker3: SpeakerInfo
   headlineFontSize?: number
+  /** Vertical alignment for the left-side content stack (eyebrow/headline/
+   *  body/cta). Logo + solutionPill stay anchored to the top. */
+  stackAlign?: StackAlign
+  /** Sparse gap overrides keyed via `emailSpeakersGapKey(prev, next)`. Falls
+   *  back to DEFAULT_GAP per slot. */
+  gaps?: Record<string, number>
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
+  /** Stage & Bench render-prop: wraps each editable block in <Editable>
+   *  for selection / inline edit / drag. Pass through unchanged for
+   *  export. */
+  renderBlock?: (blockId: EmailSpeakersBlockId, content: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: swaps a block's inner text for an
+   *  in-place editor when that block is being edited. Returns
+   *  `defaultInner` otherwise. */
+  renderInlineEditor?: (blockId: EmailSpeakersBlockId, defaultInner: ReactNode) => ReactNode
+  /** Stage & Bench render-prop for spacer slots in the left content stack.
+   *  Editor passes a drag handle; export omits → falls back to a plain div
+   *  with the configured height. */
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: EmailSpeakersStackId,
+    nextId: EmailSpeakersStackId,
+  ) => ReactNode
+  /** Stage & Bench render-prop for the inner pieces of each speaker block
+   *  (name text, role text, avatar image). Wraps the styled chrome of each
+   *  piece in <Editable> so users can deep-click into the speaker group to
+   *  edit a specific field. Export omits → renders defaults. */
+  renderSpeakerField?: (
+    speakerId: 'speaker1' | 'speaker2' | 'speaker3',
+    field: 'name' | 'role' | 'image',
+    defaultInner: ReactNode,
+  ) => ReactNode
+  /** Stage & Bench render-prop that swaps the *inner text* of a speaker's
+   *  name/role with an inline editor while preserving the surrounding
+   *  styled chrome. Mirrors `renderInlineEditor` for top-level blocks —
+   *  this is what keeps the font size/weight stable while editing. */
+  renderSpeakerFieldInline?: (
+    speakerId: 'speaker1' | 'speaker2' | 'speaker3',
+    field: 'name' | 'role',
+    defaultInner: ReactNode,
+  ) => ReactNode
+  /** Stage & Bench render-prop: an absolutely-positioned overlay that
+   *  shares the template's stacking context — the drag scrim renders
+   *  here so it can layer between blocks via z-index. */
+  renderOverlay?: () => ReactNode
 }
 
 // Check if HTML content is effectively empty (handles <p></p> etc.)
@@ -111,6 +192,75 @@ function SpeakerAvatar({
   )
 }
 
+type StackBlock = { id: Exclude<EmailSpeakersStackId, 'logo'>; node: ReactNode } | null
+
+interface LeftColumnProps {
+  header: ReactNode
+  blocks: StackBlock[]
+  stackAlign: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: EmailSpeakersProps['renderSpacerBetween']
+}
+
+function renderEmailSpeakersSpacer(
+  prevId: EmailSpeakersStackId,
+  nextId: EmailSpeakersStackId,
+  gaps: Record<string, number> | undefined,
+  renderSpacerBetween: EmailSpeakersProps['renderSpacerBetween'],
+): ReactNode {
+  const key = emailSpeakersGapKey(prevId, nextId)
+  const value = gaps?.[key] ?? DEFAULT_GAP
+  if (renderSpacerBetween) {
+    return (
+      <div style={{ width: '100%', flexShrink: 0 }} key={key}>
+        {renderSpacerBetween(key, value, prevId, nextId)}
+      </div>
+    )
+  }
+  return <div key={key} style={{ height: value, width: '100%', flexShrink: 0 }} />
+}
+
+function LeftColumn({ header, blocks, stackAlign, gaps, renderSpacerBetween }: LeftColumnProps) {
+  const visible = blocks.filter((b): b is NonNullable<StackBlock> => b !== null)
+
+  return (
+    <div style={{
+      alignSelf: 'stretch',
+      display: 'inline-flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+    }}>
+      {header}
+      {visible.length > 0 && stackAlign === 'top' &&
+        renderEmailSpeakersSpacer('logo', visible[0].id, gaps, renderSpacerBetween)}
+      <div style={{
+        flex: 1,
+        minHeight: 0,
+        width: 315,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: STACK_JUSTIFY[stackAlign],
+        alignItems: 'flex-start',
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          width: '100%',
+        }}>
+          {visible.map((block, i) => (
+            <Fragment key={block.id}>
+              {block.node}
+              {i < visible.length - 1 &&
+                renderEmailSpeakersSpacer(block.id, visible[i + 1].id, gaps, renderSpacerBetween)}
+            </Fragment>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function EmailSpeakers({
   headline,
   eyebrow,
@@ -126,14 +276,31 @@ export function EmailSpeakers({
   grayscale = false,
   theme = 'light',
   speakerCount,
+  showSpeaker1,
+  showSpeaker2,
+  showSpeaker3,
   speaker1,
   speaker2,
   speaker3,
   headlineFontSize,
+  stackAlign = 'top',
+  gaps,
   colors,
   typography,
   scale = 1,
+  renderBlock,
+  renderInlineEditor,
+  renderSpacerBetween,
+  renderSpeakerField,
+  renderSpeakerFieldInline,
+  renderOverlay,
 }: EmailSpeakersProps) {
+  // Default identity render-props so callers that don't pass them
+  // get the existing behavior with zero changes.
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
+  const wrapSpeakerField = renderSpeakerField ?? ((_id, _field, defaultInner) => defaultInner)
+  const wrapSpeakerInline = renderSpeakerFieldInline ?? ((_id, _field, defaultInner) => defaultInner)
   const themeColors = TEMPLATE_THEMES[theme]
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const logoFill = themeColors.logoFill
@@ -160,115 +327,138 @@ export function EmailSpeakers({
     transformOrigin: 'top left',
   }
 
-  const speakers = [speaker1, speaker2, speaker3].slice(0, speakerCount)
+  // Speaker visibility — Stage & Bench mode (showSpeakerN passed) takes
+  // precedence; legacy callers fall back to top-N from `speakerCount`.
+  const useIndependentVisibility =
+    showSpeaker1 !== undefined ||
+    showSpeaker2 !== undefined ||
+    showSpeaker3 !== undefined
+  const visibleSpeakers: { id: 'speaker1' | 'speaker2' | 'speaker3'; data: SpeakerInfo }[] =
+    useIndependentVisibility
+      ? ([
+          showSpeaker1 ? { id: 'speaker1' as const, data: speaker1 } : null,
+          showSpeaker2 ? { id: 'speaker2' as const, data: speaker2 } : null,
+          showSpeaker3 ? { id: 'speaker3' as const, data: speaker3 } : null,
+        ].filter(Boolean) as { id: 'speaker1' | 'speaker2' | 'speaker3'; data: SpeakerInfo }[])
+      : ([speaker1, speaker2, speaker3] as SpeakerInfo[])
+          .slice(0, speakerCount)
+          .map((data, i) => ({ id: (`speaker${i + 1}` as 'speaker1' | 'speaker2' | 'speaker3'), data }))
 
   return (
     <div style={containerStyle}>
       {/* Rich text styles for HTML content */}
       <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
-      {/* Left content area */}
-      <div style={{
-        alignSelf: 'stretch',
-        display: 'inline-flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-      }}>
-        {/* Header: Logo + Solution Pill */}
-        <div style={{
-          display: 'inline-flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          gap: 40,
-        }}>
-          <CorityLogo fill={logoFill} height={23} />
-
-          {showSolutionSet && solution !== 'none' && (
-            <SolutionPill
-              variant="email"
-              solutionColor={solutionColor}
-              solutionLabel={solutionLabel}
-              textColor={themeColors.textPrimary}
-              background={themeColors.bgCategoryChip}
-              border={`0.79px solid ${themeColors.borderFocus}`}
-            />
-          )}
-        </div>
-
-        {/* Text content block */}
-        <div style={{
-          width: 315,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          gap: 24,
-        }}>
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div style={{
-              color: textColor,
-              fontSize: 10,
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '1.1px',
-            }}>
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline - supports rich text (bold, italic, line breaks) */}
-          {showHeadline && (
-            <div
-              className="rich-text-dark"
-              style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: headlineFontSize ?? 38.15,
-                fontWeight: 350,
-                lineHeight: `${(headlineFontSize ?? 38.15) * (48.19 / 38.15)}px`,
-              }}
-              dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
-            />
-          )}
-
-          {/* Body - supports rich text (bold, italic, line breaks) */}
-          {showBody && hasBody && (
-            <div
-              className="rich-text-dark"
-              style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: 18.07,
-                fontWeight: 350,
-              }}
-              dangerouslySetInnerHTML={{ __html: body }}
-            />
-          )}
-        </div>
-
-        {/* CTA */}
-        {showCta && ctaText && (
+      {/* Left content area — header anchored top, stack container holds the rest */}
+      <LeftColumn
+        stackAlign={stackAlign}
+        gaps={gaps}
+        renderSpacerBetween={renderSpacerBetween}
+        header={
           <div style={{
             display: 'inline-flex',
             justifyContent: 'flex-start',
             alignItems: 'center',
-            gap: 12,
+            gap: 40,
+            flexShrink: 0,
           }}>
-            <span style={{
-              textAlign: 'center',
-              color: themeColors.buttonSecondaryText,
-              fontSize: 18,
-              fontWeight: 350,
-              lineHeight: '18px',
-            }}>
-              {ctaText}
-            </span>
-            <ArrowIcon color={themeColors.buttonSecondaryText} width={16.5} height={16.5 * 0.8} />
+            <CorityLogo fill={logoFill} height={23} />
+
+            {showSolutionSet && solution !== 'none' && wrapBlock(
+              'solutionPill',
+              <SolutionPill
+                variant="email"
+                solutionColor={solutionColor}
+                solutionLabel={solutionLabel}
+                textColor={themeColors.textPrimary}
+                background={themeColors.bgCategoryChip}
+                border={`0.79px solid ${themeColors.borderFocus}`}
+              />,
+            )}
           </div>
-        )}
-      </div>
+        }
+        blocks={[
+          showEyebrow && eyebrow ? {
+            id: 'eyebrow',
+            node: wrapBlock(
+              'eyebrow',
+              <div style={{
+                color: textColor,
+                fontSize: 10,
+                fontWeight: 500,
+                textTransform: 'uppercase',
+                letterSpacing: '1.1px',
+              }}>
+                {wrapInline('eyebrow', eyebrow)}
+              </div>,
+            ),
+          } : null,
+          showHeadline ? {
+            id: 'headline',
+            node: wrapBlock(
+              'headline',
+              <div
+                className="rich-text-dark"
+                style={{
+                  alignSelf: 'stretch',
+                  color: textColor,
+                  fontSize: headlineFontSize ?? 38.15,
+                  fontWeight: 350,
+                  lineHeight: `${(headlineFontSize ?? 38.15) * (48.19 / 38.15)}px`,
+                }}
+              >
+                {wrapInline(
+                  'headline',
+                  <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />,
+                )}
+              </div>,
+            ),
+          } : null,
+          showBody && hasBody ? {
+            id: 'body',
+            node: wrapBlock(
+              'body',
+              <div
+                className="rich-text-dark"
+                style={{
+                  alignSelf: 'stretch',
+                  color: textColor,
+                  fontSize: 18.07,
+                  fontWeight: 350,
+                }}
+              >
+                {wrapInline(
+                  'body',
+                  <div dangerouslySetInnerHTML={{ __html: body }} />,
+                )}
+              </div>,
+            ),
+          } : null,
+          showCta && ctaText ? {
+            id: 'cta',
+            node: wrapBlock(
+              'cta',
+              <div style={{
+                display: 'inline-flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: 12,
+              }}>
+                <span style={{
+                  textAlign: 'center',
+                  color: themeColors.buttonSecondaryText,
+                  fontSize: 18,
+                  fontWeight: 350,
+                  lineHeight: '18px',
+                }}>
+                  {wrapInline('cta', ctaText)}
+                </span>
+                <ArrowIcon color={themeColors.buttonSecondaryText} width={16.5} height={16.5 * 0.8} />
+              </div>,
+            ),
+          } : null,
+        ]}
+      />
 
       {/* Right speakers area */}
       <div style={{
@@ -280,9 +470,10 @@ export function EmailSpeakers({
         justifyContent: 'space-between',
         alignItems: 'flex-start',
       }}>
-        {speakers.map((speaker, index) => (
+        {visibleSpeakers.map(({ id, data: speaker }, index) => wrapBlock(
+          id,
           <div
-            key={index}
+            key={id}
             style={{
               alignSelf: 'stretch',
               flex: '1 1 0',
@@ -292,14 +483,18 @@ export function EmailSpeakers({
               gap: 16,
             }}
           >
-            <SpeakerAvatar
-              imageUrl={speaker.imageUrl}
-              position={speaker.imagePosition}
-              zoom={speaker.imageZoom}
-              size={48}
-              speakerIndex={index + 1}
-              grayscale={grayscale}
-            />
+            {wrapSpeakerField(
+              id,
+              'image',
+              <SpeakerAvatar
+                imageUrl={speaker.imageUrl}
+                position={speaker.imagePosition}
+                zoom={speaker.imageZoom}
+                size={48}
+                speakerIndex={index + 1}
+                grayscale={grayscale}
+              />,
+            )}
             <div style={{
               width: 161,
               display: 'inline-flex',
@@ -307,27 +502,36 @@ export function EmailSpeakers({
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
             }}>
-              <div style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: 18,
-                fontWeight: 350,
-              }}>
-                {speaker.name || 'Firstname Lastname'}
-              </div>
-              <div style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: 12,
-                fontWeight: 350,
-                lineHeight: '16px',
-              }}>
-                {speaker.role || 'Role, Company'}
-              </div>
+              {wrapSpeakerField(
+                id,
+                'name',
+                <div style={{
+                  alignSelf: 'stretch',
+                  color: textColor,
+                  fontSize: 18,
+                  fontWeight: 350,
+                }}>
+                  {wrapSpeakerInline(id, 'name', speaker.name || 'Firstname Lastname')}
+                </div>,
+              )}
+              {wrapSpeakerField(
+                id,
+                'role',
+                <div style={{
+                  alignSelf: 'stretch',
+                  color: textColor,
+                  fontSize: 12,
+                  fontWeight: 350,
+                  lineHeight: '16px',
+                }}>
+                  {wrapSpeakerInline(id, 'role', speaker.role || 'Role, Company')}
+                </div>,
+              )}
             </div>
-          </div>
+          </div>,
         ))}
       </div>
+      {renderOverlay?.()}
     </div>
   )
 }

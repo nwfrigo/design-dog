@@ -11,6 +11,18 @@ import { ActionRow } from '@/components/canvas-editor/action-row/ActionRow'
 import { SelectorRow } from '@/components/canvas-editor/stage-bar/SelectorRow'
 import { StageBenchShell } from '@/components/canvas-editor/StageBenchShell'
 import { StageBenchTab } from '@/components/canvas-editor/StageBenchTab'
+import {
+  EditbarRoot,
+  EditbarSection,
+  EditbarDivider,
+  EditbarIconButton,
+  EditbarImage,
+  EditbarSlider,
+  Toggle,
+} from '@/components/canvas-editor/editbar'
+import {
+  EyeOff, Bold, Italic, AArrowUp, AArrowDown, MoveVertical,
+} from 'lucide-react'
 
 /**
  * Visual lab for new Stage & Bench atoms. Each section controls one variant
@@ -121,15 +133,8 @@ export default function StageBenchAtomsPage() {
           </h2>
 
           <div className="flex flex-col items-start gap-4">
-            {(['headline', 'body', 'subheadline', 'eyebrow', 'button'] as BenchChipKind[]).map(kind => (
-              <BenchChip
-                key={kind}
-                kind={kind}
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('text/plain', kind)
-                  e.dataTransfer.effectAllowed = 'move'
-                }}
-              />
+            {(['headline', 'body', 'subheadline', 'eyebrow', 'button', 'category', 'speaker', 'grid-detail', 'small-caption'] as BenchChipKind[]).map(kind => (
+              <BenchChip key={kind} kind={kind} />
             ))}
           </div>
         </div>
@@ -149,6 +154,66 @@ export default function StageBenchAtomsPage() {
             <span className="text-[10px] font-mono uppercase tracking-wider text-content-secondary">loading state:</span>
             <ActionButton fn="export" loading onClick={() => {}} />
           </div>
+        </div>
+
+        <div className="space-y-6 p-6 rounded-lg border border-line-subtle bg-surface-secondary">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-content-secondary">
+            Contextual Toolbars
+          </h2>
+
+          {/* toolbar_text — eye-off + divider + bold/italic/A↑/A↓/move-vertical */}
+          <Section label="toolbar_text">
+            <EditbarRoot ariaLabel="Text formatting">
+              <EditbarSection gap="default">
+                <EditbarIconButton ariaLabel="Hide" size="sm">
+                  <EyeOff size={18} />
+                </EditbarIconButton>
+              </EditbarSection>
+              <EditbarDivider />
+              <EditbarSection gap="default">
+                <EditbarIconButton ariaLabel="Bold" size="sm">
+                  <Bold size={18} />
+                </EditbarIconButton>
+                <EditbarIconButton ariaLabel="Italic" size="sm">
+                  <Italic size={18} />
+                </EditbarIconButton>
+                <EditbarIconButton ariaLabel="Increase font size" size="sm">
+                  <AArrowUp size={18} />
+                </EditbarIconButton>
+                <EditbarIconButton ariaLabel="Decrease font size" size="sm">
+                  <AArrowDown size={18} />
+                </EditbarIconButton>
+                <EditbarIconButton ariaLabel="Line spacing" size="sm">
+                  <MoveVertical size={18} />
+                </EditbarIconButton>
+              </EditbarSection>
+            </EditbarRoot>
+          </Section>
+
+          {/* toolbar_cta — eye-off + divider + Button/Toggle/Link */}
+          <Section label="toolbar_cta">
+            <CtaToolbarPreview />
+          </Section>
+
+          {/* toolbar_image — image / sparkles / pencil */}
+          <Section label="toolbar_image">
+            <EditbarImage />
+          </Section>
+
+          {/* toolbar_slider — track + thumb + readout */}
+          <Section label="toolbar_slider">
+            <SliderPreview />
+          </Section>
+        </div>
+
+        {/* Toggle in isolation, both sides */}
+        <div className="space-y-6 p-6 rounded-lg border border-line-subtle bg-surface-secondary">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-content-secondary">
+            Toggle
+          </h2>
+          <Section label="left-on / right-on">
+            <TogglePreview />
+          </Section>
         </div>
 
         <div className="space-y-6 p-6 rounded-lg border border-line-subtle bg-surface-secondary">
@@ -213,9 +278,9 @@ export default function StageBenchAtomsPage() {
           bench={
             <>
               <span className="font-mono text-[10px] uppercase tracking-wider text-content-secondary mb-1">Bench</span>
-              <BenchChip kind="eyebrow" onDragStart={(e) => e.dataTransfer.setData('text/plain', 'eyebrow')} />
-              <BenchChip kind="subheadline" onDragStart={(e) => e.dataTransfer.setData('text/plain', 'subheadline')} />
-              <BenchChip kind="button" onDragStart={(e) => e.dataTransfer.setData('text/plain', 'button')} />
+              <BenchChip kind="eyebrow" />
+              <BenchChip kind="subheadline" />
+              <BenchChip kind="button" />
             </>
           }
           stageBar={
@@ -255,5 +320,65 @@ export default function StageBenchAtomsPage() {
         </StageBenchShell>
       </div>
     </div>
+  )
+}
+
+// --- Toolbar previews (visual-lab only) ---
+// These wrap the real components with local state so they're observable
+// in isolation. The production EditbarText / EditbarCta pull state from
+// the canvas-editor providers, which aren't mounted here.
+
+function CtaToolbarPreview() {
+  const [style, setStyle] = useState<'button' | 'link'>('button')
+  return (
+    <EditbarRoot ariaLabel="CTA formatting">
+      <EditbarSection gap="default">
+        <EditbarIconButton ariaLabel="Hide" size="sm">
+          <EyeOff size={18} />
+        </EditbarIconButton>
+      </EditbarSection>
+      <EditbarDivider />
+      <EditbarSection gap="default">
+        <span className="font-mono text-[12px] uppercase text-content-secondary">Button</span>
+        <Toggle<'button' | 'link'>
+          value={style}
+          onChange={setStyle}
+          options={[
+            { value: 'button', label: 'Button' },
+            { value: 'link', label: 'Link' },
+          ]}
+        />
+        <span className="font-mono text-[12px] uppercase text-content-secondary">Link</span>
+      </EditbarSection>
+    </EditbarRoot>
+  )
+}
+
+function SliderPreview() {
+  const [val, setVal] = useState(0.5)
+  return (
+    <EditbarSlider
+      ariaLabel="Slider"
+      value={val}
+      onChange={setVal}
+      min={0}
+      max={1}
+      step={0.01}
+      showValue
+    />
+  )
+}
+
+function TogglePreview() {
+  const [side, setSide] = useState<'left' | 'right'>('right')
+  return (
+    <Toggle<'left' | 'right'>
+      value={side}
+      onChange={setSide}
+      options={[
+        { value: 'left', label: 'Left' },
+        { value: 'right', label: 'Right' },
+      ]}
+    />
   )
 }

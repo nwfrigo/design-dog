@@ -1,13 +1,14 @@
 'use client'
 
-import { AArrowUp, AArrowDown, Palette, EyeOff } from 'lucide-react'
+import { EyeOff } from 'lucide-react'
 import {
   EditbarRoot,
   EditbarSection,
   EditbarDivider,
   EditbarIconButton,
-  EditbarSegmented,
+  EDITBAR_TOKENS,
 } from './shell'
+import { Toggle } from './Toggle'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import { useSlotVisibility } from '../VisibilityRegistry'
 import { useStore } from '@/store'
@@ -16,15 +17,12 @@ import type { CtaStyle } from '@/types'
 /**
  * EditbarCta — contextual toolbar for `kind: 'cta'` slots.
  *
- * Distinct from EditbarText: CTAs are buttons/links, not body copy. Bold and
- * italic are intentionally absent — CTA styling is template-controlled, not
- * user-controlled.
+ * Figma node 367:360. Layout: eye-off → divider → "BUTTON" label →
+ * Toggle (left = button, right = link) → "LINK" label. The toggle's
+ * thumb position reads as which CTA variant is active.
  *
- * Phase 1 stub: structure + placeholder buttons. Wiring lands in Phase 2:
- *   - Style toggle (Link / Button) → setCtaStyle
- *   - Font size ↑ / ↓ → per-template CTA size setter
- *   - Arrow color → new ctaArrowColor field (relevant only for Link style)
- *   - Hide → bench (already wired below; identical to EditbarText)
+ * Distinct from EditbarText: CTAs are buttons/links, not body copy. Bold
+ * and italic are intentionally absent — CTA styling is template-controlled.
  */
 export function EditbarCta() {
   const selection = useCanvasEditorStore((s) => s.selection)
@@ -36,42 +34,54 @@ export function EditbarCta() {
 
   return (
     <EditbarRoot ariaLabel="CTA formatting">
+      {visibility && (
+        <>
+          <EditbarSection gap="default">
+            <EditbarIconButton
+              ariaLabel={`Hide ${visibility.label}`}
+              size="sm"
+              onClick={() => {
+                visibility.hide()
+                setEditingPath(null)
+                clearSelection()
+              }}
+            >
+              <EyeOff size={18} />
+            </EditbarIconButton>
+          </EditbarSection>
+          <EditbarDivider />
+        </>
+      )}
       <EditbarSection gap="default">
-        <EditbarSegmented<CtaStyle>
-          ariaLabel="CTA Style"
+        <span
+          style={{
+            fontFamily: EDITBAR_TOKENS.fontFamily,
+            fontSize: 12,
+            color: EDITBAR_TOKENS.textSecondary,
+            textTransform: 'uppercase',
+          }}
+        >
+          Button
+        </span>
+        <Toggle<CtaStyle>
           value={ctaStyle}
           onChange={setCtaStyle}
           options={[
-            { value: 'link', label: 'Link' },
             { value: 'button', label: 'Button' },
+            { value: 'link', label: 'Link' },
           ]}
+          ariaLabel="CTA Style"
         />
-      </EditbarSection>
-      <EditbarDivider />
-      <EditbarSection gap="default">
-        {/* Phase 2 placeholders — wire when ctaFontSize / ctaArrowColor land. */}
-        <EditbarIconButton ariaLabel="Increase font size" size="sm" disabled>
-          <AArrowUp size={18} />
-        </EditbarIconButton>
-        <EditbarIconButton ariaLabel="Decrease font size" size="sm" disabled>
-          <AArrowDown size={18} />
-        </EditbarIconButton>
-        <EditbarIconButton ariaLabel="Arrow color" size="sm" disabled>
-          <Palette size={18} />
-        </EditbarIconButton>
-        {visibility && (
-          <EditbarIconButton
-            ariaLabel={`Hide ${visibility.label}`}
-            size="sm"
-            onClick={() => {
-              visibility.hide()
-              setEditingPath(null)
-              clearSelection()
-            }}
-          >
-            <EyeOff size={18} />
-          </EditbarIconButton>
-        )}
+        <span
+          style={{
+            fontFamily: EDITBAR_TOKENS.fontFamily,
+            fontSize: 12,
+            color: EDITBAR_TOKENS.textSecondary,
+            textTransform: 'uppercase',
+          }}
+        >
+          Link
+        </span>
       </EditbarSection>
     </EditbarRoot>
   )

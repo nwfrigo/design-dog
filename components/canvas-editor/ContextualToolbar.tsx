@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import type { EditableKind } from './types'
-import { EditbarText, EditbarCta, EditbarColor, EditbarImage } from './editbar'
+import { EditbarText, EditbarCta, EditbarColor, EditbarImage, EditbarCategory } from './editbar'
 
 const EDITBAR_BY_KIND: Record<EditableKind, () => ReactNode> = {
   text: () => <EditbarText />,
@@ -13,8 +13,8 @@ const EDITBAR_BY_KIND: Record<EditableKind, () => ReactNode> = {
   spacer: () => null,
   color: () => <EditbarColor />,
   image: () => <EditbarImage />,
-  // Pill / group can hand-off to text or stay empty until a use case lands.
-  pill: () => <EditbarText />,
+  // Pill = category chip (solution selector). Eye-off + dropdown.
+  pill: () => <EditbarCategory />,
   group: () => null,
 }
 

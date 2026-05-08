@@ -24,7 +24,10 @@ import {
  * one new dispatch in the renderer.
  */
 
-const ICON_SIZE = 12
+// Icon size matches the toolbar's inline icons (toolbar_text, toolbar_image,
+// etc.). Same 18px target across every "stage chrome" control surface so
+// the visual rhythm is consistent.
+const ICON_SIZE = 18
 
 type CellRender = ReactNode | ((active: boolean) => ReactNode)
 
@@ -104,7 +107,14 @@ function Cell({
   ].join(' ')
 
   const swatchStyle: CSSProperties | undefined = isColor && swatch
-    ? { backgroundImage: swatch.backgroundImage, backgroundColor: swatch.backgroundColor }
+    ? {
+        backgroundImage: swatch.backgroundImage,
+        backgroundColor: swatch.backgroundColor,
+        // Without cover/center the cell shows the natural-size image's
+        // top-left corner. We want a scaled-down crop that fills the cell.
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
     : undefined
 
   // Color cells use the swatch as the surface; non-active state still shows it.
@@ -131,7 +141,9 @@ function Cell({
       onClick={onClick}
       style={swatchStyle}
       className={[
-        'relative shrink-0 h-7 w-7',
+        // 36×36 cell — matches the toolbar height so the stage chrome
+        // (toolbars + selectors) shares one consistent control size.
+        'relative shrink-0 h-9 w-9',
         'flex items-center justify-center overflow-hidden',
         'border-[0.5px] border-line-subtle',
         'transition-colors',

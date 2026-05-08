@@ -116,6 +116,10 @@ const SNAPSHOT_FIELDS = [
   'stackAlign',
   // Email Dark Gradient inter-block gaps
   'emailDarkGradientGaps',
+  // Email Speakers inter-block gaps (left-side content stack)
+  'emailSpeakersGaps',
+  // Website Press Release inter-block gaps (left-side content stack)
+  'websitePressReleaseGaps',
   // Per-content-type line-height overrides
   'lineHeights',
   // Solution Overview - Page 1

@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode } from 'react'
+import { type ReactNode, type Ref } from 'react'
 
 /**
  * StageBenchShell — pure layout primitive for the new editor screen.
@@ -27,6 +27,10 @@ export interface StageBenchShellProps {
   actionRow: ReactNode
   /** The Stage itself — the design preview + drop-zone. */
   children: ReactNode
+  /** Optional ref on the bench column's <aside>. Lets the consumer wire
+   *  the bench as a drop target (useDroppable.setNodeRef) without the
+   *  shell needing to know about DnD. */
+  benchRef?: Ref<HTMLElement>
 }
 
 export function StageBenchShell({
@@ -35,6 +39,7 @@ export function StageBenchShell({
   stageBar,
   actionRow,
   children,
+  benchRef,
 }: StageBenchShellProps) {
   return (
     <div className="flex flex-col min-h-screen bg-surface-primary">
@@ -56,7 +61,12 @@ export function StageBenchShell({
        * by nature (selectors), so it doesn't need explicit sizing. */}
       <div className="flex-1 flex justify-center items-start py-12">
         <div className="flex items-start gap-12">
-          <aside className="w-[200px] flex flex-col items-end gap-3">
+          {/* self-stretch so the bench column matches the height of the
+           * tallest sibling (main column = stage + action row). Without
+           * stretch, an empty bench has 0 height — fine visually, but
+           * drag-and-drop hit-testing via elementFromPoint would never
+           * land on it, so a stage→bench drop would silently fail. */}
+          <aside ref={benchRef} className="self-stretch w-[200px] flex flex-col items-end gap-3">
             {bench}
           </aside>
 

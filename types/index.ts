@@ -316,6 +316,10 @@ export interface CopyContent {
 // Per-asset settings for manual mode (fields that should be independent per asset)
 export interface ManualAssetSettings {
   eyebrow: string
+  // Solution category — per-asset so users can author multiple assets in
+  // one session with different categories (e.g. environmental + safety)
+  // without one overwriting the other.
+  solution: string
   ctaText: string
   gridDetail1Text: string
   gridDetail2Text: string
@@ -351,6 +355,10 @@ export interface ManualAssetSettings {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Email Speakers inter-block gap overrides (left-side content stack)
+  emailSpeakersGaps: Record<string, number>
+  // Website Press Release inter-block gap overrides (left-side content stack)
+  websitePressReleaseGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -633,6 +641,10 @@ export interface GeneratedAsset {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Email Speakers inter-block gap overrides (left-side content stack)
+  emailSpeakersGaps: Record<string, number>
+  // Website Press Release inter-block gap overrides (left-side content stack)
+  websitePressReleaseGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -809,6 +821,10 @@ export interface QueuedAsset {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Email Speakers inter-block gap overrides (left-side content stack)
+  emailSpeakersGaps: Record<string, number>
+  // Website Press Release inter-block gap overrides (left-side content stack)
+  websitePressReleaseGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -1010,6 +1026,10 @@ export interface AppState {
   stackAlign: StackAlign
   // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
   emailDarkGradientGaps: Record<string, number>
+  // Email Speakers inter-block gap overrides (left-side content stack)
+  emailSpeakersGaps: Record<string, number>
+  // Website Press Release inter-block gap overrides (left-side content stack)
+  websitePressReleaseGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -1181,6 +1201,10 @@ export interface AppState {
   setStackAlign: (stackAlign: StackAlign) => void
   // Email Dark Gradient inter-block gaps
   setEmailDarkGradientGap: (gapKey: string, value: number) => void
+  // Email Speakers inter-block gaps (left-side content stack)
+  setEmailSpeakersGap: (gapKey: string, value: number) => void
+  // Website Press Release inter-block gaps (left-side content stack)
+  setWebsitePressReleaseGap: (gapKey: string, value: number) => void
   setLineHeight: (contentKey: string, value: number) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void

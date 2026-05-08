@@ -44,6 +44,14 @@ export interface EmailDarkGradientProps {
    * CTA pill background during text editing.
    */
   renderInlineEditor?: (blockId: EmailDarkGradientBlockId, defaultInner: ReactNode) => ReactNode
+  /**
+   * Optional render-prop for absolutely-positioned overlays inside the design
+   * (drag scrim, watermarks, etc.). Rendered as the last child of the inner
+   * overlay, so it shares the template's stacking context — z-index inside
+   * the returned node can layer between existing blocks (static) and any
+   * blocks bumped above with their own z-index.
+   */
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -152,6 +160,7 @@ export function EmailDarkGradient({
   renderSpacerBetween,
   renderBlock,
   renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
@@ -389,6 +398,7 @@ export function EmailDarkGradient({
             })}
           </div>
         </div>
+        {renderOverlay?.()}
       </div>
     </div>
   )
