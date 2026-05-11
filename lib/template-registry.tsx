@@ -1104,6 +1104,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       grayscale: asset.grayscale,
       headlineFontSize: asset.headlineFontSize ?? undefined,
       subheadFontSize: asset.subheadFontSize ?? undefined,
+      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
+      gaps: asset.templateGaps?.['newsletter-dark-gradient'] ?? {},
       colors, typography, scale: 1,
     }),
     queueTextFields: [],
@@ -1129,6 +1131,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'grayscale', parser: 'boolFalse' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'subheadFontSize', parser: 'numberOrUndefined' },
+        { param: 'stackAlign', parser: 'enum', default: 'top' },
+        { param: 'gaps', parser: 'jsonRecord' },
       ],
       assembleProps: (parsed) => ({
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },

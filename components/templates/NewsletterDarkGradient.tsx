@@ -1,12 +1,27 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type ImageSize = 'none' | 'small' | 'large'
+
+/** Logical IDs for editable blocks. CTA renders as a sibling of the
+ *  text stack, anchored to the bottom of the text column — it's NOT in
+ *  the ContentStack list (preserves the legacy CTA-at-bottom layout
+ *  without forcing 'space-between' into the StackAlign primitive). */
+export type NewsletterDarkGradientBlockId =
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'cta'
 
 export interface NewsletterDarkGradientProps {
   eyebrow: string
@@ -25,10 +40,32 @@ export interface NewsletterDarkGradientProps {
   grayscale?: boolean
   headlineFontSize?: number
   subheadFontSize?: number
+  /** Vertical distribution of the text-block (eyebrow/headline/subhead)
+   *  within its share of the text column. CTA stays anchored at the
+   *  bottom regardless. */
+  stackAlign?: StackAlign
+  /** Sparse gap overrides keyed `gap-${prev}-to-${next}`. */
+  gaps?: Record<string, number>
+  /** Stage & Bench render-prop: editor-time drag handle between blocks. */
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: NewsletterDarkGradientBlockId,
+    nextId: NewsletterDarkGradientBlockId,
+  ) => ReactNode
+  /** Stage & Bench render-prop: wraps each editable region in <Editable>. */
+  renderBlock?: (blockId: NewsletterDarkGradientBlockId, content: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: swaps a block's inner content for an in-place editor. */
+  renderInlineEditor?: (blockId: NewsletterDarkGradientBlockId, defaultInner: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: absolutely-positioned overlay inside the
+   *  template's stacking context (drag scrim lives here). */
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
+
+const DEFAULT_GAP = 14
 
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
   '1': '/assets/backgrounds/newsletter-dark-gradient-1.png',
@@ -68,10 +105,16 @@ export function NewsletterDarkGradient({
   grayscale = false,
   headlineFontSize,
   subheadFontSize,
-  colors,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: NewsletterDarkGradientProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const textColor = '#FFFFFF'
   const ctaColor = '#0080FF' // Cobalt blue for arrow
@@ -104,6 +147,65 @@ export function NewsletterDarkGradient({
   const textWidth = TEXT_WIDTHS[imageSize]
   const imageWidth = IMAGE_WIDTHS[imageSize]
 
+  // Text-block stack — eyebrow / headline / subhead with adjustable gaps.
+  // CTA sits OUTSIDE the stack, anchored to the bottom of the text column
+  // by the outer space-between, preserving the legacy layout shape.
+  const stackBlocks: ContentStackBlock<NewsletterDarkGradientBlockId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: 8,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: 0.88,
+        }}>
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
+      ),
+      renderChrome: (inner) => (
+        <div className="nl-rich-text" style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: headlineFontSize ?? 24,
+          fontWeight: 350,
+          lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
+        }}>
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && !!subhead,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+      ),
+      renderChrome: (inner) => (
+        <div className="nl-rich-text" style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: subheadFontSize ?? 12,
+          fontWeight: 350,
+          lineHeight: '16px',
+        }}>
+          {inner}
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div style={containerStyle}>
       <style>{`.nl-rich-text p { margin: 0; }`}</style>
@@ -123,7 +225,9 @@ export function NewsletterDarkGradient({
 
       {/* Content Overlay */}
       <div style={contentStyle}>
-        {/* Text Content Area */}
+        {/* Text Content Area — vertical flex with space-between:
+         *  ContentStack at top (text-block, adjustable spacing),
+         *  CTA at bottom (anchored sibling). */}
         <div style={{
           width: imageSize === 'none' ? '100%' : textWidth,
           alignSelf: 'stretch',
@@ -133,54 +237,19 @@ export function NewsletterDarkGradient({
           justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}>
-          {/* Text Block */}
-          <div style={{
-            alignSelf: 'stretch',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: 14,
-          }}>
-            {/* Eyebrow */}
-            {showEyebrow && eyebrow && (
-              <div style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: 8,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 0.88,
-              }}>
-                {eyebrow}
-              </div>
-            )}
+          <ContentStack<NewsletterDarkGradientBlockId>
+            blocks={stackBlocks}
+            gaps={gaps}
+            defaultGap={DEFAULT_GAP}
+            renderSpacerBetween={renderSpacerBetween}
+            renderBlock={renderBlock}
+            renderInlineEditor={renderInlineEditor}
+            stackAlign={stackAlign}
+            alignItems="flex-start"
+          />
 
-            {/* Headline */}
-            {showHeadline && (
-              <div className="nl-rich-text" style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: headlineFontSize ?? 24,
-                fontWeight: 350,
-                lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
-              }} dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
-            )}
-
-            {/* Subhead */}
-            {showSubhead && subhead && (
-              <div className="nl-rich-text" style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: subheadFontSize ?? 12,
-                fontWeight: 350,
-                lineHeight: '16px',
-              }} dangerouslySetInnerHTML={{ __html: subhead }} />
-            )}
-          </div>
-
-          {/* CTA */}
-          {showCta && ctaText && (
+          {/* CTA — sibling of ContentStack, anchored bottom by space-between */}
+          {showCta && ctaText && wrapBlock('cta', (
             <div style={{
               display: 'inline-flex',
               justifyContent: 'flex-start',
@@ -198,7 +267,7 @@ export function NewsletterDarkGradient({
               </span>
               <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
             </div>
-          )}
+          ))}
         </div>
 
         {/* Image Area - only show for small and large variants */}
@@ -236,6 +305,7 @@ export function NewsletterDarkGradient({
           </div>
         )}
       </div>
+      {renderOverlay?.()}
     </div>
   )
 }

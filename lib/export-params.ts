@@ -477,6 +477,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showCta: s.showCta,
     grayscale: s.grayscale,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['newsletter-dark-gradient'] ?? {},
   }),
 
   'newsletter-blue-gradient': (s) => ({
