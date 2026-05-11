@@ -20,9 +20,9 @@ import { VisibilityRegistryProvider } from '../VisibilityRegistry'
 import { SizeRegistryProvider } from '../SizeRegistry'
 import { ContentRegistryProvider } from '../ContentRegistry'
 import { CategoryRegistryProvider, type CategoryOption } from '../CategoryRegistry'
-import { ImageRegistryProvider, type SlotImage } from '../ImageRegistry'
-import { ImageLibraryModal } from '../../ImageLibraryModal'
-import { ImageCropModal } from '../../ImageCropModal'
+import { ImageRegistryProvider, useImageSelectionEffect, type SlotImage } from '../ImageRegistry'
+import { ImageEditorModal } from '../../image-editor'
+import { NEUTRAL_FILTERS, type ImageSlotSettings } from '@/lib/image-filters'
 import {
   StageScrim,
   StageBenchHeader,
@@ -85,6 +85,13 @@ const BLOCK_TO_LABEL: Record<EmailSpeakersBlockId, string> = {
   speaker2: 'Speaker 2',
   speaker3: 'Speaker 3',
 }
+
+/** 1×1 transparent gif — fallback `imageSrc` for ImageEditorModal when a
+ *  speaker has no image yet. The lightbox still renders (so Change Image
+ *  is reachable) but the preview shows nothing until the user picks a
+ *  real avatar. */
+const PLACEHOLDER_AVATAR_SRC =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
 
 export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
   const {
@@ -202,11 +209,11 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
     speaker1, speaker2, speaker3,
   } as const
 
-  // Modal state — `imageLibraryFor` and `cropModalFor` track which speaker
-  // (if any) is the current target; null = closed.
+  // Lightbox state — which speaker's editor is open. Opens automatically
+  // on selection via useImageSelectionEffect(). Library/upload UI lives
+  // inside the lightbox as a view-swap; no separate modal state needed.
   type SpeakerId = 'speaker1' | 'speaker2' | 'speaker3'
-  const [imageLibraryFor, setImageLibraryFor] = useState<SpeakerId | null>(null)
-  const [cropModalFor, setCropModalFor] = useState<SpeakerId | null>(null)
+  const [editorFor, setEditorFor] = useState<SpeakerId | null>(null)
 
   const editingPath = useCanvasEditorStore((s) => s.editingPath)
 
@@ -295,15 +302,12 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
     .filter(([key]) => key !== 'none')
     .map(([key, cfg]) => ({ value: key, label: cfg.label, color: cfg.color }))
 
-  // Image action handlers per speaker — drives EditbarImage. No `onGenerate`
-  // because speaker portraits aren't AI-generated; the button hides.
-  // `onEdit` only resolves when the speaker has an image set; otherwise
-  // crop has nothing to crop and the button hides too.
+  // Image actions per speaker — selecting a speaker's avatar opens its
+  // lightbox directly.
   const speakerIds: SpeakerId[] = ['speaker1', 'speaker2', 'speaker3']
   const slotImages: SlotImage[] = speakerIds.map((id) => ({
     path: `email-speakers.${id}.image`,
-    onChange: () => setImageLibraryFor(id),
-    onEdit: speakerById[id].imageUrl ? () => setCropModalFor(id) : undefined,
+    onSelect: () => setEditorFor(id),
   }))
 
   return (
@@ -335,6 +339,7 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
               ]}
             >
             <ImageRegistryProvider images={slotImages}>
+            <ImageSelectionEffect />
             <StageBenchShell
               header={
                 <StageBenchHeader
@@ -412,7 +417,6 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
                     </Editable>
                   )}
                   renderBlock={(blockId, content) => {
-                    const isPreviewSlot = previewKey === blockId
                     const slotPath = `email-speakers.${blockId}`
                     const slot = slots.find((s) => s.path === slotPath)
                     const dragConfig = slot
@@ -435,16 +439,9 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
                         storeKey={blockStoreKey[blockId]}
                         kind={blockKind[blockId]}
                         drag={dragConfig}
+                        previewActive={previewKey === blockId}
                       >
-                        <div
-                          style={
-                            isPreviewSlot
-                              ? { position: 'relative', zIndex: 2 }
-                              : undefined
-                          }
-                        >
-                          {content}
-                        </div>
+                        {content}
                       </Editable>
                     )
                   }}
@@ -515,36 +512,52 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
             </StageBenchShell>
             <ContextualToolbar />
             <SelectionRing />
-            {imageLibraryFor && (
-              <ImageLibraryModal
-                onSelect={(url) => {
-                  speakerImageUrlSetters[imageLibraryFor](url)
-                  // Reset crop on image swap so the new image isn't stuck
-                  // at the old image's offsets.
-                  speakerImagePositionSetters[imageLibraryFor]({ x: 0, y: 0 })
-                  speakerImageZoomSetters[imageLibraryFor](1)
-                  setImageLibraryFor(null)
-                }}
-                onClose={() => setImageLibraryFor(null)}
-              />
-            )}
-            {cropModalFor && speakerById[cropModalFor].imageUrl && (
-              <ImageCropModal
-                isOpen
-                onClose={() => setCropModalFor(null)}
-                imageSrc={speakerById[cropModalFor].imageUrl}
-                /* Avatar is a 48×48 circular crop — same dimensions used by
-                 * <SpeakerAvatar> so the crop preview matches the canvas. */
-                frameWidth={48}
-                frameHeight={48}
-                initialPosition={speakerById[cropModalFor].imagePosition}
-                initialZoom={speakerById[cropModalFor].imageZoom}
-                onSave={(position, zoom) => {
-                  speakerImagePositionSetters[cropModalFor](position)
-                  speakerImageZoomSetters[cropModalFor](zoom)
-                }}
-              />
-            )}
+            {/* Per-speaker editor lightbox — opens automatically when the
+             *  speaker's avatar slot is selected (via useImageSelectionEffect).
+             *  Falls back to a transparent placeholder URL when the speaker
+             *  has no image yet so the lightbox still has something to render;
+             *  the user reaches Change Image inside the modal to populate.
+             *  Library/upload UI lives inside the lightbox as a view-swap. */}
+            {editorFor && (() => {
+              // TODO(stage-bench/filters): per-speaker filter persistence.
+              // The modal accepts a bundled ImageSlotSettings shape; for now
+              // we feed it neutral filters and drop the filters portion of
+              // onSettingsChange — slider UI moves locally but doesn't
+              // persist across opens. Wiring 3× per-speaker `imageFilters`
+              // store fields + export-params plumbing is the follow-up to
+              // light this up. Press-release proves the pattern.
+              const speaker = speakerById[editorFor]
+              const initialSettings: ImageSlotSettings = {
+                position: speaker.imagePosition,
+                zoom: speaker.imageZoom,
+                filters: NEUTRAL_FILTERS,
+              }
+              return (
+                <ImageEditorModal
+                  isOpen
+                  onClose={() => setEditorFor(null)}
+                  imageSrc={speaker.imageUrl || PLACEHOLDER_AVATAR_SRC}
+                  /* Avatar is a 48×48 circular crop — same dimensions used by
+                   * <SpeakerAvatar> so the crop preview matches the canvas. */
+                  frameWidth={48}
+                  frameHeight={48}
+                  initialSettings={initialSettings}
+                  onSettingsChange={(next) => {
+                    speakerImagePositionSetters[editorFor](next.position)
+                    speakerImageZoomSetters[editorFor](next.zoom)
+                    // next.filters intentionally dropped until per-speaker
+                    // filter store fields land — see TODO above.
+                  }}
+                  onImageChange={(url) => {
+                    speakerImageUrlSetters[editorFor](url)
+                    // Reset crop on image swap so the new image isn't stuck
+                    // at the old image's offsets.
+                    speakerImagePositionSetters[editorFor]({ x: 0, y: 0 })
+                    speakerImageZoomSetters[editorFor](1)
+                  }}
+                />
+              )
+            })()}
             </ImageRegistryProvider>
             </CategoryRegistryProvider>
           </ContentRegistryProvider>
@@ -552,4 +565,11 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
       </VisibilityRegistryProvider>
     </CanvasEditorProvider>
   )
+}
+
+/** Calls the foundation selection-effect hook. Must render inside
+ *  ImageRegistryProvider so the hook reads the right slot list. */
+function ImageSelectionEffect() {
+  useImageSelectionEffect()
+  return null
 }

@@ -20,9 +20,9 @@ import { VisibilityRegistryProvider } from '../VisibilityRegistry'
 import { SizeRegistryProvider } from '../SizeRegistry'
 import { ContentRegistryProvider } from '../ContentRegistry'
 import { CategoryRegistryProvider, type CategoryOption } from '../CategoryRegistry'
-import { ImageRegistryProvider, type SlotImage } from '../ImageRegistry'
-import { ImageLibraryModal } from '../../ImageLibraryModal'
-import { ImageCropModal } from '../../ImageCropModal'
+import { ImageRegistryProvider, useImageSelectionEffect, type SlotImage } from '../ImageRegistry'
+import { ImageEditorModal } from '../../image-editor'
+import { NEUTRAL_FILTERS, type ImageSlotSettings } from '@/lib/image-filters'
 import {
   StageScrim,
   StageBenchHeader,
@@ -139,14 +139,20 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
   const setThumbnailImageUrl = useStore((s) => s.setThumbnailImageUrl)
   const thumbnailImageSettings = useStore((s) => s.thumbnailImageSettings)
   const setThumbnailImageSettings = useStore((s) => s.setThumbnailImageSettings)
-  const currentImageSettings = thumbnailImageSettings['website-press-release'] ?? {
-    position: { x: 0, y: 0 },
-    zoom: 1,
+  const rawImageSettings = thumbnailImageSettings['website-press-release']
+  // Build the universal ImageSlotSettings shape the modal expects. Filters
+  // default to neutral so pre-filter drafts (no `filters` field) round-trip
+  // through the modal unchanged.
+  const currentSlotSettings: ImageSlotSettings = {
+    position: rawImageSettings?.position ?? { x: 0, y: 0 },
+    zoom: rawImageSettings?.zoom ?? 1,
+    filters: rawImageSettings?.filters ?? NEUTRAL_FILTERS,
   }
 
-  // Modal state for the featured image editor flow.
-  const [showImageLibrary, setShowImageLibrary] = useState(false)
-  const [showCropModal, setShowCropModal] = useState(false)
+  // Featured image editor lightbox. Opens automatically when the
+  // image slot is selected, via useImageSelectionEffect(). The library /
+  // upload UI lives inside this modal as a view-swap — no second modal.
+  const [showImageEditor, setShowImageEditor] = useState(false)
 
   const editingPath = useCanvasEditorStore((s) => s.editingPath)
 
@@ -229,15 +235,18 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
     .filter(([key]) => key !== 'none')
     .map(([key, cfg]) => ({ value: key, label: cfg.label, color: cfg.color }))
 
-  // Featured image actions — drives EditbarImage. `onEdit` only resolves
-  // when an image is set (otherwise crop has nothing to crop).
+  // Featured image — selection opens the lightbox directly.
   const slotImages: SlotImage[] = [
     {
       path: 'website-press-release.image',
-      onChange: () => setShowImageLibrary(true),
-      onEdit: thumbnailImageUrl ? () => setShowCropModal(true) : undefined,
+      onSelect: () => setShowImageEditor(true),
     },
   ]
+
+  // The image src used by the editor flow — falls back to the template's
+  // placeholder so the lightbox has something to render before the user
+  // picks a real image.
+  const editorImageSrc = thumbnailImageUrl ?? '/placeholder-mountain.jpg'
 
   return (
     <CanvasEditorProvider mode="edit">
@@ -273,6 +282,7 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
               ]}
             >
             <ImageRegistryProvider images={slotImages}>
+            <ImageSelectionEffect />
             <StageBenchShell
               header={
                 <StageBenchHeader
@@ -312,8 +322,9 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
                   cta={ctaEff}
                   solution={showSolutionEff ? solution : 'none'}
                   imageUrl={thumbnailImageUrl ?? undefined}
-                  imagePosition={currentImageSettings.position}
-                  imageZoom={currentImageSettings.zoom}
+                  imagePosition={currentSlotSettings.position}
+                  imageZoom={currentSlotSettings.zoom}
+                  imageFilters={currentSlotSettings.filters}
                   showEyebrow={showEyebrowEff}
                   showHeadline={showHeadline}
                   showSubhead={showSubheadEff}
@@ -348,7 +359,6 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
                     </Editable>
                   )}
                   renderBlock={(blockId, content) => {
-                    const isPreviewSlot = previewKey === blockId
                     const slotPath = `website-press-release.${blockId}`
                     const slot = slots.find((s) => s.path === slotPath)
                     // Image slot doesn't drag (always on stage). Other
@@ -373,16 +383,9 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
                         storeKey={blockStoreKey[blockId]}
                         kind={blockKind[blockId]}
                         drag={dragConfig}
+                        previewActive={previewKey === blockId}
                       >
-                        <div
-                          style={
-                            isPreviewSlot
-                              ? { position: 'relative', zIndex: 2 }
-                              : undefined
-                          }
-                        >
-                          {content}
-                        </div>
+                        {content}
                       </Editable>
                     )
                   }}
@@ -424,37 +427,36 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
             </StageBenchShell>
             <ContextualToolbar />
             <SelectionRing />
-            {showImageLibrary && (
-              <ImageLibraryModal
-                onSelect={(url) => {
-                  setThumbnailImageUrl(url)
-                  // Reset crop on image swap so the new image isn't stuck
-                  // at the previous image's offsets.
-                  setThumbnailImageSettings('website-press-release', {
-                    position: { x: 0, y: 0 },
-                    zoom: 1,
-                  })
-                  setShowImageLibrary(false)
-                }}
-                onClose={() => setShowImageLibrary(false)}
-              />
-            )}
-            {showCropModal && thumbnailImageUrl && (
-              <ImageCropModal
-                isOpen
-                onClose={() => setShowCropModal(false)}
-                imageSrc={thumbnailImageUrl}
-                /* Press release featured image frame — matches legacy
-                 * EditorScreen for parity. */
-                frameWidth={338}
-                frameHeight={450}
-                initialPosition={currentImageSettings.position}
-                initialZoom={currentImageSettings.zoom}
-                onSave={(position, zoom) => {
-                  setThumbnailImageSettings('website-press-release', { position, zoom })
-                }}
-              />
-            )}
+            {/* Featured-image editor lightbox — opens automatically when
+             *  the image slot is selected (via useImageSelectionEffect).
+             *  Library/upload UI lives inside this modal as a view-swap. */}
+            <ImageEditorModal
+              isOpen={showImageEditor}
+              onClose={() => setShowImageEditor(false)}
+              imageSrc={editorImageSrc}
+              /* Press release featured image frame — matches legacy
+               * EditorScreen for parity. */
+              frameWidth={338}
+              frameHeight={450}
+              initialSettings={currentSlotSettings}
+              onSettingsChange={(next) => {
+                setThumbnailImageSettings('website-press-release', {
+                  position: next.position,
+                  zoom: next.zoom,
+                  filters: next.filters,
+                })
+              }}
+              onImageChange={(url) => {
+                setThumbnailImageUrl(url)
+                // Reset crop + filters on image swap so the new image isn't
+                // stuck with the previous image's edits.
+                setThumbnailImageSettings('website-press-release', {
+                  position: { x: 0, y: 0 },
+                  zoom: 1,
+                  filters: NEUTRAL_FILTERS,
+                })
+              }}
+            />
             </ImageRegistryProvider>
             </CategoryRegistryProvider>
           </ContentRegistryProvider>
@@ -462,4 +464,11 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
       </VisibilityRegistryProvider>
     </CanvasEditorProvider>
   )
+}
+
+/** Calls the foundation selection-effect hook. Must render inside
+ *  ImageRegistryProvider so the hook reads the right slot list. */
+function ImageSelectionEffect() {
+  useImageSelectionEffect()
+  return null
 }

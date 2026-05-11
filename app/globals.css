@@ -231,3 +231,58 @@ body {
   opacity: 0;
   transition: opacity 100ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* Image-editor slider — track + thumb styling tuned to match the Figma
+ * spec (Figma 371:640 / 371:637). Track is a 1px line at content-secondary;
+ * thumb is a 12px content-primary circle. Filled portion of the track sits
+ * above the unfilled portion via a CSS gradient driven by --slider-fill.
+ *
+ * The `--slider-fill` CSS variable is set inline by the slider's host
+ * element when it wants a filled progression (zoom defaults to leftmost,
+ * filter sliders centered). Without it, the track renders unfilled — fine
+ * for sliders where the fill direction isn't meaningful. */
+.image-editor-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  width: 100%;
+  height: 12px;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+}
+.image-editor-slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.image-editor-slider::-webkit-slider-runnable-track {
+  height: 1px;
+  background: rgb(var(--content-secondary));
+}
+.image-editor-slider::-moz-range-track {
+  height: 1px;
+  background: rgb(var(--content-secondary));
+}
+.image-editor-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: rgb(var(--content-primary));
+  margin-top: -5.5px; /* center thumb on 1px track */
+  border: none;
+}
+.image-editor-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: rgb(var(--content-primary));
+  border: none;
+}
+.image-editor-slider:focus {
+  outline: none;
+}
+.image-editor-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px rgb(var(--content-secondary) / 0.4);
+}

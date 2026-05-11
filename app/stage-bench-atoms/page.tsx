@@ -20,6 +20,8 @@ import {
   EditbarSlider,
   Toggle,
 } from '@/components/canvas-editor/editbar'
+import { ImageEditorModal } from '@/components/image-editor'
+import { NEUTRAL_SLOT_SETTINGS, type ImageSlotSettings } from '@/lib/image-filters'
 import {
   EyeOff, Bold, Italic, AArrowUp, AArrowDown, MoveVertical,
 } from 'lucide-react'
@@ -318,8 +320,49 @@ export default function StageBenchAtomsPage() {
             Stage — 640 × 300
           </div>
         </StageBenchShell>
+
+        <ImageEditorModalPreview />
       </div>
     </div>
+  )
+}
+
+function ImageEditorModalPreview() {
+  const [open, setOpen] = useState(false)
+  const [settings, setSettings] = useState<ImageSlotSettings>(NEUTRAL_SLOT_SETTINGS)
+  const { position, zoom, filters } = settings
+
+  return (
+    <section className="space-y-4 pt-10 border-t border-line-subtle">
+      <h2 className="font-mono text-[10px] uppercase tracking-wider text-content-secondary">
+        ImageEditorModal
+      </h2>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="px-3 py-2 rounded-sm bg-btn-primary text-btn-primary-text font-mono text-[12px] uppercase hover:bg-btn-primary-hover transition-colors"
+        >
+          Open image editor
+        </button>
+        <span className="font-mono text-[10px] uppercase text-content-secondary">
+          last applied: pos {position.x.toFixed(0)},{position.y.toFixed(0)} · zoom {zoom.toFixed(2)} · exp {filters.exposure.toFixed(2)} · con {filters.contrast.toFixed(2)} · sat {filters.saturation.toFixed(2)}
+        </span>
+      </div>
+      <ImageEditorModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        imageSrc="/placeholder-mountain.jpg"
+        frameWidth={338}
+        frameHeight={450}
+        initialSettings={settings}
+        onSettingsChange={setSettings}
+        onImageChange={(url) => {
+          // eslint-disable-next-line no-console
+          console.info('[atoms] onImageChange — adapter would update its store url field:', url)
+        }}
+      />
+    </section>
   )
 }
 

@@ -8,6 +8,12 @@ import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import {
+  applyGrayscaleBoolean,
+  filtersToCss,
+  NEUTRAL_FILTERS,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export type WebsitePressReleaseBlockId =
   | 'image'
@@ -47,6 +53,10 @@ export interface WebsitePressReleaseProps {
   imageUrl?: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  /** Per-image exposure/contrast/saturation. Renders as CSS filter on the
+   *  <img>; legacy `grayscale` boolean is OR-folded in via
+   *  applyGrayscaleBoolean(). Defaults to neutral. */
+  imageFilters?: ImageFilters
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
@@ -174,6 +184,7 @@ export function WebsitePressRelease({
   imageUrl = '/placeholder-mountain.jpg',
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   showEyebrow,
   showHeadline = true,
   showSubhead,
@@ -207,6 +218,12 @@ export function WebsitePressRelease({
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale)
+
+  // Reconcile per-image filters with the legacy per-asset grayscale boolean:
+  // grayscale=true forces saturation = -1 regardless of slider value. Lets
+  // pre-filter assets render correctly without a store migration.
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
 
   const containerStyle: CSSProperties = {
     width: 800,
@@ -253,7 +270,15 @@ export function WebsitePressRelease({
                 ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
                 : undefined,
               transformOrigin: 'center',
-              filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
+              // Per-image filter (exposure/contrast/saturation). When a
+              // pre-converted grayscale URL is in use, skip the saturate(0)
+              // component to avoid double-applying — but keep
+              // exposure/contrast active. When no pre-converted URL,
+              // include saturation so the CSS does the grayscale work.
+              filter:
+                filterCss && grayscaleImageUrl
+                  ? filtersToCss({ ...effectiveFilters, saturation: 0 }) ?? 'none'
+                  : filterCss ?? 'none',
             }}
           />
         </div>,

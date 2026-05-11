@@ -328,6 +328,8 @@ export interface ManualAssetSettings {
   thumbnailImageUrl: string | null
   thumbnailImagePosition: { x: number; y: number }
   thumbnailImageZoom: number
+  /** Per-image exposure/contrast/saturation; absent on pre-filter drafts. */
+  thumbnailImageFilters?: import('@/lib/image-filters').ImageFilters
   // Toggle states
   showBody: boolean
   // Social metadata
@@ -529,6 +531,8 @@ export interface GeneratedAsset {
   thumbnailImageUrl: string | null
   thumbnailImagePosition: { x: number; y: number }
   thumbnailImageZoom: number
+  /** Per-image exposure/contrast/saturation; absent on pre-filter drafts. */
+  thumbnailImageFilters?: import('@/lib/image-filters').ImageFilters
   subheading: string
   showLightHeader: boolean
   showSubheading: boolean
@@ -677,10 +681,15 @@ export interface GeneratedAsset {
   showCceEventTime: boolean
 }
 
-// Per-template image settings for decoupled zoom/pan
+// Per-template image settings for decoupled zoom/pan/filters.
+// The optional `filters` field is the new image-editor adjustment model
+// (exposure/contrast/saturation). When absent, the slot renders neutral —
+// backward-compatible with pre-filter drafts that only stored position/zoom.
+// See lib/image-filters.ts for the canonical type.
 export interface ImageSettings {
   position: { x: number; y: number }
   zoom: number
+  filters?: import('@/lib/image-filters').ImageFilters
 }
 
 export type ThumbnailImageSettings = Partial<Record<TemplateType, ImageSettings>>
@@ -704,6 +713,8 @@ export interface QueuedAsset {
   thumbnailImageUrl: string | null
   thumbnailImagePosition: { x: number; y: number }
   thumbnailImageZoom: number
+  /** Per-image exposure/contrast/saturation; absent on pre-filter drafts. */
+  thumbnailImageFilters?: import('@/lib/image-filters').ImageFilters
   // Email Grid specific
   subheading: string
   showLightHeader: boolean
