@@ -61,6 +61,17 @@ const config: Config = {
         'elevation-md': '0 var(--elevation-md-y) var(--elevation-md-blur) var(--elevation-md-color)',
         'elevation-lg': '0 var(--elevation-lg-y) var(--elevation-lg-blur) var(--elevation-lg-color)',
       },
+      // Design-system radius scale. Tailwind's default `rounded-sm` is 2px,
+      // which does NOT match our `radius/sm` token (4px) — override it here
+      // so utility names and design tokens stay aligned across the app.
+      // md/lg/xl happen to match Tailwind defaults; they're listed
+      // explicitly so future Tailwind upgrades can't drift them.
+      borderRadius: {
+        sm: '4px',   // radius/sm
+        md: '6px',   // radius/md
+        lg: '8px',   // radius/lg
+        xl: '12px',  // radius/xl
+      },
     },
   },
   plugins: [],

@@ -318,7 +318,6 @@ export function EmailDarkGradientStageBench(props: StageBenchEditorProps) {
                     )}
                     renderBlock={(blockId, content) => {
                       const cfg = slotConfig[blockId]
-                      const isPreviewSlot = previewKey === blockId
                       const slotPath = `email-dark-gradient.${blockId}`
                       const slot = slots.find((s) => s.path === slotPath)
                       const dragConfig = slot
@@ -341,16 +340,9 @@ export function EmailDarkGradientStageBench(props: StageBenchEditorProps) {
                           storeKey={cfg.storeKey}
                           kind={cfg.kind}
                           drag={dragConfig}
+                          previewActive={previewKey === blockId}
                         >
-                          <div
-                            style={
-                              isPreviewSlot
-                                ? { position: 'relative', zIndex: 2 }
-                                : undefined
-                            }
-                          >
-                            {content}
-                          </div>
+                          {content}
                         </Editable>
                       )
                     }}

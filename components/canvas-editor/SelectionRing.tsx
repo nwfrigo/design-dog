@@ -5,14 +5,21 @@ import { createPortal } from 'react-dom'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import type { EditableKind } from './types'
 
+/**
+ * Single ring color across every editable kind. Earlier iterations colored
+ * by kind (purple for image, green for pill, etc.) — that turned the canvas
+ * into a candy palette and worked against the "this is the active edit"
+ * signal the ring is supposed to send. One blue, applied uniformly, reads
+ * as a single coherent selection affordance.
+ */
 const RING_COLOR_BY_KIND: Record<EditableKind, string> = {
   text: '#3B82F6',
   cta: '#3B82F6',
-  image: '#8B5CF6',
-  spacer: '#EC4899',
-  color: '#F59E0B',
-  pill: '#10B981',
-  group: '#6B7280',
+  image: '#3B82F6',
+  spacer: '#3B82F6',
+  color: '#3B82F6',
+  pill: '#3B82F6',
+  group: '#3B82F6',
 }
 
 const PADDING = 4

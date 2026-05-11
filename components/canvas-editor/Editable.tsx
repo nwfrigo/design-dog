@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, type ReactNode } from 'react'
+import { useCallback, useRef, type CSSProperties, type ReactNode } from 'react'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import { useCanvasMode } from './CanvasEditorProvider'
 import { resolveCapabilities } from './capabilities'
@@ -29,7 +29,38 @@ type EditableProps = {
    *  by pointer. Click and double-click still work as before; drag only
    *  activates after the pointer crosses the activation threshold. */
   drag?: EditableDragConfig
+  /** When true, the slot is currently in drag-preview state (its bench
+   *  chip is hovering the stage). The wrapper switches from
+   *  `display: contents` to a real block with z-index:2 so the preview
+   *  paints above the stage scrim. Foundation-owned so adapters don't
+   *  need to re-implement the wrapper pattern. */
+  previewActive?: boolean
   children: ReactNode
+}
+
+/**
+ * Walk into the wrapper to find the first descendant with a non-zero rect.
+ * Backstop for the case where the immediate child collapses to 0×0 because
+ * it only contains out-of-flow (e.g. `position: absolute`) descendants.
+ * Returns null if nothing in the subtree has paint dimensions.
+ */
+function findVisibleRect(root: HTMLElement | null): DOMRect | null {
+  if (!root) return null
+  const rootRect = root.getBoundingClientRect()
+  if (rootRect.width > 0 && rootRect.height > 0) return rootRect
+  // Depth-first walk through element descendants.
+  const stack: Element[] = [root]
+  while (stack.length) {
+    const node = stack.shift()!
+    if (node !== root) {
+      const rect = (node as HTMLElement).getBoundingClientRect()
+      if (rect.width > 0 && rect.height > 0) return rect
+    }
+    for (let i = 0; i < node.children.length; i++) {
+      stack.push(node.children[i])
+    }
+  }
+  return null
 }
 
 export function Editable({
@@ -39,6 +70,7 @@ export function Editable({
   kind,
   capabilities,
   drag,
+  previewActive = false,
   children,
 }: EditableProps) {
   const mode = useCanvasMode()
@@ -104,8 +136,7 @@ export function Editable({
         e.stopPropagation()
       }
 
-      const child = wrapperRef.current?.firstElementChild as HTMLElement | null
-      const bounds = child?.getBoundingClientRect() ?? null
+      const bounds = findVisibleRect(wrapperRef.current)
       setSelection({
         path,
         kind,
@@ -132,8 +163,7 @@ export function Editable({
   }, [path, kind, setEditingPath])
 
   const handleEnter = useCallback(() => {
-    const child = wrapperRef.current?.firstElementChild as HTMLElement | null
-    setHover({ path, kind, bounds: child?.getBoundingClientRect() ?? null })
+    setHover({ path, kind, bounds: findVisibleRect(wrapperRef.current) })
   }, [path, kind, setHover])
   const handleLeave = useCallback(() => setHover(null), [setHover])
 
@@ -148,12 +178,21 @@ export function Editable({
     if (drag) draggable.setNodeRef(el)
   }
 
+  // Default wrapper is `display: contents` so it has no layout box of its own
+  // — the child element flows in the template's intended layout. When the
+  // slot's bench chip is being previewed over the stage, we promote the
+  // wrapper to a real block with z-index:2 so the preview paints above the
+  // stage scrim. (Adapters used to do this with their own per-slot <div>,
+  // but that wrapper silently collapsed bounds for absolutely-positioned
+  // children like full-bleed images.)
+  const wrapperStyle: CSSProperties = previewActive
+    ? { display: 'block', position: 'relative', zIndex: 2 }
+    : { display: 'contents' }
+
   return (
     <div
       ref={setRef}
-      style={{
-        display: 'contents',
-      }}
+      style={wrapperStyle}
       data-editable-path={path}
       data-editable-kind={kind}
       data-editable-dragging={drag && draggable.isDragging ? 'true' : undefined}

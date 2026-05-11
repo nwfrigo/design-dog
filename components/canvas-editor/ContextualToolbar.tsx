@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import type { EditableKind } from './types'
-import { EditbarText, EditbarCta, EditbarColor, EditbarImage, EditbarCategory } from './editbar'
+import { EditbarText, EditbarCta, EditbarColor, EditbarCategory } from './editbar'
 
 const EDITBAR_BY_KIND: Record<EditableKind, () => ReactNode> = {
   text: () => <EditbarText />,
@@ -12,13 +12,43 @@ const EDITBAR_BY_KIND: Record<EditableKind, () => ReactNode> = {
   // Spacers have their own drag-pill affordance on canvas — no toolbar needed.
   spacer: () => null,
   color: () => <EditbarColor />,
-  image: () => <EditbarImage />,
+  // Image selections open ImageEditorModal directly (wired by the adapter
+  // via SlotImage.onSelect). No toolbar layer — the modal IS the editor.
+  // The selection ring still renders so there's a visible "you're here"
+  // cue before/after the modal mounts.
+  image: () => null,
   // Pill = category chip (solution selector). Eye-off + dropdown.
   pill: () => <EditbarCategory />,
   group: () => null,
 }
 
 const TOOLBAR_GAP = 12
+/** Approximate toolbar height — used to offset above-the-bounds anchoring. */
+const TOOLBAR_HEIGHT = 48
+/** Inset for image-kind toolbars that float inside the top-left of the
+ *  selection (image fills typically extend to a canvas edge, leaving no
+ *  room above for a Notion/Figma-style above-anchored toolbar). */
+const TOOLBAR_INSET = 12
+
+/**
+ * Toolbars anchor in one of two ways:
+ *  - 'above'  → 12px above the bounds (text, cta, pill, color, spacer).
+ *  - 'inside' → 12px inside the bounds' top-left (image fills, full-bleed
+ *               content that hugs a canvas edge).
+ *
+ * Adding a new EditableKind? Pick the anchor that makes sense for the
+ * expected layout. Both modes use viewport coordinates so they survive
+ * page scroll.
+ */
+const ANCHOR_BY_KIND: Record<EditableKind, 'above' | 'inside'> = {
+  text: 'above',
+  cta: 'above',
+  spacer: 'above',
+  color: 'above',
+  pill: 'above',
+  group: 'above',
+  image: 'inside',
+}
 
 export function ContextualToolbar() {
   const selection = useCanvasEditorStore((s) => s.selection)
@@ -31,10 +61,16 @@ export function ContextualToolbar() {
   const fragment = EDITBAR_BY_KIND[selection.kind]?.()
   if (!fragment) return null
 
-  // Position above the selection by default. Toolbar height isn't measured here
-  // (kept simple); ~48px overshoot is intentional so it doesn't clip the ring.
-  const top = selection.bounds.top + window.scrollY - TOOLBAR_GAP - 48
-  const left = selection.bounds.left + window.scrollX
+  const anchor = ANCHOR_BY_KIND[selection.kind] ?? 'above'
+  const { top: bTop, left: bLeft } = selection.bounds
+  const top =
+    anchor === 'inside'
+      ? bTop + window.scrollY + TOOLBAR_INSET
+      : bTop + window.scrollY - TOOLBAR_GAP - TOOLBAR_HEIGHT
+  const left =
+    anchor === 'inside'
+      ? bLeft + window.scrollX + TOOLBAR_INSET
+      : bLeft + window.scrollX
 
   return createPortal(
     <div
