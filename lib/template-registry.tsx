@@ -729,6 +729,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta,
       headlineFontSize: asset.headlineFontSize ?? undefined,
       subheadFontSize: asset.subheadFontSize ?? undefined,
+      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
+      gaps: asset.templateGaps?.['social-blue-gradient'] ?? {},
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -758,6 +760,10 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'subheadFontSize', parser: 'numberOrUndefined' },
+        { param: 'stackAlign', parser: 'enum', default: 'top' },
+        // Inter-block gap overrides (JSON-encoded record). Falls back to
+        // DEFAULT_GAP per missing key.
+        { param: 'gaps', parser: 'jsonRecord' },
       ],
     },
   },

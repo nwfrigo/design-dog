@@ -1,14 +1,32 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type HeadingSize = 'S' | 'M' | 'L'
 export type Alignment = 'left' | 'center'
 export type CtaStyle = 'link' | 'button'
+
+/** Logical IDs for editable blocks + the `logo` topAnchor. Same shape as
+ *  SocialDarkGradient — these two templates differ only in background
+ *  imagery and the absence of a logoColor variant (logo is always white
+ *  on blue gradients). */
+export type SocialBlueGradientBlockId =
+  | 'logo'
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'body'
+  | 'metadata'
+  | 'cta'
 
 export interface SocialBlueGradientProps {
   eyebrow: string
@@ -29,10 +47,31 @@ export interface SocialBlueGradientProps {
   showCta: boolean
   headlineFontSize?: number
   subheadFontSize?: number
+  /** Vertical distribution of the content stack within the canvas.
+   *  Defaults to 'top'. Replaces the legacy space-between layout. */
+  stackAlign?: StackAlign
+  /** Sparse gap overrides keyed `gap-${prev}-to-${next}`. */
+  gaps?: Record<string, number>
+  /** Stage & Bench render-prop: editor-time drag handle between blocks. */
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: SocialBlueGradientBlockId,
+    nextId: SocialBlueGradientBlockId,
+  ) => ReactNode
+  /** Stage & Bench render-prop: wraps each editable region in <Editable>. */
+  renderBlock?: (blockId: SocialBlueGradientBlockId, content: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: swaps a block's inner content for an in-place editor. */
+  renderInlineEditor?: (blockId: SocialBlueGradientBlockId, defaultInner: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: absolutely-positioned overlay inside the
+   *  template's stacking context (drag scrim lives here). */
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
+
+const DEFAULT_GAP = 24
 
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
   '1': '/assets/backgrounds/social-blue-gradient-1.png',
@@ -94,11 +133,20 @@ export function SocialBlueGradient({
   showCta,
   headlineFontSize,
   subheadFontSize,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: SocialBlueGradientProps) {
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const textColor = '#FFFFFF'
+  const itemsAlign = alignment === 'center' ? 'center' : 'flex-start'
+  const textAlign = alignment === 'center' ? ('center' as const) : ('left' as const)
+  const stackMaxWidth = alignment === 'center' ? 900 : undefined
 
   // Determine if content is empty for conditional rendering
   const hasHeadline = !isHtmlEmpty(headline)
@@ -122,20 +170,160 @@ export function SocialBlueGradient({
     right: 0,
     bottom: 0,
     padding: 64,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: alignment === 'center' ? 'center' : 'flex-start',
   }
 
-  const textBlockStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: alignment === 'center' ? 'center' : 'flex-start',
-    gap: 24,
-    textAlign: alignment === 'center' ? 'center' : 'left',
-    maxWidth: alignment === 'center' ? 900 : undefined,
-  }
+  const blocks: ContentStackBlock<SocialBlueGradientBlockId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div
+          style={{
+            color: textColor,
+            fontSize: 14,
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            letterSpacing: 1.54,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: headlineFontSize ?? HEADING_SIZES[headingSize],
+            fontWeight: 300,
+            lineHeight: 1.1,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && hasSubhead,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: subheadFontSize ?? SUBHEAD_SIZES[headingSize],
+            fontWeight: 300,
+            lineHeight: 1.3,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'body',
+      visible: showBody && hasBody,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: body }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: BODY_SIZES[headingSize],
+            fontWeight: 300,
+            lineHeight: 1.4,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'metadata',
+      visible: showMetadata && !!metadata,
+      defaultInner: metadata,
+      renderChrome: (inner) => (
+        <div
+          style={{
+            color: textColor,
+            fontSize: 14,
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            letterSpacing: 1.54,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'cta',
+      visible: showCta && !!ctaText,
+      defaultInner: ctaText,
+      renderChrome: (inner) =>
+        ctaStyle === 'link' ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+            }}
+          >
+            <span
+              style={{
+                color: textColor,
+                fontSize: 24,
+                fontWeight: 300,
+                lineHeight: 1,
+              }}
+            >
+              {inner}
+            </span>
+            <ArrowIcon color="#FFFFFF" width={22} height={22 * 0.8} />
+          </div>
+        ) : (
+          <div
+            style={{
+              padding: '16px 32px',
+              background: '#FFFFFF',
+              borderRadius: 100,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span
+              style={{
+                color: '#000000',
+                fontSize: 18,
+                fontWeight: 300,
+                lineHeight: 1,
+              }}
+            >
+              {inner}
+            </span>
+          </div>
+        ),
+    },
+  ]
 
   return (
     <div style={containerStyle}>
@@ -156,152 +344,27 @@ export function SocialBlueGradient({
         }}
       />
 
-      {/* Content Overlay */}
+      {/* Content overlay — ContentStack handles vertical distribution
+       *  (stackAlign) and per-gap spacing. Logo is the topAnchor (always
+       *  white on blue backgrounds). */}
       <div style={contentStyle}>
-        {/* Logo - always white on blue backgrounds */}
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: alignment === 'center' ? 'center' : 'flex-start'
-        }}>
-          <CorityLogo fill="#FFFFFF" height={37} />
-        </div>
-
-        {/* Text Content */}
-        <div style={textBlockStyle}>
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div
-              style={{
-                color: textColor,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.54,
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline + Subhead Group */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 36,
-            alignItems: alignment === 'center' ? 'center' : 'flex-start',
-          }}>
-            {/* Headline - supports rich text (bold, italic, line breaks) */}
-            {showHeadline && (
-              <div
-                className="rich-text-white"
-                style={{
-                  color: textColor,
-                  fontSize: headlineFontSize ?? HEADING_SIZES[headingSize],
-                  fontWeight: 300,
-                  lineHeight: 1.1,
-                }}
-                dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
-              />
-            )}
-
-            {/* Subhead - supports rich text (bold, italic, line breaks) */}
-            {showSubhead && hasSubhead && (
-              <div
-                className="rich-text-white"
-                style={{
-                  color: textColor,
-                  fontSize: subheadFontSize ?? SUBHEAD_SIZES[headingSize],
-                  fontWeight: 300,
-                  lineHeight: 1.3,
-                }}
-                dangerouslySetInnerHTML={{ __html: subhead }}
-              />
-            )}
-          </div>
-
-          {/* Body - supports rich text (bold, italic, line breaks) */}
-          {showBody && hasBody && (
-            <div
-              className="rich-text-white"
-              style={{
-                color: textColor,
-                fontSize: BODY_SIZES[headingSize],
-                fontWeight: 300,
-                lineHeight: 1.4,
-              }}
-              dangerouslySetInnerHTML={{ __html: body }}
-            />
-          )}
-
-          {/* Metadata */}
-          {showMetadata && metadata && (
-            <div
-              style={{
-                color: textColor,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.54,
-              }}
-            >
-              {metadata}
-            </div>
-          )}
-        </div>
-
-        {/* CTA */}
-        {showCta && ctaText && (
-          <div style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: alignment === 'center' ? 'center' : 'flex-start'
-          }}>
-            {ctaStyle === 'link' ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 16,
-                }}
-              >
-                <span
-                  style={{
-                    color: textColor,
-                    fontSize: 24,
-                    fontWeight: 300,
-                    lineHeight: 1,
-                  }}
-                >
-                  {ctaText}
-                </span>
-                <ArrowIcon color="#FFFFFF" width={22} height={22 * 0.8} />
-              </div>
-            ) : (
-              <div
-                style={{
-                  padding: '16px 32px',
-                  background: '#FFFFFF',
-                  borderRadius: 100,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span
-                  style={{
-                    color: '#000000',
-                    fontSize: 18,
-                    fontWeight: 300,
-                    lineHeight: 1,
-                  }}
-                >
-                  {ctaText}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
+        <ContentStack<SocialBlueGradientBlockId>
+          blocks={blocks}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock}
+          renderInlineEditor={renderInlineEditor}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: <CorityLogo fill="#FFFFFF" height={37} />,
+            renderBlock: renderBlock ? (node) => renderBlock('logo', node) : undefined,
+          }}
+          alignItems={itemsAlign}
+          maxWidth={stackMaxWidth}
+        />
+        {renderOverlay?.()}
       </div>
     </div>
   )

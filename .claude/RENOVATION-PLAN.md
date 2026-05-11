@@ -68,7 +68,7 @@ Mostly `space-between` outer (logo top, content middle, cta bottom) with an inne
 | Template | Tier | Status |
 |---|---|---|
 | SocialDarkGradient | 1 | ✅ Done |
-| SocialBlueGradient | 1 | Queued |
+| SocialBlueGradient | 1 | ✅ Done |
 | SocialEhsAccelerate | 1 | Queued |
 | SocialImage | 1 | Queued |
 | SocialImageMeddbase | 1 | Queued |

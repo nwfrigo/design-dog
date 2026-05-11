@@ -9,6 +9,7 @@ import { EmailDarkGradientStageBench } from './template-adapters/EmailDarkGradie
 import { EmailSpeakersStageBench } from './template-adapters/EmailSpeakersStageBench'
 import { WebsitePressReleaseStageBench } from './template-adapters/WebsitePressReleaseStageBench'
 import { SocialDarkGradientStageBench } from './template-adapters/SocialDarkGradientStageBench'
+import { SocialBlueGradientStageBench } from './template-adapters/SocialBlueGradientStageBench'
 
 /**
  * StageBenchEditor — thin dispatcher for the Stage & Bench editor screen.
@@ -51,6 +52,7 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'email-speakers': EmailSpeakersStageBench,
   'website-press-release': WebsitePressReleaseStageBench,
   'social-dark-gradient': SocialDarkGradientStageBench,
+  'social-blue-gradient': SocialBlueGradientStageBench,
 }
 
 export function StageBenchEditor(props: StageBenchEditorProps) {

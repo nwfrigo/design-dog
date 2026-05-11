@@ -296,6 +296,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showMetadata: s.showMetadata,
     showCta: s.showCta,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['social-blue-gradient'] ?? {},
   }),
 
   'social-image': (s) => ({

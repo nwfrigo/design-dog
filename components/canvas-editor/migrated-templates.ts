@@ -14,6 +14,7 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'email-speakers',
   'website-press-release',
   'social-dark-gradient',
+  'social-blue-gradient',
 ])
 
 export function isStageBenchTemplate(template: TemplateType): boolean {
