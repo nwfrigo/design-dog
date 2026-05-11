@@ -93,6 +93,7 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
     typographyConfig,
     onExport,
     onAddToQueue,
+    onSaveToQueue,
     onPreview,
     onAddAsset,
     onGoToAsset,
@@ -303,6 +304,7 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
                   isEditingFromQueue={isEditingFromQueue}
                   onPreview={onPreview}
                   onAddToQueue={onAddToQueue}
+                  onSaveToQueue={onSaveToQueue}
                   onExport={onExport}
                 />
               }

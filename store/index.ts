@@ -1368,12 +1368,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         body: asset.body,
         cta: '',
       },
-      // Store per-template image settings
+      // Store per-template image settings.
+      // Filters round-trip through the queue/generated-asset → editor load
+      // path; without this, exposure/contrast/saturation drop back to
+      // neutral on re-entry to the editor while save-side correctly
+      // captures them. (Symmetrical to goToAsset's capture+restore.)
       thumbnailImageSettings: {
         ...state.thumbnailImageSettings,
         [asset.templateType]: {
           position: asset.thumbnailImagePosition,
           zoom: asset.thumbnailImageZoom,
+          filters: asset.thumbnailImageFilters,
         },
       },
       // Track that we're editing from queue
@@ -1739,12 +1744,17 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       ...restored,
       templateType: asset.templateType,
       verbatimCopy: { ...asset.copy },
-      // Store per-template image settings
+      // Store per-template image settings.
+      // Filters round-trip through the queue/generated-asset → editor load
+      // path; without this, exposure/contrast/saturation drop back to
+      // neutral on re-entry to the editor while save-side correctly
+      // captures them. (Symmetrical to goToAsset's capture+restore.)
       thumbnailImageSettings: {
         ...state.thumbnailImageSettings,
         [asset.templateType]: {
           position: asset.thumbnailImagePosition,
           zoom: asset.thumbnailImageZoom,
+          filters: asset.thumbnailImageFilters,
         },
       },
       generatedVariations: asset.variations,

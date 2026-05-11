@@ -1,6 +1,6 @@
 'use client'
 
-import { Maximize2, ListPlus, Download, Loader2, type LucideIcon } from 'lucide-react'
+import { Maximize2, ListPlus, Download, Loader2, ListChecks, type LucideIcon } from 'lucide-react'
 
 /**
  * ActionButton — atomic button used in the action row below the Stage.
@@ -9,24 +9,27 @@ import { Maximize2, ListPlus, Download, Loader2, type LucideIcon } from 'lucide-
  *   - 28h, 0.5px line-subtle border, radius/sm (4px)
  *   - px-8 py-6, gap spacing/md (8px)
  *   - 12×12 icon + UPPERCASE mono 12px label
- *   - preview / add-to-queue: bg surface/primary, text/icon content/secondary (muted)
+ *   - preview / add-to-queue / save-to-queue: bg surface/primary, text/icon
+ *     content/secondary (muted secondary-style)
  *   - export: bg surface/inverse, text/icon content/inverse (the primary CTA)
  *
  * `loading` swaps the kind icon for a spinner (matches the existing
  * "isExporting" UX in EditorScreen).
  */
 
-export type ActionFn = 'preview' | 'add-to-queue' | 'export'
+export type ActionFn = 'preview' | 'add-to-queue' | 'save-to-queue' | 'export'
 
 const FN_ICON: Record<ActionFn, LucideIcon> = {
   preview: Maximize2,
   'add-to-queue': ListPlus,
+  'save-to-queue': ListChecks,
   export: Download,
 }
 
 const DEFAULT_LABEL: Record<ActionFn, string> = {
   preview: 'Preview',
   'add-to-queue': 'Add to Queue',
+  'save-to-queue': 'Save & Return to Queue',
   export: 'Export',
 }
 

@@ -95,6 +95,7 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
     typographyConfig,
     onExport,
     onAddToQueue,
+    onSaveToQueue,
     onPreview,
     onAddAsset,
     onGoToAsset,
@@ -286,6 +287,7 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
                   isEditingFromQueue={isEditingFromQueue}
                   onPreview={onPreview}
                   onAddToQueue={onAddToQueue}
+                  onSaveToQueue={onSaveToQueue}
                   onExport={onExport}
                 />
               }

@@ -103,6 +103,7 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
     typographyConfig,
     onExport,
     onAddToQueue,
+    onSaveToQueue,
     onPreview,
     onAddAsset,
     onGoToAsset,
@@ -360,6 +361,7 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
                   isEditingFromQueue={isEditingFromQueue}
                   onPreview={onPreview}
                   onAddToQueue={onAddToQueue}
+                  onSaveToQueue={onSaveToQueue}
                   onExport={onExport}
                 />
               }

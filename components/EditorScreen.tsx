@@ -1382,6 +1382,7 @@ export function EditorScreen() {
             setShowQueuedFeedback(true)
             setTimeout(() => setShowQueuedFeedback(false), 2000)
           }}
+          onSaveToQueue={saveQueuedAssetEdit}
           onPreview={() => setShowPreviewLightbox(true)}
           onAddAsset={() => {
             setPendingAssets([])

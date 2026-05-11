@@ -34,6 +34,7 @@ export interface StageBenchEditorProps {
   typographyConfig: TypographyConfig
   onExport: () => void
   onAddToQueue: () => void
+  onSaveToQueue: () => void
   onPreview: () => void
   onAddAsset: () => void
   onGoToAsset: (idx: number) => void
