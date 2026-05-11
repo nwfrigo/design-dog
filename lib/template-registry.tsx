@@ -154,6 +154,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       imageUrl: asset.thumbnailImageUrl || undefined,
       imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
       imageZoom: asset.thumbnailImageZoom || 1,
+      imageFilters: asset.thumbnailImageFilters,
       showEyebrow: asset.showEyebrow,
       showSubhead: asset.showSubhead && !!asset.subhead,
       showBody: asset.showBody && !!asset.body,
@@ -180,6 +181,10 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'imagePositionX', parser: 'number', default: 0 },
         { param: 'imagePositionY', parser: 'number', default: 0 },
         { param: 'imageZoom', parser: 'number', default: 1 },
+        // Per-image filter values emitted by `buildImageParams` as 3 scalars.
+        { param: 'imageFilterExposure', parser: 'number', default: 0 },
+        { param: 'imageFilterContrast', parser: 'number', default: 0 },
+        { param: 'imageFilterSaturation', parser: 'number', default: 0 },
         { param: 'showEyebrow', parser: 'boolTrue' },
         { param: 'showHeadline', parser: 'boolTrue' },
         { param: 'showSubhead', parser: 'boolFalse' },
@@ -194,6 +199,13 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       assembleProps: (parsed, raw) => ({
         cta: (raw.ctaText as string) || (raw.cta as string) || 'Responsive',
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
+        // Reassemble the 3 scalar filter params into the ImageFilters
+        // shape WebsitePressRelease expects.
+        imageFilters: {
+          exposure: parsed.imageFilterExposure as number,
+          contrast: parsed.imageFilterContrast as number,
+          saturation: parsed.imageFilterSaturation as number,
+        },
       }),
     },
   },

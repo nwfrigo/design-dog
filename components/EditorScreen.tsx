@@ -529,6 +529,7 @@ export function EditorScreen() {
   const currentImageSettings = getThumbnailImageSettings(currentTemplate)
   const thumbnailImagePosition = currentImageSettings.position
   const thumbnailImageZoom = currentImageSettings.zoom
+  const thumbnailImageFilters = currentImageSettings.filters
 
   // Calculate preview scale for large templates
   const getPreviewScale = () => {
@@ -824,6 +825,7 @@ export function EditorScreen() {
         thumbnailImageUrl,
         thumbnailImagePosition,
         thumbnailImageZoom,
+        thumbnailImageFilters,
         grayscale,
         showSubhead,
         showBody,

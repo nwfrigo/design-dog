@@ -28,6 +28,9 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     eyebrow,
     editingQueueItemId,
     cancelQueueEdit,
+    // Image state for auto-save (URL + per-template crop/zoom/filters)
+    thumbnailImageUrl,
+    thumbnailImageSettings,
     // FAQ fields for auto-save
     faqTitle,
     faqPages,
@@ -60,7 +63,10 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     return hasGeneratedAssets ? 'Editor (Auto-Create)' : 'Editor'
   }
 
-  // Auto-save on changes (using key state values as proxy for all changes)
+  // Auto-save on changes (using key state values as proxy for all changes).
+  // NOTE: this deps array is hand-maintained and easy to miss when adding
+  // store fields. If your edits don't persist on refresh, your field needs
+  // to be added here (and to `saveDraft`'s payload in store/index.ts).
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       saveDraft()
@@ -74,6 +80,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     verbatimCopy,
     templateType,
     eyebrow,
+    // Image state — was missing; absence caused thumbnail URL + crop
+    // (and now filter) edits to vanish on refresh because the auto-save
+    // effect never re-fired for them.
+    thumbnailImageUrl,
+    thumbnailImageSettings,
     // FAQ fields
     faqTitle,
     faqPages,

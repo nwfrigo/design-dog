@@ -32,6 +32,9 @@ export interface ExportParamState {
   thumbnailImageUrl: string | null
   thumbnailImagePosition: { x: number; y: number }
   thumbnailImageZoom: number
+  /** Per-image filter values; optional so existing call sites compile until
+   *  they thread filters through. Defaults to NEUTRAL_FILTERS at emit time. */
+  thumbnailImageFilters?: import('./image-filters').ImageFilters
   grayscale: boolean
 
   // Toggles
@@ -191,12 +194,19 @@ function buildSpeakerParams(s: ExportParamState): Record<string, unknown> {
 }
 
 function buildImageParams(s: ExportParamState): Record<string, unknown> {
+  const f = s.thumbnailImageFilters
   return {
     imageUrl: s.thumbnailImageUrl,
     imagePositionX: s.thumbnailImagePosition.x,
     imagePositionY: s.thumbnailImagePosition.y,
     imageZoom: s.thumbnailImageZoom,
     grayscale: s.grayscale,
+    // Per-image filter values — 3 scalars so the route's auto-serializer
+    // (app/api/export/route.ts) emits them as plain URL params without
+    // COMPLEX_KEYS handling. Defaults to neutral when absent.
+    imageFilterExposure: f?.exposure ?? 0,
+    imageFilterContrast: f?.contrast ?? 0,
+    imageFilterSaturation: f?.saturation ?? 0,
   }
 }
 
@@ -645,6 +655,7 @@ export function buildExportParamsFromAsset(
     thumbnailImageUrl: (a.thumbnailImageUrl as string | null) ?? null,
     thumbnailImagePosition: (a.thumbnailImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
     thumbnailImageZoom: (a.thumbnailImageZoom as number) ?? 1,
+    thumbnailImageFilters: a.thumbnailImageFilters as import('./image-filters').ImageFilters | undefined,
     grayscale: (a.grayscale as boolean) ?? false,
     showSubhead: a.showSubhead !== false,
     showBody: a.showBody !== false,

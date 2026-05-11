@@ -886,6 +886,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         thumbnailImageUrl,
         thumbnailImagePosition: { ...currentImageSettings.position },
         thumbnailImageZoom: currentImageSettings.zoom,
+        // Filters are part of the per-template image settings. Without
+        // this capture, switching assets and back drops the user's
+        // exposure/contrast/saturation back to neutral.
+        thumbnailImageFilters: currentImageSettings.filters,
         showBody,
         metadata,
         headlineFontSize,
@@ -1119,12 +1123,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Get target template type
       const targetTemplateType = selectedAssets[index]
 
-      // Build updated thumbnailImageSettings with target asset's image position/zoom
+      // Build updated thumbnailImageSettings with target asset's image
+      // position/zoom AND filters. Restoring filters here mirrors the
+      // capture above — without it, returning to an asset wipes the
+      // exposure/contrast/saturation slider state back to neutral.
       const updatedThumbnailImageSettings = {
         ...thumbnailImageSettings,
         [targetTemplateType]: {
           position: { ...targetSettings.thumbnailImagePosition },
           zoom: targetSettings.thumbnailImageZoom,
+          filters: targetSettings.thumbnailImageFilters,
         },
       }
 
@@ -1315,6 +1323,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       },
       imageSettings.position,
       imageSettings.zoom,
+      imageSettings.filters,
     )
     set({ exportQueue: [...state.exportQueue, newAsset] })
   },
@@ -1384,6 +1393,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       },
       imageSettings.position,
       imageSettings.zoom,
+      imageSettings.filters,
     )
 
     // Update the queue item and return to queue

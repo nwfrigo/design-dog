@@ -260,6 +260,7 @@ export function snapshotToQueuedAsset(
   meta: { id: string; sourceAssetIndex: number; templateType: string },
   imagePosition: { x: number; y: number },
   imageZoom: number,
+  imageFilters?: import('./image-filters').ImageFilters,
 ): QueuedAsset {
   const snapshot = captureEditorSnapshot(state)
   return {
@@ -271,9 +272,11 @@ export function snapshotToQueuedAsset(
     headline: state.verbatimCopy.headline,
     subhead: state.verbatimCopy.subhead,
     body: state.verbatimCopy.body,
-    // Image position/zoom come from the per-template settings, not directly from state
+    // Image position/zoom/filters come from the per-template settings,
+    // not directly from state. Filters default to neutral when absent.
     thumbnailImagePosition: imagePosition,
     thumbnailImageZoom: imageZoom,
+    thumbnailImageFilters: imageFilters,
   } as QueuedAsset
 }
 
@@ -318,9 +321,10 @@ export function generatedAssetToQueuedAsset(
     headline: asset.copy.headline,
     subhead: asset.copy.subhead,
     body: asset.copy.body,
-    // Image position/zoom come directly from the generated asset
+    // Image position/zoom/filters come directly from the generated asset.
     thumbnailImagePosition: asset.thumbnailImagePosition,
     thumbnailImageZoom: asset.thumbnailImageZoom,
+    thumbnailImageFilters: asset.thumbnailImageFilters,
     sourceAssetIndex: 0,
   } as QueuedAsset
 }
