@@ -587,6 +587,7 @@ Don't migrate yet. These are PDF/multi-page documents with their own architectur
 
 ## 11. References
 
+- `.claude/RENOVATION-PLAN.md` — project-level renovation plan: per-template audit, two-paradigm split (Track 1 stack / Track 2 fixed-composition), phasing, ContentStack primitive design, anti-convergence guardrails. **Read this before picking the next template.**
 - `.claude/STAGE-AND-BENCH.md` — substrate architecture, registries, decisions, roadmap. The truth-source for *what's in* the substrate.
 - `.claude/ARCHITECTURE.md` — global app architecture (state, export pipeline, two-state-systems).
 - `.claude/BRAND.md` — brand tokens, image handling, solution pills.
