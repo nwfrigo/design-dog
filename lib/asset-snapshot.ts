@@ -120,6 +120,8 @@ const SNAPSHOT_FIELDS = [
   'emailSpeakersGaps',
   // Website Press Release inter-block gaps (left-side content stack)
   'websitePressReleaseGaps',
+  // Social Dark Gradient inter-block gaps (single content stack)
+  'socialDarkGradientGaps',
   // Per-content-type line-height overrides
   'lineHeights',
   // Solution Overview - Page 1

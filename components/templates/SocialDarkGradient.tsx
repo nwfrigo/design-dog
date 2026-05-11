@@ -2,16 +2,25 @@
 
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type HeadingSize = 'S' | 'M' | 'L'
 export type Alignment = 'left' | 'center'
 export type CtaStyle = 'link' | 'button'
 
-/** Logical IDs for editable blocks. Logo is brand-locked, not editable. */
+/** Logical IDs for editable blocks + the `logo` anchor at the top of
+ *  the stack (always-visible, brand-locked). The anchor is part of the
+ *  union so ContentStack's renderSpacerBetween stays strictly typed for
+ *  the anchor→first-block gap. */
 export type SocialDarkGradientBlockId =
+  | 'logo'
   | 'eyebrow'
   | 'headline'
   | 'subhead'
@@ -39,6 +48,22 @@ export interface SocialDarkGradientProps {
   showCta: boolean
   headlineFontSize?: number
   subheadFontSize?: number
+  /** Vertical distribution of the content stack within the canvas. Defaults
+   *  to 'top'. Previously the template forced space-between (logo top,
+   *  content middle, cta bottom); stackAlign now controls this on a per-
+   *  asset basis via the stage bar. */
+  stackAlign?: StackAlign
+  /** Sparse gap overrides keyed `gap-${prev}-to-${next}`. Falls back to
+   *  DEFAULT_GAP per missing key. Drives the adjustable per-gap spacing
+   *  feature in the editor. */
+  gaps?: Record<string, number>
+  /** Stage & Bench render-prop: editor-time drag handle between blocks. */
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: SocialDarkGradientBlockId,
+    nextId: SocialDarkGradientBlockId,
+  ) => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -50,6 +75,8 @@ export interface SocialDarkGradientProps {
    *  template's stacking context (drag scrim lives here). */
   renderOverlay?: () => ReactNode
 }
+
+const DEFAULT_GAP = 24
 
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
   '1': '/assets/backgrounds/social-dark-gradient-1.png',
@@ -112,6 +139,9 @@ export function SocialDarkGradient({
   showCta,
   headlineFontSize,
   subheadFontSize,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
   colors,
   typography,
   scale = 1,
@@ -119,14 +149,13 @@ export function SocialDarkGradient({
   renderInlineEditor,
   renderOverlay,
 }: SocialDarkGradientProps) {
-  // Identity defaults — when no render-props passed (export render route,
-  // non-migrated callers), output is byte-identical to the legacy template.
-  const wrapBlock = renderBlock ?? ((_id, content) => content)
-  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const logoFill = logoColor === 'orange' ? colors.brand.primary : '#FFFFFF'
   const textColor = '#FFFFFF'
   const ctaColor = '#FFFFFF' // CTA is always white on dark backgrounds
+  const itemsAlign = alignment === 'center' ? 'center' : 'flex-start'
+  const textAlign = alignment === 'center' ? ('center' as const) : ('left' as const)
+  const stackMaxWidth = alignment === 'center' ? 900 : undefined
 
   const containerStyle: CSSProperties = {
     width: 1200,
@@ -145,25 +174,165 @@ export function SocialDarkGradient({
     right: 0,
     bottom: 0,
     padding: 64,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: alignment === 'center' ? 'center' : 'flex-start',
-  }
-
-  const textBlockStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: alignment === 'center' ? 'center' : 'flex-start',
-    gap: 24,
-    textAlign: alignment === 'center' ? 'center' : 'left',
-    maxWidth: alignment === 'center' ? 900 : undefined,
   }
 
   // Determine if content is empty for conditional rendering
   const hasHeadline = !isHtmlEmpty(headline)
   const hasSubhead = !isHtmlEmpty(subhead)
   const hasBody = !isHtmlEmpty(body)
+
+  const blocks: ContentStackBlock<SocialDarkGradientBlockId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div
+          style={{
+            color: textColor,
+            fontSize: 14,
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            letterSpacing: 1.54,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: headlineFontSize ?? HEADING_SIZES[headingSize],
+            fontWeight: 300,
+            lineHeight: 1.1,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && hasSubhead,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: subheadFontSize ?? SUBHEAD_SIZES[headingSize],
+            fontWeight: 300,
+            lineHeight: 1.3,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'body',
+      visible: showBody && hasBody,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: body }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="rich-text-white"
+          style={{
+            color: textColor,
+            fontSize: BODY_SIZES[headingSize],
+            fontWeight: 300,
+            lineHeight: 1.4,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'metadata',
+      visible: showMetadata && !!metadata,
+      defaultInner: metadata,
+      renderChrome: (inner) => (
+        <div
+          style={{
+            color: textColor,
+            fontSize: 14,
+            fontWeight: 500,
+            textTransform: 'uppercase',
+            letterSpacing: 1.54,
+            textAlign,
+          }}
+        >
+          {inner}
+        </div>
+      ),
+    },
+    {
+      id: 'cta',
+      visible: showCta && !!ctaText,
+      defaultInner: ctaText,
+      renderChrome: (inner) =>
+        ctaStyle === 'link' ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+            }}
+          >
+            <span
+              style={{
+                color: ctaColor,
+                fontSize: 24,
+                fontWeight: 300,
+                lineHeight: 1,
+              }}
+            >
+              {inner}
+            </span>
+            <ArrowIcon color={ctaColor} width={22} height={22 * 0.8} />
+          </div>
+        ) : (
+          <div
+            style={{
+              padding: '16px 32px',
+              background: '#FFFFFF',
+              borderRadius: 100,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span
+              style={{
+                color: '#000000',
+                fontSize: 18,
+                fontWeight: 300,
+                lineHeight: 1,
+              }}
+            >
+              {inner}
+            </span>
+          </div>
+        ),
+    },
+  ]
 
   return (
     <div style={containerStyle}>
@@ -184,174 +353,28 @@ export function SocialDarkGradient({
         }}
       />
 
-      {/* Content Overlay */}
+      {/* Content overlay — ContentStack handles vertical distribution
+       *  (stackAlign) and adjustable per-gap spacing. Logo is a topAnchor,
+       *  always pinned to the top of the canvas regardless of stackAlign. */}
       <div style={contentStyle}>
-        {/* Logo */}
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: alignment === 'center' ? 'center' : 'flex-start'
-        }}>
-          <CorityLogo fill={logoFill} height={37} />
-        </div>
-
-        {/* Text Content */}
-        <div style={textBlockStyle}>
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && wrapBlock(
-            'eyebrow',
-            <div
-              style={{
-                color: textColor,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.54,
-              }}
-            >
-              {wrapInline('eyebrow', eyebrow)}
-            </div>,
-          )}
-
-          {/* Headline + Subhead Group */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 36,
-            alignItems: alignment === 'center' ? 'center' : 'flex-start',
-          }}>
-            {/* Headline — rich text (bold/italic/line breaks). Defaults to
-             *  static dangerouslySetInnerHTML; renderInlineEditor swaps in a
-             *  contentEditable when this slot is being edited. */}
-            {showHeadline && wrapBlock(
-              'headline',
-              <div
-                className="rich-text-white"
-                style={{
-                  color: textColor,
-                  fontSize: headlineFontSize ?? HEADING_SIZES[headingSize],
-                  fontWeight: 300,
-                  lineHeight: 1.1,
-                }}
-              >
-                {wrapInline(
-                  'headline',
-                  <span dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />,
-                )}
-              </div>,
-            )}
-
-            {/* Subhead — rich text. */}
-            {showSubhead && hasSubhead && wrapBlock(
-              'subhead',
-              <div
-                className="rich-text-white"
-                style={{
-                  color: textColor,
-                  fontSize: subheadFontSize ?? SUBHEAD_SIZES[headingSize],
-                  fontWeight: 300,
-                  lineHeight: 1.3,
-                }}
-              >
-                {wrapInline(
-                  'subhead',
-                  <span dangerouslySetInnerHTML={{ __html: subhead }} />,
-                )}
-              </div>,
-            )}
-          </div>
-
-          {/* Body — rich text. */}
-          {showBody && hasBody && wrapBlock(
-            'body',
-            <div
-              className="rich-text-white"
-              style={{
-                color: textColor,
-                fontSize: BODY_SIZES[headingSize],
-                fontWeight: 300,
-                lineHeight: 1.4,
-              }}
-            >
-              {wrapInline(
-                'body',
-                <span dangerouslySetInnerHTML={{ __html: body }} />,
-              )}
-            </div>,
-          )}
-
-          {/* Metadata */}
-          {showMetadata && metadata && wrapBlock(
-            'metadata',
-            <div
-              style={{
-                color: textColor,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.54,
-              }}
-            >
-              {wrapInline('metadata', metadata)}
-            </div>,
-          )}
-        </div>
-
-        {/* CTA */}
-        {showCta && ctaText && wrapBlock(
-          'cta',
-          <div style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: alignment === 'center' ? 'center' : 'flex-start'
-          }}>
-            {ctaStyle === 'link' ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 16,
-                }}
-              >
-                <span
-                  style={{
-                    color: ctaColor,
-                    fontSize: 24,
-                    fontWeight: 300,
-                    lineHeight: 1,
-                  }}
-                >
-                  {wrapInline('cta', ctaText)}
-                </span>
-                <ArrowIcon color={ctaColor} width={22} height={22 * 0.8} />
-              </div>
-            ) : (
-              <div
-                style={{
-                  padding: '16px 32px',
-                  background: '#FFFFFF',
-                  borderRadius: 100,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span
-                  style={{
-                    color: '#000000',
-                    fontSize: 18,
-                    fontWeight: 300,
-                    lineHeight: 1,
-                  }}
-                >
-                  {wrapInline('cta', ctaText)}
-                </span>
-              </div>
-            )}
-          </div>,
-        )}
+        <ContentStack<SocialDarkGradientBlockId>
+          blocks={blocks}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock}
+          renderInlineEditor={renderInlineEditor}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: <CorityLogo fill={logoFill} height={37} />,
+            renderBlock: renderBlock ? (node) => renderBlock('logo', node) : undefined,
+          }}
+          alignItems={itemsAlign}
+          maxWidth={stackMaxWidth}
+        />
+        {renderOverlay?.()}
       </div>
-      {renderOverlay?.()}
     </div>
   )
 }

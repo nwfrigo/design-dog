@@ -186,6 +186,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   emailSpeakersGaps: {} as Record<string, number>,
   // Website Press Release inter-block gap overrides (left-side content stack)
   websitePressReleaseGaps: {} as Record<string, number>,
+  // Social Dark Gradient inter-block gap overrides (single content stack)
+  socialDarkGradientGaps: {} as Record<string, number>,
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults)
   lineHeights: {} as Record<string, number>,
   // Solution Overview PDF specific - Page 1
@@ -407,6 +409,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   emailSpeakersGaps: {} as Record<string, number>,
   // Website Press Release inter-block gap overrides (left-side content stack)
   websitePressReleaseGaps: {} as Record<string, number>,
+  // Social Dark Gradient inter-block gap overrides (single content stack)
+  socialDarkGradientGaps: {} as Record<string, number>,
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults)
   lineHeights: {} as Record<string, number>,
   // Solution Overview PDF specific - Page 1
@@ -680,6 +684,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setWebsitePressReleaseGap: (gapKey, value) => set((state) => ({
     websitePressReleaseGaps: { ...state.websitePressReleaseGaps, [gapKey]: value }
   })),
+  setSocialDarkGradientGap: (gapKey, value) => set((state) => ({
+    socialDarkGradientGaps: { ...state.socialDarkGradientGaps, [gapKey]: value }
+  })),
   // Per-content-type line-height overrides
   setLineHeight: (contentKey, value) => set((state) => ({
     lineHeights: { ...state.lineHeights, [contentKey]: value }
@@ -861,7 +868,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, emailDarkGradientGaps, emailSpeakersGaps, websitePressReleaseGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, emailDarkGradientGaps, emailSpeakersGaps, websitePressReleaseGaps, socialDarkGradientGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -898,6 +905,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         emailDarkGradientGaps,
         emailSpeakersGaps,
         websitePressReleaseGaps,
+        socialDarkGradientGaps,
         lineHeights,
         speaker1Name,
         speaker1Role,
@@ -1025,6 +1033,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         emailDarkGradientGaps: {},
         emailSpeakersGaps: {},
         websitePressReleaseGaps: {},
+        socialDarkGradientGaps: {},
         lineHeights: {},
         speaker1Name: 'Firstname Lastname',
         speaker1Role: 'Role, Company',
@@ -1159,6 +1168,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         emailDarkGradientGaps: targetSettings.emailDarkGradientGaps ?? {},
         emailSpeakersGaps: targetSettings.emailSpeakersGaps ?? {},
         websitePressReleaseGaps: targetSettings.websitePressReleaseGaps ?? {},
+        socialDarkGradientGaps: targetSettings.socialDarkGradientGaps ?? {},
         lineHeights: targetSettings.lineHeights ?? {},
         speaker1Name: targetSettings.speaker1Name,
         speaker1Role: targetSettings.speaker1Role,
@@ -2139,6 +2149,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       emailDarkGradientGaps: state.emailDarkGradientGaps,
       emailSpeakersGaps: state.emailSpeakersGaps,
       websitePressReleaseGaps: state.websitePressReleaseGaps,
+      socialDarkGradientGaps: state.socialDarkGradientGaps,
       lineHeights: state.lineHeights,
       generatedVariations: state.generatedVariations,
       // FAQ PDF
@@ -2286,6 +2297,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       emailDarkGradientGaps: draft.emailDarkGradientGaps ?? {},
       emailSpeakersGaps: draft.emailSpeakersGaps ?? {},
       websitePressReleaseGaps: draft.websitePressReleaseGaps ?? {},
+      socialDarkGradientGaps: draft.socialDarkGradientGaps ?? {},
       lineHeights: draft.lineHeights ?? {},
       generatedVariations: draft.generatedVariations,
       // FAQ PDF

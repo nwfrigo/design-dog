@@ -26,6 +26,7 @@ export interface ExportParamState {
   subheadFontSize: number | null
   stackAlign: StackAlign
   emailDarkGradientGaps: Record<string, number>
+  socialDarkGradientGaps: Record<string, number>
   lineHeights: Record<string, number>
 
   // Image
@@ -279,6 +280,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showMetadata: s.showMetadata,
     showCta: s.showCta,
+    stackAlign: s.stackAlign,
+    gaps: s.socialDarkGradientGaps,
   }),
 
   'social-blue-gradient': (s) => ({
@@ -651,6 +654,7 @@ export function buildExportParamsFromAsset(
     subheadFontSize: (a.subheadFontSize as number | null) ?? null,
     stackAlign: (a.stackAlign as StackAlign) ?? 'top',
     emailDarkGradientGaps: (a.emailDarkGradientGaps as Record<string, number>) ?? {},
+    socialDarkGradientGaps: (a.socialDarkGradientGaps as Record<string, number>) ?? {},
     lineHeights: (a.lineHeights as Record<string, number>) ?? {},
     thumbnailImageUrl: (a.thumbnailImageUrl as string | null) ?? null,
     thumbnailImagePosition: (a.thumbnailImagePosition as { x: number; y: number }) || { x: 0, y: 0 },

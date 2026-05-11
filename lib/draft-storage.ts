@@ -105,6 +105,7 @@ export interface DraftState {
   emailDarkGradientGaps: Record<string, number>
   emailSpeakersGaps: Record<string, number>
   websitePressReleaseGaps: Record<string, number>
+  socialDarkGradientGaps: Record<string, number>
   lineHeights: Record<string, number>
   generatedVariations: { headlines: string[]; ctas: string[] } | null
   // FAQ PDF
@@ -276,6 +277,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       emailDarkGradientGaps: state.emailDarkGradientGaps ?? {},
       emailSpeakersGaps: state.emailSpeakersGaps ?? {},
       websitePressReleaseGaps: state.websitePressReleaseGaps ?? {},
+      socialDarkGradientGaps: state.socialDarkGradientGaps ?? {},
       lineHeights: state.lineHeights ?? {},
       generatedVariations: state.generatedVariations || null,
       // FAQ PDF

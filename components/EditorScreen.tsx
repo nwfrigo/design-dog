@@ -316,6 +316,9 @@ export function EditorScreen() {
     // Email Dark Gradient inter-block gaps
     emailDarkGradientGaps,
     setEmailDarkGradientGap,
+    // Social Dark Gradient inter-block gaps
+    socialDarkGradientGaps,
+    setSocialDarkGradientGap,
     lineHeights,
     setLineHeight,
     // Solution Overview PDF - Page 1
@@ -821,6 +824,7 @@ export function EditorScreen() {
         subheadFontSize,
         stackAlign,
         emailDarkGradientGaps,
+        socialDarkGradientGaps,
         lineHeights,
         thumbnailImageUrl,
         thumbnailImagePosition,

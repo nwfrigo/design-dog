@@ -1,4 +1,4 @@
-import type { QueuedAsset, TemplateType } from '@/types'
+import type { QueuedAsset, TemplateType, StackAlign } from '@/types'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { stripHtml } from '@/components/SimpleRichTextEditor'
 import { parseSpeakerParams } from '@/lib/render-params'
@@ -669,6 +669,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta,
       headlineFontSize: asset.headlineFontSize ?? undefined,
       subheadFontSize: asset.subheadFontSize ?? undefined,
+      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
+      gaps: (asset.socialDarkGradientGaps as Record<string, number>) ?? {},
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -699,6 +701,10 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'subheadFontSize', parser: 'numberOrUndefined' },
+        { param: 'stackAlign', parser: 'enum', default: 'top' },
+        // Inter-block gap overrides (JSON-encoded record). Falls back to
+        // DEFAULT_GAP per missing key.
+        { param: 'gaps', parser: 'jsonRecord' },
       ],
     },
   },

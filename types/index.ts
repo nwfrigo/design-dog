@@ -361,6 +361,8 @@ export interface ManualAssetSettings {
   emailSpeakersGaps: Record<string, number>
   // Website Press Release inter-block gap overrides (left-side content stack)
   websitePressReleaseGaps: Record<string, number>
+  // Social Dark Gradient inter-block gap overrides (single content stack)
+  socialDarkGradientGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -649,6 +651,8 @@ export interface GeneratedAsset {
   emailSpeakersGaps: Record<string, number>
   // Website Press Release inter-block gap overrides (left-side content stack)
   websitePressReleaseGaps: Record<string, number>
+  // Social Dark Gradient inter-block gap overrides (single content stack)
+  socialDarkGradientGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -836,6 +840,8 @@ export interface QueuedAsset {
   emailSpeakersGaps: Record<string, number>
   // Website Press Release inter-block gap overrides (left-side content stack)
   websitePressReleaseGaps: Record<string, number>
+  // Social Dark Gradient inter-block gap overrides (single content stack)
+  socialDarkGradientGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -1041,6 +1047,8 @@ export interface AppState {
   emailSpeakersGaps: Record<string, number>
   // Website Press Release inter-block gap overrides (left-side content stack)
   websitePressReleaseGaps: Record<string, number>
+  // Social Dark Gradient inter-block gap overrides (single content stack)
+  socialDarkGradientGaps: Record<string, number>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -1216,6 +1224,8 @@ export interface AppState {
   setEmailSpeakersGap: (gapKey: string, value: number) => void
   // Website Press Release inter-block gaps (left-side content stack)
   setWebsitePressReleaseGap: (gapKey: string, value: number) => void
+  // Social Dark Gradient inter-block gaps (single content stack)
+  setSocialDarkGradientGap: (gapKey: string, value: number) => void
   setLineHeight: (contentKey: string, value: number) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void

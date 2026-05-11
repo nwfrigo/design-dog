@@ -13,6 +13,7 @@ import { Editable } from '../Editable'
 import { ContextualToolbar } from '../ContextualToolbar'
 import { SelectionRing } from '../SelectionRing'
 import { InlineTextEdit } from '../InlineTextEdit'
+import { SpacingHandle } from '../handles/SpacingHandle'
 import { BenchChip, type BenchChipKind } from '../bench/BenchChip'
 import { SelectorRow } from '../stage-bar/SelectorRow'
 import { SelectorPrimitive, type ColorOption } from '../stage-bar/SelectorPrimitive'
@@ -137,6 +138,14 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
   const subheadFontSize = useStore((s) => s.subheadFontSize)
   const setSubheadFontSize = useStore((s) => s.setSubheadFontSize)
 
+  // Renovation-pattern wiring — stackAlign drives vertical distribution,
+  // socialDarkGradientGaps is the sparse per-gap override record edited
+  // via the per-spacer drag handle.
+  const stackAlign = useStore((s) => s.stackAlign)
+  const setStackAlign = useStore((s) => s.setStackAlign)
+  const socialDarkGradientGaps = useStore((s) => s.socialDarkGradientGaps)
+  const setSocialDarkGradientGap = useStore((s) => s.setSocialDarkGradientGap)
+
   const editingPath = useCanvasEditorStore((s) => s.editingPath)
 
   // ---- slot config ----
@@ -194,6 +203,9 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
           options={COLOR_STYLE_OPTIONS}
         />
       </SelectorRow>
+      <SelectorRow label="content stack">
+        <SelectorPrimitive kind="stack" value={stackAlign} onChange={setStackAlign} />
+      </SelectorRow>
       <SelectorRow label="alignment">
         <SelectorPrimitive
           kind="alignment"
@@ -216,7 +228,11 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
   )
 
   // ---- per-block Editable wrapping ----
-  const slotConfig: Record<SocialDarkGradientBlockId, { storeKey: string; kind: 'text' | 'cta' }> = {
+  // 'logo' is the topAnchor (brand-locked) but is part of the BlockId union
+  // so ContentStack's typing stays strict. Wrapped as image-kind for
+  // selection feedback (ring on click) but it doesn't surface a toolbar.
+  const slotConfig: Record<SocialDarkGradientBlockId, { storeKey: string; kind: 'text' | 'cta' | 'image' }> = {
+    logo:     { storeKey: 'logo', kind: 'image' },
     eyebrow:  { storeKey: 'eyebrow', kind: 'text' },
     headline: { storeKey: 'verbatimCopy.headline', kind: 'text' },
     subhead:  { storeKey: 'verbatimCopy.subhead', kind: 'text' },
@@ -301,6 +317,26 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
                   showCta={showCtaEff}
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
+                  stackAlign={stackAlign}
+                  gaps={socialDarkGradientGaps}
+                  renderSpacerBetween={(key, value, _prev, _next) => (
+                    <Editable
+                      templateId="social-dark-gradient"
+                      slotKey={key}
+                      storeKey="socialDarkGradientGaps"
+                      kind="spacer"
+                    >
+                      <SpacingHandle
+                        spacing={value}
+                        onChange={(next) => setSocialDarkGradientGap(key, next)}
+                        scale={1}
+                        direction={stackAlign === 'bottom' ? 'up' : 'down'}
+                        min={0}
+                        max={96}
+                        showUnit
+                      />
+                    </Editable>
+                  )}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}
