@@ -131,8 +131,8 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
   const setSubheadFontSize = useStore((s) => s.setSubheadFontSize)
   const stackAlign = useStore((s) => s.stackAlign)
   const setStackAlign = useStore((s) => s.setStackAlign)
-  const websitePressReleaseGaps = useStore((s) => s.websitePressReleaseGaps)
-  const setWebsitePressReleaseGap = useStore((s) => s.setWebsitePressReleaseGap)
+  const websitePressReleaseGaps = useStore((s) => s.templateGaps['website-press-release'] ?? {})
+  const setTemplateGap = useStore((s) => s.setTemplateGap)
 
   // Featured image — store fields (thumbnailImageUrl + per-template
   // thumbnailImageSettings); EditbarImage actions write through these.
@@ -346,12 +346,12 @@ export function WebsitePressReleaseStageBench(props: StageBenchEditorProps) {
                     <Editable
                       templateId="website-press-release"
                       slotKey={key}
-                      storeKey="websitePressReleaseGaps"
+                      storeKey="templateGaps"
                       kind="spacer"
                     >
                       <SpacingHandle
                         spacing={value}
-                        onChange={(next) => setWebsitePressReleaseGap(key, next)}
+                        onChange={(next) => setTemplateGap('website-press-release', key, next)}
                         scale={1}
                         direction={stackAlign === 'bottom' ? 'up' : 'down'}
                         min={0}

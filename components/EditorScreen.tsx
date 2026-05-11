@@ -313,12 +313,9 @@ export function EditorScreen() {
     // Email Dark Gradient stack alignment
     stackAlign,
     setStackAlign,
-    // Email Dark Gradient inter-block gaps
-    emailDarkGradientGaps,
-    setEmailDarkGradientGap,
-    // Social Dark Gradient inter-block gaps
-    socialDarkGradientGaps,
-    setSocialDarkGradientGap,
+    // Per-template inter-block gaps (bundled)
+    templateGaps,
+    setTemplateGap,
     lineHeights,
     setLineHeight,
     // Solution Overview PDF - Page 1
@@ -823,8 +820,7 @@ export function EditorScreen() {
         headlineFontSize,
         subheadFontSize,
         stackAlign,
-        emailDarkGradientGaps,
-        socialDarkGradientGaps,
+        templateGaps,
         lineHeights,
         thumbnailImageUrl,
         thumbnailImagePosition,
@@ -4873,18 +4869,18 @@ export function EditorScreen() {
                     headlineFontSize={headlineFontSize ?? undefined}
                     subheadFontSize={subheadFontSize ?? undefined}
                     stackAlign={stackAlign}
-                    gaps={emailDarkGradientGaps}
+                    gaps={templateGaps['email-dark-gradient'] ?? {}}
                     lineHeights={lineHeights}
                     renderSpacerBetween={(key, value) => (
                       <Editable
                         templateId="email-dark-gradient"
                         slotKey={key}
-                        storeKey="emailDarkGradientGaps"
+                        storeKey="templateGaps"
                         kind="spacer"
                       >
                         <SpacingHandle
                           spacing={value}
-                          onChange={(next) => setEmailDarkGradientGap(key, next)}
+                          onChange={(next) => setTemplateGap('email-dark-gradient', key, next)}
                           scale={previewScale}
                           direction={stackAlign === 'bottom' ? 'up' : 'down'}
                           min={0}

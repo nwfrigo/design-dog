@@ -9,7 +9,7 @@
  */
 
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
-import type { QueuedAsset, StackAlign } from '@/types'
+import type { QueuedAsset, StackAlign, TemplateType } from '@/types'
 
 // The shape of all the state the builders can draw from.
 // This is intentionally a flat bag — it mirrors the store + local state
@@ -25,8 +25,9 @@ export interface ExportParamState {
   headlineFontSize: number | null
   subheadFontSize: number | null
   stackAlign: StackAlign
-  emailDarkGradientGaps: Record<string, number>
-  socialDarkGradientGaps: Record<string, number>
+  // Bundled per-template gap overrides. Builders index in via the
+  // template's key (e.g. `s.templateGaps['email-dark-gradient']`).
+  templateGaps: Partial<Record<TemplateType, Record<string, number>>>
   lineHeights: Record<string, number>
 
   // Image
@@ -281,7 +282,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showMetadata: s.showMetadata,
     showCta: s.showCta,
     stackAlign: s.stackAlign,
-    gaps: s.socialDarkGradientGaps,
+    gaps: s.templateGaps['social-dark-gradient'] ?? {},
   }),
 
   'social-blue-gradient': (s) => ({
@@ -377,7 +378,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showCta: s.showCta,
     stackAlign: s.stackAlign,
-    gaps: s.emailDarkGradientGaps,
+    gaps: s.templateGaps['email-dark-gradient'] ?? {},
     lineHeights: s.lineHeights,
   }),
 
@@ -653,8 +654,7 @@ export function buildExportParamsFromAsset(
     headlineFontSize: (a.headlineFontSize as number | null) ?? null,
     subheadFontSize: (a.subheadFontSize as number | null) ?? null,
     stackAlign: (a.stackAlign as StackAlign) ?? 'top',
-    emailDarkGradientGaps: (a.emailDarkGradientGaps as Record<string, number>) ?? {},
-    socialDarkGradientGaps: (a.socialDarkGradientGaps as Record<string, number>) ?? {},
+    templateGaps: (a.templateGaps as Partial<Record<TemplateType, Record<string, number>>>) ?? {},
     lineHeights: (a.lineHeights as Record<string, number>) ?? {},
     thumbnailImageUrl: (a.thumbnailImageUrl as string | null) ?? null,
     thumbnailImagePosition: (a.thumbnailImagePosition as { x: number; y: number }) || { x: 0, y: 0 },

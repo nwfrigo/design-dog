@@ -102,10 +102,14 @@ export interface DraftState {
   headlineFontSize?: number | null
   subheadFontSize?: number | null
   stackAlign: StackAlign
-  emailDarkGradientGaps: Record<string, number>
-  emailSpeakersGaps: Record<string, number>
-  websitePressReleaseGaps: Record<string, number>
-  socialDarkGradientGaps: Record<string, number>
+  // Bundled per-template gap overrides. Legacy per-template fields are
+  // kept as optional so old localStorage drafts hydrate cleanly via the
+  // store's migration shim; new saves only write `templateGaps`.
+  templateGaps: Partial<Record<TemplateType, Record<string, number>>>
+  emailDarkGradientGaps?: Record<string, number>
+  emailSpeakersGaps?: Record<string, number>
+  websitePressReleaseGaps?: Record<string, number>
+  socialDarkGradientGaps?: Record<string, number>
   lineHeights: Record<string, number>
   generatedVariations: { headlines: string[]; ctas: string[] } | null
   // FAQ PDF
@@ -274,10 +278,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       headlineFontSize: state.headlineFontSize ?? null,
       subheadFontSize: state.subheadFontSize ?? null,
       stackAlign: state.stackAlign ?? 'top',
-      emailDarkGradientGaps: state.emailDarkGradientGaps ?? {},
-      emailSpeakersGaps: state.emailSpeakersGaps ?? {},
-      websitePressReleaseGaps: state.websitePressReleaseGaps ?? {},
-      socialDarkGradientGaps: state.socialDarkGradientGaps ?? {},
+      templateGaps: state.templateGaps ?? {},
       lineHeights: state.lineHeights ?? {},
       generatedVariations: state.generatedVariations || null,
       // FAQ PDF

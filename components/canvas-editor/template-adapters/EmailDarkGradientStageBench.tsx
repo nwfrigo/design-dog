@@ -137,8 +137,8 @@ export function EmailDarkGradientStageBench(props: StageBenchEditorProps) {
   const setHeadlineFontSize = useStore((s) => s.setHeadlineFontSize)
   const subheadFontSize = useStore((s) => s.subheadFontSize)
   const setSubheadFontSize = useStore((s) => s.setSubheadFontSize)
-  const emailDarkGradientGaps = useStore((s) => s.emailDarkGradientGaps)
-  const setEmailDarkGradientGap = useStore((s) => s.setEmailDarkGradientGap)
+  const emailDarkGradientGaps = useStore((s) => s.templateGaps['email-dark-gradient'] ?? {})
+  const setTemplateGap = useStore((s) => s.setTemplateGap)
   const lineHeights = useStore((s) => s.lineHeights)
   const setLineHeight = useStore((s) => s.setLineHeight)
   const theme = useStore((s) => s.theme)
@@ -304,12 +304,12 @@ export function EmailDarkGradientStageBench(props: StageBenchEditorProps) {
                       <Editable
                         templateId="email-dark-gradient"
                         slotKey={key}
-                        storeKey="emailDarkGradientGaps"
+                        storeKey="templateGaps"
                         kind="spacer"
                       >
                         <SpacingHandle
                           spacing={value}
-                          onChange={(next) => setEmailDarkGradientGap(key, next)}
+                          onChange={(next) => setTemplateGap('email-dark-gradient', key, next)}
                           scale={1}
                           direction={stackAlign === 'bottom' ? 'up' : 'down'}
                           min={0}

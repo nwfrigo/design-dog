@@ -141,11 +141,12 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
 
   // Renovation-pattern wiring — stackAlign drives vertical distribution,
   // socialDarkGradientGaps is the sparse per-gap override record edited
-  // via the per-spacer drag handle.
+  // via the per-spacer drag handle. Both flow through the bundled
+  // `templateGaps` record + universal `setTemplateGap` setter.
   const stackAlign = useStore((s) => s.stackAlign)
   const setStackAlign = useStore((s) => s.setStackAlign)
-  const socialDarkGradientGaps = useStore((s) => s.socialDarkGradientGaps)
-  const setSocialDarkGradientGap = useStore((s) => s.setSocialDarkGradientGap)
+  const socialDarkGradientGaps = useStore((s) => s.templateGaps['social-dark-gradient'] ?? {})
+  const setTemplateGap = useStore((s) => s.setTemplateGap)
 
   const editingPath = useCanvasEditorStore((s) => s.editingPath)
 
@@ -325,12 +326,12 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
                     <Editable
                       templateId="social-dark-gradient"
                       slotKey={key}
-                      storeKey="socialDarkGradientGaps"
+                      storeKey="templateGaps"
                       kind="spacer"
                     >
                       <SpacingHandle
                         spacing={value}
-                        onChange={(next) => setSocialDarkGradientGap(key, next)}
+                        onChange={(next) => setTemplateGap('social-dark-gradient', key, next)}
                         scale={1}
                         direction={stackAlign === 'bottom' ? 'up' : 'down'}
                         min={0}

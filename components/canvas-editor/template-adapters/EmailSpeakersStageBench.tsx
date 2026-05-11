@@ -144,8 +144,8 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
   const speakerCount = useStore((s) => s.speakerCount)
   const stackAlign = useStore((s) => s.stackAlign)
   const setStackAlign = useStore((s) => s.setStackAlign)
-  const emailSpeakersGaps = useStore((s) => s.emailSpeakersGaps)
-  const setEmailSpeakersGap = useStore((s) => s.setEmailSpeakersGap)
+  const emailSpeakersGaps = useStore((s) => s.templateGaps['email-speakers'] ?? {})
+  const setTemplateGap = useStore((s) => s.setTemplateGap)
 
   // Speaker data + setters. Each speaker exposes three editable fields
   // (name / role / image); deep-click into the group selects one of them.
@@ -404,12 +404,12 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
                     <Editable
                       templateId="email-speakers"
                       slotKey={key}
-                      storeKey="emailSpeakersGaps"
+                      storeKey="templateGaps"
                       kind="spacer"
                     >
                       <SpacingHandle
                         spacing={value}
-                        onChange={(next) => setEmailSpeakersGap(key, next)}
+                        onChange={(next) => setTemplateGap('email-speakers', key, next)}
                         scale={1}
                         direction={stackAlign === 'bottom' ? 'up' : 'down'}
                         min={0}

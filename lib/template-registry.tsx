@@ -670,7 +670,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       headlineFontSize: asset.headlineFontSize ?? undefined,
       subheadFontSize: asset.subheadFontSize ?? undefined,
       stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: (asset.socialDarkGradientGaps as Record<string, number>) ?? {},
+      gaps: asset.templateGaps?.['social-dark-gradient'] ?? {},
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -990,7 +990,7 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       headlineFontSize: asset.headlineFontSize ?? undefined,
       subheadFontSize: asset.subheadFontSize ?? undefined,
       stackAlign: (asset.stackAlign as 'top' | 'center' | 'bottom') ?? 'top',
-      gaps: (asset.emailDarkGradientGaps as Record<string, number>) ?? {},
+      gaps: asset.templateGaps?.['email-dark-gradient'] ?? {},
       lineHeights: (asset.lineHeights as Record<string, number>) ?? {},
       colors, typography, scale: 1,
     }),

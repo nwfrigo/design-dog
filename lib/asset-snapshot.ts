@@ -112,16 +112,11 @@ const SNAPSHOT_FIELDS = [
   'grayscale',
   'headlineFontSize',
   'subheadFontSize',
-  // Email Dark Gradient stack alignment
+  // Stack alignment (shared across all spacer-aware templates)
   'stackAlign',
-  // Email Dark Gradient inter-block gaps
-  'emailDarkGradientGaps',
-  // Email Speakers inter-block gaps (left-side content stack)
-  'emailSpeakersGaps',
-  // Website Press Release inter-block gaps (left-side content stack)
-  'websitePressReleaseGaps',
-  // Social Dark Gradient inter-block gaps (single content stack)
-  'socialDarkGradientGaps',
+  // Per-template inter-block gap overrides. One nested record holds every
+  // template's gaps; replaced the prior 4 per-template fields.
+  'templateGaps',
   // Per-content-type line-height overrides
   'lineHeights',
   // Solution Overview - Page 1

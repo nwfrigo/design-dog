@@ -355,14 +355,12 @@ export interface ManualAssetSettings {
   subheadFontSize: number | null
   // Email Dark Gradient stack alignment
   stackAlign: StackAlign
-  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
-  emailDarkGradientGaps: Record<string, number>
-  // Email Speakers inter-block gap overrides (left-side content stack)
-  emailSpeakersGaps: Record<string, number>
-  // Website Press Release inter-block gap overrides (left-side content stack)
-  websitePressReleaseGaps: Record<string, number>
-  // Social Dark Gradient inter-block gap overrides (single content stack)
-  socialDarkGradientGaps: Record<string, number>
+  // Inter-block gap overrides per template (sparse; falls back to the
+  // template's DEFAULT_GAP per missing key). One record per migrated
+  // template that supports adjustable spacing. Bundled into a single
+  // nested record so onboarding a new template adds one access line, not
+  // 15 sites of plumbing per field.
+  templateGaps: Partial<Record<TemplateType, Record<string, number>>>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -645,14 +643,12 @@ export interface GeneratedAsset {
   subheadFontSize: number | null
   // Email Dark Gradient stack alignment
   stackAlign: StackAlign
-  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
-  emailDarkGradientGaps: Record<string, number>
-  // Email Speakers inter-block gap overrides (left-side content stack)
-  emailSpeakersGaps: Record<string, number>
-  // Website Press Release inter-block gap overrides (left-side content stack)
-  websitePressReleaseGaps: Record<string, number>
-  // Social Dark Gradient inter-block gap overrides (single content stack)
-  socialDarkGradientGaps: Record<string, number>
+  // Inter-block gap overrides per template (sparse; falls back to the
+  // template's DEFAULT_GAP per missing key). One record per migrated
+  // template that supports adjustable spacing. Bundled into a single
+  // nested record so onboarding a new template adds one access line, not
+  // 15 sites of plumbing per field.
+  templateGaps: Partial<Record<TemplateType, Record<string, number>>>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -834,14 +830,12 @@ export interface QueuedAsset {
   subheadFontSize: number | null
   // Email Dark Gradient stack alignment
   stackAlign: StackAlign
-  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
-  emailDarkGradientGaps: Record<string, number>
-  // Email Speakers inter-block gap overrides (left-side content stack)
-  emailSpeakersGaps: Record<string, number>
-  // Website Press Release inter-block gap overrides (left-side content stack)
-  websitePressReleaseGaps: Record<string, number>
-  // Social Dark Gradient inter-block gap overrides (single content stack)
-  socialDarkGradientGaps: Record<string, number>
+  // Inter-block gap overrides per template (sparse; falls back to the
+  // template's DEFAULT_GAP per missing key). One record per migrated
+  // template that supports adjustable spacing. Bundled into a single
+  // nested record so onboarding a new template adds one access line, not
+  // 15 sites of plumbing per field.
+  templateGaps: Partial<Record<TemplateType, Record<string, number>>>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -1041,14 +1035,12 @@ export interface AppState {
 
   // Email Dark Gradient stack alignment
   stackAlign: StackAlign
-  // Email Dark Gradient inter-block gap overrides (sparse; falls back to 24 default per gap key)
-  emailDarkGradientGaps: Record<string, number>
-  // Email Speakers inter-block gap overrides (left-side content stack)
-  emailSpeakersGaps: Record<string, number>
-  // Website Press Release inter-block gap overrides (left-side content stack)
-  websitePressReleaseGaps: Record<string, number>
-  // Social Dark Gradient inter-block gap overrides (single content stack)
-  socialDarkGradientGaps: Record<string, number>
+  // Inter-block gap overrides per template (sparse; falls back to the
+  // template's DEFAULT_GAP per missing key). One record per migrated
+  // template that supports adjustable spacing. Bundled into a single
+  // nested record so onboarding a new template adds one access line, not
+  // 15 sites of plumbing per field.
+  templateGaps: Partial<Record<TemplateType, Record<string, number>>>
   // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
   // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
   // headline-line-height tweak follows the headline content across reuses.
@@ -1218,14 +1210,12 @@ export interface AppState {
   setSubheadFontSize: (size: number | null) => void
   // Email Dark Gradient stack alignment
   setStackAlign: (stackAlign: StackAlign) => void
-  // Email Dark Gradient inter-block gaps
-  setEmailDarkGradientGap: (gapKey: string, value: number) => void
-  // Email Speakers inter-block gaps (left-side content stack)
-  setEmailSpeakersGap: (gapKey: string, value: number) => void
-  // Website Press Release inter-block gaps (left-side content stack)
-  setWebsitePressReleaseGap: (gapKey: string, value: number) => void
-  // Social Dark Gradient inter-block gaps (single content stack)
-  setSocialDarkGradientGap: (gapKey: string, value: number) => void
+  // Per-template inter-block gap setter. Templates pass their templateType
+  // alongside the gap key + value; the store merges into templateGaps. One
+  // setter replaces the previous per-template setters (setEmailDarkGradientGap,
+  // setEmailSpeakersGap, etc.) so onboarding a new spacer-aware template
+  // requires no new store wiring.
+  setTemplateGap: (templateType: TemplateType, gapKey: string, value: number) => void
   setLineHeight: (contentKey: string, value: number) => void
   // Solution Overview PDF specific - Page 1
   setSolutionOverviewSolution: (solution: SolutionCategory) => void
