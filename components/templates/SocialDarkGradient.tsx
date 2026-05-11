@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
@@ -9,6 +9,15 @@ export type ColorStyle = '1' | '2' | '3' | '4'
 export type HeadingSize = 'S' | 'M' | 'L'
 export type Alignment = 'left' | 'center'
 export type CtaStyle = 'link' | 'button'
+
+/** Logical IDs for editable blocks. Logo is brand-locked, not editable. */
+export type SocialDarkGradientBlockId =
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'body'
+  | 'metadata'
+  | 'cta'
 
 export interface SocialDarkGradientProps {
   eyebrow: string
@@ -33,6 +42,13 @@ export interface SocialDarkGradientProps {
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
+  /** Stage & Bench render-prop: wraps each editable region in <Editable>. */
+  renderBlock?: (blockId: SocialDarkGradientBlockId, content: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: swaps a block's inner content for an in-place editor. */
+  renderInlineEditor?: (blockId: SocialDarkGradientBlockId, defaultInner: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: absolutely-positioned overlay inside the
+   *  template's stacking context (drag scrim lives here). */
+  renderOverlay?: () => ReactNode
 }
 
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
@@ -99,7 +115,14 @@ export function SocialDarkGradient({
   colors,
   typography,
   scale = 1,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
 }: SocialDarkGradientProps) {
+  // Identity defaults — when no render-props passed (export render route,
+  // non-migrated callers), output is byte-identical to the legacy template.
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const logoFill = logoColor === 'orange' ? colors.brand.primary : '#FFFFFF'
   const textColor = '#FFFFFF'
@@ -175,7 +198,8 @@ export function SocialDarkGradient({
         {/* Text Content */}
         <div style={textBlockStyle}>
           {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
+          {showEyebrow && eyebrow && wrapBlock(
+            'eyebrow',
             <div
               style={{
                 color: textColor,
@@ -185,8 +209,8 @@ export function SocialDarkGradient({
                 letterSpacing: 1.54,
               }}
             >
-              {eyebrow}
-            </div>
+              {wrapInline('eyebrow', eyebrow)}
+            </div>,
           )}
 
           {/* Headline + Subhead Group */}
@@ -196,8 +220,11 @@ export function SocialDarkGradient({
             gap: 36,
             alignItems: alignment === 'center' ? 'center' : 'flex-start',
           }}>
-            {/* Headline - supports rich text (bold, italic, line breaks) */}
-            {showHeadline && (
+            {/* Headline — rich text (bold/italic/line breaks). Defaults to
+             *  static dangerouslySetInnerHTML; renderInlineEditor swaps in a
+             *  contentEditable when this slot is being edited. */}
+            {showHeadline && wrapBlock(
+              'headline',
               <div
                 className="rich-text-white"
                 style={{
@@ -206,12 +233,17 @@ export function SocialDarkGradient({
                   fontWeight: 300,
                   lineHeight: 1.1,
                 }}
-                dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
-              />
+              >
+                {wrapInline(
+                  'headline',
+                  <span dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />,
+                )}
+              </div>,
             )}
 
-            {/* Subhead - supports rich text (bold, italic, line breaks) */}
-            {showSubhead && hasSubhead && (
+            {/* Subhead — rich text. */}
+            {showSubhead && hasSubhead && wrapBlock(
+              'subhead',
               <div
                 className="rich-text-white"
                 style={{
@@ -220,13 +252,18 @@ export function SocialDarkGradient({
                   fontWeight: 300,
                   lineHeight: 1.3,
                 }}
-                dangerouslySetInnerHTML={{ __html: subhead }}
-              />
+              >
+                {wrapInline(
+                  'subhead',
+                  <span dangerouslySetInnerHTML={{ __html: subhead }} />,
+                )}
+              </div>,
             )}
           </div>
 
-          {/* Body - supports rich text (bold, italic, line breaks) */}
-          {showBody && hasBody && (
+          {/* Body — rich text. */}
+          {showBody && hasBody && wrapBlock(
+            'body',
             <div
               className="rich-text-white"
               style={{
@@ -235,12 +272,17 @@ export function SocialDarkGradient({
                 fontWeight: 300,
                 lineHeight: 1.4,
               }}
-              dangerouslySetInnerHTML={{ __html: body }}
-            />
+            >
+              {wrapInline(
+                'body',
+                <span dangerouslySetInnerHTML={{ __html: body }} />,
+              )}
+            </div>,
           )}
 
           {/* Metadata */}
-          {showMetadata && metadata && (
+          {showMetadata && metadata && wrapBlock(
+            'metadata',
             <div
               style={{
                 color: textColor,
@@ -250,13 +292,14 @@ export function SocialDarkGradient({
                 letterSpacing: 1.54,
               }}
             >
-              {metadata}
-            </div>
+              {wrapInline('metadata', metadata)}
+            </div>,
           )}
         </div>
 
         {/* CTA */}
-        {showCta && ctaText && (
+        {showCta && ctaText && wrapBlock(
+          'cta',
           <div style={{
             width: '100%',
             display: 'flex',
@@ -278,7 +321,7 @@ export function SocialDarkGradient({
                     lineHeight: 1,
                   }}
                 >
-                  {ctaText}
+                  {wrapInline('cta', ctaText)}
                 </span>
                 <ArrowIcon color={ctaColor} width={22} height={22 * 0.8} />
               </div>
@@ -301,13 +344,14 @@ export function SocialDarkGradient({
                     lineHeight: 1,
                   }}
                 >
-                  {ctaText}
+                  {wrapInline('cta', ctaText)}
                 </span>
               </div>
             )}
-          </div>
+          </div>,
         )}
       </div>
+      {renderOverlay?.()}
     </div>
   )
 }
