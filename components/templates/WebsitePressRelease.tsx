@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties, Fragment, type ReactNode } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
@@ -14,6 +14,10 @@ import {
   NEUTRAL_FILTERS,
   type ImageFilters,
 } from '@/lib/image-filters'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type WebsitePressReleaseBlockId =
   | 'image'
@@ -35,12 +39,6 @@ export function websitePressReleaseGapKey(
   nextId: WebsitePressReleaseStackId,
 ): string {
   return `gap-${prevId}-to-${nextId}`
-}
-
-const STACK_JUSTIFY: Record<StackAlign, CSSProperties['justifyContent']> = {
-  top: 'flex-start',
-  center: 'center',
-  bottom: 'flex-end',
 }
 
 export interface WebsitePressReleaseProps {
@@ -93,86 +91,7 @@ export interface WebsitePressReleaseProps {
   renderOverlay?: () => ReactNode
 }
 
-type PRStackBlock =
-  | { id: Exclude<WebsitePressReleaseStackId, 'logo'>; node: ReactNode }
-  | null
-
-interface PRLeftColumnProps {
-  header: ReactNode
-  blocks: PRStackBlock[]
-  stackAlign: StackAlign
-  gaps?: Record<string, number>
-  renderSpacerBetween?: WebsitePressReleaseProps['renderSpacerBetween']
-}
-
-function renderPressReleaseSpacer(
-  prevId: WebsitePressReleaseStackId,
-  nextId: WebsitePressReleaseStackId,
-  gaps: Record<string, number> | undefined,
-  renderSpacerBetween: WebsitePressReleaseProps['renderSpacerBetween'],
-): ReactNode {
-  const key = websitePressReleaseGapKey(prevId, nextId)
-  const value = gaps?.[key] ?? DEFAULT_GAP
-  if (renderSpacerBetween) {
-    return (
-      <div style={{ width: '100%', flexShrink: 0 }} key={key}>
-        {renderSpacerBetween(key, value, prevId, nextId)}
-      </div>
-    )
-  }
-  return <div key={key} style={{ height: value, width: '100%', flexShrink: 0 }} />
-}
-
-function PressReleaseLeftColumn({
-  header, blocks, stackAlign, gaps, renderSpacerBetween,
-}: PRLeftColumnProps) {
-  const visible = blocks.filter((b): b is NonNullable<PRStackBlock> => b !== null)
-
-  return (
-    <div
-      style={{
-        width: 396,
-        flex: '1 1 0',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-      }}
-    >
-      {header}
-      {visible.length > 0 && stackAlign === 'top' &&
-        renderPressReleaseSpacer('logo', visible[0].id, gaps, renderSpacerBetween)}
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: STACK_JUSTIFY[stackAlign],
-          alignItems: 'flex-start',
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}
-        >
-          {visible.map((block, i) => (
-            <Fragment key={block.id}>
-              {block.node}
-              {i < visible.length - 1 &&
-                renderPressReleaseSpacer(block.id, visible[i + 1].id, gaps, renderSpacerBetween)}
-            </Fragment>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
+type PRStackBlock = ContentStackBlock<WebsitePressReleaseStackId>
 
 export function WebsitePressRelease({
   eyebrow,
@@ -284,134 +203,158 @@ export function WebsitePressRelease({
         </div>,
       )}
 
-      {/* Left content area — header anchored top, stack container holds the rest */}
-      <PressReleaseLeftColumn
-        stackAlign={stackAlign}
-        gaps={gaps}
-        renderSpacerBetween={renderSpacerBetween}
-        header={
-          <div
-            style={{
-              display: 'inline-flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 49.70,
-              flexShrink: 0,
-            }}
-          >
-            <CorityLogo fill={logoFill} height={29} />
-
-            {/* Solution Pill - white fill with border matching other templates */}
-            {solution !== 'none' && wrapBlock(
-              'solutionPill',
-              <SolutionPill
-                variant="website-press-release"
-                solutionColor={solutionColor}
-                solutionLabel={solutionLabel}
-                textColor={themeColors.textPrimary}
-                background={themeColors.bgCategoryChip}
-                border={`1px solid ${themeColors.borderFocus}`}
-              />,
-            )}
-          </div>
-        }
-        blocks={[
-          showEyebrow && eyebrow ? {
-            id: 'eyebrow',
-            node: wrapBlock(
-              'eyebrow',
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  textTransform: 'uppercase',
-                  letterSpacing: 1.38,
-                }}
-              >
-                {wrapInline('eyebrow', eyebrow)}
-              </div>,
-            ),
-          } : null,
-          showHeadline ? {
-            id: 'headline',
-            node: wrapBlock(
-              'headline',
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: headlineFontSize ?? 35.42,
-                  fontWeight: 350,
-                  lineHeight: `${(headlineFontSize ?? 35.42) * (50.20 / 35.42)}px`,
-                }}
-              >
-                {wrapInline('headline', headline || 'Lightweight header.')}
-              </div>,
-            ),
-          } : null,
-          showSubhead && subhead ? {
-            id: 'subhead',
-            node: wrapBlock(
-              'subhead',
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: subheadFontSize ?? 22,
-                  fontWeight: 350,
-                }}
-              >
-                {wrapInline('subhead', subhead)}
-              </div>,
-            ),
-          } : null,
-          showBody && body ? {
-            id: 'body',
-            node: wrapBlock(
-              'body',
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: 14.58,
-                  fontWeight: 350,
-                }}
-              >
-                {wrapInline('body', body)}
-              </div>,
-            ),
-          } : null,
-          showCta && cta ? {
-            id: 'cta',
-            node: wrapBlock(
-              'cta',
+      {/* Left content area — header anchored top, ContentStack handles
+       *  the body blocks. The header (logo + solution pill row) is the
+       *  topAnchor; ContentStack manages its gap to first visible block. */}
+      <div
+        style={{
+          width: 396,
+          flex: '1 1 0',
+          overflow: 'hidden',
+        }}
+      >
+        <ContentStack<WebsitePressReleaseStackId>
+          blocks={[
+            {
+              id: 'eyebrow',
+              visible: showEyebrow && !!eyebrow,
+              defaultInner: eyebrow,
+              renderChrome: (inner) => (
+                <div
+                  style={{
+                    alignSelf: 'stretch',
+                    color: themeColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: 1.38,
+                  }}
+                >
+                  {inner}
+                </div>
+              ),
+            },
+            {
+              id: 'headline',
+              visible: showHeadline,
+              defaultInner: headline || 'Lightweight header.',
+              renderChrome: (inner) => (
+                <div
+                  style={{
+                    alignSelf: 'stretch',
+                    color: themeColors.textPrimary,
+                    fontSize: headlineFontSize ?? 35.42,
+                    fontWeight: 350,
+                    lineHeight: `${(headlineFontSize ?? 35.42) * (50.20 / 35.42)}px`,
+                  }}
+                >
+                  {inner}
+                </div>
+              ),
+            },
+            {
+              id: 'subhead',
+              visible: showSubhead && !!subhead,
+              defaultInner: subhead,
+              renderChrome: (inner) => (
+                <div
+                  style={{
+                    alignSelf: 'stretch',
+                    color: themeColors.textPrimary,
+                    fontSize: subheadFontSize ?? 22,
+                    fontWeight: 350,
+                  }}
+                >
+                  {inner}
+                </div>
+              ),
+            },
+            {
+              id: 'body',
+              visible: showBody && !!body,
+              defaultInner: body,
+              renderChrome: (inner) => (
+                <div
+                  style={{
+                    alignSelf: 'stretch',
+                    color: themeColors.textPrimary,
+                    fontSize: 14.58,
+                    fontWeight: 350,
+                  }}
+                >
+                  {inner}
+                </div>
+              ),
+            },
+            {
+              id: 'cta',
+              visible: showCta && !!cta,
+              defaultInner: cta,
+              renderChrome: (inner) => (
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: 12.50,
+                  }}
+                >
+                  <span
+                    style={{
+                      textAlign: 'center',
+                      color: themeColors.buttonSecondaryText,
+                      fontSize: 18.75,
+                      fontWeight: 500,
+                      lineHeight: '18.75px',
+                    }}
+                  >
+                    {inner}
+                  </span>
+                  <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+                </div>
+              ),
+            },
+          ]}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock as (id: WebsitePressReleaseStackId, content: ReactNode) => ReactNode}
+          renderInlineEditor={renderInlineEditor as (id: WebsitePressReleaseStackId, defaultInner: ReactNode) => ReactNode}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: (
               <div
                 style={{
                   display: 'inline-flex',
                   justifyContent: 'flex-start',
                   alignItems: 'center',
-                  gap: 12.50,
+                  gap: 49.70,
+                  flexShrink: 0,
                 }}
               >
-                <span
-                  style={{
-                    textAlign: 'center',
-                    color: themeColors.buttonSecondaryText,
-                    fontSize: 18.75,
-                    fontWeight: 500,
-                    lineHeight: '18.75px',
-                  }}
-                >
-                  {wrapInline('cta', cta)}
-                </span>
-                <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
-              </div>,
+                <CorityLogo fill={logoFill} height={29} />
+
+                {/* Solution Pill — wrapped via renderBlock so the editor
+                 *  can select it; not part of the stack (it sits inside
+                 *  the header row alongside the logo). */}
+                {solution !== 'none' && wrapBlock(
+                  'solutionPill',
+                  <SolutionPill
+                    variant="website-press-release"
+                    solutionColor={solutionColor}
+                    solutionLabel={solutionLabel}
+                    textColor={themeColors.textPrimary}
+                    background={themeColors.bgCategoryChip}
+                    border={`1px solid ${themeColors.borderFocus}`}
+                  />,
+                )}
+              </div>
             ),
-          } : null,
-        ]}
-      />
+          }}
+          alignItems="flex-start"
+        />
+      </div>
       {renderOverlay?.()}
     </div>
   )

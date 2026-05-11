@@ -1,10 +1,14 @@
 'use client'
 
-import { CSSProperties, Fragment, ReactNode } from 'react'
+import { CSSProperties, ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type Alignment = 'left' | 'center'
@@ -105,38 +109,7 @@ export function gapKey(prevId: EmailDarkGradientBlockId, nextId: EmailDarkGradie
   return `gap-${prevId}-to-${nextId}`
 }
 
-const STACK_JUSTIFY: Record<StackAlign, CSSProperties['justifyContent']> = {
-  top: 'flex-start',
-  center: 'center',
-  bottom: 'flex-end',
-}
-
-type Block = {
-  id: Exclude<EmailDarkGradientBlockId, 'logo'>
-  visible: boolean
-  /** What renders inside the chrome by default (typically the text/HTML content). */
-  defaultInner: ReactNode
-  /** Wraps the inner content in the block's visual chrome (typography styling, button background, icons). */
-  renderChrome: (inner: ReactNode) => ReactNode
-}
-
-function renderSpacer(
-  prevId: EmailDarkGradientBlockId,
-  nextId: EmailDarkGradientBlockId,
-  gaps: Record<string, number> | undefined,
-  renderSpacerBetween: EmailDarkGradientProps['renderSpacerBetween'],
-): ReactNode {
-  const key = gapKey(prevId, nextId)
-  const value = gaps?.[key] ?? DEFAULT_GAP
-  if (renderSpacerBetween) {
-    return (
-      <div style={{ width: '100%', flexShrink: 0 }} key={key}>
-        {renderSpacerBetween(key, value, prevId, nextId)}
-      </div>
-    )
-  }
-  return <div key={key} style={{ height: value, width: '100%', flexShrink: 0 }} />
-}
+type Block = ContentStackBlock<EmailDarkGradientBlockId>
 
 export function EmailDarkGradient({
   headline,
@@ -191,9 +164,6 @@ export function EmailDarkGradient({
     right: 0,
     bottom: 0,
     padding: 32,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: alignment === 'center' ? 'center' : 'flex-start',
   }
 
   const logoRowStyle: CSSProperties = {
@@ -203,20 +173,8 @@ export function EmailDarkGradient({
     flexShrink: 0,
   }
 
-  const logoToContentGap = gaps?.[gapKey('logo', 'eyebrow')] ?? DEFAULT_GAP
-
-  const stackContainerStyle: CSSProperties = {
-    flex: 1,
-    minHeight: 0,
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: STACK_JUSTIFY[stackAlign],
-    alignItems: alignment === 'center' ? 'center' : 'flex-start',
-  }
-
   const textBlockMaxWidth = alignment === 'center' ? 460 : 480
-  const textBlockAlign = alignment === 'center' ? 'center' : 'flex-start'
+  const itemsAlign = alignment === 'center' ? 'center' : 'flex-start'
   const textAlign = alignment === 'center' ? ('center' as const) : ('left' as const)
 
   const blocks: Block[] = [
@@ -365,39 +323,26 @@ export function EmailDarkGradient({
       />
 
       <div style={overlayStyle}>
-        {renderBlock ? renderBlock('logo', <div style={logoRowStyle}><CorityLogo fill="#FFFFFF" height={23} /></div>) : (
-          <div style={logoRowStyle}>
-            <CorityLogo fill="#FFFFFF" height={23} />
-          </div>
-        )}
-
-        {visible.length > 0 && stackAlign === 'top' &&
-          renderSpacer('logo', visible[0].id, gaps, renderSpacerBetween)}
-
-        <div style={stackContainerStyle}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: textBlockAlign,
-              width: '100%',
-              maxWidth: textBlockMaxWidth,
-            }}
-          >
-            {visible.map((block, i) => {
-              const inner = renderInlineEditor
-                ? renderInlineEditor(block.id, block.defaultInner)
-                : block.defaultInner
-              const rendered = block.renderChrome(inner)
-              return (
-                <Fragment key={block.id}>
-                  {renderBlock ? renderBlock(block.id, rendered) : rendered}
-                  {i < visible.length - 1 && renderSpacer(block.id, visible[i + 1].id, gaps, renderSpacerBetween)}
-                </Fragment>
-              )
-            })}
-          </div>
-        </div>
+        <ContentStack<EmailDarkGradientBlockId>
+          blocks={blocks}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock}
+          renderInlineEditor={renderInlineEditor}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: (
+              <div style={logoRowStyle}>
+                <CorityLogo fill="#FFFFFF" height={23} />
+              </div>
+            ),
+            renderBlock: renderBlock ? (node) => renderBlock('logo', node) : undefined,
+          }}
+          alignItems={itemsAlign}
+          maxWidth={textBlockMaxWidth}
+        />
         {renderOverlay?.()}
       </div>
     </div>

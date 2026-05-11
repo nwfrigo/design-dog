@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties, Fragment, type ReactNode } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
@@ -8,6 +8,10 @@ import { SolutionPill } from '@/components/shared/SolutionPill'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type EmailSpeakersBlockId =
   | 'eyebrow'
@@ -30,12 +34,6 @@ export function emailSpeakersGapKey(
   nextId: EmailSpeakersStackId,
 ): string {
   return `gap-${prevId}-to-${nextId}`
-}
-
-const STACK_JUSTIFY: Record<StackAlign, CSSProperties['justifyContent']> = {
-  top: 'flex-start',
-  center: 'center',
-  bottom: 'flex-end',
 }
 
 export interface SpeakerInfo {
@@ -192,74 +190,7 @@ function SpeakerAvatar({
   )
 }
 
-type StackBlock = { id: Exclude<EmailSpeakersStackId, 'logo'>; node: ReactNode } | null
-
-interface LeftColumnProps {
-  header: ReactNode
-  blocks: StackBlock[]
-  stackAlign: StackAlign
-  gaps?: Record<string, number>
-  renderSpacerBetween?: EmailSpeakersProps['renderSpacerBetween']
-}
-
-function renderEmailSpeakersSpacer(
-  prevId: EmailSpeakersStackId,
-  nextId: EmailSpeakersStackId,
-  gaps: Record<string, number> | undefined,
-  renderSpacerBetween: EmailSpeakersProps['renderSpacerBetween'],
-): ReactNode {
-  const key = emailSpeakersGapKey(prevId, nextId)
-  const value = gaps?.[key] ?? DEFAULT_GAP
-  if (renderSpacerBetween) {
-    return (
-      <div style={{ width: '100%', flexShrink: 0 }} key={key}>
-        {renderSpacerBetween(key, value, prevId, nextId)}
-      </div>
-    )
-  }
-  return <div key={key} style={{ height: value, width: '100%', flexShrink: 0 }} />
-}
-
-function LeftColumn({ header, blocks, stackAlign, gaps, renderSpacerBetween }: LeftColumnProps) {
-  const visible = blocks.filter((b): b is NonNullable<StackBlock> => b !== null)
-
-  return (
-    <div style={{
-      alignSelf: 'stretch',
-      display: 'inline-flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-    }}>
-      {header}
-      {visible.length > 0 && stackAlign === 'top' &&
-        renderEmailSpeakersSpacer('logo', visible[0].id, gaps, renderSpacerBetween)}
-      <div style={{
-        flex: 1,
-        minHeight: 0,
-        width: 315,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: STACK_JUSTIFY[stackAlign],
-        alignItems: 'flex-start',
-      }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          width: '100%',
-        }}>
-          {visible.map((block, i) => (
-            <Fragment key={block.id}>
-              {block.node}
-              {i < visible.length - 1 &&
-                renderEmailSpeakersSpacer(block.id, visible[i + 1].id, gaps, renderSpacerBetween)}
-            </Fragment>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
+type StackBlock = ContentStackBlock<EmailSpeakersStackId>
 
 export function EmailSpeakers({
   headline,
@@ -349,116 +280,137 @@ export function EmailSpeakers({
       {/* Rich text styles for HTML content */}
       <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
-      {/* Left content area — header anchored top, stack container holds the rest */}
-      <LeftColumn
-        stackAlign={stackAlign}
-        gaps={gaps}
-        renderSpacerBetween={renderSpacerBetween}
-        header={
-          <div style={{
-            display: 'inline-flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 40,
-            flexShrink: 0,
-          }}>
-            <CorityLogo fill={logoFill} height={23} />
-
-            {showSolutionSet && solution !== 'none' && wrapBlock(
-              'solutionPill',
-              <SolutionPill
-                variant="email"
-                solutionColor={solutionColor}
-                solutionLabel={solutionLabel}
-                textColor={themeColors.textPrimary}
-                background={themeColors.bgCategoryChip}
-                border={`0.79px solid ${themeColors.borderFocus}`}
-              />,
-            )}
-          </div>
-        }
-        blocks={[
-          showEyebrow && eyebrow ? {
-            id: 'eyebrow',
-            node: wrapBlock(
-              'eyebrow',
-              <div style={{
-                color: textColor,
-                fontSize: 10,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: '1.1px',
-              }}>
-                {wrapInline('eyebrow', eyebrow)}
-              </div>,
-            ),
-          } : null,
-          showHeadline ? {
-            id: 'headline',
-            node: wrapBlock(
-              'headline',
-              <div
-                className="rich-text-dark"
-                style={{
-                  alignSelf: 'stretch',
+      {/* Left content area — header anchored top, ContentStack handles
+       *  the body blocks (eyebrow / headline / body / cta). Solution pill
+       *  rides alongside the logo in the header row, not in the stack. */}
+      <div style={{
+        alignSelf: 'stretch',
+        display: 'inline-flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        width: 315,
+      }}>
+        <ContentStack<EmailSpeakersStackId>
+          blocks={[
+            {
+              id: 'eyebrow',
+              visible: showEyebrow && !!eyebrow,
+              defaultInner: eyebrow,
+              renderChrome: (inner) => (
+                <div style={{
                   color: textColor,
-                  fontSize: headlineFontSize ?? 38.15,
-                  fontWeight: 350,
-                  lineHeight: `${(headlineFontSize ?? 38.15) * (48.19 / 38.15)}px`,
-                }}
-              >
-                {wrapInline(
-                  'headline',
-                  <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />,
-                )}
-              </div>,
-            ),
-          } : null,
-          showBody && hasBody ? {
-            id: 'body',
-            node: wrapBlock(
-              'body',
-              <div
-                className="rich-text-dark"
-                style={{
-                  alignSelf: 'stretch',
-                  color: textColor,
-                  fontSize: 18.07,
-                  fontWeight: 350,
-                }}
-              >
-                {wrapInline(
-                  'body',
-                  <div dangerouslySetInnerHTML={{ __html: body }} />,
-                )}
-              </div>,
-            ),
-          } : null,
-          showCta && ctaText ? {
-            id: 'cta',
-            node: wrapBlock(
-              'cta',
+                  fontSize: 10,
+                  fontWeight: 500,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1.1px',
+                }}>
+                  {inner}
+                </div>
+              ),
+            },
+            {
+              id: 'headline',
+              visible: showHeadline,
+              defaultInner: (
+                <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+              ),
+              renderChrome: (inner) => (
+                <div
+                  className="rich-text-dark"
+                  style={{
+                    alignSelf: 'stretch',
+                    color: textColor,
+                    fontSize: headlineFontSize ?? 38.15,
+                    fontWeight: 350,
+                    lineHeight: `${(headlineFontSize ?? 38.15) * (48.19 / 38.15)}px`,
+                  }}
+                >
+                  {inner}
+                </div>
+              ),
+            },
+            {
+              id: 'body',
+              visible: showBody && hasBody,
+              defaultInner: (
+                <div dangerouslySetInnerHTML={{ __html: body }} />
+              ),
+              renderChrome: (inner) => (
+                <div
+                  className="rich-text-dark"
+                  style={{
+                    alignSelf: 'stretch',
+                    color: textColor,
+                    fontSize: 18.07,
+                    fontWeight: 350,
+                  }}
+                >
+                  {inner}
+                </div>
+              ),
+            },
+            {
+              id: 'cta',
+              visible: showCta && !!ctaText,
+              defaultInner: ctaText,
+              renderChrome: (inner) => (
+                <div style={{
+                  display: 'inline-flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 12,
+                }}>
+                  <span style={{
+                    textAlign: 'center',
+                    color: themeColors.buttonSecondaryText,
+                    fontSize: 18,
+                    fontWeight: 350,
+                    lineHeight: '18px',
+                  }}>
+                    {inner}
+                  </span>
+                  <ArrowIcon color={themeColors.buttonSecondaryText} width={16.5} height={16.5 * 0.8} />
+                </div>
+              ),
+            },
+          ]}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock as (id: EmailSpeakersStackId, content: ReactNode) => ReactNode}
+          renderInlineEditor={renderInlineEditor as (id: EmailSpeakersStackId, defaultInner: ReactNode) => ReactNode}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: (
               <div style={{
                 display: 'inline-flex',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                gap: 12,
+                gap: 40,
+                flexShrink: 0,
               }}>
-                <span style={{
-                  textAlign: 'center',
-                  color: themeColors.buttonSecondaryText,
-                  fontSize: 18,
-                  fontWeight: 350,
-                  lineHeight: '18px',
-                }}>
-                  {wrapInline('cta', ctaText)}
-                </span>
-                <ArrowIcon color={themeColors.buttonSecondaryText} width={16.5} height={16.5 * 0.8} />
-              </div>,
+                <CorityLogo fill={logoFill} height={23} />
+
+                {/* Solution Pill — wrapped via renderBlock so the editor
+                 *  can select it; sits alongside the logo, not in the stack. */}
+                {showSolutionSet && solution !== 'none' && wrapBlock(
+                  'solutionPill',
+                  <SolutionPill
+                    variant="email"
+                    solutionColor={solutionColor}
+                    solutionLabel={solutionLabel}
+                    textColor={themeColors.textPrimary}
+                    background={themeColors.bgCategoryChip}
+                    border={`0.79px solid ${themeColors.borderFocus}`}
+                  />,
+                )}
+              </div>
             ),
-          } : null,
-        ]}
-      />
+          }}
+          alignItems="flex-start"
+        />
+      </div>
 
       {/* Right speakers area */}
       <div style={{
