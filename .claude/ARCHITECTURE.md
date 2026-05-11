@@ -122,7 +122,7 @@ When adding a new template with variants:
 4. Add to draft-storage save/load
 5. Add to `EditorScreen.tsx` store destructure
 
-**Theme support** uses a shared `theme` field (already in the store/types/snapshot pipeline) rather than per-template variant fields. If the new template supports theming, follow `.claude/THEME-ROLLOUT.md` — no new store fields needed, just wire the `theme` prop through the template component, registry, export-params, and EditorScreen preview.
+**Theme support** uses a shared `theme` field (already in the store/types/snapshot pipeline) rather than per-template variant fields. For a new themed template: no new store fields needed — wire the `theme` prop through the template component, registry, export-params, and EditorScreen preview. Use `TEMPLATE_THEMES[theme]` from `lib/template-themes.ts` for all theme-keyed colors; never hard-code hex values for theme-sensitive surfaces.
 
 ### Variant Persistence (Critical for New Templates)
 

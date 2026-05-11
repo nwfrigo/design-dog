@@ -108,8 +108,6 @@ Template colors (background, text, logo, CTA, pill) are driven by `lib/template-
 
 **Solution pill colors** (dot colors) are static across all themes. Only the pill's background, border, and text color change with theme.
 
-For the full rollout process, see `.claude/THEME-ROLLOUT.md`.
-
 ### Solution Category Colors
 - Environmental: `#49763E`
 - Health: `#00767F`

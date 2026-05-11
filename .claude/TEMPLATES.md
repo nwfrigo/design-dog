@@ -368,7 +368,7 @@ Stacker uses AI to generate the initial document structure:
 9. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
 10. [ ] Add template-specific state to store if needed (variants, etc.)
 11. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence in ARCHITECTURE.md)
-12. [ ] **If template supports theming:** Follow the full process in `.claude/THEME-ROLLOUT.md` — add `theme` prop to component, use `TEMPLATE_THEMES[theme]` for all colors, add `theme` to registry renderProps + renderSchema, add `theme: s.theme` to export-params builder, pass `theme={theme}` to EditorScreen preview, add to theme picker condition, hide logo picker. The `theme` field is already wired globally in the store/snapshot/types pipeline.
+12. [ ] **If template supports theming:** Add `theme` prop to component and use `TEMPLATE_THEMES[theme]` from `lib/template-themes.ts` for all theme-keyed colors (never hard-code hex on theme-sensitive surfaces). Add `theme` to registry renderProps + renderSchema, add `theme: s.theme` to export-params builder, pass `theme={theme}` to EditorScreen preview, add to theme picker condition, hide logo picker. The `theme` field is already wired globally in the store/snapshot/types pipeline.
 13. [ ] Add to image upload condition if template has images (use Vercel Blob upload — see ARCHITECTURE.md)
 14. [ ] Pass grayscale prop if template has images
 15. [ ] Add entry to `lib/template-registry.tsx` — see "Registry Entry Guide" below
