@@ -47,14 +47,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * Stage bar: empty (no variant / theme / color).
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  headline: 'In-Person. Exclusive.',
-  body: 'Join senior EHS+ leaders to modernize how you stay ahead of operating risks.',
-  eventDate: 'Thursday, 13th November',
-  eventLocation: 'London, UK',
-  cta: 'Join Us',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   body: 'body',
 }
@@ -106,14 +98,13 @@ export function EmailEhsAccelerateBannerStageBench(props: StageBenchEditorProps)
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const headlineEff      = withPlaceholder('headline',      verbatimCopy.headline)
-  const bodyEff          = withPlaceholder('body',          verbatimCopy.body)
-  const eventDateEff     = withPlaceholder('eventDate',     eventDate)
-  const eventLocationEff = withPlaceholder('eventLocation', eventLocation)
-  const ctaEff           = withPlaceholder('cta',           ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const headlineEff      = verbatimCopy.headline ?? ''
+  const bodyEff          = verbatimCopy.body ?? ''
+  const eventDateEff     = eventDate ?? ''
+  const eventLocationEff = eventLocation ?? ''
+  const ctaEff           = ctaText ?? ''
 
   const showBodyEff = showBody || previewKey === 'body'
 

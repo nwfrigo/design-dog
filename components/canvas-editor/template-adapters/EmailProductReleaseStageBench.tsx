@@ -48,11 +48,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * model — selection opens ImageEditorModal for change/crop/zoom/filter.
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eyebrow: 'Product Release',
-  headline: 'GX2 2026.1',
-}
-
 export function EmailProductReleaseStageBench(props: StageBenchEditorProps) {
   const {
     selectedAssets,
@@ -103,11 +98,10 @@ export function EmailProductReleaseStageBench(props: StageBenchEditorProps) {
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eyebrowEff  = withPlaceholder('eyebrow',  eyebrow)
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const eyebrowEff  = eyebrow ?? ''
+  const headlineEff = verbatimCopy.headline ?? ''
 
   const stageRef = useRef<HTMLDivElement | null>(null)
   useFlipReflow(stageRef)

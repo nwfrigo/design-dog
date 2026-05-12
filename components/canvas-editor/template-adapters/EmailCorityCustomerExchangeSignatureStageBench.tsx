@@ -49,13 +49,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * (showCceEventDate / showCceEventLocation / showCceEventTime).
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eventDate: 'Thursday, May 7th',
-  eventLocation: 'Brussels, Belgium',
-  eventTime: '10:00–16:00',
-  cta: 'Join Us',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   'small-caption': 'body',
   cta: 'button',
@@ -119,13 +112,12 @@ export function EmailCorityCustomerExchangeSignatureStageBench(props: StageBench
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eventDateEff     = withPlaceholder('eventDate',     eventDate)
-  const eventLocationEff = withPlaceholder('eventLocation', eventLocation)
-  const eventTimeEff     = withPlaceholder('eventTime',     cceEventTime)
-  const ctaEff           = withPlaceholder('cta',           ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const eventDateEff     = eventDate ?? ''
+  const eventLocationEff = eventLocation ?? ''
+  const eventTimeEff     = cceEventTime ?? ''
+  const ctaEff           = ctaText ?? ''
 
   const showEventDateEff     = showCceEventDate     || previewKey === 'eventDate'
   const showEventLocationEff = showCceEventLocation || previewKey === 'eventLocation'

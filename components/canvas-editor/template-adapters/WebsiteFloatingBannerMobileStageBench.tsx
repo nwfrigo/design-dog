@@ -50,12 +50,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * arrow-type toggle (text + arrow / arrow-only).
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eyebrow: 'EYEBROW',
-  headline: 'Lightweight header.',
-  cta: 'Learn More',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   eyebrow: 'eyebrow',
   headline: 'headline',
@@ -128,12 +122,11 @@ export function WebsiteFloatingBannerMobileStageBench(props: StageBenchEditorPro
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eyebrowEff  = withPlaceholder('eyebrow',  eyebrow)
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
-  const ctaEff      = withPlaceholder('cta',      ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const eyebrowEff  = eyebrow ?? ''
+  const headlineEff = verbatimCopy.headline ?? ''
+  const ctaEff      = ctaText ?? ''
 
   const showEyebrowEff  = showEyebrow  || previewKey === 'eyebrow'
   const showHeadlineEff = showHeadline || previewKey === 'headline'

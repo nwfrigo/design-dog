@@ -55,13 +55,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  *    purely for legacy compat (template uses showSpeakerN when present)
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eyebrow: 'Eyebrow',
-  headline: 'Headline',
-  body: 'Body copy',
-  cta: 'Call to action',
-}
-
 /** Block IDs that map to BenchChip kinds. The `speaker*` and `solutionPill`
  *  variants use the chip kinds we added (speaker, category). */
 const BLOCK_TO_CHIP_KIND: Record<EmailSpeakersBlockId, BenchChipKind> = {
@@ -236,14 +229,12 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
       : null
   const showStageScrim = previewKey !== null
 
-  // ---- effective content ----
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eyebrowEff  = withPlaceholder('eyebrow',  eyebrow)
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
-  const bodyEff     = withPlaceholder('body',     verbatimCopy.body)
-  const ctaEff      = withPlaceholder('cta',      ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const eyebrowEff  = eyebrow ?? ''
+  const headlineEff = verbatimCopy.headline ?? ''
+  const bodyEff     = verbatimCopy.body ?? ''
+  const ctaEff      = ctaText ?? ''
 
   // ---- effective speaker visibility (with preview) ----
   const showEyebrowEff  = showEyebrow      || previewKey === 'eyebrow'

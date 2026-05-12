@@ -65,17 +65,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * instead.
  */
 
-// Drag-preview placeholders — used both during chip drag-preview AND
-// as the empty-content fallback so blocks don't disappear when the user
-// deletes their text. See StageBenchEditor history for context.
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eyebrow: 'Eyebrow',
-  headline: 'Headline',
-  subhead: 'Subheadline',
-  body: 'Body copy',
-  cta: 'Call to action',
-}
-
 const COLOR_STYLE_OPTIONS: ColorOption[] = [
   { value: '1', swatch: { backgroundImage: 'url(/assets/backgrounds/social-dark-gradient-1.png)' }, ariaLabel: 'Color 1' },
   { value: '2', swatch: { backgroundImage: 'url(/assets/backgrounds/social-dark-gradient-2.png)' }, ariaLabel: 'Color 2' },
@@ -162,15 +151,15 @@ export function EmailDarkGradientStageBench(props: StageBenchEditorProps) {
       : null
   const showStageScrim = previewKey !== null
 
-  // ---- effective content (real value, with placeholder fallback) ----
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eyebrowEff  = withPlaceholder('eyebrow',  eyebrow)
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
-  const subheadEff  = withPlaceholder('subhead',  verbatimCopy.subhead)
-  const bodyEff     = withPlaceholder('body',     verbatimCopy.body)
-  const ctaEff      = withPlaceholder('cta',      ctaText)
+  // ---- effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback (`value || 'Placeholder'`
+  // in its defaultInner) so the editor renders the same string the
+  // thumbnail and the export show. ----
+  const eyebrowEff  = eyebrow ?? ''
+  const headlineEff = verbatimCopy.headline ?? ''
+  const subheadEff  = verbatimCopy.subhead ?? ''
+  const bodyEff     = verbatimCopy.body ?? ''
+  const ctaEff      = ctaText ?? ''
 
   const showEyebrowEff  = showEyebrow  || previewKey === 'eyebrow'
   const showHeadlineEff = showHeadline || previewKey === 'headline'

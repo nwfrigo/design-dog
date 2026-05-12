@@ -48,13 +48,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * the bench chip "Event Details" toggles their visibility together.
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eventDate: 'Thursday,  13th November',
-  eventLocation: 'London, UK',
-  workshopName: 'Exclusive EHS+ Leader Workshop',
-  cta: 'Join Us',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   'small-caption': 'body',
   subhead: 'subheadline',
@@ -111,13 +104,12 @@ export function EmailEhsAccelerateSignatureStageBench(props: StageBenchEditorPro
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eventDateEff     = withPlaceholder('eventDate',     eventDate)
-  const eventLocationEff = withPlaceholder('eventLocation', eventLocation)
-  const workshopNameEff  = withPlaceholder('workshopName',  workshopName)
-  const ctaEff           = withPlaceholder('cta',           ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const eventDateEff     = eventDate ?? ''
+  const eventLocationEff = eventLocation ?? ''
+  const workshopNameEff  = workshopName ?? ''
+  const ctaEff           = ctaText ?? ''
 
   // Event details preview-key 'eventDetails' surfaces the whole block.
   // Workshop / CTA preview as their own chips.

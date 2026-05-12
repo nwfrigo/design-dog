@@ -53,12 +53,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * no subhead). Body has no per-slot font size in this template.
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  headline: 'Headline',
-  body: 'This is your body copy.',
-  cta: 'Responsive',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   headline: 'headline',
   body: 'body',
@@ -141,12 +135,11 @@ export function EmailImageStageBench(props: StageBenchEditorProps) {
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
-  const bodyEff     = withPlaceholder('body',     verbatimCopy.body)
-  const ctaEff      = withPlaceholder('cta',      ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const headlineEff = verbatimCopy.headline ?? ''
+  const bodyEff     = verbatimCopy.body ?? ''
+  const ctaEff      = ctaText ?? ''
 
   const showBodyEff      = showBody         || previewKey === 'body'
   const showCtaEff       = showCta          || previewKey === 'cta'

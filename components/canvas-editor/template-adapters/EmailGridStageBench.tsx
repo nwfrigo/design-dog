@@ -54,16 +54,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * v1 ships without interactive type-switching).
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eyebrow: 'EYEBROW',
-  headline: 'Headline',
-  subheading: 'Subheading',
-  body: 'This is your body copy. Lorem ipsum dolor sit am',
-  gridDetail1: 'Date: January 1st, 2026',
-  gridDetail2: 'Date: January 1st, 2026',
-  gridDetail3: 'Responsive',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   eyebrow: 'eyebrow',
   subhead: 'subheadline',
@@ -149,16 +139,15 @@ export function EmailGridStageBench(props: StageBenchEditorProps) {
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eyebrowEff      = withPlaceholder('eyebrow',      eyebrow)
-  const headlineEff     = withPlaceholder('headline',     verbatimCopy.headline)
-  const subheadingEff   = withPlaceholder('subheading',   subheading)
-  const bodyEff         = withPlaceholder('body',         verbatimCopy.body)
-  const gridDetail1Eff  = withPlaceholder('gridDetail1',  gridDetail1Text)
-  const gridDetail2Eff  = withPlaceholder('gridDetail2',  gridDetail2Text)
-  const gridDetail3Eff  = withPlaceholder('gridDetail3',  gridDetail3Text)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const eyebrowEff      = eyebrow ?? ''
+  const headlineEff     = verbatimCopy.headline ?? ''
+  const subheadingEff   = subheading ?? ''
+  const bodyEff         = verbatimCopy.body ?? ''
+  const gridDetail1Eff  = gridDetail1Text ?? ''
+  const gridDetail2Eff  = gridDetail2Text ?? ''
+  const gridDetail3Eff  = gridDetail3Text ?? ''
 
   const showEyebrowEff      = showEyebrow      || previewKey === 'eyebrow'
   const showSubheadingEff   = showSubheading   || previewKey === 'subheading'

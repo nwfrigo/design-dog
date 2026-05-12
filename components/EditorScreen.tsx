@@ -4227,7 +4227,7 @@ export function EditorScreen() {
                   <WebsiteFloatingBanner
                     eyebrow={eyebrow}
                     headline={verbatimCopy.headline || 'Headline'}
-                    cta={ctaText || 'Learn More'}
+                    cta={ctaText || ''}
                     showEyebrow={showEyebrow}
                     showHeadline={showHeadline}
                     variant={floatingBannerVariant}
@@ -4332,7 +4332,7 @@ export function EditorScreen() {
                   eyebrow={eyebrow}
                   headline={verbatimCopy.headline || 'Lightweight header.'}
                   subhead={verbatimCopy.subhead}
-                  cta={ctaText || 'Responsive'}
+                  cta={ctaText || ''}
                   solution={solution}
                   variant={ebookVariant}
                   imageUrl={thumbnailImageUrl || undefined}
@@ -4357,7 +4357,7 @@ export function EditorScreen() {
                   headline={verbatimCopy.headline || 'Lightweight header.'}
                   subhead={verbatimCopy.subhead}
                   body={verbatimCopy.body}
-                  cta={ctaText || 'Responsive'}
+                  cta={ctaText || ''}
                   solution={solution}
                   imageUrl={thumbnailImageUrl || undefined}
                   imagePosition={thumbnailImagePosition}
@@ -4383,7 +4383,7 @@ export function EditorScreen() {
                   headline={verbatimCopy.headline || 'Lightweight header.'}
                   subhead={verbatimCopy.subhead}
                   body={verbatimCopy.body}
-                  cta={ctaText || 'Responsive'}
+                  cta={ctaText || ''}
                   solution={solution}
                   variant={webinarVariant}
                   imageUrl={thumbnailImageUrl || undefined}
@@ -4491,7 +4491,7 @@ export function EditorScreen() {
                   eyebrow={eyebrow || 'REPORT'}
                   headline={verbatimCopy.headline || 'Lightweight header.'}
                   subhead={verbatimCopy.subhead}
-                  cta={ctaText || 'Responsive'}
+                  cta={ctaText || ''}
                   solution={solution}
                   variant={reportVariant}
                   imageUrl={thumbnailImageUrl || undefined}
@@ -4652,7 +4652,7 @@ export function EditorScreen() {
               {currentTemplate === 'email-image' && (
                 <EmailImage
                   headline={verbatimCopy.headline || 'Headline'}
-                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                  body={verbatimCopy.body || ''}
                   ctaText={ctaText}
                   imageUrl={thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
                   imagePosition={thumbnailImagePosition}
@@ -4849,7 +4849,7 @@ export function EditorScreen() {
                     headline={verbatimCopy.headline || 'Headline'}
                     eyebrow={eyebrow}
                     subhead={verbatimCopy.subhead}
-                    body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum'}
+                    body={verbatimCopy.body || ''}
                     ctaText={ctaText}
                     colorStyle={colorStyle}
                     alignment={alignment}
@@ -5032,7 +5032,7 @@ export function EditorScreen() {
                 <EmailSpeakers
                   headline={verbatimCopy.headline || 'Headline'}
                   eyebrow={eyebrow}
-                  body={verbatimCopy.body || 'This is your body copy. Lorem ipsum dolor sit amet, consectetur adipiscing'}
+                  body={verbatimCopy.body || ''}
                   ctaText={ctaText}
                   solution={solution}
                   logoColor={logoColor === 'white' ? 'black' : logoColor}
@@ -5075,7 +5075,7 @@ export function EditorScreen() {
                 <WebsiteFloatingBannerMobile
                   eyebrow={eyebrow}
                   headline={verbatimCopy.headline || 'Headline'}
-                  cta={ctaText || 'Learn More'}
+                  cta={ctaText || ''}
                   showEyebrow={showEyebrow}
                   showHeadline={showHeadline}
                   variant={floatingBannerMobileVariant}

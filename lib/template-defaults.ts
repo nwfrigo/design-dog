@@ -274,6 +274,31 @@ export function getDefaultVisibility(templateType: TemplateType): TemplateDefaul
 }
 
 /**
+ * Per-template branded seed text for fields that ship with a flavored
+ * default in the design (e.g. press release eyebrow = "NEWS"). Used by
+ * both `getDefaultAssetSettings` and the homepage thumbnail so the
+ * editor and thumbnail render the same string.
+ *
+ * Editable text fields not listed here seed empty. The template's own
+ * `value || 'Canonical Placeholder'` fallback renders the canonical
+ * placeholder ('Headline', 'Body copy goes here.', 'Call to Action',
+ * etc.) when the seed is empty.
+ */
+export const BRANDED_SEEDS: Partial<Record<TemplateType, { eyebrow?: string; headline?: string }>> = {
+  'website-press-release': { eyebrow: 'NEWS' },
+  'website-thumbnail': { eyebrow: 'EBOOK' },
+  'website-webinar': { eyebrow: 'Webinar' },
+  'website-event-listing': { eyebrow: 'LIVE EVENT' },
+  'website-ehs-accelerate-listing': { eyebrow: 'LIVE EVENT' },
+  'website-report': { eyebrow: 'REPORT' },
+  'email-product-release': { eyebrow: 'Product Release', headline: 'GX2 2026.1' },
+}
+
+export function getBrandedSeed(templateType: TemplateType, field: 'eyebrow' | 'headline'): string {
+  return BRANDED_SEEDS[templateType]?.[field] ?? ''
+}
+
+/**
  * Returns a single flag's default for a template, or `undefined` if
  * the template doesn't define that flag.
  */

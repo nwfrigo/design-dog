@@ -54,13 +54,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * same universal image model.
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  eyebrow: 'REPORT',
-  headline: 'Lightweight header.',
-  subhead: 'Subheadline',
-  cta: 'Read more',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   eyebrow: 'eyebrow',
   headline: 'headline',
@@ -150,13 +143,12 @@ export function WebsiteReportStageBench(props: StageBenchEditorProps) {
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const eyebrowEff  = withPlaceholder('eyebrow',  eyebrow)
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
-  const subheadEff  = withPlaceholder('subhead',  verbatimCopy.subhead)
-  const ctaEff      = withPlaceholder('cta',      ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const eyebrowEff  = eyebrow ?? ''
+  const headlineEff = verbatimCopy.headline ?? ''
+  const subheadEff  = verbatimCopy.subhead ?? ''
+  const ctaEff      = ctaText ?? ''
 
   const showEyebrowEff   = showEyebrow      || previewKey === 'eyebrow'
   const showSubheadEff   = showSubhead      || previewKey === 'subhead'

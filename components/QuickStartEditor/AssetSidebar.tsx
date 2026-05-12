@@ -575,7 +575,7 @@ function AssetPreviewRenderer({
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead}
-          cta={asset.ctaText || 'Responsive'}
+          cta={asset.ctaText || ''}
           solution={asset.solution}
           variant={asset.ebookVariant || 'image'}
           imageUrl={asset.thumbnailImageUrl || undefined}
@@ -593,7 +593,7 @@ function AssetPreviewRenderer({
           headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead}
           body={copy.body}
-          cta={asset.ctaText || 'Responsive'}
+          cta={asset.ctaText || ''}
           solution={asset.solution}
           imageUrl={asset.thumbnailImageUrl || undefined}
           showEyebrow={asset.showEyebrow}
@@ -631,8 +631,8 @@ function AssetPreviewRenderer({
           {...commonProps}
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
-          body={copy.body || 'This is your body copy.'}
-          ctaText={asset.ctaText || 'Responsive'}
+          body={copy.body || ''}
+          ctaText={asset.ctaText || ''}
           imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
           layout={asset.layout || 'even'}
           solution={asset.solution}
@@ -694,7 +694,7 @@ function AssetPreviewRenderer({
           headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || ''}
           metadata={asset.metadata || 'Day / Month | 00:00'}
-          ctaText={asset.ctaText || 'Learn More'}
+          ctaText={asset.ctaText || ''}
           imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
           layout={asset.layout || 'even'}
           solution={asset.solution}
@@ -732,8 +732,8 @@ function AssetPreviewRenderer({
           headlineFontSize={asset.headlineFontSize ?? undefined}
           eyebrow={asset.eyebrow}
           subhead={copy.subhead}
-          body={copy.body || 'This is your body copy.'}
-          ctaText={asset.ctaText || 'Responsive'}
+          body={copy.body || ''}
+          ctaText={asset.ctaText || ''}
           colorStyle={asset.colorStyle || '1'}
           alignment={asset.alignment || 'left'}
           ctaStyle={asset.ctaStyle || 'link'}
@@ -750,8 +750,8 @@ function AssetPreviewRenderer({
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
           eyebrow={asset.eyebrow}
-          body={copy.body || 'This is your body copy.'}
-          ctaText={asset.ctaText || 'Responsive'}
+          body={copy.body || ''}
+          ctaText={asset.ctaText || ''}
           solution={asset.solution}
           logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
@@ -790,7 +790,7 @@ function AssetPreviewRenderer({
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || ''}
-          ctaText={asset.ctaText || 'Responsive'}
+          ctaText={asset.ctaText || ''}
           colorStyle={asset.colorStyle || '1'}
           imageSize={asset.newsletterImageSize || 'none'}
           imageUrl={asset.newsletterImageUrl || null}
@@ -807,7 +807,7 @@ function AssetPreviewRenderer({
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || ''}
-          ctaText={asset.ctaText || 'Responsive'}
+          ctaText={asset.ctaText || ''}
           colorStyle={asset.colorStyle || '1'}
           imageSize={asset.newsletterImageSize || 'none'}
           imageUrl={asset.newsletterImageUrl || null}
@@ -824,7 +824,7 @@ function AssetPreviewRenderer({
           headline={copy.headline || 'Headline'}
           headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || ''}
-          ctaText={asset.ctaText || 'Responsive'}
+          ctaText={asset.ctaText || ''}
           imageSize={asset.newsletterImageSize || 'none'}
           imageUrl={asset.newsletterImageUrl || null}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
@@ -841,7 +841,7 @@ function AssetPreviewRenderer({
           headlineFontSize={asset.headlineFontSize ?? undefined}
           subhead={copy.subhead || ''}
           body={copy.body || ''}
-          cta={asset.ctaText || 'Responsive'}
+          cta={asset.ctaText || ''}
           solution={asset.solution}
           variant={asset.webinarVariant || 'image'}
           imageUrl={asset.thumbnailImageUrl || undefined}

@@ -59,13 +59,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * differences are real and should not be erased by convergence.
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  headline: 'Headline',
-  subhead: 'Subheadline',
-  metadata: 'Day / Month | 00:00',
-  cta: 'Learn more',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   headline: 'headline',
   subhead: 'subheadline',
@@ -153,13 +146,12 @@ export function SocialImageMeddbaseStageBench(props: StageBenchEditorProps) {
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
-  const subheadEff  = withPlaceholder('subhead',  verbatimCopy.subhead)
-  const metadataEff = withPlaceholder('metadata', metadata)
-  const ctaEff      = withPlaceholder('cta',      ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const headlineEff = verbatimCopy.headline ?? ''
+  const subheadEff  = verbatimCopy.subhead ?? ''
+  const metadataEff = metadata ?? ''
+  const ctaEff      = ctaText ?? ''
 
   const showSubheadEff   = showSubhead     || previewKey === 'subhead'
   const showMetadataEff  = showMetadata    || previewKey === 'metadata'

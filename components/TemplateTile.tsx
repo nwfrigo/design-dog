@@ -5,7 +5,7 @@ import type { TemplateInfo } from '@/lib/template-config'
 import type { TemplateType } from '@/types'
 import { TEMPLATE_DIMENSIONS } from '@/lib/template-config'
 import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
-import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS } from '@/lib/template-defaults'
+import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS, getBrandedSeed } from '@/lib/template-defaults'
 
 // Import all template components
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
@@ -62,13 +62,18 @@ const PLACEHOLDER_IMAGES = {
   speaker3: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop',
 }
 
-// Default content for previews
+// Thumbnail content is intentionally empty — each template owns the
+// canonical placeholder ('Headline' / 'Subheadline' / 'Body copy goes
+// here.' / 'Call to Action' / 'Eyebrow') as a `value || 'Placeholder'`
+// fallback in its render body. Passing empty strings here keeps the
+// homepage thumbnail in lockstep with what the editor renders when the
+// user opens that template.
 const PREVIEW_CONTENT = {
-  headline: 'Headline',
-  subhead: 'Subheadline text here',
-  body: 'Body copy goes here.',
-  cta: 'Learn More',
-  eyebrow: 'EYEBROW',
+  headline: '',
+  subhead: '',
+  body: '',
+  cta: '',
+  eyebrow: '',
 }
 
 // Render a template with default preview content (exported for reuse in modals)
@@ -88,9 +93,18 @@ export function TemplateRenderer({
   // `as any` lets the spread reach each template's typed props without
   // listing every flag per case — the source-of-truth typing lives in
   // `lib/template-defaults.ts`.
-  const visibility: Record<string, boolean> = { ...UNIVERSAL_FALLBACK_FLAGS, ...getDefaultVisibility(templateType) }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const flags = visibility as any
+  const visibility = { ...UNIVERSAL_FALLBACK_FLAGS, ...getDefaultVisibility(templateType) } as typeof UNIVERSAL_FALLBACK_FLAGS
+  // Spread lets the same flags reach every template's typed props.
+  // Source-of-truth typing lives in lib/template-defaults.ts.
+  const flags = visibility
+
+
+  // Branded seed text (e.g. press release → "NEWS") matches what the
+  // store seeds when the user opens the editor. Templates render the
+  // canonical fallback ('Eyebrow', 'Headline', etc.) when the seed is
+  // empty.
+  const brandedEyebrow = getBrandedSeed(templateType, 'eyebrow')
+  const brandedHeadline = getBrandedSeed(templateType, 'headline')
 
   const commonProps = { colors, typography, scale }
 
@@ -104,9 +118,9 @@ export function TemplateRenderer({
           body={PREVIEW_CONTENT.body}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           solution="safety"
-          gridDetail1={{ type: 'data', text: '150+ Sessions' }}
-          gridDetail2={{ type: 'data', text: '50 Speakers' }}
-          gridDetail3={{ type: 'cta', text: 'Register Now' }}
+          gridDetail1={{ type: 'data', text: '' }}
+          gridDetail2={{ type: 'data', text: '' }}
+          gridDetail3={{ type: 'cta', text: '' }}
         />
       )
 
@@ -156,8 +170,8 @@ export function TemplateRenderer({
         <EmailEhsAccelerateBanner
           {...commonProps}
           {...flags}
-          eventDate="Thursday, 13th November"
-          eventLocation="London, UK"
+          eventDate=""
+          eventLocation=""
         />
       )
 
@@ -166,13 +180,13 @@ export function TemplateRenderer({
         <EmailEhsAccelerateInvitation
           {...commonProps}
           {...flags}
-          invitationHeader="You're Invited"
-          invitationHeadline="Exclusive EHS+ Leader Workshop"
-          invitationEventTitle="EHS+ Accelerate: Tech Convergence Workshop"
-          invitationEventDate="13 November"
-          invitationEventLocation="London, England"
-          invitationEventTime="10:00–14:30"
-          invitationEventTimeNote="Lunch Included"
+          invitationHeader=""
+          invitationHeadline=""
+          invitationEventTitle=""
+          invitationEventDate=""
+          invitationEventLocation=""
+          invitationEventTime=""
+          invitationEventTimeNote=""
           invitationBody=""
         />
       )
@@ -182,10 +196,12 @@ export function TemplateRenderer({
         <EmailEhsAccelerateSignature
           {...commonProps}
           {...flags}
-          workshopName="Exclusive EHS+ Leader Workshop"
-          eventDate="Thursday, 13th November"
-          eventLocation="London, UK"
-          ctaText="Join Us"
+          showWorkshopName={flags.showSignatureWorkshopName}
+          showEventDetails={flags.showSignatureEventDetails}
+          workshopName=""
+          eventDate=""
+          eventLocation=""
+          ctaText=""
         />
       )
 
@@ -194,9 +210,9 @@ export function TemplateRenderer({
         <EmailCorityCustomerExchangeBanner
           {...commonProps}
           {...flags}
-          headline="Join us Thursday, May 7th in Brussels."
-          body="An invite-only, in-person workshop for EHSQ and Sustainability leaders"
-          ctaText="Join us"
+          headline=""
+          body=""
+          ctaText=""
           colorStyle="1"
         />
       )
@@ -206,10 +222,13 @@ export function TemplateRenderer({
         <EmailCorityCustomerExchangeSignature
           {...commonProps}
           {...flags}
-          eventDate="Thursday, May 7th"
-          eventLocation="Brussels, Belgium"
-          eventTime="10:00–16:00"
-          ctaText="Join Us"
+          showEventDate={flags.showCceEventDate}
+          showEventLocation={flags.showCceEventLocation}
+          showEventTime={flags.showCceEventTime}
+          eventDate=""
+          eventLocation=""
+          eventTime=""
+          ctaText=""
         />
       )
 
@@ -218,8 +237,8 @@ export function TemplateRenderer({
         <EmailProductRelease
           {...commonProps}
           {...flags}
-          eyebrow="Product Release"
-          headline="GX2 2026.1"
+          eyebrow={brandedEyebrow}
+          headline={brandedHeadline}
           imageUrl={PLACEHOLDER_IMAGES.default}
         />
       )
@@ -315,9 +334,9 @@ export function TemplateRenderer({
         <SocialEhsAccelerate
           {...commonProps}
           {...flags}
-          headline="Room for a great headline."
-          subhead="This is your subheader or description text. Keep it to two lines if you can."
-          ctaText="Responsive"
+          headline={PREVIEW_CONTENT.headline}
+          subhead={PREVIEW_CONTENT.subhead}
+          ctaText={PREVIEW_CONTENT.cta}
         />
       )
 
@@ -330,10 +349,10 @@ export function TemplateRenderer({
           subhead={PREVIEW_CONTENT.subhead}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           solution="safety"
-          gridDetail1={{ type: 'data', text: '150+ Sessions' }}
-          gridDetail2={{ type: 'data', text: '50 Speakers' }}
-          gridDetail3={{ type: 'data', text: '3 Days' }}
-          gridDetail4={{ type: 'cta', text: 'Register Now' }}
+          gridDetail1={{ type: 'data', text: '' }}
+          gridDetail2={{ type: 'data', text: '' }}
+          gridDetail3={{ type: 'data', text: '' }}
+          gridDetail4={{ type: 'cta', text: '' }}
         />
       )
 
@@ -373,10 +392,10 @@ export function TemplateRenderer({
         <WebsiteThumbnail
           {...commonProps}
           {...flags}
-          eyebrow="EBOOK"
+          eyebrow={brandedEyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
-          cta="Responsive"
+          cta={PREVIEW_CONTENT.cta}
           solution="safety"
           variant="image"
           imageUrl={PLACEHOLDER_IMAGES.ebook}
@@ -388,7 +407,7 @@ export function TemplateRenderer({
         <WebsitePressRelease
           {...commonProps}
           {...flags}
-          eyebrow={PREVIEW_CONTENT.eyebrow}
+          eyebrow={brandedEyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
           body={PREVIEW_CONTENT.body}
@@ -404,7 +423,7 @@ export function TemplateRenderer({
         <WebsiteWebinar
           {...commonProps}
           {...flags}
-          eyebrow="Webinar"
+          eyebrow={brandedEyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
           body={PREVIEW_CONTENT.body}
@@ -423,14 +442,14 @@ export function TemplateRenderer({
         <WebsiteEventListing
           {...commonProps}
           {...flags}
-          eyebrow="LIVE EVENT"
+          eyebrow={brandedEyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
           variant="orange"
-          gridDetail1Text="Date: January 15, 2026"
-          gridDetail2Text="Time: 2:00 PM EST"
-          gridDetail3Text="Location: Virtual"
-          gridDetail4Text="Register Now"
+          gridDetail1Text=""
+          gridDetail2Text=""
+          gridDetail3Text=""
+          gridDetail4Text=""
         />
       )
 
@@ -439,13 +458,13 @@ export function TemplateRenderer({
         <WebsiteEhsAccelerateListing
           {...commonProps}
           {...flags}
-          eyebrow="LIVE EVENT"
+          eyebrow={brandedEyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
-          gridDetail1Text="Date: January 15, 2026"
-          gridDetail2Text="Time: 2:00 PM EST"
-          gridDetail3Text="Location: Virtual"
-          gridDetail4Text="Register Now"
+          gridDetail1Text=""
+          gridDetail2Text=""
+          gridDetail3Text=""
+          gridDetail4Text=""
         />
       )
 
@@ -454,10 +473,10 @@ export function TemplateRenderer({
         <WebsiteReport
           {...commonProps}
           {...flags}
-          eyebrow="REPORT"
+          eyebrow={brandedEyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
-          cta="Responsive"
+          cta={PREVIEW_CONTENT.cta}
           solution="environmental"
           variant="image"
           imageUrl={PLACEHOLDER_IMAGES.report}
@@ -471,7 +490,7 @@ export function TemplateRenderer({
           {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
-          cta="Learn More"
+          cta={PREVIEW_CONTENT.cta}
           variant="dark"
         />
       )
@@ -483,7 +502,7 @@ export function TemplateRenderer({
           {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
-          cta="Learn More"
+          cta={PREVIEW_CONTENT.cta}
           variant="light"
           arrowType="text"
         />
@@ -538,8 +557,8 @@ export function TemplateRenderer({
         <NewsletterTopBanner
           {...commonProps}
           {...flags}
-          eyebrow="Month | Year"
-          headline="EHS+ Newsletter"
+          eyebrow=""
+          headline=""
           subhead=""
           variant="dark"
         />

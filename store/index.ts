@@ -6,7 +6,7 @@ import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
 import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset, generatedAssetToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
-import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS } from '@/lib/template-defaults'
+import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS, getBrandedSeed } from '@/lib/template-defaults'
 
 const initialVerbatimCopy: CopyContent = {
   headline: '',
@@ -110,7 +110,11 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => {
     : { ...UNIVERSAL_FALLBACK_FLAGS }
   return ({
   ...visibility,
-  eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : templateType === 'website-thumbnail' ? 'EBOOK' : templateType === 'website-event-listing' ? 'LIVE EVENT' : templateType === 'website-report' ? 'REPORT' : templateType === 'email-product-release' ? 'Product Release' : 'Eyebrow',
+  // Branded eyebrow seed (e.g. press release → "NEWS") lives in
+  // BRANDED_SEEDS in lib/template-defaults.ts. Empty for templates
+  // that don't ship a flavored default — the template's
+  // `eyebrow || 'Eyebrow'` fallback renders the canonical.
+  eyebrow: templateType ? getBrandedSeed(templateType, 'eyebrow') : '',
   solution: templateType === 'website-webinar' ? 'safety' : templateType === 'website-press-release' ? 'health' : 'environmental',
   logoColor: templateType === 'website-webinar' || templateType === 'website-report' ? 'white' as const : 'black' as const,
   ebookVariant: 'image' as const,
@@ -119,14 +123,17 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => {
   thumbnailImagePosition: { x: 0, y: 0 },
   thumbnailImageZoom: 1,
   subheading: '',
-  gridDetail1Text: templateType === 'website-event-listing' ? '' : 'Date: January 1st, 2026',
-  gridDetail2Text: templateType === 'website-event-listing' ? '' : 'Date: January 1st, 2026',
+  // Editable text fields seed empty — templates own the canonical
+  // placeholder fallback (e.g. `ctaText || 'Call to Action'`) so the
+  // same string renders in the thumbnail, the editor, and the export.
+  gridDetail1Text: '',
+  gridDetail2Text: '',
   gridDetail3Type: 'cta' as const,
-  gridDetail3Text: templateType === 'website-event-listing' ? '' : 'Responsive',
+  gridDetail3Text: '',
   gridDetail4Type: 'cta' as const,
-  gridDetail4Text: 'Join the event',
-  metadata: 'Day / Month | 00:00',
-  ctaText: 'Responsive',
+  gridDetail4Text: '',
+  metadata: '',
+  ctaText: '',
   colorStyle: (templateType === 'email-cority-customer-exchange-banner' ? '2' : '1') as ColorStyle,
   headingSize: 'L' as const,
   alignment: 'left' as const,
@@ -314,20 +321,20 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   showSubheading: false,
   showSolutionSet: true,
   showGridDetail2: true,
-  gridDetail1Text: 'Date: January 1st, 2026',
-  gridDetail2Text: 'Date: January 1st, 2026',
+  gridDetail1Text: '',
+  gridDetail2Text: '',
   gridDetail3Type: 'cta',
-  gridDetail3Text: 'Responsive',
+  gridDetail3Text: '',
 
   // Social Grid Detail specific settings
   gridDetail4Type: 'cta',
-  gridDetail4Text: 'Join the event',
+  gridDetail4Text: '',
   showRow3: true,
   showRow4: true,
 
   // Social Dark Gradient specific settings
-  metadata: 'Day / Month | 00:00',
-  ctaText: 'Responsive',
+  metadata: '',
+  ctaText: '',
   colorStyle: '1',
   headingSize: 'L',
   alignment: 'left',
@@ -994,18 +1001,18 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Note: Images default to placeholder for new assets, not copied from previous
       const targetTemplateDefaults = getDefaultAssetSettings(selectedAssets[index])
       const defaultSettings: ManualAssetSettings = {
-        eyebrow: verbatimCopy.headline ? eyebrow : 'Eyebrow', // Keep eyebrow if has content, else default
+        eyebrow: verbatimCopy.headline ? eyebrow : '',
         solution: targetTemplateDefaults.solution,
-        ctaText: 'Responsive',
-        gridDetail1Text: 'Date: January 1st, 2026',
-        gridDetail2Text: 'Date: January 1st, 2026',
-        gridDetail3Text: 'Responsive',
-        gridDetail4Text: 'Join the event',
-        thumbnailImageUrl: null, // Always default placeholder for new assets
+        ctaText: '',
+        gridDetail1Text: '',
+        gridDetail2Text: '',
+        gridDetail3Text: '',
+        gridDetail4Text: '',
+        thumbnailImageUrl: null,
         thumbnailImagePosition: { x: 0, y: 0 },
         thumbnailImageZoom: 1,
         showBody: true,
-        metadata: 'Day / Month | 00:00',
+        metadata: '',
         headlineFontSize: null,
   subheadFontSize: null,
         stackAlign: 'top',
@@ -1987,18 +1994,18 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showSubheading: false,
       showSolutionSet: true,
       showGridDetail2: true,
-      gridDetail1Text: 'Date: January 1st, 2026',
-      gridDetail2Text: 'Date: January 1st, 2026',
+      gridDetail1Text: '',
+      gridDetail2Text: '',
       gridDetail3Type: 'cta',
-      gridDetail3Text: 'Responsive',
+      gridDetail3Text: '',
       // Social Grid Detail defaults
       gridDetail4Type: 'cta',
-      gridDetail4Text: 'Join the event',
+      gridDetail4Text: '',
       showRow3: true,
       showRow4: true,
       // Social Dark Gradient defaults
-      metadata: 'Day / Month | 00:00',
-      ctaText: 'Responsive',
+      metadata: '',
+      ctaText: '',
       colorStyle: '1',
       headingSize: 'L',
       alignment: 'left',

@@ -50,12 +50,6 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * (shares the social-dark-gradient swatch set).
  */
 
-const PREVIEW_PLACEHOLDERS: Record<string, string> = {
-  headline: 'Headline',
-  body: '',
-  cta: 'Learn more',
-}
-
 const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   headline: 'headline',
   body: 'body',
@@ -120,12 +114,11 @@ export function EmailCorityCustomerExchangeBannerStageBench(props: StageBenchEdi
       : null
   const showStageScrim = previewKey !== null
 
-  const withPlaceholder = (key: string, real: string | undefined): string =>
-    real || PREVIEW_PLACEHOLDERS[key] || ''
-
-  const headlineEff = withPlaceholder('headline', verbatimCopy.headline)
-  const bodyEff     = verbatimCopy.body || ''
-  const ctaEff      = withPlaceholder('cta',      ctaText)
+  // ---- Effective content — raw value, empty when unset. The template
+  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
+  const headlineEff = verbatimCopy.headline ?? ''
+  const bodyEff     = verbatimCopy.body ?? ''
+  const ctaEff      = ctaText ?? ''
 
   const showHeadlineEff = showHeadline || previewKey === 'headline'
   const showBodyEff     = showBody     || previewKey === 'body'
