@@ -6,6 +6,7 @@ import { KIT_CONFIGS } from '@/config/kit-configs'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
 import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset, generatedAssetToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
+import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS } from '@/lib/template-defaults'
 
 const initialVerbatimCopy: CopyContent = {
   headline: '',
@@ -101,40 +102,35 @@ const initialAutoCreate: AutoCreateState = {
   },
 }
 
-const getDefaultAssetSettings = (templateType?: TemplateType) => ({
+const getDefaultAssetSettings = (templateType?: TemplateType) => {
+  // Visibility defaults — single source of truth in lib/template-defaults.ts.
+  // UNIVERSAL_FALLBACK_FLAGS fills in any flag the per-template table omits.
+  const visibility = templateType
+    ? { ...UNIVERSAL_FALLBACK_FLAGS, ...getDefaultVisibility(templateType) }
+    : { ...UNIVERSAL_FALLBACK_FLAGS }
+  return ({
+  ...visibility,
   eyebrow: templateType === 'website-webinar' ? 'Webinar' : templateType === 'website-press-release' ? 'NEWS' : templateType === 'website-thumbnail' ? 'EBOOK' : templateType === 'website-event-listing' ? 'LIVE EVENT' : templateType === 'website-report' ? 'REPORT' : templateType === 'email-product-release' ? 'Product Release' : 'Eyebrow',
   solution: templateType === 'website-webinar' ? 'safety' : templateType === 'website-press-release' ? 'health' : 'environmental',
   logoColor: templateType === 'website-webinar' || templateType === 'website-report' ? 'white' as const : 'black' as const,
-  showEyebrow: true,
-  showSubhead: templateType === 'website-press-release' ? false : true,
-  showBody: true,
-  showHeadline: true,
   ebookVariant: 'image' as const,
   reportVariant: 'image' as const,
   thumbnailImageUrl: null,
   thumbnailImagePosition: { x: 0, y: 0 },
   thumbnailImageZoom: 1,
   subheading: '',
-  showLightHeader: true,
-  showSubheading: false,
-  showSolutionSet: true,
-  showGridDetail2: true,
   gridDetail1Text: templateType === 'website-event-listing' ? '' : 'Date: January 1st, 2026',
   gridDetail2Text: templateType === 'website-event-listing' ? '' : 'Date: January 1st, 2026',
   gridDetail3Type: 'cta' as const,
   gridDetail3Text: templateType === 'website-event-listing' ? '' : 'Responsive',
   gridDetail4Type: 'cta' as const,
   gridDetail4Text: 'Join the event',
-  showRow3: true,
-  showRow4: true,
   metadata: 'Day / Month | 00:00',
   ctaText: 'Responsive',
   colorStyle: (templateType === 'email-cority-customer-exchange-banner' ? '2' : '1') as ColorStyle,
   headingSize: 'L' as const,
   alignment: 'left' as const,
   ctaStyle: 'link' as const,
-  showMetadata: true,
-  showCta: true,
   layout: 'even' as const,
   newsletterImageSize: 'small' as const,
   newsletterImageUrl: null,
@@ -159,9 +155,6 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   speaker3ImageZoom: 1,
   // Website Webinar specific
   webinarVariant: 'speakers' as const,
-  showSpeaker1: true,
-  showSpeaker2: true,
-  showSpeaker3: true,
   // Website Event Listing specific
   eventListingVariant: 'orange' as const,
   // Customer Library specific
@@ -250,8 +243,6 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   eventLocation: '',
   // Email EHS Accelerate Signature specific
   signatureWorkshopName: '',
-  showSignatureWorkshopName: true,
-  showSignatureEventDetails: true,
   // Email EHS Accelerate Invitation specific
   invitationHeader: '',
   invitationHeadline: '',
@@ -263,9 +254,6 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   invitationBody: '',
   // Email Cority Customer Exchange Signature specific
   cceEventTime: '',
-  showCceEventDate: true,
-  showCceEventLocation: true,
-  showCceEventTime: true,
 
   // FAQ PDF specific
   faqTitle: 'Title Goes Here',
@@ -276,7 +264,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => ({
   faqCoverImagePosition: { x: 0, y: 0 },
   faqCoverImageZoom: 1,
   faqCoverImageGrayscale: false,
-})
+  })
+}
 
 export const useStore = create<AppState>()(subscribeWithSelector((set, get) => ({
   // Current screen

@@ -5,6 +5,7 @@ import type { TemplateInfo } from '@/lib/template-config'
 import type { TemplateType } from '@/types'
 import { TEMPLATE_DIMENSIONS } from '@/lib/template-config'
 import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
+import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS } from '@/lib/template-defaults'
 
 // Import all template components
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
@@ -82,6 +83,15 @@ export function TemplateRenderer({
   typography: TypographyConfig
   scale?: number
 }) {
+  // Visibility flags pulled from the central defaults source so thumbnails
+  // match what the editor renders on first open.
+  // `as any` lets the spread reach each template's typed props without
+  // listing every flag per case — the source-of-truth typing lives in
+  // `lib/template-defaults.ts`.
+  const visibility: Record<string, boolean> = { ...UNIVERSAL_FALLBACK_FLAGS, ...getDefaultVisibility(templateType) }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const flags = visibility as any
+
   const commonProps = { colors, typography, scale }
 
   switch (templateType) {
@@ -89,17 +99,11 @@ export function TemplateRenderer({
       return (
         <EmailGrid
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
           body={PREVIEW_CONTENT.body}
-          showEyebrow={true}
           eyebrow={PREVIEW_CONTENT.eyebrow}
-          showLightHeader={true}
-          showHeavyHeader={false}
-          showSubheading={false}
-          showBody={false}
-          showSolutionSet={true}
           solution="safety"
-          showGridDetail2={true}
           gridDetail1={{ type: 'data', text: '150+ Sessions' }}
           gridDetail2={{ type: 'data', text: '50 Speakers' }}
           gridDetail3={{ type: 'cta', text: 'Register Now' }}
@@ -110,15 +114,13 @@ export function TemplateRenderer({
       return (
         <EmailImage
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
           body={PREVIEW_CONTENT.body}
           ctaText={PREVIEW_CONTENT.cta}
           imageUrl={PLACEHOLDER_IMAGES.default}
           layout="even"
           solution="safety"
-          showBody={false}
-          showCta={true}
-          showSolutionSet={true}
         />
       )
 
@@ -126,17 +128,14 @@ export function TemplateRenderer({
       return (
         <SocialImageMeddbase
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
-          subhead=""
+          subhead={PREVIEW_CONTENT.subhead}
           metadata="Day / Month | 00:00"
           ctaText={PREVIEW_CONTENT.cta}
           imageUrl={PLACEHOLDER_IMAGES.default}
           layout="even"
           solution="safety"
-          showSubhead={false}
-          showMetadata={true}
-          showCta={true}
-          showSolutionSet={true}
         />
       )
 
@@ -144,13 +143,11 @@ export function TemplateRenderer({
       return (
         <EmailCorityConnect2026
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
           body={PREVIEW_CONTENT.body}
           ctaText={PREVIEW_CONTENT.cta}
           backgroundVariant="dark-blue-1"
-          showHeadline={true}
-          showBody={true}
-          showCta={true}
         />
       )
 
@@ -158,6 +155,7 @@ export function TemplateRenderer({
       return (
         <EmailEhsAccelerateBanner
           {...commonProps}
+          {...flags}
           eventDate="Thursday, 13th November"
           eventLocation="London, UK"
         />
@@ -167,6 +165,7 @@ export function TemplateRenderer({
       return (
         <EmailEhsAccelerateInvitation
           {...commonProps}
+          {...flags}
           invitationHeader="You're Invited"
           invitationHeadline="Exclusive EHS+ Leader Workshop"
           invitationEventTitle="EHS+ Accelerate: Tech Convergence Workshop"
@@ -182,13 +181,11 @@ export function TemplateRenderer({
       return (
         <EmailEhsAccelerateSignature
           {...commonProps}
+          {...flags}
           workshopName="Exclusive EHS+ Leader Workshop"
           eventDate="Thursday, 13th November"
           eventLocation="London, UK"
           ctaText="Join Us"
-          showWorkshopName={true}
-          showEventDetails={true}
-          showCta={true}
         />
       )
 
@@ -196,13 +193,11 @@ export function TemplateRenderer({
       return (
         <EmailCorityCustomerExchangeBanner
           {...commonProps}
+          {...flags}
           headline="Join us Thursday, May 7th in Brussels."
           body="An invite-only, in-person workshop for EHSQ and Sustainability leaders"
           ctaText="Join us"
           colorStyle="1"
-          showHeadline={true}
-          showBody={true}
-          showCta={true}
         />
       )
 
@@ -210,14 +205,11 @@ export function TemplateRenderer({
       return (
         <EmailCorityCustomerExchangeSignature
           {...commonProps}
+          {...flags}
           eventDate="Thursday, May 7th"
           eventLocation="Brussels, Belgium"
           eventTime="10:00–16:00"
           ctaText="Join Us"
-          showEventDate={true}
-          showEventLocation={true}
-          showEventTime={true}
-          showCta={true}
         />
       )
 
@@ -225,6 +217,7 @@ export function TemplateRenderer({
       return (
         <EmailProductRelease
           {...commonProps}
+          {...flags}
           eyebrow="Product Release"
           headline="GX2 2026.1"
           imageUrl={PLACEHOLDER_IMAGES.default}
@@ -235,6 +228,7 @@ export function TemplateRenderer({
       return (
         <EmailDarkGradient
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           subhead={PREVIEW_CONTENT.subhead}
@@ -243,10 +237,6 @@ export function TemplateRenderer({
           colorStyle="1"
           alignment="left"
           ctaStyle="link"
-          showEyebrow={true}
-          showSubhead={false}
-          showBody={false}
-          showCta={true}
         />
       )
 
@@ -254,16 +244,13 @@ export function TemplateRenderer({
       return (
         <EmailSpeakers
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           body={PREVIEW_CONTENT.body}
           ctaText={PREVIEW_CONTENT.cta}
           solution="safety"
           logoColor="orange"
-          showEyebrow={true}
-          showBody={false}
-          showCta={true}
-          showSolutionSet={true}
           speakerCount={3}
           speaker1={{ name: 'Jane Smith', role: 'CEO', imageUrl: PLACEHOLDER_IMAGES.speaker1, imagePosition: { x: 50, y: 50 }, imageZoom: 1 }}
           speaker2={{ name: 'John Doe', role: 'CTO', imageUrl: PLACEHOLDER_IMAGES.speaker2, imagePosition: { x: 50, y: 50 }, imageZoom: 1 }}
@@ -275,6 +262,7 @@ export function TemplateRenderer({
       return (
         <SocialDarkGradient
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -286,11 +274,6 @@ export function TemplateRenderer({
           alignment="left"
           ctaStyle="link"
           logoColor="white"
-          showEyebrow={true}
-          showSubhead={true}
-          showBody={false}
-          showMetadata={false}
-          showCta={true}
         />
       )
 
@@ -298,6 +281,7 @@ export function TemplateRenderer({
       return (
         <SocialBlueGradient
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -308,11 +292,6 @@ export function TemplateRenderer({
           headingSize="M"
           alignment="left"
           ctaStyle="link"
-          showEyebrow={true}
-          showSubhead={true}
-          showBody={false}
-          showMetadata={false}
-          showCta={true}
         />
       )
 
@@ -320,6 +299,7 @@ export function TemplateRenderer({
       return (
         <SocialImage
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
           metadata=""
@@ -327,10 +307,6 @@ export function TemplateRenderer({
           imageUrl={PLACEHOLDER_IMAGES.default}
           layout="even"
           solution="safety"
-          showSubhead={false}
-          showMetadata={false}
-          showCta={true}
-          showSolutionSet={true}
         />
       )
 
@@ -338,12 +314,10 @@ export function TemplateRenderer({
       return (
         <SocialEhsAccelerate
           {...commonProps}
+          {...flags}
           headline="Room for a great headline."
           subhead="This is your subheader or description text. Keep it to two lines if you can."
           ctaText="Responsive"
-          showHeadline={true}
-          showSubhead={true}
-          showCta={true}
         />
       )
 
@@ -351,15 +325,11 @@ export function TemplateRenderer({
       return (
         <SocialGridDetail
           {...commonProps}
+          {...flags}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
           eyebrow={PREVIEW_CONTENT.eyebrow}
-          showEyebrow={true}
-          showSubhead={false}
-          showSolutionSet={true}
           solution="safety"
-          showRow3={true}
-          showRow4={true}
           gridDetail1={{ type: 'data', text: '150+ Sessions' }}
           gridDetail2={{ type: 'data', text: '50 Speakers' }}
           gridDetail3={{ type: 'data', text: '3 Days' }}
@@ -402,6 +372,7 @@ export function TemplateRenderer({
       return (
         <WebsiteThumbnail
           {...commonProps}
+          {...flags}
           eyebrow="EBOOK"
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -409,9 +380,6 @@ export function TemplateRenderer({
           solution="safety"
           variant="image"
           imageUrl={PLACEHOLDER_IMAGES.ebook}
-          showEyebrow={true}
-          showSubhead={false}
-          showCta={true}
         />
       )
 
@@ -419,6 +387,7 @@ export function TemplateRenderer({
       return (
         <WebsitePressRelease
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -426,10 +395,6 @@ export function TemplateRenderer({
           cta={PREVIEW_CONTENT.cta}
           solution="environmental"
           imageUrl={PLACEHOLDER_IMAGES.default}
-          showEyebrow={true}
-          showSubhead={true}
-          showBody={true}
-          showCta={true}
           logoColor="black"
         />
       )
@@ -438,6 +403,7 @@ export function TemplateRenderer({
       return (
         <WebsiteWebinar
           {...commonProps}
+          {...flags}
           eyebrow="Webinar"
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -446,10 +412,6 @@ export function TemplateRenderer({
           solution="safety"
           variant="speakers"
           imageUrl={PLACEHOLDER_IMAGES.default}
-          showEyebrow={true}
-          showSubhead={true}
-          showBody={true}
-          showCta={true}
           speaker1={{ name: 'Jane Smith', role: 'CEO, Company', imageUrl: PLACEHOLDER_IMAGES.speaker1, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
           speaker2={{ name: 'John Doe', role: 'CTO, Company', imageUrl: PLACEHOLDER_IMAGES.speaker2, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
           speaker3={{ name: 'Alex Chen', role: 'VP Safety', imageUrl: PLACEHOLDER_IMAGES.speaker3, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
@@ -460,6 +422,7 @@ export function TemplateRenderer({
       return (
         <WebsiteEventListing
           {...commonProps}
+          {...flags}
           eyebrow="LIVE EVENT"
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -468,10 +431,6 @@ export function TemplateRenderer({
           gridDetail2Text="Time: 2:00 PM EST"
           gridDetail3Text="Location: Virtual"
           gridDetail4Text="Register Now"
-          showRow3={true}
-          showRow4={true}
-          showEyebrow={true}
-          showSubhead={false}
         />
       )
 
@@ -479,6 +438,7 @@ export function TemplateRenderer({
       return (
         <WebsiteEhsAccelerateListing
           {...commonProps}
+          {...flags}
           eyebrow="LIVE EVENT"
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -486,10 +446,6 @@ export function TemplateRenderer({
           gridDetail2Text="Time: 2:00 PM EST"
           gridDetail3Text="Location: Virtual"
           gridDetail4Text="Register Now"
-          showRow3={true}
-          showRow4={true}
-          showEyebrow={true}
-          showSubhead={false}
         />
       )
 
@@ -497,6 +453,7 @@ export function TemplateRenderer({
       return (
         <WebsiteReport
           {...commonProps}
+          {...flags}
           eyebrow="REPORT"
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -504,9 +461,6 @@ export function TemplateRenderer({
           solution="environmental"
           variant="image"
           imageUrl={PLACEHOLDER_IMAGES.report}
-          showEyebrow={true}
-          showSubhead={false}
-          showCta={true}
         />
       )
 
@@ -514,10 +468,10 @@ export function TemplateRenderer({
       return (
         <WebsiteFloatingBanner
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           cta="Learn More"
-          showEyebrow={true}
           variant="dark"
         />
       )
@@ -526,10 +480,10 @@ export function TemplateRenderer({
       return (
         <WebsiteFloatingBannerMobile
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           cta="Learn More"
-          showEyebrow={true}
           variant="light"
           arrowType="text"
         />
@@ -539,6 +493,7 @@ export function TemplateRenderer({
       return (
         <NewsletterDarkGradient
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -546,9 +501,6 @@ export function TemplateRenderer({
           colorStyle="1"
           imageSize="none"
           imageUrl={null}
-          showEyebrow={true}
-          showSubhead={false}
-          showCta={true}
         />
       )
 
@@ -556,6 +508,7 @@ export function TemplateRenderer({
       return (
         <NewsletterBlueGradient
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
@@ -563,9 +516,6 @@ export function TemplateRenderer({
           colorStyle="1"
           imageSize="none"
           imageUrl={null}
-          showEyebrow={true}
-          showSubhead={false}
-          showCta={true}
         />
       )
 
@@ -573,15 +523,13 @@ export function TemplateRenderer({
       return (
         <NewsletterLight
           {...commonProps}
+          {...flags}
           eyebrow={PREVIEW_CONTENT.eyebrow}
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
           ctaText={PREVIEW_CONTENT.cta}
           imageSize="none"
           imageUrl={null}
-          showEyebrow={true}
-          showSubhead={false}
-          showCta={true}
         />
       )
 
@@ -589,11 +537,11 @@ export function TemplateRenderer({
       return (
         <NewsletterTopBanner
           {...commonProps}
+          {...flags}
           eyebrow="Month | Year"
           headline="EHS+ Newsletter"
           subhead=""
           variant="dark"
-          showSubhead={false}
         />
       )
 
