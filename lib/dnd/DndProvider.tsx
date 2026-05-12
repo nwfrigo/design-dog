@@ -105,6 +105,25 @@ export function DndProvider({ children }: { children: ReactNode }) {
     setActiveDrag(drag)
   }, [])
 
+  // Suppress browser text-selection while a drag is active. Without this
+  // the user's drag gesture co-fires the browser's native text-select-
+  // and-drag, leaving "highlighted" text/HTML behind the slot they were
+  // trying to move. We toggle a `data-dnd-dragging` attribute on <body>
+  // and a global CSS rule (`globals.css`) applies `user-select: none`
+  // while it's set. Selection that was already in progress when the
+  // drag activated gets cleared the same moment.
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (activeDrag) {
+      document.body.setAttribute('data-dnd-dragging', 'true')
+      window.getSelection()?.removeAllRanges()
+      return () => {
+        document.body.removeAttribute('data-dnd-dragging')
+      }
+    }
+    return undefined
+  }, [activeDrag])
+
   // Attach window listeners only while a drag is active. Effect deps are
   // [activeDrag] (whose identity is stable mid-drag), NOT [overTargetId]
   // — otherwise the listeners would re-attach every time the hover region

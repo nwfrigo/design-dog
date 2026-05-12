@@ -286,3 +286,17 @@ body {
 .image-editor-slider:focus-visible::-webkit-slider-thumb {
   box-shadow: 0 0 0 2px rgb(var(--content-secondary) / 0.4);
 }
+
+/* Suppress browser text-selection during an active drag.
+ * The flag is set/cleared by lib/dnd/DndProvider on the active-drag
+ * lifecycle. Prevents the "drag hard enough and the browser selects the
+ * stage's HTML" behavior that otherwise leaks through pointer-event
+ * DnD. */
+body[data-dnd-dragging] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+body[data-dnd-dragging] * {
+  user-select: none;
+  -webkit-user-select: none;
+}
