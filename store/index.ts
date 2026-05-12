@@ -307,20 +307,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   thumbnailImageUrl: null,
   // Per-template image settings (decoupled per template)
   thumbnailImageSettings: {} as ThumbnailImageSettings,
-  eyebrow: 'Eyebrow',
+  eyebrow: '',
   solution: 'environmental',
   logoColor: 'black',
-  showEyebrow: true,
-  showSubhead: true,
-  showBody: true,
-  showHeadline: true,
+  // Visibility flags inherit from the universal fallback set; once a
+  // template is selected, `goToEditorWithTemplate` spreads the
+  // per-template overrides on top via `getDefaultAssetSettings`.
+  ...UNIVERSAL_FALLBACK_FLAGS,
 
   // Email Grid specific settings
   subheading: '',
-  showLightHeader: true,
-  showSubheading: false,
-  showSolutionSet: true,
-  showGridDetail2: true,
   gridDetail1Text: '',
   gridDetail2Text: '',
   gridDetail3Type: 'cta',
@@ -329,8 +325,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Social Grid Detail specific settings
   gridDetail4Type: 'cta',
   gridDetail4Text: '',
-  showRow3: true,
-  showRow4: true,
 
   // Social Dark Gradient specific settings
   metadata: '',
@@ -339,8 +333,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   headingSize: 'L',
   alignment: 'left',
   ctaStyle: 'link',
-  showMetadata: true,
-  showCta: true,
 
   // Social Image specific settings
   layout: 'even',
@@ -1253,10 +1245,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   proceedToEditor: () => {
     const { selectedAssets } = get()
     if (selectedAssets.length > 0) {
+      const firstTemplate = selectedAssets[0]
+      const defaults = getDefaultAssetSettings(firstTemplate)
       set({
         currentScreen: 'editor',
         currentAssetIndex: 0,
-        templateType: selectedAssets[0],
+        templateType: firstTemplate,
+        // Apply per-template defaults so first-render visibility +
+        // branded seeds + flag overrides line up with the thumbnail.
+        ...defaults,
+        verbatimCopy: { ...initialVerbatimCopy },
       })
     }
   },
@@ -1283,13 +1281,15 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       selectedAssets: [templateType],
       currentAssetIndex: 0,
       templateType: templateType,
-      // Apply template-specific defaults
-      eyebrow: defaults.eyebrow,
-      solution: defaults.solution,
-      gridDetail1Text: defaults.gridDetail1Text,
-      gridDetail2Text: defaults.gridDetail2Text,
-      gridDetail3Text: defaults.gridDetail3Text,
-      gridDetail4Text: defaults.gridDetail4Text,
+      // Apply the FULL default set so visibility flags + text seeds +
+      // branded values + template-specific scalars all snap to the
+      // template's defaults. Anything left out here keeps stale values
+      // from a prior template — which is exactly the thumbnail-vs-editor
+      // divergence we keep chasing.
+      ...defaults,
+      // Reset editable text fields so empty fallbacks render the
+      // canonical placeholder (template's `value || 'Canonical'`).
+      verbatimCopy: { ...initialVerbatimCopy },
     })
   },
 
