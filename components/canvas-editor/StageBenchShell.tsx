@@ -59,23 +59,30 @@ export function StageBenchShell({
        * Bench column has a fixed width so the layout doesn't reflow when
        * chips drain in/out of the rail. Stage Bar's content is fixed-width
        * by nature (selectors), so it doesn't need explicit sizing. */}
-      <div className="flex-1 flex justify-center items-start py-12">
-        <div className="flex items-start gap-12">
+      <div className="flex-1 flex items-start py-12 px-12">
+        {/* The cluster fills the viewport's available width with `w-full`
+         * so `<main>` (flex-1) has a real parent width to flex against.
+         * Bench + stageBar stay fixed-width via flex-shrink-0; main
+         * uses min-w-0 so flex can actually shrink it below its
+         * intrinsic content width — that shrinkage is what gives the
+         * ScaledStage's parent.clientWidth a value smaller than the
+         * template's intrinsic dims, which is what drives the scale. */}
+        <div className="flex items-start gap-12 w-full">
           {/* self-stretch so the bench column matches the height of the
            * tallest sibling (main column = stage + action row). Without
            * stretch, an empty bench has 0 height — fine visually, but
            * drag-and-drop hit-testing via elementFromPoint would never
            * land on it, so a stage→bench drop would silently fail. */}
-          <aside ref={benchRef} className="self-stretch w-[200px] flex flex-col items-end gap-3">
+          <aside ref={benchRef} className="self-stretch w-[200px] flex-shrink-0 flex flex-col items-end gap-3">
             {bench}
           </aside>
 
-          <main className="flex flex-col items-center gap-12">
+          <main className="flex-1 min-w-0 flex flex-col items-center gap-12">
             <ScaledStage>{children}</ScaledStage>
             <div>{actionRow}</div>
           </main>
 
-          <aside className="flex flex-col gap-4">
+          <aside className="w-[240px] flex-shrink-0 flex flex-col gap-4">
             {stageBar}
           </aside>
         </div>
