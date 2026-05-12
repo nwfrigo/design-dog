@@ -17,7 +17,7 @@ import { InlineTextEdit } from '../InlineTextEdit'
 import { SpacingHandle } from '../handles/SpacingHandle'
 import { BenchChip, type BenchChipKind } from '../bench/BenchChip'
 import { SelectorRow } from '../stage-bar/SelectorRow'
-import { SelectorPrimitive, type EnumOption } from '../stage-bar/SelectorPrimitive'
+import { SelectorPrimitive, type EnumOption, type ColorOption } from '../stage-bar/SelectorPrimitive'
 import { VisibilityRegistryProvider, type SlotVisibility } from '../VisibilityRegistry'
 import { SizeRegistryProvider, type SlotSize } from '../SizeRegistry'
 import { ContentRegistryProvider, type SlotContent } from '../ContentRegistry'
@@ -94,6 +94,7 @@ export type StageBarItemDescriptor =
   | { id: string; kind: 'alignment'; label?: string }
   | { id: string; kind: 'layout'; label?: string }
   | { id: string; kind: 'enum'; label?: string; options: EnumOption[] }
+  | { id: string; kind: 'color-2' | 'color-3' | 'color-4'; label?: string; options: ColorOption[] }
   | { id: string; kind: 'custom'; label?: string; render: () => ReactNode }
 
 export type ImageSlotConfig<TBlockId extends string> = {
@@ -442,6 +443,19 @@ export function defineStageBenchAdapter<TBlockId extends string>(
                 <SelectorRow key={item.id} label={label}>
                   <SelectorPrimitive
                     kind="enum"
+                    value={sb.value as string}
+                    onChange={sb.set as (v: string) => void}
+                    options={item.options}
+                  />
+                </SelectorRow>
+              )
+            case 'color-2':
+            case 'color-3':
+            case 'color-4':
+              return (
+                <SelectorRow key={item.id} label={label}>
+                  <SelectorPrimitive
+                    kind={item.kind}
                     value={sb.value as string}
                     onChange={sb.set as (v: string) => void}
                     options={item.options}
