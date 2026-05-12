@@ -329,7 +329,6 @@ export function TemplateRenderer({
           imageUrl={PLACEHOLDER_IMAGES.default}
           layout="even"
           solution="safety"
-          logoColor="orange"
           showSubhead={false}
           showMetadata={false}
           showCta={true}

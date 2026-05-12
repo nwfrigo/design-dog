@@ -1,14 +1,38 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export type LayoutVariant = 'even' | 'more-image' | 'more-text'
+
+/** Logical IDs for editable blocks + the `logo` topAnchor (brand-locked
+ *  baked-in Cority logo; the solutionPill is rendered alongside it in
+ *  the anchor node but wrapped via its own renderBlock call, so it
+ *  surfaces the EditbarCategory toolbar independently). */
+export type SocialImageBlockId =
+  | 'logo'
+  | 'solutionPill'
+  | 'headline'
+  | 'subhead'
+  | 'metadata'
+  | 'cta'
+  | 'image'
 
 export interface SocialImageProps {
   headline: string
@@ -18,9 +42,9 @@ export interface SocialImageProps {
   imageUrl: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  imageFilters?: ImageFilters
   layout: LayoutVariant
   solution: string
-  logoColor: 'black' | 'orange'
   showHeadline?: boolean
   showSubhead: boolean
   showMetadata: boolean
@@ -30,32 +54,40 @@ export interface SocialImageProps {
   theme?: TemplateTheme
   headlineFontSize?: number
   subheadFontSize?: number
+  stackAlign?: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: SocialImageBlockId,
+    nextId: SocialImageBlockId,
+  ) => ReactNode
+  renderBlock?: (blockId: SocialImageBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: SocialImageBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
 
-// Image widths for each layout variant
 const IMAGE_WIDTHS: Record<LayoutVariant, number> = {
   'even': 488,
   'more-image': 600,
   'more-text': 376,
 }
 
-// Check if HTML content is effectively empty (handles <p></p> etc.)
+const DEFAULT_GAP = 24
+
 function isHtmlEmpty(html: string | undefined): boolean {
   if (!html) return true
-  // Strip tags and check for content
-  const stripped = html.replace(/<[^>]*>/g, '').trim()
-  return stripped === ''
+  return html.replace(/<[^>]*>/g, '').trim() === ''
 }
 
-// Inline styles for rich text elements (dark text on light background)
 const RICH_TEXT_STYLES = `
-  .rich-text-dark strong { font-weight: 500; }
-  .rich-text-dark em { font-style: italic; }
-  .rich-text-dark p { margin: 0; }
-  .rich-text-dark p + p { margin-top: 0.3em; }
+  .social-img-rich-text strong { font-weight: 500; }
+  .social-img-rich-text em { font-style: italic; }
+  .social-img-rich-text p { margin: 0; }
+  .social-img-rich-text p + p { margin-top: 0.3em; }
 `
 
 export function SocialImage({
@@ -66,9 +98,9 @@ export function SocialImage({
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   layout,
   solution,
-  logoColor,
   showHeadline = true,
   showSubhead,
   showMetadata,
@@ -78,10 +110,17 @@ export function SocialImage({
   theme = 'light',
   headlineFontSize,
   subheadFontSize,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
 }: SocialImageProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const themeColors = TEMPLATE_THEMES[theme]
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const logoFill = themeColors.logoFill
@@ -93,7 +132,18 @@ export function SocialImage({
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale)
 
-  // Determine if content is empty for conditional rendering
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const filterCssNoSat =
+    filterCss && grayscaleImageUrl
+      ? filtersToCss({ ...effectiveFilters, saturation: 0 })
+      : undefined
+  const imageFilterStyle =
+    grayscaleImageUrl && filterCssNoSat ? filterCssNoSat :
+    grayscaleImageUrl ? 'none' :
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
+
   const hasHeadline = !isHtmlEmpty(headline)
   const hasSubhead = !isHtmlEmpty(subhead)
 
@@ -111,143 +161,163 @@ export function SocialImage({
     transformOrigin: 'top left',
   }
 
+  // Header node — logo + (optional) solution pill in a horizontal row.
+  // Each is wrapped via renderBlock independently so the pill can surface
+  // EditbarCategory on selection while the logo stays brand-locked.
+  const headerNode: ReactNode = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 64 }}>
+      {wrapBlock('logo', (
+        <CorityLogo fill={logoFill} height={37} />
+      ))}
+      {showSolutionSet && solution !== 'none' && wrapBlock('solutionPill', (
+        <SolutionPill
+          variant="social"
+          solutionColor={solutionColor}
+          solutionLabel={solutionLabel}
+          textColor={themeColors.textPrimary}
+          background={themeColors.bgCategoryChip}
+          border={`1.25px solid ${themeColors.borderFocus}`}
+        />
+      ))}
+    </div>
+  )
+
+  const blocks: ContentStackBlock<SocialImageBlockId>[] = [
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="social-img-rich-text"
+          style={{
+            color: textColor,
+            fontSize: headlineFontSize ?? 84,
+            fontWeight: 300,
+            lineHeight: `${(headlineFontSize ?? 84) * (96 / 84)}px`,
+          }}
+        >{inner}</div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && hasSubhead,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+      ),
+      renderChrome: (inner) => (
+        <div
+          className="social-img-rich-text"
+          style={{
+            color: textColor,
+            fontSize: subheadFontSize ?? 36,
+            fontWeight: 300,
+            lineHeight: 1.3,
+          }}
+        >{inner}</div>
+      ),
+    },
+    {
+      id: 'metadata',
+      visible: showMetadata && !!metadata,
+      defaultInner: metadata,
+      renderChrome: (inner) => (
+        <div style={{
+          color: textColor,
+          fontSize: 14,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: '1.54px',
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'cta',
+      visible: showCta && !!ctaText,
+      defaultInner: (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+        }}>
+          <span style={{
+            color: textColor,
+            fontSize: 24,
+            fontWeight: 300,
+            lineHeight: 1,
+          }}>
+            {ctaText}
+          </span>
+          <ArrowIcon color={themeColors.buttonSecondaryText} width={22} height={22 * 0.8} />
+        </div>
+      ),
+      renderChrome: (inner) => inner,
+    },
+  ]
+
   return (
     <div style={containerStyle}>
-      {/* Rich text styles for HTML content */}
       <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
-      {/* Left content area */}
+
+      {/* Left content column — header (logo + pill) at top via ContentStack
+       *  topAnchor; rest of the column is ContentStack-distributed by
+       *  stackAlign with adjustable per-gap spacing. */}
       <div style={{
         flex: '1 1 0',
         alignSelf: 'stretch',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
       }}>
-        {/* Header: Logo + Solution Pill */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 64,
-        }}>
-          <CorityLogo fill={logoFill} height={37} />
-
-          {showSolutionSet && solution !== 'none' && (
-            <SolutionPill
-              variant="social"
-              solutionColor={solutionColor}
-              solutionLabel={solutionLabel}
-              textColor={themeColors.textPrimary}
-              background={themeColors.bgCategoryChip}
-              border={`1.25px solid ${themeColors.borderFocus}`}
-            />
-          )}
-        </div>
-
-        {/* Text content block */}
-        <div style={{
-          alignSelf: 'stretch',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 24,
-        }}>
-          {/* Headline + Subhead group */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 36,
-          }}>
-            {/* Headline - supports rich text (bold, italic, line breaks) */}
-            {showHeadline && (
-              <div
-                className="rich-text-dark"
-                style={{
-                  color: textColor,
-                  fontSize: headlineFontSize ?? 84,
-                  fontWeight: 300,
-                  lineHeight: `${(headlineFontSize ?? 84) * (96 / 84)}px`,
-                }}
-                dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
-              />
-            )}
-
-            {/* Subhead - supports rich text (bold, italic, line breaks) */}
-            {showSubhead && hasSubhead && (
-              <div
-                className="rich-text-dark"
-                style={{
-                  color: textColor,
-                  fontSize: subheadFontSize ?? 36,
-                  fontWeight: 300,
-                  lineHeight: 1.3,
-                }}
-                dangerouslySetInnerHTML={{ __html: subhead }}
-              />
-            )}
-          </div>
-
-          {/* Metadata */}
-          {showMetadata && metadata && (
-            <div style={{
-              color: textColor,
-              fontSize: 14,
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '1.54px',
-            }}>
-              {metadata}
-            </div>
-          )}
-        </div>
-
-        {/* CTA */}
-        {showCta && ctaText && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 16,
-          }}>
-            <span style={{
-              color: textColor,
-              fontSize: 24,
-              fontWeight: 300,
-              lineHeight: 1,
-            }}>
-              {ctaText}
-            </span>
-            <ArrowIcon color={themeColors.buttonSecondaryText} width={22} height={22 * 0.8} />
-          </div>
-        )}
-      </div>
-
-      {/* Right image area */}
-      <div style={{
-        width: imageWidth,
-        height: 628,
-        position: 'relative',
-        overflow: 'hidden',
-        flexShrink: 0,
-        background: themeColors.backgroundPrimary,
-      }}>
-        {/* Image */}
-        <img
-          src={grayscaleImageUrl || imageUrl}
-          alt=""
-          data-export-image="true"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
-            transform: imageZoom !== 1
-              ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
-              : undefined,
-            transformOrigin: 'center',
-            filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
+        <ContentStack<SocialImageBlockId>
+          blocks={blocks}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock}
+          renderInlineEditor={renderInlineEditor}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: headerNode,
+            // No renderBlock — the header sub-elements (logo, pill) are
+            // wrapped independently inside `headerNode` via wrapBlock.
           }}
+          alignItems="flex-start"
         />
-
       </div>
+
+      {/* Right image column — fixed-presence image slot. */}
+      {wrapBlock('image', (
+        <div style={{
+          width: imageWidth,
+          height: 628,
+          position: 'relative',
+          overflow: 'hidden',
+          flexShrink: 0,
+          background: themeColors.backgroundPrimary,
+        }}>
+          <img
+            src={grayscaleImageUrl || imageUrl}
+            alt=""
+            data-export-image="true"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+              transform: imageZoom !== 1
+                ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
+                : undefined,
+              transformOrigin: 'center',
+              filter: imageFilterStyle,
+            }}
+          />
+        </div>
+      ))}
+
+      {renderOverlay?.()}
     </div>
   )
 }

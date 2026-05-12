@@ -11,6 +11,7 @@ import { WebsitePressReleaseStageBench } from './template-adapters/WebsitePressR
 import { SocialDarkGradientStageBench } from './template-adapters/SocialDarkGradientStageBench'
 import { SocialBlueGradientStageBench } from './template-adapters/SocialBlueGradientStageBench'
 import { SocialEhsAccelerateStageBench } from './template-adapters/SocialEhsAccelerateStageBench'
+import { SocialImageStageBench } from './template-adapters/SocialImageStageBench'
 import { NewsletterDarkGradientStageBench } from './template-adapters/NewsletterDarkGradientStageBench'
 import { NewsletterBlueGradientStageBench } from './template-adapters/NewsletterBlueGradientStageBench'
 import { NewsletterLightStageBench } from './template-adapters/NewsletterLightStageBench'
@@ -58,6 +59,7 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,
   'social-ehs-accelerate': SocialEhsAccelerateStageBench,
+  'social-image': SocialImageStageBench,
   'newsletter-dark-gradient': NewsletterDarkGradientStageBench,
   'newsletter-blue-gradient': NewsletterBlueGradientStageBench,
   'newsletter-light': NewsletterLightStageBench,

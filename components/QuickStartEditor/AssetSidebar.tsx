@@ -701,7 +701,6 @@ function AssetPreviewRenderer({
           imageUrl={asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png'}
           layout={asset.layout || 'even'}
           solution={asset.solution}
-          logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
           showSubhead={asset.showSubhead && !!copy.subhead}
           showMetadata={asset.showMetadata !== false}
           showCta={asset.showCta !== false}
