@@ -242,8 +242,8 @@ export function EmailDarkGradient({
     },
     {
       id: 'body',
-      visible: showBody && hasBody,
-      defaultInner: <div dangerouslySetInnerHTML={{ __html: body }} />,
+      visible: showBody,
+      defaultInner: <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />,
       renderChrome: (inner) => (
         <div
           className="rich-text-white"

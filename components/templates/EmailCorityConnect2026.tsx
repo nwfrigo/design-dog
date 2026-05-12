@@ -126,7 +126,7 @@ export function EmailCorityConnect2026({
       }}
     >
       {wrapInline('body', (
-        <div dangerouslySetInnerHTML={{ __html: body }} />
+        <div dangerouslySetInnerHTML={{ __html: hasBody ? body : 'Body copy goes here.' }} />
       ))}
     </div>
   ))
@@ -194,7 +194,7 @@ export function EmailCorityConnect2026({
             gap: 24,
           }}>
             {showHeadline && headlineNode}
-            {showBody && hasBody && bodyNode}
+            {showBody && bodyNode}
           </div>
 
           {showCta && ctaText && ctaNode}

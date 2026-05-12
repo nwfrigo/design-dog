@@ -293,8 +293,8 @@ export function WebsiteWebinar({
     },
     {
       id: 'body',
-      visible: showBody && !!body,
-      defaultInner: body,
+      visible: showBody,
+      defaultInner: body || 'Body copy goes here.',
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',

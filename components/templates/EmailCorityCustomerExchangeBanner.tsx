@@ -119,7 +119,7 @@ export function EmailCorityCustomerExchangeBanner({
       }}
     >
       {wrapInline('body', (
-        <div dangerouslySetInnerHTML={{ __html: body }} />
+        <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />
       ))}
     </div>
   ))
@@ -194,14 +194,14 @@ export function EmailCorityCustomerExchangeBanner({
         justifyContent: 'flex-end',
         gap: 36,
       }}>
-        {(showHeadline || (showBody && hasBody)) && (
+        {(showHeadline || showBody) && (
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             gap: 24,
           }}>
             {showHeadline && headlineNode}
-            {showBody && hasBody && bodyNode}
+            {showBody && bodyNode}
           </div>
         )}
 

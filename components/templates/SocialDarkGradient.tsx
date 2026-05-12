@@ -245,9 +245,9 @@ export function SocialDarkGradient({
     },
     {
       id: 'body',
-      visible: showBody && hasBody,
+      visible: showBody,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: body }} />
+        <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />
       ),
       renderChrome: (inner) => (
         <div

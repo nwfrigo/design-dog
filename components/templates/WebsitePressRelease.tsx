@@ -271,8 +271,8 @@ export function WebsitePressRelease({
             },
             {
               id: 'body',
-              visible: showBody && !!body,
-              defaultInner: body,
+              visible: showBody,
+              defaultInner: body || 'Body copy goes here.',
               renderChrome: (inner) => (
                 <div
                   style={{
