@@ -10,6 +10,7 @@ import { EmailSpeakersStageBench } from './template-adapters/EmailSpeakersStageB
 import { EmailImageStageBench } from './template-adapters/EmailImageStageBench'
 import { EmailCorityConnect2026StageBench } from './template-adapters/EmailCorityConnect2026StageBench'
 import { WebsiteFloatingBannerMobileStageBench } from './template-adapters/WebsiteFloatingBannerMobileStageBench'
+import { WebsiteFloatingBannerStageBench } from './template-adapters/WebsiteFloatingBannerStageBench'
 import { WebsiteThumbnailStageBench } from './template-adapters/WebsiteThumbnailStageBench'
 import { WebsiteReportStageBench } from './template-adapters/WebsiteReportStageBench'
 import { WebsiteWebinarStageBench } from './template-adapters/WebsiteWebinarStageBench'
@@ -65,6 +66,7 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'email-image': EmailImageStageBench,
   'email-cority-connect-2026': EmailCorityConnect2026StageBench,
   'website-floating-banner-mobile': WebsiteFloatingBannerMobileStageBench,
+  'website-floating-banner': WebsiteFloatingBannerStageBench,
   'website-press-release': WebsitePressReleaseStageBench,
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,

@@ -119,7 +119,7 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 
 | Template | Status |
 |---|---|
-| WebsiteFloatingBanner | Queued (Track 2) |
+| WebsiteFloatingBanner | ✅ Done (Track 2; 7-variant enum selector — mirrors mobile, adds logo anchor) |
 | WebsiteFloatingBannerMobile | ✅ Done (Track 2; 7-variant enum + arrow-type toggle) |
 
 ### Totals

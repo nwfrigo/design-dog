@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
@@ -14,6 +14,14 @@ export type FloatingBannerVariant =
   | 'dark-gradient-1'
   | 'dark-gradient-2'
 
+/** Track 2 (fixed-composition) editable block ids. Logo is a brand-
+ *  locked anchor — colored per variant. */
+export type WebsiteFloatingBannerBlockId =
+  | 'logo'
+  | 'eyebrow'
+  | 'headline'
+  | 'cta'
+
 export interface WebsiteFloatingBannerProps {
   eyebrow: string
   headline: string
@@ -22,12 +30,14 @@ export interface WebsiteFloatingBannerProps {
   showHeadline?: boolean
   variant: FloatingBannerVariant
   headlineFontSize?: number
+  renderBlock?: (blockId: WebsiteFloatingBannerBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: WebsiteFloatingBannerBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
 
-// Background images for gradient variants
 const BACKGROUND_IMAGES: Partial<Record<FloatingBannerVariant, string>> = {
   'blue-gradient-1': '/assets/backgrounds/Template_Website_Floater_Desktop_Blue_gradient_background_1.png',
   'blue-gradient-2': '/assets/backgrounds/Template_Website_Floater_Desktop_Blue_gradient_background_2.png',
@@ -35,8 +45,7 @@ const BACKGROUND_IMAGES: Partial<Record<FloatingBannerVariant, string>> = {
   'dark-gradient-2': '/assets/backgrounds/Template_Website_Floater_Desktop_Dark_gradient_background_2.png',
 }
 
-// Variant styling configurations
-const VARIANT_STYLES: Record<FloatingBannerVariant, {
+export const FLOATING_BANNER_VARIANT_STYLES: Record<FloatingBannerVariant, {
   background: string
   logoColor: string
   textColor: string
@@ -47,8 +56,8 @@ const VARIANT_STYLES: Record<FloatingBannerVariant, {
 }> = {
   'white': {
     background: '#FFFFFF',
-    logoColor: '#D65F00', // Orange
-    textColor: '#060015', // Black/midnight
+    logoColor: '#D65F00',
+    textColor: '#060015',
     ctaTextColor: '#060015',
     ctaArrowColor: '#D35F0B',
     hasTextShadow: false,
@@ -65,7 +74,7 @@ const VARIANT_STYLES: Record<FloatingBannerVariant, {
   },
   'dark': {
     background: '#060015',
-    logoColor: '#D65F00', // Orange
+    logoColor: '#D65F00',
     textColor: '#FFFFFF',
     ctaTextColor: '#FFFFFF',
     ctaArrowColor: '#D35F0B',
@@ -73,16 +82,16 @@ const VARIANT_STYLES: Record<FloatingBannerVariant, {
     isGradient: false,
   },
   'blue-gradient-1': {
-    background: '#0080FF', // Fallback
+    background: '#0080FF',
     logoColor: '#FFFFFF',
     textColor: '#FFFFFF',
-    ctaTextColor: '#060015', // Black/midnight
+    ctaTextColor: '#060015',
     ctaArrowColor: '#060015',
     hasTextShadow: true,
     isGradient: true,
   },
   'blue-gradient-2': {
-    background: '#0080FF', // Fallback
+    background: '#0080FF',
     logoColor: '#FFFFFF',
     textColor: '#FFFFFF',
     ctaTextColor: '#FFFFFF',
@@ -91,23 +100,34 @@ const VARIANT_STYLES: Record<FloatingBannerVariant, {
     isGradient: true,
   },
   'dark-gradient-1': {
-    background: '#000000', // Fallback
-    logoColor: '#D65F00', // Orange
+    background: '#000000',
+    logoColor: '#D65F00',
     textColor: '#FFFFFF',
     ctaTextColor: '#FFFFFF',
-    ctaArrowColor: '#0080FF', // Cobalt
+    ctaArrowColor: '#0080FF',
     hasTextShadow: false,
     isGradient: true,
   },
   'dark-gradient-2': {
-    background: '#000000', // Fallback
+    background: '#000000',
     logoColor: '#FFFFFF',
     textColor: '#FFFFFF',
     ctaTextColor: '#FFFFFF',
-    ctaArrowColor: '#D35F0B', // Orange
+    ctaArrowColor: '#D35F0B',
     hasTextShadow: false,
     isGradient: true,
   },
+}
+
+/** Background-thumb URL for a variant — solid-color variants return a
+ *  CSS color string; gradient variants return the gradient image URL. */
+export function floatingBannerVariantSwatch(variant: FloatingBannerVariant): {
+  backgroundColor?: string
+  backgroundImage?: string
+} {
+  const img = BACKGROUND_IMAGES[variant]
+  if (img) return { backgroundImage: `url(${img})` }
+  return { backgroundColor: FLOATING_BANNER_VARIANT_STYLES[variant].background }
 }
 
 export function WebsiteFloatingBanner({
@@ -118,12 +138,16 @@ export function WebsiteFloatingBanner({
   showHeadline = true,
   variant,
   headlineFontSize,
-  colors,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: WebsiteFloatingBannerProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const styles = VARIANT_STYLES[variant]
+  const styles = FLOATING_BANNER_VARIANT_STYLES[variant]
   const backgroundImage = BACKGROUND_IMAGES[variant]
 
   const containerStyle: CSSProperties = {
@@ -134,16 +158,61 @@ export function WebsiteFloatingBanner({
     fontFamily,
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
-    background: styles.isGradient ? styles.background : styles.background,
+    background: styles.background,
   }
 
   const textShadowStyle = styles.hasTextShadow
     ? '0px 0px 7px rgba(0, 0, 0, 0.25)'
     : undefined
 
+  const eyebrowNode: ReactNode = wrapBlock('eyebrow', wrapInline('eyebrow', (
+    <div style={{
+      color: styles.textColor,
+      fontSize: 16,
+      fontWeight: 500,
+      textTransform: 'uppercase',
+      letterSpacing: 1.76,
+      textShadow: textShadowStyle,
+    }}>
+      {eyebrow}
+    </div>
+  )))
+
+  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+    <div style={{
+      textAlign: 'center',
+      color: styles.textColor,
+      fontSize: headlineFontSize ?? 32.73,
+      fontWeight: 350,
+      lineHeight: `${headlineFontSize ?? 32.73}px`,
+      textShadow: textShadowStyle,
+    }}>
+      {headline || 'Headline'}
+    </div>
+  )))
+
+  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      gap: 16,
+    }}>
+      <div style={{
+        textAlign: 'center',
+        color: styles.ctaTextColor,
+        fontSize: 24,
+        fontWeight: 500,
+        lineHeight: '24px',
+      }}>
+        {cta || 'Learn More'}
+      </div>
+      <ArrowIcon color={styles.ctaArrowColor} width={22} height={22 * 0.795} />
+    </div>
+  )))
+
   return (
     <div style={containerStyle}>
-      {/* Background image for gradient variants */}
       {styles.isGradient && backgroundImage && (
         <img
           src={backgroundImage}
@@ -159,7 +228,6 @@ export function WebsiteFloatingBanner({
         />
       )}
 
-      {/* Content */}
       <div style={{
         position: 'relative',
         width: '100%',
@@ -170,64 +238,24 @@ export function WebsiteFloatingBanner({
         justifyContent: 'space-between',
         alignItems: 'center',
       }}>
-        {/* Logo */}
-        <CorityLogo fill={styles.logoColor} height={30} />
+        {wrapBlock('logo', (
+          <CorityLogo fill={styles.logoColor} height={30} />
+        ))}
 
-        {/* Center content: Eyebrow + Headline */}
         <div style={{
           display: 'flex',
           justifyContent: 'flex-start',
           alignItems: 'center',
           gap: 43,
         }}>
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div style={{
-              color: styles.textColor,
-              fontSize: 16,
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: 1.76,
-              textShadow: textShadowStyle,
-            }}>
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline */}
-          {showHeadline && (
-            <div style={{
-              textAlign: 'center',
-              color: styles.textColor,
-              fontSize: headlineFontSize ?? 32.73,
-              fontWeight: 350,
-              lineHeight: `${headlineFontSize ?? 32.73}px`,
-              textShadow: textShadowStyle,
-            }}>
-              {headline || 'Headline'}
-            </div>
-          )}
+          {showEyebrow && eyebrow && eyebrowNode}
+          {showHeadline && headlineNode}
         </div>
 
-        {/* CTA */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          gap: 16,
-        }}>
-          <div style={{
-            textAlign: 'center',
-            color: styles.ctaTextColor,
-            fontSize: 24,
-            fontWeight: 500,
-            lineHeight: '24px',
-          }}>
-            {cta || 'Learn More'}
-          </div>
-          <ArrowIcon color={styles.ctaArrowColor} width={22} height={22 * 0.795} />
-        </div>
+        {ctaNode}
       </div>
+
+      {renderOverlay?.()}
     </div>
   )
 }
