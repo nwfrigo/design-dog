@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '@/store'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import type { WebinarVariant } from '@/types'
@@ -52,11 +52,7 @@ import type { StageBenchEditorProps } from '../StageBenchEditor'
  * — per-speaker inline editing is deferred (mirrors EmailSpeakers'
  * initial-shipped state).
  *
- * Substrate finding: there's no generic 3-state enum SelectorPrimitive
- * yet (only fixed-vocabulary kind="layout" for image/even/text). The
- * variant selector is inlined as a small button row below. If more
- * templates need arbitrary 3-state variants, the right move is to
- * promote it to a SelectorPrimitive kind.
+ * Variant selector uses `SelectorPrimitive kind="enum"` (text-label cells).
  */
 
 const PREVIEW_PLACEHOLDERS: Record<string, string> = {
@@ -74,55 +70,6 @@ const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   body: 'body',
   cta: 'button',
   category: 'category',
-}
-
-/** Inline 3-state segmented control. Match SelectorPrimitive visuals so
- *  the stage bar reads as one consistent surface. Promote to a substrate
- *  primitive if reused. */
-function VariantThreeWay({
-  value,
-  onChange,
-  options,
-  ariaLabel,
-}: {
-  value: WebinarVariant
-  onChange: (v: WebinarVariant) => void
-  options: ReadonlyArray<{ value: WebinarVariant; label: string }>
-  ariaLabel: string
-}): ReactNode {
-  return (
-    <div className="inline-flex items-center" role="radiogroup" aria-label={ariaLabel}>
-      {options.map((opt, i) => {
-        const active = value === opt.value
-        const isFirst = i === 0
-        const isLast = i === options.length - 1
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            aria-label={opt.label}
-            aria-pressed={active}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => onChange(opt.value)}
-            className={[
-              'relative shrink-0 h-9 px-3',
-              'flex items-center justify-center',
-              'border-[0.5px] border-line-subtle',
-              'transition-colors text-xs font-medium',
-              isFirst ? 'rounded-l-[4px]' : '',
-              isLast ? 'rounded-r-[4px]' : '',
-              isFirst ? '' : '-ml-px',
-              active
-                ? 'bg-surface-primary text-icon-focus'
-                : 'bg-surface-primary text-icon-subtle hover:bg-interactive-hover',
-            ].join(' ')}
-          >
-            {opt.label}
-          </button>
-        )
-      })}
-    </div>
-  )
 }
 
 export function WebsiteWebinarStageBench(props: StageBenchEditorProps) {
@@ -258,15 +205,15 @@ export function WebsiteWebinarStageBench(props: StageBenchEditorProps) {
         <SelectorPrimitive kind="theme" value={theme} onChange={setTheme} />
       </SelectorRow>
       <SelectorRow label="variant">
-        <VariantThreeWay
+        <SelectorPrimitive
+          kind="enum"
           value={webinarVariant}
-          onChange={setWebinarVariant}
+          onChange={(v) => setWebinarVariant(v as WebinarVariant)}
           options={[
-            { value: 'none', label: 'Text' },
-            { value: 'image', label: 'Image' },
-            { value: 'speakers', label: 'Speakers' },
-          ] as const}
-          ariaLabel="Webinar variant"
+            { value: 'none', ariaLabel: 'Text-only variant', label: 'Text' },
+            { value: 'image', ariaLabel: 'Image variant', label: 'Image' },
+            { value: 'speakers', ariaLabel: 'Speakers variant', label: 'Speakers' },
+          ]}
         />
       </SelectorRow>
       <SelectorRow label="content stack">

@@ -72,13 +72,24 @@ type ColorSwatch = {
 
 export type ColorOption = { value: string; swatch: ColorSwatch; ariaLabel?: string }
 
+/** Generic option for the `enum` kind. Each cell renders an icon (Lucide
+ *  component) or a short text label — never both. Provide `ariaLabel` for
+ *  icon-only cells. */
+export type EnumOption = {
+  value: string
+  ariaLabel: string
+  icon?: LucideIcon
+  label?: string
+}
+
 type ThemeProps     = { kind: 'theme';     value: 'light' | 'dark'; onChange: (v: 'light' | 'dark') => void }
 type AlignmentProps = { kind: 'alignment'; value: 'left' | 'center'; onChange: (v: 'left' | 'center') => void }
 type StackProps     = { kind: 'stack';     value: 'top' | 'center' | 'bottom'; onChange: (v: 'top' | 'center' | 'bottom') => void }
 type LayoutProps    = { kind: 'layout';    value: 'image' | 'even' | 'text'; onChange: (v: 'image' | 'even' | 'text') => void }
 type ColorProps     = { kind: 'color-2' | 'color-3' | 'color-4'; value: string; onChange: (v: string) => void; options: ColorOption[] }
+type EnumProps      = { kind: 'enum';      value: string; onChange: (v: string) => void; options: EnumOption[] }
 
-export type SelectorPrimitiveProps = ThemeProps | AlignmentProps | StackProps | LayoutProps | ColorProps
+export type SelectorPrimitiveProps = ThemeProps | AlignmentProps | StackProps | LayoutProps | ColorProps | EnumProps
 
 // ---- shared cell button ------------------------------------------------------
 
@@ -90,6 +101,7 @@ function Cell({
   isLast,
   isColor,
   swatch,
+  wide,
   children,
 }: {
   ariaLabel: string
@@ -99,6 +111,10 @@ function Cell({
   isLast: boolean
   isColor: boolean
   swatch?: ColorSwatch
+  /** When true, the cell auto-sizes to its content width (with 12px
+   *  horizontal padding) instead of the fixed 36×36 square. Used by
+   *  text-label `enum` cells. */
+  wide?: boolean
   children?: ReactNode
 }) {
   const cornerClass = [
@@ -141,9 +157,12 @@ function Cell({
       onClick={onClick}
       style={swatchStyle}
       className={[
-        // 36×36 cell — matches the toolbar height so the stage chrome
+        // 36px tall cell — matches the toolbar height so the stage chrome
         // (toolbars + selectors) shares one consistent control size.
-        'relative shrink-0 h-9 w-9',
+        // Width is 36px fixed for icon/swatch cells, auto for text-label
+        // cells (with 12px horizontal padding).
+        'relative shrink-0 h-9',
+        wide ? 'min-w-9 px-3 text-xs font-medium' : 'w-9',
         'flex items-center justify-center overflow-hidden',
         'border-[0.5px] border-line-subtle',
         'transition-colors',
@@ -180,6 +199,39 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
             swatch={opt.swatch}
           />
         ))}
+      </div>
+    )
+  }
+
+  // N-state enum — arbitrary option list, each cell renders an icon OR a
+  // text label. No upper bound on options.length; when the row overflows
+  // the stage bar's horizontal space, the next iteration will swap the
+  // outer wrapper to a horizontal carousel. For now the row simply renders
+  // inline. Always-applied min-width keeps cells consistent with the
+  // icon-kind primitives.
+  if (props.kind === 'enum') {
+    const { value, onChange, options } = props
+    return (
+      <div className="inline-flex items-center" role="radiogroup">
+        {options.map((opt, i) => {
+          const active = value === opt.value
+          const Icon = opt.icon
+          const isWide = !Icon && !!opt.label
+          return (
+            <Cell
+              key={opt.value}
+              ariaLabel={opt.ariaLabel}
+              active={active}
+              onClick={() => onChange(opt.value)}
+              isFirst={i === 0}
+              isLast={i === options.length - 1}
+              isColor={false}
+              wide={isWide}
+            >
+              {Icon ? <Icon size={ICON_SIZE} /> : opt.label}
+            </Cell>
+          )
+        })}
       </div>
     )
   }
