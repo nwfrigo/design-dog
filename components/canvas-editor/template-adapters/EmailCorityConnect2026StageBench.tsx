@@ -46,7 +46,7 @@ export const EmailCorityConnect2026StageBench = defineStageBenchAdapter<EmailCor
       iconKey: 'headline',
       kind: 'text',
       content: { format: 'html', placeholder: 'Lightweight header.' },
-      size: { default: 40, min: 24, max: 72, step: 2 },
+      size: { default: 38.15, min: 20, max: 60, step: 2 },
     },
     {
       blockId: 'body',

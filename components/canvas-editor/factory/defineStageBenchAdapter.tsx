@@ -526,10 +526,21 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       </StageBenchShell>
     )
 
+    // ContextualToolbar + SelectionRing must live INSIDE the Category and
+    // Image registry providers so EditbarCategory / EditbarImage can
+    // resolve the active slot's bindings via context.
+    const innerWithToolbar = (
+      <>
+        {inner}
+        <ContextualToolbar />
+        <SelectionRing />
+      </>
+    )
+
     const imageWrapped = descriptor.image && bindings.image ? (
       <ImageRegistryProvider images={slotImages}>
         <ImageSelectionEffect />
-        {inner}
+        {innerWithToolbar}
         <ImageEditorModal
           isOpen={showImageEditor}
           onClose={() => setShowImageEditor(false)}
@@ -558,7 +569,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           }}
         />
       </ImageRegistryProvider>
-    ) : inner
+    ) : innerWithToolbar
 
     const categoryWrapped = descriptor.category && bindings.category ? (
       <CategoryRegistryProvider
@@ -581,8 +592,6 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           <SizeRegistryProvider sizes={sizeSlots}>
             <ContentRegistryProvider contents={contentSlots}>
               {categoryWrapped}
-              <ContextualToolbar />
-              <SelectionRing />
             </ContentRegistryProvider>
           </SizeRegistryProvider>
         </VisibilityRegistryProvider>

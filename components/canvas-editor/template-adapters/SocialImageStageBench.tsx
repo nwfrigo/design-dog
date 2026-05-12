@@ -29,7 +29,7 @@ export const SocialImageStageBench = defineStageBenchAdapter<SocialImageBlockId>
   templateId: 'social-image',
   slots: [
     { blockId: 'logo', label: 'Logo', iconKey: 'logo', kind: 'image', benchable: false },
-    { blockId: 'solutionPill', label: 'Solution', iconKey: 'category', chipKind: 'category', kind: 'pill' },
+    { blockId: 'solutionPill', label: 'Category', iconKey: 'category', chipKind: 'category', kind: 'pill' },
     {
       blockId: 'headline',
       label: 'Headline',
