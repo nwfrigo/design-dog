@@ -357,17 +357,16 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   }),
 
   'email-image': (s) => ({
-    ctaText: s.ctaText,
+    ...buildImageParams(s),
     imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-    imagePositionX: s.thumbnailImagePosition.x,
-    imagePositionY: s.thumbnailImagePosition.y,
-    imageZoom: s.thumbnailImageZoom,
+    ctaText: s.ctaText,
     layout: s.layout,
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showCta: s.showCta,
     showSolutionSet: s.showSolutionSet,
-    grayscale: s.grayscale,
     theme: s.theme,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['email-image'] ?? {},
   }),
 
   'social-image-meddbase': (s) => ({

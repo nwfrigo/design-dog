@@ -117,7 +117,6 @@ export function TemplateRenderer({
           imageUrl={PLACEHOLDER_IMAGES.default}
           layout="even"
           solution="safety"
-          logoColor="orange"
           showBody={false}
           showCta={true}
           showSolutionSet={true}

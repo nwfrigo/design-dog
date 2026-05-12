@@ -72,7 +72,7 @@ Mostly `space-between` outer (logo top, content middle, cta bottom) with an inne
 | SocialEhsAccelerate | 1 | ✅ Done (smallest social — no image / no color / no theme / no eyebrow) |
 | SocialImage | 1 | ✅ Done (universal image model; layout 3-state via substrate primitive) |
 | SocialImageMeddbase | 1 | ✅ Done (twin of social-image; no theme, MeddbaseLogo, brand-primary arrow) |
-| EmailImage | 1 | Queued |
+| EmailImage | 1 | ✅ Done (universal image model + 3-state layout; sibling of social-image at 640×300) |
 | NewsletterDarkGradient | 1 | ✅ Done (image content editing deferred — see image-source-key follow-up) |
 | NewsletterBlueGradient | 1 | ✅ Done (image content editing deferred — see image-source-key follow-up) |
 | NewsletterLight | 1 | ✅ Done (image content editing deferred — see image-source-key follow-up) |

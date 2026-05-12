@@ -4664,7 +4664,6 @@ export function EditorScreen() {
                   imageZoom={thumbnailImageZoom}
                   layout={layout}
                   solution={solution}
-                  logoColor={logoColor === 'white' ? 'black' : logoColor}
                   showHeadline={showHeadline}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}

@@ -11,6 +11,7 @@ import type { TemplateType } from '@/types'
 
 export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'email-dark-gradient',
+  'email-image',
   'email-speakers',
   'website-press-release',
   'social-dark-gradient',

@@ -7,6 +7,7 @@ import { DndProvider } from '@/lib/dnd'
 
 import { EmailDarkGradientStageBench } from './template-adapters/EmailDarkGradientStageBench'
 import { EmailSpeakersStageBench } from './template-adapters/EmailSpeakersStageBench'
+import { EmailImageStageBench } from './template-adapters/EmailImageStageBench'
 import { WebsitePressReleaseStageBench } from './template-adapters/WebsitePressReleaseStageBench'
 import { SocialDarkGradientStageBench } from './template-adapters/SocialDarkGradientStageBench'
 import { SocialBlueGradientStageBench } from './template-adapters/SocialBlueGradientStageBench'
@@ -56,6 +57,7 @@ export interface StageBenchEditorProps {
 const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEditorProps>>> = {
   'email-dark-gradient': EmailDarkGradientStageBench,
   'email-speakers': EmailSpeakersStageBench,
+  'email-image': EmailImageStageBench,
   'website-press-release': WebsitePressReleaseStageBench,
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,
