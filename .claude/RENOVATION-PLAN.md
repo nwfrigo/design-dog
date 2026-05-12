@@ -94,7 +94,7 @@ Outer stack of repeated child groups. Each child has its own internal compositio
 
 | Template | Tier | Status |
 |---|---|---|
-| EmailGrid | 3 | Queued |
+| EmailGrid | 3 | ✅ Done (Track 1 left column + Track-2-style equal-distribute grid panel; per-row type toggle deferred) |
 | SocialGridDetail | 3 | Queued |
 | WebsiteEventListing | 3 | Queued |
 | WebsiteEhsAccelerateListing | 3 | Queued |

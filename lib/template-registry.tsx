@@ -328,11 +328,12 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         showBody: asset.showBody,
         showSolutionSet: asset.showSolutionSet,
         solution: asset.solution,
-        logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
         showGridDetail2: asset.showGridDetail2,
         gridDetail1, gridDetail2, gridDetail3,
         headlineFontSize: asset.headlineFontSize ?? undefined,
         theme: asset.theme || 'light',
+        stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
+        gaps: asset.templateGaps?.['email-grid'] ?? {},
         colors, typography, scale: 1,
       }
     },
@@ -368,6 +369,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'gridDetail3Text', parser: 'string', default: 'Responsive' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'theme', parser: 'enum', default: 'light' },
+        { param: 'stackAlign', parser: 'enum', default: 'top' },
+        { param: 'gaps', parser: 'jsonRecord' },
       ],
       assembleProps: (parsed) => ({
         gridDetail1: { type: parsed.gridDetail1Type, text: parsed.gridDetail1Text },

@@ -21,6 +21,7 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'email-ehs-accelerate-banner',
   'email-ehs-accelerate-signature',
   'email-product-release',
+  'email-grid',
   'website-press-release',
   'social-dark-gradient',
   'social-blue-gradient',

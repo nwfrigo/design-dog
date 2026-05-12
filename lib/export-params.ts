@@ -284,6 +284,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gridDetail3Type: s.gridDetail3Type,
     gridDetail3Text: s.gridDetail3Text,
     theme: s.theme,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['email-grid'] ?? {},
   }),
 
   'social-dark-gradient': (s) => ({

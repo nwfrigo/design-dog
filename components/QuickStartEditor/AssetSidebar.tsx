@@ -619,7 +619,6 @@ function AssetPreviewRenderer({
           showBody={asset.showBody}
           showSolutionSet={asset.showSolutionSet}
           solution={asset.solution}
-          logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
           showGridDetail2={asset.showGridDetail2}
           gridDetail1={{ type: 'data', text: asset.gridDetail1Text }}
           gridDetail2={{ type: 'data', text: asset.gridDetail2Text }}

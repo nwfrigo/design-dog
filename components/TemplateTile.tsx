@@ -99,7 +99,6 @@ export function TemplateRenderer({
           showBody={false}
           showSolutionSet={true}
           solution="safety"
-          logoColor="orange"
           showGridDetail2={true}
           gridDetail1={{ type: 'data', text: '150+ Sessions' }}
           gridDetail2={{ type: 'data', text: '50 Speakers' }}
