@@ -61,6 +61,15 @@ const LAYOUT_CELLS: CellSpec<'image' | 'even' | 'text'>[] = [
   { value: 'text',  ariaLabel: 'Text-heavy layout',  render: <Type    size={ICON_SIZE} /> },
 ]
 
+// 2-cell variant of LAYOUT for templates that only have Image / Text
+// states (e.g. Website Report, Website Thumbnail). Reuses the same
+// ImageUp + Type icons as the 3-cell layout selector so users see the
+// same visual vocabulary across the app.
+const LAYOUT2_CELLS: CellSpec<'image' | 'text'>[] = [
+  { value: 'image', ariaLabel: 'Image variant', render: <ImageUp size={ICON_SIZE} /> },
+  { value: 'text',  ariaLabel: 'Text variant',  render: <Type    size={ICON_SIZE} /> },
+]
+
 // ---- discriminated props -----------------------------------------------------
 
 type ColorSwatch = {
@@ -88,10 +97,11 @@ type ThemeProps     = { kind: 'theme';     value: 'light' | 'dark'; onChange: (v
 type AlignmentProps = { kind: 'alignment'; value: 'left' | 'center'; onChange: (v: 'left' | 'center') => void }
 type StackProps     = { kind: 'stack';     value: 'top' | 'center' | 'bottom'; onChange: (v: 'top' | 'center' | 'bottom') => void }
 type LayoutProps    = { kind: 'layout';    value: 'image' | 'even' | 'text'; onChange: (v: 'image' | 'even' | 'text') => void }
+type Layout2Props   = { kind: 'layout-2';  value: 'image' | 'text'; onChange: (v: 'image' | 'text') => void }
 type ColorProps     = { kind: 'color-2' | 'color-3' | 'color-4'; value: string; onChange: (v: string) => void; options: ColorOption[] }
 type EnumProps      = { kind: 'enum';      value: string; onChange: (v: string) => void; options: EnumOption[] }
 
-export type SelectorPrimitiveProps = ThemeProps | AlignmentProps | StackProps | LayoutProps | ColorProps | EnumProps
+export type SelectorPrimitiveProps = ThemeProps | AlignmentProps | StackProps | LayoutProps | Layout2Props | ColorProps | EnumProps
 
 // ---- shared cell button ------------------------------------------------------
 
@@ -246,6 +256,7 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
     props.kind === 'theme'     ? THEME_CELLS :
     props.kind === 'alignment' ? ALIGNMENT_CELLS :
     props.kind === 'stack'     ? STACK_CELLS :
+    props.kind === 'layout-2'  ? LAYOUT2_CELLS :
                                  LAYOUT_CELLS
 
   return (

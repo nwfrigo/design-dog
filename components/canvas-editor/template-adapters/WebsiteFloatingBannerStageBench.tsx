@@ -127,6 +127,7 @@ export function WebsiteFloatingBannerStageBench(props: StageBenchEditorProps) {
 
   const showEyebrowEff  = showEyebrow  || previewKey === 'eyebrow'
   const showHeadlineEff = showHeadline || previewKey === 'headline'
+  const showCtaEff      = showCta      || previewKey === 'cta'
 
   const stageRef = useRef<HTMLDivElement | null>(null)
   useFlipReflow(stageRef)
@@ -209,6 +210,7 @@ export function WebsiteFloatingBannerStageBench(props: StageBenchEditorProps) {
                   cta={ctaEff}
                   showEyebrow={showEyebrowEff}
                   showHeadline={showHeadlineEff}
+                  showCta={showCtaEff}
                   variant={variant}
                   headlineFontSize={headlineFontSize ?? undefined}
                   colors={colorsConfig}
@@ -218,7 +220,7 @@ export function WebsiteFloatingBannerStageBench(props: StageBenchEditorProps) {
                     const cfg = slotConfig[blockId]
                     const slotPath = `website-floating-banner.${blockId}`
                     const slot = slots.find((s) => s.path === slotPath)
-                    const dragConfig = blockId !== 'logo' && blockId !== 'cta' && slot
+                    const dragConfig = blockId !== 'logo' && slot
                       ? {
                           data: { region: 'stage' as const, path: slotPath },
                           preview: (

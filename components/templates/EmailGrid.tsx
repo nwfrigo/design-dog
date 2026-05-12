@@ -99,6 +99,7 @@ export function EmailGrid({
   theme = 'light',
 }: EmailGridProps) {
   const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
@@ -225,15 +226,12 @@ export function EmailGrid({
           display: 'flex',
           alignItems: 'center',
           gap: 12,
+          color: themeColors.buttonSecondaryText,
+          fontSize: 18,
+          fontWeight: 300,
+          lineHeight: '18px',
         }}>
-          <span style={{
-            color: themeColors.buttonSecondaryText,
-            fontSize: 18,
-            fontWeight: 300,
-            lineHeight: '18px',
-          }}>
-            {text}
-          </span>
+          {wrapInline(blockId, <span>{text}</span>)}
           <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={13} viewBox="0 0 17 13" pathD="M10 1L16 6.5M16 6.5L10 12M16 6.5H0" strokeLinecap="butt" strokeLinejoin="miter" />
         </div>
       ) : (
@@ -242,7 +240,7 @@ export function EmailGrid({
           fontSize: 18,
           fontWeight: 300,
         }}>
-          {text}
+          {wrapInline(blockId, <span>{text}</span>)}
         </span>
       )
 

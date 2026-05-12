@@ -50,11 +50,11 @@ export const SocialImageStageBench = defineStageBenchAdapter<SocialImageBlockId>
     },
     {
       blockId: 'metadata',
-      label: 'Metadata',
+      label: 'Small Caption',
       iconKey: 'small-caption',
       chipKind: 'small-caption',
       kind: 'text',
-      content: { format: 'plain', singleLine: true, placeholder: 'Day / Month | 00:00' },
+      content: { format: 'plain', singleLine: true, placeholder: 'Small Caption' },
     },
     {
       blockId: 'cta',

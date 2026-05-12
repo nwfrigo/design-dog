@@ -28,6 +28,7 @@ export interface WebsiteFloatingBannerProps {
   cta: string
   showEyebrow: boolean
   showHeadline?: boolean
+  showCta?: boolean
   variant: FloatingBannerVariant
   headlineFontSize?: number
   renderBlock?: (blockId: WebsiteFloatingBannerBlockId, content: ReactNode) => ReactNode
@@ -136,6 +137,7 @@ export function WebsiteFloatingBanner({
   cta,
   showEyebrow,
   showHeadline = true,
+  showCta = true,
   variant,
   headlineFontSize,
   renderBlock,
@@ -249,7 +251,7 @@ export function WebsiteFloatingBanner({
           {showHeadline && headlineNode}
         </div>
 
-        {ctaNode}
+        {showCta && ctaNode}
       </div>
 
       {renderOverlay?.()}

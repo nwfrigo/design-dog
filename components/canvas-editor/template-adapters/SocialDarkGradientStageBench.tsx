@@ -205,14 +205,14 @@ export function SocialDarkGradientStageBench(props: StageBenchEditorProps) {
         />
       </SelectorRow>
       <SelectorRow label="logo">
-        <Toggle<LogoColor>
+        <SelectorPrimitive
+          kind="color-2"
           value={logoColor === 'orange' ? 'orange' : 'white'}
-          onChange={setLogoColor}
+          onChange={(v) => setLogoColor(v as LogoColor)}
           options={[
-            { value: 'white', label: 'White' },
-            { value: 'orange', label: 'Orange' },
-          ] as const}
-          ariaLabel="Logo color"
+            { value: 'white',  swatch: { backgroundColor: '#FFFFFF' }, ariaLabel: 'White logo' },
+            { value: 'orange', swatch: { backgroundColor: '#D35F0B' }, ariaLabel: 'Orange logo' },
+          ]}
         />
       </SelectorRow>
     </>

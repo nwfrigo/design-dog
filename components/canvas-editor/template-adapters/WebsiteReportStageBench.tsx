@@ -169,15 +169,11 @@ export function WebsiteReportStageBench(props: StageBenchEditorProps) {
       <SelectorRow label="theme">
         <SelectorPrimitive kind="theme" value={theme} onChange={setTheme} />
       </SelectorRow>
-      <SelectorRow label="variant">
-        <Toggle<ImageVariant>
-          value={reportVariant}
-          onChange={setReportVariant}
-          options={[
-            { value: 'image', label: 'Image' },
-            { value: 'none', label: 'Text' },
-          ] as const}
-          ariaLabel="Image variant"
+      <SelectorRow label="layout">
+        <SelectorPrimitive
+          kind="layout-2"
+          value={reportVariant === 'image' ? 'image' : 'text'}
+          onChange={(v) => setReportVariant((v === 'image' ? 'image' : 'none') as ImageVariant)}
         />
       </SelectorRow>
       <SelectorRow label="content stack">

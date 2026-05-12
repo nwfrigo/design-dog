@@ -32,7 +32,7 @@ export function getSocialBlueGradientSlots(s: SlotsParams): SlotVisibility[] {
     { path: 'social-blue-gradient.headline', label: 'Headline', iconKey: 'headline', isHidden: !s.showHeadline, hide: () => s.setShowHeadline(false), show: () => s.setShowHeadline(true) },
     { path: 'social-blue-gradient.subhead',  label: 'Subhead',  iconKey: 'subhead',  isHidden: !s.showSubhead,  hide: () => s.setShowSubhead(false),  show: () => s.setShowSubhead(true) },
     { path: 'social-blue-gradient.body',     label: 'Body',     iconKey: 'body',     isHidden: !s.showBody,     hide: () => s.setShowBody(false),     show: () => s.setShowBody(true) },
-    { path: 'social-blue-gradient.metadata', label: 'Metadata', iconKey: 'small-caption', isHidden: !s.showMetadata, hide: () => s.setShowMetadata(false), show: () => s.setShowMetadata(true) },
+    { path: 'social-blue-gradient.metadata', label: 'Small Caption', iconKey: 'small-caption', isHidden: !s.showMetadata, hide: () => s.setShowMetadata(false), show: () => s.setShowMetadata(true) },
     { path: 'social-blue-gradient.cta',      label: 'CTA',      iconKey: 'cta',      isHidden: !s.showCta,      hide: () => s.setShowCta(false),      show: () => s.setShowCta(true) },
   ]
 }

@@ -85,6 +85,7 @@ export function WebsiteEhsAccelerateListing({
   scale = 1,
 }: WebsiteEhsAccelerateListingProps) {
   const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
   const containerStyle: CSSProperties = {
@@ -170,15 +171,12 @@ export function WebsiteEhsAccelerateListing({
         alignItems: 'center',
         gap: 12,
         display: 'flex',
+        textAlign: 'center',
+        color: TEXT_COLOR,
+        fontSize: 20,
+        fontWeight: 350,
       }}>
-        <div style={{
-          textAlign: 'center',
-          color: TEXT_COLOR,
-          fontSize: 20,
-          fontWeight: 350,
-        }}>
-          {text}
-        </div>
+        {wrapInline(blockId, <div>{text}</div>)}
         <ArrowIcon color={TEXT_COLOR} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
       </div>
     ) : (
@@ -187,7 +185,7 @@ export function WebsiteEhsAccelerateListing({
         fontSize: 20,
         fontWeight: 350,
       }}>
-        {text}
+        {wrapInline(blockId, <div>{text}</div>)}
       </div>
     )
 

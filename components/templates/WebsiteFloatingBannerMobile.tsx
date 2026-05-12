@@ -27,6 +27,7 @@ export interface WebsiteFloatingBannerMobileProps {
   cta: string
   showEyebrow: boolean
   showHeadline?: boolean
+  showCta?: boolean
   variant: FloatingBannerMobileVariant
   arrowType: FloatingBannerMobileArrowType
   headlineFontSize?: number
@@ -121,6 +122,7 @@ export function WebsiteFloatingBannerMobile({
   cta,
   showEyebrow,
   showHeadline = true,
+  showCta = true,
   variant,
   arrowType,
   headlineFontSize,
@@ -232,7 +234,7 @@ export function WebsiteFloatingBannerMobile({
           {showHeadline && headlineNode}
         </div>
 
-        {ctaNode}
+        {showCta && ctaNode}
       </div>
 
       {renderOverlay?.()}

@@ -97,6 +97,7 @@ export function SocialGridDetail({
   scale = 1,
 }: SocialGridDetailProps) {
   const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
@@ -212,16 +213,13 @@ export function SocialGridDetail({
           display: 'flex',
           alignItems: 'center',
           gap: 16,
+          color: themeColors.buttonSecondaryText,
+          fontSize: 24,
+          fontWeight: 500,
+          lineHeight: '24px',
+          textAlign: 'center',
         }}>
-          <span style={{
-            color: themeColors.buttonSecondaryText,
-            fontSize: 24,
-            fontWeight: 500,
-            lineHeight: '24px',
-            textAlign: 'center',
-          }}>
-            {text}
-          </span>
+          {wrapInline(blockId, <span>{text}</span>)}
           <ArrowIcon color={themeColors.buttonSecondaryText} width={22} height={18} viewBox="0 0 22 18" pathD="M13 1L21 9M21 9L13 17M21 9H1" />
         </div>
       ) : (
@@ -230,7 +228,7 @@ export function SocialGridDetail({
           fontSize: 24,
           fontWeight: 300,
         }}>
-          {text}
+          {wrapInline(blockId, <span>{text}</span>)}
         </span>
       )
 

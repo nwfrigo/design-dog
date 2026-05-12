@@ -96,6 +96,7 @@ export function WebsiteEventListing({
   scale = 1,
 }: WebsiteEventListingProps) {
   const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const v = EVENT_LISTING_VARIANT_COLORS[variant]
 
@@ -182,15 +183,12 @@ export function WebsiteEventListing({
         alignItems: 'center',
         gap: 12,
         display: 'flex',
+        textAlign: 'center',
+        color: v.textColor,
+        fontSize: 20,
+        fontWeight: 350,
       }}>
-        <div style={{
-          textAlign: 'center',
-          color: v.textColor,
-          fontSize: 20,
-          fontWeight: 350,
-        }}>
-          {text}
-        </div>
+        {wrapInline(blockId, <div>{text}</div>)}
         <ArrowIcon color={v.textColor} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
       </div>
     ) : (
@@ -199,7 +197,7 @@ export function WebsiteEventListing({
         fontSize: 20,
         fontWeight: 350,
       }}>
-        {text}
+        {wrapInline(blockId, <div>{text}</div>)}
       </div>
     )
 

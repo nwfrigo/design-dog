@@ -26,7 +26,7 @@ export function getSocialImageMeddbaseSlots(s: SlotsParams): SlotVisibility[] {
   return [
     { path: 'social-image-meddbase.solutionPill', label: 'Category', iconKey: 'category', isHidden: !s.showSolutionSet, hide: () => s.setShowSolutionSet(false), show: () => s.setShowSolutionSet(true) },
     { path: 'social-image-meddbase.subhead',      label: 'Subhead',  iconKey: 'subhead',  isHidden: !s.showSubhead,     hide: () => s.setShowSubhead(false),     show: () => s.setShowSubhead(true) },
-    { path: 'social-image-meddbase.metadata',     label: 'Metadata', iconKey: 'small-caption', isHidden: !s.showMetadata, hide: () => s.setShowMetadata(false), show: () => s.setShowMetadata(true) },
+    { path: 'social-image-meddbase.metadata',     label: 'Small Caption', iconKey: 'small-caption', isHidden: !s.showMetadata, hide: () => s.setShowMetadata(false), show: () => s.setShowMetadata(true) },
     { path: 'social-image-meddbase.cta',          label: 'CTA',      iconKey: 'cta',      isHidden: !s.showCta,         hide: () => s.setShowCta(false),         show: () => s.setShowCta(true) },
   ]
 }

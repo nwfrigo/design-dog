@@ -170,15 +170,11 @@ export function WebsiteThumbnailStageBench(props: StageBenchEditorProps) {
       <SelectorRow label="theme">
         <SelectorPrimitive kind="theme" value={theme} onChange={setTheme} />
       </SelectorRow>
-      <SelectorRow label="variant">
-        <Toggle<ImageVariant>
-          value={ebookVariant}
-          onChange={setEbookVariant}
-          options={[
-            { value: 'image', label: 'Image' },
-            { value: 'none', label: 'Text' },
-          ] as const}
-          ariaLabel="Image variant"
+      <SelectorRow label="layout">
+        <SelectorPrimitive
+          kind="layout-2"
+          value={ebookVariant === 'image' ? 'image' : 'text'}
+          onChange={(v) => setEbookVariant((v === 'image' ? 'image' : 'none') as ImageVariant)}
         />
       </SelectorRow>
       <SelectorRow label="content stack">

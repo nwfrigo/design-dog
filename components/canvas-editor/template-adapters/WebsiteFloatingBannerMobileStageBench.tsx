@@ -225,6 +225,7 @@ export function WebsiteFloatingBannerMobileStageBench(props: StageBenchEditorPro
                   cta={ctaEff}
                   showEyebrow={showEyebrowEff}
                   showHeadline={showHeadlineEff}
+                  showCta={showCtaEff}
                   variant={variant}
                   arrowType={arrowType}
                   headlineFontSize={headlineFontSize ?? undefined}
@@ -235,7 +236,7 @@ export function WebsiteFloatingBannerMobileStageBench(props: StageBenchEditorPro
                     const cfg = slotConfig[blockId]
                     const slotPath = `website-floating-banner-mobile.${blockId}`
                     const slot = slots.find((s) => s.path === slotPath)
-                    const dragConfig = blockId !== 'cta' && slot
+                    const dragConfig = slot
                       ? {
                           data: { region: 'stage' as const, path: slotPath },
                           preview: (
