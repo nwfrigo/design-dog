@@ -4394,7 +4394,6 @@ export function EditorScreen() {
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showBody={showBody && !!verbatimCopy.body}
                   showCta={showCta}
-                  speakerCount={speakerCount}
                   speaker1={{
                     name: speaker1Name,
                     role: speaker1Role,

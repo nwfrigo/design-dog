@@ -117,7 +117,6 @@ export function WebsiteWebinarStageBench(props: StageBenchEditorProps) {
   const setWebinarVariant = useStore((s) => s.setWebinarVariant)
   const grayscale = useStore((s) => s.grayscale)
 
-  const speakerCount = useStore((s) => s.speakerCount)
   const speaker1Name = useStore((s) => s.speaker1Name)
   const speaker1Role = useStore((s) => s.speaker1Role)
   const speaker1ImageUrl = useStore((s) => s.speaker1ImageUrl)
@@ -332,7 +331,6 @@ export function WebsiteWebinarStageBench(props: StageBenchEditorProps) {
                   showCta={showCtaEff}
                   grayscale={grayscale}
                   theme={theme}
-                  speakerCount={speakerCount}
                   speaker1={{ name: speaker1Name, role: speaker1Role, imageUrl: speaker1ImageUrl, imagePosition: speaker1ImagePosition, imageZoom: speaker1ImageZoom }}
                   speaker2={{ name: speaker2Name, role: speaker2Role, imageUrl: speaker2ImageUrl, imagePosition: speaker2ImagePosition, imageZoom: speaker2ImageZoom }}
                   speaker3={{ name: speaker3Name, role: speaker3Role, imageUrl: speaker3ImageUrl, imagePosition: speaker3ImagePosition, imageZoom: speaker3ImageZoom }}

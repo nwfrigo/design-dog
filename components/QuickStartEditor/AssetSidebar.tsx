@@ -849,7 +849,6 @@ function AssetPreviewRenderer({
           showSubhead={asset.showSubhead && !!copy.subhead}
           showBody={asset.showBody && !!copy.body}
           showCta={asset.showCta !== false}
-          speakerCount={asset.speakerCount || 3}
           speaker1={{
             name: asset.speaker1Name || 'Firstname Lastname',
             role: asset.speaker1Role || 'Role, Company',

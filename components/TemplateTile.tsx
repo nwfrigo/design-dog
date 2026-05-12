@@ -450,7 +450,6 @@ export function TemplateRenderer({
           showSubhead={true}
           showBody={true}
           showCta={true}
-          speakerCount={3}
           speaker1={{ name: 'Jane Smith', role: 'CEO, Company', imageUrl: PLACEHOLDER_IMAGES.speaker1, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
           speaker2={{ name: 'John Doe', role: 'CTO, Company', imageUrl: PLACEHOLDER_IMAGES.speaker2, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}
           speaker3={{ name: 'Alex Chen', role: 'VP Safety', imageUrl: PLACEHOLDER_IMAGES.speaker3, imagePosition: { x: 0, y: 0 }, imageZoom: 1 }}

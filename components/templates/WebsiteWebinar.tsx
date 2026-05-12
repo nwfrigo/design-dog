@@ -64,7 +64,6 @@ export interface WebsiteWebinarProps {
   showCta: boolean
   grayscale?: boolean
   theme?: TemplateTheme
-  speakerCount: 1 | 2 | 3
   speaker1: WebinarSpeakerInfo
   speaker2: WebinarSpeakerInfo
   speaker3: WebinarSpeakerInfo
