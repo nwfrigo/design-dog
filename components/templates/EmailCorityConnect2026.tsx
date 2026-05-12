@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityConnectLogo } from '@/components/shared/CorityConnectLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
@@ -14,6 +14,15 @@ export type CCBackgroundVariant =
   | 'light-blue-1' | 'light-blue-2' | 'light-blue-3' | 'light-blue-4'
   | 'light-orange-1' | 'light-orange-2' | 'light-orange-3' | 'light-orange-4'
 
+/** Track 2 (fixed-composition) editable block ids. Logo is a brand-
+ *  locked anchor — wrapped only so it surfaces a selection ring; not
+ *  editable. */
+export type EmailCorityConnect2026BlockId =
+  | 'logo'
+  | 'headline'
+  | 'body'
+  | 'cta'
+
 export interface EmailCorityConnect2026Props {
   headline: string
   body: string
@@ -23,13 +32,16 @@ export interface EmailCorityConnect2026Props {
   showBody: boolean
   showCta: boolean
   headlineFontSize?: number
+  renderBlock?: (blockId: EmailCorityConnect2026BlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: EmailCorityConnect2026BlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
 
 // Note: filenames use "emial" (Figma export typo) — must match exactly.
-function backgroundUrl(variant: CCBackgroundVariant): string {
+export function backgroundUrl(variant: CCBackgroundVariant): string {
   return `/assets/backgrounds/cority-connect-emial-background-${variant}.png`
 }
 
@@ -54,9 +66,14 @@ export function EmailCorityConnect2026({
   showBody = true,
   showCta = true,
   headlineFontSize,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: EmailCorityConnect2026Props) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const isDark = backgroundVariant.startsWith('dark-')
   const textColor = isDark ? '#ffffff' : '#060015'
@@ -72,8 +89,6 @@ export function EmailCorityConnect2026({
   const containerStyle: CSSProperties = {
     width: 640,
     height: 370,
-    // No padding here — padding lives on the inner content div to avoid
-    // box-sizing ambiguity inflating the outer height in the export renderer.
     position: 'relative',
     overflow: 'hidden',
     fontFamily,
@@ -81,11 +96,55 @@ export function EmailCorityConnect2026({
     transformOrigin: 'top left',
   }
 
+  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+    <div
+      className="cc-rich-text"
+      style={{
+        alignSelf: 'stretch',
+        color: textColor,
+        fontSize,
+        fontWeight: 350,
+        lineHeight: `${fontSize * LINE_HEIGHT_RATIO}px`,
+      }}
+      dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Lightweight header.' }}
+    />
+  )))
+
+  const bodyNode: ReactNode = wrapBlock('body', wrapInline('body', (
+    <div
+      className="cc-rich-text"
+      style={{
+        alignSelf: 'stretch',
+        color: textColor,
+        fontSize: 18.07,
+        fontWeight: 350,
+      }}
+      dangerouslySetInnerHTML={{ __html: body }}
+    />
+  )))
+
+  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+    <div style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 12,
+    }}>
+      <span style={{
+        color: textColor,
+        fontSize: 18,
+        fontWeight: 500,
+        lineHeight: '18px',
+      }}>
+        {ctaText}
+      </span>
+      <ArrowIcon color="#0080FF" width={16.5} height={13.13} />
+    </div>
+  )))
+
   return (
     <div style={containerStyle}>
       <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
-      {/* Full-bleed background image */}
       <img
         src={backgroundUrl(backgroundVariant)}
         alt=""
@@ -100,7 +159,6 @@ export function EmailCorityConnect2026({
         }}
       />
 
-      {/* Content layer — sits above the background, carries the padding */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -109,77 +167,34 @@ export function EmailCorityConnect2026({
         alignItems: 'center',
         zIndex: 1,
       }}>
-
-      {/* Inner layout: logo + text, full height */}
-      <div style={{
-        width: 480,
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        overflow: 'hidden',
-      }}>
-
-        {/* Logo — static, always shown */}
-        <CorityConnectLogo mode={mode} />
-
-        {/* Headline + Body */}
         <div style={{
-          alignSelf: 'stretch',
+          width: 480,
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          gap: 24,
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          overflow: 'hidden',
         }}>
-          {showHeadline && (
-            <div
-              className="cc-rich-text"
-              style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize,
-                fontWeight: 350,
-                lineHeight: `${fontSize * LINE_HEIGHT_RATIO}px`,
-              }}
-              dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Lightweight header.' }}
-            />
-          )}
+          {wrapBlock('logo', (
+            <CorityConnectLogo mode={mode} />
+          ))}
 
-          {showBody && hasBody && (
-            <div
-              className="cc-rich-text"
-              style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: 18.07,
-                fontWeight: 350,
-              }}
-              dangerouslySetInnerHTML={{ __html: body }}
-            />
-          )}
-        </div>
-
-        {/* CTA */}
-        {showCta && ctaText && (
           <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 12,
+            alignSelf: 'stretch',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 24,
           }}>
-            <span style={{
-              color: textColor,
-              fontSize: 18,
-              fontWeight: 500,
-              lineHeight: '18px',
-            }}>
-              {ctaText}
-            </span>
-            <ArrowIcon color="#0080FF" width={16.5} height={13.13} />
+            {showHeadline && headlineNode}
+            {showBody && hasBody && bodyNode}
           </div>
-        )}
+
+          {showCta && ctaText && ctaNode}
+        </div>
       </div>
-      {/* close content layer (absolute inset) */}
-      </div>
+
+      {renderOverlay?.()}
     </div>
   )
 }

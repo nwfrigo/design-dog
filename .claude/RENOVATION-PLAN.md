@@ -106,7 +106,7 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 | Template | abs-pos count | Status |
 |---|---|---|
 | EmailProductRelease | 7 | Queued (Track 2) |
-| EmailCorityConnect2026 | 2 | Queued (Track 2) — mixed mode, may have a small inner stack |
+| EmailCorityConnect2026 | 2 | ✅ Done (Track 2; 16-background enum selector, validates new substrate primitive) |
 | EmailCorityCustomerExchangeSignature | 5 | Queued (Track 2) |
 | EmailCorityCustomerExchangeBanner | 4 | Queued (Track 2) |
 | EmailEhsAccelerateSignature | 5 | Queued (Track 2) |
