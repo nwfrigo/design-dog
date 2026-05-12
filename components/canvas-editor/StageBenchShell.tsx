@@ -120,7 +120,11 @@ function ScaledStage({ children }: { children: ReactNode }) {
     // ratio is stable across re-renders even after we've applied a scale.
     const w = stageEl.offsetWidth
     const h = stageEl.offsetHeight
-    if (w && h) setStageSize({ w, h })
+    if (!w || !h) return
+    // Bail out when the measured size hasn't changed — otherwise this
+    // layout effect (no deps → fires every render) churns state on
+    // every render and triggers the React infinite-loop guard.
+    setStageSize((prev) => (prev && prev.w === w && prev.h === h ? prev : { w, h }))
   })
 
   useEffect(() => {
