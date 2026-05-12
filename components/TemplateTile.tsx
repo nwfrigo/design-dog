@@ -464,7 +464,6 @@ export function TemplateRenderer({
           eyebrow="LIVE EVENT"
           headline={PREVIEW_CONTENT.headline}
           subhead={PREVIEW_CONTENT.subhead}
-          cta="Join the event"
           variant="orange"
           gridDetail1Text="Date: January 15, 2026"
           gridDetail2Text="Time: 2:00 PM EST"

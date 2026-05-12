@@ -96,7 +96,7 @@ Outer stack of repeated child groups. Each child has its own internal compositio
 |---|---|---|
 | EmailGrid | 3 | ✅ Done (Track 1 left column + Track-2-style equal-distribute grid panel; per-row type toggle deferred) |
 | SocialGridDetail | 3 | ✅ Done (Track 1 + nested grid panel; 4 rows, rows 3+4 toggleable) |
-| WebsiteEventListing | 3 | Queued |
+| WebsiteEventListing | 3 | ✅ Done (Track 1 + 3-variant enum + nested grid panel; logo as left-column footer sibling) |
 | WebsiteEhsAccelerateListing | 3 | Queued |
 
 ### Group E — Track 2 absolute-positioned compositions (7 templates)

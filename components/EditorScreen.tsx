@@ -4433,7 +4433,6 @@ export function EditorScreen() {
                   eyebrow={eyebrow || 'LIVE EVENT'}
                   headline={verbatimCopy.headline || 'Headline'}
                   subhead={verbatimCopy.subhead}
-                  cta={ctaText || 'Responsive'}
                   variant={eventListingVariant}
                   gridDetail1Text={gridDetail1Text || 'Add Details or Hide Me'}
                   gridDetail2Text={gridDetail2Text || 'Add Details or Hide Me'}

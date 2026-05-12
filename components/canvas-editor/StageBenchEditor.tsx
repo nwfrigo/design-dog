@@ -18,6 +18,7 @@ import { EmailEhsAccelerateSignatureStageBench } from './template-adapters/Email
 import { EmailProductReleaseStageBench } from './template-adapters/EmailProductReleaseStageBench'
 import { EmailGridStageBench } from './template-adapters/EmailGridStageBench'
 import { SocialGridDetailStageBench } from './template-adapters/SocialGridDetailStageBench'
+import { WebsiteEventListingStageBench } from './template-adapters/WebsiteEventListingStageBench'
 import { WebsiteThumbnailStageBench } from './template-adapters/WebsiteThumbnailStageBench'
 import { WebsiteReportStageBench } from './template-adapters/WebsiteReportStageBench'
 import { WebsiteWebinarStageBench } from './template-adapters/WebsiteWebinarStageBench'
@@ -81,6 +82,7 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'email-product-release': EmailProductReleaseStageBench,
   'email-grid': EmailGridStageBench,
   'social-grid-detail': SocialGridDetailStageBench,
+  'website-event-listing': WebsiteEventListingStageBench,
   'website-press-release': WebsitePressReleaseStageBench,
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,
