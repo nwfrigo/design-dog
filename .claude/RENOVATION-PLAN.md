@@ -69,7 +69,7 @@ Mostly `space-between` outer (logo top, content middle, cta bottom) with an inne
 |---|---|---|
 | SocialDarkGradient | 1 | ✅ Done |
 | SocialBlueGradient | 1 | ✅ Done |
-| SocialEhsAccelerate | 1 | Queued |
+| SocialEhsAccelerate | 1 | ✅ Done (smallest social — no image / no color / no theme / no eyebrow) |
 | SocialImage | 1 | Queued |
 | SocialImageMeddbase | 1 | Queued |
 | EmailImage | 1 | Queued |

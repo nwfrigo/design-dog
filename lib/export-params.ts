@@ -339,6 +339,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showCta: s.showCta,
     headlineFontSize: s.headlineFontSize ?? undefined,
     subheadFontSize: s.subheadFontSize ?? undefined,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['social-ehs-accelerate'] ?? {},
   }),
 
   'social-grid-detail': (s) => ({

@@ -954,6 +954,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showCta: asset.showCta !== false,
       headlineFontSize: asset.headlineFontSize ?? undefined,
       subheadFontSize: asset.subheadFontSize ?? undefined,
+      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
+      gaps: asset.templateGaps?.['social-ehs-accelerate'] ?? {},
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -974,6 +976,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showCta', parser: 'boolTrue', default: true },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'subheadFontSize', parser: 'numberOrUndefined' },
+        { param: 'stackAlign', parser: 'enum', default: 'top' },
+        { param: 'gaps', parser: 'jsonRecord' },
       ],
     },
   },

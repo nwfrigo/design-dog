@@ -10,6 +10,7 @@ import { EmailSpeakersStageBench } from './template-adapters/EmailSpeakersStageB
 import { WebsitePressReleaseStageBench } from './template-adapters/WebsitePressReleaseStageBench'
 import { SocialDarkGradientStageBench } from './template-adapters/SocialDarkGradientStageBench'
 import { SocialBlueGradientStageBench } from './template-adapters/SocialBlueGradientStageBench'
+import { SocialEhsAccelerateStageBench } from './template-adapters/SocialEhsAccelerateStageBench'
 import { NewsletterDarkGradientStageBench } from './template-adapters/NewsletterDarkGradientStageBench'
 import { NewsletterBlueGradientStageBench } from './template-adapters/NewsletterBlueGradientStageBench'
 import { NewsletterLightStageBench } from './template-adapters/NewsletterLightStageBench'
@@ -56,6 +57,7 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'website-press-release': WebsitePressReleaseStageBench,
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,
+  'social-ehs-accelerate': SocialEhsAccelerateStageBench,
   'newsletter-dark-gradient': NewsletterDarkGradientStageBench,
   'newsletter-blue-gradient': NewsletterBlueGradientStageBench,
   'newsletter-light': NewsletterLightStageBench,
