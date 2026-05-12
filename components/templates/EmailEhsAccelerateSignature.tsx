@@ -1,9 +1,20 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+
+/** Track 2 (fixed-composition) editable block ids. eventDate and
+ *  eventLocation are independent <Editable> slots so each text field
+ *  can be selected and edited on its own, even though they share the
+ *  `showEventDetails` visibility flag in the bench. */
+export type EmailEhsAccelerateSignatureBlockId =
+  | 'logo'
+  | 'eventDate'
+  | 'eventLocation'
+  | 'workshopName'
+  | 'cta'
 
 export interface EmailEhsAccelerateSignatureProps {
   eventDate: string
@@ -13,6 +24,9 @@ export interface EmailEhsAccelerateSignatureProps {
   showWorkshopName: boolean
   showEventDetails: boolean
   showCta: boolean
+  renderBlock?: (blockId: EmailEhsAccelerateSignatureBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: EmailEhsAccelerateSignatureBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -26,12 +40,16 @@ export function EmailEhsAccelerateSignature({
   showWorkshopName,
   showEventDetails,
   showCta,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: EmailEhsAccelerateSignatureProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
-  // Outer container: no padding — padding on outer inflates height in Puppeteer (see LESSONS.md).
   const containerStyle: CSSProperties = {
     width: 400,
     height: 100,
@@ -43,10 +61,61 @@ export function EmailEhsAccelerateSignature({
     transformOrigin: 'top left',
   }
 
+  const eventDetailsLineStyle: CSSProperties = {
+    textAlign: 'right',
+    color: 'black',
+    fontSize: 11,
+    fontWeight: 350,
+    lineHeight: '13.20px',
+    wordWrap: 'break-word',
+  }
+
+  const eventDateNode: ReactNode = wrapBlock('eventDate', wrapInline('eventDate', (
+    <div style={eventDetailsLineStyle}>
+      {eventDate || 'Thursday,  13th November'}
+    </div>
+  )))
+
+  const eventLocationNode: ReactNode = wrapBlock('eventLocation', wrapInline('eventLocation', (
+    <div style={eventDetailsLineStyle}>
+      {eventLocation || 'London, UK'}
+    </div>
+  )))
+
+  const workshopNode: ReactNode = wrapBlock('workshopName', wrapInline('workshopName', (
+    <div style={{
+      width: 237,
+      color: '#060015',
+      fontSize: 15,
+      fontWeight: 350,
+      lineHeight: '15.60px',
+      wordWrap: 'break-word',
+    }}>
+      {workshopName || 'Exclusive EHS+ Leader Workshop'}
+    </div>
+  )))
+
+  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      gap: 4,
+    }}>
+      <span style={{
+        color: '#060015',
+        fontSize: 11,
+        fontWeight: 350,
+        lineHeight: '11px',
+      }}>
+        {ctaText || 'Join Us'}
+      </span>
+      <ArrowIcon color="#060015" width={10} height={6} strokeWidth={1.2} />
+    </div>
+  )))
+
   return (
     <div style={containerStyle}>
-
-      {/* Full-bleed background image */}
       <img
         src="/assets/backgrounds/ehs_accelerate_email_signature_banner_background.png"
         alt=""
@@ -61,76 +130,51 @@ export function EmailEhsAccelerateSignature({
         }}
       />
 
-      {/* Logo — top left */}
-      <div style={{
-        position: 'absolute',
-        left: 16,
-        top: 20,
-        overflow: 'hidden',
-      }}>
-        <EhsAccelerateLogo width={113} />
-      </div>
+      {wrapBlock('logo', (
+        <div style={{
+          position: 'absolute',
+          left: 16,
+          top: 20,
+          overflow: 'hidden',
+        }}>
+          <EhsAccelerateLogo width={113} />
+        </div>
+      ))}
 
-      {/* Event date + location — top right */}
       {showEventDetails && (
         <div style={{
           width: 126,
           position: 'absolute',
           left: 252,
           top: 20,
-          textAlign: 'right',
-          color: 'black',
-          fontSize: 11,
-          fontWeight: 350,
-          lineHeight: '13.20px',
-          wordWrap: 'break-word',
         }}>
-          {eventDate || 'Thursday,  13th November'}<br />
-          {eventLocation || 'London, UK'}
+          {eventDateNode}
+          {eventLocationNode}
         </div>
       )}
 
-      {/* Workshop name — bottom left */}
       {showWorkshopName && (
         <div style={{
-          width: 237,
           position: 'absolute',
           left: 15,
           top: 71,
-          color: '#060015',
-          fontSize: 15,
-          fontWeight: 350,
-          lineHeight: '15.60px',
-          wordWrap: 'break-word',
         }}>
-          {workshopName || 'Exclusive EHS+ Leader Workshop'}
+          {workshopNode}
         </div>
       )}
 
-      {/* CTA — bottom right, right-aligned with event details block above */}
       {showCta && (
         <div style={{
           position: 'absolute',
           left: 252,
           width: 126,
           top: 75,
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          gap: 4,
         }}>
-          <span style={{
-            color: '#060015',
-            fontSize: 11,
-            fontWeight: 350,
-            lineHeight: '11px',
-          }}>
-            {ctaText || 'Join Us'}
-          </span>
-          <ArrowIcon color="#060015" width={10} height={6} strokeWidth={1.2} />
+          {ctaNode}
         </div>
       )}
 
+      {renderOverlay?.()}
     </div>
   )
 }
