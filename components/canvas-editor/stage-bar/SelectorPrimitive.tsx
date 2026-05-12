@@ -72,13 +72,15 @@ type ColorSwatch = {
 
 export type ColorOption = { value: string; swatch: ColorSwatch; ariaLabel?: string }
 
-/** Generic option for the `enum` kind. Each cell renders an icon (Lucide
- *  component) or a short text label — never both. Provide `ariaLabel` for
- *  icon-only cells. */
+/** Generic option for the `enum` kind. Each cell renders one of: an icon
+ *  (Lucide component), a color/image swatch (36×36 fill), or a short text
+ *  label. Priority when multiple are set: icon > swatch > label. Always
+ *  provide `ariaLabel` so the cell is selectable by assistive tech. */
 export type EnumOption = {
   value: string
   ariaLabel: string
   icon?: LucideIcon
+  swatch?: ColorSwatch
   label?: string
 }
 
@@ -216,7 +218,10 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
         {options.map((opt, i) => {
           const active = value === opt.value
           const Icon = opt.icon
-          const isWide = !Icon && !!opt.label
+          // Render priority: icon > swatch > label. Swatch cells use the
+          // same surface treatment as color-N (the swatch IS the fill).
+          const isSwatch = !Icon && !!opt.swatch
+          const isWide = !Icon && !opt.swatch && !!opt.label
           return (
             <Cell
               key={opt.value}
@@ -225,10 +230,11 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
               onClick={() => onChange(opt.value)}
               isFirst={i === 0}
               isLast={i === options.length - 1}
-              isColor={false}
+              isColor={isSwatch}
+              swatch={opt.swatch}
               wide={isWide}
             >
-              {Icon ? <Icon size={ICON_SIZE} /> : opt.label}
+              {Icon ? <Icon size={ICON_SIZE} /> : isSwatch ? null : opt.label}
             </Cell>
           )
         })}
