@@ -337,6 +337,65 @@ This is the rule the migration mostly followed. Don't add `show*` flags to slots
 
 Decorative chrome (dividers, borders, baked-in shapes) stays visible always. It is not editable and not bench-able. Wrap it in `<Editable>` only if you need a selection ring for navigation feedback — never as a toggleable slot.
 
+### 8.4 Block existence is independent of content
+
+**Rule:** a slot renders whenever its `show*` flag is true, regardless of whether the user has typed anything yet. Never gate visibility on content presence (`showEyebrow && !!eyebrow`, `showSubhead && hasSubhead`, etc.).
+
+Why: WYSIWYG editing depends on the slot existing on stage so the user can double-click into it. If the block only renders when content is present, the user can't get into edit mode for an empty slot — and they can't add content without entering edit mode.
+
+How to implement, by template paradigm:
+
+- **ContentStack (Track 1):** in the block's `defaultInner`, fall back to the placeholder string when the value is empty (e.g. `defaultInner: subhead || 'Subheadline'`). `renderChrome` already wraps the inner; the placeholder inherits the chrome's styling.
+- **Track 2 (inline `wrapInline`):** put the styled wrapper *outside* `wrapInline` (see §8.5 below) and pass `value || 'Placeholder'` into the body that `wrapInline` receives.
+
+#### Canonical placeholder strings
+
+Use these unless the design calls for a flavored default (event-specific labels, product names, etc.):
+
+| Block kind | Canonical placeholder |
+|---|---|
+| `eyebrow` | `Eyebrow` |
+| `headline` | `Headline` |
+| `subhead` / `subheading` | `Subheadline` |
+| `body` | `Body copy goes here.` |
+| `metadata` | `Small Caption` |
+| `cta` | `Call to Action` |
+| `eventDate` | `Event date` |
+| `eventLocation` | `Event location` |
+| `eventTime` | `Event time` |
+| `workshopName` | `Workshop name` |
+| `speakerName` | `Firstname Lastname` |
+| `speakerRole` | `Role, Company` |
+| `gridDetail<N>` | `Grid detail <N>` |
+
+Eyebrow strings live in mixed case in source; CSS `text-transform: uppercase` handles the rendered casing.
+
+**When to override the canonical:** event-specific templates (EHS+ Accelerate, Cority Connect, Customer Exchange) keep their flavored defaults so the editor preview reads like a real banner instead of a blank scaffold. EmailProductRelease keeps `Product Release` / `GX2 2026.1` for the same reason. The rule of thumb is *would a non-designer expect to see this default copy on first open?* If yes, use a flavored default; if no, use canonical.
+
+### 8.5 Styling wrappers live outside `wrapInline`
+
+**Rule:** when an editable block is replaced by `InlineTextEdit` (on double-click), the styled wrapper must survive the swap. Put the styled `<div className="rich-text" style={{...}}>` *around* the `wrapInline(...)` call, not inside the JSX that `wrapInline` receives.
+
+```tsx
+// ❌ Wrong — styling is INSIDE wrapInline, gets replaced on edit
+wrapInline('headline', (
+  <div className="rich-text" style={{ color, fontSize, fontWeight }}>
+    {headline || 'Headline'}
+  </div>
+))
+
+// ✅ Right — styled wrapper survives the editor swap
+<div className="rich-text" style={{ color, fontSize, fontWeight }}>
+  {wrapInline('headline', (
+    <div dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
+  ))}
+</div>
+```
+
+For ContentStack templates the `renderChrome` callback already implements this pattern — `renderChrome((inner) => <styled-wrapper>{inner}</styled-wrapper>)` wraps the inline editor when it takes over from `defaultInner`. Track 2 templates have to hand-wire it.
+
+CTA blocks that include an `ArrowIcon` next to text: the arrow stays outside `wrapInline` so it doesn't vanish during edit. Pattern: a flex container holds both the `wrapInline(...)`-wrapped text and the static `<ArrowIcon />`.
+
 ---
 
 ## 9. Active risks & open items
