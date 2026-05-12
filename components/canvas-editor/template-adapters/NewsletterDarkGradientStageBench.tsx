@@ -124,9 +124,11 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
   const subheadFontSize = useStore((s) => s.subheadFontSize)
   const setSubheadFontSize = useStore((s) => s.setSubheadFontSize)
 
-  // Newsletter-specific image fields — used for rendering only.
-  // Editing image still goes through legacy sidebar (deferred).
+  // Newsletter-specific image fields. imageSize is now editable via the
+  // stage bar's `layout` selector below. Image content (URL / crop /
+  // filters) editing still goes through the legacy sidebar (deferred).
   const newsletterImageSize = useStore((s) => s.newsletterImageSize)
+  const setNewsletterImageSize = useStore((s) => s.setNewsletterImageSize)
   const newsletterImageUrl = useStore((s) => s.newsletterImageUrl)
   const newsletterImagePosition = useStore((s) => s.newsletterImagePosition)
   const newsletterImageZoom = useStore((s) => s.newsletterImageZoom)
@@ -179,6 +181,23 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
   }
 
   // ---- stage bar ----
+  // Layout selector reuses the substrate's `kind: 'layout'` primitive
+  // (image-heavy / even / text-heavy → ImageUp / Scale / Type icons).
+  // Newsletter's `imageSize` semantically maps:
+  //   none  → text   (no image, text-only)
+  //   small → even   (balanced image + text)
+  //   large → image  (image-heavy)
+  // Mapping is bidirectional so the user-facing control is the universal
+  // layout primitive while the store keeps the newsletter-native vocabulary.
+  const layoutValue: 'image' | 'even' | 'text' =
+    newsletterImageSize === 'none' ? 'text' :
+    newsletterImageSize === 'small' ? 'even' : 'image'
+  const onLayoutChange = (next: 'image' | 'even' | 'text') => {
+    setNewsletterImageSize(
+      next === 'text' ? 'none' : next === 'even' ? 'small' : 'large',
+    )
+  }
+
   const stageBar = (
     <>
       <SelectorRow label="color">
@@ -188,6 +207,9 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
           onChange={(v) => setColorStyle(v as ColorStyle)}
           options={COLOR_STYLE_OPTIONS}
         />
+      </SelectorRow>
+      <SelectorRow label="layout">
+        <SelectorPrimitive kind="layout" value={layoutValue} onChange={onLayoutChange} />
       </SelectorRow>
       <SelectorRow label="content stack">
         <SelectorPrimitive kind="stack" value={stackAlign} onChange={setStackAlign} />

@@ -73,7 +73,7 @@ Mostly `space-between` outer (logo top, content middle, cta bottom) with an inne
 | SocialImage | 1 | Queued |
 | SocialImageMeddbase | 1 | Queued |
 | EmailImage | 1 | Queued |
-| NewsletterDarkGradient | 1 | ✅ Done (image controls deferred) |
+| NewsletterDarkGradient | 1 | ✅ Done (image content editing deferred — see image-source-key follow-up) |
 | NewsletterBlueGradient | 1 | Queued |
 | NewsletterLight | 1 | Queued |
 | NewsletterTopBanner | 1 | Queued |
