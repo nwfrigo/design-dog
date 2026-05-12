@@ -6,6 +6,22 @@
 
 ---
 
+## Execution log
+
+| Task | Status | Commits | Notes |
+|------|--------|---------|-------|
+| 5 — SUBSTRATE-DEBT.md seed | ✅ Done | `97a8771` | 7 entries; CLAUDE.md + RENOVATION-PLAN.md cross-references wired. |
+| 4 — Dead-prop audit | ✅ Done | `ac11f85` | Catalog clean. Only actionable find: `WebsiteWebinar.speakerCount`. Removed across 6 files. `EmailCorityConnect2026.colors` left as known-acceptable tax per §4.5. |
+| 1 phase A — Factory + 3 pilots | ✅ Done | `949903c`, `93ba8ae` | `defineStageBenchAdapter` lands. Pilots ported: social-ehs-accelerate (−54%), social-image (−45%), email-cority-connect-2026 (−53%). Validation pass added color-N selector kinds. Multi-image (EmailSpeakers) deferred via `renderTemplate` escape. |
+| 3 §3.2 + §3.3 — Conventions | ✅ Done | `7b85321` | Three subsections under §8 of STAGE-AND-BENCH.md (factory pointer, visibility-flag naming, bench-toggle-ability). |
+| **Visual smoke test of 3 pilots** | ⏸ **Required before mass-port** | — | TypeScript clean and production build compiles, but no in-browser verification yet. **Run dev server, open each pilot in the editor: selection / inline edit / bench drag / stage-bar selectors / image modal (social-image) / export to PNG.** |
+| 2 — Auto-registration | Not started | — | Folds the factory's descriptor into `template-registry.tsx` + `export-params.ts` + `migrated-templates.ts` + `StageBenchEditor.tsx`. Start with the 3 pilots, then propagate. |
+| 1 phase B — Mass-port 24 adapters | Not started | — | Order: sibling templates of pilots first (newsletter variants, social-blue-gradient, social-image-meddbase, email-image), then signatures + banners, then grids (combine with §3.1 grid rename here), then Speakers last (use the §1.4 easy-path). |
+| 3 §3.1 — Grid off-by-one rename | Not started | — | Bundle with grid-template ports under the new factory. |
+| 6 — Contribution playbook | Not started | — | Rewrite STAGE-BENCH-MIGRATION.md once the factory is stable. |
+
+---
+
 ## How to use this doc
 
 Each task below is **self-contained** — a fresh agent can run any one of them without the others. Tasks are ordered by ROI; some have hard dependencies (noted). Estimates are focused-work days, not calendar time.
