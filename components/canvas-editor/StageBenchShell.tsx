@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, type Ref } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 
 /**
  * StageBenchShell — pure layout primitive for the new editor screen.
@@ -71,7 +71,7 @@ export function StageBenchShell({
           </aside>
 
           <main className="flex flex-col items-center gap-12">
-            <div className="flex justify-center">{children}</div>
+            <ScaledStage>{children}</ScaledStage>
             <div>{actionRow}</div>
           </main>
 
@@ -79,6 +79,95 @@ export function StageBenchShell({
             {stageBar}
           </aside>
         </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * ScaledStage — keeps the template within the viewport.
+ *
+ * Templates render at intrinsic pixel dimensions (1200×628 for socials,
+ * 800×450 for press-release, etc). On a small laptop viewport the
+ * larger ones overflow the stage column and push the bench + stage-bar
+ * off-screen.
+ *
+ * Strategy:
+ *  - Wrap the stage child in an outer measurement box.
+ *  - On mount and every viewport resize, read the available width from
+ *    the box's parent (the centered <main>'s available width) and the
+ *    stage's intrinsic width from its DOM node (offsetWidth ignores
+ *    transforms, so it returns the un-scaled value).
+ *  - Compute scale = min(1, available / intrinsic). 1 means "fits";
+ *    anything less is the shrink factor.
+ *  - Apply `transform: scale(scale)` to a positioned inner wrapper, and
+ *    set the outer wrapper's width/height to the SCALED dims so the
+ *    surrounding flex layout reflects the shrunken footprint.
+ *
+ * The export render route is unaffected — it bypasses this shell and
+ * renders the template directly at scale=1 for true-pixel output.
+ */
+function ScaledStage({ children }: { children: ReactNode }) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const stageRef = useRef<HTMLDivElement | null>(null)
+  const [scale, setScale] = useState(1)
+  const [stageSize, setStageSize] = useState<{ w: number; h: number } | null>(null)
+
+  useLayoutEffect(() => {
+    const stageEl = stageRef.current?.firstElementChild as HTMLElement | null
+    if (!stageEl) return
+    // offsetWidth/Height read the un-transformed intrinsic size, so the
+    // ratio is stable across re-renders even after we've applied a scale.
+    const w = stageEl.offsetWidth
+    const h = stageEl.offsetHeight
+    if (w && h) setStageSize({ w, h })
+  })
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || !stageSize) return
+    const compute = () => {
+      const parent = container.parentElement
+      if (!parent) return
+      const available = parent.clientWidth
+      const next = Math.min(1, available / stageSize.w)
+      // Round to 3 decimals so tiny sub-pixel ResizeObserver jitter
+      // doesn't churn the scale.
+      setScale(Math.round(next * 1000) / 1000)
+    }
+    compute()
+    const ro = new ResizeObserver(compute)
+    if (container.parentElement) ro.observe(container.parentElement)
+    window.addEventListener('resize', compute)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', compute)
+    }
+  }, [stageSize])
+
+  // Outer wrapper: takes layout space equal to the SCALED dims (so the
+  // surrounding flex column knows how much room the stage uses).
+  // Inner wrapper: rendered at intrinsic size, scaled visually.
+  const outerStyle: React.CSSProperties = stageSize
+    ? { width: stageSize.w * scale, height: stageSize.h * scale, position: 'relative' }
+    : { display: 'flex', justifyContent: 'center' }
+
+  const innerStyle: React.CSSProperties = stageSize
+    ? {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: stageSize.w,
+        height: stageSize.h,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
+      }
+    : {}
+
+  return (
+    <div ref={containerRef} style={outerStyle}>
+      <div ref={stageRef} style={innerStyle}>
+        {children}
       </div>
     </div>
   )
