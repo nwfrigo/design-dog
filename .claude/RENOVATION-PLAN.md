@@ -124,10 +124,9 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 
 ### Totals
 
-- **Track 1**: 17 templates (3 done + 14 queued)
-- **Track 2**: 9 templates (all queued)
-- **Already done**: 3 (counted in Track 1)
-- **Total in scope**: 26 to ship + 3 to refactor onto ContentStack
+- **Track 1**: 17 templates done (Groups A–C complete; Group D queued)
+- **Track 2**: 8 of 9 done; EmailEhsAccelerateInvitation deferred (rich-text dep)
+- **Substrate primitives added**: `SelectorPrimitive kind="enum"` (N-state, icons/swatches/labels — overflow carousel pending design pass)
 
 ---
 
