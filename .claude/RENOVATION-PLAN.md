@@ -108,7 +108,7 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 | EmailProductRelease | 7 | Queued (Track 2) |
 | EmailCorityConnect2026 | 2 | ✅ Done (Track 2; 16-background enum selector, validates new substrate primitive) |
 | EmailCorityCustomerExchangeSignature | 5 | Queued (Track 2) |
-| EmailCorityCustomerExchangeBanner | 4 | Queued (Track 2) |
+| EmailCorityCustomerExchangeBanner | 4 | ✅ Done (Track 2; 4-color enum selector, flex-end CTA anchor) |
 | EmailEhsAccelerateSignature | 5 | Queued (Track 2) |
 | EmailEhsAccelerateBanner | 5 | Queued (Track 2) |
 | EmailEhsAccelerateInvitation | 8 | Queued (Track 2) — most complex; possibly worth holding to last |
