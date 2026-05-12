@@ -163,7 +163,7 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 
 | Block | Current Visibility | Decoupled? | Current Placeholder | Proposed Placeholder | Notes |
 |---|---|---|---|---|---|
-| eventDate | `showEventDetails` | ✅ | `Thursday,  13th November` | `Thursday,  13th November` | Track 2; flavored default kept |
+| eventDate | `showEventDetails` | ✅ | `Thursday, 13th November` | `Thursday, 13th November` | Track 2; flavored default kept |
 | eventLocation | `showEventDetails` | ✅ | `London, UK` | `London, UK` | Track 2; flavored default kept |
 | workshopName | `showWorkshopName` | ✅ | `Exclusive EHS+ Leader Workshop` | `Exclusive EHS+ Leader Workshop` | Track 2; flavored default kept |
 | cta | `showCta` | ✅ | `Join Us` | `Join Us` | Track 2; flavored default kept |

@@ -72,7 +72,7 @@ export function EmailEhsAccelerateSignature({
 
   const eventDateNode: ReactNode = wrapBlock('eventDate', (
     <div style={eventDetailsLineStyle}>
-      {wrapInline('eventDate', <div>{eventDate || 'Thursday,  13th November'}</div>)}
+      {wrapInline('eventDate', <div>{eventDate || 'Thursday, 13th November'}</div>)}
     </div>
   ))
 
