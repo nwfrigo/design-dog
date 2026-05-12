@@ -18,6 +18,7 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'website-floating-banner',
   'email-cority-customer-exchange-banner',
   'email-cority-customer-exchange-signature',
+  'email-ehs-accelerate-banner',
   'website-press-release',
   'social-dark-gradient',
   'social-blue-gradient',

@@ -13,6 +13,7 @@ import { WebsiteFloatingBannerMobileStageBench } from './template-adapters/Websi
 import { WebsiteFloatingBannerStageBench } from './template-adapters/WebsiteFloatingBannerStageBench'
 import { EmailCorityCustomerExchangeBannerStageBench } from './template-adapters/EmailCorityCustomerExchangeBannerStageBench'
 import { EmailCorityCustomerExchangeSignatureStageBench } from './template-adapters/EmailCorityCustomerExchangeSignatureStageBench'
+import { EmailEhsAccelerateBannerStageBench } from './template-adapters/EmailEhsAccelerateBannerStageBench'
 import { WebsiteThumbnailStageBench } from './template-adapters/WebsiteThumbnailStageBench'
 import { WebsiteReportStageBench } from './template-adapters/WebsiteReportStageBench'
 import { WebsiteWebinarStageBench } from './template-adapters/WebsiteWebinarStageBench'
@@ -71,6 +72,7 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'website-floating-banner': WebsiteFloatingBannerStageBench,
   'email-cority-customer-exchange-banner': EmailCorityCustomerExchangeBannerStageBench,
   'email-cority-customer-exchange-signature': EmailCorityCustomerExchangeSignatureStageBench,
+  'email-ehs-accelerate-banner': EmailEhsAccelerateBannerStageBench,
   'website-press-release': WebsitePressReleaseStageBench,
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,

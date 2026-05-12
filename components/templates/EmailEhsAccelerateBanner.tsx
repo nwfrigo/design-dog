@@ -1,9 +1,20 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+
+/** Track 2 (fixed-composition) editable block ids. Logo is brand-
+ *  locked. Date/location/cta live inside the bottom info bar; each
+ *  is wrapped as an independent <Editable>. */
+export type EmailEhsAccelerateBannerBlockId =
+  | 'logo'
+  | 'headline'
+  | 'body'
+  | 'eventDate'
+  | 'eventLocation'
+  | 'cta'
 
 export interface EmailEhsAccelerateBannerProps {
   headline?: string
@@ -13,6 +24,9 @@ export interface EmailEhsAccelerateBannerProps {
   headlineFontSize?: number
   eventDate: string
   eventLocation: string
+  renderBlock?: (blockId: EmailEhsAccelerateBannerBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: EmailEhsAccelerateBannerBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -26,17 +40,21 @@ export function EmailEhsAccelerateBanner({
   headlineFontSize,
   eventDate,
   eventLocation,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: EmailEhsAccelerateBannerProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const headlineText = headline || 'In-Person. Exclusive.'
   const bodyText = body || 'Join senior EHS+ leaders to modernize how you stay ahead of operating risks.'
   const ctaLabel = ctaText || 'Join Us'
   const hlSize = headlineFontSize ?? 63.6
-  const hlLineHeight = hlSize * 0.94 // preserve original 59.79/63.6 ratio
+  const hlLineHeight = hlSize * 0.94
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
-  // Outer container: no padding — padding on outer inflates height in Puppeteer (see LESSONS.md).
   const containerStyle: CSSProperties = {
     width: 600,
     height: 373,
@@ -50,8 +68,6 @@ export function EmailEhsAccelerateBanner({
 
   return (
     <div style={containerStyle}>
-
-      {/* Full-bleed background image */}
       <img
         src="/assets/backgrounds/ehs_accelerate_email_banner_background.png"
         alt=""
@@ -66,34 +82,35 @@ export function EmailEhsAccelerateBanner({
         }}
       />
 
-      {/* Logo — top left */}
-      <div style={{
-        position: 'absolute',
-        left: 30,
-        top: 39,
-        width: 218,
-        overflow: 'hidden',
-      }}>
-        <EhsAccelerateLogo width={218} />
-      </div>
+      {wrapBlock('logo', (
+        <div style={{
+          position: 'absolute',
+          left: 30,
+          top: 39,
+          width: 218,
+          overflow: 'hidden',
+        }}>
+          <EhsAccelerateLogo width={218} />
+        </div>
+      ))}
 
-      {/* Main headline — "In-Person. Exclusive." */}
-      <div style={{
-        width: 300,
-        position: 'absolute',
-        left: 28,
-        top: 149,
-        color: 'black',
-        fontSize: hlSize,
-        fontWeight: 350,
-        lineHeight: `${hlLineHeight}px`,
-        wordWrap: 'break-word',
-      }}>
-        {headlineText}
-      </div>
+      {wrapBlock('headline', wrapInline('headline', (
+        <div style={{
+          width: 300,
+          position: 'absolute',
+          left: 28,
+          top: 149,
+          color: 'black',
+          fontSize: hlSize,
+          fontWeight: 350,
+          lineHeight: `${hlLineHeight}px`,
+          wordWrap: 'break-word',
+        }}>
+          {headlineText}
+        </div>
+      )))}
 
-      {/* Body copy — right side */}
-      {showBody && (
+      {showBody && wrapBlock('body', wrapInline('body', (
         <div style={{
           width: 204,
           position: 'absolute',
@@ -107,9 +124,8 @@ export function EmailEhsAccelerateBanner({
         }}>
           {bodyText}
         </div>
-      )}
+      )))}
 
-      {/* Bottom info bar */}
       <div style={{
         width: 547,
         height: 43,
@@ -127,41 +143,7 @@ export function EmailEhsAccelerateBanner({
         paddingRight: 8,
         boxSizing: 'border-box',
       }}>
-        {/* Date (editable) */}
-        <span style={{
-          color: 'black',
-          fontSize: 14,
-          fontWeight: 350,
-          lineHeight: '14px',
-          whiteSpace: 'nowrap',
-        }}>
-          {eventDate || 'Thursday, 13th November'}
-        </span>
-
-        {/* Location (editable) */}
-        <span style={{
-          color: 'black',
-          fontSize: 14,
-          fontWeight: 350,
-          lineHeight: '14px',
-          whiteSpace: 'nowrap',
-        }}>
-          {eventLocation || 'London, UK'}
-        </span>
-
-        {/* CTA — auto-sizes to text length; grows leftward */}
-        <div style={{
-          paddingLeft: 17,
-          paddingRight: 17,
-          paddingTop: 10,
-          paddingBottom: 10,
-          background: '#F1F3F4',
-          borderRadius: 4,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          flexShrink: 0,
-        }}>
+        {wrapBlock('eventDate', wrapInline('eventDate', (
           <span style={{
             color: 'black',
             fontSize: 14,
@@ -169,12 +151,50 @@ export function EmailEhsAccelerateBanner({
             lineHeight: '14px',
             whiteSpace: 'nowrap',
           }}>
-            {ctaLabel}
+            {eventDate || 'Thursday, 13th November'}
           </span>
-          <ArrowIcon color="black" width={14} height={8.75} strokeWidth={1.2} />
-        </div>
+        )))}
+
+        {wrapBlock('eventLocation', wrapInline('eventLocation', (
+          <span style={{
+            color: 'black',
+            fontSize: 14,
+            fontWeight: 350,
+            lineHeight: '14px',
+            whiteSpace: 'nowrap',
+          }}>
+            {eventLocation || 'London, UK'}
+          </span>
+        )))}
+
+        {wrapBlock('cta', wrapInline('cta', (
+          <div style={{
+            paddingLeft: 17,
+            paddingRight: 17,
+            paddingTop: 10,
+            paddingBottom: 10,
+            background: '#F1F3F4',
+            borderRadius: 4,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            flexShrink: 0,
+          }}>
+            <span style={{
+              color: 'black',
+              fontSize: 14,
+              fontWeight: 350,
+              lineHeight: '14px',
+              whiteSpace: 'nowrap',
+            }}>
+              {ctaLabel}
+            </span>
+            <ArrowIcon color="black" width={14} height={8.75} strokeWidth={1.2} />
+          </div>
+        )))}
       </div>
 
+      {renderOverlay?.()}
     </div>
   )
 }

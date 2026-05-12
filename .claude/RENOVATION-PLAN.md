@@ -110,7 +110,7 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 | EmailCorityCustomerExchangeSignature | 5 | ✅ Done (Track 2; 4 text slots, empty stage bar) |
 | EmailCorityCustomerExchangeBanner | 4 | ✅ Done (Track 2; 4-color enum selector, flex-end CTA anchor) |
 | EmailEhsAccelerateSignature | 5 | Queued (Track 2) |
-| EmailEhsAccelerateBanner | 5 | Queued (Track 2) |
+| EmailEhsAccelerateBanner | 5 | ✅ Done (Track 2; logo + headline + body + bottom info bar with date/location/cta) |
 | EmailEhsAccelerateInvitation | 8 | Queued (Track 2) — most complex; possibly worth holding to last |
 
 ### Group F — Track 2 horizontal banner strips (2 templates)
