@@ -180,8 +180,8 @@ export function EmailDarkGradient({
   const blocks: Block[] = [
     {
       id: 'eyebrow',
-      visible: showEyebrow && !!eyebrow,
-      defaultInner: eyebrow,
+      visible: showEyebrow,
+      defaultInner: eyebrow || 'Eyebrow',
       renderChrome: (inner) => (
         <div
           style={{
@@ -221,8 +221,8 @@ export function EmailDarkGradient({
     },
     {
       id: 'subhead',
-      visible: showSubhead && hasSubhead,
-      defaultInner: <div dangerouslySetInnerHTML={{ __html: subhead! }} />,
+      visible: showSubhead,
+      defaultInner: <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead! : 'Subheadline' }} />,
       renderChrome: (inner) => (
         <div
           className="rich-text-white"
@@ -263,8 +263,8 @@ export function EmailDarkGradient({
     },
     {
       id: 'cta',
-      visible: showCta && hasCta,
-      defaultInner: ctaText,
+      visible: showCta,
+      defaultInner: ctaText || 'Call to Action',
       renderChrome: (inner) =>
         ctaStyle === 'link' ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

@@ -217,8 +217,8 @@ export function WebsitePressRelease({
           blocks={[
             {
               id: 'eyebrow',
-              visible: showEyebrow && !!eyebrow,
-              defaultInner: eyebrow,
+              visible: showEyebrow,
+              defaultInner: eyebrow || 'Eyebrow',
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -237,7 +237,7 @@ export function WebsitePressRelease({
             {
               id: 'headline',
               visible: showHeadline,
-              defaultInner: headline || 'Lightweight header.',
+              defaultInner: headline || 'Headline',
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -254,8 +254,8 @@ export function WebsitePressRelease({
             },
             {
               id: 'subhead',
-              visible: showSubhead && !!subhead,
-              defaultInner: subhead,
+              visible: showSubhead,
+              defaultInner: subhead || 'Subheadline',
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -288,8 +288,8 @@ export function WebsitePressRelease({
             },
             {
               id: 'cta',
-              visible: showCta && !!cta,
-              defaultInner: cta,
+              visible: showCta,
+              defaultInner: cta || 'Call to Action',
               renderChrome: (inner) => (
                 <div
                   style={{

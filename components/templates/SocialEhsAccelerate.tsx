@@ -128,9 +128,9 @@ export function SocialEhsAccelerate({
     },
     {
       id: 'subhead',
-      visible: showSubhead && hasSubhead,
+      visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+        <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead : 'Subheadline' }} />
       ),
       renderChrome: (inner) => (
         <div
@@ -148,8 +148,8 @@ export function SocialEhsAccelerate({
     },
     {
       id: 'cta',
-      visible: showCta && !!ctaText,
-      defaultInner: <span>{ctaText}</span>,
+      visible: showCta,
+      defaultInner: <span>{ctaText || 'Call to Action'}</span>,
       renderChrome: (inner) => (
         <div style={{
           display: 'flex',

@@ -110,7 +110,7 @@ export function EmailCorityConnect2026({
       }}
     >
       {wrapInline('headline', (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Lightweight header.' }} />
+        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
       ))}
     </div>
   ))
@@ -142,7 +142,7 @@ export function EmailCorityConnect2026({
       lineHeight: '18px',
     }}>
       {wrapInline('cta', (
-        <span>{ctaText}</span>
+        <span>{ctaText || 'Call to Action'}</span>
       ))}
       <ArrowIcon color="#0080FF" width={16.5} height={13.13} />
     </div>
@@ -197,7 +197,7 @@ export function EmailCorityConnect2026({
             {showBody && bodyNode}
           </div>
 
-          {showCta && ctaText && ctaNode}
+          {showCta && ctaNode}
         </div>
       </div>
 

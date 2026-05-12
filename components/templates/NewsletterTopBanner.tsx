@@ -209,11 +209,11 @@ export function NewsletterTopBanner({
                 fontWeight: '350',
                 wordWrap: 'break-word',
               }}>
-                {headline || 'EHS+ Newsletter'}
+                {headline || 'Headline'}
               </div>
             )}
 
-            {showSubhead && subhead && (
+            {showSubhead && (
               <div style={{
                 alignSelf: 'stretch',
                 color: textColor,
@@ -222,7 +222,7 @@ export function NewsletterTopBanner({
                 fontWeight: '350',
                 wordWrap: 'break-word',
               }}>
-                {subhead}
+                {subhead || 'Subheadline'}
               </div>
             )}
           </div>

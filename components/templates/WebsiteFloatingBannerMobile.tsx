@@ -156,7 +156,7 @@ export function WebsiteFloatingBannerMobile({
       letterSpacing: 1.32,
       whiteSpace: 'nowrap',
     }}>
-      {wrapInline('eyebrow', <div>{eyebrow}</div>)}
+      {wrapInline('eyebrow', <div>{eyebrow || 'Eyebrow'}</div>)}
     </div>
   ))
 
@@ -228,7 +228,7 @@ export function WebsiteFloatingBannerMobile({
           gap: 30,
           marginRight: 20,
         }}>
-          {showEyebrow && eyebrow && eyebrowNode}
+          {showEyebrow && eyebrowNode}
           {showHeadline && headlineNode}
         </div>
 

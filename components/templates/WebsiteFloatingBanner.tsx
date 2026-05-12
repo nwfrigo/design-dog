@@ -174,7 +174,7 @@ export function WebsiteFloatingBanner({
       letterSpacing: 1.76,
       textShadow: textShadowStyle,
     }}>
-      {wrapInline('eyebrow', <div>{eyebrow}</div>)}
+      {wrapInline('eyebrow', <div>{eyebrow || 'Eyebrow'}</div>)}
     </div>
   ))
 
@@ -245,7 +245,7 @@ export function WebsiteFloatingBanner({
           alignItems: 'center',
           gap: 43,
         }}>
-          {showEyebrow && eyebrow && eyebrowNode}
+          {showEyebrow && eyebrowNode}
           {showHeadline && headlineNode}
         </div>
 

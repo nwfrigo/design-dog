@@ -225,8 +225,8 @@ export function EmailImage({
     },
     {
       id: 'cta',
-      visible: showCta && !!ctaText,
-      defaultInner: <span>{ctaText}</span>,
+      visible: showCta,
+      defaultInner: <span>{ctaText || 'Call to Action'}</span>,
       renderChrome: (inner) => (
         <div style={{
           display: 'inline-flex',

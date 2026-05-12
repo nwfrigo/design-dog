@@ -28,19 +28,19 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 
 | Block kind | Canonical placeholder | Notes |
 |---|---|---|
-| `eyebrow` |   | uppercase per design? |
-| `headline` |   |   |
-| `subhead` / `subheading` |   |   |
+| `eyebrow` | `Eyebrow` | mixed case in source; CSS text-transform handles uppercase rendering |
+| `headline` | `Headline` |   |
+| `subhead` / `subheading` | `Subheadline` |   |
 | `body` | `Body copy goes here.` | already used in recent fixes |
-| `metadata` |   |   |
-| `cta` |   |   |
-| `eventDate` |   |   |
-| `eventLocation` |   |   |
-| `eventTime` |   |   |
-| `workshopName` |   |   |
-| `speakerName` |   | applies to speaker1/2/3 Name |
-| `speakerRole` |   | applies to speaker1/2/3 Role |
-| `gridDetail` |   | applies to gridDetail1..4; may need per-row text |
+| `metadata` | `Small Caption` |   |
+| `cta` | `Call to Action` |   |
+| `eventDate` | `Event date` |   |
+| `eventLocation` | `Event location` |   |
+| `eventTime` | `Event time` |   |
+| `workshopName` | `Workshop name` |   |
+| `speakerName` | `Firstname Lastname` | applies to speaker1/2/3 Name |
+| `speakerRole` | `Role, Company` | applies to speaker1/2/3 Role |
+| `gridDetail` | `Grid detail` | applies to gridDetail1..4; per-row overrides in per-template tables |
 
 ---
 
@@ -74,9 +74,9 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 | headline | `showLightHeader && showHeadline` | ❌ | `Headline` |   |   |
 | subheading | `showSubheading && !!subheading` | ❌ |   |   |   |
 | body | `showBody` | ✅ | `This is your body copy. Lorem ipsum dolor sit am` |   | placeholder is mid-sentence — refine |
-| gridDetail1 | always rendered | ✅ |   |   | grid row |
-| gridDetail2 | `showGridDetail2` | ✅ |   |   | grid row |
-| gridDetail3 | always rendered (3-row vs 2-row mode) | ✅ |   |   | grid row |
+| gridDetail1 | always rendered | ✅ |   | `Grid detail 1` | grid row |
+| gridDetail2 | `showGridDetail2` | ✅ |   | `Grid detail 2` | grid row |
+| gridDetail3 | always rendered (3-row vs 2-row mode) | ✅ |   | `Grid detail 3` | grid row |
 
 ### EmailImage
 
@@ -108,8 +108,8 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 
 | Block | Current Visibility | Decoupled? | Current Placeholder | Proposed Placeholder | Notes |
 |---|---|---|---|---|---|
-| eyebrow | always | ✅ | `Product Release` |   | Track 2 |
-| headline | always | ✅ | `GX2 2026.1` |   | Track 2 |
+| eyebrow | always | ✅ | `Product Release` | `Product Release` | Track 2; flavored default kept |
+| headline | always | ✅ | `GX2 2026.1` | `GX2 2026.1` | Track 2; flavored default kept |
 
 ### EmailCorityConnect2026
 
@@ -131,42 +131,42 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 
 | Block | Current Visibility | Decoupled? | Current Placeholder | Proposed Placeholder | Notes |
 |---|---|---|---|---|---|
-| eventDate | `showEventDate` | ✅ | `Thursday, May 7th` |   | Track 2 |
-| eventLocation | `showEventLocation` | ✅ | `Brussels, Belgium` |   | Track 2 |
-| eventTime | `showEventTime` | ✅ | `10:00–16:00` |   | Track 2 |
-| cta | `showCta` | ✅ | `Join Us` |   | Track 2 |
+| eventDate | `showEventDate` | ✅ | `Thursday, May 7th` | `Thursday, May 7th` | Track 2; flavored default kept |
+| eventLocation | `showEventLocation` | ✅ | `Brussels, Belgium` | `Brussels, Belgium` | Track 2; flavored default kept |
+| eventTime | `showEventTime` | ✅ | `10:00–16:00` | `10:00–16:00` | Track 2; flavored default kept |
+| cta | `showCta` | ✅ | `Join Us` | `Join Us` | Track 2; flavored default kept |
 
 ### EmailEhsAccelerateBanner
 
 | Block | Current Visibility | Decoupled? | Current Placeholder | Proposed Placeholder | Notes |
 |---|---|---|---|---|---|
-| headline | always | ✅ | `In-Person. Exclusive.` |   | Track 2 |
-| body | `showBody` | ✅ | `Join senior EHS+ leaders to modernize how you stay ahead of operating risks.` |   | Track 2 |
-| eventDate | always | ✅ | `Thursday, 13th November` |   | Track 2 |
-| eventLocation | always | ✅ | `London, UK` |   | Track 2 |
-| cta | always | ✅ | `Join Us` |   | Track 2 |
+| headline | always | ✅ | `In-Person. Exclusive.` | `In-Person. Exclusive.` | Track 2; flavored default kept |
+| body | `showBody` | ✅ | `Join senior EHS+ leaders to modernize how you stay ahead of operating risks.` | `Join senior EHS+ leaders to modernize how you stay ahead of operating risks.` | Track 2; flavored default kept |
+| eventDate | always | ✅ | `Thursday, 13th November` | `Thursday, 13th November` | Track 2; flavored default kept |
+| eventLocation | always | ✅ | `London, UK` | `London, UK` | Track 2; flavored default kept |
+| cta | always | ✅ | `Join Us` | `Join Us` | Track 2; flavored default kept |
 
 ### EmailEhsAccelerateInvitation (deferred from S&B migration)
 
 | Block | Current Visibility | Decoupled? | Current Placeholder | Proposed Placeholder | Notes |
 |---|---|---|---|---|---|
-| invitationHeader | always | ✅ | `You're Invited` |   | not yet migrated to S&B |
-| invitationHeadline | always | ✅ | `Exclusive EHS+ Leader Workshop` |   | not yet migrated |
-| invitationEventTitle | always | ✅ | `EHS+ Accelerate: Tech Convergence Workshop` |   | not yet migrated |
-| invitationEventDate | always | ✅ | `13 November` |   | not yet migrated |
-| invitationEventLocation | always | ✅ | `London, England` |   | not yet migrated |
-| invitationEventTime | always | ✅ | `10:00–14:30` |   | not yet migrated |
-| invitationEventTimeNote | always | ✅ | `Lunch Included` |   | not yet migrated |
-| invitationBody | always | ✅ | (long DEFAULT_BODY constant) |   | rich HTML |
+| invitationHeader | always | ✅ | `You're Invited` | `You're Invited` | not yet migrated to S&B; flavored default kept |
+| invitationHeadline | always | ✅ | `Exclusive EHS+ Leader Workshop` | `Exclusive EHS+ Leader Workshop` | not yet migrated; flavored default kept |
+| invitationEventTitle | always | ✅ | `EHS+ Accelerate: Tech Convergence Workshop` | `EHS+ Accelerate: Tech Convergence Workshop` | not yet migrated; flavored default kept |
+| invitationEventDate | always | ✅ | `13 November` | `13 November` | not yet migrated; flavored default kept |
+| invitationEventLocation | always | ✅ | `London, England` | `London, England` | not yet migrated; flavored default kept |
+| invitationEventTime | always | ✅ | `10:00–14:30` | `10:00–14:30` | not yet migrated; flavored default kept |
+| invitationEventTimeNote | always | ✅ | `Lunch Included` | `Lunch Included` | not yet migrated; flavored default kept |
+| invitationBody | always | ✅ | (long DEFAULT_BODY constant) | (long DEFAULT_BODY constant) | rich HTML; flavored default kept |
 
 ### EmailEhsAccelerateSignature
 
 | Block | Current Visibility | Decoupled? | Current Placeholder | Proposed Placeholder | Notes |
 |---|---|---|---|---|---|
-| eventDate | `showEventDetails` | ✅ | `Thursday,  13th November` |   | Track 2 |
-| eventLocation | `showEventDetails` | ✅ | `London, UK` |   | Track 2 |
-| workshopName | `showWorkshopName` | ✅ | `Exclusive EHS+ Leader Workshop` |   | Track 2 |
-| cta | `showCta` | ✅ | `Join Us` |   | Track 2 |
+| eventDate | `showEventDetails` | ✅ | `Thursday,  13th November` | `Thursday,  13th November` | Track 2; flavored default kept |
+| eventLocation | `showEventDetails` | ✅ | `London, UK` | `London, UK` | Track 2; flavored default kept |
+| workshopName | `showWorkshopName` | ✅ | `Exclusive EHS+ Leader Workshop` | `Exclusive EHS+ Leader Workshop` | Track 2; flavored default kept |
+| cta | `showCta` | ✅ | `Join Us` | `Join Us` | Track 2; flavored default kept |
 
 ---
 
@@ -203,7 +203,7 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 
 | Block | Current Visibility | Decoupled? | Current Placeholder | Proposed Placeholder | Notes |
 |---|---|---|---|---|---|
-| eyebrow | always | ✅ | `Month \| Year` |   | not yet migrated |
+| eyebrow | always | ✅ | `Month \| Year` | `Month \| Year` | not yet migrated; format-hint kept |
 | headline | `showHeadline` | ✅ |   |   | no fallback in code; bare value |
 | subhead | `showSubhead && subhead` | ❌ |   |   | not yet migrated |
 
@@ -258,10 +258,10 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 | eyebrow | `showEyebrow && !!eyebrow` | ❌ |   |   |   |
 | headline | `showHeadline` | ✅ | `Headline` |   |   |
 | subhead | `showSubhead && !!subhead` | ❌ |   |   |   |
-| gridDetail1 | always | ✅ |   |   | grid row |
-| gridDetail2 | always | ✅ |   |   | grid row |
-| gridDetail3 | `showRow3` | ✅ |   |   | grid row |
-| gridDetail4 | `showRow4` | ✅ |   |   | grid row |
+| gridDetail1 | always | ✅ |   | `Grid detail 1` | grid row |
+| gridDetail2 | always | ✅ |   | `Grid detail 2` | grid row |
+| gridDetail3 | `showRow3` | ✅ |   | `Grid detail 3` | grid row |
+| gridDetail4 | `showRow4` | ✅ |   | `Grid detail 4` | grid row |
 
 ### SocialEhsAccelerate
 
@@ -311,10 +311,10 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 | eyebrow | `showEyebrow && !!eyebrow` | ❌ |   |   |   |
 | headline | `showHeadline` | ✅ | `Headline` |   |   |
 | subhead | `showSubhead && !!subhead` | ❌ |   |   |   |
-| gridDetail1 | always | ✅ |   |   | grid row |
-| gridDetail2 | `showRow3` | ✅ |   |   | grid row |
-| gridDetail3 | `showRow4` | ✅ |   |   | grid row |
-| gridDetail4 | always | ✅ |   |   | grid row (CTA row) |
+| gridDetail1 | always | ✅ |   | `Grid detail 1` | grid row |
+| gridDetail2 | `showRow3` | ✅ |   | `Grid detail 2` | grid row |
+| gridDetail3 | `showRow4` | ✅ |   | `Grid detail 3` | grid row |
+| gridDetail4 | always | ✅ |   | `Grid detail 4` | grid row (CTA row) |
 
 ### WebsiteEhsAccelerateListing
 
@@ -323,10 +323,10 @@ Fill these in. Per-template sections below default to the canonical placeholder 
 | eyebrow | `showEyebrow && !!eyebrow` | ❌ |   |   |   |
 | headline | `showHeadline` | ✅ | `Headline` |   |   |
 | subhead | `showSubhead && !!subhead` | ❌ |   |   |   |
-| gridDetail1 | always | ✅ |   |   | grid row |
-| gridDetail2 | `showRow3` | ✅ |   |   | grid row |
-| gridDetail3 | `showRow4` | ✅ |   |   | grid row |
-| gridDetail4 | always | ✅ |   |   | grid row (CTA row) |
+| gridDetail1 | always | ✅ |   | `Grid detail 1` | grid row |
+| gridDetail2 | `showRow3` | ✅ |   | `Grid detail 2` | grid row |
+| gridDetail3 | `showRow4` | ✅ |   | `Grid detail 3` | grid row |
+| gridDetail4 | always | ✅ |   | `Grid detail 4` | grid row (CTA row) |
 
 ### WebsiteReport
 

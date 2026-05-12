@@ -134,7 +134,7 @@ export function EmailCorityCustomerExchangeBanner({
       fontWeight: 500,
       lineHeight: 1,
     }}>
-      {wrapInline('cta', <span>{ctaText}</span>)}
+      {wrapInline('cta', <span>{ctaText || 'Call to Action'}</span>)}
       <ArrowIcon
         color="#FFFFFF"
         width={16.5}
@@ -205,7 +205,7 @@ export function EmailCorityCustomerExchangeBanner({
           </div>
         )}
 
-        {showCta && ctaText && ctaNode}
+        {showCta && ctaNode}
       </div>
 
       {renderOverlay?.()}

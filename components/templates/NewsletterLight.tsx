@@ -156,8 +156,8 @@ export function NewsletterLight({
   const stackBlocks: ContentStackBlock<NewsletterLightBlockId>[] = [
     {
       id: 'eyebrow',
-      visible: showEyebrow && !!eyebrow,
-      defaultInner: eyebrow,
+      visible: showEyebrow,
+      defaultInner: eyebrow || 'Eyebrow',
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -187,9 +187,9 @@ export function NewsletterLight({
     },
     {
       id: 'subhead',
-      visible: showSubhead && !!subhead,
+      visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+        <div dangerouslySetInnerHTML={{ __html: subhead || 'Subheadline' }} />
       ),
       renderChrome: (inner) => (
         <div className="nl-rich-text" style={{
@@ -230,7 +230,7 @@ export function NewsletterLight({
           />
 
           {/* CTA — sibling, anchored bottom by space-between */}
-          {showCta && ctaText && wrapBlock('cta', (
+          {showCta && wrapBlock('cta', (
             <div style={{
               display: 'inline-flex',
               justifyContent: 'flex-start',
@@ -244,7 +244,7 @@ export function NewsletterLight({
                 fontWeight: 500,
                 lineHeight: '12px',
               }}>
-                {ctaText}
+                {ctaText || 'Call to Action'}
               </span>
               <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
             </div>

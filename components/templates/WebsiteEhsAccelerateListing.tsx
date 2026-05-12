@@ -105,8 +105,8 @@ export function WebsiteEhsAccelerateListing({
   const blocks: ContentStackBlock<WebsiteEhsAccelerateListingStackId>[] = [
     {
       id: 'eyebrow',
-      visible: showEyebrow && !!eyebrow,
-      defaultInner: eyebrow,
+      visible: showEyebrow,
+      defaultInner: eyebrow || 'Eyebrow',
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -134,8 +134,8 @@ export function WebsiteEhsAccelerateListing({
     },
     {
       id: 'subhead',
-      visible: showSubhead && !!subhead,
-      defaultInner: subhead,
+      visible: showSubhead,
+      defaultInner: subhead || 'Subheadline',
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -197,10 +197,10 @@ export function WebsiteEhsAccelerateListing({
   }
 
   const gridRows: Array<{ id: 'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4'; text: string; isCta: boolean }> = [
-    { id: 'gridDetail1', text: gridDetail1Text, isCta: false },
-    ...(showRow3 ? [{ id: 'gridDetail2' as const, text: gridDetail2Text, isCta: false }] : []),
-    ...(showRow4 ? [{ id: 'gridDetail3' as const, text: gridDetail3Text, isCta: false }] : []),
-    { id: 'gridDetail4', text: gridDetail4Text, isCta: true },
+    { id: 'gridDetail1', text: gridDetail1Text || 'Grid detail 1', isCta: false },
+    ...(showRow3 ? [{ id: 'gridDetail2' as const, text: gridDetail2Text || 'Grid detail 2', isCta: false }] : []),
+    ...(showRow4 ? [{ id: 'gridDetail3' as const, text: gridDetail3Text || 'Grid detail 3', isCta: false }] : []),
+    { id: 'gridDetail4', text: gridDetail4Text || 'Grid detail 4', isCta: true },
   ]
 
   return (

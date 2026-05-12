@@ -294,8 +294,8 @@ export function EmailSpeakers({
           blocks={[
             {
               id: 'eyebrow',
-              visible: showEyebrow && !!eyebrow,
-              defaultInner: eyebrow,
+              visible: showEyebrow,
+              defaultInner: eyebrow || 'Eyebrow',
               renderChrome: (inner) => (
                 <div style={{
                   color: textColor,
@@ -351,8 +351,8 @@ export function EmailSpeakers({
             },
             {
               id: 'cta',
-              visible: showCta && !!ctaText,
-              defaultInner: ctaText,
+              visible: showCta,
+              defaultInner: ctaText || 'Call to Action',
               renderChrome: (inner) => (
                 <div style={{
                   display: 'inline-flex',

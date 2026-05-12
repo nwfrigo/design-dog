@@ -143,8 +143,8 @@ export function EmailGrid({
   const blocks: ContentStackBlock<EmailGridStackId>[] = [
     {
       id: 'eyebrow',
-      visible: showEyebrow && !!eyebrow,
-      defaultInner: eyebrow,
+      visible: showEyebrow,
+      defaultInner: eyebrow || 'Eyebrow',
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,
@@ -170,8 +170,8 @@ export function EmailGrid({
     },
     {
       id: 'subheading',
-      visible: showSubheading && !!subheading,
-      defaultInner: subheading,
+      visible: showSubheading,
+      defaultInner: subheading || 'Subheadline',
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,
@@ -184,7 +184,7 @@ export function EmailGrid({
     {
       id: 'body',
       visible: !!showBody,
-      defaultInner: body || 'This is your body copy. Lorem ipsum dolor sit am',
+      defaultInner: body || 'Body copy goes here.',
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,
@@ -194,6 +194,12 @@ export function EmailGrid({
       ),
     },
   ]
+
+  const GRID_DETAIL_PLACEHOLDERS: Record<'gridDetail1' | 'gridDetail2' | 'gridDetail3', string> = {
+    gridDetail1: 'Grid detail 1',
+    gridDetail2: 'Grid detail 2',
+    gridDetail3: 'Grid detail 3',
+  }
 
   const renderGridRow = (
     blockId: 'gridDetail1' | 'gridDetail2' | 'gridDetail3',
@@ -211,6 +217,8 @@ export function EmailGrid({
       gap: 10,
     }
 
+    const text = detail.text || GRID_DETAIL_PLACEHOLDERS[blockId]
+
     const inner: ReactNode =
       detail.type === 'cta' ? (
         <div style={{
@@ -224,7 +232,7 @@ export function EmailGrid({
             fontWeight: 300,
             lineHeight: '18px',
           }}>
-            {detail.text}
+            {text}
           </span>
           <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={13} viewBox="0 0 17 13" pathD="M10 1L16 6.5M16 6.5L10 12M16 6.5H0" strokeLinecap="butt" strokeLinejoin="miter" />
         </div>
@@ -234,7 +242,7 @@ export function EmailGrid({
           fontSize: 18,
           fontWeight: 300,
         }}>
-          {detail.text}
+          {text}
         </span>
       )
 

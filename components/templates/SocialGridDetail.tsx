@@ -140,8 +140,8 @@ export function SocialGridDetail({
   const blocks: ContentStackBlock<SocialGridDetailStackId>[] = [
     {
       id: 'eyebrow',
-      visible: showEyebrow && !!eyebrow,
-      defaultInner: eyebrow,
+      visible: showEyebrow,
+      defaultInner: eyebrow || 'Eyebrow',
       renderChrome: (inner) => (
         <div style={{
           color: textColor,
@@ -168,8 +168,8 @@ export function SocialGridDetail({
     },
     {
       id: 'subhead',
-      visible: showSubhead && !!subhead,
-      defaultInner: subhead,
+      visible: showSubhead,
+      defaultInner: subhead || 'Subheadline',
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -181,6 +181,13 @@ export function SocialGridDetail({
       ),
     },
   ]
+
+  const GRID_DETAIL_PLACEHOLDERS: Record<'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4', string> = {
+    gridDetail1: 'Grid detail 1',
+    gridDetail2: 'Grid detail 2',
+    gridDetail3: 'Grid detail 3',
+    gridDetail4: 'Grid detail 4',
+  }
 
   const renderGridRow = (
     blockId: 'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4',
@@ -197,6 +204,8 @@ export function SocialGridDetail({
       gap: 10,
     }
 
+    const text = detail.text || GRID_DETAIL_PLACEHOLDERS[blockId]
+
     const inner: ReactNode =
       detail.type === 'cta' ? (
         <div style={{
@@ -211,7 +220,7 @@ export function SocialGridDetail({
             lineHeight: '24px',
             textAlign: 'center',
           }}>
-            {detail.text || 'Join the event'}
+            {text}
           </span>
           <ArrowIcon color={themeColors.buttonSecondaryText} width={22} height={18} viewBox="0 0 22 18" pathD="M13 1L21 9M21 9L13 17M21 9H1" />
         </div>
@@ -221,7 +230,7 @@ export function SocialGridDetail({
           fontSize: 24,
           fontWeight: 300,
         }}>
-          {detail.text}
+          {text}
         </span>
       )
 

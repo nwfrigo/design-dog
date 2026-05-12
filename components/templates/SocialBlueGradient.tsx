@@ -175,8 +175,8 @@ export function SocialBlueGradient({
   const blocks: ContentStackBlock<SocialBlueGradientBlockId>[] = [
     {
       id: 'eyebrow',
-      visible: showEyebrow && !!eyebrow,
-      defaultInner: eyebrow,
+      visible: showEyebrow,
+      defaultInner: eyebrow || 'Eyebrow',
       renderChrome: (inner) => (
         <div
           style={{
@@ -215,9 +215,9 @@ export function SocialBlueGradient({
     },
     {
       id: 'subhead',
-      visible: showSubhead && hasSubhead,
+      visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+        <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead : 'Subheadline' }} />
       ),
       renderChrome: (inner) => (
         <div
@@ -257,8 +257,8 @@ export function SocialBlueGradient({
     },
     {
       id: 'metadata',
-      visible: showMetadata && !!metadata,
-      defaultInner: metadata,
+      visible: showMetadata,
+      defaultInner: metadata || 'Small Caption',
       renderChrome: (inner) => (
         <div
           style={{
@@ -276,8 +276,8 @@ export function SocialBlueGradient({
     },
     {
       id: 'cta',
-      visible: showCta && !!ctaText,
-      defaultInner: ctaText,
+      visible: showCta,
+      defaultInner: ctaText || 'Call to Action',
       renderChrome: (inner) =>
         ctaStyle === 'link' ? (
           <div
