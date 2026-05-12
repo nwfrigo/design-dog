@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 
@@ -15,6 +15,12 @@ export type FloatingBannerMobileVariant =
 
 export type FloatingBannerMobileArrowType = 'text' | 'arrow'
 
+/** Track 2 (fixed-composition) editable block ids. */
+export type WebsiteFloatingBannerMobileBlockId =
+  | 'eyebrow'
+  | 'headline'
+  | 'cta'
+
 export interface WebsiteFloatingBannerMobileProps {
   eyebrow: string
   headline: string
@@ -24,12 +30,14 @@ export interface WebsiteFloatingBannerMobileProps {
   variant: FloatingBannerMobileVariant
   arrowType: FloatingBannerMobileArrowType
   headlineFontSize?: number
+  renderBlock?: (blockId: WebsiteFloatingBannerMobileBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: WebsiteFloatingBannerMobileBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
 
-// Background images for gradient variants
 const BACKGROUND_IMAGES: Partial<Record<FloatingBannerMobileVariant, string>> = {
   'blue-gradient-1': '/assets/backgrounds/Template_Website_Floater_Mobile_Blue_Gradient_1.png',
   'blue-gradient-2': '/assets/backgrounds/Template_Website_Floater_Mobile_Blue_Gradient_2.png',
@@ -37,8 +45,7 @@ const BACKGROUND_IMAGES: Partial<Record<FloatingBannerMobileVariant, string>> = 
   'dark-gradient-2': '/assets/backgrounds/Template_Website_Floater_Mobile_Dark_Gradient_2.png',
 }
 
-// Variant styling configurations
-const VARIANT_STYLES: Record<FloatingBannerMobileVariant, {
+export const FLOATING_BANNER_MOBILE_VARIANT_STYLES: Record<FloatingBannerMobileVariant, {
   background: string
   textColor: string
   ctaTextColor: string
@@ -96,6 +103,18 @@ const VARIANT_STYLES: Record<FloatingBannerMobileVariant, {
   },
 }
 
+/** Background-thumb URL for a variant — solid-color variants return a
+ *  CSS color string; gradient variants return the gradient image URL.
+ *  Adapter consumes this to render swatches in the stage bar. */
+export function floatingBannerMobileVariantSwatch(variant: FloatingBannerMobileVariant): {
+  backgroundColor?: string
+  backgroundImage?: string
+} {
+  const img = BACKGROUND_IMAGES[variant]
+  if (img) return { backgroundImage: `url(${img})` }
+  return { backgroundColor: FLOATING_BANNER_MOBILE_VARIANT_STYLES[variant].background }
+}
+
 export function WebsiteFloatingBannerMobile({
   eyebrow,
   headline,
@@ -105,12 +124,16 @@ export function WebsiteFloatingBannerMobile({
   variant,
   arrowType,
   headlineFontSize,
-  colors,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: WebsiteFloatingBannerMobileProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const styles = VARIANT_STYLES[variant]
+  const styles = FLOATING_BANNER_MOBILE_VARIANT_STYLES[variant]
   const backgroundImage = BACKGROUND_IMAGES[variant]
 
   const containerStyle: CSSProperties = {
@@ -124,9 +147,57 @@ export function WebsiteFloatingBannerMobile({
     background: styles.background,
   }
 
+  const eyebrowNode: ReactNode = wrapBlock('eyebrow', wrapInline('eyebrow', (
+    <div style={{
+      color: styles.textColor,
+      fontSize: 14,
+      fontWeight: 500,
+      textTransform: 'uppercase',
+      letterSpacing: 1.32,
+      whiteSpace: 'nowrap',
+    }}>
+      {eyebrow}
+    </div>
+  )))
+
+  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+    <div style={{
+      flex: 1,
+      color: styles.textColor,
+      fontSize: headlineFontSize ?? 14,
+      fontWeight: 350,
+      lineHeight: `${(headlineFontSize ?? 14) * (15.40 / 14)}px`,
+    }}>
+      {headline || 'Headline'}
+    </div>
+  )))
+
+  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      gap: 10.67,
+      flexShrink: 0,
+    }}>
+      {arrowType === 'text' && (
+        <div style={{
+          textAlign: 'center',
+          color: styles.ctaTextColor,
+          fontSize: 16,
+          fontWeight: 500,
+          lineHeight: '16px',
+          whiteSpace: 'nowrap',
+        }}>
+          {cta || 'Learn More'}
+        </div>
+      )}
+      <ArrowIcon color={styles.ctaArrowColor} width={14.67} height={14.67 * 0.795} />
+    </div>
+  )))
+
   return (
     <div style={containerStyle}>
-      {/* Background image for gradient variants */}
       {styles.isGradient && backgroundImage && (
         <img
           src={backgroundImage}
@@ -142,7 +213,6 @@ export function WebsiteFloatingBannerMobile({
         />
       )}
 
-      {/* Content */}
       <div style={{
         position: 'relative',
         width: '100%',
@@ -155,7 +225,6 @@ export function WebsiteFloatingBannerMobile({
         justifyContent: 'space-between',
         alignItems: 'center',
       }}>
-        {/* Left content: Eyebrow + Headline */}
         <div style={{
           flex: 1,
           display: 'flex',
@@ -164,57 +233,14 @@ export function WebsiteFloatingBannerMobile({
           gap: 30,
           marginRight: 20,
         }}>
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div style={{
-              color: styles.textColor,
-              fontSize: 14,
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: 1.32,
-              whiteSpace: 'nowrap',
-            }}>
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline */}
-          {showHeadline && (
-            <div style={{
-              flex: 1,
-              color: styles.textColor,
-              fontSize: headlineFontSize ?? 14,
-              fontWeight: 350,
-              lineHeight: `${(headlineFontSize ?? 14) * (15.40 / 14)}px`,
-            }}>
-              {headline || 'Headline'}
-            </div>
-          )}
+          {showEyebrow && eyebrow && eyebrowNode}
+          {showHeadline && headlineNode}
         </div>
 
-        {/* CTA */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          gap: 10.67,
-          flexShrink: 0,
-        }}>
-          {arrowType === 'text' && (
-            <div style={{
-              textAlign: 'center',
-              color: styles.ctaTextColor,
-              fontSize: 16,
-              fontWeight: 500,
-              lineHeight: '16px',
-              whiteSpace: 'nowrap',
-            }}>
-              {cta || 'Learn More'}
-            </div>
-          )}
-          <ArrowIcon color={styles.ctaArrowColor} width={14.67} height={14.67 * 0.795} />
-        </div>
+        {ctaNode}
       </div>
+
+      {renderOverlay?.()}
     </div>
   )
 }

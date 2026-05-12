@@ -14,6 +14,7 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'email-image',
   'email-speakers',
   'email-cority-connect-2026',
+  'website-floating-banner-mobile',
   'website-press-release',
   'social-dark-gradient',
   'social-blue-gradient',
