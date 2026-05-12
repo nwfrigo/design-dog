@@ -317,6 +317,26 @@ These are settled. Reopening requires a fresh round of justification.
 | 13 | Multi-select | **Out of scope for v1.** Foundation assumes single selection. |
 | 14 | Image lightbox modal | **In progress.** Current adapters route `slot.onEdit` → `ImageCropModal`. New lightbox is being designed; will swap in at marked `// SWAP-IN POINT` sites. `SlotImage.onEdit` contract stays. |
 
+### 8.1 Adapter factory
+
+New adapters use `defineStageBenchAdapter` (`components/canvas-editor/factory/defineStageBenchAdapter.tsx`). The factory absorbs registry wiring, droppables, FLIP, drag preview-key, render dispatchers, image-editor modal, and stage-bar selectors. Per-template work is a declarative descriptor (slots, stage-bar items, optional image / category / contentStack configs) plus two small functions: `useStoreBindings()` for store reads and `renderTemplate(ctx)` for the template's JSX. See the playbook in `STAGE-BENCH-MIGRATION.md` and the 3 pilot adapters (`SocialEhsAccelerateStageBench`, `SocialImageStageBench`, `EmailCorityConnect2026StageBench`) for the canonical shape.
+
+### 8.2 Visibility-flag naming
+
+**Use generic flags when the store field is template-agnostic.** If a slot's visibility is controlled by a flag that any template could reuse (`showEyebrow`, `showHeadline`, `showSubhead`, `showBody`, `showCta`, `showSolutionSet`), use the generic name. These flags are global in the store and shared across templates.
+
+**Prefix template-specific flags with a short template key.** If a slot's store field is shared across N templates but visibility decisions are per-template, prefix the flag with the template's short name: `showCceEventDate` (Cority Connect 2026 event date), `showSignatureWorkshopName` (signature workshop name), etc. The prefix prevents cross-template visibility coupling.
+
+Don't rename existing flags that already follow this rule. Audit only when you add a new flag, and pick the right form based on whether the underlying field is shared.
+
+### 8.3 Slot bench-toggle-ability
+
+**Rule:** if a slot appears in the bench (the chip list), it has a `show<Field>` visibility flag. If a slot is always-on (logo, brand-locked anchor, mandatory headline, baked-in decorative chrome), it has no flag and no bench chip — declare `benchable: false` in the slot descriptor.
+
+This is the rule the migration mostly followed. Don't add `show*` flags to slots whose design contract is "always on" — that's design drift dressed up as user control.
+
+Decorative chrome (dividers, borders, baked-in shapes) stays visible always. It is not editable and not bench-able. Wrap it in `<Editable>` only if you need a selection ring for navigation feedback — never as a toggleable slot.
+
 ---
 
 ## 9. Active risks & open items
