@@ -5,6 +5,7 @@
 > **Companion docs.**
 > - `STAGE-AND-BENCH.md` — substrate architecture (the *what*).
 > - `STAGE-BENCH-MIGRATION.md` — per-template playbook (the *how*).
+> - `SUBSTRATE-DEBT.md` — ledger of deferred substrate work, with trigger conditions for when each item becomes due.
 > - This doc — the project-level plan (the *why* and *in what order*).
 
 ---
