@@ -11,6 +11,8 @@ import { WebsitePressReleaseStageBench } from './template-adapters/WebsitePressR
 import { SocialDarkGradientStageBench } from './template-adapters/SocialDarkGradientStageBench'
 import { SocialBlueGradientStageBench } from './template-adapters/SocialBlueGradientStageBench'
 import { NewsletterDarkGradientStageBench } from './template-adapters/NewsletterDarkGradientStageBench'
+import { NewsletterBlueGradientStageBench } from './template-adapters/NewsletterBlueGradientStageBench'
+import { NewsletterLightStageBench } from './template-adapters/NewsletterLightStageBench'
 
 /**
  * StageBenchEditor — thin dispatcher for the Stage & Bench editor screen.
@@ -55,6 +57,8 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,
   'newsletter-dark-gradient': NewsletterDarkGradientStageBench,
+  'newsletter-blue-gradient': NewsletterBlueGradientStageBench,
+  'newsletter-light': NewsletterLightStageBench,
 }
 
 export function StageBenchEditor(props: StageBenchEditorProps) {

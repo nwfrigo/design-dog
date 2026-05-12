@@ -1,12 +1,23 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type ImageSize = 'none' | 'small' | 'large'
+
+export type NewsletterLightBlockId =
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'cta'
 
 export interface NewsletterLightProps {
   eyebrow: string
@@ -24,11 +35,24 @@ export interface NewsletterLightProps {
   grayscale?: boolean
   headlineFontSize?: number
   subheadFontSize?: number
+  stackAlign?: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: NewsletterLightBlockId,
+    nextId: NewsletterLightBlockId,
+  ) => ReactNode
+  renderBlock?: (blockId: NewsletterLightBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: NewsletterLightBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
   theme?: TemplateTheme
 }
+
+const DEFAULT_GAP = 14
 
 // Text content width based on image size
 const TEXT_WIDTHS: Record<ImageSize, number> = {
@@ -60,11 +84,17 @@ export function NewsletterLight({
   grayscale = false,
   headlineFontSize,
   subheadFontSize,
-  colors,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
   theme = 'light',
 }: NewsletterLightProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const themeColors = TEMPLATE_THEMES[theme]
   const textColor = themeColors.textPrimary
@@ -100,6 +130,58 @@ export function NewsletterLight({
   const textWidth = TEXT_WIDTHS[imageSize]
   const imageWidth = IMAGE_WIDTHS[imageSize]
 
+  // Text-block stack — eyebrow / headline / subhead with adjustable gaps.
+  // CTA renders as a sibling below, anchored bottom by space-between.
+  const stackBlocks: ContentStackBlock<NewsletterLightBlockId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: 8,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: 0.88,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
+      ),
+      renderChrome: (inner) => (
+        <div className="nl-rich-text" style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: headlineFontSize ?? 24,
+          fontWeight: 350,
+          lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && !!subhead,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+      ),
+      renderChrome: (inner) => (
+        <div className="nl-rich-text" style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: subheadFontSize ?? 12,
+          fontWeight: 350,
+          lineHeight: '16px',
+        }}>{inner}</div>
+      ),
+    },
+  ]
+
   return (
     <div style={containerStyle}>
       <style>{`.nl-rich-text p { margin: 0; }`}</style>
@@ -115,54 +197,19 @@ export function NewsletterLight({
           justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}>
-          {/* Text Block */}
-          <div style={{
-            alignSelf: 'stretch',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: 14,
-          }}>
-            {/* Eyebrow */}
-            {showEyebrow && eyebrow && (
-              <div style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: 8,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 0.88,
-              }}>
-                {eyebrow}
-              </div>
-            )}
+          <ContentStack<NewsletterLightBlockId>
+            blocks={stackBlocks}
+            gaps={gaps}
+            defaultGap={DEFAULT_GAP}
+            renderSpacerBetween={renderSpacerBetween}
+            renderBlock={renderBlock}
+            renderInlineEditor={renderInlineEditor}
+            stackAlign={stackAlign}
+            alignItems="flex-start"
+          />
 
-            {/* Headline */}
-            {showHeadline && (
-              <div className="nl-rich-text" style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: headlineFontSize ?? 24,
-                fontWeight: 350,
-                lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
-              }} dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
-            )}
-
-            {/* Body */}
-            {showSubhead && subhead && (
-              <div className="nl-rich-text" style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: subheadFontSize ?? 12,
-                fontWeight: 350,
-                lineHeight: '16px',
-              }} dangerouslySetInnerHTML={{ __html: subhead }} />
-            )}
-          </div>
-
-          {/* CTA */}
-          {showCta && ctaText && (
+          {/* CTA — sibling, anchored bottom by space-between */}
+          {showCta && ctaText && wrapBlock('cta', (
             <div style={{
               display: 'inline-flex',
               justifyContent: 'flex-start',
@@ -180,7 +227,7 @@ export function NewsletterLight({
               </span>
               <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
             </div>
-          )}
+          ))}
         </div>
 
         {/* Image Area - only show for small and large variants */}
@@ -250,6 +297,7 @@ export function NewsletterLight({
           </>
         )}
       </div>
+      {renderOverlay?.()}
     </div>
   )
 }

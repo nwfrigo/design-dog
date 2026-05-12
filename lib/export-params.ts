@@ -493,6 +493,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showCta: s.showCta,
     grayscale: s.grayscale,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['newsletter-blue-gradient'] ?? {},
   }),
 
   'newsletter-light': (s) => ({
@@ -507,6 +509,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showCta: s.showCta,
     grayscale: s.grayscale,
     theme: s.theme,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['newsletter-light'] ?? {},
   }),
 
   'newsletter-top-banner': (s) => ({

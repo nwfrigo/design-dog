@@ -74,8 +74,8 @@ Mostly `space-between` outer (logo top, content middle, cta bottom) with an inne
 | SocialImageMeddbase | 1 | Queued |
 | EmailImage | 1 | Queued |
 | NewsletterDarkGradient | 1 | ✅ Done (image content editing deferred — see image-source-key follow-up) |
-| NewsletterBlueGradient | 1 | Queued |
-| NewsletterLight | 1 | Queued |
+| NewsletterBlueGradient | 1 | ✅ Done (image content editing deferred — see image-source-key follow-up) |
+| NewsletterLight | 1 | ✅ Done (image content editing deferred — see image-source-key follow-up) |
 | NewsletterTopBanner | 1 | Queued |
 
 ### Group C — Track 1 two-column press-release-shaped (3 templates)

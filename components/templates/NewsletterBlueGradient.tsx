@@ -1,12 +1,26 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type ImageSize = 'none' | 'small' | 'large'
+
+/** Editable block ids. CTA renders as a sibling of the text stack
+ *  (anchored bottom via outer space-between), preserving the legacy
+ *  layout. Same shape as NewsletterDarkGradient. */
+export type NewsletterBlueGradientBlockId =
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'cta'
 
 export interface NewsletterBlueGradientProps {
   eyebrow: string
@@ -25,10 +39,23 @@ export interface NewsletterBlueGradientProps {
   grayscale?: boolean
   headlineFontSize?: number
   subheadFontSize?: number
+  stackAlign?: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: NewsletterBlueGradientBlockId,
+    nextId: NewsletterBlueGradientBlockId,
+  ) => ReactNode
+  renderBlock?: (blockId: NewsletterBlueGradientBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: NewsletterBlueGradientBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
+
+const DEFAULT_GAP = 14
 
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
   '1': '/assets/backgrounds/newsletter-blue-gradient-1.png',
@@ -68,10 +95,16 @@ export function NewsletterBlueGradient({
   grayscale = false,
   headlineFontSize,
   subheadFontSize,
-  colors,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: NewsletterBlueGradientProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const textColor = '#FFFFFF'
   const ctaColor = '#0080FF' // Cobalt blue for arrow
@@ -104,6 +137,59 @@ export function NewsletterBlueGradient({
   const textWidth = TEXT_WIDTHS[imageSize]
   const imageWidth = IMAGE_WIDTHS[imageSize]
 
+  // Text-block stack — eyebrow / headline / subhead with adjustable gaps.
+  // CTA renders as a sibling below, anchored bottom by space-between
+  // (mirrors NewsletterDarkGradient's renovation shape).
+  const stackBlocks: ContentStackBlock<NewsletterBlueGradientBlockId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: 8,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: 0.88,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
+      ),
+      renderChrome: (inner) => (
+        <div className="nl-rich-text" style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: headlineFontSize ?? 24,
+          fontWeight: 350,
+          lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && !!subhead,
+      defaultInner: (
+        <div dangerouslySetInnerHTML={{ __html: subhead }} />
+      ),
+      renderChrome: (inner) => (
+        <div className="nl-rich-text" style={{
+          alignSelf: 'stretch',
+          color: textColor,
+          fontSize: subheadFontSize ?? 12,
+          fontWeight: 350,
+          lineHeight: '16px',
+        }}>{inner}</div>
+      ),
+    },
+  ]
+
   return (
     <div style={containerStyle}>
       <style>{`.nl-rich-text p { margin: 0; }`}</style>
@@ -133,54 +219,19 @@ export function NewsletterBlueGradient({
           justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}>
-          {/* Text Block */}
-          <div style={{
-            alignSelf: 'stretch',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: 14,
-          }}>
-            {/* Eyebrow */}
-            {showEyebrow && eyebrow && (
-              <div style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: 8,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 0.88,
-              }}>
-                {eyebrow}
-              </div>
-            )}
+          <ContentStack<NewsletterBlueGradientBlockId>
+            blocks={stackBlocks}
+            gaps={gaps}
+            defaultGap={DEFAULT_GAP}
+            renderSpacerBetween={renderSpacerBetween}
+            renderBlock={renderBlock}
+            renderInlineEditor={renderInlineEditor}
+            stackAlign={stackAlign}
+            alignItems="flex-start"
+          />
 
-            {/* Headline */}
-            {showHeadline && (
-              <div className="nl-rich-text" style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: headlineFontSize ?? 24,
-                fontWeight: 350,
-                lineHeight: `${(headlineFontSize ?? 24) * (26 / 24)}px`,
-              }} dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
-            )}
-
-            {/* Body */}
-            {showSubhead && subhead && (
-              <div className="nl-rich-text" style={{
-                alignSelf: 'stretch',
-                color: textColor,
-                fontSize: subheadFontSize ?? 12,
-                fontWeight: 350,
-                lineHeight: '16px',
-              }} dangerouslySetInnerHTML={{ __html: subhead }} />
-            )}
-          </div>
-
-          {/* CTA */}
-          {showCta && ctaText && (
+          {/* CTA — sibling, anchored bottom by space-between */}
+          {showCta && ctaText && wrapBlock('cta', (
             <div style={{
               display: 'inline-flex',
               justifyContent: 'flex-start',
@@ -198,7 +249,7 @@ export function NewsletterBlueGradient({
               </span>
               <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
             </div>
-          )}
+          ))}
         </div>
 
         {/* Image Area - only show for small and large variants */}
@@ -236,6 +287,7 @@ export function NewsletterBlueGradient({
           </div>
         )}
       </div>
+      {renderOverlay?.()}
     </div>
   )
 }
