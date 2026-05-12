@@ -471,13 +471,10 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   }),
 
   'email-product-release': (s) => ({
+    ...buildImageParams(s),
+    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
     eyebrow: s.eyebrow || 'Product Release',
     headline: s.verbatimCopy.headline || 'GX2 2026.1',
-    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-    imagePositionX: s.thumbnailImagePosition.x,
-    imagePositionY: s.thumbnailImagePosition.y,
-    imageZoom: s.thumbnailImageZoom,
-    grayscale: s.grayscale,
   }),
 
   'newsletter-dark-gradient': (s) => ({
