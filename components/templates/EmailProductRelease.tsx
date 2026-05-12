@@ -78,7 +78,7 @@ export function EmailProductRelease({
     transformOrigin: 'top left',
   }
 
-  const eyebrowNode: ReactNode = wrapBlock('eyebrow', wrapInline('eyebrow', (
+  const eyebrowNode: ReactNode = wrapBlock('eyebrow', (
     <span style={{
       color: textColor,
       fontSize: 8,
@@ -86,20 +86,20 @@ export function EmailProductRelease({
       textTransform: 'uppercase',
       letterSpacing: 0.88,
     }}>
-      {eyebrow || 'Product Release'}
+      {wrapInline('eyebrow', <span>{eyebrow || 'Product Release'}</span>)}
     </span>
-  )))
+  ))
 
-  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+  const headlineNode: ReactNode = wrapBlock('headline', (
     <div style={{
       color: textColor,
       fontSize: 36.88,
       fontWeight: 300,
       lineHeight: '46.10px',
     }}>
-      {headline || 'GX2 2026.1'}
+      {wrapInline('headline', <div>{headline || 'GX2 2026.1'}</div>)}
     </div>
-  )))
+  ))
 
   return (
     <div style={containerStyle}>

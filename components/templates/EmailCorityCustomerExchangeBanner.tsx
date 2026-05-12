@@ -92,7 +92,7 @@ export function EmailCorityCustomerExchangeBanner({
     transformOrigin: 'top left',
   }
 
-  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+  const headlineNode: ReactNode = wrapBlock('headline', (
     <div
       className="cce-rich-text"
       style={{
@@ -101,11 +101,14 @@ export function EmailCorityCustomerExchangeBanner({
         fontWeight: 350,
         lineHeight: 1.26,
       }}
-      dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }}
-    />
-  )))
+    >
+      {wrapInline('headline', (
+        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+      ))}
+    </div>
+  ))
 
-  const bodyNode: ReactNode = wrapBlock('body', wrapInline('body', (
+  const bodyNode: ReactNode = wrapBlock('body', (
     <div
       className="cce-rich-text"
       style={{
@@ -114,24 +117,24 @@ export function EmailCorityCustomerExchangeBanner({
         fontWeight: 350,
         lineHeight: 1.4,
       }}
-      dangerouslySetInnerHTML={{ __html: body }}
-    />
-  )))
+    >
+      {wrapInline('body', (
+        <div dangerouslySetInnerHTML={{ __html: body }} />
+      ))}
+    </div>
+  ))
 
-  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+  const ctaNode: ReactNode = wrapBlock('cta', (
     <div style={{
       display: 'flex',
       alignItems: 'center',
       gap: 12,
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontWeight: 500,
+      lineHeight: 1,
     }}>
-      <span style={{
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: 500,
-        lineHeight: 1,
-      }}>
-        {ctaText}
-      </span>
+      {wrapInline('cta', <span>{ctaText}</span>)}
       <ArrowIcon
         color="#FFFFFF"
         width={16.5}
@@ -141,7 +144,7 @@ export function EmailCorityCustomerExchangeBanner({
         strokeWidth={1.12}
       />
     </div>
-  )))
+  ))
 
   return (
     <div style={containerStyle}>

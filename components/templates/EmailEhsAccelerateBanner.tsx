@@ -94,7 +94,7 @@ export function EmailEhsAccelerateBanner({
         </div>
       ))}
 
-      {wrapBlock('headline', wrapInline('headline', (
+      {wrapBlock('headline', (
         <div style={{
           width: 300,
           position: 'absolute',
@@ -106,11 +106,11 @@ export function EmailEhsAccelerateBanner({
           lineHeight: `${hlLineHeight}px`,
           wordWrap: 'break-word',
         }}>
-          {headlineText}
+          {wrapInline('headline', <div>{headlineText}</div>)}
         </div>
-      )))}
+      ))}
 
-      {showBody && wrapBlock('body', wrapInline('body', (
+      {showBody && wrapBlock('body', (
         <div style={{
           width: 204,
           position: 'absolute',
@@ -122,9 +122,9 @@ export function EmailEhsAccelerateBanner({
           lineHeight: '21.76px',
           wordWrap: 'break-word',
         }}>
-          {bodyText}
+          {wrapInline('body', <div>{bodyText}</div>)}
         </div>
-      )))}
+      ))}
 
       <div style={{
         width: 547,
@@ -143,7 +143,7 @@ export function EmailEhsAccelerateBanner({
         paddingRight: 8,
         boxSizing: 'border-box',
       }}>
-        {wrapBlock('eventDate', wrapInline('eventDate', (
+        {wrapBlock('eventDate', (
           <span style={{
             color: 'black',
             fontSize: 14,
@@ -151,11 +151,11 @@ export function EmailEhsAccelerateBanner({
             lineHeight: '14px',
             whiteSpace: 'nowrap',
           }}>
-            {eventDate || 'Thursday, 13th November'}
+            {wrapInline('eventDate', <span>{eventDate || 'Thursday, 13th November'}</span>)}
           </span>
-        )))}
+        ))}
 
-        {wrapBlock('eventLocation', wrapInline('eventLocation', (
+        {wrapBlock('eventLocation', (
           <span style={{
             color: 'black',
             fontSize: 14,
@@ -163,11 +163,11 @@ export function EmailEhsAccelerateBanner({
             lineHeight: '14px',
             whiteSpace: 'nowrap',
           }}>
-            {eventLocation || 'London, UK'}
+            {wrapInline('eventLocation', <span>{eventLocation || 'London, UK'}</span>)}
           </span>
-        )))}
+        ))}
 
-        {wrapBlock('cta', wrapInline('cta', (
+        {wrapBlock('cta', (
           <div style={{
             paddingLeft: 17,
             paddingRight: 17,
@@ -179,19 +179,16 @@ export function EmailEhsAccelerateBanner({
             alignItems: 'center',
             gap: 10,
             flexShrink: 0,
+            color: 'black',
+            fontSize: 14,
+            fontWeight: 350,
+            lineHeight: '14px',
+            whiteSpace: 'nowrap',
           }}>
-            <span style={{
-              color: 'black',
-              fontSize: 14,
-              fontWeight: 350,
-              lineHeight: '14px',
-              whiteSpace: 'nowrap',
-            }}>
-              {ctaLabel}
-            </span>
+            {wrapInline('cta', <span>{ctaLabel}</span>)}
             <ArrowIcon color="black" width={14} height={8.75} strokeWidth={1.2} />
           </div>
-        )))}
+        ))}
       </div>
 
       {renderOverlay?.()}

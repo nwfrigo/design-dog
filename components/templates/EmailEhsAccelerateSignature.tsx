@@ -70,19 +70,19 @@ export function EmailEhsAccelerateSignature({
     wordWrap: 'break-word',
   }
 
-  const eventDateNode: ReactNode = wrapBlock('eventDate', wrapInline('eventDate', (
+  const eventDateNode: ReactNode = wrapBlock('eventDate', (
     <div style={eventDetailsLineStyle}>
-      {eventDate || 'Thursday,  13th November'}
+      {wrapInline('eventDate', <div>{eventDate || 'Thursday,  13th November'}</div>)}
     </div>
-  )))
+  ))
 
-  const eventLocationNode: ReactNode = wrapBlock('eventLocation', wrapInline('eventLocation', (
+  const eventLocationNode: ReactNode = wrapBlock('eventLocation', (
     <div style={eventDetailsLineStyle}>
-      {eventLocation || 'London, UK'}
+      {wrapInline('eventLocation', <div>{eventLocation || 'London, UK'}</div>)}
     </div>
-  )))
+  ))
 
-  const workshopNode: ReactNode = wrapBlock('workshopName', wrapInline('workshopName', (
+  const workshopNode: ReactNode = wrapBlock('workshopName', (
     <div style={{
       width: 237,
       color: '#060015',
@@ -91,28 +91,25 @@ export function EmailEhsAccelerateSignature({
       lineHeight: '15.60px',
       wordWrap: 'break-word',
     }}>
-      {workshopName || 'Exclusive EHS+ Leader Workshop'}
+      {wrapInline('workshopName', <div>{workshopName || 'Exclusive EHS+ Leader Workshop'}</div>)}
     </div>
-  )))
+  ))
 
-  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+  const ctaNode: ReactNode = wrapBlock('cta', (
     <div style={{
       display: 'flex',
       justifyContent: 'flex-end',
       alignItems: 'center',
       gap: 4,
+      color: '#060015',
+      fontSize: 11,
+      fontWeight: 350,
+      lineHeight: '11px',
     }}>
-      <span style={{
-        color: '#060015',
-        fontSize: 11,
-        fontWeight: 350,
-        lineHeight: '11px',
-      }}>
-        {ctaText || 'Join Us'}
-      </span>
+      {wrapInline('cta', <span>{ctaText || 'Join Us'}</span>)}
       <ArrowIcon color="#060015" width={10} height={6} strokeWidth={1.2} />
     </div>
-  )))
+  ))
 
   return (
     <div style={containerStyle}>

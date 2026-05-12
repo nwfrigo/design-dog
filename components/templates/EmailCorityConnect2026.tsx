@@ -96,7 +96,9 @@ export function EmailCorityConnect2026({
     transformOrigin: 'top left',
   }
 
-  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+  // Styling wrappers sit OUTSIDE wrapInline so the InlineTextEdit replacement
+  // inherits typography from a div that survives edit mode (WYSIWYG).
+  const headlineNode: ReactNode = wrapBlock('headline', (
     <div
       className="cc-rich-text"
       style={{
@@ -106,11 +108,14 @@ export function EmailCorityConnect2026({
         fontWeight: 350,
         lineHeight: `${fontSize * LINE_HEIGHT_RATIO}px`,
       }}
-      dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Lightweight header.' }}
-    />
-  )))
+    >
+      {wrapInline('headline', (
+        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Lightweight header.' }} />
+      ))}
+    </div>
+  ))
 
-  const bodyNode: ReactNode = wrapBlock('body', wrapInline('body', (
+  const bodyNode: ReactNode = wrapBlock('body', (
     <div
       className="cc-rich-text"
       style={{
@@ -119,27 +124,29 @@ export function EmailCorityConnect2026({
         fontSize: 18.07,
         fontWeight: 350,
       }}
-      dangerouslySetInnerHTML={{ __html: body }}
-    />
-  )))
+    >
+      {wrapInline('body', (
+        <div dangerouslySetInnerHTML={{ __html: body }} />
+      ))}
+    </div>
+  ))
 
-  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+  const ctaNode: ReactNode = wrapBlock('cta', (
     <div style={{
       display: 'inline-flex',
       alignItems: 'center',
       gap: 12,
+      color: textColor,
+      fontSize: 18,
+      fontWeight: 500,
+      lineHeight: '18px',
     }}>
-      <span style={{
-        color: textColor,
-        fontSize: 18,
-        fontWeight: 500,
-        lineHeight: '18px',
-      }}>
-        {ctaText}
-      </span>
+      {wrapInline('cta', (
+        <span>{ctaText}</span>
+      ))}
       <ArrowIcon color="#0080FF" width={16.5} height={13.13} />
     </div>
-  )))
+  ))
 
   return (
     <div style={containerStyle}>

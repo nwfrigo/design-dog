@@ -149,24 +149,21 @@ export function SocialEhsAccelerate({
     {
       id: 'cta',
       visible: showCta && !!ctaText,
-      defaultInner: (
+      defaultInner: <span>{ctaText}</span>,
+      renderChrome: (inner) => (
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: 16,
+          color: textColor,
+          fontSize: 24,
+          fontWeight: 500,
+          lineHeight: 1,
         }}>
-          <span style={{
-            color: textColor,
-            fontSize: 24,
-            fontWeight: 500,
-            lineHeight: 1,
-          }}>
-            {ctaText}
-          </span>
+          {inner}
           <ArrowIcon color={textColor} width={22} height={22 * 0.8} strokeWidth={1.5} />
         </div>
       ),
-      renderChrome: (inner) => inner,
     },
   ]
 

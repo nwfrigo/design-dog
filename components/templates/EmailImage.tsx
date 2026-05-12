@@ -226,26 +226,23 @@ export function EmailImage({
     {
       id: 'cta',
       visible: showCta && !!ctaText,
-      defaultInner: (
+      defaultInner: <span>{ctaText}</span>,
+      renderChrome: (inner) => (
         <div style={{
           display: 'inline-flex',
           justifyContent: 'flex-start',
           alignItems: 'center',
           gap: 12,
+          textAlign: 'center',
+          color: themeColors.buttonSecondaryText,
+          fontSize: 18,
+          fontWeight: 500,
+          lineHeight: '18px',
         }}>
-          <span style={{
-            textAlign: 'center',
-            color: themeColors.buttonSecondaryText,
-            fontSize: 18,
-            fontWeight: 500,
-            lineHeight: '18px',
-          }}>
-            {ctaText}
-          </span>
+          {inner}
           <ArrowIcon color={themeColors.buttonSecondaryText} width={16.5} height={16.5 * 0.8} />
         </div>
       ),
-      renderChrome: (inner) => inner,
     },
   ]
 

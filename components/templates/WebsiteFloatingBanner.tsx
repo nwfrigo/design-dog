@@ -165,7 +165,7 @@ export function WebsiteFloatingBanner({
     ? '0px 0px 7px rgba(0, 0, 0, 0.25)'
     : undefined
 
-  const eyebrowNode: ReactNode = wrapBlock('eyebrow', wrapInline('eyebrow', (
+  const eyebrowNode: ReactNode = wrapBlock('eyebrow', (
     <div style={{
       color: styles.textColor,
       fontSize: 16,
@@ -174,11 +174,11 @@ export function WebsiteFloatingBanner({
       letterSpacing: 1.76,
       textShadow: textShadowStyle,
     }}>
-      {eyebrow}
+      {wrapInline('eyebrow', <div>{eyebrow}</div>)}
     </div>
-  )))
+  ))
 
-  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+  const headlineNode: ReactNode = wrapBlock('headline', (
     <div style={{
       textAlign: 'center',
       color: styles.textColor,
@@ -187,29 +187,26 @@ export function WebsiteFloatingBanner({
       lineHeight: `${headlineFontSize ?? 32.73}px`,
       textShadow: textShadowStyle,
     }}>
-      {headline || 'Headline'}
+      {wrapInline('headline', <div>{headline || 'Headline'}</div>)}
     </div>
-  )))
+  ))
 
-  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+  const ctaNode: ReactNode = wrapBlock('cta', (
     <div style={{
       display: 'flex',
       justifyContent: 'flex-start',
       alignItems: 'center',
       gap: 16,
+      textAlign: 'center',
+      color: styles.ctaTextColor,
+      fontSize: 24,
+      fontWeight: 500,
+      lineHeight: '24px',
     }}>
-      <div style={{
-        textAlign: 'center',
-        color: styles.ctaTextColor,
-        fontSize: 24,
-        fontWeight: 500,
-        lineHeight: '24px',
-      }}>
-        {cta || 'Learn More'}
-      </div>
+      {wrapInline('cta', <div>{cta || 'Learn More'}</div>)}
       <ArrowIcon color={styles.ctaArrowColor} width={22} height={22 * 0.795} />
     </div>
-  )))
+  ))
 
   return (
     <div style={containerStyle}>

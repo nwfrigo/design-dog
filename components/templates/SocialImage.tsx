@@ -236,24 +236,21 @@ export function SocialImage({
     {
       id: 'cta',
       visible: showCta && !!ctaText,
-      defaultInner: (
+      defaultInner: <span>{ctaText}</span>,
+      renderChrome: (inner) => (
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: 16,
+          color: textColor,
+          fontSize: 24,
+          fontWeight: 300,
+          lineHeight: 1,
         }}>
-          <span style={{
-            color: textColor,
-            fontSize: 24,
-            fontWeight: 300,
-            lineHeight: 1,
-          }}>
-            {ctaText}
-          </span>
+          {inner}
           <ArrowIcon color={themeColors.buttonSecondaryText} width={22} height={22 * 0.8} />
         </div>
       ),
-      renderChrome: (inner) => inner,
     },
   ]
 

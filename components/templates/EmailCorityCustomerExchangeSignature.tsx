@@ -66,7 +66,7 @@ export function EmailCorityCustomerExchangeSignature({
     transformOrigin: 'top left',
   }
 
-  const eventDateNode: ReactNode = wrapBlock('eventDate', wrapInline('eventDate', (
+  const eventDateNode: ReactNode = wrapBlock('eventDate', (
     <div style={{
       color: 'white',
       fontSize: 10,
@@ -74,51 +74,48 @@ export function EmailCorityCustomerExchangeSignature({
       lineHeight: '12px',
       textAlign: 'center',
     }}>
-      {eventDate || 'Thursday, May 7th'}
+      {wrapInline('eventDate', <div>{eventDate || 'Thursday, May 7th'}</div>)}
     </div>
-  )))
+  ))
 
-  const eventLocationNode: ReactNode = wrapBlock('eventLocation', wrapInline('eventLocation', (
+  const eventLocationNode: ReactNode = wrapBlock('eventLocation', (
     <div style={{
       color: 'white',
       fontSize: 7,
       fontWeight: 350,
       lineHeight: '8.4px',
     }}>
-      {eventLocation || 'Brussels, Belgium'}
+      {wrapInline('eventLocation', <div>{eventLocation || 'Brussels, Belgium'}</div>)}
     </div>
-  )))
+  ))
 
-  const eventTimeNode: ReactNode = wrapBlock('eventTime', wrapInline('eventTime', (
+  const eventTimeNode: ReactNode = wrapBlock('eventTime', (
     <div style={{
       color: 'white',
       fontSize: 7,
       fontWeight: 350,
       lineHeight: '8.4px',
     }}>
-      {eventTime || '10:00–16:00'}
+      {wrapInline('eventTime', <div>{eventTime || '10:00–16:00'}</div>)}
     </div>
-  )))
+  ))
 
-  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+  const ctaNode: ReactNode = wrapBlock('cta', (
     <div style={{
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       gap: 4,
+      color: 'white',
+      fontSize: 11,
+      fontWeight: 350,
+      lineHeight: '11px',
+      textAlign: 'center',
     }}>
-      <span style={{
-        color: 'white',
-        fontSize: 11,
-        fontWeight: 350,
-        lineHeight: '11px',
-        textAlign: 'center',
-      }}>
-        {ctaText || 'Join Us'}
-      </span>
+      {wrapInline('cta', <span>{ctaText || 'Join Us'}</span>)}
       <ArrowIcon color="white" width={10} height={6} strokeWidth={1.2} />
     </div>
-  )))
+  ))
 
   return (
     <div style={containerStyle}>

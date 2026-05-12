@@ -147,7 +147,7 @@ export function WebsiteFloatingBannerMobile({
     background: styles.background,
   }
 
-  const eyebrowNode: ReactNode = wrapBlock('eyebrow', wrapInline('eyebrow', (
+  const eyebrowNode: ReactNode = wrapBlock('eyebrow', (
     <div style={{
       color: styles.textColor,
       fontSize: 14,
@@ -156,11 +156,11 @@ export function WebsiteFloatingBannerMobile({
       letterSpacing: 1.32,
       whiteSpace: 'nowrap',
     }}>
-      {eyebrow}
+      {wrapInline('eyebrow', <div>{eyebrow}</div>)}
     </div>
-  )))
+  ))
 
-  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+  const headlineNode: ReactNode = wrapBlock('headline', (
     <div style={{
       flex: 1,
       color: styles.textColor,
@@ -168,33 +168,28 @@ export function WebsiteFloatingBannerMobile({
       fontWeight: 350,
       lineHeight: `${(headlineFontSize ?? 14) * (15.40 / 14)}px`,
     }}>
-      {headline || 'Headline'}
+      {wrapInline('headline', <div>{headline || 'Headline'}</div>)}
     </div>
-  )))
+  ))
 
-  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+  const ctaNode: ReactNode = wrapBlock('cta', (
     <div style={{
       display: 'flex',
       justifyContent: 'flex-start',
       alignItems: 'center',
       gap: 10.67,
       flexShrink: 0,
+      textAlign: 'center',
+      color: styles.ctaTextColor,
+      fontSize: 16,
+      fontWeight: 500,
+      lineHeight: '16px',
+      whiteSpace: 'nowrap',
     }}>
-      {arrowType === 'text' && (
-        <div style={{
-          textAlign: 'center',
-          color: styles.ctaTextColor,
-          fontSize: 16,
-          fontWeight: 500,
-          lineHeight: '16px',
-          whiteSpace: 'nowrap',
-        }}>
-          {cta || 'Learn More'}
-        </div>
-      )}
+      {arrowType === 'text' && wrapInline('cta', <div>{cta || 'Learn More'}</div>)}
       <ArrowIcon color={styles.ctaArrowColor} width={14.67} height={14.67 * 0.795} />
     </div>
-  )))
+  ))
 
   return (
     <div style={containerStyle}>
