@@ -718,10 +718,10 @@ function AssetPreviewRenderer({
           solution={asset.solution}
           showRow3={asset.showRow3 !== false}
           showRow4={asset.showRow4 !== false}
-          gridDetail1={{ type: 'data', text: asset.gridDetail1Text || 'Date: January 1st, 2026' }}
+          gridDetail1={{ type: 'data', text: asset.gridDetail1Text || '' }}
           gridDetail2={{ type: 'data', text: asset.gridDetail2Text || 'Time: Midnight, EST' }}
           gridDetail3={{ type: asset.gridDetail3Type || 'data', text: asset.gridDetail3Text || 'Place: Wherever' }}
-          gridDetail4={{ type: asset.gridDetail4Type || 'cta', text: asset.gridDetail4Text || 'Join the event' }}
+          gridDetail4={{ type: asset.gridDetail4Type || 'cta', text: asset.gridDetail4Text || '' }}
         />
       )
     case 'email-dark-gradient':
