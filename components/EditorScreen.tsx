@@ -4638,7 +4638,6 @@ export function EditorScreen() {
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showSolutionSet={showSolutionSet}
                   solution={solution}
-                  logoColor={logoColor === 'white' ? 'black' : logoColor}
                   showRow3={showRow3}
                   showRow4={showRow4}
                   gridDetail1={{ type: 'data', text: gridDetail1Text }}

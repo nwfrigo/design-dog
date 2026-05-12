@@ -964,7 +964,6 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       showSubhead: asset.showSubhead && !!asset.subhead,
       showSolutionSet: asset.showSolutionSet !== false,
       solution: asset.solution,
-      logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
       showRow3: asset.showRow3 !== false,
       showRow4: asset.showRow4 !== false,
       gridDetail1: { type: 'data' as const, text: asset.gridDetail1Text || 'Date: January 1st, 2026' },
@@ -973,6 +972,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       gridDetail4: { type: (asset.gridDetail4Type || 'cta') as GridDetailRow['type'], text: asset.gridDetail4Text || 'Join the event' },
       headlineFontSize: asset.headlineFontSize ?? undefined,
       theme: asset.theme || 'light',
+      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
+      gaps: asset.templateGaps?.['social-grid-detail'] ?? {},
       colors, typography, scale: 1,
     }),
     queueTextFields: [
@@ -994,7 +995,6 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'showSubhead', parser: 'boolTrue' },
         { param: 'showSolutionSet', parser: 'boolTrue' },
         { param: 'solution', parser: 'string', default: 'environmental' },
-        { param: 'logoColor', parser: 'enum', default: 'black' },
         { param: 'showRow3', parser: 'boolTrue' },
         { param: 'showRow4', parser: 'boolTrue' },
         { param: 'gridDetail1Text', parser: 'string', default: 'Date: January 1st, 2026' },
@@ -1005,6 +1005,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
         { param: 'gridDetail4Type', parser: 'enum', default: 'cta' },
         { param: 'headlineFontSize', parser: 'numberOrUndefined' },
         { param: 'theme', parser: 'enum', default: 'light' },
+        { param: 'stackAlign', parser: 'enum', default: 'top' },
+        { param: 'gaps', parser: 'jsonRecord' },
       ],
       assembleProps: (parsed) => ({
         gridDetail1: { type: 'data', text: parsed.gridDetail1Text },

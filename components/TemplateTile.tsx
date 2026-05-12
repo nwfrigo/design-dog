@@ -358,7 +358,6 @@ export function TemplateRenderer({
           showSubhead={false}
           showSolutionSet={true}
           solution="safety"
-          logoColor="orange"
           showRow3={true}
           showRow4={true}
           gridDetail1={{ type: 'data', text: '150+ Sessions' }}

@@ -358,6 +358,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showRow3: s.showRow3,
     showRow4: s.showRow4,
     theme: s.theme,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['social-grid-detail'] ?? {},
   }),
 
   'email-image': (s) => ({

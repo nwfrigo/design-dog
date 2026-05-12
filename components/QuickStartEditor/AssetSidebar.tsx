@@ -716,7 +716,6 @@ function AssetPreviewRenderer({
           showSubhead={asset.showSubhead && !!copy.subhead}
           showSolutionSet={asset.showSolutionSet !== false}
           solution={asset.solution}
-          logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
           showRow3={asset.showRow3 !== false}
           showRow4={asset.showRow4 !== false}
           gridDetail1={{ type: 'data', text: asset.gridDetail1Text || 'Date: January 1st, 2026' }}
