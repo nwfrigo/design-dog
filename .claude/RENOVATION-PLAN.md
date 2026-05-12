@@ -97,7 +97,7 @@ Outer stack of repeated child groups. Each child has its own internal compositio
 | EmailGrid | 3 | ✅ Done (Track 1 left column + Track-2-style equal-distribute grid panel; per-row type toggle deferred) |
 | SocialGridDetail | 3 | ✅ Done (Track 1 + nested grid panel; 4 rows, rows 3+4 toggleable) |
 | WebsiteEventListing | 3 | ✅ Done (Track 1 + 3-variant enum + nested grid panel; logo as left-column footer sibling) |
-| WebsiteEhsAccelerateListing | 3 | Queued |
+| WebsiteEhsAccelerateListing | 3 | ✅ Done (Track 1 + nested grid; no variant, baked background) |
 
 ### Group E — Track 2 absolute-positioned compositions (7 templates)
 
@@ -124,9 +124,10 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 
 ### Totals
 
-- **Track 1**: 17 templates done (Groups A–C complete; Group D queued)
-- **Track 2**: 8 of 9 done; EmailEhsAccelerateInvitation deferred (rich-text dep)
-- **Substrate primitives added**: `SelectorPrimitive kind="enum"` (N-state, icons/swatches/labels — overflow carousel pending design pass)
+- **Track 1**: 17 of 17 done (Groups A–D complete).
+- **Track 2**: 8 of 9 done; EmailEhsAccelerateInvitation deferred (rich-text dep).
+- **Substrate primitives added**: `SelectorPrimitive kind="enum"` (N-state, icons/swatches/labels — overflow carousel pending design pass).
+- **Nested-grid pattern**: established in Group D — left column ContentStack + right grid panel where each row is an independent `<Editable>` but rows retain equal-flex distribution as design identity. Per-row data/cta type toggle deferred.
 
 ---
 

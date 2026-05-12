@@ -19,6 +19,7 @@ import { EmailProductReleaseStageBench } from './template-adapters/EmailProductR
 import { EmailGridStageBench } from './template-adapters/EmailGridStageBench'
 import { SocialGridDetailStageBench } from './template-adapters/SocialGridDetailStageBench'
 import { WebsiteEventListingStageBench } from './template-adapters/WebsiteEventListingStageBench'
+import { WebsiteEhsAccelerateListingStageBench } from './template-adapters/WebsiteEhsAccelerateListingStageBench'
 import { WebsiteThumbnailStageBench } from './template-adapters/WebsiteThumbnailStageBench'
 import { WebsiteReportStageBench } from './template-adapters/WebsiteReportStageBench'
 import { WebsiteWebinarStageBench } from './template-adapters/WebsiteWebinarStageBench'
@@ -83,6 +84,7 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'email-grid': EmailGridStageBench,
   'social-grid-detail': SocialGridDetailStageBench,
   'website-event-listing': WebsiteEventListingStageBench,
+  'website-ehs-accelerate-listing': WebsiteEhsAccelerateListingStageBench,
   'website-press-release': WebsitePressReleaseStageBench,
   'social-dark-gradient': SocialDarkGradientStageBench,
   'social-blue-gradient': SocialBlueGradientStageBench,

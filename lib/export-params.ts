@@ -268,6 +268,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showRow3: s.showRow3,
     showRow4: s.showRow4,
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['website-ehs-accelerate-listing'] ?? {},
   }),
 
   'email-grid': (s) => ({

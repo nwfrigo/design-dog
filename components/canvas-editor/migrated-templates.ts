@@ -24,6 +24,7 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'email-grid',
   'social-grid-detail',
   'website-event-listing',
+  'website-ehs-accelerate-listing',
   'website-press-release',
   'social-dark-gradient',
   'social-blue-gradient',

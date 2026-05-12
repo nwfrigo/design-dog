@@ -1,15 +1,34 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
+
+/** Track 1 left column + Track-2-style grid panel. EHS Accelerate
+ *  lockup lives at the left-column footer (anchored bottom of the
+ *  column). */
+export type WebsiteEhsAccelerateListingBlockId =
+  | 'logo'
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'gridDetail1'
+  | 'gridDetail2'
+  | 'gridDetail3'
+  | 'gridDetail4'
+
+type WebsiteEhsAccelerateListingStackId = 'eyebrow' | 'headline' | 'subhead'
 
 export interface WebsiteEhsAccelerateListingProps {
   eyebrow: string
   headline: string
   subhead: string
-  // Grid details (up to 4 rows)
   gridDetail1Text: string
   gridDetail2Text: string
   gridDetail3Text: string
@@ -20,6 +39,17 @@ export interface WebsiteEhsAccelerateListingProps {
   showHeadline?: boolean
   showSubhead: boolean
   headlineFontSize?: number
+  stackAlign?: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: WebsiteEhsAccelerateListingStackId,
+    nextId: WebsiteEhsAccelerateListingStackId,
+  ) => ReactNode
+  renderBlock?: (blockId: WebsiteEhsAccelerateListingBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: WebsiteEhsAccelerateListingBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -29,6 +59,7 @@ const BACKGROUND_IMAGE = '/assets/backgrounds/Template_Website_EHS-Accelerate_Li
 const TEXT_COLOR = '#060015'
 const BORDER_COLOR = '#969899'
 const PANEL_BG = '#FFFFFF'
+const DEFAULT_GAP = 25.10
 
 export function WebsiteEhsAccelerateListing({
   eyebrow,
@@ -44,18 +75,17 @@ export function WebsiteEhsAccelerateListing({
   showHeadline = true,
   showSubhead,
   headlineFontSize,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: WebsiteEhsAccelerateListingProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-
-  // Grid rows — Row 1 always visible, Rows 2/3 toggleable, Row 4 always visible (CTA)
-  const gridDetails = [
-    { text: gridDetail1Text, isCtaRow: false },
-    ...(showRow3 ? [{ text: gridDetail2Text, isCtaRow: false }] : []),
-    ...(showRow4 ? [{ text: gridDetail3Text, isCtaRow: false }] : []),
-    { text: gridDetail4Text, isCtaRow: true },
-  ]
 
   const containerStyle: CSSProperties = {
     width: 800,
@@ -72,10 +102,111 @@ export function WebsiteEhsAccelerateListing({
     transformOrigin: 'top left',
   }
 
+  const blocks: ContentStackBlock<WebsiteEhsAccelerateListingStackId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: TEXT_COLOR,
+          fontSize: 14,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: 1.38,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: headline || 'Headline',
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: TEXT_COLOR,
+          fontSize: headlineFontSize ?? 58,
+          fontWeight: 350,
+          lineHeight: `${(headlineFontSize ?? 58) * (64 / 58)}px`,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && !!subhead,
+      defaultInner: subhead,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: TEXT_COLOR,
+          fontSize: 24,
+          fontWeight: 350,
+        }}>{inner}</div>
+      ),
+    },
+  ]
+
+  const renderGridRow = (
+    blockId: 'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4',
+    text: string,
+    isCta: boolean,
+    isFirst: boolean,
+  ): ReactNode => {
+    const rowStyle: CSSProperties = {
+      width: 300,
+      flex: '1 1 0',
+      padding: 24,
+      borderTop: isFirst ? undefined : `1px ${BORDER_COLOR} solid`,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 10,
+      display: 'inline-flex',
+    }
+
+    const inner: ReactNode = isCta ? (
+      <div style={{
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        gap: 12,
+        display: 'flex',
+      }}>
+        <div style={{
+          textAlign: 'center',
+          color: TEXT_COLOR,
+          fontSize: 20,
+          fontWeight: 350,
+        }}>
+          {text}
+        </div>
+        <ArrowIcon color={TEXT_COLOR} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+      </div>
+    ) : (
+      <div style={{
+        color: TEXT_COLOR,
+        fontSize: 20,
+        fontWeight: 350,
+      }}>
+        {text}
+      </div>
+    )
+
+    return wrapBlock(blockId, (
+      <div style={rowStyle}>{inner}</div>
+    ))
+  }
+
+  const gridRows: Array<{ id: 'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4'; text: string; isCta: boolean }> = [
+    { id: 'gridDetail1', text: gridDetail1Text, isCta: false },
+    ...(showRow3 ? [{ id: 'gridDetail2' as const, text: gridDetail2Text, isCta: false }] : []),
+    ...(showRow4 ? [{ id: 'gridDetail3' as const, text: gridDetail3Text, isCta: false }] : []),
+    { id: 'gridDetail4', text: gridDetail4Text, isCta: true },
+  ]
+
   return (
     <div style={containerStyle}>
-      {/* Full-canvas background image (gradients baked in). The right white
-          panel sits on top and covers the right portion. */}
+      {/* Full-canvas baked background image. Right white panel sits
+       *  on top and covers the right ~300px. */}
       <img
         src={BACKGROUND_IMAGE}
         alt=""
@@ -107,86 +238,32 @@ export function WebsiteEhsAccelerateListing({
           zIndex: 1,
         }}
       >
-        {/* Content block */}
-        <div
-          style={{
-            alignSelf: 'stretch',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: 25.10,
-            display: 'flex',
-          }}
-        >
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: TEXT_COLOR,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.38,
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline + Subhead */}
-          <div
-            style={{
-              alignSelf: 'stretch',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: 12,
-              display: 'flex',
-            }}
-          >
-            {showHeadline && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: TEXT_COLOR,
-                  fontSize: headlineFontSize ?? 58,
-                  fontWeight: 350,
-                  lineHeight: `${(headlineFontSize ?? 58) * (64 / 58)}px`,
-                }}
-              >
-                {headline || 'Headline'}
-              </div>
-            )}
-
-            {showSubhead && subhead && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: TEXT_COLOR,
-                  fontSize: 24,
-                  fontWeight: 350,
-                }}
-              >
-                {subhead}
-              </div>
-            )}
-          </div>
+        <div style={{ alignSelf: 'stretch' }}>
+          <ContentStack<WebsiteEhsAccelerateListingStackId>
+            blocks={blocks}
+            gaps={gaps}
+            defaultGap={DEFAULT_GAP}
+            renderSpacerBetween={renderSpacerBetween}
+            renderBlock={renderBlock as (id: WebsiteEhsAccelerateListingStackId, content: ReactNode) => ReactNode}
+            renderInlineEditor={renderInlineEditor as (id: WebsiteEhsAccelerateListingStackId, defaultInner: ReactNode) => ReactNode}
+            stackAlign={stackAlign}
+            alignItems="flex-start"
+          />
         </div>
 
-        {/* EHS+ Accelerate lockup (cority + EHS+ ACCELERATE + TECH CONVERGENCE WORKSHOP baked in) */}
-        <div
-          style={{
+        {/* EHS+ Accelerate lockup pinned to bottom of left column */}
+        {wrapBlock('logo', (
+          <div style={{
             justifyContent: 'flex-start',
             alignItems: 'center',
             display: 'inline-flex',
-          }}
-        >
-          <EhsAccelerateLogo width={254} />
-        </div>
+          }}>
+            <EhsAccelerateLogo width={254} />
+          </div>
+        ))}
       </div>
 
-      {/* Right grid panel — opaque white, covers right ~300px of the bg image */}
+      {/* Right opaque grid panel (covers right ~300px of bg). */}
       <div
         style={{
           alignSelf: 'stretch',
@@ -200,55 +277,14 @@ export function WebsiteEhsAccelerateListing({
           zIndex: 1,
         }}
       >
-        {gridDetails.map((detail, index) => (
-          <div
-            key={index}
-            style={{
-              width: 300,
-              flex: '1 1 0',
-              padding: 24,
-              borderTop: index > 0 ? `1px ${BORDER_COLOR} solid` : undefined,
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 10,
-              display: 'inline-flex',
-            }}
-          >
-            {detail.isCtaRow ? (
-              <div
-                style={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: 12,
-                  display: 'flex',
-                }}
-              >
-                <div
-                  style={{
-                    textAlign: 'center',
-                    color: TEXT_COLOR,
-                    fontSize: 20,
-                    fontWeight: 350,
-                  }}
-                >
-                  {detail.text}
-                </div>
-                <ArrowIcon color={TEXT_COLOR} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
-              </div>
-            ) : (
-              <div
-                style={{
-                  color: TEXT_COLOR,
-                  fontSize: 20,
-                  fontWeight: 350,
-                }}
-              >
-                {detail.text}
-              </div>
-            )}
+        {gridRows.map((row, idx) => (
+          <div key={row.id} style={{ flex: '1 1 0', display: 'flex' }}>
+            {renderGridRow(row.id, row.text, row.isCta, idx === 0)}
           </div>
         ))}
       </div>
+
+      {renderOverlay?.()}
     </div>
   )
 }
