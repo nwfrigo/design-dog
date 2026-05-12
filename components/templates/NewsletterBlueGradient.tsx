@@ -9,6 +9,12 @@ import {
   ContentStack,
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type ImageSize = 'none' | 'small' | 'large'
@@ -21,6 +27,7 @@ export type NewsletterBlueGradientBlockId =
   | 'headline'
   | 'subhead'
   | 'cta'
+  | 'image'
 
 export interface NewsletterBlueGradientProps {
   eyebrow: string
@@ -32,6 +39,7 @@ export interface NewsletterBlueGradientProps {
   imageUrl: string | null
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  imageFilters?: ImageFilters
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
@@ -88,6 +96,7 @@ export function NewsletterBlueGradient({
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   showEyebrow,
   showHeadline = true,
   showSubhead,
@@ -110,6 +119,18 @@ export function NewsletterBlueGradient({
   const ctaColor = '#0080FF' // Cobalt blue for arrow
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale && imageSize !== 'none')
+
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const filterCssNoSat =
+    filterCss && grayscaleImageUrl
+      ? filtersToCss({ ...effectiveFilters, saturation: 0 })
+      : undefined
+  const imageFilterStyle =
+    grayscaleImageUrl && filterCssNoSat ? filterCssNoSat :
+    grayscaleImageUrl ? 'none' :
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -252,8 +273,9 @@ export function NewsletterBlueGradient({
           ))}
         </div>
 
-        {/* Image Area - only show for small and large variants */}
-        {imageSize !== 'none' && (
+        {/* Image Area — wrapped for Stage & Bench so it surfaces the
+         *  EditbarImage toolbar on selection. */}
+        {imageSize !== 'none' && wrapBlock('image', (
           <div style={{
             flex: imageSize === 'small' ? '1 1 0' : undefined,
             width: imageSize === 'large' ? imageWidth : undefined,
@@ -280,12 +302,12 @@ export function NewsletterBlueGradient({
                     ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
                     : undefined,
                   transformOrigin: 'center',
-                  filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
+                  filter: imageFilterStyle,
                 }}
               />
             )}
           </div>
-        )}
+        ))}
       </div>
       {renderOverlay?.()}
     </div>

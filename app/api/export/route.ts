@@ -158,6 +158,7 @@ export async function POST(request: NextRequest) {
       'slidesData',
       // Newsletter: keys are remapped to generic image* names
       'newsletterImageUrl', 'newsletterImagePositionX', 'newsletterImagePositionY', 'newsletterImageZoom',
+      'newsletterImageFilterExposure', 'newsletterImageFilterContrast', 'newsletterImageFilterSaturation',
     ])
 
     for (const [key, value] of Object.entries(body)) {
@@ -186,6 +187,9 @@ export async function POST(request: NextRequest) {
       if (body.newsletterImagePositionX != null) params.set('imagePositionX', String(body.newsletterImagePositionX))
       if (body.newsletterImagePositionY != null) params.set('imagePositionY', String(body.newsletterImagePositionY))
       if (body.newsletterImageZoom != null) params.set('imageZoom', String(body.newsletterImageZoom))
+      if (body.newsletterImageFilterExposure != null) params.set('imageFilterExposure', String(body.newsletterImageFilterExposure))
+      if (body.newsletterImageFilterContrast != null) params.set('imageFilterContrast', String(body.newsletterImageFilterContrast))
+      if (body.newsletterImageFilterSaturation != null) params.set('imageFilterSaturation', String(body.newsletterImageFilterSaturation))
     }
 
     // FAQ cover image position: object → flat X/Y params

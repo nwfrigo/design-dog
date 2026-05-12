@@ -9,6 +9,12 @@ import {
   ContentStack,
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type ImageSize = 'none' | 'small' | 'large'
@@ -22,6 +28,7 @@ export type NewsletterDarkGradientBlockId =
   | 'headline'
   | 'subhead'
   | 'cta'
+  | 'image'
 
 export interface NewsletterDarkGradientProps {
   eyebrow: string
@@ -33,6 +40,9 @@ export interface NewsletterDarkGradientProps {
   imageUrl: string | null
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  /** Per-image exposure/contrast/saturation. Renders as CSS filter on the
+   *  <img>. Defaults to NEUTRAL_FILTERS. */
+  imageFilters?: ImageFilters
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
@@ -98,6 +108,7 @@ export function NewsletterDarkGradient({
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   showEyebrow,
   showHeadline = true,
   showSubhead,
@@ -120,6 +131,21 @@ export function NewsletterDarkGradient({
   const ctaColor = '#0080FF' // Cobalt blue for arrow
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale && imageSize !== 'none')
+
+  // Per-image filter (exposure/contrast/saturation), reconciled with the
+  // legacy `grayscale` boolean. When a pre-converted grayscale URL is in
+  // use, skip the saturate(0) component to avoid double-applying.
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const filterCssNoSat =
+    filterCss && grayscaleImageUrl
+      ? filtersToCss({ ...effectiveFilters, saturation: 0 })
+      : undefined
+  const imageFilterStyle =
+    grayscaleImageUrl && filterCssNoSat ? filterCssNoSat :
+    grayscaleImageUrl ? 'none' :
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -270,8 +296,10 @@ export function NewsletterDarkGradient({
           ))}
         </div>
 
-        {/* Image Area - only show for small and large variants */}
-        {imageSize !== 'none' && (
+        {/* Image Area — wrapped for Stage & Bench so it surfaces the
+         *  EditbarImage toolbar on selection. Visible for small + large
+         *  variants only (none = no image frame). */}
+        {imageSize !== 'none' && wrapBlock('image', (
           <div style={{
             flex: imageSize === 'small' ? '1 1 0' : undefined,
             width: imageSize === 'large' ? imageWidth : undefined,
@@ -298,12 +326,12 @@ export function NewsletterDarkGradient({
                     ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
                     : undefined,
                   transformOrigin: 'center',
-                  filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
+                  filter: imageFilterStyle,
                 }}
               />
             )}
           </div>
-        )}
+        ))}
       </div>
       {renderOverlay?.()}
     </div>

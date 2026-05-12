@@ -559,6 +559,7 @@ export interface GeneratedAsset {
   newsletterImageUrl: string | null
   newsletterImagePosition: { x: number; y: number }
   newsletterImageZoom: number
+  newsletterImageFilters?: import('@/lib/image-filters').ImageFilters
   speakerCount: SpeakerCount
   speaker1Name: string
   speaker1Role: string
@@ -746,6 +747,7 @@ export interface QueuedAsset {
   newsletterImageUrl: string | null
   newsletterImagePosition: { x: number; y: number }
   newsletterImageZoom: number
+  newsletterImageFilters?: import('@/lib/image-filters').ImageFilters
   // Email Speakers specific
   speakerCount: SpeakerCount
   speaker1Name: string
@@ -947,6 +949,7 @@ export interface AppState {
   newsletterImageUrl: string | null
   newsletterImagePosition: { x: number; y: number }
   newsletterImageZoom: number
+  newsletterImageFilters: import('@/lib/image-filters').ImageFilters
 
   // Email Speakers specific settings
   speakerCount: SpeakerCount
@@ -1164,6 +1167,7 @@ export interface AppState {
   setNewsletterImageUrl: (url: string | null) => void
   setNewsletterImagePosition: (position: { x: number; y: number }) => void
   setNewsletterImageZoom: (zoom: number) => void
+  setNewsletterImageFilters: (filters: import('@/lib/image-filters').ImageFilters) => void
 
   // Email Speakers specific actions
   setSpeakerCount: (count: SpeakerCount) => void

@@ -88,6 +88,7 @@ export interface ExportParamState {
   newsletterImageUrl: string | null
   newsletterImagePosition: { x: number; y: number }
   newsletterImageZoom: number
+  newsletterImageFilters?: import('./image-filters').ImageFilters
 
   // Speakers
   speakerCount: number
@@ -192,6 +193,19 @@ function buildSpeakerParams(s: ExportParamState): Record<string, unknown> {
     speaker3ImagePositionX: s.speaker3ImagePosition.x,
     speaker3ImagePositionY: s.speaker3ImagePosition.y,
     speaker3ImageZoom: s.speaker3ImageZoom,
+  }
+}
+
+function buildNewsletterImageParams(s: ExportParamState): Record<string, unknown> {
+  const f = s.newsletterImageFilters
+  return {
+    newsletterImageUrl: s.newsletterImageUrl,
+    newsletterImagePositionX: s.newsletterImagePosition.x,
+    newsletterImagePositionY: s.newsletterImagePosition.y,
+    newsletterImageZoom: s.newsletterImageZoom,
+    newsletterImageFilterExposure: f?.exposure ?? 0,
+    newsletterImageFilterContrast: f?.contrast ?? 0,
+    newsletterImageFilterSaturation: f?.saturation ?? 0,
   }
 }
 
@@ -466,13 +480,10 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   }),
 
   'newsletter-dark-gradient': (s) => ({
+    ...buildNewsletterImageParams(s),
     ctaText: s.ctaText,
     colorStyle: s.colorStyle,
     imageSize: s.newsletterImageSize,
-    newsletterImageUrl: s.newsletterImageUrl,
-    newsletterImagePositionX: s.newsletterImagePosition.x,
-    newsletterImagePositionY: s.newsletterImagePosition.y,
-    newsletterImageZoom: s.newsletterImageZoom,
     showEyebrow: s.showEyebrow && !!s.eyebrow,
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showCta: s.showCta,
@@ -482,13 +493,10 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   }),
 
   'newsletter-blue-gradient': (s) => ({
+    ...buildNewsletterImageParams(s),
     ctaText: s.ctaText,
     colorStyle: s.colorStyle,
     imageSize: s.newsletterImageSize,
-    newsletterImageUrl: s.newsletterImageUrl,
-    newsletterImagePositionX: s.newsletterImagePosition.x,
-    newsletterImagePositionY: s.newsletterImagePosition.y,
-    newsletterImageZoom: s.newsletterImageZoom,
     showEyebrow: s.showEyebrow && !!s.eyebrow,
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showCta: s.showCta,
@@ -498,12 +506,9 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   }),
 
   'newsletter-light': (s) => ({
+    ...buildNewsletterImageParams(s),
     ctaText: s.ctaText,
     imageSize: s.newsletterImageSize,
-    newsletterImageUrl: s.newsletterImageUrl,
-    newsletterImagePositionX: s.newsletterImagePosition.x,
-    newsletterImagePositionY: s.newsletterImagePosition.y,
-    newsletterImageZoom: s.newsletterImageZoom,
     showEyebrow: s.showEyebrow && !!s.eyebrow,
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showCta: s.showCta,

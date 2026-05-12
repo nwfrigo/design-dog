@@ -1,11 +1,12 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '@/store'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import type { ColorStyle } from '@/types'
 import { useFlipReflow } from '@/lib/motion'
 import { useActiveDrag } from '@/lib/dnd'
+import { NEUTRAL_FILTERS, type ImageSlotSettings } from '@/lib/image-filters'
 
 import { StageBenchShell } from '../StageBenchShell'
 import { CanvasEditorProvider } from '../CanvasEditorProvider'
@@ -20,6 +21,8 @@ import { SelectorPrimitive, type ColorOption } from '../stage-bar/SelectorPrimit
 import { VisibilityRegistryProvider } from '../VisibilityRegistry'
 import { SizeRegistryProvider } from '../SizeRegistry'
 import { ContentRegistryProvider } from '../ContentRegistry'
+import { ImageRegistryProvider, useImageSelectionEffect, type SlotImage } from '../ImageRegistry'
+import { ImageEditorModal } from '../../image-editor'
 import {
   StageBenchHeader,
   StageBenchActionRow,
@@ -124,15 +127,28 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
   const subheadFontSize = useStore((s) => s.subheadFontSize)
   const setSubheadFontSize = useStore((s) => s.setSubheadFontSize)
 
-  // Newsletter-specific image fields. imageSize is now editable via the
-  // stage bar's `layout` selector below. Image content (URL / crop /
-  // filters) editing still goes through the legacy sidebar (deferred).
+  // Newsletter-specific image fields. imageSize is editable via the stage
+  // bar's `layout` selector below. Image content (URL / crop / filters)
+  // is wired through ImageRegistry + ImageEditorModal — selecting the
+  // image frame opens the lightbox.
   const newsletterImageSize = useStore((s) => s.newsletterImageSize)
   const setNewsletterImageSize = useStore((s) => s.setNewsletterImageSize)
   const newsletterImageUrl = useStore((s) => s.newsletterImageUrl)
+  const setNewsletterImageUrl = useStore((s) => s.setNewsletterImageUrl)
   const newsletterImagePosition = useStore((s) => s.newsletterImagePosition)
+  const setNewsletterImagePosition = useStore((s) => s.setNewsletterImagePosition)
   const newsletterImageZoom = useStore((s) => s.newsletterImageZoom)
+  const setNewsletterImageZoom = useStore((s) => s.setNewsletterImageZoom)
+  const newsletterImageFilters = useStore((s) => s.newsletterImageFilters) ?? NEUTRAL_FILTERS
+  const setNewsletterImageFilters = useStore((s) => s.setNewsletterImageFilters)
   const grayscale = useStore((s) => s.grayscale)
+
+  const [showImageEditor, setShowImageEditor] = useState(false)
+  const currentSlotSettings: ImageSlotSettings = {
+    position: newsletterImagePosition,
+    zoom: newsletterImageZoom,
+    filters: newsletterImageFilters,
+  }
 
   const stackAlign = useStore((s) => s.stackAlign)
   const setStackAlign = useStore((s) => s.setStackAlign)
@@ -218,12 +234,28 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
   )
 
   // ---- per-block Editable wrapping ----
-  const slotConfig: Record<NewsletterDarkGradientBlockId, { storeKey: string; kind: 'text' | 'cta' }> = {
+  const slotConfig: Record<NewsletterDarkGradientBlockId, { storeKey: string; kind: 'text' | 'cta' | 'image' }> = {
     eyebrow:  { storeKey: 'eyebrow', kind: 'text' },
     headline: { storeKey: 'verbatimCopy.headline', kind: 'text' },
     subhead:  { storeKey: 'verbatimCopy.subhead', kind: 'text' },
     cta:      { storeKey: 'ctaText', kind: 'cta' },
+    image:    { storeKey: 'newsletterImageUrl', kind: 'image' },
   }
+
+  // Image slot — selection opens the editor lightbox directly.
+  const slotImages: SlotImage[] = [
+    {
+      path: 'newsletter-dark-gradient.image',
+      onSelect: () => setShowImageEditor(true),
+    },
+  ]
+
+  // Frame size for the editor lightbox follows the active newsletter
+  // variant: small = 234×132 (rounded rect column), large = 317×179 (full-
+  // bleed right side). 'none' has no image frame so the modal never opens.
+  const imageFrameWidth = newsletterImageSize === 'large' ? 317 : 234
+  const imageFrameHeight = newsletterImageSize === 'large' ? 179 : 132
+  const editorImageSrc = newsletterImageUrl ?? '/placeholder-mountain.jpg'
 
   return (
     <CanvasEditorProvider mode="edit">
@@ -246,6 +278,8 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
               setCtaText,
             })}
           >
+            <ImageRegistryProvider images={slotImages}>
+            <ImageSelectionEffect />
             <StageBenchShell
               header={
                 <StageBenchHeader
@@ -288,6 +322,7 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
                   imageUrl={newsletterImageUrl}
                   imagePosition={newsletterImagePosition}
                   imageZoom={newsletterImageZoom}
+                  imageFilters={newsletterImageFilters}
                   showEyebrow={showEyebrowEff}
                   showHeadline={showHeadlineEff}
                   showSubhead={showSubheadEff}
@@ -322,7 +357,9 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
                     const cfg = slotConfig[blockId]
                     const slotPath = `newsletter-dark-gradient.${blockId}`
                     const slot = slots.find((s) => s.path === slotPath)
-                    const dragConfig = slot
+                    // Image slot is fixed-presence (no bench drag). Other
+                    // slots use their VisibilityRegistry slot for drag config.
+                    const dragConfig = blockId !== 'image' && slot
                       ? {
                           data: { region: 'stage' as const, path: slotPath },
                           preview: (
@@ -379,10 +416,39 @@ export function NewsletterDarkGradientStageBench(props: StageBenchEditorProps) {
             </StageBenchShell>
             <ContextualToolbar />
             <SelectionRing />
+            <ImageEditorModal
+              isOpen={showImageEditor}
+              onClose={() => setShowImageEditor(false)}
+              imageSrc={editorImageSrc}
+              frameWidth={imageFrameWidth}
+              frameHeight={imageFrameHeight}
+              initialSettings={currentSlotSettings}
+              onSettingsChange={(next) => {
+                setNewsletterImagePosition(next.position)
+                setNewsletterImageZoom(next.zoom)
+                setNewsletterImageFilters(next.filters)
+              }}
+              onImageChange={(url) => {
+                setNewsletterImageUrl(url)
+                // Reset crop + filters on image swap so the new image isn't
+                // stuck with the previous image's edits.
+                setNewsletterImagePosition({ x: 0, y: 0 })
+                setNewsletterImageZoom(1)
+                setNewsletterImageFilters(NEUTRAL_FILTERS)
+              }}
+            />
+            </ImageRegistryProvider>
           </ContentRegistryProvider>
         </SizeRegistryProvider>
       </VisibilityRegistryProvider>
     </CanvasEditorProvider>
   )
+}
+
+/** Mounts useImageSelectionEffect inside ImageRegistryProvider so it
+ *  reads the right slot list. */
+function ImageSelectionEffect() {
+  useImageSelectionEffect()
+  return null
 }
 

@@ -58,6 +58,7 @@ export interface DraftState {
   newsletterImageUrl: string | null
   newsletterImagePosition: { x: number; y: number }
   newsletterImageZoom: number
+  newsletterImageFilters?: import('./image-filters').ImageFilters
   speakerCount: SpeakerCount
   speaker1Name: string
   speaker1Role: string
@@ -245,6 +246,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       newsletterImageUrl: state.newsletterImageUrl || null,
       newsletterImagePosition: state.newsletterImagePosition || { x: 0, y: 0 },
       newsletterImageZoom: state.newsletterImageZoom ?? 1,
+      newsletterImageFilters: state.newsletterImageFilters,
       speakerCount: state.speakerCount || 3,
       speaker1Name: state.speaker1Name || 'Firstname Lastname',
       speaker1Role: state.speaker1Role || 'Role, Company',

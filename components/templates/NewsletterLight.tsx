@@ -10,6 +10,12 @@ import {
   ContentStack,
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export type ImageSize = 'none' | 'small' | 'large'
 
@@ -18,6 +24,7 @@ export type NewsletterLightBlockId =
   | 'headline'
   | 'subhead'
   | 'cta'
+  | 'image'
 
 export interface NewsletterLightProps {
   eyebrow: string
@@ -28,6 +35,7 @@ export interface NewsletterLightProps {
   imageUrl: string | null
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  imageFilters?: ImageFilters
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
@@ -77,6 +85,7 @@ export function NewsletterLight({
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   showEyebrow,
   showHeadline = true,
   showSubhead,
@@ -102,6 +111,18 @@ export function NewsletterLight({
   const backgroundColor = themeColors.backgroundPrimary
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale && imageSize !== 'none')
+
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const filterCssNoSat =
+    filterCss && grayscaleImageUrl
+      ? filtersToCss({ ...effectiveFilters, saturation: 0 })
+      : undefined
+  const imageFilterStyle =
+    grayscaleImageUrl && filterCssNoSat ? filterCssNoSat :
+    grayscaleImageUrl ? 'none' :
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -230,72 +251,69 @@ export function NewsletterLight({
           ))}
         </div>
 
-        {/* Image Area - only show for small and large variants */}
-        {imageSize !== 'none' && (
-          <>
-            {imageSize === 'small' && (
-              <div style={{
-                flex: '1 1 0',
-                height: 132,
-                background: imageUrl ? 'transparent' : '#F1F1F1',
-                borderRadius: 6,
-                overflow: 'hidden',
-              }}>
-                {imageUrl && (
-                  <img
-                    src={grayscaleImageUrl || imageUrl}
-                    alt=""
-                    data-export-image="true"
-                    data-newsletter-image="true"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
-                      transform: imageZoom !== 1
-                        ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
-                        : undefined,
-                      transformOrigin: 'center',
-                      filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
-                    }}
-                  />
-                )}
-              </div>
+        {/* Image Area — wrapped for Stage & Bench so it surfaces the
+         *  EditbarImage toolbar on selection. */}
+        {imageSize === 'small' && wrapBlock('image', (
+          <div style={{
+            flex: '1 1 0',
+            height: 132,
+            background: imageUrl ? 'transparent' : '#F1F1F1',
+            borderRadius: 6,
+            overflow: 'hidden',
+          }}>
+            {imageUrl && (
+              <img
+                src={grayscaleImageUrl || imageUrl}
+                alt=""
+                data-export-image="true"
+                data-newsletter-image="true"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+                  transform: imageZoom !== 1
+                    ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
+                    : undefined,
+                  transformOrigin: 'center',
+                  filter: imageFilterStyle,
+                }}
+              />
             )}
-            {imageSize === 'large' && (
-              <div style={{
-                width: imageWidth,
-                height: 179,
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                background: imageUrl ? 'transparent' : backgroundColor,
-                borderLeft: '0.5px solid #000000',
-                overflow: 'hidden',
-              }}>
-                {imageUrl && (
-                  <img
-                    src={grayscaleImageUrl || imageUrl}
-                    alt=""
-                    data-export-image="true"
-                    data-newsletter-image="true"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
-                      transform: imageZoom !== 1
-                        ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
-                        : undefined,
-                      transformOrigin: 'center',
-                      filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
-                    }}
-                  />
-                )}
-              </div>
+          </div>
+        ))}
+        {imageSize === 'large' && wrapBlock('image', (
+          <div style={{
+            width: imageWidth,
+            height: 179,
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            background: imageUrl ? 'transparent' : backgroundColor,
+            borderLeft: '0.5px solid #000000',
+            overflow: 'hidden',
+          }}>
+            {imageUrl && (
+              <img
+                src={grayscaleImageUrl || imageUrl}
+                alt=""
+                data-export-image="true"
+                data-newsletter-image="true"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+                  transform: imageZoom !== 1
+                    ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
+                    : undefined,
+                  transformOrigin: 'center',
+                  filter: imageFilterStyle,
+                }}
+              />
             )}
-          </>
-        )}
+          </div>
+        ))}
       </div>
       {renderOverlay?.()}
     </div>

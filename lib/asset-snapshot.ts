@@ -69,6 +69,7 @@ const SNAPSHOT_FIELDS = [
   'newsletterImageUrl',
   'newsletterImagePosition',
   'newsletterImageZoom',
+  'newsletterImageFilters',
   // Speakers
   'speakerCount',
   'speaker1Name',

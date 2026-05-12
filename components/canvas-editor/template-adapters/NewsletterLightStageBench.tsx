@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '@/store'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import { useFlipReflow } from '@/lib/motion'
 import { useActiveDrag } from '@/lib/dnd'
+import { NEUTRAL_FILTERS, type ImageSlotSettings } from '@/lib/image-filters'
 
 import { StageBenchShell } from '../StageBenchShell'
 import { CanvasEditorProvider } from '../CanvasEditorProvider'
@@ -19,6 +20,8 @@ import { SelectorPrimitive } from '../stage-bar/SelectorPrimitive'
 import { VisibilityRegistryProvider } from '../VisibilityRegistry'
 import { SizeRegistryProvider } from '../SizeRegistry'
 import { ContentRegistryProvider } from '../ContentRegistry'
+import { ImageRegistryProvider, useImageSelectionEffect, type SlotImage } from '../ImageRegistry'
+import { ImageEditorModal } from '../../image-editor'
 import {
   StageBenchHeader,
   StageBenchActionRow,
@@ -105,9 +108,21 @@ export function NewsletterLightStageBench(props: StageBenchEditorProps) {
   const newsletterImageSize = useStore((s) => s.newsletterImageSize)
   const setNewsletterImageSize = useStore((s) => s.setNewsletterImageSize)
   const newsletterImageUrl = useStore((s) => s.newsletterImageUrl)
+  const setNewsletterImageUrl = useStore((s) => s.setNewsletterImageUrl)
   const newsletterImagePosition = useStore((s) => s.newsletterImagePosition)
+  const setNewsletterImagePosition = useStore((s) => s.setNewsletterImagePosition)
   const newsletterImageZoom = useStore((s) => s.newsletterImageZoom)
+  const setNewsletterImageZoom = useStore((s) => s.setNewsletterImageZoom)
+  const newsletterImageFilters = useStore((s) => s.newsletterImageFilters) ?? NEUTRAL_FILTERS
+  const setNewsletterImageFilters = useStore((s) => s.setNewsletterImageFilters)
   const grayscale = useStore((s) => s.grayscale)
+
+  const [showImageEditor, setShowImageEditor] = useState(false)
+  const currentSlotSettings: ImageSlotSettings = {
+    position: newsletterImagePosition,
+    zoom: newsletterImageZoom,
+    filters: newsletterImageFilters,
+  }
 
   const stackAlign = useStore((s) => s.stackAlign)
   const setStackAlign = useStore((s) => s.setStackAlign)
@@ -174,12 +189,24 @@ export function NewsletterLightStageBench(props: StageBenchEditorProps) {
     </>
   )
 
-  const slotConfig: Record<NewsletterLightBlockId, { storeKey: string; kind: 'text' | 'cta' }> = {
+  const slotConfig: Record<NewsletterLightBlockId, { storeKey: string; kind: 'text' | 'cta' | 'image' }> = {
     eyebrow:  { storeKey: 'eyebrow', kind: 'text' },
     headline: { storeKey: 'verbatimCopy.headline', kind: 'text' },
     subhead:  { storeKey: 'verbatimCopy.subhead', kind: 'text' },
     cta:      { storeKey: 'ctaText', kind: 'cta' },
+    image:    { storeKey: 'newsletterImageUrl', kind: 'image' },
   }
+
+  const slotImages: SlotImage[] = [
+    {
+      path: 'newsletter-light.image',
+      onSelect: () => setShowImageEditor(true),
+    },
+  ]
+
+  const imageFrameWidth = newsletterImageSize === 'large' ? 317 : 234
+  const imageFrameHeight = newsletterImageSize === 'large' ? 179 : 132
+  const editorImageSrc = newsletterImageUrl ?? '/placeholder-mountain.jpg'
 
   return (
     <CanvasEditorProvider mode="edit">
@@ -202,6 +229,8 @@ export function NewsletterLightStageBench(props: StageBenchEditorProps) {
               setCtaText,
             })}
           >
+            <ImageRegistryProvider images={slotImages}>
+            <ImageSelectionEffect />
             <StageBenchShell
               header={
                 <StageBenchHeader
@@ -243,6 +272,7 @@ export function NewsletterLightStageBench(props: StageBenchEditorProps) {
                   imageUrl={newsletterImageUrl}
                   imagePosition={newsletterImagePosition}
                   imageZoom={newsletterImageZoom}
+                  imageFilters={newsletterImageFilters}
                   showEyebrow={showEyebrowEff}
                   showHeadline={showHeadlineEff}
                   showSubhead={showSubheadEff}
@@ -278,7 +308,7 @@ export function NewsletterLightStageBench(props: StageBenchEditorProps) {
                     const cfg = slotConfig[blockId]
                     const slotPath = `newsletter-light.${blockId}`
                     const slot = slots.find((s) => s.path === slotPath)
-                    const dragConfig = slot
+                    const dragConfig = blockId !== 'image' && slot
                       ? {
                           data: { region: 'stage' as const, path: slotPath },
                           preview: (
@@ -335,9 +365,34 @@ export function NewsletterLightStageBench(props: StageBenchEditorProps) {
             </StageBenchShell>
             <ContextualToolbar />
             <SelectionRing />
+            <ImageEditorModal
+              isOpen={showImageEditor}
+              onClose={() => setShowImageEditor(false)}
+              imageSrc={editorImageSrc}
+              frameWidth={imageFrameWidth}
+              frameHeight={imageFrameHeight}
+              initialSettings={currentSlotSettings}
+              onSettingsChange={(next) => {
+                setNewsletterImagePosition(next.position)
+                setNewsletterImageZoom(next.zoom)
+                setNewsletterImageFilters(next.filters)
+              }}
+              onImageChange={(url) => {
+                setNewsletterImageUrl(url)
+                setNewsletterImagePosition({ x: 0, y: 0 })
+                setNewsletterImageZoom(1)
+                setNewsletterImageFilters(NEUTRAL_FILTERS)
+              }}
+            />
+            </ImageRegistryProvider>
           </ContentRegistryProvider>
         </SizeRegistryProvider>
       </VisibilityRegistryProvider>
     </CanvasEditorProvider>
   )
+}
+
+function ImageSelectionEffect() {
+  useImageSelectionEffect()
+  return null
 }
