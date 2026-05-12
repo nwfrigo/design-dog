@@ -1,8 +1,24 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
+
+/** Track 2 (fixed-composition) editable block ids. Logo is brand-
+ *  locked (orange Cority mark top-left). Decorative chrome (vertical
+ *  divider at 33% + horizontal rule under header + image border) is
+ *  not editable; it's part of the visual lockup. */
+export type EmailProductReleaseBlockId =
+  | 'logo'
+  | 'eyebrow'
+  | 'headline'
+  | 'image'
 
 export interface EmailProductReleaseProps {
   eyebrow: string
@@ -10,15 +26,18 @@ export interface EmailProductReleaseProps {
   imageUrl: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  imageFilters?: ImageFilters
   grayscale?: boolean
+  renderBlock?: (blockId: EmailProductReleaseBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: EmailProductReleaseBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
 
-// Layout constants
-const IMAGE_START = 320 // Where the image area begins
-const DIVIDER_X = Math.round(IMAGE_START * 0.33) // 33% of the way = ~106px
+const IMAGE_START = 320
+const DIVIDER_X = Math.round(IMAGE_START * 0.33)
 const HEADER_HEIGHT = 55
 
 export function EmailProductRelease({
@@ -27,14 +46,26 @@ export function EmailProductRelease({
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   grayscale = false,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
 }: EmailProductReleaseProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const textColor = colors.brand.black
   const borderColor = '#000000'
+
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const imageFilterStyle =
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
 
   const containerStyle: CSSProperties = {
     width: 640,
@@ -47,9 +78,31 @@ export function EmailProductRelease({
     transformOrigin: 'top left',
   }
 
+  const eyebrowNode: ReactNode = wrapBlock('eyebrow', wrapInline('eyebrow', (
+    <span style={{
+      color: textColor,
+      fontSize: 8,
+      fontWeight: 500,
+      textTransform: 'uppercase',
+      letterSpacing: 0.88,
+    }}>
+      {eyebrow || 'Product Release'}
+    </span>
+  )))
+
+  const headlineNode: ReactNode = wrapBlock('headline', wrapInline('headline', (
+    <div style={{
+      color: textColor,
+      fontSize: 36.88,
+      fontWeight: 300,
+      lineHeight: '46.10px',
+    }}>
+      {headline || 'GX2 2026.1'}
+    </div>
+  )))
+
   return (
     <div style={containerStyle}>
-      {/* Left content area */}
       <div style={{
         width: IMAGE_START,
         height: '100%',
@@ -57,16 +110,16 @@ export function EmailProductRelease({
         left: 0,
         top: 0,
       }}>
-        {/* Logo area */}
-        <div style={{
-          position: 'absolute',
-          left: 27,
-          top: 18,
-        }}>
-          <CorityLogo fill="#D65F00" height={18} />
-        </div>
+        {wrapBlock('logo', (
+          <div style={{
+            position: 'absolute',
+            left: 27,
+            top: 18,
+          }}>
+            <CorityLogo fill="#D65F00" height={18} />
+          </div>
+        ))}
 
-        {/* Vertical divider - 33% of the way from left to image */}
         <div style={{
           position: 'absolute',
           left: DIVIDER_X,
@@ -76,7 +129,6 @@ export function EmailProductRelease({
           borderLeft: `0.5px solid ${borderColor}`,
         }} />
 
-        {/* Horizontal line under header - extends to image edge */}
         <div style={{
           position: 'absolute',
           left: 0,
@@ -86,7 +138,6 @@ export function EmailProductRelease({
           borderTop: `0.5px solid ${borderColor}`,
         }} />
 
-        {/* Eyebrow text - centered in the box between divider and image */}
         <div style={{
           position: 'absolute',
           left: DIVIDER_X,
@@ -97,77 +148,64 @@ export function EmailProductRelease({
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <span style={{
-            color: textColor,
-            fontSize: 8,
-            fontWeight: 500,
-            textTransform: 'uppercase',
-            letterSpacing: 0.88,
-          }}>
-            {eyebrow || 'Product Release'}
-          </span>
+          {eyebrowNode}
         </div>
 
-        {/* Headline area */}
         <div style={{
           position: 'absolute',
           left: 27,
           top: 96,
         }}>
-          <div style={{
-            color: textColor,
-            fontSize: 36.88,
-            fontWeight: 300,
-            lineHeight: '46.10px',
-          }}>
-            {headline || 'GX2 2026.1'}
-          </div>
+          {headlineNode}
         </div>
       </div>
 
-      {/* Right image area */}
-      <div style={{
-        width: 331,
-        height: 184,
-        position: 'absolute',
-        left: IMAGE_START,
-        top: -10,
-        overflow: 'hidden',
-        borderRadius: 6,
-        borderLeft: `0.5px solid ${borderColor}`,
-      }}>
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt=""
-            data-export-image="true"
-            style={{
+      {wrapBlock('image', (
+        <div style={{
+          width: 331,
+          height: 184,
+          position: 'absolute',
+          left: IMAGE_START,
+          top: -10,
+          overflow: 'hidden',
+          borderRadius: 6,
+          borderLeft: `0.5px solid ${borderColor}`,
+        }}>
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt=""
+              data-export-image="true"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+                transform: imageZoom !== 1
+                  ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
+                  : undefined,
+                transformOrigin: 'center',
+                filter: imageFilterStyle,
+              }}
+            />
+          ) : (
+            <div style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
-              objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
-              transform: imageZoom !== 1
-                ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
-                : undefined,
-              transformOrigin: 'center',
-              filter: grayscale ? 'grayscale(100%)' : undefined,
-            }}
-          />
-        ) : (
-          <div style={{
-            width: '100%',
-            height: '100%',
-            background: '#E0E0E0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#999',
-            fontSize: 14,
-          }}>
-            Upload Image
-          </div>
-        )}
-      </div>
+              background: '#E0E0E0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#999',
+              fontSize: 14,
+            }}>
+              Upload Image
+            </div>
+          )}
+        </div>
+      ))}
+
+      {renderOverlay?.()}
     </div>
   )
 }

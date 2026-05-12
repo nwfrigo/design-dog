@@ -105,13 +105,13 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 
 | Template | abs-pos count | Status |
 |---|---|---|
-| EmailProductRelease | 7 | Queued (Track 2) |
+| EmailProductRelease | 7 | ✅ Done (Track 2; eyebrow + headline + universal image slot, decorative dividers preserved as chrome) |
 | EmailCorityConnect2026 | 2 | ✅ Done (Track 2; 16-background enum selector, validates new substrate primitive) |
 | EmailCorityCustomerExchangeSignature | 5 | ✅ Done (Track 2; 4 text slots, empty stage bar) |
 | EmailCorityCustomerExchangeBanner | 4 | ✅ Done (Track 2; 4-color enum selector, flex-end CTA anchor) |
 | EmailEhsAccelerateSignature | 5 | ✅ Done (Track 2; date/location share visibility flag but stay independently editable) |
 | EmailEhsAccelerateBanner | 5 | ✅ Done (Track 2; logo + headline + body + bottom info bar with date/location/cta) |
-| EmailEhsAccelerateInvitation | 8 | Queued (Track 2) — most complex; possibly worth holding to last |
+| EmailEhsAccelerateInvitation | 8 | ⏸ Deferred — body field is rich HTML; pairs with the upcoming collateral-rich-text work in a couple weeks. Migrate when InlineTextEdit gains rich-text support. |
 
 ### Group F — Track 2 horizontal banner strips (2 templates)
 
