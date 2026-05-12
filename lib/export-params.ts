@@ -371,18 +371,17 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   }),
 
   'social-image-meddbase': (s) => ({
+    ...buildImageParams(s),
+    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
     metadata: s.metadata,
     ctaText: s.ctaText,
-    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-    imagePositionX: s.thumbnailImagePosition.x,
-    imagePositionY: s.thumbnailImagePosition.y,
-    imageZoom: s.thumbnailImageZoom,
     layout: s.layout,
     showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
     showMetadata: s.showMetadata,
     showCta: s.showCta,
     showSolutionSet: s.showSolutionSet,
-    grayscale: s.grayscale,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['social-image-meddbase'] ?? {},
   }),
 
   'email-dark-gradient': (s) => ({

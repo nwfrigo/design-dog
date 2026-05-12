@@ -17,6 +17,7 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'social-blue-gradient',
   'social-ehs-accelerate',
   'social-image',
+  'social-image-meddbase',
   'newsletter-dark-gradient',
   'newsletter-blue-gradient',
   'newsletter-light',
