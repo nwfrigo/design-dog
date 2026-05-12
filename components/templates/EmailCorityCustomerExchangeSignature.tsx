@@ -1,9 +1,19 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityCustomerExchangeLogo } from '@/components/shared/CorityCustomerExchangeLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+
+/** Track 2 (fixed-composition) editable block ids. Logo is brand-locked
+ *  on the left. Event details + cta live inside the right translucent
+ *  panel. */
+export type EmailCorityCustomerExchangeSignatureBlockId =
+  | 'logo'
+  | 'eventDate'
+  | 'eventLocation'
+  | 'eventTime'
+  | 'cta'
 
 export interface EmailCorityCustomerExchangeSignatureProps {
   eventDate: string
@@ -14,6 +24,9 @@ export interface EmailCorityCustomerExchangeSignatureProps {
   showEventLocation: boolean
   showEventTime: boolean
   showCta: boolean
+  renderBlock?: (blockId: EmailCorityCustomerExchangeSignatureBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: EmailCorityCustomerExchangeSignatureBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -28,12 +41,16 @@ export function EmailCorityCustomerExchangeSignature({
   showEventLocation,
   showEventTime,
   showCta,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: EmailCorityCustomerExchangeSignatureProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
-  // Panel positioned on the right; logo lockup lives in the remaining left area.
   const PANEL_WIDTH = 157
   const LOGO_WIDTH = 220
   const LOGO_HEIGHT = Math.round(LOGO_WIDTH * (74 / 210))
@@ -49,10 +66,62 @@ export function EmailCorityCustomerExchangeSignature({
     transformOrigin: 'top left',
   }
 
+  const eventDateNode: ReactNode = wrapBlock('eventDate', wrapInline('eventDate', (
+    <div style={{
+      color: 'white',
+      fontSize: 10,
+      fontWeight: 350,
+      lineHeight: '12px',
+      textAlign: 'center',
+    }}>
+      {eventDate || 'Thursday, May 7th'}
+    </div>
+  )))
+
+  const eventLocationNode: ReactNode = wrapBlock('eventLocation', wrapInline('eventLocation', (
+    <div style={{
+      color: 'white',
+      fontSize: 7,
+      fontWeight: 350,
+      lineHeight: '8.4px',
+    }}>
+      {eventLocation || 'Brussels, Belgium'}
+    </div>
+  )))
+
+  const eventTimeNode: ReactNode = wrapBlock('eventTime', wrapInline('eventTime', (
+    <div style={{
+      color: 'white',
+      fontSize: 7,
+      fontWeight: 350,
+      lineHeight: '8.4px',
+    }}>
+      {eventTime || '10:00–16:00'}
+    </div>
+  )))
+
+  const ctaNode: ReactNode = wrapBlock('cta', wrapInline('cta', (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 4,
+    }}>
+      <span style={{
+        color: 'white',
+        fontSize: 11,
+        fontWeight: 350,
+        lineHeight: '11px',
+        textAlign: 'center',
+      }}>
+        {ctaText || 'Join Us'}
+      </span>
+      <ArrowIcon color="white" width={10} height={6} strokeWidth={1.2} />
+    </div>
+  )))
+
   return (
     <div style={containerStyle}>
-
-      {/* Full-bleed background image (gradients are baked in) */}
       <img
         src="/assets/backgrounds/cority_customer_exchange_email_signature_background.png"
         alt=""
@@ -67,16 +136,16 @@ export function EmailCorityCustomerExchangeSignature({
         }}
       />
 
-      {/* Logo lockup — left side, vertically centered */}
-      <div style={{
-        position: 'absolute',
-        left: 16,
-        top: Math.round((100 - LOGO_HEIGHT) / 2),
-      }}>
-        <CorityCustomerExchangeLogo width={LOGO_WIDTH} />
-      </div>
+      {wrapBlock('logo', (
+        <div style={{
+          position: 'absolute',
+          left: 16,
+          top: Math.round((100 - LOGO_HEIGHT) / 2),
+        }}>
+          <CorityCustomerExchangeLogo width={LOGO_WIDTH} />
+        </div>
+      ))}
 
-      {/* Dark translucent right panel */}
       <div style={{
         position: 'absolute',
         left: 400 - PANEL_WIDTH,
@@ -87,8 +156,6 @@ export function EmailCorityCustomerExchangeSignature({
         backdropFilter: 'blur(6.4px)',
         WebkitBackdropFilter: 'blur(6.4px)',
       }}>
-
-        {/* Event details block — date on top, location + time below */}
         <div style={{
           position: 'absolute',
           top: 24,
@@ -99,17 +166,7 @@ export function EmailCorityCustomerExchangeSignature({
           alignItems: 'center',
           gap: 8,
         }}>
-          {showEventDate && (
-            <div style={{
-              color: 'white',
-              fontSize: 10,
-              fontWeight: 350,
-              lineHeight: '12px',
-              textAlign: 'center',
-            }}>
-              {eventDate || 'Thursday, May 7th'}
-            </div>
-          )}
+          {showEventDate && eventDateNode}
           {(showEventLocation || showEventTime) && (
             <div style={{
               display: 'flex',
@@ -117,31 +174,12 @@ export function EmailCorityCustomerExchangeSignature({
               alignItems: 'flex-start',
               gap: 4,
             }}>
-              {showEventLocation && (
-                <div style={{
-                  color: 'white',
-                  fontSize: 7,
-                  fontWeight: 350,
-                  lineHeight: '8.4px',
-                }}>
-                  {eventLocation || 'Brussels, Belgium'}
-                </div>
-              )}
-              {showEventTime && (
-                <div style={{
-                  color: 'white',
-                  fontSize: 7,
-                  fontWeight: 350,
-                  lineHeight: '8.4px',
-                }}>
-                  {eventTime || '10:00–16:00'}
-                </div>
-              )}
+              {showEventLocation && eventLocationNode}
+              {showEventTime && eventTimeNode}
             </div>
           )}
         </div>
 
-        {/* CTA — bottom of panel, centered */}
         {showCta && (
           <div style={{
             position: 'absolute',
@@ -153,21 +191,12 @@ export function EmailCorityCustomerExchangeSignature({
             alignItems: 'center',
             gap: 4,
           }}>
-            <span style={{
-              color: 'white',
-              fontSize: 11,
-              fontWeight: 350,
-              lineHeight: '11px',
-              textAlign: 'center',
-            }}>
-              {ctaText || 'Join Us'}
-            </span>
-            <ArrowIcon color="white" width={10} height={6} strokeWidth={1.2} />
+            {ctaNode}
           </div>
         )}
-
       </div>
 
+      {renderOverlay?.()}
     </div>
   )
 }
