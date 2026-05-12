@@ -414,7 +414,6 @@ export function TemplateRenderer({
           showEyebrow={true}
           showSubhead={false}
           showCta={true}
-          logoColor="orange"
         />
       )
 

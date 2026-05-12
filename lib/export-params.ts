@@ -234,6 +234,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showCta: s.showCta,
     ctaText: s.ctaText,
     theme: s.theme,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['website-thumbnail'] ?? {},
   }),
 
   'website-press-release': (s) => ({
@@ -529,6 +531,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showCta: s.showCta,
     ctaText: s.ctaText,
     theme: s.theme,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['website-report'] ?? {},
   }),
 
   'website-webinar': (s) => ({
@@ -544,6 +548,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     showSpeaker2: s.showSpeaker2,
     showSpeaker3: s.showSpeaker3,
     theme: s.theme,
+    stackAlign: s.stackAlign,
+    gaps: s.templateGaps['website-webinar'] ?? {},
   }),
 
   'website-floating-banner': (s) => ({

@@ -1,66 +1,36 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
-
-// Simple zoom/pan image component
-function ZoomPanImage({
-  src,
-  containerWidth,
-  containerHeight,
-  position,
-  zoom,
-  grayscale = false,
-  grayscaleImageUrl,
-}: {
-  src: string
-  containerWidth: number
-  containerHeight: number
-  position: { x: number; y: number }
-  zoom: number
-  grayscale?: boolean
-  grayscaleImageUrl?: string | null
-}) {
-  return (
-    <div
-      style={{
-        width: containerWidth,
-        height: containerHeight,
-        borderRadius: 10,
-        border: '1px solid #D9D8D6',
-        overflow: 'hidden',
-      }}
-    >
-      <img
-        src={grayscale && grayscaleImageUrl ? grayscaleImageUrl : src}
-        alt=""
-        data-export-image="true"
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          // object-position: 0% = left/top edge, 50% = center, 100% = right/bottom edge
-          objectPosition: `${50 - position.x}% ${50 - position.y}%`,
-          // When zoomed: scale + translate to maintain the same visible content
-          // After scale from center, content shifts away from center
-          // Translate in SAME direction as position to compensate
-          transform: zoom !== 1
-            ? `translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%) scale(${zoom})`
-            : undefined,
-          transformOrigin: 'center',
-          filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
-        }}
-      />
-    </div>
-  )
-}
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export type EbookVariant = 'image' | 'none'
+
+export type WebsiteThumbnailBlockId =
+  | 'logo'
+  | 'solutionPill'
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'cta'
+  | 'image'
+
+type WebsiteThumbnailStackId = Exclude<WebsiteThumbnailBlockId, 'image' | 'solutionPill'>
 
 export interface WebsiteThumbnailProps {
   eyebrow: string
@@ -72,19 +42,32 @@ export interface WebsiteThumbnailProps {
   imageUrl?: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  imageFilters?: ImageFilters
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
   showCta: boolean
-  logoColor: 'black' | 'orange'
   grayscale?: boolean
   theme?: TemplateTheme
   headlineFontSize?: number
   subheadFontSize?: number
+  stackAlign?: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: WebsiteThumbnailStackId,
+    nextId: WebsiteThumbnailStackId,
+  ) => ReactNode
+  renderBlock?: (blockId: WebsiteThumbnailBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: WebsiteThumbnailBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
+
+const DEFAULT_GAP = 24.09
 
 export function WebsiteThumbnail({
   eyebrow,
@@ -96,19 +79,26 @@ export function WebsiteThumbnail({
   imageUrl = '/assets/images/safer_is_stronger_sample_page.png',
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   showEyebrow,
   showHeadline = true,
   showSubhead,
   showCta,
-  logoColor,
   grayscale = false,
   theme = 'light',
   headlineFontSize: headlineFontSizeProp,
   subheadFontSize,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
 }: WebsiteThumbnailProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale)
 
   const themeColors = TEMPLATE_THEMES[theme]
@@ -119,11 +109,21 @@ export function WebsiteThumbnail({
 
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
-  // Text sizes change based on variant
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const filterCssNoSat =
+    filterCss && grayscaleImageUrl
+      ? filtersToCss({ ...effectiveFilters, saturation: 0 })
+      : undefined
+  const imageFilterStyle =
+    grayscaleImageUrl && filterCssNoSat ? filterCssNoSat :
+    grayscaleImageUrl ? 'none' :
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
+
   const defaultHeadlineSize = variant === 'none' ? 54 : 35
   const headlineSize = headlineFontSizeProp ?? defaultHeadlineSize
   const headlineLineHeight = `${headlineSize * (48.19 / defaultHeadlineSize)}px`
-  const headlineSubheadGap = variant === 'none' ? 8 : 4
 
   const containerStyle: CSSProperties = {
     width: 800,
@@ -141,151 +141,146 @@ export function WebsiteThumbnail({
     gap: 20,
   }
 
+  const headerNode: ReactNode = (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 47.71, flexShrink: 0 }}>
+      {wrapBlock('logo', (
+        <CorityLogo fill={logoFill} height={28} />
+      ))}
+      {solution !== 'none' && wrapBlock('solutionPill', (
+        <SolutionPill
+          variant="website-light"
+          solutionColor={solutionColor}
+          solutionLabel={solutionLabel}
+          textColor={themeColors.textPrimary}
+          background={themeColors.bgCategoryChip}
+          border={`1px solid ${themeColors.borderFocus}`}
+        />
+      ))}
+    </div>
+  )
+
+  const blocks: ContentStackBlock<WebsiteThumbnailStackId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: 14,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: 1.32,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: headline || 'Lightweight header.',
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: headlineSize,
+          fontWeight: 350,
+          lineHeight: headlineLineHeight,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && !!subhead,
+      defaultInner: subhead,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: subheadFontSize ?? 20,
+          fontWeight: 350,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'cta',
+      visible: showCta && !!cta,
+      defaultInner: cta,
+      renderChrome: (inner) => (
+        <div style={{
+          display: 'inline-flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: 12.50,
+        }}>
+          <span style={{
+            textAlign: 'center',
+            color: themeColors.buttonSecondaryText,
+            fontSize: 18.75,
+            fontWeight: 500,
+            lineHeight: '18.75px',
+          }}>{inner}</span>
+          <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div style={containerStyle}>
-      {/* Left content area */}
-      <div
-        style={{
-          width: variant === 'image' ? 396 : undefined,
-          flex: variant === 'none' ? '1 1 0' : undefined,
-          alignSelf: 'stretch',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-        }}
-      >
-        {/* Header: Logo + Solution Pill */}
-        <div
-          style={{
-            display: 'inline-flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 47.71,
+      {/* Left content column */}
+      <div style={{
+        width: variant === 'image' ? 396 : undefined,
+        flex: variant === 'none' ? '1 1 0' : undefined,
+        alignSelf: 'stretch',
+        overflow: 'hidden',
+      }}>
+        <ContentStack<WebsiteThumbnailStackId>
+          blocks={blocks}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock as (id: WebsiteThumbnailStackId, content: ReactNode) => ReactNode}
+          renderInlineEditor={renderInlineEditor as (id: WebsiteThumbnailStackId, defaultInner: ReactNode) => ReactNode}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: headerNode,
           }}
-        >
-          <CorityLogo fill={logoFill} height={28} />
-
-          {/* Solution Pill - white fill with subtle border */}
-          {solution !== 'none' && (
-            <SolutionPill
-              variant="website-light"
-              solutionColor={solutionColor}
-              solutionLabel={solutionLabel}
-              textColor={themeColors.textPrimary}
-              background={themeColors.bgCategoryChip}
-              border={`1px solid ${themeColors.borderFocus}`}
-            />
-          )}
-        </div>
-
-        {/* Content area */}
-        <div
-          style={{
-            width: variant === 'none' ? 574 : undefined,
-            alignSelf: variant === 'image' ? 'stretch' : undefined,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: 24.09,
-          }}
-        >
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: themeColors.textPrimary,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.32,
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline + Subhead */}
-          <div
-            style={{
-              alignSelf: 'stretch',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: headlineSubheadGap,
-            }}
-          >
-            {showHeadline && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: headlineSize,
-                  fontWeight: 350,
-                  lineHeight: headlineLineHeight,
-                }}
-              >
-                {headline || 'Lightweight header.'}
-              </div>
-            )}
-
-            {showSubhead && subhead && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: subheadFontSize ?? 20,
-                  fontWeight: 350,
-                }}
-              >
-                {subhead}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CTA Link */}
-        {showCta && cta && (
-          <div
-            style={{
-              display: 'inline-flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 12.50,
-            }}
-          >
-            <span
-              style={{
-                textAlign: 'center',
-                color: themeColors.buttonSecondaryText,
-                fontSize: 18.75,
-                fontWeight: 500,
-                lineHeight: '18.75px',
-              }}
-            >
-              {cta}
-            </span>
-            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
-          </div>
-        )}
+          alignItems="flex-start"
+        />
       </div>
 
-      {/* Image - only shown for image variant */}
-      {variant === 'image' && (
-        <ZoomPanImage
-          src={imageUrl}
-          containerWidth={320}
-          containerHeight={386}
-          position={imagePosition}
-          zoom={imageZoom}
-          grayscale={grayscale}
-          grayscaleImageUrl={grayscaleImageUrl}
-        />
-      )}
+      {/* Right image — only for image variant */}
+      {variant === 'image' && wrapBlock('image', (
+        <div style={{
+          width: 320,
+          height: 386,
+          borderRadius: 10,
+          border: '1px solid #D9D8D6',
+          overflow: 'hidden',
+          flexShrink: 0,
+        }}>
+          <img
+            src={grayscaleImageUrl || imageUrl}
+            alt=""
+            data-export-image="true"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: `${50 - imagePosition.x}% ${50 - imagePosition.y}%`,
+              transform: imageZoom !== 1
+                ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
+                : undefined,
+              transformOrigin: 'center',
+              filter: imageFilterStyle,
+            }}
+          />
+        </div>
+      ))}
+
+      {renderOverlay?.()}
     </div>
   )
 }

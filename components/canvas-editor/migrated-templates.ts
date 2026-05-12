@@ -22,6 +22,9 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'newsletter-dark-gradient',
   'newsletter-blue-gradient',
   'newsletter-light',
+  'website-thumbnail',
+  'website-report',
+  'website-webinar',
 ])
 
 export function isStageBenchTemplate(template: TemplateType): boolean {

@@ -582,7 +582,6 @@ function AssetPreviewRenderer({
           showEyebrow={asset.showEyebrow}
           showSubhead={asset.showSubhead && !!copy.subhead}
           showCta={asset.showCta !== false}
-          logoColor={asset.logoColor === 'white' ? 'black' : asset.logoColor}
         />
       )
     case 'website-press-release':

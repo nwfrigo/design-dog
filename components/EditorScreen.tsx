@@ -4345,7 +4345,6 @@ export function EditorScreen() {
                   grayscale={grayscale}
                   headlineFontSize={headlineFontSize ?? undefined}
                   subheadFontSize={subheadFontSize ?? undefined}
-                  logoColor={logoColor === 'white' ? 'black' : logoColor}
                   theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}

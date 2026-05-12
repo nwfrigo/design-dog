@@ -1,12 +1,23 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export interface WebinarSpeakerInfo {
   name: string
@@ -17,6 +28,22 @@ export interface WebinarSpeakerInfo {
 }
 
 export type WebinarVariant = 'none' | 'image' | 'speakers'
+
+/** Editable block IDs. The `speakers` block is a panel-level slot that
+ *  contains 3 speaker rows internally; per-speaker editing is deferred
+ *  (mirrors how EmailSpeakers initially shipped). */
+export type WebsiteWebinarBlockId =
+  | 'logo'
+  | 'solutionPill'
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'body'
+  | 'cta'
+  | 'image'
+  | 'speakers'
+
+type WebsiteWebinarStackId = Exclude<WebsiteWebinarBlockId, 'image' | 'solutionPill' | 'speakers'>
 
 export interface WebsiteWebinarProps {
   eyebrow: string
@@ -29,6 +56,7 @@ export interface WebsiteWebinarProps {
   imageUrl?: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  imageFilters?: ImageFilters
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
@@ -45,12 +73,24 @@ export interface WebsiteWebinarProps {
   showSpeaker3?: boolean
   headlineFontSize?: number
   subheadFontSize?: number
+  stackAlign?: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: WebsiteWebinarStackId,
+    nextId: WebsiteWebinarStackId,
+  ) => ReactNode
+  renderBlock?: (blockId: WebsiteWebinarBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: WebsiteWebinarBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
 
-// Component to render a circular speaker avatar with optional grayscale
+const DEFAULT_GAP = 25.10
+
 function SpeakerAvatar({
   imageUrl,
   position,
@@ -117,6 +157,7 @@ export function WebsiteWebinar({
   imageUrl = '/placeholder-mountain.jpg',
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   showEyebrow,
   showHeadline = true,
   showSubhead,
@@ -124,7 +165,6 @@ export function WebsiteWebinar({
   showCta,
   grayscale = false,
   theme = 'dark',
-  speakerCount = 3,
   speaker1,
   speaker2,
   speaker3,
@@ -133,10 +173,17 @@ export function WebsiteWebinar({
   showSpeaker3 = true,
   headlineFontSize: headlineFontSizeProp,
   subheadFontSize,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
 }: WebsiteWebinarProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.safety
   const solutionColor = solutionConfig.color
@@ -146,18 +193,27 @@ export function WebsiteWebinar({
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale && variant === 'image')
 
-  // Font sizes differ based on variant
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const filterCssNoSat =
+    filterCss && grayscaleImageUrl
+      ? filtersToCss({ ...effectiveFilters, saturation: 0 })
+      : undefined
+  const imageFilterStyle =
+    grayscaleImageUrl && filterCssNoSat ? filterCssNoSat :
+    grayscaleImageUrl ? 'none' :
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
+
   const defaultHeadlineFontSize = variant === 'none' ? 54 : 35.42
   const headlineFontSize = headlineFontSizeProp ?? defaultHeadlineFontSize
-  const contentWidth = variant === 'none' ? 574 : 401.04
   const headlineLineHeight = `${headlineFontSize * (50.20 / defaultHeadlineFontSize)}px`
-  const headlineGap = variant === 'none' ? 8 : 4.17
 
   const containerStyle: CSSProperties = {
     width: 800,
     height: 450,
     padding: 33.33,
-    paddingRight: variant === 'image' ? 0 : 33.33, // No right padding for image variant so image goes to edge
+    paddingRight: variant === 'image' ? 0 : 33.33,
     position: 'relative',
     background: themeColors.backgroundPrimary,
     overflow: 'hidden',
@@ -167,29 +223,125 @@ export function WebsiteWebinar({
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    gap: variant === 'none' ? 28 : (variant === 'speakers' ? 28 : 10.42),
+    gap: variant === 'image' ? 10.42 : 28,
   }
 
-  // Build speakers array based on visibility
   const speakers: (WebinarSpeakerInfo & { speakerIndex: number })[] = []
   if (showSpeaker1) speakers.push({ ...speaker1, speakerIndex: 1 })
   if (showSpeaker2) speakers.push({ ...speaker2, speakerIndex: 2 })
   if (showSpeaker3) speakers.push({ ...speaker3, speakerIndex: 3 })
 
+  const headerNode: ReactNode = (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 49.70, flexShrink: 0 }}>
+      {wrapBlock('logo', (
+        <CorityLogo fill={themeColors.logoFill} height={29} />
+      ))}
+      {solution !== 'none' && wrapBlock('solutionPill', (
+        <SolutionPill
+          variant="website-dark"
+          solutionColor={solutionColor}
+          solutionLabel={solutionLabel}
+          textColor={themeColors.textPrimary}
+          background={themeColors.bgCategoryChip}
+          border={`0.79px solid ${themeColors.borderFocus}`}
+        />
+      ))}
+    </div>
+  )
+
+  const blocks: ContentStackBlock<WebsiteWebinarStackId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: 14,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: 1.38,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: headline || 'Lightweight header.',
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: headlineFontSize,
+          fontWeight: 350,
+          lineHeight: headlineLineHeight,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && !!subhead,
+      defaultInner: subhead,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: subheadFontSize ?? 22,
+          fontWeight: 350,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'body',
+      visible: showBody && !!body,
+      defaultInner: body,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: 14.58,
+          fontWeight: 350,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'cta',
+      visible: showCta && !!cta,
+      defaultInner: cta,
+      renderChrome: (inner) => (
+        <div style={{
+          display: 'inline-flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: 12.50,
+        }}>
+          <span style={{
+            textAlign: 'center',
+            color: themeColors.buttonSecondaryText,
+            fontSize: 18.75,
+            fontWeight: 500,
+            lineHeight: '18.75px',
+          }}>{inner}</span>
+          <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div style={containerStyle}>
-      {/* Image on right side (only for image variant) */}
-      {variant === 'image' && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 467, // Start after text content area (33.33 padding + 401 content + ~32 gap)
-            top: 0,
-            right: 0, // Extend to right edge
-            bottom: 0, // Full height
-            overflow: 'hidden',
-          }}
-        >
+      {/* Image on right — only for image variant. Absolute-positioned so
+       *  it extends to the right edge (matches legacy layout). */}
+      {variant === 'image' && wrapBlock('image', (
+        <div style={{
+          position: 'absolute',
+          left: 467,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          overflow: 'hidden',
+        }}>
           <img
             src={grayscaleImageUrl || imageUrl}
             alt=""
@@ -203,174 +355,53 @@ export function WebsiteWebinar({
                 ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
                 : undefined,
               transformOrigin: 'center',
-              filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
+              filter: imageFilterStyle,
             }}
           />
         </div>
-      )}
+      ))}
 
-      {/* Left content area */}
-      <div
-        style={{
-          width: variant === 'none' ? undefined : 401,
-          flex: variant === 'none' ? '1 1 0' : undefined,
+      {/* Left content column */}
+      <div style={{
+        width: variant === 'none' ? undefined : 401,
+        flex: variant === 'none' ? '1 1 0' : undefined,
+        alignSelf: 'stretch',
+        overflow: 'hidden',
+      }}>
+        <ContentStack<WebsiteWebinarStackId>
+          blocks={blocks}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock as (id: WebsiteWebinarStackId, content: ReactNode) => ReactNode}
+          renderInlineEditor={renderInlineEditor as (id: WebsiteWebinarStackId, defaultInner: ReactNode) => ReactNode}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: headerNode,
+          }}
+          alignItems="flex-start"
+        />
+      </div>
+
+      {/* Speakers panel — only for speakers variant. Wrapped as a single
+       *  block (per-speaker editing deferred — mirrors EmailSpeakers'
+       *  initial state). */}
+      {variant === 'speakers' && wrapBlock('speakers', (
+        <div style={{
+          flex: '1 1 0',
           alignSelf: 'stretch',
+          paddingLeft: 20,
+          paddingRight: 20,
+          background: themeColors.bgCategoryChip,
           overflow: 'hidden',
+          borderRadius: 7,
+          border: `0.75px solid ${themeColors.borderFocus}`,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-        }}
-      >
-        {/* Header: Logo + Solution Pill */}
-        <div
-          style={{
-            display: 'inline-flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 49.70,
-          }}
-        >
-          <CorityLogo fill={themeColors.logoFill} height={29} />
-
-          {/* Solution Pill */}
-          {solution !== 'none' && (
-            <SolutionPill
-              variant="website-dark"
-              solutionColor={solutionColor}
-              solutionLabel={solutionLabel}
-              textColor={themeColors.textPrimary}
-              background={themeColors.bgCategoryChip}
-              border={`0.79px solid ${themeColors.borderFocus}`}
-            />
-          )}
-        </div>
-
-        {/* Content area */}
-        <div
-          style={{
-            width: contentWidth,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: 25.10,
-          }}
-        >
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: themeColors.textPrimary,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.38,
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline + Subhead */}
-          <div
-            style={{
-              alignSelf: 'stretch',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: headlineGap,
-            }}
-          >
-            {showHeadline && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: headlineFontSize,
-                  fontWeight: 350,
-                  lineHeight: headlineLineHeight,
-                }}
-              >
-                {headline || 'Lightweight header.'}
-              </div>
-            )}
-
-            {showSubhead && subhead && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: subheadFontSize ?? 22,
-                  fontWeight: 350,
-                }}
-              >
-                {subhead}
-              </div>
-            )}
-          </div>
-
-          {/* Body */}
-          {showBody && body && (
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: themeColors.textPrimary,
-                fontSize: 14.58,
-                fontWeight: 350,
-              }}
-            >
-              {body}
-            </div>
-          )}
-        </div>
-
-        {/* CTA Link */}
-        {showCta && cta && (
-          <div
-            style={{
-              display: 'inline-flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 12.50,
-            }}
-          >
-            <span
-              style={{
-                textAlign: 'center',
-                color: themeColors.buttonSecondaryText,
-                fontSize: 18.75,
-                fontWeight: 500,
-                lineHeight: '18.75px',
-              }}
-            >
-              {cta}
-            </span>
-            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
-          </div>
-        )}
-      </div>
-
-      {/* Speakers panel (only for speakers variant) */}
-      {variant === 'speakers' && (
-        <div
-          style={{
-            flex: '1 1 0',
-            alignSelf: 'stretch',
-            paddingLeft: 20,
-            paddingRight: 20,
-            background: themeColors.bgCategoryChip,
-            overflow: 'hidden',
-            borderRadius: 7,
-            border: `0.75px solid ${themeColors.borderFocus}`,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-          }}
-        >
+        }}>
           {speakers.map((speaker, index) => (
             <div
               key={index}
@@ -391,41 +422,37 @@ export function WebsiteWebinar({
                 speakerIndex={speaker.speakerIndex}
                 grayscale={grayscale}
               />
-              <div
-                style={{
-                  flex: '1 1 0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}
-              >
-                <div
-                  style={{
-                    alignSelf: 'stretch',
-                    color: themeColors.textPrimary,
-                    fontSize: 18,
-                    fontWeight: 350,
-                  }}
-                >
+              <div style={{
+                flex: '1 1 0',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+              }}>
+                <div style={{
+                  alignSelf: 'stretch',
+                  color: themeColors.textPrimary,
+                  fontSize: 18,
+                  fontWeight: 350,
+                }}>
                   {speaker.name}
                 </div>
-                <div
-                  style={{
-                    alignSelf: 'stretch',
-                    color: themeColors.textPrimary,
-                    fontSize: 12,
-                    fontWeight: 350,
-                    lineHeight: '16px',
-                  }}
-                >
+                <div style={{
+                  alignSelf: 'stretch',
+                  color: themeColors.textPrimary,
+                  fontSize: 12,
+                  fontWeight: 350,
+                  lineHeight: '16px',
+                }}>
                   {speaker.role}
                 </div>
               </div>
             </div>
           ))}
         </div>
-      )}
+      ))}
+
+      {renderOverlay?.()}
     </div>
   )
 }

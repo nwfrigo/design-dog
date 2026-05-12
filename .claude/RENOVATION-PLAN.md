@@ -84,9 +84,9 @@ Left content stack + right image. ContentStack for the left column; image stays 
 
 | Template | Tier | Status |
 |---|---|---|
-| WebsiteWebinar | 2 | Queued |
-| WebsiteReport | 2 | Queued |
-| WebsiteThumbnail | 2 | Queued |
+| WebsiteWebinar | 2 | ✅ Done (3-variant text/image/speakers; speakers panel wrapped as single block — inner editing deferred, mirrors EmailSpeakers) |
+| WebsiteReport | 2 | ✅ Done (image-left variant + text-only; press-release shape mirrored) |
+| WebsiteThumbnail | 2 | ✅ Done (image-right variant + text-only; press-release shape mirrored) |
 
 ### Group D — Track 1 nested stacks (4 templates)
 

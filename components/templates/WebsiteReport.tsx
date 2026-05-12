@@ -1,14 +1,36 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import type { StackAlign } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { useGrayscaleImage } from '@/hooks/useGrayscaleImage'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import {
+  ContentStack,
+  type ContentStackBlock,
+} from '@/components/canvas-editor/ContentStack'
+import {
+  NEUTRAL_FILTERS,
+  applyGrayscaleBoolean,
+  filtersToCss,
+  type ImageFilters,
+} from '@/lib/image-filters'
 
 export type ReportVariant = 'image' | 'none'
+
+export type WebsiteReportBlockId =
+  | 'logo'
+  | 'solutionPill'
+  | 'eyebrow'
+  | 'headline'
+  | 'subhead'
+  | 'cta'
+  | 'image'
+
+type WebsiteReportStackId = Exclude<WebsiteReportBlockId, 'image' | 'solutionPill'>
 
 export interface WebsiteReportProps {
   eyebrow: string
@@ -20,6 +42,7 @@ export interface WebsiteReportProps {
   imageUrl?: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
+  imageFilters?: ImageFilters
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
@@ -28,10 +51,23 @@ export interface WebsiteReportProps {
   theme?: TemplateTheme
   headlineFontSize?: number
   subheadFontSize?: number
+  stackAlign?: StackAlign
+  gaps?: Record<string, number>
+  renderSpacerBetween?: (
+    gapKey: string,
+    value: number,
+    prevId: WebsiteReportStackId,
+    nextId: WebsiteReportStackId,
+  ) => ReactNode
+  renderBlock?: (blockId: WebsiteReportBlockId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (blockId: WebsiteReportBlockId, defaultInner: ReactNode) => ReactNode
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
 }
+
+const DEFAULT_GAP = 24.09
 
 export function WebsiteReport({
   eyebrow,
@@ -43,6 +79,7 @@ export function WebsiteReport({
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
+  imageFilters = NEUTRAL_FILTERS,
   showEyebrow,
   showHeadline = true,
   showSubhead,
@@ -51,10 +88,17 @@ export function WebsiteReport({
   theme = 'dark',
   headlineFontSize: headlineFontSizeProp,
   subheadFontSize,
+  stackAlign = 'top',
+  gaps,
+  renderSpacerBetween,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
 }: WebsiteReportProps) {
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
   const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.general
   const solutionColor = solutionConfig.color
@@ -64,12 +108,22 @@ export function WebsiteReport({
 
   const grayscaleImageUrl = useGrayscaleImage(imageUrl, grayscale && variant === 'image')
 
-  // Text sizes change based on variant
+  const effectiveFilters = applyGrayscaleBoolean(imageFilters, grayscale)
+  const filterCss = filtersToCss(effectiveFilters)
+  const filterCssNoSat =
+    filterCss && grayscaleImageUrl
+      ? filtersToCss({ ...effectiveFilters, saturation: 0 })
+      : undefined
+  const imageFilterStyle =
+    grayscaleImageUrl && filterCssNoSat ? filterCssNoSat :
+    grayscaleImageUrl ? 'none' :
+    filterCss ? filterCss :
+    grayscale ? 'grayscale(100%)' : 'none'
+
   const defaultHeadlineSize = variant === 'none' ? 54 : 35
   const headlineSize = headlineFontSizeProp ?? defaultHeadlineSize
   const defaultLineHeight = variant === 'none' ? 58 : 48.19
   const headlineLineHeight = `${headlineSize * (defaultLineHeight / defaultHeadlineSize)}px`
-  const headlineSubheadGap = variant === 'none' ? 8 : 4
 
   const containerStyle: CSSProperties = {
     width: 800,
@@ -87,19 +141,102 @@ export function WebsiteReport({
     gap: 40,
   }
 
+  const headerNode: ReactNode = (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 49.70, flexShrink: 0 }}>
+      {wrapBlock('logo', (
+        <CorityLogo fill={themeColors.logoFill} height={28} />
+      ))}
+      {solution !== 'none' && wrapBlock('solutionPill', (
+        <SolutionPill
+          variant="website-dark"
+          solutionColor={solutionColor}
+          solutionLabel={solutionLabel}
+          textColor={themeColors.textPrimary}
+          background={themeColors.bgCategoryChip}
+          border={`0.79px solid ${themeColors.borderFocus}`}
+        />
+      ))}
+    </div>
+  )
+
+  const blocks: ContentStackBlock<WebsiteReportStackId>[] = [
+    {
+      id: 'eyebrow',
+      visible: showEyebrow && !!eyebrow,
+      defaultInner: eyebrow,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: 14,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: 1.32,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'headline',
+      visible: !!showHeadline,
+      defaultInner: headline || 'Lightweight header.',
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: headlineSize,
+          fontWeight: 350,
+          lineHeight: headlineLineHeight,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'subhead',
+      visible: showSubhead && !!subhead,
+      defaultInner: subhead,
+      renderChrome: (inner) => (
+        <div style={{
+          alignSelf: 'stretch',
+          color: themeColors.textPrimary,
+          fontSize: subheadFontSize ?? 20,
+          fontWeight: 350,
+        }}>{inner}</div>
+      ),
+    },
+    {
+      id: 'cta',
+      visible: showCta && !!cta,
+      defaultInner: cta,
+      renderChrome: (inner) => (
+        <div style={{
+          display: 'inline-flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: 12.50,
+        }}>
+          <span style={{
+            textAlign: 'center',
+            color: themeColors.buttonSecondaryText,
+            fontSize: 18.75,
+            fontWeight: 500,
+            lineHeight: '18.75px',
+          }}>{inner}</span>
+          <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div style={containerStyle}>
-      {/* Image on left side - only shown for image variant */}
-      {variant === 'image' && (
-        <div
-          style={{
-            width: 320,
-            height: 386,
-            borderRadius: 10,
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
+      {/* Image on left — only for image variant */}
+      {variant === 'image' && wrapBlock('image', (
+        <div style={{
+          width: 320,
+          height: 386,
+          borderRadius: 10,
+          overflow: 'hidden',
+          flexShrink: 0,
+        }}>
           <img
             src={grayscaleImageUrl || imageUrl || '/assets/images/default_placeholder_image_report.png'}
             alt=""
@@ -113,141 +250,35 @@ export function WebsiteReport({
                 ? `translate(${imagePosition.x * (imageZoom - 1)}%, ${imagePosition.y * (imageZoom - 1)}%) scale(${imageZoom})`
                 : undefined,
               transformOrigin: 'center',
-              filter: grayscale ? (grayscaleImageUrl ? 'none' : 'grayscale(100%)') : 'none',
+              filter: imageFilterStyle,
             }}
           />
         </div>
-      )}
+      ))}
 
-      {/* Right content area (for image variant) / Full content area (for none variant) */}
-      <div
-        style={{
-          flex: '1 1 0',
-          alignSelf: 'stretch',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-        }}
-      >
-        {/* Header: Logo + Solution Pill */}
-        <div
-          style={{
-            display: 'inline-flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            gap: 49.70,
+      {/* Right content column (left when variant='none') */}
+      <div style={{
+        flex: '1 1 0',
+        alignSelf: 'stretch',
+        overflow: 'hidden',
+      }}>
+        <ContentStack<WebsiteReportStackId>
+          blocks={blocks}
+          gaps={gaps}
+          defaultGap={DEFAULT_GAP}
+          renderSpacerBetween={renderSpacerBetween}
+          renderBlock={renderBlock as (id: WebsiteReportStackId, content: ReactNode) => ReactNode}
+          renderInlineEditor={renderInlineEditor as (id: WebsiteReportStackId, defaultInner: ReactNode) => ReactNode}
+          stackAlign={stackAlign}
+          topAnchor={{
+            id: 'logo',
+            node: headerNode,
           }}
-        >
-          <CorityLogo fill={themeColors.logoFill} height={28} />
-
-          {/* Solution Pill */}
-          {solution !== 'none' && (
-            <SolutionPill
-              variant="website-dark"
-              solutionColor={solutionColor}
-              solutionLabel={solutionLabel}
-              textColor={themeColors.textPrimary}
-              background={themeColors.bgCategoryChip}
-              border={`0.79px solid ${themeColors.borderFocus}`}
-            />
-          )}
-        </div>
-
-        {/* Content area */}
-        <div
-          style={{
-            width: variant === 'none' ? 574 : undefined,
-            alignSelf: variant === 'image' ? 'stretch' : undefined,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: 24.09,
-          }}
-        >
-          {/* Eyebrow */}
-          {showEyebrow && eyebrow && (
-            <div
-              style={{
-                alignSelf: 'stretch',
-                color: themeColors.textPrimary,
-                fontSize: 14,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 1.32,
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Headline + Subhead */}
-          <div
-            style={{
-              alignSelf: 'stretch',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: headlineSubheadGap,
-            }}
-          >
-            {showHeadline && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: headlineSize,
-                  fontWeight: 350,
-                  lineHeight: headlineLineHeight,
-                }}
-              >
-                {headline || 'Lightweight header.'}
-              </div>
-            )}
-
-            {showSubhead && subhead && (
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: subheadFontSize ?? 20,
-                  fontWeight: 350,
-                }}
-              >
-                {subhead}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CTA Link */}
-        {showCta && cta && (
-          <div
-            style={{
-              display: 'inline-flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 12.50,
-            }}
-          >
-            <span
-              style={{
-                textAlign: 'center',
-                color: themeColors.buttonSecondaryText,
-                fontSize: 18.75,
-                fontWeight: 500,
-                lineHeight: '18.75px',
-              }}
-            >
-              {cta}
-            </span>
-            <ArrowIcon color={themeColors.buttonSecondaryText} width={17} height={14} viewBox="0 0 17 14" pathD="M10 1L16 7M16 7L10 13M16 7H1" strokeWidth={1.17} />
-          </div>
-        )}
+          alignItems="flex-start"
+        />
       </div>
+
+      {renderOverlay?.()}
     </div>
   )
 }

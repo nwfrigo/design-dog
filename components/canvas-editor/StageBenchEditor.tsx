@@ -8,6 +8,9 @@ import { DndProvider } from '@/lib/dnd'
 import { EmailDarkGradientStageBench } from './template-adapters/EmailDarkGradientStageBench'
 import { EmailSpeakersStageBench } from './template-adapters/EmailSpeakersStageBench'
 import { EmailImageStageBench } from './template-adapters/EmailImageStageBench'
+import { WebsiteThumbnailStageBench } from './template-adapters/WebsiteThumbnailStageBench'
+import { WebsiteReportStageBench } from './template-adapters/WebsiteReportStageBench'
+import { WebsiteWebinarStageBench } from './template-adapters/WebsiteWebinarStageBench'
 import { WebsitePressReleaseStageBench } from './template-adapters/WebsitePressReleaseStageBench'
 import { SocialDarkGradientStageBench } from './template-adapters/SocialDarkGradientStageBench'
 import { SocialBlueGradientStageBench } from './template-adapters/SocialBlueGradientStageBench'
@@ -67,6 +70,9 @@ const TEMPLATE_ADAPTERS: Partial<Record<TemplateType, ComponentType<StageBenchEd
   'newsletter-dark-gradient': NewsletterDarkGradientStageBench,
   'newsletter-blue-gradient': NewsletterBlueGradientStageBench,
   'newsletter-light': NewsletterLightStageBench,
+  'website-thumbnail': WebsiteThumbnailStageBench,
+  'website-report': WebsiteReportStageBench,
+  'website-webinar': WebsiteWebinarStageBench,
 }
 
 export function StageBenchEditor(props: StageBenchEditorProps) {
