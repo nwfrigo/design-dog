@@ -80,40 +80,40 @@ export const WebsiteWebinarStageBench =
         content: { format: 'plain', placeholder: 'Call to Action' },
       },
       { blockId: 'image', label: 'Image', iconKey: 'image', kind: 'image', benchable: false },
-      { blockId: 'speakers', label: 'Speakers', iconKey: 'group', kind: 'group', benchable: false },
-      // Per-speaker name + role fields. `parent: 'speakers'` excludes them
-      // from the bench surface (the parent group represents them) while
-      // keeping selection / inline editing wired up via the DOM walker.
-      // Avatars are intentionally not yet child slots — image slots need
-      // a dedicated framework pass.
+      // Each speaker is its own bench-able group (matches EmailSpeakers).
+      // Drag a speaker to the bench → showSpeakerN goes false; drag back
+      // → restored. Per-speaker name + role are nested children below.
+      { blockId: 'speaker1', label: 'Speaker 1', iconKey: 'speaker', chipKind: 'speaker', kind: 'group' },
+      { blockId: 'speaker2', label: 'Speaker 2', iconKey: 'speaker', chipKind: 'speaker', kind: 'group' },
+      { blockId: 'speaker3', label: 'Speaker 3', iconKey: 'speaker', chipKind: 'speaker', kind: 'group' },
       {
         blockId: 'speaker1Name', label: 'Speaker 1 Name', iconKey: 'speaker',
-        chipKind: 'speaker', kind: 'text', parent: 'speakers',
+        chipKind: 'speaker', kind: 'text', parent: 'speaker1',
         content: { format: 'plain', singleLine: true, placeholder: 'Speaker Name' },
       },
       {
         blockId: 'speaker1Role', label: 'Speaker 1 Role', iconKey: 'small-caption',
-        chipKind: 'small-caption', kind: 'text', parent: 'speakers',
+        chipKind: 'small-caption', kind: 'text', parent: 'speaker1',
         content: { format: 'plain', singleLine: true, placeholder: 'Speaker Role' },
       },
       {
         blockId: 'speaker2Name', label: 'Speaker 2 Name', iconKey: 'speaker',
-        chipKind: 'speaker', kind: 'text', parent: 'speakers',
+        chipKind: 'speaker', kind: 'text', parent: 'speaker2',
         content: { format: 'plain', singleLine: true, placeholder: 'Speaker Name' },
       },
       {
         blockId: 'speaker2Role', label: 'Speaker 2 Role', iconKey: 'small-caption',
-        chipKind: 'small-caption', kind: 'text', parent: 'speakers',
+        chipKind: 'small-caption', kind: 'text', parent: 'speaker2',
         content: { format: 'plain', singleLine: true, placeholder: 'Speaker Role' },
       },
       {
         blockId: 'speaker3Name', label: 'Speaker 3 Name', iconKey: 'speaker',
-        chipKind: 'speaker', kind: 'text', parent: 'speakers',
+        chipKind: 'speaker', kind: 'text', parent: 'speaker3',
         content: { format: 'plain', singleLine: true, placeholder: 'Speaker Name' },
       },
       {
         blockId: 'speaker3Role', label: 'Speaker 3 Role', iconKey: 'small-caption',
-        chipKind: 'small-caption', kind: 'text', parent: 'speakers',
+        chipKind: 'small-caption', kind: 'text', parent: 'speaker3',
         content: { format: 'plain', singleLine: true, placeholder: 'Speaker Role' },
       },
     ],
@@ -202,8 +202,11 @@ export const WebsiteWebinarStageBench =
       const speaker3ImagePosition = useStore((s) => s.speaker3ImagePosition)
       const speaker3ImageZoom = useStore((s) => s.speaker3ImageZoom)
       const showSpeaker1 = useStore((s) => s.showSpeaker1)
+      const setShowSpeaker1 = useStore((s) => s.setShowSpeaker1)
       const showSpeaker2 = useStore((s) => s.showSpeaker2)
+      const setShowSpeaker2 = useStore((s) => s.setShowSpeaker2)
       const showSpeaker3 = useStore((s) => s.showSpeaker3)
+      const setShowSpeaker3 = useStore((s) => s.setShowSpeaker3)
       const speakers = {
         speaker1: { name: speaker1Name, role: speaker1Role, imageUrl: speaker1ImageUrl, imagePosition: speaker1ImagePosition, imageZoom: speaker1ImageZoom },
         speaker2: { name: speaker2Name, role: speaker2Role, imageUrl: speaker2ImageUrl, imagePosition: speaker2ImagePosition, imageZoom: speaker2ImageZoom },
@@ -252,7 +255,9 @@ export const WebsiteWebinarStageBench =
             setVisible: setShowCta,
           },
           image: {},
-          speakers: {},
+          speaker1: { visible: showSpeaker1, setVisible: setShowSpeaker1 },
+          speaker2: { visible: showSpeaker2, setVisible: setShowSpeaker2 },
+          speaker3: { visible: showSpeaker3, setVisible: setShowSpeaker3 },
           speaker1Name: { value: speaker1Name, setValue: setSpeaker1Name },
           speaker1Role: { value: speaker1Role, setValue: setSpeaker1Role },
           speaker2Name: { value: speaker2Name, setValue: setSpeaker2Name },
@@ -325,9 +330,9 @@ export const WebsiteWebinarStageBench =
           speaker1={speakers.speaker1}
           speaker2={speakers.speaker2}
           speaker3={speakers.speaker3}
-          showSpeaker1={speakers.showSpeaker1}
-          showSpeaker2={speakers.showSpeaker2}
-          showSpeaker3={speakers.showSpeaker3}
+          showSpeaker1={ctx.visibilityOf('speaker1')}
+          showSpeaker2={ctx.visibilityOf('speaker2')}
+          showSpeaker3={ctx.visibilityOf('speaker3')}
           headlineFontSize={ctx.fontSizeOf('headline')}
           subheadFontSize={ctx.fontSizeOf('subhead')}
           stackAlign={ctx.stackAlign}

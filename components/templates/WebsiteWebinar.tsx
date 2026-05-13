@@ -29,9 +29,9 @@ export interface WebinarSpeakerInfo {
 
 export type WebinarVariant = 'none' | 'image' | 'speakers'
 
-/** Editable block IDs. The `speakers` block is a panel-level group;
+/** Editable block IDs. Each of speaker1/2/3 is a bench-able group;
  *  per-speaker name + role fields are nested child slots (declared with
- *  `parent: 'speakers'` in the adapter, deep-clicked via the DOM walker
+ *  `parent: 'speakerN'` in the adapter, deep-clicked via the DOM walker
  *  in Editable.tsx). */
 export type WebsiteWebinarBlockId =
   | 'logo'
@@ -42,7 +42,9 @@ export type WebsiteWebinarBlockId =
   | 'body'
   | 'cta'
   | 'image'
-  | 'speakers'
+  | 'speaker1'
+  | 'speaker2'
+  | 'speaker3'
   | 'speaker1Name'
   | 'speaker1Role'
   | 'speaker2Name'
@@ -54,7 +56,9 @@ type WebsiteWebinarStackId = Exclude<
   WebsiteWebinarBlockId,
   | 'image'
   | 'solutionPill'
-  | 'speakers'
+  | 'speaker1'
+  | 'speaker2'
+  | 'speaker3'
   | 'speaker1Name'
   | 'speaker1Role'
   | 'speaker2Name'
@@ -402,10 +406,13 @@ export function WebsiteWebinar({
         />
       </div>
 
-      {/* Speakers panel — only for speakers variant. Wrapped as a single
-       *  block (per-speaker editing deferred — mirrors EmailSpeakers'
-       *  initial state). */}
-      {variant === 'speakers' && wrapBlock('speakers', (
+      {/* Speakers panel — only for speakers variant. Each speaker row is
+       *  its own bench-able group (matches EmailSpeakers): the panel
+       *  container is brand-locked visual chrome, the per-speaker
+       *  wrapBlock(`speakerN`) makes each row independently selectable +
+       *  bench-droppable. Children `speakerNName` / `speakerNRole` are
+       *  declared with `parent: 'speakerN'` in the adapter. */}
+      {variant === 'speakers' && (
         <div style={{
           flex: '1 1 0',
           alignSelf: 'stretch',
@@ -421,9 +428,10 @@ export function WebsiteWebinar({
           alignItems: 'flex-start',
         }}>
           {speakers.map((speaker) => {
+            const groupId = `speaker${speaker.speakerIndex}` as WebsiteWebinarBlockId
             const nameId = `speaker${speaker.speakerIndex}Name` as WebsiteWebinarBlockId
             const roleId = `speaker${speaker.speakerIndex}Role` as WebsiteWebinarBlockId
-            return (
+            return wrapBlock(groupId, (
               <div
                 key={speaker.speakerIndex}
                 style={{
@@ -473,10 +481,10 @@ export function WebsiteWebinar({
                   ))}
                 </div>
               </div>
-            )
+            ))
           })}
         </div>
-      ))}
+      )}
 
       {renderOverlay?.()}
     </div>
