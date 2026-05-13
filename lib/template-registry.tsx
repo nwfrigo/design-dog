@@ -15,7 +15,6 @@ import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import { WebsiteFloatingBanner } from '@/components/templates/WebsiteFloatingBanner'
 import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloatingBannerMobile'
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
-import { EmailImage } from '@/components/templates/EmailImage'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
@@ -24,7 +23,6 @@ import { EmailEhsAccelerateSignature } from '@/components/templates/EmailEhsAcce
 import { EmailCorityCustomerExchangeSignature } from '@/components/templates/EmailCorityCustomerExchangeSignature'
 import { EmailCorityCustomerExchangeBanner } from '@/components/templates/EmailCorityCustomerExchangeBanner'
 import { SocialImage } from '@/components/templates/SocialImage'
-import { SocialImageMeddbase } from '@/components/templates/SocialImageMeddbase'
 import { SocialGridDetail, type GridDetailRow } from '@/components/templates/SocialGridDetail'
 import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
 import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
@@ -376,68 +374,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     },
   },
 
-  'email-image': {
-    component: EmailImage,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      body: asset.body || '',
-      ctaText: asset.ctaText || '',
-      imageUrl: asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-      imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
-      imageZoom: asset.thumbnailImageZoom || 1,
-      imageFilters: asset.thumbnailImageFilters,
-      layout: asset.layout || 'even',
-      solution: asset.solution,
-      showBody: asset.showBody && !!asset.body,
-      showCta: asset.showCta !== false,
-      showSolutionSet: asset.showSolutionSet !== false,
-      grayscale: asset.grayscale,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      theme: asset.theme || 'light',
-      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: asset.templateGaps?.['email-image'] ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'ctaText', label: 'CTA', showKey: 'showCta' },
-    ],
-    renderSchema: {
-      width: 640,
-      height: 300,
-      background: '#ffffff',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'imageUrl', parser: 'string', default: '/assets/images/default_placeholder_image_1.png' },
-        { param: 'imagePositionX', parser: 'number', default: 0 },
-        { param: 'imagePositionY', parser: 'number', default: 0 },
-        { param: 'imageZoom', parser: 'number', default: 1 },
-        { param: 'imageFilterExposure', parser: 'number', default: 0 },
-        { param: 'imageFilterContrast', parser: 'number', default: 0 },
-        { param: 'imageFilterSaturation', parser: 'number', default: 0 },
-        { param: 'layout', parser: 'enum', default: 'even' },
-        { param: 'solution', parser: 'string', default: 'environmental' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showBody', parser: 'boolTrue' },
-        { param: 'showCta', parser: 'boolTrue' },
-        { param: 'showSolutionSet', parser: 'boolTrue' },
-        { param: 'grayscale', parser: 'boolFalse' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'theme', parser: 'enum', default: 'light' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-      assembleProps: (parsed) => ({
-        imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
-        imageFilters: {
-          exposure: parsed.imageFilterExposure as number,
-          contrast: parsed.imageFilterContrast as number,
-          saturation: parsed.imageFilterSaturation as number,
-        },
-      }),
-    },
-  },
 
   'email-product-release': {
     component: EmailProductRelease,
@@ -664,74 +600,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
 
   // 'social-image' — migrated to stage-bench-registry (Task 2 pilot).
   // Entry now lives in SocialImageRegistration.ts.
-
-  'social-image-meddbase': {
-    component: SocialImageMeddbase,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      subhead: asset.subhead || '',
-      metadata: asset.metadata || '',
-      ctaText: asset.ctaText || '',
-      imageUrl: asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-      imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
-      imageZoom: asset.thumbnailImageZoom || 1,
-      imageFilters: asset.thumbnailImageFilters,
-      layout: asset.layout || 'even',
-      solution: asset.solution,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      showMetadata: asset.showMetadata !== false,
-      showCta: asset.showCta !== false,
-      showSolutionSet: asset.showSolutionSet !== false,
-      grayscale: asset.grayscale,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      subheadFontSize: asset.subheadFontSize ?? undefined,
-      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: asset.templateGaps?.['social-image-meddbase'] ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'metadata', label: 'Metadata', showKey: 'showMetadata' },
-      { key: 'ctaText', label: 'CTA', showKey: 'showCta' },
-    ],
-    renderSchema: {
-      width: 1200,
-      height: 628,
-      background: '#ffffff',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'metadata', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'imageUrl', parser: 'string', default: '/assets/images/default_placeholder_image_1.png' },
-        { param: 'imagePositionX', parser: 'number', default: 0 },
-        { param: 'imagePositionY', parser: 'number', default: 0 },
-        { param: 'imageZoom', parser: 'number', default: 1 },
-        { param: 'imageFilterExposure', parser: 'number', default: 0 },
-        { param: 'imageFilterContrast', parser: 'number', default: 0 },
-        { param: 'imageFilterSaturation', parser: 'number', default: 0 },
-        { param: 'layout', parser: 'enum', default: 'even' },
-        { param: 'solution', parser: 'string', default: 'environmental' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolTrue' },
-        { param: 'showMetadata', parser: 'boolTrue' },
-        { param: 'showCta', parser: 'boolTrue' },
-        { param: 'showSolutionSet', parser: 'boolTrue' },
-        { param: 'grayscale', parser: 'boolFalse' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-      assembleProps: (parsed) => ({
-        imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
-        imageFilters: {
-          exposure: parsed.imageFilterExposure as number,
-          contrast: parsed.imageFilterContrast as number,
-          saturation: parsed.imageFilterSaturation as number,
-        },
-      }),
-    },
-  },
 
   'social-grid-detail': {
     component: SocialGridDetail,

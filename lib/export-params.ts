@@ -311,33 +311,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gaps: s.templateGaps['social-grid-detail'] ?? {},
   }),
 
-  'email-image': (s) => ({
-    ...buildImageParams(s),
-    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-    ctaText: s.ctaText,
-    layout: s.layout,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showCta: s.showCta,
-    showSolutionSet: s.showSolutionSet,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['email-image'] ?? {},
-  }),
-
-  'social-image-meddbase': (s) => ({
-    ...buildImageParams(s),
-    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-    metadata: s.metadata,
-    ctaText: s.ctaText,
-    layout: s.layout,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showMetadata: s.showMetadata,
-    showCta: s.showCta,
-    showSolutionSet: s.showSolutionSet,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['social-image-meddbase'] ?? {},
-  }),
-
   'email-dark-gradient': (s) => ({
     ctaText: s.ctaText,
     colorStyle: s.colorStyle,
