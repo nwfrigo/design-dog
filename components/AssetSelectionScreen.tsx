@@ -11,12 +11,12 @@ type FilterType = 'all' | 'email-banners' | 'email-signatures' | 'social' | 'web
 
 const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
   { id: 'all', label: 'All' },
+  { id: 'sales-pm', label: 'Collateral' },
   { id: 'email-banners', label: 'Email Banners' },
   { id: 'email-signatures', label: 'Email Signatures' },
-  { id: 'website', label: 'Website' },
-  { id: 'sales-pm', label: 'Collateral' },
-  { id: 'social', label: 'Social' },
   { id: 'newsletter', label: 'Newsletter' },
+  { id: 'social', label: 'Social' },
+  { id: 'website', label: 'Website' },
 ]
 
 // Events dropdown config
@@ -44,8 +44,8 @@ interface TemplateWithChannel extends TemplateInfo {
   channelLabel: string
 }
 
-// Channel order for grid display (matches filter chip order).
-const CHANNEL_ORDER = ['email-banners', 'email-signatures', 'website', 'collateral-pdf', 'social', 'newsletter']
+// Channel order for grid display (matches filter chip order — alphabetized).
+const CHANNEL_ORDER = ['collateral-pdf', 'email-banners', 'email-signatures', 'newsletter', 'social', 'website']
 
 // Flatten all templates with channel info, ordered by channel.
 function getAllTemplatesWithChannels(): TemplateWithChannel[] {
