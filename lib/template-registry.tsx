@@ -10,7 +10,6 @@ import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnec
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { SocialImage } from '@/components/templates/SocialImage'
 import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
-import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 
 // ---------------------------------------------------------------------------
@@ -122,63 +121,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
   // 'social-ehs-accelerate' — migrated to stage-bench-registry (Task 2 pilot).
   // Entry now lives in SocialEhsAccelerateRegistration.ts.
 
-  'email-speakers': {
-    component: EmailSpeakers,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      eyebrow: asset.eyebrow,
-      body: asset.body || '',
-      ctaText: asset.ctaText || '',
-      solution: asset.solution,
-      logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
-      showEyebrow: asset.showEyebrow && !!asset.eyebrow,
-      showBody: asset.showBody && !!asset.body,
-      showCta: asset.showCta !== false,
-      showSolutionSet: asset.showSolutionSet !== false,
-      speakerCount: asset.speakerCount || 3,
-      speaker1: { name: asset.speaker1Name || '', role: asset.speaker1Role || '', imageUrl: asset.speaker1ImageUrl || '', imagePosition: asset.speaker1ImagePosition || { x: 0, y: 0 }, imageZoom: asset.speaker1ImageZoom || 1 },
-      speaker2: { name: asset.speaker2Name || '', role: asset.speaker2Role || '', imageUrl: asset.speaker2ImageUrl || '', imagePosition: asset.speaker2ImagePosition || { x: 0, y: 0 }, imageZoom: asset.speaker2ImageZoom || 1 },
-      speaker3: { name: asset.speaker3Name || '', role: asset.speaker3Role || '', imageUrl: asset.speaker3ImageUrl || '', imagePosition: asset.speaker3ImagePosition || { x: 0, y: 0 }, imageZoom: asset.speaker3ImageZoom || 1 },
-      grayscale: asset.grayscale,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      theme: asset.theme || 'light',
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 640,
-      height: 300,
-      background: '#FFFFFF',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'solution', parser: 'string', default: 'environmental' },
-        { param: 'logoColor', parser: 'enum', default: 'black' },
-        { param: 'showEyebrow', parser: 'boolFalse' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showBody', parser: 'boolTrue' },
-        { param: 'showCta', parser: 'boolTrue' },
-        { param: 'showSolutionSet', parser: 'boolTrue' },
-        { param: 'speakerCount', parser: 'int', default: 3 },
-        { param: 'grayscale', parser: 'boolFalse' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'theme', parser: 'enum', default: 'light' },
-      ],
-      assembleProps: (parsed, raw) => {
-        const searchParams = raw as SearchParams
-        const s1 = parseSpeakerParams(searchParams, 1)
-        const s2 = parseSpeakerParams(searchParams, 2)
-        const s3 = parseSpeakerParams(searchParams, 3)
-        return {
-          speaker1: { name: s1.name, role: s1.role, imageUrl: s1.imageUrl, imagePosition: { x: s1.imagePositionX, y: s1.imagePositionY }, imageZoom: s1.imageZoom },
-          speaker2: { name: s2.name, role: s2.role, imageUrl: s2.imageUrl, imagePosition: { x: s2.imagePositionX, y: s2.imagePositionY }, imageZoom: s2.imageZoom },
-          speaker3: { name: s3.name, role: s3.role, imageUrl: s3.imageUrl, imagePosition: { x: s3.imagePositionX, y: s3.imagePositionY }, imageZoom: s3.imageZoom },
-        }
-      },
-    },
-  },
 
   'newsletter-top-banner': {
     component: NewsletterTopBanner,

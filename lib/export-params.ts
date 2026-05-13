@@ -231,17 +231,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   // stage-bench-registry (Task 2 pilots). Builders now live in their
   // respective *Registration.ts files.
 
-  'email-speakers': (s) => ({
-    ctaText: s.ctaText,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showCta: s.showCta,
-    showSolutionSet: s.showSolutionSet,
-    ...buildSpeakerParams(s),
-    grayscale: s.grayscale,
-    theme: s.theme,
-  }),
-
   // 'email-cority-connect-2026' — migrated to stage-bench-registry
   // (Task 2 pilot). Builder lives in EmailCorityConnect2026Registration.ts.
 
