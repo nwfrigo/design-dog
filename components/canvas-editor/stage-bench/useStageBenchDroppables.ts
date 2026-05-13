@@ -11,7 +11,13 @@ import type { SlotDragData } from './StageBenchBench'
  * Stage accepts bench drags → calls slot.show() and animates the cursor
  * follower into the now-visible block on stage.
  * Bench accepts stage drags → calls slot.hide() and animates the cursor
- * follower into the bench preview chip's position.
+ * follower into the bench preview chip's position. **Marked as a
+ * fallback droppable**: the bench claims any stage-region drag whose
+ * cursor has left the stage rect, regardless of where on the page it
+ * ends up. On wide viewports the bench column can sit ~600px from the
+ * stage edge — without the fallback semantics the user has to drag the
+ * chip all the way over to commit the removal, which feels broken.
+ * With it, "drag off the stage" is the removal gesture.
  *
  * Both drop callbacks find the matching slot by path and use its
  * `show`/`hide` from the registry — no per-template setShowX wiring
@@ -19,7 +25,9 @@ import type { SlotDragData } from './StageBenchBench'
  *
  * Returns the two `setNodeRef` callbacks. Spread onto the stage's
  * outermost element and the bench column's `<aside>` (via
- * StageBenchShell's `benchRef` prop).
+ * StageBenchShell's `benchRef` prop). The bench ref is no longer used
+ * for hit-testing (the fallback predicate ignores element containment)
+ * but kept wired so any visual `isOver` feedback still works.
  */
 
 export const STAGE_DROPPABLE_ID = 'canvas-stage'
@@ -52,6 +60,7 @@ export function useStageBenchDroppables(
   const bench = useDroppable<SlotDragData>({
     id: BENCH_DROPPABLE_ID,
     accept: (data) => data.region === 'stage',
+    fallback: true,
     onDrop: (data) => {
       // Capture the preview chip's position BEFORE slot.hide() flushes,
       // so the cursor follower can settle to its exact landing spot.

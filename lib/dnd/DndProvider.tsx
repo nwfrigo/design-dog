@@ -134,15 +134,41 @@ export function DndProvider({ children }: { children: ReactNode }) {
     function findOverTarget(x: number, y: number): string | null {
       const point = document.elementFromPoint(x, y)
       if (!point) return null
-      // Walk registered droppables; the first whose element contains the
-      // hit point AND accepts this drag wins. (For overlapping zones the
-      // outer-rendered one wins because contains() is true for both.)
       const regs = Array.from(droppablesRef.current.values())
+
+      // Pass 1: real (non-fallback) droppables. The first whose
+      // element contains the hit point AND accepts this drag wins.
+      // (For overlapping zones the outer-rendered one wins because
+      // contains() is true for both.) Track whether the cursor is
+      // inside ANY real droppable's element — fallback claims are
+      // suppressed in that case so hovering over a real zone that
+      // simply doesn't accept this drag doesn't silently route to
+      // the fallback.
+      let cursorOverAnyRealDroppable = false
       for (let i = 0; i < regs.length; i++) {
         const reg = regs[i]
+        if (reg.fallback) continue
         const el = reg.getElement()
         if (!el) continue
-        if (el.contains(point) && reg.accept(activeDrag!.data)) {
+        if (el.contains(point)) {
+          cursorOverAnyRealDroppable = true
+          if (reg.accept(activeDrag!.data)) {
+            return reg.id
+          }
+        }
+      }
+
+      // Pass 2: fallback droppables. Only consulted when the cursor
+      // is fully outside every real droppable. The fallback's own
+      // element is intentionally ignored — the predicate is purely
+      // "do I accept this data." Used for "anywhere else" zones (e.g.
+      // bench accepts any stage-region drag whose cursor has left the
+      // stage rect, regardless of where on the page it lands).
+      if (cursorOverAnyRealDroppable) return null
+      for (let i = 0; i < regs.length; i++) {
+        const reg = regs[i]
+        if (!reg.fallback) continue
+        if (reg.accept(activeDrag!.data)) {
           return reg.id
         }
       }

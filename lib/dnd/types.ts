@@ -55,6 +55,14 @@ export interface DroppableRegistration<T = unknown> {
   /** Predicate — return true if this droppable accepts the given drag.
    *  Called repeatedly during pointermove; keep cheap. */
   accept: (data: T) => boolean
+  /** When true, this droppable claims the drag only when the cursor is
+   *  NOT inside any non-fallback droppable's element. Use for "anywhere
+   *  else" zones (e.g., stage→bench: the bench should claim any drag
+   *  that leaves the stage rect, regardless of where the cursor lands).
+   *  The droppable's own element is ignored for hit-testing — the test
+   *  is purely "cursor is outside all real droppables AND I accept the
+   *  data." */
+  fallback?: boolean
   /** Fired when a drag enters this droppable (after passing accept). */
   onDragEnter?: (data: T) => void
   /** Fired when a drag leaves this droppable. */

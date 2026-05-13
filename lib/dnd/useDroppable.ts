@@ -32,6 +32,14 @@ export interface UseDroppableOptions<T = unknown> {
    *  Default: accept everything. Called repeatedly during pointermove,
    *  so keep cheap. */
   accept?: (data: T) => boolean
+  /** When true, this droppable claims the drag only when the cursor is
+   *  NOT inside any non-fallback droppable's element. Use for
+   *  "anywhere else" zones (the bench claims any stage drag that
+   *  leaves the stage rect — user doesn't have to drag all the way to
+   *  the bench column). The element bound via `setNodeRef` is still
+   *  useful for visual feedback (e.g., `isOver` highlight) but is NOT
+   *  used for hit-testing. */
+  fallback?: boolean
   /** Fired when the cursor enters this droppable with an accepted drag. */
   onDragEnter?: (data: T) => void
   /** Fired when the cursor leaves this droppable, OR when the drag
@@ -71,11 +79,12 @@ export function useDroppable<T = unknown>(opts: UseDroppableOptions<T>): UseDrop
       id: opts.id,
       getElement: () => elementRef.current,
       accept: (data) => (optsRef.current.accept ? optsRef.current.accept(data as T) : true),
+      fallback: opts.fallback,
       onDragEnter: (data) => optsRef.current.onDragEnter?.(data as T),
       onDragLeave: (data) => optsRef.current.onDragLeave?.(data as T),
       onDrop: (data) => optsRef.current.onDrop(data as T) ?? undefined,
     })
-  }, [ctx, opts.id])
+  }, [ctx, opts.id, opts.fallback])
 
   return {
     setNodeRef,
