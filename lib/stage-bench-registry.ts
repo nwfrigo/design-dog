@@ -56,6 +56,8 @@ import { emailEhsAccelerateBannerRegistration } from '@/components/canvas-editor
 import { emailEhsAccelerateSignatureRegistration } from '@/components/canvas-editor/template-adapters/EmailEhsAccelerateSignatureRegistration'
 import { websiteFloatingBannerRegistration } from '@/components/canvas-editor/template-adapters/WebsiteFloatingBannerRegistration'
 import { websiteFloatingBannerMobileRegistration } from '@/components/canvas-editor/template-adapters/WebsiteFloatingBannerMobileRegistration'
+import { emailProductReleaseRegistration } from '@/components/canvas-editor/template-adapters/EmailProductReleaseRegistration'
+import { websitePressReleaseRegistration } from '@/components/canvas-editor/template-adapters/WebsitePressReleaseRegistration'
 
 // Each template has unique props — kept loose at the registry boundary
 // because `renderProps` is the bridge that produces the correctly-shaped
@@ -93,6 +95,8 @@ const REGISTRATIONS: ReadonlyArray<StageBenchRegistrationData> = [
   emailEhsAccelerateSignatureRegistration,
   websiteFloatingBannerRegistration,
   websiteFloatingBannerMobileRegistration,
+  emailProductReleaseRegistration,
+  websitePressReleaseRegistration,
 ]
 
 const BY_ID = new Map<TemplateType, StageBenchRegistrationData>(

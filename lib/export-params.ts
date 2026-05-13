@@ -238,15 +238,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gaps: s.templateGaps['website-thumbnail'] ?? {},
   }),
 
-  'website-press-release': (s) => ({
-    ...buildImageParams(s),
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-    showBody: s.showBody && !!s.verbatimCopy.body,
-    showCta: s.showCta,
-    ctaText: s.ctaText,
-    theme: s.theme,
-  }),
-
   'website-event-listing': (s) => ({
     variant: s.eventListingVariant,
     gridDetail1Text: s.gridDetail1Text,
@@ -334,13 +325,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     invitationEventTime: s.invitationEventTime || '',
     invitationEventTimeNote: s.invitationEventTimeNote || '',
     invitationBody: s.invitationBody || '',
-  }),
-
-  'email-product-release': (s) => ({
-    ...buildImageParams(s),
-    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-    eyebrow: s.eyebrow || 'Product Release',
-    headline: s.verbatimCopy.headline || 'GX2 2026.1',
   }),
 
   'newsletter-top-banner': (s) => ({

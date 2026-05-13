@@ -6,14 +6,12 @@ import type { SearchParams } from '@/lib/render-params'
 
 // Import all template components
 import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
-import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { WebsiteReport } from '@/components/templates/WebsiteReport'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
 import { WebsiteEhsAccelerateListing } from '@/components/templates/WebsiteEhsAccelerateListing'
 import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
-import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -133,74 +131,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
       assembleProps: (parsed, raw) => ({
         cta: (raw.ctaText as string) || (raw.cta as string) || '',
         imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
-        imageFilters: {
-          exposure: parsed.imageFilterExposure as number,
-          contrast: parsed.imageFilterContrast as number,
-          saturation: parsed.imageFilterSaturation as number,
-        },
-      }),
-    },
-  },
-
-  'website-press-release': {
-    component: WebsitePressRelease,
-    renderProps: (asset, colors, typography) => ({
-      eyebrow: asset.eyebrow,
-      headline: asset.headline || '',
-      subhead: asset.subhead,
-      body: asset.body,
-      cta: asset.ctaText || '',
-      solution: asset.solution,
-      imageUrl: asset.thumbnailImageUrl || undefined,
-      imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
-      imageZoom: asset.thumbnailImageZoom || 1,
-      imageFilters: asset.thumbnailImageFilters,
-      showEyebrow: asset.showEyebrow,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      showBody: asset.showBody && !!asset.body,
-      showCta: asset.showCta,
-      logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
-      grayscale: asset.grayscale,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      subheadFontSize: asset.subheadFontSize ?? undefined,
-      theme: asset.theme || 'light',
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 800,
-      height: 450,
-      background: '#F9F9F9',
-      fields: [
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'solution', parser: 'string', default: 'health' },
-        { param: 'imageUrl', parser: 'string', default: '/placeholder-mountain.jpg' },
-        { param: 'imagePositionX', parser: 'number', default: 0 },
-        { param: 'imagePositionY', parser: 'number', default: 0 },
-        { param: 'imageZoom', parser: 'number', default: 1 },
-        // Per-image filter values emitted by `buildImageParams` as 3 scalars.
-        { param: 'imageFilterExposure', parser: 'number', default: 0 },
-        { param: 'imageFilterContrast', parser: 'number', default: 0 },
-        { param: 'imageFilterSaturation', parser: 'number', default: 0 },
-        { param: 'showEyebrow', parser: 'boolTrue' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolFalse' },
-        { param: 'showBody', parser: 'boolFalse' },
-        { param: 'showCta', parser: 'boolTrue' },
-        { param: 'logoColor', parser: 'enum', default: 'black' },
-        { param: 'grayscale', parser: 'boolFalse' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
-        { param: 'theme', parser: 'enum', default: 'light' },
-      ],
-      assembleProps: (parsed, raw) => ({
-        cta: (raw.ctaText as string) || (raw.cta as string) || '',
-        imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
-        // Reassemble the 3 scalar filter params into the ImageFilters
-        // shape WebsitePressRelease expects.
         imageFilters: {
           exposure: parsed.imageFilterExposure as number,
           contrast: parsed.imageFilterContrast as number,
@@ -368,45 +298,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
   },
 
 
-  'email-product-release': {
-    component: EmailProductRelease,
-    renderProps: (asset, colors, typography) => ({
-      eyebrow: asset.eyebrow || '',
-      headline: asset.headline || '',
-      imageUrl: asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-      imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
-      imageZoom: asset.thumbnailImageZoom || 1,
-      imageFilters: asset.thumbnailImageFilters,
-      grayscale: asset.grayscale,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 640,
-      height: 164,
-      background: '#F9F9F9',
-      fields: [
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'imageUrl', parser: 'string', default: '/assets/images/default_placeholder_image_1.png' },
-        { param: 'imagePositionX', parser: 'number', default: 0 },
-        { param: 'imagePositionY', parser: 'number', default: 0 },
-        { param: 'imageZoom', parser: 'number', default: 1 },
-        { param: 'imageFilterExposure', parser: 'number', default: 0 },
-        { param: 'imageFilterContrast', parser: 'number', default: 0 },
-        { param: 'imageFilterSaturation', parser: 'number', default: 0 },
-        { param: 'grayscale', parser: 'boolFalse' },
-      ],
-      assembleProps: (parsed) => ({
-        imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
-        imageFilters: {
-          exposure: parsed.imageFilterExposure as number,
-          contrast: parsed.imageFilterContrast as number,
-          saturation: parsed.imageFilterSaturation as number,
-        },
-      }),
-    },
-  },
 
   'email-ehs-accelerate-invitation': {
     component: EmailEhsAccelerateInvitation,
