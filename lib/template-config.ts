@@ -7,6 +7,10 @@ export interface TemplateInfo {
   width: number
   height: number
   channelLabel?: string // Override the subchannel label shown on the tile
+  /** Excluded from user-facing selection surfaces (homepage, auto-create
+   *  asset picker, in-editor template dropdowns). Existing drafts still
+   *  open via the registry — this only suppresses new selections. */
+  hidden?: boolean
 }
 
 export interface ChannelConfig {
@@ -159,6 +163,7 @@ const SOCIAL_TEMPLATES: TemplateInfo[] = [
     dimensions: '1080 × 1080px',
     width: 1080,
     height: 1080,
+    hidden: true,
   },
   {
     type: 'social-ehs-accelerate',
@@ -345,46 +350,56 @@ export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
   },
 ]
 
-// Legacy: All templates organized by channel (for backwards compatibility)
+// Legacy: All templates organized by channel (for backwards compatibility).
+// Hidden templates are excluded from CHANNELS so the in-editor template
+// pickers don't surface them; they remain in TEMPLATE_INFO /
+// TEMPLATE_DIMENSIONS below so existing drafts still resolve.
+const visible = <T extends TemplateInfo>(arr: T[]): T[] => arr.filter(t => !t.hidden)
 export const CHANNELS: ChannelConfig[] = [
   {
     id: 'email',
     label: 'Email Banners',
-    templates: EMAIL_TEMPLATES.map(t => ({ ...t, label: `Email - ${t.label}` })),
+    templates: visible(EMAIL_TEMPLATES).map(t => ({ ...t, label: `Email - ${t.label}` })),
   },
   {
     id: 'social',
     label: 'Social Posts',
-    templates: SOCIAL_TEMPLATES.map(t => ({ ...t, label: `Social - ${t.label}` })),
+    templates: visible(SOCIAL_TEMPLATES).map(t => ({ ...t, label: `Social - ${t.label}` })),
   },
   {
     id: 'website',
     label: 'Website Assets',
-    templates: WEBSITE_TEMPLATES.map(t => ({ ...t, label: `Website - ${t.label}` })),
+    templates: visible(WEBSITE_TEMPLATES).map(t => ({ ...t, label: `Website - ${t.label}` })),
   },
   {
     id: 'newsletter',
     label: 'Newsletter Banners',
-    templates: NEWSLETTER_TEMPLATES.map(t => ({ ...t, label: `Newsletter - ${t.label}` })),
+    templates: visible(NEWSLETTER_TEMPLATES).map(t => ({ ...t, label: `Newsletter - ${t.label}` })),
   },
   {
     id: 'collateral',
     label: 'Collateral',
-    templates: DISTRIBUTION_CHANNELS
-      .find(ch => ch.id === 'collateral')!
-      .subChannels.flatMap(sc => sc.templates)
-      .filter(t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type)),
+    templates: visible(
+      DISTRIBUTION_CHANNELS
+        .find(ch => ch.id === 'collateral')!
+        .subChannels.flatMap(sc => sc.templates)
+    ).filter(t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type)),
   },
 ]
 
-// Flat list of all templates (includes collateral single-page templates for lookups)
+// Flat list of all templates (includes collateral single-page templates for lookups).
+// Built from the raw per-channel arrays so hidden templates remain present
+// in TEMPLATE_INFO / TEMPLATE_DIMENSIONS for draft resolution.
 const COLLATERAL_SINGLE_PAGE: TemplateInfo[] = DISTRIBUTION_CHANNELS
   .flatMap(ch => ch.subChannels)
   .flatMap(sc => sc.templates)
   .filter(t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type))
 
 export const ALL_TEMPLATES: TemplateInfo[] = [
-  ...CHANNELS.flatMap(channel => channel.templates),
+  ...EMAIL_TEMPLATES,
+  ...SOCIAL_TEMPLATES,
+  ...WEBSITE_TEMPLATES,
+  ...NEWSLETTER_TEMPLATES,
   ...COLLATERAL_SINGLE_PAGE,
 ]
 

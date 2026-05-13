@@ -71,7 +71,7 @@ export function AutoCreateAssetsScreen() {
     return 'Other'
   }
 
-  const templatesByChannel = ALL_TEMPLATES.reduce((acc, template) => {
+  const templatesByChannel = ALL_TEMPLATES.filter((t) => !t.hidden).reduce((acc, template) => {
     const channel = getChannel(template.type)
     if (!acc[channel]) acc[channel] = []
     acc[channel].push(template)

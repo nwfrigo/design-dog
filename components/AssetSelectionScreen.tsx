@@ -61,6 +61,7 @@ function getAllTemplatesWithChannels(): TemplateWithChannel[] {
         templatesByChannel[subChannel.id] = []
       }
       for (const template of subChannel.templates) {
+        if (template.hidden) continue
         templatesByChannel[subChannel.id].push({
           ...template,
           channel: subChannel.id,
