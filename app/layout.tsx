@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { InfoModal } from '@/components/InfoModal'
 
 export const metadata: Metadata = {
   title: 'Design Dog',
@@ -46,7 +47,10 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-screen bg-white dark:bg-surface-primary">{children}</body>
+      <body className="min-h-screen bg-white dark:bg-surface-primary">
+        {children}
+        <InfoModal />
+      </body>
     </html>
   )
 }
