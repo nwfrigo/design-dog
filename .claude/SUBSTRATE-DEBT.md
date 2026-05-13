@@ -26,14 +26,14 @@
 
 ---
 
-## Rich-text inline editing
+## Rich-text inline editing — formatting toolbar
 
-**What:** `InlineTextEdit` is plain-text-only. HTML body fields in `EmailEhsAccelerateInvitation` (deferred) and any future collateral templates need rich editing.
-**Why deferred:** Paired with the upcoming collateral-rich-text work in a couple weeks.
-**Cost to ignore:** Blocks Invitation migration; users edit body via legacy sidebar (if available) or paste-HTML.
-**Trigger condition:** Collateral work starts, OR a third HTML-body template lands.
-**Estimate to pay:** ~1–2 days for a minimal contenteditable-with-toolbar editor inside `InlineTextEdit`.
-**First step when you start:** Prototype rich-text editing inside the existing `InlineTextEdit` portal. Reuse the `format: 'html'` ContentRegistry path that's already there.
+**What:** `InlineTextEdit` supports `format: 'html'` (contenteditable preserves `<strong>`, `<em>`, `<br>`, etc.), but there is no formatting toolbar. Users can only apply bold/italic via OS keyboard shortcuts (Cmd/Ctrl+B / I) — discoverability is poor, and there's no way to surface link, list, or other formatting affordances. Affects HTML-bearing fields in migrated templates (customer-library body/headline, social-grid-detail headline/subhead, etc.) and is the remaining blocker for the `email-ehs-accelerate-invitation` migration whose body field was authored against the legacy `SimpleRichTextEditor` UI.
+**Why deferred:** Existing HTML-bearing templates render existing data fine; users editing in S&B can rely on Cmd-shortcuts for now. Toolbar work pairs with the planned collateral-rich-text effort.
+**Cost to ignore:** Blocks Invitation migration (its body field was authored expecting a visible toolbar). For already-migrated templates, formatting is technically possible but undiscoverable.
+**Trigger condition:** Invitation migration starts, OR user feedback that bold/italic on the migrated HTML-body templates is unreachable.
+**Estimate to pay:** ~1–2 days for a minimal contextual toolbar (bold / italic / link) surfaced on selection within an active `InlineTextEdit`.
+**First step when you start:** Prototype a selection-aware toolbar that sits inside the existing `ContextualToolbar` host. Reuse the `format: 'html'` path and `document.execCommand` (or the modern Selection-API equivalent) for the bold/italic commands.
 
 ---
 
