@@ -984,11 +984,14 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
             <span className="text-xs text-gray-400 dark:text-content-secondary font-mono uppercase block mb-1">
               {channelLabel}
             </span>
-            <span className={`text-sm font-medium truncate block ${
-              isSelected
-                ? 'text-blue-700 dark:text-blue-300'
-                : 'text-gray-900 dark:text-content-primary'
-            }`}>
+            <span
+              className={`font-mono truncate block ${
+                isSelected
+                  ? 'text-blue-700 dark:text-blue-300'
+                  : 'text-gray-900 dark:text-content-primary'
+              }`}
+              style={{ fontSize: 14, lineHeight: '20px' }}
+            >
               {template.label}
             </span>
             <span className="text-xs text-gray-400 dark:text-content-secondary font-mono">

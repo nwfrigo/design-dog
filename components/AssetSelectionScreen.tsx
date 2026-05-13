@@ -2,22 +2,38 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  Infinity as InfinityIcon,
+  Mail,
+  Signature,
+  Newspaper,
+  MessageSquareHeart,
+  Globe,
+  CalendarCheck,
+  File as FileIcon,
+  type LucideIcon,
+} from 'lucide-react'
 import { useStore } from '@/store'
 import { SUBCHANNELS, type TemplateInfo } from '@/lib/template-config'
 import { TemplateTileV2, RequestTemplateTile } from '@/components/TemplateTile'
 
-// Filter chip options
+// Filter chip options. Icon names match the Figma layer stack (Lucide).
 type FilterType = 'all' | 'email-banners' | 'email-signatures' | 'social' | 'website' | 'newsletter' | 'sales-pm' | 'event:cority-connect' | 'event:ehs-accelerate' | 'event:cority-customer-exchange'
 
-const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'sales-pm', label: 'Collateral' },
-  { id: 'email-banners', label: 'Email Banners' },
-  { id: 'email-signatures', label: 'Email Signatures' },
-  { id: 'newsletter', label: 'Newsletter' },
-  { id: 'social', label: 'Social' },
-  { id: 'website', label: 'Website' },
+const FILTER_OPTIONS: { id: FilterType; label: string; icon: LucideIcon }[] = [
+  { id: 'all', label: 'All', icon: InfinityIcon },
+  { id: 'email-banners', label: 'Email Banners', icon: Mail },
+  { id: 'email-signatures', label: 'Email Sig.', icon: Signature },
+  { id: 'newsletter', label: 'Newsletters', icon: Newspaper },
+  { id: 'social', label: 'Social', icon: MessageSquareHeart },
+  { id: 'website', label: 'Website', icon: Globe },
 ]
+
+const COLLATERAL_FILTER: { id: FilterType; label: string; icon: LucideIcon } = {
+  id: 'sales-pm',
+  label: 'Collateral',
+  icon: FileIcon,
+}
 
 // Events dropdown config
 const EVENTS: { id: FilterType; label: string; templates: string[] }[] = [
@@ -44,8 +60,9 @@ interface TemplateWithChannel extends TemplateInfo {
   channelLabel: string
 }
 
-// Channel order for grid display (matches filter chip order — alphabetized).
-const CHANNEL_ORDER = ['collateral-pdf', 'email-banners', 'email-signatures', 'newsletter', 'social', 'website']
+// Channel order for grid display. Mirrors the chip row: content channels
+// alphabetized, then Collateral trailing at the bottom.
+const CHANNEL_ORDER = ['email-banners', 'email-signatures', 'newsletter', 'social', 'website', 'collateral-pdf']
 
 // Flatten all templates with channel info, ordered by channel.
 function getAllTemplatesWithChannels(): TemplateWithChannel[] {
@@ -193,48 +210,55 @@ export function AssetSelectionScreen() {
           </p>
         </div>
 
-        {/* Filter Chips */}
+        {/* Filter Chips — Figma node 401:4390. Each chip: icon + uppercase
+            label, 0.5px border, 4px radius. Active = surface-primary,
+            inactive = surface-secondary. */}
         <div className="mb-4">
           <div className="flex flex-wrap gap-2">
-            {FILTER_OPTIONS.map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => { setActiveFilter(filter.id); setEventsDropdownOpen(false) }}
-                className={`
-                  px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border
-                  ${activeFilter === filter.id
-                    ? 'bg-blue-500 text-white border-blue-500'
-                    : 'text-gray-500 dark:text-content-secondary border-gray-200 dark:border-line-subtle hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
-                  }
-                `}
-              >
-                {filter.label}
-              </button>
-            ))}
+            {FILTER_OPTIONS.map((filter) => {
+              const Icon = filter.icon
+              const active = activeFilter === filter.id
+              return (
+                <button
+                  key={filter.id}
+                  onClick={() => { setActiveFilter(filter.id); setEventsDropdownOpen(false) }}
+                  className={`
+                    inline-flex items-center gap-2 px-2 py-2 rounded border-[0.5px] border-line-subtle
+                    font-mono text-xs uppercase whitespace-nowrap text-content-primary
+                    transition-colors
+                    ${active
+                      ? 'bg-surface-primary'
+                      : 'bg-surface-secondary hover:bg-surface-primary'
+                    }
+                  `}
+                >
+                  <Icon size={12} strokeWidth={1.5} />
+                  {filter.label}
+                </button>
+              )
+            })}
 
-            {/* Events dropdown chip */}
+            {/* Events dropdown chip — same visual treatment as the others,
+                wrapped in a positioning container for the dropdown menu. */}
             <div className="relative" ref={eventsRef}>
               <button
                 onClick={() => setEventsDropdownOpen(prev => !prev)}
                 className={`
-                  flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border
+                  inline-flex items-center gap-2 px-2 py-2 rounded border-[0.5px] border-line-subtle
+                  font-mono text-xs uppercase whitespace-nowrap text-content-primary
+                  transition-colors
                   ${isEventsActive
-                    ? 'bg-blue-500 text-white border-blue-500'
-                    : 'text-gray-500 dark:text-content-secondary border-gray-200 dark:border-line-subtle hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30'
+                    ? 'bg-surface-primary'
+                    : 'bg-surface-secondary hover:bg-surface-primary'
                   }
                 `}
               >
+                <CalendarCheck size={12} strokeWidth={1.5} />
                 {activeEventLabel ? `Events: ${activeEventLabel}` : 'Events'}
-                <svg
-                  className={`w-3 h-3 transition-transform ${eventsDropdownOpen ? 'rotate-180' : ''}`}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
               </button>
 
               {eventsDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 z-20 min-w-[160px] bg-white dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-lg shadow-lg overflow-hidden">
+                <div className="absolute top-full left-0 mt-1 z-20 min-w-[160px] bg-surface-primary border border-line-subtle rounded-lg shadow-lg overflow-hidden">
                   {EVENTS.map((event) => (
                     <button
                       key={event.id}
@@ -243,7 +267,7 @@ export function AssetSelectionScreen() {
                         w-full text-left px-3 py-2 text-xs font-medium transition-colors
                         ${activeFilter === event.id
                           ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                          : 'text-gray-700 dark:text-content-primary hover:bg-gray-50 dark:hover:bg-surface-tertiary'
+                          : 'text-content-primary hover:bg-surface-secondary'
                         }
                       `}
                     >
@@ -253,6 +277,28 @@ export function AssetSelectionScreen() {
                 </div>
               )}
             </div>
+
+            {/* Vertical hairline divider — 24px gap on each side per Figma
+                spacing/2xl. Outer flex gap-2 (8px) + mx-4 (16px) = 24px. */}
+            <div className="self-center mx-4 h-7 w-px bg-line-subtle" />
+
+            {/* Collateral chip — trails the divider with the same visual
+                treatment as the main chips. */}
+            <button
+              onClick={() => { setActiveFilter(COLLATERAL_FILTER.id); setEventsDropdownOpen(false) }}
+              className={`
+                inline-flex items-center gap-2 px-2 py-2 rounded border-[0.5px] border-line-subtle
+                font-mono text-xs uppercase whitespace-nowrap text-content-primary
+                transition-colors
+                ${activeFilter === COLLATERAL_FILTER.id
+                  ? 'bg-surface-primary'
+                  : 'bg-surface-secondary hover:bg-surface-primary'
+                }
+              `}
+            >
+              <FileIcon size={12} strokeWidth={1.5} />
+              {COLLATERAL_FILTER.label}
+            </button>
           </div>
         </div>
 
@@ -263,8 +309,8 @@ export function AssetSelectionScreen() {
           </p>
         </div>
 
-        {/* Template Grid - 2 columns */}
-        <div className="grid grid-cols-2 gap-5">
+        {/* Template Grid — 3 cols on wider screens, 2 cols below. */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredTemplates.map((template) => (
             <TemplateTileV2
               key={template.type}

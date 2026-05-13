@@ -63,7 +63,7 @@ const EMAIL_BANNER_TEMPLATES: TemplateInfo[] = [
   },
   {
     type: 'email-product-release',
-    label: 'Product Release Banner',
+    label: 'Product Release',
     dimensions: '640 × 164px',
     width: 640,
     height: 164,
@@ -84,7 +84,7 @@ const EMAIL_BANNER_TEMPLATES: TemplateInfo[] = [
   },
   {
     type: 'email-ehs-accelerate-invitation',
-    label: 'EHS+ Accelerate Invitation',
+    label: 'EHS+ Accelerate',
     dimensions: '420 × 595px',
     width: 420,
     height: 595,
@@ -93,7 +93,7 @@ const EMAIL_BANNER_TEMPLATES: TemplateInfo[] = [
   },
   {
     type: 'email-cority-customer-exchange-banner',
-    label: 'Cority Customer Exchange Email Banner',
+    label: 'Cority Customer Exchange',
     dimensions: '640 × 300px',
     width: 640,
     height: 300,
@@ -104,14 +104,14 @@ const EMAIL_BANNER_TEMPLATES: TemplateInfo[] = [
 const EMAIL_SIGNATURE_TEMPLATES: TemplateInfo[] = [
   {
     type: 'email-ehs-accelerate-signature',
-    label: 'EHS+ Accelerate Email Signature',
+    label: 'EHS+ Accelerate',
     dimensions: '400 × 100px',
     width: 400,
     height: 100,
   },
   {
     type: 'email-cority-customer-exchange-signature',
-    label: 'Cority Customer Exchange Email Signature',
+    label: 'Cority Customer Exchange',
     dimensions: '400 × 100px',
     width: 400,
     height: 100,
@@ -165,7 +165,7 @@ const SOCIAL_TEMPLATES: TemplateInfo[] = [
   },
   {
     type: 'social-ehs-accelerate',
-    label: 'EHS+ Accelerate Social',
+    label: 'EHS+ Accelerate',
     dimensions: '1200 × 628px',
     width: 1200,
     height: 628,
