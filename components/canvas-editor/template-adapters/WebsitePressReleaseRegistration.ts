@@ -17,7 +17,10 @@ export const websitePressReleaseRegistration: StageBenchRegistrationData = {
     subhead: asset.subhead,
     body: asset.body,
     cta: asset.ctaText || '',
-    solution: asset.solution,
+    // Template gates the solution pill via `solution !== 'none'` instead
+    // of a separate showSolutionSet prop — collapse to 'none' when the
+    // user has hidden the pill in the editor so export respects it.
+    solution: asset.showSolutionSet === false ? 'none' : asset.solution,
     imageUrl: asset.thumbnailImageUrl || undefined,
     imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
     imageZoom: asset.thumbnailImageZoom || 1,
@@ -83,11 +86,16 @@ export const websitePressReleaseRegistration: StageBenchRegistrationData = {
       imageFilterExposure: f?.exposure ?? 0,
       imageFilterContrast: f?.contrast ?? 0,
       imageFilterSaturation: f?.saturation ?? 0,
+      showEyebrow: s.showEyebrow,
       showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
       showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
       showCta: s.showCta,
       ctaText: s.ctaText,
       theme: s.theme,
+      // Solution pill is gated via the 'none' sentinel — template has no
+      // showSolutionSet prop; collapse the value when hidden so the export
+      // mirrors the editor.
+      solution: s.showSolutionSet === false ? 'none' : s.solution,
     }
   },
 }

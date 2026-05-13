@@ -24,7 +24,9 @@ export const websiteWebinarRegistration: StageBenchRegistrationData = {
     subhead: asset.subhead,
     body: asset.body,
     cta: asset.ctaText || '',
-    solution: asset.solution,
+    // Template gates the solution pill via `solution !== 'none'`; collapse
+    // when user has hidden it so export respects the toggle.
+    solution: asset.showSolutionSet === false ? 'none' : asset.solution,
     variant: asset.webinarVariant,
     imageUrl: asset.thumbnailImageUrl || undefined,
     imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
@@ -143,6 +145,9 @@ export const websiteWebinarRegistration: StageBenchRegistrationData = {
       theme: s.theme,
       stackAlign: s.stackAlign,
       gaps: s.templateGaps['website-webinar'] ?? {},
+      // Solution pill is gated via the 'none' sentinel — template has no
+      // showSolutionSet prop; collapse when hidden.
+      solution: s.showSolutionSet === false ? 'none' : s.solution,
     }
   },
 }

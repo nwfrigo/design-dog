@@ -79,6 +79,7 @@ export const emailGridRegistration: StageBenchRegistrationData = {
   },
   exportBuilder: (s) => ({
     subheading: s.subheading,
+    showEyebrow: s.showEyebrow,
     showLightHeader: s.showLightHeader,
     showHeavyHeader: false,
     showSubheading: s.showSubheading,

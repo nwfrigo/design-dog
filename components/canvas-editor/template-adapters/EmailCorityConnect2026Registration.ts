@@ -45,6 +45,7 @@ export const emailCorityConnect2026Registration: StageBenchRegistrationData = {
   exportBuilder: (s) => ({
     backgroundVariant: s.ccBackgroundVariant || 'dark-blue-1',
     ctaText: s.ctaText,
+    showHeadline: s.showHeadline,
     showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
     showCta: s.showCta,
   }),

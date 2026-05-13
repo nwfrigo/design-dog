@@ -15,6 +15,8 @@ export const websiteFloatingBannerMobileRegistration: StageBenchRegistrationData
     headline: asset.headline || '',
     cta: asset.ctaText || '',
     showEyebrow: asset.showEyebrow,
+    showHeadline: asset.showHeadline !== false,
+    showCta: asset.showCta !== false,
     variant: asset.floatingBannerMobileVariant || 'light',
     arrowType: asset.floatingBannerMobileArrowType || 'text',
     headlineFontSize: asset.headlineFontSize ?? undefined,
@@ -25,5 +27,8 @@ export const websiteFloatingBannerMobileRegistration: StageBenchRegistrationData
     variant: s.floatingBannerMobileVariant,
     arrowType: s.floatingBannerMobileArrowType,
     cta: s.ctaText,
+    showEyebrow: s.showEyebrow,
+    showHeadline: s.showHeadline,
+    showCta: s.showCta,
   }),
 }

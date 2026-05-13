@@ -71,6 +71,7 @@ export const socialGridDetailRegistration: StageBenchRegistrationData = {
     }),
   },
   exportBuilder: (s) => ({
+    showEyebrow: s.showEyebrow,
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
     showSolutionSet: s.showSolutionSet,
     gridDetail1Text: s.gridDetail1Text,

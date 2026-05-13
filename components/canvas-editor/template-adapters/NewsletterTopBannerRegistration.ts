@@ -38,6 +38,7 @@ export const newsletterTopBannerRegistration: StageBenchRegistrationData = {
   },
   exportBuilder: (s) => ({
     variant: s.newsletterTopBannerVariant,
+    showHeadline: s.showHeadline,
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
     subheadFontSize: s.subheadFontSize ?? undefined,
   }),

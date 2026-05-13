@@ -15,6 +15,8 @@ export const websiteFloatingBannerRegistration: StageBenchRegistrationData = {
     headline: asset.headline || '',
     cta: asset.ctaText || '',
     showEyebrow: asset.showEyebrow,
+    showHeadline: asset.showHeadline !== false,
+    showCta: asset.showCta !== false,
     variant: asset.floatingBannerVariant || 'dark',
     headlineFontSize: asset.headlineFontSize ?? undefined,
     colors, typography, scale: 1,
@@ -29,6 +31,7 @@ export const websiteFloatingBannerRegistration: StageBenchRegistrationData = {
       { param: 'headline', parser: 'string', default: '' },
       { param: 'showEyebrow', parser: 'boolFalse' },
       { param: 'showHeadline', parser: 'boolTrue' },
+      { param: 'showCta', parser: 'boolTrue', default: true },
       { param: 'variant', parser: 'enum', default: 'dark' },
       { param: 'headlineFontSize', parser: 'numberOrUndefined' },
     ],
@@ -39,5 +42,8 @@ export const websiteFloatingBannerRegistration: StageBenchRegistrationData = {
   exportBuilder: (s) => ({
     variant: s.floatingBannerVariant,
     cta: s.ctaText,
+    showEyebrow: s.showEyebrow,
+    showHeadline: s.showHeadline,
+    showCta: s.showCta,
   }),
 }

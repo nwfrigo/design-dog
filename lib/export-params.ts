@@ -284,7 +284,13 @@ export function buildExportParams(
     headline: state.verbatimCopy.headline,
     subhead: state.verbatimCopy.subhead,
     body: state.verbatimCopy.body,
-    solution: state.solution,
+    // Solution-pill visibility gates via the 'none' sentinel for templates
+    // (e.g. WebsiteThumbnail / WebsiteReport / WebsiteWebinar / WebsitePressRelease)
+    // that don't expose a separate showSolutionSet prop. Other templates also
+    // emit showSolutionSet from their per-template builder and gate with both
+    // conditions — passing 'none' here is harmless when the pill is already
+    // suppressed.
+    solution: state.showSolutionSet === false ? 'none' : state.solution,
     logoColor: state.logoColor,
     showEyebrow: state.showEyebrow,
     showHeadline: state.showHeadline,

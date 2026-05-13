@@ -162,7 +162,7 @@ These apply across the entire codebase — memorize them:
 
 - **Figma outline → border:** Always convert. This is the #1 regression source. (Details in BRAND.md)
 - **Figma logo divs:** Always replace with SVG component. (Details in BRAND.md)
-- **Export params missing:** Every prop visible in the template MUST appear in exportParams. (Details in ARCHITECTURE.md)
+- **Export params missing:** Every prop visible in the template MUST appear in exportParams. (Details in ARCHITECTURE.md) Run `npm run validate:registrations` after any Registration/Adapter change — it catches missing visibility flags across the full export pipeline (renderProps + exportBuilder).
 - **Grayscale in export:** Must be passed in exportParams AND handled in render page.
 - **Vercel body limit:** PDFs must go through Blob storage, not direct upload. (Details in ARCHITECTURE.md)
 - **Modal state persistence:** Use React `key` prop or `useEffect` cleanup to reset modal state on mount.

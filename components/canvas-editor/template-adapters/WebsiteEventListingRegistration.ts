@@ -62,6 +62,7 @@ export const websiteEventListingRegistration: StageBenchRegistrationData = {
     gridDetail4Text: s.gridDetail4Text,
     showGridDetail2: s.showGridDetail2,
     showGridDetail3: s.showGridDetail3,
+    showEyebrow: s.showEyebrow,
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
     stackAlign: s.stackAlign,
     gaps: s.templateGaps['website-event-listing'] ?? {},
