@@ -40,7 +40,6 @@ const LEGACY_STAGE_BENCH_TEMPLATES: ReadonlyArray<TemplateType> = [
   'social-blue-gradient',
   'social-image-meddbase',
   'newsletter-dark-gradient',
-  'newsletter-blue-gradient',
   'newsletter-light',
   'website-thumbnail',
   'website-report',

@@ -469,19 +469,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gaps: s.templateGaps['newsletter-dark-gradient'] ?? {},
   }),
 
-  'newsletter-blue-gradient': (s) => ({
-    ...buildNewsletterImageParams(s),
-    ctaText: s.ctaText,
-    colorStyle: s.colorStyle,
-    imageSize: s.newsletterImageSize,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showCta: s.showCta,
-    grayscale: s.grayscale,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['newsletter-blue-gradient'] ?? {},
-  }),
-
   'newsletter-light': (s) => ({
     ...buildNewsletterImageParams(s),
     ctaText: s.ctaText,
