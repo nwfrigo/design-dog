@@ -83,12 +83,8 @@ export interface ExportParamState {
   gridDetail4Type: string
   gridDetail4Text: string
 
-  // Newsletter image
+  // Newsletter layout switch (image data is universal — see thumbnailImage*)
   newsletterImageSize: string
-  newsletterImageUrl: string | null
-  newsletterImagePosition: { x: number; y: number }
-  newsletterImageZoom: number
-  newsletterImageFilters?: import('./image-filters').ImageFilters
 
   // Speakers
   speakerCount: number
@@ -193,19 +189,6 @@ function buildSpeakerParams(s: ExportParamState): Record<string, unknown> {
     speaker3ImagePositionX: s.speaker3ImagePosition.x,
     speaker3ImagePositionY: s.speaker3ImagePosition.y,
     speaker3ImageZoom: s.speaker3ImageZoom,
-  }
-}
-
-function buildNewsletterImageParams(s: ExportParamState): Record<string, unknown> {
-  const f = s.newsletterImageFilters
-  return {
-    newsletterImageUrl: s.newsletterImageUrl,
-    newsletterImagePositionX: s.newsletterImagePosition.x,
-    newsletterImagePositionY: s.newsletterImagePosition.y,
-    newsletterImageZoom: s.newsletterImageZoom,
-    newsletterImageFilterExposure: f?.exposure ?? 0,
-    newsletterImageFilterContrast: f?.contrast ?? 0,
-    newsletterImageFilterSaturation: f?.saturation ?? 0,
   }
 }
 
@@ -410,9 +393,6 @@ export function buildExportParamsFromAsset(
     gridDetail4Type: (a.gridDetail4Type as string) || 'cta',
     gridDetail4Text: (a.gridDetail4Text as string) || '',
     newsletterImageSize: (a.newsletterImageSize as string) || 'none',
-    newsletterImageUrl: (a.newsletterImageUrl as string | null) ?? null,
-    newsletterImagePosition: (a.newsletterImagePosition as { x: number; y: number }) || { x: 0, y: 0 },
-    newsletterImageZoom: (a.newsletterImageZoom as number) ?? 1,
     speakerCount: (a.speakerCount as number) || 3,
     speaker1Name: (a.speaker1Name as string) || '',
     speaker1Role: (a.speaker1Role as string) || '',

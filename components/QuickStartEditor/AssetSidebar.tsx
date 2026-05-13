@@ -793,7 +793,7 @@ function AssetPreviewRenderer({
           ctaText={asset.ctaText || ''}
           colorStyle={asset.colorStyle || '1'}
           imageSize={asset.newsletterImageSize || 'none'}
-          imageUrl={asset.newsletterImageUrl || null}
+          imageUrl={asset.thumbnailImageUrl || null}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
           showSubhead={asset.showSubhead && !!copy.subhead}
           showCta={asset.showCta !== false}
@@ -810,7 +810,7 @@ function AssetPreviewRenderer({
           ctaText={asset.ctaText || ''}
           colorStyle={asset.colorStyle || '1'}
           imageSize={asset.newsletterImageSize || 'none'}
-          imageUrl={asset.newsletterImageUrl || null}
+          imageUrl={asset.thumbnailImageUrl || null}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
           showSubhead={asset.showSubhead && !!copy.subhead}
           showCta={asset.showCta !== false}
@@ -826,7 +826,7 @@ function AssetPreviewRenderer({
           subhead={copy.subhead || ''}
           ctaText={asset.ctaText || ''}
           imageSize={asset.newsletterImageSize || 'none'}
-          imageUrl={asset.newsletterImageUrl || null}
+          imageUrl={asset.thumbnailImageUrl || null}
           showEyebrow={asset.showEyebrow && !!asset.eyebrow}
           showSubhead={asset.showSubhead && !!copy.subhead}
           showCta={asset.showCta !== false}

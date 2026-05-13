@@ -159,8 +159,18 @@ function ScaledStage({ children }: { children: ReactNode }) {
   // Outer wrapper: takes layout space equal to the SCALED dims (so the
   // surrounding flex column knows how much room the stage uses).
   // Inner wrapper: rendered at intrinsic size, scaled visually.
+  //
+  // boxShadow is a hairline at the visual edge of the stage. Applied to
+  // the outer (which has the post-scale dims, not transform-scaled) so
+  // it renders crisp at 1 device pixel. Subtle enough to disappear
+  // against dark templates; provides separation on light ones.
   const outerStyle: React.CSSProperties = stageSize
-    ? { width: stageSize.w * scale, height: stageSize.h * scale, position: 'relative' }
+    ? {
+        width: stageSize.w * scale,
+        height: stageSize.h * scale,
+        position: 'relative',
+        boxShadow: '0 0 0 1px rgba(0,0,0,0.08)',
+      }
     : { display: 'flex', justifyContent: 'center' }
 
   const innerStyle: React.CSSProperties = stageSize

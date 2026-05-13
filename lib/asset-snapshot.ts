@@ -64,12 +64,8 @@ const SNAPSHOT_FIELDS = [
   'showCta',
   // Social Image
   'layout',
-  // Newsletter
+  // Newsletter (image URL/settings ride on the universal thumbnailImage*)
   'newsletterImageSize',
-  'newsletterImageUrl',
-  'newsletterImagePosition',
-  'newsletterImageZoom',
-  'newsletterImageFilters',
   // Speakers
   'speakerCount',
   'speaker1Name',

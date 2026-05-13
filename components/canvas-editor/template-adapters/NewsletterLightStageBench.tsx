@@ -95,14 +95,14 @@ export const NewsletterLightStageBench = defineStageBenchAdapter<NewsletterLight
 
     const newsletterImageSize = useStore((s) => s.newsletterImageSize)
     const setNewsletterImageSize = useStore((s) => s.setNewsletterImageSize)
-    const newsletterImageUrl = useStore((s) => s.newsletterImageUrl)
-    const setNewsletterImageUrl = useStore((s) => s.setNewsletterImageUrl)
-    const newsletterImagePosition = useStore((s) => s.newsletterImagePosition)
-    const setNewsletterImagePosition = useStore((s) => s.setNewsletterImagePosition)
-    const newsletterImageZoom = useStore((s) => s.newsletterImageZoom)
-    const setNewsletterImageZoom = useStore((s) => s.setNewsletterImageZoom)
-    const newsletterImageFilters = useStore((s) => s.newsletterImageFilters) ?? NEUTRAL_FILTERS
-    const setNewsletterImageFilters = useStore((s) => s.setNewsletterImageFilters)
+    const thumbnailImageUrl = useStore((s) => s.thumbnailImageUrl)
+    const setThumbnailImageUrl = useStore((s) => s.setThumbnailImageUrl)
+    const thumbnailImageSettings = useStore((s) => s.thumbnailImageSettings)
+    const setThumbnailImageSettings = useStore((s) => s.setThumbnailImageSettings)
+    const raw = thumbnailImageSettings['newsletter-light']
+    const position = raw?.position ?? { x: 0, y: 0 }
+    const zoom = raw?.zoom ?? 1
+    const filters = raw?.filters ?? NEUTRAL_FILTERS
 
     const stackAlign = useStore((s) => s.stackAlign)
     const setStackAlign = useStore((s) => s.setStackAlign)
@@ -158,16 +158,12 @@ export const NewsletterLightStageBench = defineStageBenchAdapter<NewsletterLight
         stackAlign: { value: stackAlign, set: setStackAlign as (v: unknown) => void },
       },
       image: {
-        url: newsletterImageUrl ?? undefined,
-        position: newsletterImagePosition,
-        zoom: newsletterImageZoom,
-        filters: newsletterImageFilters,
-        setUrl: setNewsletterImageUrl,
-        setSettings: (next) => {
-          setNewsletterImagePosition(next.position)
-          setNewsletterImageZoom(next.zoom)
-          setNewsletterImageFilters(next.filters)
-        },
+        url: thumbnailImageUrl ?? undefined,
+        position,
+        zoom,
+        filters,
+        setUrl: setThumbnailImageUrl,
+        setSettings: (next) => setThumbnailImageSettings('newsletter-light', next),
         frameWidth,
         frameHeight,
       },

@@ -56,10 +56,6 @@ export interface DraftState {
   showCta: boolean
   layout: ImageLayout
   newsletterImageSize: NewsletterImageSize
-  newsletterImageUrl: string | null
-  newsletterImagePosition: { x: number; y: number }
-  newsletterImageZoom: number
-  newsletterImageFilters?: import('./image-filters').ImageFilters
   speakerCount: SpeakerCount
   speaker1Name: string
   speaker1Role: string
@@ -249,10 +245,6 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       showCta: state.showCta ?? UNIVERSAL_FALLBACK_FLAGS.showCta,
       layout: state.layout || 'even',
       newsletterImageSize: state.newsletterImageSize || 'none',
-      newsletterImageUrl: state.newsletterImageUrl || null,
-      newsletterImagePosition: state.newsletterImagePosition || { x: 0, y: 0 },
-      newsletterImageZoom: state.newsletterImageZoom ?? 1,
-      newsletterImageFilters: state.newsletterImageFilters,
       speakerCount: state.speakerCount || 3,
       // Speaker text fields persist as-is. Templates render
       // 'Firstname Lastname' / 'Role, Company' canonical placeholders.

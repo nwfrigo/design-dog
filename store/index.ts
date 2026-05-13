@@ -140,10 +140,6 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => {
   ctaStyle: 'link' as const,
   layout: 'even' as const,
   newsletterImageSize: 'small' as const,
-  newsletterImageUrl: null,
-  newsletterImagePosition: { x: 0, y: 0 },
-  newsletterImageZoom: 1,
-  newsletterImageFilters: NEUTRAL_FILTERS,
   speakerCount: 3 as const,
   speaker1Name: 'Firstname Lastname',
   speaker1Role: 'Role, Company',
@@ -337,12 +333,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Social Image specific settings
   layout: 'even',
 
-  // Newsletter Dark Gradient specific settings
+  // Newsletter Dark Gradient specific settings (only the layout switch —
+  // image URL/settings live in the universal thumbnailImage* shape)
   newsletterImageSize: 'small',
-  newsletterImageUrl: null,
-  newsletterImagePosition: { x: 0, y: 0 },
-  newsletterImageZoom: 1,
-  newsletterImageFilters: NEUTRAL_FILTERS,
 
   // Email Speakers specific settings
   speakerCount: 3,
@@ -606,10 +599,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   // Newsletter Dark Gradient specific actions
   setNewsletterImageSize: (newsletterImageSize: NewsletterImageSize) => set({ newsletterImageSize }),
-  setNewsletterImageUrl: (newsletterImageUrl: string | null) => set({ newsletterImageUrl }),
-  setNewsletterImagePosition: (newsletterImagePosition: { x: number; y: number }) => set({ newsletterImagePosition }),
-  setNewsletterImageZoom: (newsletterImageZoom: number) => set({ newsletterImageZoom }),
-  setNewsletterImageFilters: (newsletterImageFilters: ImageFilters) => set({ newsletterImageFilters }),
 
   // Email Speakers specific actions
   setSpeakerCount: (speakerCount: SpeakerCount) => set({ speakerCount }),
@@ -2016,10 +2005,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       layout: 'even',
       // Newsletter Dark Gradient defaults
       newsletterImageSize: 'small',
-      newsletterImageUrl: null,
-      newsletterImagePosition: { x: 0, y: 0 },
-      newsletterImageZoom: 1,
-      newsletterImageFilters: NEUTRAL_FILTERS,
       // Email Speakers defaults
       speakerCount: 3,
       speaker1Name: 'Firstname Lastname',
@@ -2102,10 +2087,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showCta: state.showCta,
       layout: state.layout,
       newsletterImageSize: state.newsletterImageSize,
-      newsletterImageUrl: state.newsletterImageUrl,
-      newsletterImagePosition: state.newsletterImagePosition,
-      newsletterImageZoom: state.newsletterImageZoom,
-      newsletterImageFilters: state.newsletterImageFilters,
       speakerCount: state.speakerCount,
       speaker1Name: state.speaker1Name,
       speaker1Role: state.speaker1Role,
@@ -2250,10 +2231,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       showCta: draft.showCta,
       layout: draft.layout,
       newsletterImageSize: draft.newsletterImageSize,
-      newsletterImageUrl: draft.newsletterImageUrl,
-      newsletterImagePosition: draft.newsletterImagePosition,
-      newsletterImageZoom: draft.newsletterImageZoom,
-      newsletterImageFilters: draft.newsletterImageFilters ?? NEUTRAL_FILTERS,
       speakerCount: draft.speakerCount,
       speaker1Name: draft.speaker1Name,
       speaker1Role: draft.speaker1Role,

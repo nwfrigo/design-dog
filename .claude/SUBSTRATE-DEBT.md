@@ -37,17 +37,6 @@
 
 ---
 
-## Newsletter → universal `thumbnailImageSettings`
-
-**What:** Newsletter image data lives in 4 flat globals (`newsletterImageUrl`, `newsletterImagePosition`, `newsletterImageZoom`, `newsletterImageFilters`). Every other image-flow template uses the universal per-template-bundled `thumbnailImageSettings[templateId]`.
-**Why deferred:** Would have ballooned the original migration. The flat-field shape was extended with `newsletterImageFilters` instead.
-**Cost to ignore:** Every newsletter image change touches a different code path. Adapter is ~30 lines longer than its peers. Export route has a special-case `newsletter-*` → `image*` param remap.
-**Trigger condition:** Any new newsletter template, OR the next time anything image-related changes across newsletters.
-**Estimate to pay:** ~1 day. Delete 4 store fields, migrate 3 adapters, remove the export-route remap.
-**First step when you start:** `git grep newsletterImageUrl` to see the full surface area.
-
----
-
 ## Per-row data/cta type toggle on grids
 
 **What:** 4 Group D templates have rows whose `type: 'data' | 'cta'` comes from the store but isn't editable in S&B. Users see the existing type rendered; can't swap it interactively.
@@ -89,17 +78,6 @@
 **Trigger condition:** Factory's nested-slot support lands (whichever branch of Cleanup Plan Task 1 §1.4 wins), OR user feedback.
 **Estimate to pay:** ~1 day once the factory supports nested slots.
 **First step when you start:** Pick one speaker, wire its name field as a deep-click child of the speakers group. Validate, then propagate.
-
----
-
-## Filter wiring on remaining image-flow templates
-
-**What:** A few image-flow templates accept `imageFilters` but don't fully thread filters through the renderProps + export-params pipeline. Caught and fixed for `email-product-release` (`c2763a3`). Worth a one-pass sweep to verify everything works end-to-end now.
-**Why deferred:** Easy to miss the second half (renderProps OR export-params, not both) when adding filters. Easier to catch with the factory in place.
-**Cost to ignore:** Image filters set in the editor don't survive Puppeteer export for some templates.
-**Trigger condition:** After Cleanup Plan Task 1 lands (the factory makes this a non-issue going forward).
-**Estimate to pay:** ~1 hour audit after factory lands.
-**First step when you start:** List all templates with `imageFilters` prop. Verify each has the filter scalars in renderSchema.fields and the assembleProps reshape. Grep `imageFilterExposure` to inventory.
 
 ---
 

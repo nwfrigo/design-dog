@@ -156,9 +156,6 @@ export async function POST(request: NextRequest) {
       'coverImagePosition',
       // Carousel: only forwarded when exporting all slides
       'slidesData',
-      // Newsletter: keys are remapped to generic image* names
-      'newsletterImageUrl', 'newsletterImagePositionX', 'newsletterImagePositionY', 'newsletterImageZoom',
-      'newsletterImageFilterExposure', 'newsletterImageFilterContrast', 'newsletterImageFilterSaturation',
     ])
 
     for (const [key, value] of Object.entries(body)) {
@@ -178,19 +175,6 @@ export async function POST(request: NextRequest) {
     // ---------------------------------------------------------------
     // Special-case handling
     // ---------------------------------------------------------------
-
-    // Newsletter templates: remap newsletterImage* → image* for render page
-    if (template.startsWith('newsletter-')) {
-      if (body.newsletterImageUrl && !body.newsletterImageUrl.startsWith('data:') && !body.newsletterImageUrl.startsWith('blob:')) {
-        params.set('imageUrl', body.newsletterImageUrl)
-      }
-      if (body.newsletterImagePositionX != null) params.set('imagePositionX', String(body.newsletterImagePositionX))
-      if (body.newsletterImagePositionY != null) params.set('imagePositionY', String(body.newsletterImagePositionY))
-      if (body.newsletterImageZoom != null) params.set('imageZoom', String(body.newsletterImageZoom))
-      if (body.newsletterImageFilterExposure != null) params.set('imageFilterExposure', String(body.newsletterImageFilterExposure))
-      if (body.newsletterImageFilterContrast != null) params.set('imageFilterContrast', String(body.newsletterImageFilterContrast))
-      if (body.newsletterImageFilterSaturation != null) params.set('imageFilterSaturation', String(body.newsletterImageFilterSaturation))
-    }
 
     // FAQ cover image position: object → flat X/Y params
     if (body.coverImagePosition) {
@@ -410,11 +394,6 @@ export async function POST(request: NextRequest) {
       await injectDataUrlImage(body.speaker3ImageUrl, 'img[data-speaker="3"]')
     }
 
-    // Inject newsletter image
-    if (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:')) {
-      await injectDataUrlImage(body.newsletterImageUrl, 'img[data-newsletter-image="true"]')
-    }
-
     // Inject Solution Overview images
     if (body.heroImageUrl && body.heroImageUrl.startsWith('data:')) {
       await injectDataUrlImage(body.heroImageUrl, 'img[data-so-hero-image="true"]')
@@ -460,7 +439,6 @@ export async function POST(request: NextRequest) {
         (body.speaker1ImageUrl && body.speaker1ImageUrl.startsWith('data:')) ||
         (body.speaker2ImageUrl && body.speaker2ImageUrl.startsWith('data:')) ||
         (body.speaker3ImageUrl && body.speaker3ImageUrl.startsWith('data:')) ||
-        (body.newsletterImageUrl && body.newsletterImageUrl.startsWith('data:')) ||
         (body.heroImageUrl && body.heroImageUrl.startsWith('data:')) ||
         (body.screenshotUrl && body.screenshotUrl.startsWith('data:')) ||
         (body.coverImageUrl && body.coverImageUrl.startsWith('data:')) ||

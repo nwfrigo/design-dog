@@ -213,12 +213,6 @@ export function EditorScreen() {
     // Newsletter Dark Gradient specific
     newsletterImageSize,
     setNewsletterImageSize,
-    newsletterImageUrl,
-    setNewsletterImageUrl,
-    newsletterImagePosition,
-    setNewsletterImagePosition,
-    newsletterImageZoom,
-    setNewsletterImageZoom,
     // Social Grid Detail specific
     gridDetail4Type,
     setGridDetail4Type,
@@ -480,12 +474,10 @@ export function EditorScreen() {
   // Image library modal state
   const [showImageLibrary, setShowImageLibrary] = useState(false)
   const [activeSpeakerForImage, setActiveSpeakerForImage] = useState<1 | 2 | 3 | null>(null)
-  const [selectingNewsletterImage, setSelectingNewsletterImage] = useState(false)
   const [selectingSOScreenshot, setSelectingSOScreenshot] = useState(false)
 
   // Image crop modal state
   const [showCropModal, setShowCropModal] = useState(false)
-  const [showNewsletterCropModal, setShowNewsletterCropModal] = useState(false)
 
   // Queue feedback state
   const [showQueuedFeedback, setShowQueuedFeedback] = useState(false)
@@ -723,24 +715,6 @@ export function EditorScreen() {
     }
   }, [setThumbnailImageUrl])
 
-  // Newsletter image upload — same Blob pattern as main image to avoid 413 errors
-  const handleNewsletterImageUpload = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) return
-    try {
-      const ext = file.name.split('.').pop() || file.type.split('/')[1] || 'png'
-      const filename = `images/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
-      const blob = await upload(filename, file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload-image',
-      })
-      setNewsletterImageUrl(blob.url)
-    } catch {
-      const reader = new FileReader()
-      reader.onload = () => setNewsletterImageUrl(reader.result as string)
-      reader.readAsDataURL(file)
-    }
-  }, [setNewsletterImageUrl])
-
   const handleImageDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault()
     setIsImageDragging(false)
@@ -861,9 +835,6 @@ export function EditorScreen() {
         gridDetail4Type,
         gridDetail4Text,
         newsletterImageSize,
-        newsletterImageUrl,
-        newsletterImagePosition,
-        newsletterImageZoom,
         speakerCount,
         speaker1Name,
         speaker1Role,
@@ -1253,8 +1224,6 @@ export function EditorScreen() {
               setSpeaker2ImageUrl(url)
             } else if (activeSpeakerForImage === 3) {
               setSpeaker3ImageUrl(url)
-            } else if (selectingNewsletterImage) {
-              setNewsletterImageUrl(url)
             } else if (selectingSOScreenshot) {
               setSolutionOverviewScreenshotUrl(url)
             } else {
@@ -1262,13 +1231,11 @@ export function EditorScreen() {
             }
             setShowImageLibrary(false)
             setActiveSpeakerForImage(null)
-            setSelectingNewsletterImage(false)
             setSelectingSOScreenshot(false)
           }}
           onClose={() => {
             setShowImageLibrary(false)
             setActiveSpeakerForImage(null)
-            setSelectingNewsletterImage(false)
             setSelectingSOScreenshot(false)
           }}
         />
@@ -1311,23 +1278,6 @@ export function EditorScreen() {
       )}
 
       {/* Newsletter Image Crop Modal */}
-      {newsletterImageUrl && (
-        <ImageCropModal
-          isOpen={showNewsletterCropModal}
-          onClose={() => setShowNewsletterCropModal(false)}
-          imageSrc={newsletterImageUrl}
-          // Frame dimensions based on newsletter image size
-          frameWidth={newsletterImageSize === 'small' ? 234 : 317}
-          frameHeight={newsletterImageSize === 'small' ? 132 : 179}
-          initialPosition={newsletterImagePosition}
-          initialZoom={newsletterImageZoom}
-          onSave={(position, zoom) => {
-            setNewsletterImagePosition(position)
-            setNewsletterImageZoom(zoom)
-          }}
-        />
-      )}
-
       {/* Preview lightbox — uses the registry to render the live template at native size.
           Sibling to the layout branch so it works in both legacy and Stage & Bench paths. */}
       {showPreviewLightbox && colorsConfig && typographyConfig && (() => {
@@ -1635,344 +1585,6 @@ export function EditorScreen() {
               </>
             )}
 
-            {/* Newsletter Dark Gradient Variant Controls */}
-            {currentTemplate === 'newsletter-dark-gradient' && (
-              <>
-                {/* Color Style */}
-                <div>
-                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Background</label>
-                  <div className="flex gap-2">
-                    {(['1', '2', '3', '4'] as const).map((style) => (
-                      <button
-                        key={style}
-                        onClick={() => setColorStyle(style)}
-                        className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
-                          colorStyle === style
-                            ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
-                        }`}
-                      >
-                        <img
-                          src={`/assets/backgrounds/newsletter-dark-gradient-${style}.png`}
-                          alt={`Style ${style}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Image Size */}
-                <div>
-                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
-                    <button
-                      onClick={() => setNewsletterImageSize('none')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      None
-                    </button>
-                    <button
-                      onClick={() => setNewsletterImageSize('small')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      Small
-                    </button>
-                    <button
-                      onClick={() => setNewsletterImageSize('large')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      Large
-                    </button>
-                  </div>
-                </div>
-
-                {/* Image Upload - only show when image size is not 'none' */}
-                {newsletterImageSize !== 'none' && (
-                  <div>
-                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image</label>
-                    {newsletterImageUrl ? (
-                      <ImagePreviewWithCrop
-                        imageUrl={newsletterImageUrl}
-                        imagePosition={newsletterImagePosition}
-                        imageZoom={newsletterImageZoom}
-                        onAdjust={() => setShowNewsletterCropModal(true)}
-                        onRemove={() => {
-                          setNewsletterImageUrl(null)
-                          setNewsletterImageZoom(1)
-                          setNewsletterImagePosition({ x: 0, y: 0 })
-                        }}
-                      />
-                    ) : (
-                      <div className="flex gap-2">
-                        {/* Upload box */}
-                        <div
-                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
-                        >
-                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0]
-                                if (file) handleNewsletterImageUpload(file)
-                              }}
-                              className="hidden"
-                            />
-                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            Drop or upload
-                          </label>
-                        </div>
-                        {/* Library box */}
-                        <button
-                          onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
-                            hover:border-gray-400 dark:hover:border-line-focus transition-colors
-                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
-                        >
-                          <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Choose from library
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Newsletter Blue Gradient Variant Controls */}
-            {currentTemplate === 'newsletter-blue-gradient' && (
-              <>
-                {/* Color Style */}
-                <div>
-                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Background</label>
-                  <div className="flex gap-2">
-                    {(['1', '2', '3', '4'] as const).map((style) => (
-                      <button
-                        key={style}
-                        onClick={() => setColorStyle(style)}
-                        className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
-                          colorStyle === style
-                            ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
-                        }`}
-                      >
-                        <img
-                          src={`/assets/backgrounds/newsletter-blue-gradient-${style}.png`}
-                          alt={`Style ${style}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Image Size */}
-                <div>
-                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
-                    <button
-                      onClick={() => setNewsletterImageSize('none')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      None
-                    </button>
-                    <button
-                      onClick={() => setNewsletterImageSize('small')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      Small
-                    </button>
-                    <button
-                      onClick={() => setNewsletterImageSize('large')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      Large
-                    </button>
-                  </div>
-                </div>
-
-                {/* Image Upload - only show when image size is not 'none' */}
-                {newsletterImageSize !== 'none' && (
-                  <div>
-                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image</label>
-                    {newsletterImageUrl ? (
-                      <ImagePreviewWithCrop
-                        imageUrl={newsletterImageUrl}
-                        imagePosition={newsletterImagePosition}
-                        imageZoom={newsletterImageZoom}
-                        onAdjust={() => setShowNewsletterCropModal(true)}
-                        onRemove={() => {
-                          setNewsletterImageUrl(null)
-                          setNewsletterImageZoom(1)
-                          setNewsletterImagePosition({ x: 0, y: 0 })
-                        }}
-                      />
-                    ) : (
-                      <div className="flex gap-2">
-                        {/* Upload box */}
-                        <div
-                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
-                        >
-                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0]
-                                if (file) handleNewsletterImageUpload(file)
-                              }}
-                              className="hidden"
-                            />
-                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            Drop or upload
-                          </label>
-                        </div>
-                        {/* Library box */}
-                        <button
-                          onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
-                            hover:border-gray-400 dark:hover:border-line-focus transition-colors
-                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
-                        >
-                          <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Choose from library
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Newsletter Light Variant Controls */}
-            {currentTemplate === 'newsletter-light' && (
-              <>
-                {/* Image Size */}
-                <div>
-                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image Size</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
-                    <button
-                      onClick={() => setNewsletterImageSize('none')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'none'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      None
-                    </button>
-                    <button
-                      onClick={() => setNewsletterImageSize('small')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'small'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      Small
-                    </button>
-                    <button
-                      onClick={() => setNewsletterImageSize('large')}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                        newsletterImageSize === 'large'
-                          ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                          : 'text-gray-600 dark:text-content-secondary'
-                      }`}
-                    >
-                      Large
-                    </button>
-                  </div>
-                </div>
-
-                {/* Image Upload - only show when image size is not 'none' */}
-                {newsletterImageSize !== 'none' && (
-                  <div>
-                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Image</label>
-                    {newsletterImageUrl ? (
-                      <ImagePreviewWithCrop
-                        imageUrl={newsletterImageUrl}
-                        imagePosition={newsletterImagePosition}
-                        imageZoom={newsletterImageZoom}
-                        onAdjust={() => setShowNewsletterCropModal(true)}
-                        onRemove={() => {
-                          setNewsletterImageUrl(null)
-                          setNewsletterImageZoom(1)
-                          setNewsletterImagePosition({ x: 0, y: 0 })
-                        }}
-                      />
-                    ) : (
-                      <div className="flex gap-2">
-                        {/* Upload box */}
-                        <div
-                          className="flex-1 border-2 border-dashed rounded-lg h-16 transition-colors border-gray-300 dark:border-line-subtle hover:border-gray-400"
-                        >
-                          <label className="flex flex-col items-center justify-center h-full cursor-pointer text-xs text-gray-500 dark:text-content-secondary">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0]
-                                if (file) handleNewsletterImageUpload(file)
-                              }}
-                              className="hidden"
-                            />
-                            <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            Drop or upload
-                          </label>
-                        </div>
-                        {/* Library box */}
-                        <button
-                          onClick={() => { setSelectingNewsletterImage(true); setShowImageLibrary(true) }}
-                          className="flex-1 border-2 border-dashed border-gray-300 dark:border-line-subtle rounded-lg h-16
-                            hover:border-gray-400 dark:hover:border-line-focus transition-colors
-                            flex flex-col items-center justify-center text-xs text-gray-500 dark:text-content-secondary"
-                        >
-                          <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Choose from library
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
 
             {/* Newsletter Top Banner Variant Controls */}
             {currentTemplate === 'newsletter-top-banner' && (
@@ -4785,75 +4397,6 @@ export function EditorScreen() {
                   invitationEventTime={invitationEventTime}
                   invitationEventTimeNote={invitationEventTimeNote}
                   invitationBody={invitationBody}
-                  colors={colorsConfig}
-                  typography={typographyConfig}
-                  scale={1}
-                />
-              )}
-              {currentTemplate === 'newsletter-dark-gradient' && (
-                <NewsletterDarkGradient
-                  eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Headline'}
-                  subhead={verbatimCopy.subhead || ''}
-                  ctaText={ctaText}
-                  colorStyle={colorStyle}
-                  imageSize={newsletterImageSize}
-                  imageUrl={newsletterImageUrl}
-                  imagePosition={newsletterImagePosition}
-                  imageZoom={newsletterImageZoom}
-                  showEyebrow={showEyebrow && !!eyebrow}
-                  showHeadline={showHeadline}
-                  showSubhead={showSubhead && !!verbatimCopy.subhead}
-                  showCta={showCta}
-                  grayscale={grayscale}
-                  headlineFontSize={headlineFontSize ?? undefined}
-                  subheadFontSize={subheadFontSize ?? undefined}
-                  colors={colorsConfig}
-                  typography={typographyConfig}
-                  scale={1}
-                />
-              )}
-              {currentTemplate === 'newsletter-blue-gradient' && (
-                <NewsletterBlueGradient
-                  eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Headline'}
-                  subhead={verbatimCopy.subhead || ''}
-                  ctaText={ctaText}
-                  colorStyle={colorStyle}
-                  imageSize={newsletterImageSize}
-                  imageUrl={newsletterImageUrl}
-                  imagePosition={newsletterImagePosition}
-                  imageZoom={newsletterImageZoom}
-                  showEyebrow={showEyebrow && !!eyebrow}
-                  showHeadline={showHeadline}
-                  showSubhead={showSubhead && !!verbatimCopy.subhead}
-                  showCta={showCta}
-                  grayscale={grayscale}
-                  headlineFontSize={headlineFontSize ?? undefined}
-                  subheadFontSize={subheadFontSize ?? undefined}
-                  colors={colorsConfig}
-                  typography={typographyConfig}
-                  scale={1}
-                />
-              )}
-              {currentTemplate === 'newsletter-light' && (
-                <NewsletterLight
-                  eyebrow={eyebrow}
-                  headline={verbatimCopy.headline || 'Headline'}
-                  subhead={verbatimCopy.subhead || ''}
-                  ctaText={ctaText}
-                  imageSize={newsletterImageSize}
-                  imageUrl={newsletterImageUrl}
-                  imagePosition={newsletterImagePosition}
-                  imageZoom={newsletterImageZoom}
-                  showEyebrow={showEyebrow && !!eyebrow}
-                  showHeadline={showHeadline}
-                  showSubhead={showSubhead && !!verbatimCopy.subhead}
-                  showCta={showCta}
-                  grayscale={grayscale}
-                  headlineFontSize={headlineFontSize ?? undefined}
-                  subheadFontSize={subheadFontSize ?? undefined}
-                  theme={theme}
                   colors={colorsConfig}
                   typography={typographyConfig}
                   scale={1}

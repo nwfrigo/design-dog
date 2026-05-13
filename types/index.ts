@@ -556,10 +556,6 @@ export interface GeneratedAsset {
   showCta: boolean
   layout: ImageLayout
   newsletterImageSize: NewsletterImageSize
-  newsletterImageUrl: string | null
-  newsletterImagePosition: { x: number; y: number }
-  newsletterImageZoom: number
-  newsletterImageFilters?: import('@/lib/image-filters').ImageFilters
   speakerCount: SpeakerCount
   speaker1Name: string
   speaker1Role: string
@@ -742,12 +738,10 @@ export interface QueuedAsset {
   showCta: boolean
   // Social Image specific
   layout: ImageLayout
-  // Newsletter Dark Gradient specific
+  // Newsletter Dark Gradient specific (image URL/settings live in the universal
+  // thumbnailImageUrl + thumbnailImageSettings[templateId]; only the layout
+  // switch is bespoke to newsletters).
   newsletterImageSize: NewsletterImageSize
-  newsletterImageUrl: string | null
-  newsletterImagePosition: { x: number; y: number }
-  newsletterImageZoom: number
-  newsletterImageFilters?: import('@/lib/image-filters').ImageFilters
   // Email Speakers specific
   speakerCount: SpeakerCount
   speaker1Name: string
@@ -944,12 +938,9 @@ export interface AppState {
   // Social Image specific settings
   layout: ImageLayout
 
-  // Newsletter Dark Gradient specific settings
+  // Newsletter Dark Gradient specific settings (image data is universal —
+  // see thumbnailImageUrl + thumbnailImageSettings)
   newsletterImageSize: NewsletterImageSize
-  newsletterImageUrl: string | null
-  newsletterImagePosition: { x: number; y: number }
-  newsletterImageZoom: number
-  newsletterImageFilters: import('@/lib/image-filters').ImageFilters
 
   // Email Speakers specific settings
   speakerCount: SpeakerCount
@@ -1164,10 +1155,6 @@ export interface AppState {
 
   // Newsletter Dark Gradient specific actions
   setNewsletterImageSize: (size: NewsletterImageSize) => void
-  setNewsletterImageUrl: (url: string | null) => void
-  setNewsletterImagePosition: (position: { x: number; y: number }) => void
-  setNewsletterImageZoom: (zoom: number) => void
-  setNewsletterImageFilters: (filters: import('@/lib/image-filters').ImageFilters) => void
 
   // Email Speakers specific actions
   setSpeakerCount: (count: SpeakerCount) => void
