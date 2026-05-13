@@ -216,16 +216,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   // 'email-cority-connect-2026' — migrated to stage-bench-registry
   // (Task 2 pilot). Builder lives in EmailCorityConnect2026Registration.ts.
 
-  'email-ehs-accelerate-invitation': (s) => ({
-    invitationHeader: s.invitationHeader || '',
-    invitationHeadline: s.invitationHeadline || '',
-    invitationEventTitle: s.invitationEventTitle || '',
-    invitationEventDate: s.invitationEventDate || '',
-    invitationEventLocation: s.invitationEventLocation || '',
-    invitationEventTime: s.invitationEventTime || '',
-    invitationEventTimeNote: s.invitationEventTimeNote || '',
-    invitationBody: s.invitationBody || '',
-  }),
+  // 'email-ehs-accelerate-invitation' — exportBuilder lives in
+  // EmailEhsAccelerateInvitationRegistration.ts.
 
   // 'newsletter-top-banner' — exportBuilder lives in NewsletterTopBannerRegistration.ts.
 

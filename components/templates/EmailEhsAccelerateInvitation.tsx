@@ -1,7 +1,20 @@
 'use client'
 
+import { type ReactNode } from 'react'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+
+/** Editable block ids for Stage & Bench wiring. Logo + RSVP button +
+ *  background image are brand-locked. */
+export type EmailEhsAccelerateInvitationBlockId =
+  | 'invitationHeader'
+  | 'invitationHeadline'
+  | 'invitationEventTitle'
+  | 'invitationEventDate'
+  | 'invitationEventLocation'
+  | 'invitationEventTime'
+  | 'invitationEventTimeNote'
+  | 'invitationBody'
 
 export interface EmailEhsAccelerateInvitationProps {
   invitationHeader: string
@@ -12,6 +25,12 @@ export interface EmailEhsAccelerateInvitationProps {
   invitationEventTime: string
   invitationEventTimeNote: string
   invitationBody: string
+  /** Stage & Bench render-prop: wraps each editable region in <Editable>. */
+  renderBlock?: (blockId: EmailEhsAccelerateInvitationBlockId, content: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: swaps a block's inner text for an in-place editor. */
+  renderInlineEditor?: (blockId: EmailEhsAccelerateInvitationBlockId, defaultInner: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: absolutely-positioned overlay (drag scrim). */
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -28,9 +47,17 @@ export function EmailEhsAccelerateInvitation({
   invitationEventTime,
   invitationEventTimeNote,
   invitationBody,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   typography,
   scale = 1,
 }: EmailEhsAccelerateInvitationProps) {
+  // Render-prop shims: in export/preview contexts these are no-ops; in
+  // the editor they wrap blocks with <Editable> and swap inner text for
+  // an in-place editor when selected.
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const bodyHtml = invitationBody || DEFAULT_BODY
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
@@ -49,21 +76,25 @@ export function EmailEhsAccelerateInvitation({
       </div>
 
       {/* "You're Invited" header */}
-      <div style={{
-        position: 'absolute', left: 28, top: 36,
-        color: '#060015', fontSize: 18, fontWeight: 350, lineHeight: '16.92px',
-      }}>
-        {invitationHeader || "You're Invited"}
-      </div>
+      {wrapBlock('invitationHeader', (
+        <div style={{
+          position: 'absolute', left: 28, top: 36,
+          color: '#060015', fontSize: 18, fontWeight: 350, lineHeight: '16.92px',
+        }}>
+          {wrapInline('invitationHeader', invitationHeader || "You're Invited")}
+        </div>
+      ))}
 
       {/* Main headline */}
-      <div style={{
-        position: 'absolute', width: 250, left: 26, top: 65,
-        color: '#060015', fontSize: 40.93, fontWeight: 350, lineHeight: '38.47px',
-        wordWrap: 'break-word',
-      }}>
-        {invitationHeadline || 'Exclusive EHS+ Leader Workshop'}
-      </div>
+      {wrapBlock('invitationHeadline', (
+        <div style={{
+          position: 'absolute', width: 250, left: 26, top: 65,
+          color: '#060015', fontSize: 40.93, fontWeight: 350, lineHeight: '38.47px',
+          wordWrap: 'break-word',
+        }}>
+          {wrapInline('invitationHeadline', invitationHeadline || 'Exclusive EHS+ Leader Workshop')}
+        </div>
+      ))}
 
       {/* Event details bar */}
       <div style={{
@@ -71,36 +102,49 @@ export function EmailEhsAccelerateInvitation({
         display: 'flex', alignItems: 'flex-start', gap: 18,
       }}>
         {/* Event title */}
+        {wrapBlock('invitationEventTitle', (
+          <div style={{
+            maxWidth: 118,
+            color: '#060015', fontSize: 8, fontWeight: 400,
+            textTransform: 'uppercase', lineHeight: '9.92px',
+          }}>
+            {wrapInline('invitationEventTitle', invitationEventTitle || 'EHS+ Accelerate: Tech Convergence Workshop')}
+          </div>
+        ))}
+
+        {/* Divider */}
+        <div style={{ width: 1, height: 21, background: '#060015', opacity: 0.3, flexShrink: 0, marginTop: 1 }} />
+
+        {/* Date + Location — two separate editable blocks stacked, gap matches
+            the original <br/> rhythm (9.92px line-height ≈ 10px). */}
         <div style={{
-          maxWidth: 118,
+          display: 'flex', flexDirection: 'column',
           color: '#060015', fontSize: 8, fontWeight: 400,
           textTransform: 'uppercase', lineHeight: '9.92px',
         }}>
-          {invitationEventTitle || 'EHS+ Accelerate: Tech Convergence Workshop'}
+          {wrapBlock('invitationEventDate', (
+            <div>{wrapInline('invitationEventDate', invitationEventDate || '13 November')}</div>
+          ))}
+          {wrapBlock('invitationEventLocation', (
+            <div>{wrapInline('invitationEventLocation', invitationEventLocation || 'London, England')}</div>
+          ))}
         </div>
 
         {/* Divider */}
         <div style={{ width: 1, height: 21, background: '#060015', opacity: 0.3, flexShrink: 0, marginTop: 1 }} />
 
-        {/* Date + Location */}
+        {/* Time + Note — two separate editable blocks stacked. */}
         <div style={{
+          display: 'flex', flexDirection: 'column',
           color: '#060015', fontSize: 8, fontWeight: 400,
           textTransform: 'uppercase', lineHeight: '9.92px',
         }}>
-          {invitationEventDate || '13 November'}<br />
-          {invitationEventLocation || 'London, England'}
-        </div>
-
-        {/* Divider */}
-        <div style={{ width: 1, height: 21, background: '#060015', opacity: 0.3, flexShrink: 0, marginTop: 1 }} />
-
-        {/* Time + Note */}
-        <div style={{
-          color: '#060015', fontSize: 8, fontWeight: 400,
-          textTransform: 'uppercase', lineHeight: '9.92px',
-        }}>
-          {invitationEventTime || '10:00–14:30'}<br />
-          {invitationEventTimeNote || 'Lunch Included'}
+          {wrapBlock('invitationEventTime', (
+            <div>{wrapInline('invitationEventTime', invitationEventTime || '10:00–14:30')}</div>
+          ))}
+          {wrapBlock('invitationEventTimeNote', (
+            <div>{wrapInline('invitationEventTimeNote', invitationEventTimeNote || 'Lunch Included')}</div>
+          ))}
         </div>
       </div>
 
@@ -112,15 +156,21 @@ export function EmailEhsAccelerateInvitation({
         overflow: 'hidden',
       }}>
         {/* Body text */}
-        <div
-          className="ehs-invite-body"
-          style={{
-            position: 'absolute', left: 13, top: 19, width: 337,
-            color: '#060015', fontSize: 10, fontWeight: 350,
-            lineHeight: '13.9px',
-          }}
-          dangerouslySetInnerHTML={{ __html: bodyHtml }}
-        />
+        {wrapBlock('invitationBody', (
+          <div
+            className="ehs-invite-body"
+            style={{
+              position: 'absolute', left: 13, top: 19, width: 337,
+              color: '#060015', fontSize: 10, fontWeight: 350,
+              lineHeight: '13.9px',
+            }}
+          >
+            {wrapInline(
+              'invitationBody',
+              <span dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+            )}
+          </div>
+        ))}
 
         {/* RSVP button */}
         <div style={{
@@ -152,6 +202,7 @@ export function EmailEhsAccelerateInvitation({
         .ehs-invite-body li p { display: inline; margin: 0; }
         .ehs-invite-body strong { font-weight: 500; }
       `}</style>
+      {renderOverlay?.()}
     </div>
   )
 }

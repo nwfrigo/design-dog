@@ -26,17 +26,6 @@
 
 ---
 
-## Rich-text inline editing — formatting toolbar
-
-**What:** `InlineTextEdit` supports `format: 'html'` (contenteditable preserves `<strong>`, `<em>`, `<br>`, etc.), but there is no formatting toolbar. Users can only apply bold/italic via OS keyboard shortcuts (Cmd/Ctrl+B / I) — discoverability is poor, and there's no way to surface link, list, or other formatting affordances. Affects HTML-bearing fields in migrated templates (customer-library body/headline, social-grid-detail headline/subhead, etc.) and is the remaining blocker for the `email-ehs-accelerate-invitation` migration whose body field was authored against the legacy `SimpleRichTextEditor` UI.
-**Why deferred:** Existing HTML-bearing templates render existing data fine; users editing in S&B can rely on Cmd-shortcuts for now. Toolbar work pairs with the planned collateral-rich-text effort.
-**Cost to ignore:** Blocks Invitation migration (its body field was authored expecting a visible toolbar). For already-migrated templates, formatting is technically possible but undiscoverable.
-**Trigger condition:** Invitation migration starts, OR user feedback that bold/italic on the migrated HTML-body templates is unreachable.
-**Estimate to pay:** ~1–2 days for a minimal contextual toolbar (bold / italic / link) surfaced on selection within an active `InlineTextEdit`.
-**First step when you start:** Prototype a selection-aware toolbar that sits inside the existing `ContextualToolbar` host. Reuse the `format: 'html'` path and `document.execCommand` (or the modern Selection-API equivalent) for the bold/italic commands.
-
----
-
 ## Image-source-key for shared image slots
 
 **What:** When the same image source is used across multiple templates (e.g., a newsletter image visible in dark + light variants of the same asset), there's no concept of a "shared image identity." Each template gets its own settings bundle, which is correct architecturally but creates a UX wrinkle: edit the image in one variant, the other variant doesn't pick it up.

@@ -400,21 +400,13 @@ export function EditorScreen() {
     showSignatureEventDetails,
     setShowSignatureEventDetails,
     invitationHeader,
-    setInvitationHeader,
     invitationHeadline,
-    setInvitationHeadline,
     invitationEventTitle,
-    setInvitationEventTitle,
     invitationEventDate,
-    setInvitationEventDate,
     invitationEventLocation,
-    setInvitationEventLocation,
     invitationEventTime,
-    setInvitationEventTime,
     invitationEventTimeNote,
-    setInvitationEventTimeNote,
     invitationBody,
-    setInvitationBody,
     // Email Cority Customer Exchange Signature
     cceEventTime,
     setCceEventTime,
@@ -2682,113 +2674,6 @@ export function EditorScreen() {
               )}
 
               {/* Invitation Fields - EHS Accelerate Invitation */}
-              {currentTemplate === 'email-ehs-accelerate-invitation' && (
-                <div className="space-y-3">
-                  {/* Header */}
-                  <div>
-                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Header</label>
-                    <input
-                      type="text"
-                      value={invitationHeader}
-                      onChange={(e) => setInvitationHeader(e.target.value)}
-                      placeholder="You're Invited"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
-                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  {/* Headline */}
-                  <div>
-                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Headline</label>
-                    <input
-                      type="text"
-                      value={invitationHeadline}
-                      onChange={(e) => setInvitationHeadline(e.target.value)}
-                      placeholder="Exclusive EHS+ Leader Workshop"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
-                        bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                        focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  {/* Event Details */}
-                  <div className="pt-2 border-t border-gray-200 dark:border-line-subtle">
-                    <h4 className="text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-2">Event Details</h4>
-                    <div className="space-y-2">
-                      <div>
-                        <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Event Title</label>
-                        <input
-                          type="text"
-                          value={invitationEventTitle}
-                          onChange={(e) => setInvitationEventTitle(e.target.value)}
-                          placeholder="EHS+ Accelerate: Tech Convergence Workshop"
-                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
-                            bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                            focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Date</label>
-                          <input
-                            type="text"
-                            value={invitationEventDate}
-                            onChange={(e) => setInvitationEventDate(e.target.value)}
-                            placeholder="13 November"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
-                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Location</label>
-                          <input
-                            type="text"
-                            value={invitationEventLocation}
-                            onChange={(e) => setInvitationEventLocation(e.target.value)}
-                            placeholder="London, England"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
-                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Time</label>
-                          <input
-                            type="text"
-                            value={invitationEventTime}
-                            onChange={(e) => setInvitationEventTime(e.target.value)}
-                            placeholder="10:00–14:30"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
-                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Note</label>
-                          <input
-                            type="text"
-                            value={invitationEventTimeNote}
-                            onChange={(e) => setInvitationEventTimeNote(e.target.value)}
-                            placeholder="Lunch Included"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
-                              bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
-                              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Body (rich text) */}
-                  <div className="pt-2 border-t border-gray-200 dark:border-line-subtle">
-                    <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-2">Body Text</label>
-                    <RichTextEditor
-                      content={invitationBody}
-                      onChange={setInvitationBody}
-                      placeholder="Enter invitation body text..."
-                    />
-                  </div>
-                </div>
-              )}
 
               {/* CTA Text - Email Cority Connect 2026 */}
               {currentTemplate === 'email-cority-connect-2026' && (
