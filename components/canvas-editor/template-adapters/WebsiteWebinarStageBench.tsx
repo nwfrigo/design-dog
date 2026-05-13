@@ -81,6 +81,41 @@ export const WebsiteWebinarStageBench =
       },
       { blockId: 'image', label: 'Image', iconKey: 'image', kind: 'image', benchable: false },
       { blockId: 'speakers', label: 'Speakers', iconKey: 'group', kind: 'group', benchable: false },
+      // Per-speaker name + role fields. `parent: 'speakers'` excludes them
+      // from the bench surface (the parent group represents them) while
+      // keeping selection / inline editing wired up via the DOM walker.
+      // Avatars are intentionally not yet child slots — image slots need
+      // a dedicated framework pass.
+      {
+        blockId: 'speaker1Name', label: 'Speaker 1 Name', iconKey: 'speaker',
+        chipKind: 'speaker', kind: 'text', parent: 'speakers',
+        content: { format: 'plain', singleLine: true, placeholder: 'Speaker Name' },
+      },
+      {
+        blockId: 'speaker1Role', label: 'Speaker 1 Role', iconKey: 'small-caption',
+        chipKind: 'small-caption', kind: 'text', parent: 'speakers',
+        content: { format: 'plain', singleLine: true, placeholder: 'Speaker Role' },
+      },
+      {
+        blockId: 'speaker2Name', label: 'Speaker 2 Name', iconKey: 'speaker',
+        chipKind: 'speaker', kind: 'text', parent: 'speakers',
+        content: { format: 'plain', singleLine: true, placeholder: 'Speaker Name' },
+      },
+      {
+        blockId: 'speaker2Role', label: 'Speaker 2 Role', iconKey: 'small-caption',
+        chipKind: 'small-caption', kind: 'text', parent: 'speakers',
+        content: { format: 'plain', singleLine: true, placeholder: 'Speaker Role' },
+      },
+      {
+        blockId: 'speaker3Name', label: 'Speaker 3 Name', iconKey: 'speaker',
+        chipKind: 'speaker', kind: 'text', parent: 'speakers',
+        content: { format: 'plain', singleLine: true, placeholder: 'Speaker Name' },
+      },
+      {
+        blockId: 'speaker3Role', label: 'Speaker 3 Role', iconKey: 'small-caption',
+        chipKind: 'small-caption', kind: 'text', parent: 'speakers',
+        content: { format: 'plain', singleLine: true, placeholder: 'Speaker Role' },
+      },
     ],
     stageBar: [
       { id: 'theme', kind: 'theme', label: 'theme' },
@@ -146,17 +181,23 @@ export const WebsiteWebinarStageBench =
       // Speaker fields stay raw — surfaced via extras for the template
       // to render its 3-card column directly.
       const speaker1Name = useStore((s) => s.speaker1Name)
+      const setSpeaker1Name = useStore((s) => s.setSpeaker1Name)
       const speaker1Role = useStore((s) => s.speaker1Role)
+      const setSpeaker1Role = useStore((s) => s.setSpeaker1Role)
       const speaker1ImageUrl = useStore((s) => s.speaker1ImageUrl)
       const speaker1ImagePosition = useStore((s) => s.speaker1ImagePosition)
       const speaker1ImageZoom = useStore((s) => s.speaker1ImageZoom)
       const speaker2Name = useStore((s) => s.speaker2Name)
+      const setSpeaker2Name = useStore((s) => s.setSpeaker2Name)
       const speaker2Role = useStore((s) => s.speaker2Role)
+      const setSpeaker2Role = useStore((s) => s.setSpeaker2Role)
       const speaker2ImageUrl = useStore((s) => s.speaker2ImageUrl)
       const speaker2ImagePosition = useStore((s) => s.speaker2ImagePosition)
       const speaker2ImageZoom = useStore((s) => s.speaker2ImageZoom)
       const speaker3Name = useStore((s) => s.speaker3Name)
+      const setSpeaker3Name = useStore((s) => s.setSpeaker3Name)
       const speaker3Role = useStore((s) => s.speaker3Role)
+      const setSpeaker3Role = useStore((s) => s.setSpeaker3Role)
       const speaker3ImageUrl = useStore((s) => s.speaker3ImageUrl)
       const speaker3ImagePosition = useStore((s) => s.speaker3ImagePosition)
       const speaker3ImageZoom = useStore((s) => s.speaker3ImageZoom)
@@ -212,6 +253,12 @@ export const WebsiteWebinarStageBench =
           },
           image: {},
           speakers: {},
+          speaker1Name: { value: speaker1Name, setValue: setSpeaker1Name },
+          speaker1Role: { value: speaker1Role, setValue: setSpeaker1Role },
+          speaker2Name: { value: speaker2Name, setValue: setSpeaker2Name },
+          speaker2Role: { value: speaker2Role, setValue: setSpeaker2Role },
+          speaker3Name: { value: speaker3Name, setValue: setSpeaker3Name },
+          speaker3Role: { value: speaker3Role, setValue: setSpeaker3Role },
         },
         stageBar: {
           theme: { value: theme, set: (v) => setTheme(v as TemplateTheme) },

@@ -22,6 +22,12 @@ export type EmailSpeakersBlockId =
   | 'speaker1'
   | 'speaker2'
   | 'speaker3'
+  | 'speaker1Name'
+  | 'speaker1Role'
+  | 'speaker2Name'
+  | 'speaker2Role'
+  | 'speaker3Name'
+  | 'speaker3Role'
 
 /** Logical IDs for vertical-stack endpoints (left column only). 'logo' is
  *  the always-on header anchor; solutionPill renders alongside it. */
@@ -94,24 +100,6 @@ export interface EmailSpeakersProps {
     value: number,
     prevId: EmailSpeakersStackId,
     nextId: EmailSpeakersStackId,
-  ) => ReactNode
-  /** Stage & Bench render-prop for the inner pieces of each speaker block
-   *  (name text, role text, avatar image). Wraps the styled chrome of each
-   *  piece in <Editable> so users can deep-click into the speaker group to
-   *  edit a specific field. Export omits → renders defaults. */
-  renderSpeakerField?: (
-    speakerId: 'speaker1' | 'speaker2' | 'speaker3',
-    field: 'name' | 'role' | 'image',
-    defaultInner: ReactNode,
-  ) => ReactNode
-  /** Stage & Bench render-prop that swaps the *inner text* of a speaker's
-   *  name/role with an inline editor while preserving the surrounding
-   *  styled chrome. Mirrors `renderInlineEditor` for top-level blocks —
-   *  this is what keeps the font size/weight stable while editing. */
-  renderSpeakerFieldInline?: (
-    speakerId: 'speaker1' | 'speaker2' | 'speaker3',
-    field: 'name' | 'role',
-    defaultInner: ReactNode,
   ) => ReactNode
   /** Stage & Bench render-prop: an absolutely-positioned overlay that
    *  shares the template's stacking context — the drag scrim renders
@@ -222,16 +210,12 @@ export function EmailSpeakers({
   renderBlock,
   renderInlineEditor,
   renderSpacerBetween,
-  renderSpeakerField,
-  renderSpeakerFieldInline,
   renderOverlay,
 }: EmailSpeakersProps) {
   // Default identity render-props so callers that don't pass them
   // get the existing behavior with zero changes.
   const wrapBlock = renderBlock ?? ((_id, content) => content)
   const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
-  const wrapSpeakerField = renderSpeakerField ?? ((_id, _field, defaultInner) => defaultInner)
-  const wrapSpeakerInline = renderSpeakerFieldInline ?? ((_id, _field, defaultInner) => defaultInner)
   const themeColors = TEMPLATE_THEMES[theme]
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const logoFill = themeColors.logoFill
@@ -422,22 +406,22 @@ export function EmailSpeakers({
         justifyContent: 'space-between',
         alignItems: 'flex-start',
       }}>
-        {visibleSpeakers.map(({ id, data: speaker }, index) => wrapBlock(
-          id,
-          <div
-            key={id}
-            style={{
-              alignSelf: 'stretch',
-              flex: '1 1 0',
-              display: 'inline-flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 16,
-            }}
-          >
-            {wrapSpeakerField(
-              id,
-              'image',
+        {visibleSpeakers.map(({ id, data: speaker }, index) => {
+          const nameId = `${id}Name` as EmailSpeakersBlockId
+          const roleId = `${id}Role` as EmailSpeakersBlockId
+          return wrapBlock(
+            id,
+            <div
+              key={id}
+              style={{
+                alignSelf: 'stretch',
+                flex: '1 1 0',
+                display: 'inline-flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: 16,
+              }}
+            >
               <SpeakerAvatar
                 imageUrl={speaker.imageUrl}
                 position={speaker.imagePosition}
@@ -445,43 +429,39 @@ export function EmailSpeakers({
                 size={48}
                 speakerIndex={index + 1}
                 grayscale={grayscale}
-              />,
-            )}
-            <div style={{
-              width: 161,
-              display: 'inline-flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-            }}>
-              {wrapSpeakerField(
-                id,
-                'name',
-                <div style={{
-                  alignSelf: 'stretch',
-                  color: textColor,
-                  fontSize: 18,
-                  fontWeight: 350,
-                }}>
-                  {wrapSpeakerInline(id, 'name', speaker.name || 'Firstname Lastname')}
-                </div>,
-              )}
-              {wrapSpeakerField(
-                id,
-                'role',
-                <div style={{
-                  alignSelf: 'stretch',
-                  color: textColor,
-                  fontSize: 12,
-                  fontWeight: 350,
-                  lineHeight: '16px',
-                }}>
-                  {wrapSpeakerInline(id, 'role', speaker.role || 'Role, Company')}
-                </div>,
-              )}
-            </div>
-          </div>,
-        ))}
+              />
+              <div style={{
+                width: 161,
+                display: 'inline-flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+              }}>
+                {wrapBlock(nameId, (
+                  <div style={{
+                    alignSelf: 'stretch',
+                    color: textColor,
+                    fontSize: 18,
+                    fontWeight: 350,
+                  }}>
+                    {wrapInline(nameId, speaker.name || 'Firstname Lastname')}
+                  </div>
+                ))}
+                {wrapBlock(roleId, (
+                  <div style={{
+                    alignSelf: 'stretch',
+                    color: textColor,
+                    fontSize: 12,
+                    fontWeight: 350,
+                    lineHeight: '16px',
+                  }}>
+                    {wrapInline(roleId, speaker.role || 'Role, Company')}
+                  </div>
+                ))}
+              </div>
+            </div>,
+          )
+        })}
       </div>
       {renderOverlay?.()}
     </div>

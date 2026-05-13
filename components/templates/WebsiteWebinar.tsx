@@ -29,9 +29,10 @@ export interface WebinarSpeakerInfo {
 
 export type WebinarVariant = 'none' | 'image' | 'speakers'
 
-/** Editable block IDs. The `speakers` block is a panel-level slot that
- *  contains 3 speaker rows internally; per-speaker editing is deferred
- *  (mirrors how EmailSpeakers initially shipped). */
+/** Editable block IDs. The `speakers` block is a panel-level group;
+ *  per-speaker name + role fields are nested child slots (declared with
+ *  `parent: 'speakers'` in the adapter, deep-clicked via the DOM walker
+ *  in Editable.tsx). */
 export type WebsiteWebinarBlockId =
   | 'logo'
   | 'solutionPill'
@@ -42,8 +43,25 @@ export type WebsiteWebinarBlockId =
   | 'cta'
   | 'image'
   | 'speakers'
+  | 'speaker1Name'
+  | 'speaker1Role'
+  | 'speaker2Name'
+  | 'speaker2Role'
+  | 'speaker3Name'
+  | 'speaker3Role'
 
-type WebsiteWebinarStackId = Exclude<WebsiteWebinarBlockId, 'image' | 'solutionPill' | 'speakers'>
+type WebsiteWebinarStackId = Exclude<
+  WebsiteWebinarBlockId,
+  | 'image'
+  | 'solutionPill'
+  | 'speakers'
+  | 'speaker1Name'
+  | 'speaker1Role'
+  | 'speaker2Name'
+  | 'speaker2Role'
+  | 'speaker3Name'
+  | 'speaker3Role'
+>
 
 export interface WebsiteWebinarProps {
   eyebrow: string
@@ -183,6 +201,7 @@ export function WebsiteWebinar({
   scale = 1,
 }: WebsiteWebinarProps) {
   const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const themeColors = TEMPLATE_THEMES[theme]
   const solutionConfig = colors.solutions[solution] || colors.solutions.safety
   const solutionColor = solutionConfig.color
@@ -401,53 +420,61 @@ export function WebsiteWebinar({
           justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}>
-          {speakers.map((speaker, index) => (
-            <div
-              key={index}
-              style={{
-                alignSelf: 'stretch',
-                flex: '1 1 0',
-                display: 'inline-flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: 16,
-              }}
-            >
-              <SpeakerAvatar
-                imageUrl={speaker.imageUrl}
-                position={speaker.imagePosition}
-                zoom={speaker.imageZoom}
-                size={48}
-                speakerIndex={speaker.speakerIndex}
-                grayscale={grayscale}
-              />
-              <div style={{
-                flex: '1 1 0',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-              }}>
-                <div style={{
+          {speakers.map((speaker) => {
+            const nameId = `speaker${speaker.speakerIndex}Name` as WebsiteWebinarBlockId
+            const roleId = `speaker${speaker.speakerIndex}Role` as WebsiteWebinarBlockId
+            return (
+              <div
+                key={speaker.speakerIndex}
+                style={{
                   alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: 18,
-                  fontWeight: 350,
-                }}>
-                  {speaker.name}
-                </div>
+                  flex: '1 1 0',
+                  display: 'inline-flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 16,
+                }}
+              >
+                <SpeakerAvatar
+                  imageUrl={speaker.imageUrl}
+                  position={speaker.imagePosition}
+                  zoom={speaker.imageZoom}
+                  size={48}
+                  speakerIndex={speaker.speakerIndex}
+                  grayscale={grayscale}
+                />
                 <div style={{
-                  alignSelf: 'stretch',
-                  color: themeColors.textPrimary,
-                  fontSize: 12,
-                  fontWeight: 350,
-                  lineHeight: '16px',
+                  flex: '1 1 0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}>
-                  {speaker.role}
+                  {wrapBlock(nameId, (
+                    <div style={{
+                      alignSelf: 'stretch',
+                      color: themeColors.textPrimary,
+                      fontSize: 18,
+                      fontWeight: 350,
+                    }}>
+                      {wrapInline(nameId, speaker.name || 'Speaker Name')}
+                    </div>
+                  ))}
+                  {wrapBlock(roleId, (
+                    <div style={{
+                      alignSelf: 'stretch',
+                      color: themeColors.textPrimary,
+                      fontSize: 12,
+                      fontWeight: 350,
+                      lineHeight: '16px',
+                    }}>
+                      {wrapInline(roleId, speaker.role || 'Speaker Role')}
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       ))}
 

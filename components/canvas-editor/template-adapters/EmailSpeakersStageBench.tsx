@@ -66,6 +66,15 @@ const BLOCK_TO_CHIP_KIND: Record<EmailSpeakersBlockId, BenchChipKind> = {
   speaker1: 'speaker',
   speaker2: 'speaker',
   speaker3: 'speaker',
+  // Children of the speakerN groups — not surfaced on the bench (no
+  // visibility slot entry below) but the chip-kind defaulting still
+  // expects an entry. Fall back to speaker.
+  speaker1Name: 'speaker',
+  speaker1Role: 'speaker',
+  speaker2Name: 'speaker',
+  speaker2Role: 'speaker',
+  speaker3Name: 'speaker',
+  speaker3Role: 'speaker',
 }
 
 const BLOCK_TO_LABEL: Record<EmailSpeakersBlockId, string> = {
@@ -77,6 +86,12 @@ const BLOCK_TO_LABEL: Record<EmailSpeakersBlockId, string> = {
   speaker1: 'Speaker 1',
   speaker2: 'Speaker 2',
   speaker3: 'Speaker 3',
+  speaker1Name: 'Speaker 1 Name',
+  speaker1Role: 'Speaker 1 Role',
+  speaker2Name: 'Speaker 2 Name',
+  speaker2Role: 'Speaker 2 Role',
+  speaker3Name: 'Speaker 3 Name',
+  speaker3Role: 'Speaker 3 Role',
 }
 
 /** 1×1 transparent gif — fallback `imageSrc` for ImageEditorModal when a
@@ -277,6 +292,12 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
     speaker1: 'group',
     speaker2: 'group',
     speaker3: 'group',
+    speaker1Name: 'text',
+    speaker1Role: 'text',
+    speaker2Name: 'text',
+    speaker2Role: 'text',
+    speaker3Name: 'text',
+    speaker3Role: 'text',
   }
   const blockStoreKey: Record<EmailSpeakersBlockId, string> = {
     eyebrow: 'eyebrow',
@@ -287,6 +308,12 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
     speaker1: 'speaker1',
     speaker2: 'speaker2',
     speaker3: 'speaker3',
+    speaker1Name: 'speaker1Name',
+    speaker1Role: 'speaker1Role',
+    speaker2Name: 'speaker2Name',
+    speaker2Role: 'speaker2Role',
+    speaker3Name: 'speaker3Name',
+    speaker3Role: 'speaker3Role',
   }
 
   // Solution category options — drives the EditbarCategory dropdown.
@@ -441,6 +468,24 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
                   renderInlineEditor={(blockId, defaultInner) => {
                     const path = `email-speakers.${blockId}`
                     if (editingPath !== path) return defaultInner
+
+                    // Per-speaker name/role children — match e.g. 'speaker1Name'.
+                    const childMatch = /^(speaker[123])(Name|Role)$/.exec(blockId)
+                    if (childMatch) {
+                      const speakerId = childMatch[1] as 'speaker1' | 'speaker2' | 'speaker3'
+                      const field = childMatch[2] as 'Name' | 'Role'
+                      const value = field === 'Name' ? speakerNames[speakerId] : speakerRoles[speakerId]
+                      const setter = field === 'Name' ? speakerNameSetters[speakerId] : speakerRoleSetters[speakerId]
+                      return (
+                        <InlineTextEdit
+                          value={value}
+                          onChange={setter}
+                          format="plain"
+                          singleLine
+                        />
+                      )
+                    }
+
                     if (blockId !== 'eyebrow' && blockId !== 'headline' &&
                         blockId !== 'body' && blockId !== 'cta') {
                       return defaultInner
@@ -465,37 +510,6 @@ export function EmailSpeakersStageBench(props: StageBenchEditorProps) {
                         onChange={handleChange}
                         format={isPlainText ? 'plain' : 'html'}
                         singleLine={isPlainText}
-                      />
-                    )
-                  }}
-                  renderSpeakerField={(speakerId, field, defaultInner) => {
-                    const fieldKind = field === 'image' ? 'image' as const : 'text' as const
-                    const fieldStoreKey =
-                      field === 'image' ? `${speakerId}ImageUrl`
-                        : field === 'name' ? `${speakerId}Name`
-                        : `${speakerId}Role`
-                    return (
-                      <Editable
-                        templateId="email-speakers"
-                        slotKey={`${speakerId}.${field}`}
-                        storeKey={fieldStoreKey}
-                        kind={fieldKind}
-                      >
-                        {defaultInner}
-                      </Editable>
-                    )
-                  }}
-                  renderSpeakerFieldInline={(speakerId, field, defaultInner) => {
-                    const fieldPath = `email-speakers.${speakerId}.${field}`
-                    if (editingPath !== fieldPath) return defaultInner
-                    const value = field === 'name' ? speakerNames[speakerId] : speakerRoles[speakerId]
-                    const setter = field === 'name' ? speakerNameSetters[speakerId] : speakerRoleSetters[speakerId]
-                    return (
-                      <InlineTextEdit
-                        value={value}
-                        onChange={setter}
-                        format="plain"
-                        singleLine
                       />
                     )
                   }}

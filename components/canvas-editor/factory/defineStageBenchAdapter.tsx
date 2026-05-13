@@ -80,7 +80,14 @@ export type SlotDescriptor<TBlockId extends string> = {
   /** Explicit chip kind. Defaults derived from `kind`. */
   chipKind?: BenchChipKind
   kind: SlotKind
-  /** Default: true. False = always-on slot (logo, brand-locked anchor, mandatory headline). */
+  /** When set, this slot is a child of the named parent slot. Children
+   *  participate in selection / content / size / inline editing, but are
+   *  excluded from the bench surface (no chip, no drag region) — the parent
+   *  represents the group on the bench. Selection deep-clicks via the
+   *  DOM walker in `Editable.tsx`. Defaults `benchable` to false. */
+  parent?: TBlockId
+  /** Default: true (false when `parent` is set). False = always-on slot
+   *  (logo, brand-locked anchor, mandatory headline, nested-group child). */
   benchable?: boolean
   /** For text/cta/group slots whose value is edited via InlineTextEdit. */
   content?: SlotContentSpec
@@ -222,8 +229,13 @@ export function defineStageBenchAdapter<TBlockId extends string>(
     const slotByBlockId = new Map<TBlockId, SlotDescriptor<TBlockId>>()
     for (const s of descriptor.slots) slotByBlockId.set(s.blockId, s)
 
+    // Effective benchable: explicit value wins; otherwise children
+    // (`parent` set) default to false, top-level slots default to true.
+    const isBenchable = (s: SlotDescriptor<TBlockId>): boolean =>
+      s.benchable ?? !s.parent
+
     const visibilitySlots: SlotVisibility[] = descriptor.slots
-      .filter((s) => s.benchable !== false)
+      .filter(isBenchable)
       .map((s) => {
         const state = bindings.slotState[s.blockId]
         const visible = state?.visible ?? true
@@ -304,11 +316,11 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       const slot = slotByBlockId.get(blockId)
       if (!slot) return content
       const slotPath = `${descriptor.templateId}.${blockId}`
-      const isBenchable = slot.benchable !== false
+      const slotIsBenchable = isBenchable(slot)
       const isImage = slot.kind === 'image'
       const visSlot = visibilitySlots.find((v) => v.path === slotPath)
       const chipKind = slot.chipKind ?? DEFAULT_CHIP_KIND[slot.kind]
-      const dragConfig = isBenchable && !isImage && visSlot
+      const dragConfig = slotIsBenchable && !isImage && visSlot
         ? {
             data: { region: 'stage' as const, path: slotPath },
             preview: (
