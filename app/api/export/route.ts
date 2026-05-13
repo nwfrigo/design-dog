@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import puppeteer from 'puppeteer-core'
 import chromium from '@sparticuz/chromium-min'
 import { trackExport } from '@/lib/usage-tracking'
-import { logExport } from '@/lib/db'
+import { logExport, logEvent } from '@/lib/db'
 import { put } from '@vercel/blob'
 
 async function uploadPdf(buffer: Buffer, template: string): Promise<string | undefined> {
@@ -516,6 +516,7 @@ export async function POST(request: NextRequest) {
         const stackerPdfBuf = Buffer.from(pdfBuffer)
         const stackerPdfUrl = await uploadPdf(stackerPdfBuf, template)
         await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: body.format || 'pdf', scale, thumbnailUrl: stackerPdfUrl })
+        logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: body.format || 'pdf', scale } })
 
         return new NextResponse(stackerPdfBuf, {
           headers: {
@@ -543,6 +544,7 @@ export async function POST(request: NextRequest) {
       const screenshotBuf1 = Buffer.from(screenshot)
       const thumbnailUrl1 = await uploadThumbnail(screenshotBuf1, template)
       await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl1 })
+      logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: 'png', scale } })
 
       return new NextResponse(screenshotBuf1, {
         headers: {
@@ -569,6 +571,7 @@ export async function POST(request: NextRequest) {
       const faqPdfBuf = Buffer.from(pdfBuffer)
       const faqPdfUrl = await uploadPdf(faqPdfBuf, template)
       await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.title || body.headline || body.eyebrow, solution: body.solution, format: 'pdf', scale, thumbnailUrl: faqPdfUrl })
+      logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: 'pdf', scale } })
 
       // Use document title for FAQ PDF filename, sanitized for filesystem
       const faqFilename = body.title
@@ -601,6 +604,7 @@ export async function POST(request: NextRequest) {
     const screenshotBuf2 = Buffer.from(screenshot)
     const thumbnailUrl2 = await uploadThumbnail(screenshotBuf2, template)
     await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl2 })
+    logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: 'png', scale } })
 
     // Return the image
     return new NextResponse(screenshotBuf2, {

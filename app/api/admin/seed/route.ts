@@ -45,6 +45,26 @@ export async function POST(request: NextRequest) {
       await sql`INSERT INTO team_members (name) VALUES (${name}) ON CONFLICT (name) DO NOTHING`
     }
 
+    // Telemetry events — append-only log of editor interactions.
+    // event_name examples: slot_edited, block_dragged_to_bench,
+    // block_restored_from_bench, variant_changed, asset_queued, asset_exported.
+    // props is a free-form JSONB bag for event-specific payload.
+    await sql`
+      CREATE TABLE IF NOT EXISTS events (
+        id SERIAL PRIMARY KEY,
+        event_name VARCHAR(50) NOT NULL,
+        template_id VARCHAR(100),
+        slot_id VARCHAR(100),
+        asset_id VARCHAR(100),
+        user_id VARCHAR(100),
+        props JSONB,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `
+    await sql`CREATE INDEX IF NOT EXISTS idx_events_created_at ON events(created_at DESC)`
+    await sql`CREATE INDEX IF NOT EXISTS idx_events_name ON events(event_name)`
+    await sql`CREATE INDEX IF NOT EXISTS idx_events_template ON events(template_id)`
+
     return NextResponse.json({ success: true, message: 'Database seeded successfully' })
   } catch (error) {
     console.error('Seed error:', error)

@@ -169,3 +169,101 @@ export async function addTeamMember(name: string): Promise<{ id: number; name: s
     return null
   }
 }
+
+// ---------------------------------------------------------------------------
+// Telemetry events
+// ---------------------------------------------------------------------------
+
+export interface EventRow {
+  id: number
+  event_name: string
+  template_id: string | null
+  slot_id: string | null
+  asset_id: string | null
+  user_id: string | null
+  props: Record<string, unknown> | null
+  created_at: string
+}
+
+export interface EventCounts {
+  total: number
+  byName: { event_name: string; count: number }[]
+  byTemplate: { template_id: string; count: number }[]
+  byUser: { user_id: string; count: number }[]
+}
+
+/**
+ * Log a telemetry event. Fire-and-forget — never blocks the calling action.
+ * Surface is intentionally generic — see `/api/track` for the wire format.
+ */
+export function logEvent(data: {
+  eventName: string
+  templateId?: string | null
+  slotId?: string | null
+  assetId?: string | null
+  userId?: string | null
+  props?: Record<string, unknown> | null
+}): void {
+  const propsJson = data.props ? JSON.stringify(data.props) : null
+  sql`
+    INSERT INTO events (event_name, template_id, slot_id, asset_id, user_id, props)
+    VALUES (
+      ${data.eventName},
+      ${data.templateId || null},
+      ${data.slotId || null},
+      ${data.assetId || null},
+      ${data.userId || null},
+      ${propsJson}::jsonb
+    )
+  `.catch((err) => {
+    console.error('Failed to log event:', err)
+  })
+}
+
+/**
+ * Group-by counts for the admin events page. Date filter is inclusive of start,
+ * exclusive of end (ISO yyyy-mm-dd strings; null = no bound).
+ */
+export async function getEventCounts(opts: {
+  start?: string | null
+  end?: string | null
+}): Promise<EventCounts> {
+  // null params skip their bound. @vercel/postgres tag doesn't compose
+  // nested fragments, so the WHERE clause is repeated inline per query.
+  const start = opts.start || null
+  const end = opts.end || null
+
+  const totalRes = await sql`
+    SELECT COUNT(*)::int AS count FROM events
+    WHERE (${start}::timestamptz IS NULL OR created_at >= ${start}::timestamptz)
+      AND (${end}::timestamptz IS NULL OR created_at < ${end}::timestamptz)
+  `
+  const byNameRes = await sql`
+    SELECT event_name, COUNT(*)::int AS count FROM events
+    WHERE (${start}::timestamptz IS NULL OR created_at >= ${start}::timestamptz)
+      AND (${end}::timestamptz IS NULL OR created_at < ${end}::timestamptz)
+    GROUP BY event_name ORDER BY count DESC
+  `
+  const byTemplateRes = await sql`
+    SELECT COALESCE(template_id, '(none)') AS template_id, COUNT(*)::int AS count
+    FROM events
+    WHERE (${start}::timestamptz IS NULL OR created_at >= ${start}::timestamptz)
+      AND (${end}::timestamptz IS NULL OR created_at < ${end}::timestamptz)
+    GROUP BY template_id ORDER BY count DESC
+  `
+  const byUserRes = await sql`
+    SELECT COALESCE(user_id, '(anon)') AS user_id, COUNT(*)::int AS count
+    FROM events
+    WHERE (${start}::timestamptz IS NULL OR created_at >= ${start}::timestamptz)
+      AND (${end}::timestamptz IS NULL OR created_at < ${end}::timestamptz)
+    GROUP BY user_id ORDER BY count DESC
+    LIMIT 20
+  `
+
+  return {
+    total: (totalRes.rows[0]?.count as number) ?? 0,
+    byName: byNameRes.rows as { event_name: string; count: number }[],
+    byTemplate: byTemplateRes.rows as { template_id: string; count: number }[],
+    byUser: byUserRes.rows as { user_id: string; count: number }[],
+  }
+}

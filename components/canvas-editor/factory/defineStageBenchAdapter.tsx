@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type ComponentType, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react'
 import type { TemplateType, StackAlign } from '@/types'
 import { NEUTRAL_FILTERS, type ImageFilters, type ImageSlotSettings } from '@/lib/image-filters'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
@@ -34,6 +34,7 @@ import {
   type SlotDragData,
 } from '../stage-bench'
 import type { StageBenchEditorProps } from '../StageBenchEditor'
+import { useTelemetry } from '@/lib/telemetry'
 
 /**
  * Adapter factory. Replaces ~300–450 lines of per-template boilerplate
@@ -254,6 +255,26 @@ export function defineStageBenchAdapter<TBlockId extends string>(
     // both the top-level descriptor.image and any descriptor.childImages.
     const [editorForBlockId, setEditorForBlockId] = useState<TBlockId | null>(null)
 
+    const track = useTelemetry()
+    // Telemetry: fire `slot_edited` when editing ends (editingPath
+    // transitions from a path inside this template back to null). One
+    // event per edit session rather than per keystroke.
+    const lastEditingPathRef = useRef<string | null>(editingPath)
+    useEffect(() => {
+      const prev = lastEditingPathRef.current
+      lastEditingPathRef.current = editingPath
+      if (prev && !editingPath) {
+        const [tplId, ...rest] = prev.split('.')
+        if (tplId === descriptor.templateId) {
+          track({
+            event_name: 'slot_edited',
+            template_id: tplId,
+            slot_id: rest.join('.'),
+          })
+        }
+      }
+    }, [editingPath, track])
+
     const slotByBlockId = new Map<TBlockId, SlotDescriptor<TBlockId>>()
     for (const s of descriptor.slots) slotByBlockId.set(s.blockId, s)
 
@@ -268,13 +289,28 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         const state = bindings.slotState[s.blockId]
         const visible = state?.visible ?? true
         const setVisible = state?.setVisible ?? (() => {})
+        const slotIdStr = s.blockId as string
         return {
           path: `${descriptor.templateId}.${s.blockId}`,
           label: s.label,
           iconKey: s.iconKey,
           isHidden: !visible,
-          hide: () => setVisible(false),
-          show: () => setVisible(true),
+          hide: () => {
+            setVisible(false)
+            track({
+              event_name: 'block_dragged_to_bench',
+              template_id: descriptor.templateId,
+              slot_id: slotIdStr,
+            })
+          },
+          show: () => {
+            setVisible(true)
+            track({
+              event_name: 'block_restored_from_bench',
+              template_id: descriptor.templateId,
+              slot_id: slotIdStr,
+            })
+          },
         }
       })
 
@@ -436,8 +472,23 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           if (item.kind === 'custom') {
             return <SelectorRow key={item.id} label={label}>{item.render()}</SelectorRow>
           }
-          const sb = bindings.stageBar?.[item.id]
-          if (!sb) return null
+          const sbRaw = bindings.stageBar?.[item.id]
+          if (!sbRaw) return null
+          // Wrap the setter so every stage-bar change fires telemetry.
+          const sb = {
+            value: sbRaw.value,
+            set: (next: unknown) => {
+              if (next !== sbRaw.value) {
+                track({
+                  event_name: 'variant_changed',
+                  template_id: descriptor.templateId,
+                  slot_id: item.id,
+                  props: { kind: item.kind, value: next as string | number | boolean },
+                })
+              }
+              sbRaw.set(next)
+            },
+          }
           switch (item.kind) {
             case 'theme':
               return (

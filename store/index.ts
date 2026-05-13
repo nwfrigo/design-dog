@@ -5,6 +5,7 @@ import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStora
 import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
 import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS, getBrandedSeed } from '@/lib/template-defaults'
+import { trackEvent } from '@/lib/telemetry'
 
 const initialVerbatimCopy: CopyContent = {
   headline: '',
@@ -1267,6 +1268,14 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       imageSettings.filters,
     )
     set({ exportQueue: [...state.exportQueue, newAsset] })
+    trackEvent(
+      {
+        event_name: 'asset_queued',
+        template_id: currentTemplate,
+        asset_id: newAsset.id,
+      },
+      state.exportedBy,
+    )
   },
 
   removeFromQueue: (id: string) => {
