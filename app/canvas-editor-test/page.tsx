@@ -4,12 +4,14 @@ import { CanvasEditorProvider } from '@/components/canvas-editor/CanvasEditorPro
 import { Editable } from '@/components/canvas-editor/Editable'
 import { ContextualToolbar } from '@/components/canvas-editor/ContextualToolbar'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
+import { DndProvider } from '@/lib/dnd'
 
 export default function CanvasEditorTestPage() {
   const selection = useCanvasEditorStore((s) => s.selection)
   const hover = useCanvasEditorStore((s) => s.hover)
 
   return (
+    <DndProvider>
     <CanvasEditorProvider mode="edit">
       <div style={{ padding: 40, fontFamily: 'system-ui, sans-serif', maxWidth: 900 }}>
         <h1 style={{ marginBottom: 8, fontSize: 22, fontWeight: 600 }}>
@@ -119,5 +121,6 @@ export default function CanvasEditorTestPage() {
         <ContextualToolbar />
       </div>
     </CanvasEditorProvider>
+    </DndProvider>
   )
 }
