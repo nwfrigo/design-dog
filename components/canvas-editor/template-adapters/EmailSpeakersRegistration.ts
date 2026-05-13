@@ -1,10 +1,10 @@
 /**
  * Stage & Bench registration for email-speakers.
  *
- * The React adapter (`EmailSpeakersStageBench`) stays hand-rolled (568
- * LOC, multi-image speakers + `renderSpeakerField` per-piece editing
- * don't fit the standard factory slot model). This file only owns the
- * server-safe metadata: renderProps, renderSchema, exportBuilder.
+ * Factory-driven adapter — per-speaker name/role/avatar editing is wired
+ * via the factory's nested-slot + childImages primitives. This file
+ * owns the server-safe metadata: renderProps, renderSchema,
+ * exportBuilder.
  */
 
 import { parseSpeakerParams } from '@/lib/render-params'

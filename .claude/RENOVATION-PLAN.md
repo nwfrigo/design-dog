@@ -85,7 +85,7 @@ Left content stack + right image. ContentStack for the left column; image stays 
 
 | Template | Tier | Status |
 |---|---|---|
-| WebsiteWebinar | 2 | ✅ Done (3-variant text/image/speakers; speakers panel wrapped as single block — inner editing deferred, mirrors EmailSpeakers) |
+| WebsiteWebinar | 2 | ✅ Done (3-variant text/image/speakers; per-speaker name + role + avatar editable via factory nested slots + childImages) |
 | WebsiteReport | 2 | ✅ Done (image-left variant + text-only; press-release shape mirrored) |
 | WebsiteThumbnail | 2 | ✅ Done (image-right variant + text-only; press-release shape mirrored) |
 
@@ -95,7 +95,7 @@ Outer stack of repeated child groups. Each child has its own internal compositio
 
 | Template | Tier | Status |
 |---|---|---|
-| EmailGrid | 3 | ✅ Done (Track 1 left column + Track-2-style equal-distribute grid panel; per-row type toggle deferred) |
+| EmailGrid | 3 | ✅ Done (Track 1 left column + Track-2-style equal-distribute grid panel; per-row data/cta type toggle intentionally not built — small wrinkle, real block-type swapping deserves a first-principles design later) |
 | SocialGridDetail | 3 | ✅ Done (Track 1 + nested grid panel; 4 rows, rows 3+4 toggleable) |
 | WebsiteEventListing | 3 | ✅ Done (Track 1 + 3-variant enum + nested grid panel; logo as left-column footer sibling) |
 | WebsiteEhsAccelerateListing | 3 | ✅ Done (Track 1 + nested grid; no variant, baked background) |
@@ -112,7 +112,7 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 | EmailCorityCustomerExchangeBanner | 4 | ✅ Done (Track 2; 4-color enum selector, flex-end CTA anchor) |
 | EmailEhsAccelerateSignature | 5 | ✅ Done (Track 2; date/location share visibility flag but stay independently editable) |
 | EmailEhsAccelerateBanner | 5 | ✅ Done (Track 2; logo + headline + body + bottom info bar with date/location/cta) |
-| EmailEhsAccelerateInvitation | 8 | ⏸ Deferred — body field is rich HTML; pairs with the upcoming collateral-rich-text work in a couple weeks. Migrate when InlineTextEdit gains rich-text support. |
+| EmailEhsAccelerateInvitation | 8 | ✅ Done (Track 2; 8 abs-pos text slots; body uses HTML via factory format='html' + EditbarText bold/italic toolbar. Template hidden from selection surfaces — see `hidden: true` flag in template-config). |
 
 ### Group F — Track 2 horizontal banner strips (2 templates)
 
@@ -126,9 +126,13 @@ Designed at fixed pixel coordinates. ContentStack does NOT apply. Migrate to S&B
 ### Totals
 
 - **Track 1**: 17 of 17 done (Groups A–D complete).
-- **Track 2**: 8 of 9 done; EmailEhsAccelerateInvitation deferred (rich-text dep).
-- **Substrate primitives added**: `SelectorPrimitive kind="enum"` (N-state, icons/swatches/labels — overflow carousel pending design pass).
-- **Nested-grid pattern**: established in Group D — left column ContentStack + right grid panel where each row is an independent `<Editable>` but rows retain equal-flex distribution as design identity. Per-row data/cta type toggle deferred.
+- **Track 2**: 9 of 9 done.
+- **Substrate primitives added**:
+  - `SelectorPrimitive kind="enum"` (N-state, icons/swatches/labels — wrap-at-4 for >4 cells).
+  - **Nested slots** (`SlotDescriptor.parent`) — bench-suppressed child slots, deep-click via DOM ancestor walker.
+  - **Nested image slots** (`AdapterDescriptor.childImages`) — per-blockId image bindings + per-blockId modal state.
+- **Nested-grid pattern**: established in Group D — left column ContentStack + right grid panel where each row is an independent `<Editable>` but rows retain equal-flex distribution as design identity.
+- **Per-card group pattern**: established for EmailSpeakers + WebsiteWebinar — each speaker is a bench-able group; per-speaker name + role + avatar are nested children. Reusable for any future template with the "N similar cards" shape.
 
 ---
 

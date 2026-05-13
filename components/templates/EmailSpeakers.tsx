@@ -24,10 +24,13 @@ export type EmailSpeakersBlockId =
   | 'speaker3'
   | 'speaker1Name'
   | 'speaker1Role'
+  | 'speaker1Avatar'
   | 'speaker2Name'
   | 'speaker2Role'
+  | 'speaker2Avatar'
   | 'speaker3Name'
   | 'speaker3Role'
+  | 'speaker3Avatar'
 
 /** Logical IDs for vertical-stack endpoints (left column only). 'logo' is
  *  the always-on header anchor; solutionPill renders alongside it. */
@@ -409,6 +412,7 @@ export function EmailSpeakers({
         {visibleSpeakers.map(({ id, data: speaker }, index) => {
           const nameId = `${id}Name` as EmailSpeakersBlockId
           const roleId = `${id}Role` as EmailSpeakersBlockId
+          const avatarId = `${id}Avatar` as EmailSpeakersBlockId
           return wrapBlock(
             id,
             <div
@@ -422,14 +426,16 @@ export function EmailSpeakers({
                 gap: 16,
               }}
             >
-              <SpeakerAvatar
-                imageUrl={speaker.imageUrl}
-                position={speaker.imagePosition}
-                zoom={speaker.imageZoom}
-                size={48}
-                speakerIndex={index + 1}
-                grayscale={grayscale}
-              />
+              {wrapBlock(avatarId, (
+                <SpeakerAvatar
+                  imageUrl={speaker.imageUrl}
+                  position={speaker.imagePosition}
+                  zoom={speaker.imageZoom}
+                  size={48}
+                  speakerIndex={index + 1}
+                  grayscale={grayscale}
+                />
+              ))}
               <div style={{
                 width: 161,
                 display: 'inline-flex',
