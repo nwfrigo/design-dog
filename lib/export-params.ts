@@ -227,10 +227,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     invitationBody: s.invitationBody || '',
   }),
 
-  'newsletter-top-banner': (s) => ({
-    variant: s.newsletterTopBannerVariant,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-  }),
+  // 'newsletter-top-banner' — exportBuilder lives in NewsletterTopBannerRegistration.ts.
 
   'customer-library': (s) => ({
     variant: s.customerLibraryVariant,

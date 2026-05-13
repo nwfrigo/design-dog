@@ -1583,35 +1583,6 @@ export function EditorScreen() {
             )}
 
 
-            {/* Newsletter Top Banner Variant Controls */}
-            {currentTemplate === 'newsletter-top-banner' && (
-              <>
-                {/* Dark/Light Variant */}
-                <div>
-                  <label className="block text-xs font-light font-mono text-gray-500 dark:text-content-secondary mb-1">Theme</label>
-                  <div className="flex gap-2">
-                    {(['dark', 'light'] as const).map((variant) => (
-                      <button
-                        key={variant}
-                        onClick={() => setNewsletterTopBannerVariant(variant)}
-                        className={`flex-1 h-10 rounded-lg border-2 transition-all overflow-hidden ${
-                          newsletterTopBannerVariant === variant
-                            ? 'border-blue-500 ring-2 ring-blue-200'
-                            : 'border-gray-300 dark:border-line-subtle hover:border-gray-400'
-                        }`}
-                      >
-                        <img
-                          src={`/assets/backgrounds/newsletter_header_background_${variant}.png`}
-                          alt={`${variant} theme`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
             {/* Email Speakers Controls */}
             {currentTemplate === 'email-speakers' && (
               <div className="space-y-3">

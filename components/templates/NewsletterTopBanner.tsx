@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 
@@ -15,6 +15,10 @@ const CATEGORIES = [
 
 export type TopBannerVariant = 'dark' | 'light'
 
+/** Editable block ids for Stage & Bench wiring. Logo + category chips
+ *  are brand-locked (baked in). */
+export type NewsletterTopBannerBlockId = 'eyebrow' | 'headline' | 'subhead'
+
 export interface NewsletterTopBannerProps {
   eyebrow: string
   headline: string
@@ -23,6 +27,12 @@ export interface NewsletterTopBannerProps {
   showHeadline?: boolean
   showSubhead: boolean
   subheadFontSize?: number
+  /** Stage & Bench render-prop: wraps each editable region in <Editable>. */
+  renderBlock?: (blockId: NewsletterTopBannerBlockId, content: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: swaps a block's inner text for an in-place editor. */
+  renderInlineEditor?: (blockId: NewsletterTopBannerBlockId, defaultInner: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: absolutely-positioned overlay (drag scrim). */
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -36,11 +46,21 @@ export function NewsletterTopBanner({
   showHeadline = true,
   showSubhead,
   subheadFontSize,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
 }: NewsletterTopBannerProps) {
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
+  // Render-prop shims: in export/preview contexts these are no-ops; in
+  // the editor they wrap blocks with <Editable> and swap inner text
+  // for an in-place editor when selected. Template owns the canonical
+  // placeholder fallback so editor / thumbnail / export all render
+  // the same string.
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
 
   const isDark = variant === 'dark'
   const textColor = isDark ? 'white' : 'black'
@@ -178,18 +198,20 @@ export function NewsletterTopBanner({
           display: 'flex',
         }}>
           {/* Eyebrow */}
-          <div style={{
-            alignSelf: 'stretch',
-            color: eyebrowColor,
-            fontSize: 10,
-            fontFamily: 'Fakt Pro',
-            fontWeight: '500',
-            textTransform: 'uppercase',
-            letterSpacing: 1.10,
-            wordWrap: 'break-word',
-          }}>
-            {eyebrow || 'Month | Year'}
-          </div>
+          {wrapBlock('eyebrow', (
+            <div style={{
+              alignSelf: 'stretch',
+              color: eyebrowColor,
+              fontSize: 10,
+              fontFamily: 'Fakt Pro',
+              fontWeight: '500',
+              textTransform: 'uppercase',
+              letterSpacing: 1.10,
+              wordWrap: 'break-word',
+            }}>
+              {wrapInline('eyebrow', eyebrow || 'Month | Year')}
+            </div>
+          ))}
 
           {/* Headline + Subhead */}
           <div style={{
@@ -200,7 +222,7 @@ export function NewsletterTopBanner({
             gap: 5.6,
             display: 'flex',
           }}>
-            {showHeadline && (
+            {showHeadline && wrapBlock('headline', (
               <div style={{
                 alignSelf: 'stretch',
                 color: textColor,
@@ -209,11 +231,11 @@ export function NewsletterTopBanner({
                 fontWeight: '350',
                 wordWrap: 'break-word',
               }}>
-                {headline || 'Headline'}
+                {wrapInline('headline', headline || 'Headline')}
               </div>
-            )}
+            ))}
 
-            {showSubhead && (
+            {showSubhead && wrapBlock('subhead', (
               <div style={{
                 alignSelf: 'stretch',
                 color: textColor,
@@ -222,11 +244,12 @@ export function NewsletterTopBanner({
                 fontWeight: '350',
                 wordWrap: 'break-word',
               }}>
-                {subhead || 'Subheadline'}
+                {wrapInline('subhead', subhead || 'Subheadline')}
               </div>
-            )}
+            ))}
           </div>
         </div>
+        {renderOverlay?.()}
       </div>
     </div>
   )

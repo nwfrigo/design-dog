@@ -10,7 +10,6 @@ import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnec
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { SocialImage } from '@/components/templates/SocialImage'
 import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
-import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 
 // ---------------------------------------------------------------------------
 // Render Schema — declarative field definitions for dynamic render route
@@ -122,34 +121,8 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
   // Entry now lives in SocialEhsAccelerateRegistration.ts.
 
 
-  'newsletter-top-banner': {
-    component: NewsletterTopBanner,
-    renderProps: (asset, colors, typography) => ({
-      eyebrow: asset.eyebrow || '',
-      headline: asset.headline || '',
-      subhead: asset.subhead || '',
-      variant: asset.newsletterTopBannerVariant || 'dark',
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 600,
-      height: 240,
-      background: null,
-      dynamicBackground: (p) => p.variant === 'dark' ? '#060015' : '#FFFFFF',
-      fields: [
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'variant', parser: 'enum', default: 'dark' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolFalse' },
-      ],
-    },
-  },
-
-
+  // 'newsletter-top-banner' — migrated to stage-bench-registry.
+  // Entry now lives in NewsletterTopBannerRegistration.ts.
 
   'customer-library': {
     component: CustomerLibrary,
