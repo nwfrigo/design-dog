@@ -26,6 +26,11 @@ import type { EnumOption } from '../stage-bar/SelectorPrimitive'
  */
 
 const IMAGE_PLACEHOLDER = '/placeholder-mountain.jpg'
+/** 1×1 transparent gif used as the imageSrc placeholder when a speaker
+ *  has no avatar yet — keeps the lightbox renderable so Change Image is
+ *  reachable. Matches the pattern used in EmailSpeakersStageBench. */
+const AVATAR_PLACEHOLDER_SRC =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
 
 const VARIANT_OPTIONS: EnumOption[] = [
   { value: 'none', ariaLabel: 'Text-only variant', label: 'Text' },
@@ -116,6 +121,17 @@ export const WebsiteWebinarStageBench =
         chipKind: 'small-caption', kind: 'text', parent: 'speaker3',
         content: { format: 'plain', singleLine: true, placeholder: 'Speaker Role' },
       },
+      // Per-speaker avatars — image children of the respective speaker
+      // group. Each opens its own ImageEditorModal via the factory's
+      // childImages config (resolved by blockId).
+      { blockId: 'speaker1Avatar', label: 'Speaker 1 Avatar', iconKey: 'image', kind: 'image', parent: 'speaker1' },
+      { blockId: 'speaker2Avatar', label: 'Speaker 2 Avatar', iconKey: 'image', kind: 'image', parent: 'speaker2' },
+      { blockId: 'speaker3Avatar', label: 'Speaker 3 Avatar', iconKey: 'image', kind: 'image', parent: 'speaker3' },
+    ],
+    childImages: [
+      { blockId: 'speaker1Avatar', placeholderSrc: AVATAR_PLACEHOLDER_SRC, frameWidth: 48, frameHeight: 48 },
+      { blockId: 'speaker2Avatar', placeholderSrc: AVATAR_PLACEHOLDER_SRC, frameWidth: 48, frameHeight: 48 },
+      { blockId: 'speaker3Avatar', placeholderSrc: AVATAR_PLACEHOLDER_SRC, frameWidth: 48, frameHeight: 48 },
     ],
     stageBar: [
       { id: 'theme', kind: 'theme', label: 'theme' },
@@ -185,22 +201,31 @@ export const WebsiteWebinarStageBench =
       const speaker1Role = useStore((s) => s.speaker1Role)
       const setSpeaker1Role = useStore((s) => s.setSpeaker1Role)
       const speaker1ImageUrl = useStore((s) => s.speaker1ImageUrl)
+      const setSpeaker1ImageUrl = useStore((s) => s.setSpeaker1ImageUrl)
       const speaker1ImagePosition = useStore((s) => s.speaker1ImagePosition)
+      const setSpeaker1ImagePosition = useStore((s) => s.setSpeaker1ImagePosition)
       const speaker1ImageZoom = useStore((s) => s.speaker1ImageZoom)
+      const setSpeaker1ImageZoom = useStore((s) => s.setSpeaker1ImageZoom)
       const speaker2Name = useStore((s) => s.speaker2Name)
       const setSpeaker2Name = useStore((s) => s.setSpeaker2Name)
       const speaker2Role = useStore((s) => s.speaker2Role)
       const setSpeaker2Role = useStore((s) => s.setSpeaker2Role)
       const speaker2ImageUrl = useStore((s) => s.speaker2ImageUrl)
+      const setSpeaker2ImageUrl = useStore((s) => s.setSpeaker2ImageUrl)
       const speaker2ImagePosition = useStore((s) => s.speaker2ImagePosition)
+      const setSpeaker2ImagePosition = useStore((s) => s.setSpeaker2ImagePosition)
       const speaker2ImageZoom = useStore((s) => s.speaker2ImageZoom)
+      const setSpeaker2ImageZoom = useStore((s) => s.setSpeaker2ImageZoom)
       const speaker3Name = useStore((s) => s.speaker3Name)
       const setSpeaker3Name = useStore((s) => s.setSpeaker3Name)
       const speaker3Role = useStore((s) => s.speaker3Role)
       const setSpeaker3Role = useStore((s) => s.setSpeaker3Role)
       const speaker3ImageUrl = useStore((s) => s.speaker3ImageUrl)
+      const setSpeaker3ImageUrl = useStore((s) => s.setSpeaker3ImageUrl)
       const speaker3ImagePosition = useStore((s) => s.speaker3ImagePosition)
+      const setSpeaker3ImagePosition = useStore((s) => s.setSpeaker3ImagePosition)
       const speaker3ImageZoom = useStore((s) => s.speaker3ImageZoom)
+      const setSpeaker3ImageZoom = useStore((s) => s.setSpeaker3ImageZoom)
       const showSpeaker1 = useStore((s) => s.showSpeaker1)
       const setShowSpeaker1 = useStore((s) => s.setShowSpeaker1)
       const showSpeaker2 = useStore((s) => s.showSpeaker2)
@@ -260,10 +285,13 @@ export const WebsiteWebinarStageBench =
           speaker3: { visible: showSpeaker3, setVisible: setShowSpeaker3 },
           speaker1Name: { value: speaker1Name, setValue: setSpeaker1Name },
           speaker1Role: { value: speaker1Role, setValue: setSpeaker1Role },
+          speaker1Avatar: {},
           speaker2Name: { value: speaker2Name, setValue: setSpeaker2Name },
           speaker2Role: { value: speaker2Role, setValue: setSpeaker2Role },
+          speaker2Avatar: {},
           speaker3Name: { value: speaker3Name, setValue: setSpeaker3Name },
           speaker3Role: { value: speaker3Role, setValue: setSpeaker3Role },
+          speaker3Avatar: {},
         },
         stageBar: {
           theme: { value: theme, set: (v) => setTheme(v as TemplateTheme) },
@@ -279,6 +307,45 @@ export const WebsiteWebinarStageBench =
           setSettings: (next) => setThumbnailImageSettings('website-webinar', next),
           frameWidth: 333,
           frameHeight: 450,
+        },
+        // Per-speaker avatar bindings. Filters aren't persisted per speaker
+        // yet — feed NEUTRAL_FILTERS and ignore the filters portion of
+        // onSettingsChange (sliders move locally but reset on reopen).
+        // Matches the existing EmailSpeakers TODO.
+        childImages: {
+          speaker1Avatar: {
+            url: speaker1ImageUrl || undefined,
+            position: speaker1ImagePosition,
+            zoom: speaker1ImageZoom,
+            filters: NEUTRAL_FILTERS,
+            setUrl: setSpeaker1ImageUrl,
+            setSettings: (next) => {
+              setSpeaker1ImagePosition(next.position)
+              setSpeaker1ImageZoom(next.zoom)
+            },
+          },
+          speaker2Avatar: {
+            url: speaker2ImageUrl || undefined,
+            position: speaker2ImagePosition,
+            zoom: speaker2ImageZoom,
+            filters: NEUTRAL_FILTERS,
+            setUrl: setSpeaker2ImageUrl,
+            setSettings: (next) => {
+              setSpeaker2ImagePosition(next.position)
+              setSpeaker2ImageZoom(next.zoom)
+            },
+          },
+          speaker3Avatar: {
+            url: speaker3ImageUrl || undefined,
+            position: speaker3ImagePosition,
+            zoom: speaker3ImageZoom,
+            filters: NEUTRAL_FILTERS,
+            setUrl: setSpeaker3ImageUrl,
+            setSettings: (next) => {
+              setSpeaker3ImagePosition(next.position)
+              setSpeaker3ImageZoom(next.zoom)
+            },
+          },
         },
         category: {
           value: solution,

@@ -110,6 +110,29 @@ export type ImageSlotConfig<TBlockId extends string> = {
   placeholderSrc: string
 }
 
+/** Per-blockId image slot for nested image children (e.g. per-speaker
+ *  avatars). Each child gets its own modal binding via
+ *  `AdapterStoreBindings.childImages[blockId]`. Use alongside a
+ *  SlotDescriptor for the same blockId declared with `kind: 'image'`
+ *  and `parent: 'parentBlockId'`. */
+export type ChildImageSlotConfig<TBlockId extends string> = {
+  blockId: TBlockId
+  placeholderSrc: string
+  frameWidth: number
+  frameHeight: number
+}
+
+/** Per-image binding bundle. Used for both top-level and child image
+ *  slots — the factory resolves the right bundle by blockId. */
+export type ImageBinding = {
+  url: string | undefined
+  position: { x: number; y: number }
+  zoom: number
+  filters: ImageFilters
+  setUrl: (next: string) => void
+  setSettings: (next: ImageSlotSettings) => void
+}
+
 export type CategorySlotConfig<TBlockId extends string> = {
   blockId: TBlockId
   /** Derive the option list from the editor's colorsConfig. */
@@ -133,17 +156,16 @@ export type AdapterStoreBindings<TBlockId extends string> = {
     setFontSize?: (next: number) => void
   }>
   /** Image slot bundle — required iff `descriptor.image` is set. */
-  image?: {
-    url: string | undefined
-    position: { x: number; y: number }
-    zoom: number
-    filters: ImageFilters
-    setUrl: (next: string) => void
-    setSettings: (next: ImageSlotSettings) => void
+  image?: ImageBinding & {
     /** Image-editor modal frame width. May depend on layout state. */
     frameWidth: number
     frameHeight: number
   }
+  /** Per-blockId image bindings for child image slots — required iff
+   *  `descriptor.childImages` has entries. Keyed by blockId so the
+   *  factory can resolve the right bundle when a child avatar is
+   *  selected. */
+  childImages?: Partial<Record<TBlockId, ImageBinding>>
   /** Category bound state — required iff `descriptor.category` is set. */
   category?: {
     value: string
@@ -197,6 +219,10 @@ export type StageBenchAdapterDescriptor<TBlockId extends string> = {
   slots: SlotDescriptor<TBlockId>[]
   stageBar?: StageBarItemDescriptor[]
   image?: ImageSlotConfig<TBlockId>
+  /** Nested image slots — e.g. per-speaker avatars. Each entry needs a
+   *  matching SlotDescriptor (kind: 'image', parent: 'parentBlockId')
+   *  and a binding entry in `AdapterStoreBindings.childImages`. */
+  childImages?: ChildImageSlotConfig<TBlockId>[]
   category?: CategorySlotConfig<TBlockId>
   contentStack?: ContentStackConfig
   useStoreBindings: () => AdapterStoreBindings<TBlockId>
@@ -224,7 +250,9 @@ export function defineStageBenchAdapter<TBlockId extends string>(
 
     const bindings = descriptor.useStoreBindings()
     const editingPath = useCanvasEditorStore((s) => s.editingPath)
-    const [showImageEditor, setShowImageEditor] = useState(false)
+    // Tracks which image slot's modal is open. null = closed. Used by
+    // both the top-level descriptor.image and any descriptor.childImages.
+    const [editorForBlockId, setEditorForBlockId] = useState<TBlockId | null>(null)
 
     const slotByBlockId = new Map<TBlockId, SlotDescriptor<TBlockId>>()
     for (const s of descriptor.slots) slotByBlockId.set(s.blockId, s)
@@ -490,14 +518,18 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       </>
     ) : null
 
-    const slotImages: SlotImage[] = descriptor.image
-      ? [
-          {
+    const slotImages: SlotImage[] = [
+      ...(descriptor.image
+        ? [{
             path: `${descriptor.templateId}.${descriptor.image.blockId}`,
-            onSelect: () => setShowImageEditor(true),
-          },
-        ]
-      : []
+            onSelect: () => setEditorForBlockId(descriptor.image!.blockId),
+          }]
+        : []),
+      ...(descriptor.childImages ?? []).map((cfg) => ({
+        path: `${descriptor.templateId}.${cfg.blockId}`,
+        onSelect: () => setEditorForBlockId(cfg.blockId),
+      })),
+    ]
 
     const ctx: AdapterRenderContext<TBlockId> = {
       textOf, rawTextOf, visibilityOf, rawVisibilityOf, fontSizeOf,
@@ -560,37 +592,72 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       </>
     )
 
-    const imageWrapped = descriptor.image && bindings.image ? (
+    // Resolve the modal's binding + frame from whichever slot is open.
+    // editorForBlockId can be either descriptor.image.blockId or one of
+    // the descriptor.childImages[].blockId values.
+    const resolveModalConfig = (): {
+      binding: ImageBinding
+      placeholderSrc: string
+      frameWidth: number
+      frameHeight: number
+    } | null => {
+      if (!editorForBlockId) return null
+      if (descriptor.image && bindings.image && editorForBlockId === descriptor.image.blockId) {
+        return {
+          binding: bindings.image,
+          placeholderSrc: descriptor.image.placeholderSrc,
+          frameWidth: bindings.image.frameWidth,
+          frameHeight: bindings.image.frameHeight,
+        }
+      }
+      const childCfg = descriptor.childImages?.find((c) => c.blockId === editorForBlockId)
+      const childBinding = bindings.childImages?.[editorForBlockId]
+      if (childCfg && childBinding) {
+        return {
+          binding: childBinding,
+          placeholderSrc: childCfg.placeholderSrc,
+          frameWidth: childCfg.frameWidth,
+          frameHeight: childCfg.frameHeight,
+        }
+      }
+      return null
+    }
+    const modalCfg = resolveModalConfig()
+
+    const hasAnyImage = !!descriptor.image || (descriptor.childImages?.length ?? 0) > 0
+    const imageWrapped = hasAnyImage ? (
       <ImageRegistryProvider images={slotImages}>
         <ImageSelectionEffect />
         {innerWithToolbar}
-        <ImageEditorModal
-          isOpen={showImageEditor}
-          onClose={() => setShowImageEditor(false)}
-          imageSrc={bindings.image.url ?? descriptor.image.placeholderSrc}
-          frameWidth={bindings.image.frameWidth}
-          frameHeight={bindings.image.frameHeight}
-          initialSettings={{
-            position: bindings.image.position,
-            zoom: bindings.image.zoom,
-            filters: bindings.image.filters,
-          }}
-          onSettingsChange={(next) => {
-            bindings.image!.setSettings({
-              position: next.position,
-              zoom: next.zoom,
-              filters: next.filters,
-            })
-          }}
-          onImageChange={(url) => {
-            bindings.image!.setUrl(url)
-            bindings.image!.setSettings({
-              position: { x: 0, y: 0 },
-              zoom: 1,
-              filters: NEUTRAL_FILTERS,
-            })
-          }}
-        />
+        {modalCfg && (
+          <ImageEditorModal
+            isOpen={true}
+            onClose={() => setEditorForBlockId(null)}
+            imageSrc={modalCfg.binding.url ?? modalCfg.placeholderSrc}
+            frameWidth={modalCfg.frameWidth}
+            frameHeight={modalCfg.frameHeight}
+            initialSettings={{
+              position: modalCfg.binding.position,
+              zoom: modalCfg.binding.zoom,
+              filters: modalCfg.binding.filters,
+            }}
+            onSettingsChange={(next) => {
+              modalCfg.binding.setSettings({
+                position: next.position,
+                zoom: next.zoom,
+                filters: next.filters,
+              })
+            }}
+            onImageChange={(url) => {
+              modalCfg.binding.setUrl(url)
+              modalCfg.binding.setSettings({
+                position: { x: 0, y: 0 },
+                zoom: 1,
+                filters: NEUTRAL_FILTERS,
+              })
+            }}
+          />
+        )}
       </ImageRegistryProvider>
     ) : innerWithToolbar
 

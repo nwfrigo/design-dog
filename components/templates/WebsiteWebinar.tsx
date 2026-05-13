@@ -47,10 +47,13 @@ export type WebsiteWebinarBlockId =
   | 'speaker3'
   | 'speaker1Name'
   | 'speaker1Role'
+  | 'speaker1Avatar'
   | 'speaker2Name'
   | 'speaker2Role'
+  | 'speaker2Avatar'
   | 'speaker3Name'
   | 'speaker3Role'
+  | 'speaker3Avatar'
 
 type WebsiteWebinarStackId = Exclude<
   WebsiteWebinarBlockId,
@@ -61,10 +64,13 @@ type WebsiteWebinarStackId = Exclude<
   | 'speaker3'
   | 'speaker1Name'
   | 'speaker1Role'
+  | 'speaker1Avatar'
   | 'speaker2Name'
   | 'speaker2Role'
+  | 'speaker2Avatar'
   | 'speaker3Name'
   | 'speaker3Role'
+  | 'speaker3Avatar'
 >
 
 export interface WebsiteWebinarProps {
@@ -431,6 +437,7 @@ export function WebsiteWebinar({
             const groupId = `speaker${speaker.speakerIndex}` as WebsiteWebinarBlockId
             const nameId = `speaker${speaker.speakerIndex}Name` as WebsiteWebinarBlockId
             const roleId = `speaker${speaker.speakerIndex}Role` as WebsiteWebinarBlockId
+            const avatarId = `speaker${speaker.speakerIndex}Avatar` as WebsiteWebinarBlockId
             return wrapBlock(groupId, (
               <div
                 key={speaker.speakerIndex}
@@ -443,14 +450,16 @@ export function WebsiteWebinar({
                   gap: 16,
                 }}
               >
-                <SpeakerAvatar
-                  imageUrl={speaker.imageUrl}
-                  position={speaker.imagePosition}
-                  zoom={speaker.imageZoom}
-                  size={48}
-                  speakerIndex={speaker.speakerIndex}
-                  grayscale={grayscale}
-                />
+                {wrapBlock(avatarId, (
+                  <SpeakerAvatar
+                    imageUrl={speaker.imageUrl}
+                    position={speaker.imagePosition}
+                    zoom={speaker.imageZoom}
+                    size={48}
+                    speakerIndex={speaker.speakerIndex}
+                    grayscale={grayscale}
+                  />
+                ))}
                 <div style={{
                   flex: '1 1 0',
                   display: 'flex',

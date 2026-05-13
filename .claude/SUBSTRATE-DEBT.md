@@ -35,13 +35,3 @@
 **Estimate to pay:** Medium — depends on data model.
 **First step when you start:** Only when the newsletter→universal-image migration above runs.
 
----
-
-## Nested image slots (per-speaker avatars)
-
-**What:** The nested-slot factory primitive (`parent: 'parentBlockId'` on SlotDescriptor) supports text children — per-speaker name + role are now editable on WebsiteWebinar + EmailSpeakers. Avatar (image) children are NOT yet supported: image slots have their own framework (`image: { blockId, placeholderSrc }` on the adapter, position/zoom/filters settings, ImageEditorModal) and that framework currently assumes one image slot per template.
-**Why deferred:** Image substrate is more involved than text substrate (image-editor modal, settings bundle, per-image filters). The text case unblocked per-speaker name/role editing which was the user-visible gap; avatars stay editable via the existing per-speaker lightbox flow.
-**Cost to ignore:** Avatar position/zoom/upload still works via the legacy per-speaker editor lightbox in `EmailSpeakersStageBench`; it just doesn't compose with the bench/chip surface the way text children do.
-**Trigger condition:** A new template needs multiple image children inside a group, OR user feedback that per-speaker avatar editing should match per-speaker name/role editing.
-**Estimate to pay:** ~1 day. Extend the factory's `image` config to accept a child variant, route `imageSlotState` per child, hook into the existing per-block ImageEditorModal opener.
-**First step when you start:** Promote one speaker avatar to a child image slot in WebsiteWebinar — wire the bench-chip suppression and ImageEditorModal opener through the same channel name/role children use.
