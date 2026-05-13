@@ -48,17 +48,6 @@
 
 ---
 
-## `SelectorPrimitive kind="enum"` overflow carousel
-
-**What:** The N-state enum primitive renders all cells inline. Works for 3–7 cells; overflows the stage bar at 7+. Hits hardest on `EmailCorityConnect2026` (16 backgrounds) and the 7-variant floating banners.
-**Why deferred:** Design pass pending — Nick to finesse the UX.
-**Cost to ignore:** Stage bar looks bad for templates with >5 enum options.
-**Trigger condition:** Nick's design pass; OR a new template lands that needs >5 enum options.
-**Estimate to pay:** ~1 day depending on UX design.
-**First step when you start:** Get the design (popover grid vs horizontal scroll vs ↔ buttons), implement once in `SelectorPrimitive`.
-
----
-
 ## Image-source-key for shared image slots
 
 **What:** When the same image source is used across multiple templates (e.g., a newsletter image visible in dark + light variants of the same asset), there's no concept of a "shared image identity." Each template gets its own settings bundle, which is correct architecturally but creates a UX wrinkle: edit the image in one variant, the other variant doesn't pick it up.
