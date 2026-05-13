@@ -1,19 +1,29 @@
 /**
  * Single source of truth for which templates render the Stage & Bench editor
  * vs. the legacy sidebar-form editor. EditorScreen reads this set and
- * dispatches accordingly. As templates migrate, add their key here.
+ * dispatches accordingly.
  *
- * When this set covers every single-page template, the legacy EditorScreen
- * code path becomes unreachable and can be deleted in one cleanup pass.
+ * Templates registered via the new factory descriptor (Task 2) auto-include
+ * themselves via `getRegisteredStageBenchTemplateIds()`. Legacy adapters
+ * that haven't been ported yet still live in `LEGACY_STAGE_BENCH_TEMPLATES`
+ * below and shrink as Task 1 phase B ports each onto the factory.
+ *
+ * When this set covers every single-page template AND every adapter has
+ * been ported to the factory, the legacy EditorScreen code path becomes
+ * unreachable and can be deleted in one cleanup pass.
  */
 
 import type { TemplateType } from '@/types'
+import { getRegisteredStageBenchTemplateIds } from '@/lib/stage-bench-registry'
 
-export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
+/** Templates whose adapters still use the per-file scaffold. Each entry
+ *  here corresponds to a `template-adapters/*StageBench.tsx` file that
+ *  hasn't yet been registered via the central registry. As adapters
+ *  migrate to the registry, remove them from here. */
+const LEGACY_STAGE_BENCH_TEMPLATES: ReadonlyArray<TemplateType> = [
   'email-dark-gradient',
   'email-image',
   'email-speakers',
-  'email-cority-connect-2026',
   'website-floating-banner-mobile',
   'website-floating-banner',
   'email-cority-customer-exchange-banner',
@@ -28,8 +38,6 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'website-press-release',
   'social-dark-gradient',
   'social-blue-gradient',
-  'social-ehs-accelerate',
-  'social-image',
   'social-image-meddbase',
   'newsletter-dark-gradient',
   'newsletter-blue-gradient',
@@ -37,6 +45,11 @@ export const STAGE_BENCH_TEMPLATES = new Set<TemplateType>([
   'website-thumbnail',
   'website-report',
   'website-webinar',
+]
+
+export const STAGE_BENCH_TEMPLATES: Set<TemplateType> = new Set<TemplateType>([
+  ...LEGACY_STAGE_BENCH_TEMPLATES,
+  ...getRegisteredStageBenchTemplateIds(),
 ])
 
 export function isStageBenchTemplate(template: TemplateType): boolean {

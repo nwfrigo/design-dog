@@ -170,7 +170,7 @@ export interface ExportParamState {
   showCceEventTime: boolean
 }
 
-type ExportParamBuilder = (s: ExportParamState) => Record<string, unknown>
+export type ExportParamBuilder = (s: ExportParamState) => Record<string, unknown>
 
 function buildSpeakerParams(s: ExportParamState): Record<string, unknown> {
   return {
@@ -321,33 +321,9 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gaps: s.templateGaps['social-blue-gradient'] ?? {},
   }),
 
-  'social-image': (s) => ({
-    ...buildImageParams(s),
-    imageUrl: s.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-    metadata: s.metadata,
-    ctaText: s.ctaText,
-    layout: s.layout,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showMetadata: s.showMetadata,
-    showCta: s.showCta,
-    showSolutionSet: s.showSolutionSet,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['social-image'] ?? {},
-  }),
-
-  'social-ehs-accelerate': (s) => ({
-    headline: s.verbatimCopy.headline || '',
-    subhead: s.verbatimCopy.subhead || '',
-    ctaText: s.ctaText || '',
-    showHeadline: s.showHeadline,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showCta: s.showCta,
-    headlineFontSize: s.headlineFontSize ?? undefined,
-    subheadFontSize: s.subheadFontSize ?? undefined,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['social-ehs-accelerate'] ?? {},
-  }),
+  // 'social-image' + 'social-ehs-accelerate' — migrated to
+  // stage-bench-registry (Task 2 pilots). Builders now live in their
+  // respective *Registration.ts files.
 
   'social-grid-detail': (s) => ({
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
@@ -417,12 +393,8 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     theme: s.theme,
   }),
 
-  'email-cority-connect-2026': (s) => ({
-    backgroundVariant: s.ccBackgroundVariant || 'dark-blue-1',
-    ctaText: s.ctaText,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showCta: s.showCta,
-  }),
+  // 'email-cority-connect-2026' — migrated to stage-bench-registry
+  // (Task 2 pilot). Builder lives in EmailCorityConnect2026Registration.ts.
 
   'email-ehs-accelerate-banner': (s) => ({
     headline: s.verbatimCopy.headline || '',
@@ -615,6 +587,13 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     ctaOption: s.solutionOverviewCtaOption,
   }),
 }
+
+// Pull in builders from the central Stage & Bench registry. Stage-bench
+// templates own their export logic alongside their renderProps /
+// renderSchema in *Registration.ts files; this `Object.assign` is the
+// only place that hand-off happens.
+import { getStageBenchExportBuilders } from './stage-bench-registry'
+Object.assign(BUILDERS, getStageBenchExportBuilders())
 
 /**
  * Build the full export params for a given template type.

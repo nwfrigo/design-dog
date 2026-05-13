@@ -73,21 +73,24 @@ export interface TemplateRenderSchema {
   ) => Record<string, unknown>
 }
 
-interface QueueTextField {
+export interface QueueTextField {
   key: string
   label: string
   showKey?: string
   isHtml?: boolean
 }
 
-interface TemplateRegistryEntry {
+export interface TemplateRegistryEntry {
   component: React.ComponentType<any> // Each template has unique props — typed via renderProps
   renderProps: (asset: QueuedAsset, colors: ColorsConfig, typography: TypographyConfig) => Record<string, unknown>
   queueTextFields: QueueTextField[]
   renderSchema?: TemplateRenderSchema
 }
 
-export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEntry>> = {
+// Legacy-shape entries. Templates that have migrated onto the central
+// Stage & Bench registry are removed from here and rejoined via the
+// spread below — keeps a single source of truth per template.
+const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEntry>> = {
   'website-thumbnail': {
     component: WebsiteThumbnail,
     renderProps: (asset, colors, typography) => ({
@@ -661,38 +664,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     },
   },
 
-  'email-cority-connect-2026': {
-    component: EmailCorityConnect2026,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      body: asset.body || '',
-      ctaText: asset.ctaText || '',
-      backgroundVariant: asset.ccBackgroundVariant || 'dark-blue-1',
-      showHeadline: asset.showHeadline !== false,
-      showBody: asset.showBody && !!asset.body,
-      showCta: asset.showCta !== false,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'ctaText', label: 'CTA', showKey: 'showCta' },
-    ],
-    renderSchema: {
-      width: 640,
-      height: 370,
-      background: '#060015',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'backgroundVariant', parser: 'enum', default: 'dark-blue-1' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showBody', parser: 'boolTrue' },
-        { param: 'showCta', parser: 'boolTrue' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-      ],
-    },
-  },
+  // 'email-cority-connect-2026' — migrated to stage-bench-registry
+  // (Task 2 pilot). Entry now lives in EmailCorityConnect2026Registration.ts.
 
   'social-dark-gradient': {
     component: SocialDarkGradient,
@@ -814,75 +787,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     },
   },
 
-  'social-image': {
-    component: SocialImage,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      subhead: asset.subhead || '',
-      metadata: asset.metadata || '',
-      ctaText: asset.ctaText || '',
-      imageUrl: asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
-      imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
-      imageZoom: asset.thumbnailImageZoom || 1,
-      imageFilters: asset.thumbnailImageFilters,
-      layout: asset.layout || 'even',
-      solution: asset.solution,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      showMetadata: asset.showMetadata !== false,
-      showCta: asset.showCta !== false,
-      showSolutionSet: asset.showSolutionSet !== false,
-      grayscale: asset.grayscale,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      subheadFontSize: asset.subheadFontSize ?? undefined,
-      theme: asset.theme || 'light',
-      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: asset.templateGaps?.['social-image'] ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'metadata', label: 'Metadata', showKey: 'showMetadata' },
-      { key: 'ctaText', label: 'CTA', showKey: 'showCta' },
-    ],
-    renderSchema: {
-      width: 1200,
-      height: 628,
-      background: '#ffffff',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'metadata', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'imageUrl', parser: 'string', default: '/assets/images/default_placeholder_image_1.png' },
-        { param: 'imagePositionX', parser: 'number', default: 0 },
-        { param: 'imagePositionY', parser: 'number', default: 0 },
-        { param: 'imageZoom', parser: 'number', default: 1 },
-        { param: 'imageFilterExposure', parser: 'number', default: 0 },
-        { param: 'imageFilterContrast', parser: 'number', default: 0 },
-        { param: 'imageFilterSaturation', parser: 'number', default: 0 },
-        { param: 'layout', parser: 'enum', default: 'even' },
-        { param: 'solution', parser: 'string', default: 'environmental' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolTrue' },
-        { param: 'showMetadata', parser: 'boolTrue' },
-        { param: 'showCta', parser: 'boolTrue' },
-        { param: 'showSolutionSet', parser: 'boolTrue' },
-        { param: 'grayscale', parser: 'boolFalse' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
-        { param: 'theme', parser: 'enum', default: 'light' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-      assembleProps: (parsed) => ({
-        imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
-        imageFilters: {
-          exposure: parsed.imageFilterExposure as number,
-          contrast: parsed.imageFilterContrast as number,
-          saturation: parsed.imageFilterSaturation as number,
-        },
-      }),
-    },
-  },
+  // 'social-image' — migrated to stage-bench-registry (Task 2 pilot).
+  // Entry now lives in SocialImageRegistration.ts.
 
   'social-image-meddbase': {
     component: SocialImageMeddbase,
@@ -1015,44 +921,8 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     },
   },
 
-  'social-ehs-accelerate': {
-    component: SocialEhsAccelerate,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      subhead: asset.subhead || '',
-      ctaText: asset.ctaText || '',
-      showHeadline: asset.showHeadline !== false,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      showCta: asset.showCta !== false,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      subheadFontSize: asset.subheadFontSize ?? undefined,
-      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: asset.templateGaps?.['social-ehs-accelerate'] ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'headline', label: 'Headline' },
-      { key: 'subhead', label: 'Subhead' },
-      { key: 'ctaText', label: 'CTA' },
-    ],
-    renderSchema: {
-      width: 1200,
-      height: 628,
-      background: '#FFFFFF',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'showHeadline', parser: 'boolTrue', default: true },
-        { param: 'showSubhead', parser: 'boolTrue', default: true },
-        { param: 'showCta', parser: 'boolTrue', default: true },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-    },
-  },
+  // 'social-ehs-accelerate' — migrated to stage-bench-registry (Task 2 pilot).
+  // Entry now lives in SocialEhsAccelerateRegistration.ts.
 
   'email-dark-gradient': {
     component: EmailDarkGradient,
@@ -1620,6 +1490,16 @@ export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     }),
     queueTextFields: [],
   },
+}
+
+// Merge in stage-bench-registry entries last so the central registry's
+// values take precedence over any leftover legacy entry for the same
+// template id.
+import { getStageBenchTemplateRegistryEntries } from './stage-bench-registry'
+
+export const TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEntry>> = {
+  ...LEGACY_TEMPLATE_REGISTRY,
+  ...getStageBenchTemplateRegistryEntries(),
 }
 
 export function getQueueTextFields(asset: QueuedAsset): { label: string; value: string }[] {
