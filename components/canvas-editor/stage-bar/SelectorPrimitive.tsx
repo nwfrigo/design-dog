@@ -105,33 +105,79 @@ export type SelectorPrimitiveProps = ThemeProps | AlignmentProps | StackProps | 
 
 // ---- shared cell button ------------------------------------------------------
 
+/** Per-corner rounding flags. A cell rounds a corner only when it has
+ *  no neighbor in the orthogonal direction — i.e. it's on the outer
+ *  edge of the grid in that corner. Computed by `computeCellRadii`
+ *  from a cell's (row, col) position within an N-cell grid wrapped at
+ *  `perRow` columns; the same helper handles single-row and wrapped
+ *  layouts so consumers don't branch. */
+type CellRadii = { tl: boolean; tr: boolean; bl: boolean; br: boolean }
+
+/** Substrate rule for stage-bar selectors: cells share a uniform 0.5px
+ *  hairline border, so the outer corners of the grid round but interior
+ *  edges stay square (otherwise the rounded curves would intrude into
+ *  shared neighbor borders).
+ *
+ *  Generalizes cleanly to partial last rows: in a 7-cell grid wrapped
+ *  at 4-per-row, the rightmost cell of row 0 rounds both TR (no cell
+ *  above) AND BR (no cell below, since row 1 only has 3 cells). Try
+ *  any count + perRow and the corners follow naturally. */
+function computeCellRadii(index: number, total: number, perRow: number): CellRadii {
+  const row = Math.floor(index / perRow)
+  const col = index % perRow
+  const hasNeighbor = (r: number, c: number) => {
+    if (r < 0 || c < 0 || c >= perRow) return false
+    const idx = r * perRow + c
+    return idx >= 0 && idx < total
+  }
+  return {
+    tl: row === 0 && col === 0,
+    tr: row === 0 && !hasNeighbor(row, col + 1),
+    bl: col === 0 && !hasNeighbor(row + 1, col),
+    br: !hasNeighbor(row, col + 1) && !hasNeighbor(row + 1, col),
+  }
+}
+
 function Cell({
   ariaLabel,
   active,
   onClick,
-  isFirst,
-  isLast,
+  radii,
   isColor,
   swatch,
   wide,
+  overlapTop,
+  overlapLeft,
   children,
 }: {
   ariaLabel: string
   active: boolean
   onClick: () => void
-  isFirst: boolean
-  isLast: boolean
+  /** Which corners of this cell should round. Outer-edge corners only —
+   *  interior corners stay square so neighbors' shared borders meet
+   *  flush. See `computeCellRadii`. */
+  radii: CellRadii
   isColor: boolean
   swatch?: ColorSwatch
   /** When true, the cell auto-sizes to its content width (with 12px
    *  horizontal padding) instead of the fixed 36×36 square. Used by
    *  text-label `enum` cells. */
   wide?: boolean
+  /** When true, pull the cell up 1px so its top border overlaps the
+   *  row above's bottom border. Avoids a 1px doubled line at the
+   *  vertical seam. Set to false on the first row. */
+  overlapTop?: boolean
+  /** When true, pull the cell left 1px so its left border overlaps the
+   *  previous cell's right border. Set to false on the first cell of
+   *  each row. */
+  overlapLeft?: boolean
   children?: ReactNode
 }) {
   const cornerClass = [
-    isFirst ? 'rounded-l-[4px]' : '',
-    isLast ? 'rounded-r-[4px]' : '',
+    radii.tl ? 'rounded-tl-[4px]' : '',
+    radii.tr ? 'rounded-tr-[4px]' : '',
+    radii.bl ? 'rounded-bl-[4px]' : '',
+    radii.br ? 'rounded-br-[4px]' : '',
   ].join(' ')
 
   const swatchStyle: CSSProperties | undefined = isColor && swatch
@@ -181,8 +227,8 @@ function Cell({
         cornerClass,
         fillClass,
         colorActiveRing,
-        // Negative margin on non-first cells to overlap shared borders (avoids 1px junction)
-        isFirst ? '' : '-ml-px',
+        overlapLeft ? '-ml-px' : '',
+        overlapTop ? '-mt-px' : '',
       ].join(' ')}
     >
       {children}
@@ -192,63 +238,65 @@ function Cell({
 
 // ---- main component ----------------------------------------------------------
 
+/** Substrate-wide wrap threshold for stage-bar selectors. Any cell
+ *  grid wider than this rolls to a new row at this column count,
+ *  giving wide-option selectors (CC2026's 16 backgrounds, the two
+ *  FloatingBanner variant pickers' 7 swatches, plus anything future)
+ *  a tidy 4-per-row block that still fits the 240px stage-bar column.
+ *  Wrapping only applies to uniform-square cells; text-label cells
+ *  (`wide: true`) stay single-row regardless of count because their
+ *  variable width would break the grid alignment. */
+const WRAP_AT = 4
+
 export function SelectorPrimitive(props: SelectorPrimitiveProps) {
   if (props.kind === 'color-2' || props.kind === 'color-3' || props.kind === 'color-4') {
     const { value, onChange, options } = props
     const expectedLen = props.kind === 'color-2' ? 2 : props.kind === 'color-3' ? 3 : 4
     const cells = options.slice(0, expectedLen)
+    // color-N caps at 4 by definition → never wraps. perRow = count
+    // gives single-row corner math via the same helper.
     return (
-      <div className="inline-flex items-center" role="radiogroup">
-        {cells.map((opt, i) => (
-          <Cell
-            key={opt.value}
-            ariaLabel={opt.ariaLabel ?? `Color ${opt.value}`}
-            active={value === opt.value}
-            onClick={() => onChange(opt.value)}
-            isFirst={i === 0}
-            isLast={i === cells.length - 1}
-            isColor
-            swatch={opt.swatch}
-          />
-        ))}
-      </div>
+      <CellGrid
+        cells={cells.map((opt) => ({
+          key: opt.value,
+          ariaLabel: opt.ariaLabel ?? `Color ${opt.value}`,
+          active: value === opt.value,
+          onClick: () => onChange(opt.value),
+          isColor: true,
+          swatch: opt.swatch,
+        }))}
+        perRow={cells.length}
+      />
     )
   }
 
   // N-state enum — arbitrary option list, each cell renders an icon OR a
-  // text label. No upper bound on options.length; when the row overflows
-  // the stage bar's horizontal space, the next iteration will swap the
-  // outer wrapper to a horizontal carousel. For now the row simply renders
-  // inline. Always-applied min-width keeps cells consistent with the
-  // icon-kind primitives.
+  // text label. When all cells are uniform-square (no `wide` text labels)
+  // AND the count exceeds WRAP_AT, the grid wraps at WRAP_AT per row.
+  // Text-label rows stay single-row because their widths vary.
   if (props.kind === 'enum') {
     const { value, onChange, options } = props
+    const anyWide = options.some((o) => !o.icon && !o.swatch && !!o.label)
+    const perRow = !anyWide && options.length > WRAP_AT ? WRAP_AT : options.length
     return (
-      <div className="inline-flex items-center" role="radiogroup">
-        {options.map((opt, i) => {
-          const active = value === opt.value
+      <CellGrid
+        cells={options.map((opt) => {
           const Icon = opt.icon
-          // Render priority: icon > swatch > label. Swatch cells use the
-          // same surface treatment as color-N (the swatch IS the fill).
           const isSwatch = !Icon && !!opt.swatch
           const isWide = !Icon && !opt.swatch && !!opt.label
-          return (
-            <Cell
-              key={opt.value}
-              ariaLabel={opt.ariaLabel}
-              active={active}
-              onClick={() => onChange(opt.value)}
-              isFirst={i === 0}
-              isLast={i === options.length - 1}
-              isColor={isSwatch}
-              swatch={opt.swatch}
-              wide={isWide}
-            >
-              {Icon ? <Icon size={ICON_SIZE} /> : isSwatch ? null : opt.label}
-            </Cell>
-          )
+          return {
+            key: opt.value,
+            ariaLabel: opt.ariaLabel,
+            active: value === opt.value,
+            onClick: () => onChange(opt.value),
+            isColor: isSwatch,
+            swatch: opt.swatch,
+            wide: isWide,
+            content: Icon ? <Icon size={ICON_SIZE} /> : isSwatch ? null : opt.label,
+          }
         })}
-      </div>
+        perRow={perRow}
+      />
     )
   }
 
@@ -260,21 +308,78 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
                                  LAYOUT_CELLS
 
   return (
-    <div className="inline-flex items-center" role="radiogroup">
-      {cells.map((cell, i) => {
+    <CellGrid
+      cells={cells.map((cell) => {
         const active = props.value === cell.value
+        return {
+          key: cell.value,
+          ariaLabel: cell.ariaLabel,
+          active,
+          onClick: () => (props.onChange as (v: string) => void)(cell.value),
+          isColor: false,
+          content: typeof cell.render === 'function' ? cell.render(active) : cell.render,
+        }
+      })}
+      perRow={cells.length}
+    />
+  )
+}
+
+/** Shared grid renderer for every `SelectorPrimitive` kind. Splits the
+ *  flat `cells` list into rows of `perRow` (set perRow=count for a
+ *  single-row selector), computes each cell's outer-edge corner radii
+ *  from its grid position, and threads the right `overlapTop`/`overlapLeft`
+ *  flags so the 0.5px hairline borders meet flush at every seam without
+ *  doubling. Owns the `role="radiogroup"` wrapper and the row containers
+ *  — keeps the substrate's grid math in one place so future kinds (and
+ *  any future cell-count growth) just pass cells + perRow and inherit
+ *  the look. */
+function CellGrid({
+  cells,
+  perRow,
+}: {
+  cells: Array<{
+    key: string
+    ariaLabel: string
+    active: boolean
+    onClick: () => void
+    isColor: boolean
+    swatch?: ColorSwatch
+    wide?: boolean
+    content?: ReactNode
+  }>
+  perRow: number
+}) {
+  const total = cells.length
+  const rowCount = Math.max(1, Math.ceil(total / perRow))
+  return (
+    <div className="inline-flex flex-col items-start" role="radiogroup">
+      {Array.from({ length: rowCount }, (_, rowIdx) => {
+        const start = rowIdx * perRow
+        const rowCells = cells.slice(start, start + perRow)
         return (
-          <Cell
-            key={cell.value}
-            ariaLabel={cell.ariaLabel}
-            active={active}
-            onClick={() => (props.onChange as (v: string) => void)(cell.value)}
-            isFirst={i === 0}
-            isLast={i === cells.length - 1}
-            isColor={false}
-          >
-            {typeof cell.render === 'function' ? cell.render(active) : cell.render}
-          </Cell>
+          <div key={rowIdx} className="inline-flex items-center">
+            {rowCells.map((c, colIdx) => {
+              const index = start + colIdx
+              const radii = computeCellRadii(index, total, perRow)
+              return (
+                <Cell
+                  key={c.key}
+                  ariaLabel={c.ariaLabel}
+                  active={c.active}
+                  onClick={c.onClick}
+                  radii={radii}
+                  isColor={c.isColor}
+                  swatch={c.swatch}
+                  wide={c.wide}
+                  overlapLeft={colIdx > 0}
+                  overlapTop={rowIdx > 0}
+                >
+                  {c.content}
+                </Cell>
+              )
+            })}
+          </div>
         )
       })}
     </div>
