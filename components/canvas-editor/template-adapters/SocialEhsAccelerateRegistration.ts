@@ -15,10 +15,12 @@
 import type { StackAlign } from '@/types'
 import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { SocialEhsAccelerateStageBench } from './SocialEhsAccelerateStageBench'
 
 export const socialEhsAccelerateRegistration: StageBenchRegistrationData = {
   templateId: 'social-ehs-accelerate',
   Template: SocialEhsAccelerate,
+  Adapter: SocialEhsAccelerateStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     subhead: asset.subhead || '',

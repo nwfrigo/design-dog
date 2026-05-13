@@ -7,10 +7,12 @@ import type { StackAlign } from '@/types'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { SocialBlueGradientStageBench } from './SocialBlueGradientStageBench'
 
 export const socialBlueGradientRegistration: StageBenchRegistrationData = {
   templateId: 'social-blue-gradient',
   Template: SocialBlueGradient,
+  Adapter: SocialBlueGradientStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow,
     headline: asset.headline || '',

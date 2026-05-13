@@ -6,10 +6,12 @@ import type { StackAlign } from '@/types'
 import { WebsiteThumbnail } from '@/components/templates/WebsiteThumbnail'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { WebsiteThumbnailStageBench } from './WebsiteThumbnailStageBench'
 
 export const websiteThumbnailRegistration: StageBenchRegistrationData = {
   templateId: 'website-thumbnail',
   Template: WebsiteThumbnail,
+  Adapter: WebsiteThumbnailStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow,
     headline: asset.headline || '',

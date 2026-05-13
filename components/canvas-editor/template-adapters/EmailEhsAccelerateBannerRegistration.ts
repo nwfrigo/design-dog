@@ -4,10 +4,12 @@
 
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailEhsAccelerateBannerStageBench } from './EmailEhsAccelerateBannerStageBench'
 
 export const emailEhsAccelerateBannerRegistration: StageBenchRegistrationData = {
   templateId: 'email-ehs-accelerate-banner',
   Template: EmailEhsAccelerateBanner,
+  Adapter: EmailEhsAccelerateBannerStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     body: asset.body || '',

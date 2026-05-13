@@ -6,10 +6,12 @@ import type { StackAlign } from '@/types'
 import { WebsiteReport } from '@/components/templates/WebsiteReport'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { WebsiteReportStageBench } from './WebsiteReportStageBench'
 
 export const websiteReportRegistration: StageBenchRegistrationData = {
   templateId: 'website-report',
   Template: WebsiteReport,
+  Adapter: WebsiteReportStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow,
     headline: asset.headline || '',

@@ -5,10 +5,12 @@
 import type { StackAlign } from '@/types'
 import { SocialGridDetail, type GridDetailRow } from '@/components/templates/SocialGridDetail'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { SocialGridDetailStageBench } from './SocialGridDetailStageBench'
 
 export const socialGridDetailRegistration: StageBenchRegistrationData = {
   templateId: 'social-grid-detail',
   Template: SocialGridDetail,
+  Adapter: SocialGridDetailStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     subhead: asset.subhead || '',

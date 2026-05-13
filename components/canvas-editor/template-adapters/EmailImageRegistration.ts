@@ -7,10 +7,12 @@ import type { StackAlign } from '@/types'
 import { EmailImage } from '@/components/templates/EmailImage'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailImageStageBench } from './EmailImageStageBench'
 
 export const emailImageRegistration: StageBenchRegistrationData = {
   templateId: 'email-image',
   Template: EmailImage,
+  Adapter: EmailImageStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     body: asset.body || '',

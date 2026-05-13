@@ -4,10 +4,12 @@
 
 import { EmailCorityCustomerExchangeSignature } from '@/components/templates/EmailCorityCustomerExchangeSignature'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailCorityCustomerExchangeSignatureStageBench } from './EmailCorityCustomerExchangeSignatureStageBench'
 
 export const emailCorityCustomerExchangeSignatureRegistration: StageBenchRegistrationData = {
   templateId: 'email-cority-customer-exchange-signature',
   Template: EmailCorityCustomerExchangeSignature,
+  Adapter: EmailCorityCustomerExchangeSignatureStageBench,
   renderProps: (asset, colors, typography) => ({
     eventDate: asset.eventDate || '',
     eventLocation: asset.eventLocation || '',

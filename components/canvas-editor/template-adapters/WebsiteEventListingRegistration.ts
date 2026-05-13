@@ -5,10 +5,12 @@
 import type { StackAlign } from '@/types'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { WebsiteEventListingStageBench } from './WebsiteEventListingStageBench'
 
 export const websiteEventListingRegistration: StageBenchRegistrationData = {
   templateId: 'website-event-listing',
   Template: WebsiteEventListing,
+  Adapter: WebsiteEventListingStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow || '',
     headline: asset.headline || '',

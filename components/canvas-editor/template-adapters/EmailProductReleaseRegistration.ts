@@ -4,10 +4,12 @@
 
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailProductReleaseStageBench } from './EmailProductReleaseStageBench'
 
 export const emailProductReleaseRegistration: StageBenchRegistrationData = {
   templateId: 'email-product-release',
   Template: EmailProductRelease,
+  Adapter: EmailProductReleaseStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow || '',
     headline: asset.headline || '',

@@ -4,10 +4,12 @@
 
 import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloatingBannerMobile'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { WebsiteFloatingBannerMobileStageBench } from './WebsiteFloatingBannerMobileStageBench'
 
 export const websiteFloatingBannerMobileRegistration: StageBenchRegistrationData = {
   templateId: 'website-floating-banner-mobile',
   Template: WebsiteFloatingBannerMobile,
+  Adapter: WebsiteFloatingBannerMobileStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow || '',
     headline: asset.headline || '',

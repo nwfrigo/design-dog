@@ -7,10 +7,12 @@ import type { StackAlign } from '@/types'
 import { SocialImage } from '@/components/templates/SocialImage'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { SocialImageStageBench } from './SocialImageStageBench'
 
 export const socialImageRegistration: StageBenchRegistrationData = {
   templateId: 'social-image',
   Template: SocialImage,
+  Adapter: SocialImageStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     subhead: asset.subhead || '',

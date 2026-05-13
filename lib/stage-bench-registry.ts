@@ -38,6 +38,7 @@ import type {
   TemplateRegistryEntry,
 } from './template-registry'
 import type { ExportParamBuilder } from './export-params'
+import type { StageBenchEditorProps } from '@/components/canvas-editor/StageBenchEditor'
 
 import { socialEhsAccelerateRegistration } from '@/components/canvas-editor/template-adapters/SocialEhsAccelerateRegistration'
 import { socialImageRegistration } from '@/components/canvas-editor/template-adapters/SocialImageRegistration'
@@ -75,6 +76,11 @@ type AnyTemplateComponent = ComponentType<any> // eslint-disable-line
 export interface StageBenchRegistrationData {
   templateId: TemplateType
   Template: AnyTemplateComponent
+  /** The Stage & Bench editor adapter (React component). Reads store
+   *  state, wires up slot config + stage-bar, and renders the template
+   *  with editor render-props. Built either via `defineStageBenchAdapter`
+   *  or as a hand-rolled component (e.g. EmailSpeakers). */
+  Adapter: ComponentType<StageBenchEditorProps>
   renderProps: (
     asset: QueuedAsset,
     colors: ColorsConfig,
@@ -131,6 +137,14 @@ export function getStageBenchRegistration(
  *  (`StageBenchEditor.tsx`). */
 export function getRegisteredStageBenchTemplateIds(): readonly TemplateType[] {
   return REGISTRATIONS.map((r) => r.templateId)
+}
+
+/** Resolve the Stage & Bench React adapter for a template id. Used by
+ *  `StageBenchEditor.tsx` to dispatch. */
+export function getStageBenchAdapter(
+  id: TemplateType,
+): ComponentType<StageBenchEditorProps> | undefined {
+  return BY_ID.get(id)?.Adapter
 }
 
 /** Build a TemplateRegistryEntry from a registration. Lets

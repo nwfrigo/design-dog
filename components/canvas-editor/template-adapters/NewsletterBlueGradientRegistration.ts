@@ -7,10 +7,12 @@ import type { ColorStyle, StackAlign } from '@/types'
 import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGradient'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { NewsletterBlueGradientStageBench } from './NewsletterBlueGradientStageBench'
 
 export const newsletterBlueGradientRegistration: StageBenchRegistrationData = {
   templateId: 'newsletter-blue-gradient',
   Template: NewsletterBlueGradient,
+  Adapter: NewsletterBlueGradientStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow,
     headline: asset.headline || '',

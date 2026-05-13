@@ -7,10 +7,12 @@ import type { StackAlign } from '@/types'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { NewsletterLightStageBench } from './NewsletterLightStageBench'
 
 export const newsletterLightRegistration: StageBenchRegistrationData = {
   templateId: 'newsletter-light',
   Template: NewsletterLight,
+  Adapter: NewsletterLightStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow,
     headline: asset.headline || '',

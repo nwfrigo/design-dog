@@ -5,10 +5,12 @@
 import type { StackAlign } from '@/types'
 import { WebsiteEhsAccelerateListing } from '@/components/templates/WebsiteEhsAccelerateListing'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { WebsiteEhsAccelerateListingStageBench } from './WebsiteEhsAccelerateListingStageBench'
 
 export const websiteEhsAccelerateListingRegistration: StageBenchRegistrationData = {
   templateId: 'website-ehs-accelerate-listing',
   Template: WebsiteEhsAccelerateListing,
+  Adapter: WebsiteEhsAccelerateListingStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow || '',
     headline: asset.headline || '',

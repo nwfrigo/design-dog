@@ -7,10 +7,12 @@
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailCorityConnect2026StageBench } from './EmailCorityConnect2026StageBench'
 
 export const emailCorityConnect2026Registration: StageBenchRegistrationData = {
   templateId: 'email-cority-connect-2026',
   Template: EmailCorityConnect2026,
+  Adapter: EmailCorityConnect2026StageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     body: asset.body || '',

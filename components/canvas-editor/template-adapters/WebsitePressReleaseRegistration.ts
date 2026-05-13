@@ -5,10 +5,12 @@
 import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { WebsitePressReleaseStageBench } from './WebsitePressReleaseStageBench'
 
 export const websitePressReleaseRegistration: StageBenchRegistrationData = {
   templateId: 'website-press-release',
   Template: WebsitePressRelease,
+  Adapter: WebsitePressReleaseStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow,
     headline: asset.headline || '',

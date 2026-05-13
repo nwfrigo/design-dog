@@ -5,10 +5,12 @@
 import { EmailCorityCustomerExchangeBanner } from '@/components/templates/EmailCorityCustomerExchangeBanner'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailCorityCustomerExchangeBannerStageBench } from './EmailCorityCustomerExchangeBannerStageBench'
 
 export const emailCorityCustomerExchangeBannerRegistration: StageBenchRegistrationData = {
   templateId: 'email-cority-customer-exchange-banner',
   Template: EmailCorityCustomerExchangeBanner,
+  Adapter: EmailCorityCustomerExchangeBannerStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     body: asset.body || '',

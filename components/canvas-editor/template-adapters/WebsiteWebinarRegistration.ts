@@ -12,10 +12,12 @@ import type { SearchParams } from '@/lib/render-params'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { WebsiteWebinarStageBench } from './WebsiteWebinarStageBench'
 
 export const websiteWebinarRegistration: StageBenchRegistrationData = {
   templateId: 'website-webinar',
   Template: WebsiteWebinar,
+  Adapter: WebsiteWebinarStageBench,
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow || '',
     headline: asset.headline || '',

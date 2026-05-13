@@ -8,10 +8,12 @@ import type { StackAlign } from '@/types'
 import { SocialImageMeddbase } from '@/components/templates/SocialImageMeddbase'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { SocialImageMeddbaseStageBench } from './SocialImageMeddbaseStageBench'
 
 export const socialImageMeddbaseRegistration: StageBenchRegistrationData = {
   templateId: 'social-image-meddbase',
   Template: SocialImageMeddbase,
+  Adapter: SocialImageMeddbaseStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     subhead: asset.subhead || '',

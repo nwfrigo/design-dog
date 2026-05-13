@@ -4,10 +4,12 @@
 
 import { EmailEhsAccelerateSignature } from '@/components/templates/EmailEhsAccelerateSignature'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailEhsAccelerateSignatureStageBench } from './EmailEhsAccelerateSignatureStageBench'
 
 export const emailEhsAccelerateSignatureRegistration: StageBenchRegistrationData = {
   templateId: 'email-ehs-accelerate-signature',
   Template: EmailEhsAccelerateSignature,
+  Adapter: EmailEhsAccelerateSignatureStageBench,
   renderProps: (asset, colors, typography) => ({
     workshopName: asset.signatureWorkshopName || '',
     eventDate: asset.eventDate || '',

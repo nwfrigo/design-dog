@@ -12,10 +12,12 @@ import type { SearchParams } from '@/lib/render-params'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailSpeakersStageBench } from './EmailSpeakersStageBench'
 
 export const emailSpeakersRegistration: StageBenchRegistrationData = {
   templateId: 'email-speakers',
   Template: EmailSpeakers,
+  Adapter: EmailSpeakersStageBench,
   renderProps: (asset, colors, typography) => ({
     headline: asset.headline || '',
     eyebrow: asset.eyebrow,

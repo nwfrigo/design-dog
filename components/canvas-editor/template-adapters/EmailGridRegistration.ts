@@ -5,10 +5,12 @@
 import type { StackAlign } from '@/types'
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
+import { EmailGridStageBench } from './EmailGridStageBench'
 
 export const emailGridRegistration: StageBenchRegistrationData = {
   templateId: 'email-grid',
   Template: EmailGrid,
+  Adapter: EmailGridStageBench,
   renderProps: (asset, colors, typography) => {
     const gridDetail1: GridDetail = { type: 'data', text: asset.gridDetail1Text }
     const gridDetail2: GridDetail = { type: 'data', text: asset.gridDetail2Text }
