@@ -450,232 +450,7 @@ export interface ManualAssetSettings {
 
 // App Flow Types
 export type ContentMode = 'verbatim' | 'generate'
-export type AppScreen = 'select' | 'editor' | 'queue' | 'auto-create-content' | 'auto-create-assets' | 'auto-create-generating' | 'auto-create-editor' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-setup' | 'stacker-editor' | 'stacker-export' | 'social-carousel-editor'
-
-// Auto-Create Types (formerly Quick Start)
-export type WizardStep = 'kit-selection' | 'content-source' | 'asset-selection' | 'generating' | 'complete'
-
-// Extracted content from PDF analysis
-export interface ExtractedContent {
-  title?: string
-  mainMessage?: string
-  keyPoints?: string[]
-  targetAudience?: string
-  callToAction?: string
-  dates?: string | null
-  speakers?: string[] | null
-  rawSummary?: string
-}
-
-// User-edited version of extracted content
-export interface EditedContent {
-  title: string
-  mainMessage: string
-  keyPoints: string[]
-  callToAction: string
-}
-
-// Analysis metadata
-export interface AnalysisInfo {
-  fileSizeBytes: number
-  fileSizeMB: string
-  fileFormat: string
-  extracted?: ExtractedContent
-  error?: string
-  errorCode?: 'rate_limit' | 'overloaded' | 'invalid_pdf' | 'unknown'
-  errorDetails?: string
-}
-
-export interface ContentSourceState {
-  method: 'upload' | 'manual' | 'unified' | null
-  pdfContent: string | null
-  manualDescription: string
-  manualKeyPoints: string
-  additionalContext: string
-  uploadedFileName: string | null
-  uploadedFileType: 'pdf' | 'docx' | 'pptx' | 'txt' | 'md' | null
-  // Persisted analysis state
-  analysisInfo: AnalysisInfo | null
-  editedContent: EditedContent | null
-  editedFields: string[]
-}
-
-export interface AutoCreateState {
-  isWizardOpen: boolean  // Only for modal (kit selection)
-  currentStep: WizardStep
-  selectedKit: import('@/config/kit-configs').KitType | null
-  contentSource: ContentSourceState
-  selectedAssets: TemplateType[]
-  generationProgress: {
-    total: number
-    completed: number
-    failed: string[]
-  }
-}
-
-export interface GeneratedAsset {
-  id: string
-  templateType: TemplateType
-  status: 'pending' | 'generating' | 'complete' | 'error'
-  error: string | null
-  copy: CopyContent
-  variations: { headlines: string[]; ctas: string[] } | null
-  // Settings from QueuedAsset
-  eyebrow: string
-  solution: string
-  logoColor: LogoColor
-  showEyebrow: boolean
-  showSubhead: boolean
-  showBody: boolean
-  showHeadline: boolean
-  thumbnailImageUrl: string | null
-  thumbnailImagePosition: { x: number; y: number }
-  thumbnailImageZoom: number
-  /** Per-image exposure/contrast/saturation; absent on pre-filter drafts. */
-  thumbnailImageFilters?: import('@/lib/image-filters').ImageFilters
-  subheading: string
-  showLightHeader: boolean
-  showSubheading: boolean
-  showSolutionSet: boolean
-  showGridDetail2: boolean
-  gridDetail1Text: string
-  gridDetail2Text: string
-  gridDetail3Type: GridDetailType
-  gridDetail3Text: string
-  gridDetail4Type: GridDetailType
-  gridDetail4Text: string
-  showGridDetail3: boolean
-  metadata: string
-  ctaText: string
-  colorStyle: ColorStyle
-  headingSize: HeadingSize
-  alignment: TextAlignment
-  ctaStyle: CtaStyle
-  showMetadata: boolean
-  showCta: boolean
-  layout: ImageLayout
-  newsletterImageSize: NewsletterImageSize
-  speakerCount: SpeakerCount
-  speaker1Name: string
-  speaker1Role: string
-  speaker1ImageUrl: string
-  speaker1ImagePosition: { x: number; y: number }
-  speaker1ImageZoom: number
-  speaker2Name: string
-  speaker2Role: string
-  speaker2ImageUrl: string
-  speaker2ImagePosition: { x: number; y: number }
-  speaker2ImageZoom: number
-  speaker3Name: string
-  speaker3Role: string
-  speaker3ImageUrl: string
-  speaker3ImagePosition: { x: number; y: number }
-  speaker3ImageZoom: number
-  // Website Webinar specific
-  webinarVariant: WebinarVariant
-  showSpeaker1: boolean
-  showSpeaker2: boolean
-  showSpeaker3: boolean
-  // Website eBook Listing specific
-  ebookVariant: ImageVariant
-  // Website Report specific
-  reportVariant: ImageVariant
-  // Website Event Listing specific
-  eventListingVariant: EventListingVariant
-  // Customer Library specific
-  customerLibraryVariant: CustomerLibraryVariant
-  // Website Floating Banner specific
-  floatingBannerVariant: FloatingBannerVariant
-  // Website Floating Banner Mobile specific
-  floatingBannerMobileVariant: FloatingBannerMobileVariant
-  floatingBannerMobileArrowType: FloatingBannerMobileArrowType
-  // Newsletter Top Banner specific
-  newsletterTopBannerVariant: NewsletterTopBannerVariant
-  // Template theme
-  theme: TemplateTheme
-  // Image effects
-  grayscale: boolean
-  // Solution Overview PDF specific - Page 1
-  solutionOverviewSolution: SolutionCategory
-  solutionOverviewSolutionName: string
-  solutionOverviewTagline: string
-  solutionOverviewCurrentPage: SolutionOverviewPage
-  // Solution Overview PDF specific - Page 2
-  solutionOverviewHeroImageId: string
-  solutionOverviewHeroImageUrl: string | null
-  solutionOverviewHeroImagePosition: { x: number; y: number }
-  solutionOverviewHeroImageZoom: number
-  solutionOverviewHeroImageGrayscale: boolean
-  solutionOverviewPage2Header: string
-  solutionOverviewSectionHeader: string
-  solutionOverviewIntroParagraph: string
-  solutionOverviewKeySolutions: string[]
-  solutionOverviewQuoteText: string
-  solutionOverviewQuoteName: string
-  solutionOverviewQuoteTitle: string
-  solutionOverviewQuoteCompany: string
-  // Solution Overview PDF specific - Page 3
-  solutionOverviewBenefits: SolutionOverviewBenefit[]
-  solutionOverviewFeatures: SolutionOverviewFeature[]
-  solutionOverviewScreenshotUrl: string | null
-  solutionOverviewScreenshotPosition: { x: number; y: number }
-  solutionOverviewScreenshotZoom: number
-  solutionOverviewScreenshotGrayscale: boolean
-  solutionOverviewCtaOption: SolutionOverviewCtaOption
-  solutionOverviewCtaUrl: string
-  // Solution Overview PDF - Page 2 Stats (editable)
-  solutionOverviewStat1Value: string
-  solutionOverviewStat1Label: string
-  solutionOverviewStat2Value: string
-  solutionOverviewStat2Label: string
-  solutionOverviewStat3Value: string
-  solutionOverviewStat3Label: string
-  solutionOverviewStat4Value: string
-  solutionOverviewStat4Label: string
-  solutionOverviewStat5Value: string
-  solutionOverviewStat5Label: string
-  // Manual text size
-  headlineFontSize: number | null
-  subheadFontSize: number | null
-  // Email Dark Gradient stack alignment
-  stackAlign: StackAlign
-  // Inter-block gap overrides per template (sparse; falls back to the
-  // template's DEFAULT_GAP per missing key). One record per migrated
-  // template that supports adjustable spacing. Bundled into a single
-  // nested record so onboarding a new template adds one access line, not
-  // 15 sites of plumbing per field.
-  templateGaps: Partial<Record<TemplateType, Record<string, number>>>
-  // Per-content-type line-height overrides (sparse; falls back to per-template defaults).
-  // Keys: 'headline' | 'subhead' | 'body' (for now). Shared across templates so a
-  // headline-line-height tweak follows the headline content across reuses.
-  lineHeights: Record<string, number>
-  // Social Carousel specific
-  carouselSlides: CarouselSlide[]
-  carouselCurrentSlideIndex: number
-  // Email Cority Connect 2026 specific
-  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
-  // Email EHS Accelerate Banner specific
-  eventDate: string
-  eventLocation: string
-  // Email EHS Accelerate Signature specific
-  signatureWorkshopName: string
-  showSignatureWorkshopName: boolean
-  showSignatureEventDetails: boolean
-  // Email EHS Accelerate Invitation specific
-  invitationHeader: string
-  invitationHeadline: string
-  invitationEventTitle: string
-  invitationEventDate: string
-  invitationEventLocation: string
-  invitationEventTime: string
-  invitationEventTimeNote: string
-  invitationBody: string
-  // Email Cority Customer Exchange Signature specific
-  cceEventTime: string
-  showCceEventDate: boolean
-  showCceEventLocation: boolean
-  showCceEventTime: boolean
-}
+export type AppScreen = 'select' | 'editor' | 'queue' | 'solution-overview-export' | 'solution-overview-setup' | 'faq-setup' | 'faq-editor' | 'faq-export' | 'stacker-setup' | 'stacker-editor' | 'stacker-export' | 'social-carousel-editor'
 
 // Per-template image settings for decoupled zoom/pan/filters.
 // The optional `filters` field is the new image-editor adjustment model
@@ -882,7 +657,6 @@ export interface AppState {
 
   // Final copy (either verbatim or generated)
   finalCopy: CopyContent | null
-  generatedVariations: { headlines: string[]; ctas: string[] } | null
   isGenerating: boolean
 
   // Multi-asset selection
@@ -1105,7 +879,6 @@ export interface AppState {
   setPdfContent: (content: string | null) => void
   setContextFile: (file: File | null) => void
   setFinalCopy: (copy: CopyContent | null) => void
-  setGeneratedVariations: (variations: { headlines: string[]; ctas: string[] } | null) => void
   setIsGenerating: (generating: boolean) => void
   setTemplateType: (type: TemplateType) => void
   setThumbnailImageUrl: (url: string | null) => void
@@ -1326,37 +1099,6 @@ export interface AppState {
   goToEditorWithTemplate: (templateType: TemplateType) => void
   goToQueue: () => void
   reset: () => void
-
-  // Auto-Create state (formerly Quick Start)
-  autoCreate: AutoCreateState
-  generatedAssets: Record<string, GeneratedAsset>
-
-  // Auto-Create wizard actions
-  openAutoCreateWizard: () => void
-  closeAutoCreateWizard: () => void
-  setAutoCreateStep: (step: WizardStep) => void
-  setSelectedKit: (kit: import('@/config/kit-configs').KitType | null) => void
-  setAutoCreateContentSource: (source: Partial<ContentSourceState>) => void
-  setAutoCreateAssets: (assets: TemplateType[]) => void
-  toggleAutoCreateAsset: (asset: TemplateType) => void
-  resetAutoCreate: () => void
-
-  // Auto-Create flow navigation
-  startAutoCreateWithKit: (kit: import('@/config/kit-configs').KitType) => void
-  goToAutoCreateContent: () => void
-  goToAutoCreateAssets: () => void
-  skipToAssetEditor: () => void
-
-  // Auto-Create generation actions
-  startAutoCreateGeneration: () => Promise<void>
-  updateGeneratedAsset: (id: string, updates: Partial<GeneratedAsset>) => void
-  retryFailedAsset: (assetId: string) => Promise<void>
-  addAndGenerateAssets: (templateTypes: TemplateType[]) => Promise<string[]>
-
-  // Multi-asset editor actions
-  loadGeneratedAssetIntoEditor: (assetId: string) => void
-  proceedToAutoCreateEditor: () => void
-  addAllGeneratedToQueue: () => void
 
   // Draft persistence
   saveDraft: () => void

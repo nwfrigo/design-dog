@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, GeneratedAsset, AutoCreateState, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, StackAlign } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, StackAlign } from '@/types'
 import { UNIVERSAL_FALLBACK_FLAGS } from './template-defaults'
 
 const DRAFT_KEY = 'design-dog-active-draft'
@@ -17,9 +17,6 @@ export interface DraftState {
   manualAssetSettings: Record<number, ManualAssetSettings>
   templateType: TemplateType
   verbatimCopy: CopyContent
-  // Generated assets (for auto-create flow)
-  generatedAssets: Record<string, GeneratedAsset>
-  autoCreate: AutoCreateState
   // Export queue
   exportQueue: QueuedAsset[]
   // Design settings
@@ -170,7 +167,10 @@ export interface DraftState {
   carouselCurrentSlideIndex: number
 }
 
-const CURRENT_VERSION = 1
+// Bumped to 2 for the 1.5 Auto-Create sunset — drafts saved against
+// the prior shape carry now-removed fields (generatedAssets, autoCreate,
+// etc.) and are cleared on next load.
+const CURRENT_VERSION = 2
 
 export function saveDraftToStorage(state: Partial<DraftState>): void {
   if (typeof window === 'undefined') return
@@ -186,26 +186,6 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       manualAssetSettings: state.manualAssetSettings || {},
       templateType: state.templateType || 'website-thumbnail',
       verbatimCopy: state.verbatimCopy || { headline: '', subhead: '', body: '', cta: '' },
-      generatedAssets: state.generatedAssets || {},
-      autoCreate: state.autoCreate || {
-        isWizardOpen: false,
-        currentStep: 'kit-selection',
-        selectedKit: null,
-        contentSource: {
-          method: null,
-          pdfContent: null,
-          manualDescription: '',
-          manualKeyPoints: '',
-          additionalContext: '',
-          uploadedFileName: null,
-          uploadedFileType: null,
-          analysisInfo: null,
-          editedContent: null,
-          editedFields: [],
-        },
-        selectedAssets: [],
-        generationProgress: { total: 0, completed: 0, failed: [] },
-      },
       exportQueue: state.exportQueue || [],
       // Text fields persist as-is (empty when unset). The template
       // renders the canonical placeholder via its own
@@ -418,7 +398,7 @@ export function hasDraft(): boolean {
     const draft = JSON.parse(stored) as DraftState
 
     // Check if draft has any actual content
-    const hasAssets = draft.selectedAssets.length > 0 || Object.keys(draft.generatedAssets).length > 0
+    const hasAssets = draft.selectedAssets.length > 0
     const hasQueue = draft.exportQueue.length > 0
     const hasContent = draft.verbatimCopy.headline.length > 0 || draft.verbatimCopy.body.length > 0
     // Check for FAQ content (has pages with blocks)
@@ -457,13 +437,12 @@ export function getDraftAssetCount(): number {
     if (!stored) return 0
 
     const draft = JSON.parse(stored) as DraftState
-    const generatedCount = Object.keys(draft.generatedAssets).length
     const selectedCount = draft.selectedAssets.length
     const queueCount = draft.exportQueue.length
 
     // If queue has items, show queue count only (selectedAssets is stale context)
     // Otherwise show the active editing count
-    return queueCount > 0 ? queueCount : Math.max(generatedCount, selectedCount)
+    return queueCount > 0 ? queueCount : selectedCount
   } catch {
     return 0
   }

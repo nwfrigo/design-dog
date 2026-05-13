@@ -7,7 +7,6 @@ import { hasDraft } from '@/lib/draft-storage'
 import { getStoredUser } from '@/components/NamePickerModal'
 import { EditorLayout } from '@/components/EditorLayout'
 import { EditorScreen } from '@/components/EditorScreen'
-import { AutoCreateEditor } from '@/components/QuickStartEditor'
 import { ExportQueueScreen } from '@/components/ExportQueueScreen'
 import { SolutionOverviewExportScreen } from '@/components/SolutionOverviewExportScreen'
 import { SolutionOverviewSetupScreen } from '@/components/SolutionOverviewSetupScreen'
@@ -21,7 +20,7 @@ import { SocialCarouselEditorScreen } from '@/components/SocialCarouselEditorScr
 
 export default function EditorPage() {
   const router = useRouter()
-  const { loadDraft, generatedAssets, selectedAssets, currentScreen, setCurrentScreen, setExportedBy } = useStore()
+  const { loadDraft, currentScreen, setExportedBy } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const [hasValidDraft, setHasValidDraft] = useState(false)
 
@@ -66,7 +65,6 @@ export default function EditorPage() {
   }
 
   // Determine which editor view to show based on state
-  const hasGeneratedAssets = Object.keys(generatedAssets).length > 0
   const isQueueScreen = currentScreen === 'queue'
   const isSolutionOverviewExport = currentScreen === 'solution-overview-export'
   const isSolutionOverviewSetup = currentScreen === 'solution-overview-setup'
@@ -108,8 +106,6 @@ export default function EditorPage() {
         <SolutionOverviewExportScreen />
       ) : isQueueScreen ? (
         <ExportQueueScreen />
-      ) : hasGeneratedAssets ? (
-        <AutoCreateEditor />
       ) : (
         <EditorScreen />
       )}

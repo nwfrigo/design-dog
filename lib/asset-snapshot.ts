@@ -1,10 +1,10 @@
 /**
  * Asset Snapshot Pattern (P1-8)
  *
- * Centralizes the field list that gets copied between editor state,
- * QueuedAsset, and GeneratedAsset objects. Previously this field list
- * was duplicated across 5 functions in the store, meaning new fields
- * had to be added in 5 places (and forgetting one caused silent data loss).
+ * Centralizes the field list that gets copied between editor state and
+ * QueuedAsset objects. Previously this field list was duplicated across
+ * multiple functions in the store, meaning new fields had to be added in
+ * multiple places (and forgetting one caused silent data loss).
  *
  * Now adding a new field means:
  * 1. Add to SNAPSHOT_FIELDS array
@@ -13,7 +13,7 @@
  * The snapshot functions handle the rest automatically.
  */
 
-import type { AppState, QueuedAsset, GeneratedAsset } from '@/types'
+import type { AppState, QueuedAsset } from '@/types'
 
 // ---------------------------------------------------------------------------
 // Snapshot field definitions
@@ -214,7 +214,7 @@ export function captureEditorSnapshot(state: AppState): Record<SnapshotFieldKey,
 /**
  * Produces a partial state object that restores all editable fields
  * from a source object (QueuedAsset or GeneratedAsset) back into the
- * editor state. Used by editQueuedAsset and loadGeneratedAssetIntoEditor.
+ * editor state. Used by editQueuedAsset.
  *
  * @param source - A QueuedAsset, GeneratedAsset, or any object with the same field keys
  * @returns A Partial<AppState> suitable for passing to Zustand's `set()`
@@ -273,52 +273,4 @@ export function snapshotToQueuedAsset(
   } as QueuedAsset
 }
 
-// ---------------------------------------------------------------------------
-// generatedAssetToQueuedAsset
-// ---------------------------------------------------------------------------
-
-/**
- * Converts a GeneratedAsset into a QueuedAsset. This is the centralized
- * version of the field copying in addAllGeneratedToQueue().
- *
- * @param asset - The GeneratedAsset to convert
- * @param queueId - The unique ID for the new queue item
- */
-export function generatedAssetToQueuedAsset(
-  asset: GeneratedAsset,
-  queueId: string,
-): QueuedAsset {
-  const partial: Record<string, unknown> = {}
-  for (const field of SNAPSHOT_FIELDS) {
-    if (field in asset) {
-      // Normalize specific fields to match original behavior
-      if (field === 'headlineFontSize' || field === 'subheadFontSize') {
-        partial[field] = (asset as unknown as Record<string, unknown>)[field] ?? null
-      } else if (field === 'solutionOverviewCtaUrl') {
-        partial[field] = (asset as unknown as Record<string, unknown>)[field] || ''
-      } else if (field === 'carouselSlides') {
-        partial[field] = (asset as unknown as Record<string, unknown>)[field] || []
-      } else if (field === 'carouselCurrentSlideIndex') {
-        partial[field] = (asset as unknown as Record<string, unknown>)[field] ?? 0
-      } else {
-        partial[field] = (asset as unknown as Record<string, unknown>)[field]
-      }
-    }
-  }
-
-  return {
-    ...partial,
-    id: queueId,
-    templateType: asset.templateType,
-    // Copy fields come from the asset's copy object
-    headline: asset.copy.headline,
-    subhead: asset.copy.subhead,
-    body: asset.copy.body,
-    // Image position/zoom/filters come directly from the generated asset.
-    thumbnailImagePosition: asset.thumbnailImagePosition,
-    thumbnailImageZoom: asset.thumbnailImageZoom,
-    thumbnailImageFilters: asset.thumbnailImageFilters,
-    sourceAssetIndex: 0,
-  } as QueuedAsset
-}
 

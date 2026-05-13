@@ -16,13 +16,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   const mainRef = useRef<HTMLElement>(null)
   const {
     saveDraft,
-    generatedAssets,
     selectedAssets,
     setSelectedAssets,
     exportQueue,
     currentScreen,
     setCurrentScreen,
-    addAllGeneratedToQueue,
     verbatimCopy,
     templateType,
     eyebrow,
@@ -59,8 +57,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   // Derive screen name for bug reports
   const getScreenName = () => {
     if (currentScreen === 'queue') return 'Export Queue'
-    const hasGeneratedAssets = Object.keys(generatedAssets).length > 0
-    return hasGeneratedAssets ? 'Editor (Auto-Create)' : 'Editor'
+    return 'Editor'
   }
 
   // Auto-save on changes (using key state values as proxy for all changes).
@@ -74,7 +71,6 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     return () => clearTimeout(timeoutId)
   }, [
     saveDraft,
-    generatedAssets,
     selectedAssets,
     exportQueue,
     verbatimCopy,
@@ -121,11 +117,6 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     }
   }, [showSaveToast])
 
-  const handleExportAll = () => {
-    addAllGeneratedToQueue()
-    setCurrentScreen('queue')
-  }
-
   const handleViewQueue = () => {
     // If editing from queue, show confirmation modal instead
     if (isEditingFromQueue) {
@@ -136,14 +127,10 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   }
 
   const handleBackToEditor = () => {
-    const hasGeneratedAssets = Object.keys(generatedAssets).length > 0
-    setCurrentScreen(hasGeneratedAssets ? 'auto-create-editor' : 'editor')
+    setCurrentScreen('editor')
   }
 
-  const assetCount = Math.max(
-    Object.keys(generatedAssets).length,
-    selectedAssets.length
-  )
+  const assetCount = selectedAssets.length
 
   const isQueueScreen = currentScreen === 'queue'
   const isSolutionOverviewExport = currentScreen === 'solution-overview-export'
@@ -171,17 +158,6 @@ export function EditorLayout({ children }: EditorLayoutProps) {
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-        </button>
-      )}
-      {Object.keys(generatedAssets).length > 0 && !isQueueScreen && !isEditingFromQueue && !isSolutionOverviewExport && (
-        <button
-          onClick={handleExportAll}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          Export All
         </button>
       )}
       <ReportBugLink onClick={() => setShowBugModal(true)} />

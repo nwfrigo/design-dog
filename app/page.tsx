@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useStore } from '@/store'
 import { AssetSelectionScreen } from '@/components/AssetSelectionScreen'
-import { AutoCreateContentScreen, AutoCreateAssetsScreen, AutoCreateGeneratingScreen } from '@/components/AutoCreate'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { DraftBanner } from '@/components/DraftBanner'
 import { Header } from '@/components/Header'
@@ -33,22 +32,17 @@ function HomeContent() {
 
   // Redirect to /editor for editor screens
   useEffect(() => {
-    if (currentScreen === 'editor' || currentScreen === 'queue' || currentScreen === 'auto-create-editor' || currentScreen === 'faq-setup' || currentScreen === 'faq-editor' || currentScreen === 'faq-export' || currentScreen === 'stacker-setup' || currentScreen === 'stacker-editor' || currentScreen === 'stacker-export' || currentScreen === 'social-carousel-editor') {
+    if (currentScreen === 'editor' || currentScreen === 'queue' || currentScreen === 'faq-setup' || currentScreen === 'faq-editor' || currentScreen === 'faq-export' || currentScreen === 'stacker-setup' || currentScreen === 'stacker-editor' || currentScreen === 'stacker-export' || currentScreen === 'social-carousel-editor') {
       router.push('/editor')
     }
   }, [currentScreen, router])
 
-  // Auto-create flow screens use medium width
-  const isAutoCreateFlow = currentScreen === 'auto-create-content' || currentScreen === 'auto-create-assets' || currentScreen === 'auto-create-generating'
   const isSelectScreen = currentScreen === 'select'
 
   // Derive screen name for bug reports
   const getScreenName = () => {
     switch (currentScreen) {
       case 'select': return 'Homepage'
-      case 'auto-create-content': return 'Content Source'
-      case 'auto-create-assets': return 'Asset Selection'
-      case 'auto-create-generating': return 'Generating Assets'
       default: return 'Homepage'
     }
   }
@@ -117,11 +111,8 @@ function HomeContent() {
       )}
 
       {/* Main content */}
-      <div className={`${isSelectScreen ? 'max-w-[1600px]' : 'max-w-5xl'} mx-auto px-6 py-8`}>
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
         {currentScreen === 'select' && <AssetSelectionScreen />}
-        {currentScreen === 'auto-create-content' && <AutoCreateContentScreen />}
-        {currentScreen === 'auto-create-assets' && <AutoCreateAssetsScreen />}
-        {currentScreen === 'auto-create-generating' && <AutoCreateGeneratingScreen />}
       </div>
     </main>
   )

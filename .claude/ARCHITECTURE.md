@@ -108,10 +108,9 @@ When variant is `'none'`:
 
 ### Key State Patterns
 
-- **Auto-Create mode** detection: Check for presence of `generatedAssets`
-- **Two state systems** exist (legacy): `selectedAssets + currentAssetIndex` AND `generatedAssets + templateType`. In auto-create mode, use `templateType` directly.
+- **Asset selection:** `selectedAssets + currentAssetIndex` is the single asset-tracking model. Templates are added to `selectedAssets` from the homepage and navigated via tabs in the editor header.
 - **Queue editing:** `editingQueueItemId` tracks which queue item is being edited. Asset stays in queue during edit (not removed).
-- **Draft persistence:** `localStorage` key `design-dog-active-draft` — single active project, auto-save on every state change.
+- **Draft persistence:** `localStorage` key `design-dog-active-draft`, version-gated by `CURRENT_VERSION` in `lib/draft-storage.ts`. Single active project, auto-save on every state change. Bump the version when the draft shape changes incompatibly so existing drafts get cleared instead of silently corrupting.
 
 ### Adding New Template State
 

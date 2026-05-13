@@ -147,7 +147,6 @@ export function EditorScreen() {
     setContextFile,
     finalCopy,
     setFinalCopy,
-    setGeneratedVariations,
     isGenerating,
     setIsGenerating,
     // Shared settings
@@ -426,14 +425,9 @@ export function EditorScreen() {
     cancelQueueEdit,
     // Template type fallback
     templateType,
-    // Generated assets (for auto-create mode detection)
-    generatedAssets,
     // User identity
     exportedBy,
   } = useStore()
-
-  // Check if we're in auto-create mode (sidebar handles navigation, not tabs)
-  const isAutoCreateMode = Object.keys(generatedAssets).length > 0
 
   // Check if we're editing an item from the queue
   const isEditingFromQueue = !!editingQueueItemId
@@ -496,9 +490,7 @@ export function EditorScreen() {
   const floatingBannerContainerRef = useRef<HTMLDivElement>(null)
   const [floatingBannerContainerWidth, setFloatingBannerContainerWidth] = useState(0)
 
-  // In auto-create mode, use templateType directly (sidebar handles selection)
-  // In regular mode, use selectedAssets array with tabs
-  const currentTemplate = isAutoCreateMode ? templateType : (selectedAssets[currentAssetIndex] || templateType)
+  const currentTemplate = selectedAssets[currentAssetIndex] || templateType
   const dimensions = TEMPLATE_DIMENSIONS[currentTemplate] || { width: 1200, height: 628 }
 
   // Get per-template image settings for the current template
@@ -752,10 +744,6 @@ export function EditorScreen() {
       setFinalCopy(generatedCopy)
       setVerbatimCopy(generatedCopy)
 
-      if (data.copy.variations) {
-        setGeneratedVariations(data.copy.variations)
-      }
-
       setContentMode('verbatim')
     } catch (error) {
       setGenerationError(error instanceof Error ? error.message : 'Generation failed')
@@ -958,9 +946,9 @@ export function EditorScreen() {
 
   return (
     <div className="space-y-6">
-      {/* Tab Navigation - only show in regular mode, not auto-create mode.
-          Hidden for Stage & Bench templates — the new shell renders its own tabs in the header. */}
-      {!isAutoCreateMode && !isStageBenchTemplate(currentTemplate) && (
+      {/* Tab Navigation — hidden for Stage & Bench templates (the new shell
+          renders its own tabs in the header). */}
+      {!isStageBenchTemplate(currentTemplate) && (
         <div className="flex items-center border-b border-gray-200 dark:border-line-subtle">
           <div className="flex">
             {selectedAssets.map((asset, index) => (
@@ -1296,7 +1284,7 @@ export function EditorScreen() {
         )
       })()}
 
-      {isStageBenchTemplate(currentTemplate) && !isAutoCreateMode ? (
+      {isStageBenchTemplate(currentTemplate) ? (
         <StageBenchEditor
           currentTemplate={currentTemplate}
           selectedAssets={selectedAssets}
@@ -1329,9 +1317,9 @@ export function EditorScreen() {
         />
       ) : (
       <div className="flex gap-8 h-[calc(100vh-180px)]">
-        {/* Left: Editor — collapsed for Stage & Bench templates in manual mode (Q1).
-            Auto-create still keeps its sidebar (asset navigation lives there). */}
-        {(isAutoCreateMode || !isStageBenchTemplate(currentTemplate)) && (
+        {/* Left: legacy 340px sidebar form — only the non-S&B templates
+            (the PDFs) still hit this path. */}
+        {!isStageBenchTemplate(currentTemplate) && (
         <div className="w-[340px] flex-shrink-0 space-y-5 overflow-y-auto">
           {/* Mode Toggle removed — Generate button is now inline above the first text field */}
 

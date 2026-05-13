@@ -165,7 +165,6 @@ These apply across the entire codebase — memorize them:
 - **Export params missing:** Every prop visible in the template MUST appear in exportParams. (Details in ARCHITECTURE.md)
 - **Grayscale in export:** Must be passed in exportParams AND handled in render page.
 - **Vercel body limit:** PDFs must go through Blob storage, not direct upload. (Details in ARCHITECTURE.md)
-- **Two state systems:** Auto-create uses `generatedAssets` + `templateType`; manual mode uses `selectedAssets` + `currentAssetIndex`. Don't mix them. (Details in ARCHITECTURE.md)
 - **Modal state persistence:** Use React `key` prop or `useEffect` cleanup to reset modal state on mount.
 - **Local PDF uploads:** Require `BLOB_READ_WRITE_TOKEN` in `.env.local`.
 - **Local state vs store state:** Editor screens using `useState` for editing MUST sync to store via `useEffect` for draft persistence to work. (Details in ARCHITECTURE.md)
@@ -179,30 +178,10 @@ Headline is NOT required. No red asterisks. All buttons (export, queue, save) wo
 
 ---
 
-## Auto-Create (formerly Quick Start) Flow
-
-### Screens
-1. **Kit Selection** — choose campaign type (webinar, ebook, etc.)
-2. **Content Source** — upload PDF or enter text manually
-3. **Asset Selection** — pick which assets to generate (checkboxes)
-4. **Generating** — progress screen
-5. **Editor** — edit generated assets with sidebar navigation
-
-### Key UX Decisions
-- No breadcrumbs on auto-create screens
-- Full clickable cards for asset selection (not just image area)
-- "Deselect All" button next to selection count
-- Generate button disabled when 0 assets selected
-- Generate button is blue
-- About blurb at bottom of sidebar in monospace style
-
----
-
 ## Homepage
 
 ### Layout
 - Main area: Visual grid of templates by channel (Digital > Email, Social, Website, Newsletter)
-- Right sidebar: Auto-Create entry point (formerly "Quick Start" placeholder)
 - Expand-in-place interaction for channel categories
 - Only one channel expanded at a time
 

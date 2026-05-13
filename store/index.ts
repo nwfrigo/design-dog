@@ -1,10 +1,8 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, AutoCreateState, ContentSourceState, WizardStep, GeneratedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme } from '@/types'
-import type { KitType } from '@/config/kit-configs'
-import { KIT_CONFIGS } from '@/config/kit-configs'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme } from '@/types'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
-import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset, generatedAssetToQueuedAsset } from '@/lib/asset-snapshot'
+import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
 import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS, getBrandedSeed } from '@/lib/template-defaults'
 
@@ -48,19 +46,6 @@ const createDefaultFaqPages = (): FaqPage[] => [{
   ] as FaqContentBlock[],
 }]
 
-const initialContentSource: ContentSourceState = {
-  method: null,
-  pdfContent: null,
-  manualDescription: '',
-  manualKeyPoints: '',
-  additionalContext: '',
-  uploadedFileName: null,
-  uploadedFileType: null,
-  analysisInfo: null,
-  editedContent: null,
-  editedFields: [],
-}
-
 // Create a default carousel slide
 export function createDefaultCarouselSlide(slideType: CarouselSlideType): CarouselSlide {
   const isCoverOrOutro = slideType === 'cover-text' || slideType === 'cover-image' || slideType === 'outro'
@@ -87,19 +72,6 @@ export function createDefaultCarouselSlide(slideType: CarouselSlideType): Carous
     imageZoom: 1,
     grayscale: false,
   }
-}
-
-const initialAutoCreate: AutoCreateState = {
-  isWizardOpen: false,
-  currentStep: 'kit-selection',
-  selectedKit: null,
-  contentSource: { ...initialContentSource },
-  selectedAssets: [],
-  generationProgress: {
-    total: 0,
-    completed: 0,
-    failed: [],
-  },
 }
 
 const getDefaultAssetSettings = (templateType?: TemplateType) => {
@@ -287,7 +259,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   // Final copy
   finalCopy: null,
-  generatedVariations: null,
   isGenerating: false,
 
   // Multi-asset selection
@@ -529,10 +500,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   exportQueue: [],
   editingQueueItemId: null as string | null,
 
-  // Auto-Create state (formerly Quick Start)
-  autoCreate: { ...initialAutoCreate },
-  generatedAssets: {},
-
   // Actions
   setCurrentScreen: (screen: AppScreen) => set({ currentScreen: screen }),
   setContentMode: (mode: ContentMode) => set({ contentMode: mode }),
@@ -542,7 +509,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setPdfContent: (content: string | null) => set({ pdfContent: content }),
   setContextFile: (file: File | null) => set({ contextFile: file }),
   setFinalCopy: (copy: CopyContent | null) => set({ finalCopy: copy }),
-  setGeneratedVariations: (variations) => set({ generatedVariations: variations }),
   setIsGenerating: (generating: boolean) => set({ isGenerating: generating }),
   setTemplateType: (type: TemplateType) => set({ templateType: type }),
   setThumbnailImageUrl: (url: string | null) => set({ thumbnailImageUrl: url }),
@@ -1284,11 +1250,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Export queue actions
   addToQueue: () => {
     const state = get()
-    // Determine current template: in auto-create mode use templateType, in manual mode use selectedAssets
-    const isAutoCreateMode = Object.keys(state.generatedAssets).length > 0
-    const currentTemplate = isAutoCreateMode
-      ? state.templateType
-      : (state.selectedAssets[state.currentAssetIndex] || state.templateType)
+    // Determine current template from selectedAssets (manual mode)
+    const currentTemplate = state.selectedAssets[state.currentAssetIndex] || state.templateType
     // Get per-template image settings using the correct template
     const imageSettings = state.thumbnailImageSettings[currentTemplate] ?? { position: { x: 0, y: 0 }, zoom: 1 }
 
@@ -1400,558 +1363,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     set({ currentScreen: 'queue' })
   },
 
-  // Auto-Create wizard actions
-  openAutoCreateWizard: () => {
-    set({
-      autoCreate: {
-        ...initialAutoCreate,
-        isWizardOpen: true,
-      },
-    })
-  },
-
-  closeAutoCreateWizard: () => {
-    set((state) => ({
-      autoCreate: {
-        ...state.autoCreate,
-        isWizardOpen: false,
-      },
-    }))
-  },
-
-  setAutoCreateStep: (step: WizardStep) => {
-    set((state) => ({
-      autoCreate: {
-        ...state.autoCreate,
-        currentStep: step,
-      },
-    }))
-  },
-
-  setSelectedKit: (kit: KitType | null) => {
-    const kitConfig = kit ? KIT_CONFIGS[kit] : null
-    set((state) => ({
-      autoCreate: {
-        ...state.autoCreate,
-        selectedKit: kit,
-        selectedAssets: kitConfig?.recommendedAssets || [],
-      },
-    }))
-  },
-
-  setAutoCreateContentSource: (source: Partial<ContentSourceState>) => {
-    set((state) => ({
-      autoCreate: {
-        ...state.autoCreate,
-        contentSource: {
-          ...state.autoCreate.contentSource,
-          ...source,
-        },
-      },
-    }))
-  },
-
-  setAutoCreateAssets: (assets: TemplateType[]) => {
-    set((state) => ({
-      autoCreate: {
-        ...state.autoCreate,
-        selectedAssets: assets,
-      },
-    }))
-  },
-
-  toggleAutoCreateAsset: (asset: TemplateType) => {
-    set((state) => {
-      const { selectedAssets } = state.autoCreate
-      const newAssets = selectedAssets.includes(asset)
-        ? selectedAssets.filter((a) => a !== asset)
-        : [...selectedAssets, asset]
-      return {
-        autoCreate: {
-          ...state.autoCreate,
-          selectedAssets: newAssets,
-        },
-      }
-    })
-  },
-
-  resetAutoCreate: () => {
-    set({
-      autoCreate: { ...initialAutoCreate },
-      generatedAssets: {},
-    })
-  },
-
-  // Auto-Create flow navigation
-  startAutoCreateWithKit: (kit: KitType) => {
-    const kitConfig = KIT_CONFIGS[kit]
-    set({
-      currentScreen: 'auto-create-content',
-      autoCreate: {
-        ...initialAutoCreate,
-        selectedKit: kit,
-        selectedAssets: kitConfig?.recommendedAssets || [],
-        currentStep: 'content-source',
-      },
-    })
-  },
-
-  goToAutoCreateContent: () => {
-    set({ currentScreen: 'auto-create-content' })
-  },
-
-  goToAutoCreateAssets: () => {
-    set({ currentScreen: 'auto-create-assets' })
-  },
-
-  skipToAssetEditor: () => {
-    // Skip content input and go directly to editor with all kit assets
-    const state = get()
-    const { selectedAssets } = state.autoCreate
-    if (selectedAssets.length > 0) {
-      // Create generatedAssets entries so AutoCreateEditor is shown
-      const timestamp = Date.now()
-      const initialAssets: Record<string, GeneratedAsset> = {}
-      selectedAssets.forEach((templateType, i) => {
-        const id = `skip-${timestamp}-${i}`
-        initialAssets[id] = {
-          id,
-          templateType,
-          status: 'complete', // Mark as complete since user will write copy manually
-          error: null,
-          copy: { headline: '', subhead: '', body: '', cta: '' },
-          variations: null,
-          ...getDefaultAssetSettings(templateType),
-        }
-      })
-
-      set({
-        currentScreen: 'editor',
-        selectedAssets: selectedAssets,
-        currentAssetIndex: 0,
-        templateType: selectedAssets[0],
-        generatedAssets: initialAssets,
-      })
-
-      // Save draft so editor page doesn't redirect
-      get().saveDraft()
-    }
-  },
-
-  // Auto-Create generation actions
-  startAutoCreateGeneration: async () => {
-    const state = get()
-    const { selectedAssets, contentSource } = state.autoCreate
-
-    if (selectedAssets.length === 0) return
-
-    // Build context from content sources
-    let context = ''
-    if (contentSource.pdfContent) {
-      context += `Document:\n${contentSource.pdfContent}\n\n`
-    }
-    if (contentSource.manualDescription) {
-      context += `Description:\n${contentSource.manualDescription}\n\n`
-    }
-    if (contentSource.manualKeyPoints) {
-      context += `Key points:\n${contentSource.manualKeyPoints}\n\n`
-    }
-    if (contentSource.additionalContext) {
-      context += `Notes:\n${contentSource.additionalContext}\n\n`
-    }
-
-    // Set initial progress
-    set((state) => ({
-      autoCreate: {
-        ...state.autoCreate,
-        currentStep: 'generating',
-        generationProgress: {
-          total: selectedAssets.length,
-          completed: 0,
-          failed: [],
-        },
-      },
-    }))
-
-    // Create initial asset entries
-    const timestamp = Date.now()
-    const assetIds = selectedAssets.map((templateType, i) => `qs-${timestamp}-${i}`)
-
-    const initialAssets: Record<string, GeneratedAsset> = {}
-    selectedAssets.forEach((templateType, i) => {
-      initialAssets[assetIds[i]] = {
-        id: assetIds[i],
-        templateType,
-        status: 'pending',
-        error: null,
-        copy: { headline: '', subhead: '', body: '', cta: '' },
-        variations: null,
-        ...getDefaultAssetSettings(templateType),
-      }
-    })
-    set({ generatedAssets: initialAssets })
-
-    // Fire staggered API calls (1.5s apart to avoid rate limits)
-    const results = await Promise.allSettled(
-      selectedAssets.map(async (templateType, i) => {
-        const id = assetIds[i]
-
-        // Stagger calls to avoid hitting rate limits
-        if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, i * 1500))
-        }
-
-        // Mark as generating
-        set((state) => ({
-          generatedAssets: {
-            ...state.generatedAssets,
-            [id]: {
-              ...state.generatedAssets[id],
-              status: 'generating',
-            },
-          },
-        }))
-
-        try {
-          const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ context, templateType }),
-          })
-
-          const data = await response.json()
-
-          if (!response.ok) {
-            throw new Error(data.error || `Generation failed: ${response.status}`)
-          }
-
-          // Update asset with generated copy
-          set((state) => ({
-            generatedAssets: {
-              ...state.generatedAssets,
-              [id]: {
-                ...state.generatedAssets[id],
-                status: 'complete',
-                copy: {
-                  headline: data.copy?.headline || '',
-                  subhead: data.copy?.subhead || '',
-                  body: data.copy?.body || '',
-                  cta: data.copy?.cta || '',
-                },
-                variations: data.variations || null,
-              },
-            },
-            autoCreate: {
-              ...state.autoCreate,
-              generationProgress: {
-                ...state.autoCreate.generationProgress,
-                completed: state.autoCreate.generationProgress.completed + 1,
-              },
-            },
-          }))
-
-          return { id, success: true }
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-
-          set((state) => ({
-            generatedAssets: {
-              ...state.generatedAssets,
-              [id]: {
-                ...state.generatedAssets[id],
-                status: 'error',
-                error: errorMessage,
-              },
-            },
-            autoCreate: {
-              ...state.autoCreate,
-              generationProgress: {
-                ...state.autoCreate.generationProgress,
-                completed: state.autoCreate.generationProgress.completed + 1,
-                failed: [...state.autoCreate.generationProgress.failed, id],
-              },
-            },
-          }))
-
-          return { id, success: false, error: errorMessage }
-        }
-      })
-    )
-
-    // Mark as complete
-    set((state) => ({
-      autoCreate: {
-        ...state.autoCreate,
-        currentStep: 'complete',
-      },
-    }))
-  },
-
-  updateGeneratedAsset: (id: string, updates: Partial<GeneratedAsset>) => {
-    set((state) => ({
-      generatedAssets: {
-        ...state.generatedAssets,
-        [id]: {
-          ...state.generatedAssets[id],
-          ...updates,
-        },
-      },
-    }))
-  },
-
-  // Multi-asset editor actions
-  loadGeneratedAssetIntoEditor: (assetId: string) => {
-    const state = get()
-    const asset = state.generatedAssets[assetId]
-    if (!asset) return
-
-    // Restore all editable fields from the generated asset
-    const restored = restoreEditorSnapshot(asset as unknown as Record<string, unknown>)
-
-    set({
-      ...restored,
-      templateType: asset.templateType,
-      verbatimCopy: { ...asset.copy },
-      // Store per-template image settings.
-      // Filters round-trip through the queue/generated-asset → editor load
-      // path; without this, exposure/contrast/saturation drop back to
-      // neutral on re-entry to the editor while save-side correctly
-      // captures them. (Symmetrical to goToAsset's capture+restore.)
-      thumbnailImageSettings: {
-        ...state.thumbnailImageSettings,
-        [asset.templateType]: {
-          position: asset.thumbnailImagePosition,
-          zoom: asset.thumbnailImageZoom,
-          filters: asset.thumbnailImageFilters,
-        },
-      },
-      generatedVariations: asset.variations,
-    })
-  },
-
-  proceedToAutoCreateEditor: () => {
-    const state = get()
-    const assetIds = Object.keys(state.generatedAssets)
-
-    if (assetIds.length > 0) {
-      // Load the first asset into the editor
-      const firstAssetId = assetIds[0]
-      get().loadGeneratedAssetIntoEditor(firstAssetId)
-
-      set({
-        currentScreen: 'auto-create-editor',
-        autoCreate: {
-          ...state.autoCreate,
-          isWizardOpen: false,
-        },
-      })
-    }
-  },
-
-  // Retry a single failed asset
-  retryFailedAsset: async (assetId: string) => {
-    const state = get()
-    const asset = state.generatedAssets[assetId]
-    if (!asset || asset.status !== 'error') return
-
-    const { contentSource } = state.autoCreate
-
-    // Build context
-    let context = ''
-    if (contentSource.pdfContent) {
-      context += `Document:\n${contentSource.pdfContent}\n\n`
-    }
-    if (contentSource.manualDescription) {
-      context += `Description:\n${contentSource.manualDescription}\n\n`
-    }
-    if (contentSource.manualKeyPoints) {
-      context += `Key points:\n${contentSource.manualKeyPoints}\n\n`
-    }
-    if (contentSource.additionalContext) {
-      context += `Notes:\n${contentSource.additionalContext}\n\n`
-    }
-
-    // Mark as generating
-    set((state) => ({
-      generatedAssets: {
-        ...state.generatedAssets,
-        [assetId]: {
-          ...state.generatedAssets[assetId],
-          status: 'generating',
-          error: null,
-        },
-      },
-    }))
-
-    try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context, templateType: asset.templateType }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || `Generation failed: ${response.status}`)
-      }
-
-      // Update asset with generated copy
-      set((state) => ({
-        generatedAssets: {
-          ...state.generatedAssets,
-          [assetId]: {
-            ...state.generatedAssets[assetId],
-            status: 'complete',
-            error: null,
-            copy: {
-              headline: data.copy?.headline || '',
-              subhead: data.copy?.subhead || '',
-              body: data.copy?.body || '',
-              cta: data.copy?.cta || '',
-            },
-            variations: data.variations || null,
-          },
-        },
-        autoCreate: {
-          ...state.autoCreate,
-          generationProgress: {
-            ...state.autoCreate.generationProgress,
-            failed: state.autoCreate.generationProgress.failed.filter(id => id !== assetId),
-          },
-        },
-      }))
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      set((state) => ({
-        generatedAssets: {
-          ...state.generatedAssets,
-          [assetId]: {
-            ...state.generatedAssets[assetId],
-            status: 'error',
-            error: errorMessage,
-          },
-        },
-      }))
-    }
-  },
-
-  // Add new assets and generate copy for them using stored content source
-  addAndGenerateAssets: async (templateTypes: TemplateType[]) => {
-    if (templateTypes.length === 0) return []
-
-    const state = get()
-    const { contentSource } = state.autoCreate
-
-    // Build context from stored content source
-    let context = ''
-    if (contentSource.pdfContent) {
-      context += `Document:\n${contentSource.pdfContent}\n\n`
-    }
-    if (contentSource.manualDescription) {
-      context += `Description:\n${contentSource.manualDescription}\n\n`
-    }
-    if (contentSource.manualKeyPoints) {
-      context += `Key points:\n${contentSource.manualKeyPoints}\n\n`
-    }
-    if (contentSource.additionalContext) {
-      context += `Notes:\n${contentSource.additionalContext}\n\n`
-    }
-
-    // Create initial assets with 'generating' status
-    const timestamp = Date.now()
-    const newAssetIds: string[] = []
-    const initialAssets: Record<string, GeneratedAsset> = {}
-
-    templateTypes.forEach((templateType, i) => {
-      const id = `new-${timestamp}-${i}`
-      newAssetIds.push(id)
-      initialAssets[id] = {
-        id,
-        templateType,
-        status: 'generating',
-        error: null,
-        copy: { headline: '', subhead: '', body: '', cta: '' },
-        variations: null,
-        ...getDefaultAssetSettings(templateType),
-      }
-    })
-
-    // Add to existing generated assets
-    set((state) => ({
-      generatedAssets: { ...state.generatedAssets, ...initialAssets }
-    }))
-
-    // Fire parallel API calls to generate copy
-    await Promise.allSettled(
-      templateTypes.map(async (templateType, i) => {
-        const id = newAssetIds[i]
-
-        try {
-          const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ context, templateType }),
-          })
-
-          const data = await response.json()
-
-          if (!response.ok) {
-            throw new Error(data.error || `Generation failed: ${response.status}`)
-          }
-
-          // Update asset with generated copy
-          set((state) => ({
-            generatedAssets: {
-              ...state.generatedAssets,
-              [id]: {
-                ...state.generatedAssets[id],
-                status: 'complete',
-                copy: {
-                  headline: data.copy?.headline || '',
-                  subhead: data.copy?.subhead || '',
-                  body: data.copy?.body || '',
-                  cta: data.copy?.cta || '',
-                },
-                variations: data.copy?.variations || null,
-              },
-            },
-          }))
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-          set((state) => ({
-            generatedAssets: {
-              ...state.generatedAssets,
-              [id]: {
-                ...state.generatedAssets[id],
-                status: 'error',
-                error: errorMessage,
-              },
-            },
-          }))
-        }
-      })
-    )
-
-    return newAssetIds
-  },
-
-  addAllGeneratedToQueue: () => {
-    const state = get()
-    const newQueueItems: QueuedAsset[] = []
-
-    Object.values(state.generatedAssets).forEach((asset) => {
-      if (asset.status === 'complete') {
-        const queueId = `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-        newQueueItems.push(generatedAssetToQueuedAsset(asset, queueId))
-      }
-    })
-
-    set((prevState) => ({
-      exportQueue: [...prevState.exportQueue, ...newQueueItems],
-    }))
-  },
-
   reset: () =>
     set({
       currentScreen: 'select',
@@ -1961,7 +1372,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       pdfContent: null,
       contextFile: null,
       finalCopy: null,
-      generatedVariations: null,
       isGenerating: false,
       selectedAssets: [],
       currentAssetIndex: 0,
@@ -2034,9 +1444,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       theme: 'light',
       grayscale: false,
       exportQueue: [],
-      // Auto-Create defaults
-      autoCreate: { ...initialAutoCreate },
-      generatedAssets: {},
     }),
 
   // Draft persistence actions
@@ -2050,8 +1457,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       manualAssetSettings: state.manualAssetSettings,
       templateType: state.templateType,
       verbatimCopy: state.verbatimCopy,
-      generatedAssets: state.generatedAssets,
-      autoCreate: state.autoCreate,
       exportQueue: state.exportQueue,
       eyebrow: state.eyebrow,
       solution: state.solution,
@@ -2118,7 +1523,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       stackAlign: state.stackAlign,
       templateGaps: state.templateGaps,
       lineHeights: state.lineHeights,
-      generatedVariations: state.generatedVariations,
       // FAQ PDF
       faqTitle: state.faqTitle,
       faqCoverSubheader: state.faqCoverSubheader,
@@ -2193,8 +1597,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       manualAssetSettings: draft.manualAssetSettings || {},
       templateType: draft.templateType,
       verbatimCopy: draft.verbatimCopy,
-      generatedAssets: draft.generatedAssets,
-      autoCreate: draft.autoCreate,
       exportQueue: draft.exportQueue,
       eyebrow: draft.eyebrow,
       solution: draft.solution,
@@ -2268,7 +1670,6 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         ...(draft.socialDarkGradientGaps ? { 'social-dark-gradient': draft.socialDarkGradientGaps } : {}),
       },
       lineHeights: draft.lineHeights ?? {},
-      generatedVariations: draft.generatedVariations,
       // FAQ PDF
       faqTitle: draft.faqTitle ?? 'Title Goes Here',
       faqCoverSubheader: draft.faqCoverSubheader ?? 'Frequently Asked Questions',
