@@ -37,17 +37,6 @@
 
 ---
 
-## Per-row data/cta type toggle on grids
-
-**What:** 4 Group D templates have rows whose `type: 'data' | 'cta'` comes from the store but isn't editable in S&B. Users see the existing type rendered; can't swap it interactively.
-**Why deferred:** Required a new per-block toolbar control. Out of scope for the migration sprint.
-**Cost to ignore:** Real-world feedback when users want to change a row's type and can't.
-**Trigger condition:** First user complaint or design ask, OR the per-block toolbar gains a similar toggle for another reason.
-**Estimate to pay:** ~3 hours. Add a 2-state `Toggle` inside `EditbarText`/`EditbarCta` that swaps the row's store `type` field. The factory descriptor should declare which slots support type-toggling.
-**First step when you start:** Pick `EmailGrid` (smallest grid). Wire the toggle. Port to the other 3 once feel is right.
-
----
-
 ## Image-source-key for shared image slots
 
 **What:** When the same image source is used across multiple templates (e.g., a newsletter image visible in dark + light variants of the same asset), there's no concept of a "shared image identity." Each template gets its own settings bundle, which is correct architecturally but creates a UX wrinkle: edit the image in one variant, the other variant doesn't pick it up.
