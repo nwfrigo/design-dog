@@ -456,32 +456,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     headline: s.verbatimCopy.headline || 'GX2 2026.1',
   }),
 
-  'newsletter-dark-gradient': (s) => ({
-    ...buildNewsletterImageParams(s),
-    ctaText: s.ctaText,
-    colorStyle: s.colorStyle,
-    imageSize: s.newsletterImageSize,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showCta: s.showCta,
-    grayscale: s.grayscale,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['newsletter-dark-gradient'] ?? {},
-  }),
-
-  'newsletter-light': (s) => ({
-    ...buildNewsletterImageParams(s),
-    ctaText: s.ctaText,
-    imageSize: s.newsletterImageSize,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showCta: s.showCta,
-    grayscale: s.grayscale,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['newsletter-light'] ?? {},
-  }),
-
   'newsletter-top-banner': (s) => ({
     variant: s.newsletterTopBannerVariant,
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,

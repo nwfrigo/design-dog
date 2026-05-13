@@ -43,6 +43,8 @@ import { socialEhsAccelerateRegistration } from '@/components/canvas-editor/temp
 import { socialImageRegistration } from '@/components/canvas-editor/template-adapters/SocialImageRegistration'
 import { emailCorityConnect2026Registration } from '@/components/canvas-editor/template-adapters/EmailCorityConnect2026Registration'
 import { newsletterBlueGradientRegistration } from '@/components/canvas-editor/template-adapters/NewsletterBlueGradientRegistration'
+import { newsletterDarkGradientRegistration } from '@/components/canvas-editor/template-adapters/NewsletterDarkGradientRegistration'
+import { newsletterLightRegistration } from '@/components/canvas-editor/template-adapters/NewsletterLightRegistration'
 
 // Each template has unique props — kept loose at the registry boundary
 // because `renderProps` is the bridge that produces the correctly-shaped
@@ -67,6 +69,8 @@ const REGISTRATIONS: ReadonlyArray<StageBenchRegistrationData> = [
   socialImageRegistration,
   emailCorityConnect2026Registration,
   newsletterBlueGradientRegistration,
+  newsletterDarkGradientRegistration,
+  newsletterLightRegistration,
 ]
 
 const BY_ID = new Map<TemplateType, StageBenchRegistrationData>(
