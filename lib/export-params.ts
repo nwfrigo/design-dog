@@ -311,20 +311,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gaps: s.templateGaps['social-grid-detail'] ?? {},
   }),
 
-  'email-dark-gradient': (s) => ({
-    ctaText: s.ctaText,
-    colorStyle: s.colorStyle,
-    alignment: s.alignment,
-    ctaStyle: s.ctaStyle,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showCta: s.showCta,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['email-dark-gradient'] ?? {},
-    lineHeights: s.lineHeights,
-  }),
-
   'email-speakers': (s) => ({
     ctaText: s.ctaText,
     showEyebrow: s.showEyebrow && !!s.eyebrow,

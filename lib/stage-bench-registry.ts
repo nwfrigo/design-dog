@@ -49,6 +49,7 @@ import { socialBlueGradientRegistration } from '@/components/canvas-editor/templ
 import { socialDarkGradientRegistration } from '@/components/canvas-editor/template-adapters/SocialDarkGradientRegistration'
 import { socialImageMeddbaseRegistration } from '@/components/canvas-editor/template-adapters/SocialImageMeddbaseRegistration'
 import { emailImageRegistration } from '@/components/canvas-editor/template-adapters/EmailImageRegistration'
+import { emailDarkGradientRegistration } from '@/components/canvas-editor/template-adapters/EmailDarkGradientRegistration'
 
 // Each template has unique props — kept loose at the registry boundary
 // because `renderProps` is the bridge that produces the correctly-shaped
@@ -79,6 +80,7 @@ const REGISTRATIONS: ReadonlyArray<StageBenchRegistrationData> = [
   socialDarkGradientRegistration,
   socialImageMeddbaseRegistration,
   emailImageRegistration,
+  emailDarkGradientRegistration,
 ]
 
 const BY_ID = new Map<TemplateType, StageBenchRegistrationData>(

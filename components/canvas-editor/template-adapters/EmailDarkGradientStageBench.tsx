@@ -1,68 +1,24 @@
 'use client'
 
-import { useRef } from 'react'
 import { useStore } from '@/store'
-import { useCanvasEditorStore } from '@/store/canvas-editor'
-import type { ColorStyle } from '@/types'
-import { useFlipReflow } from '@/lib/motion'
-import { useActiveDrag } from '@/lib/dnd'
+import type { ColorStyle, TextAlignment, CtaStyle } from '@/types'
 
-import { StageBenchShell } from '../StageBenchShell'
-import { CanvasEditorProvider } from '../CanvasEditorProvider'
-import { Editable } from '../Editable'
-import { ContextualToolbar } from '../ContextualToolbar'
-import { SelectionRing } from '../SelectionRing'
-import { InlineTextEdit } from '../InlineTextEdit'
-import { SpacingHandle } from '../handles/SpacingHandle'
-import { BenchChip, type BenchChipKind } from '../bench/BenchChip'
-import { SelectorRow } from '../stage-bar/SelectorRow'
-import { SelectorPrimitive, type ColorOption } from '../stage-bar/SelectorPrimitive'
-import { VisibilityRegistryProvider } from '../VisibilityRegistry'
-import { SizeRegistryProvider } from '../SizeRegistry'
-import { ContentRegistryProvider } from '../ContentRegistry'
-import { LineHeightRegistryProvider } from '../LineHeightRegistry'
-import {
-  StageScrim,
-  StageBenchHeader,
-  StageBenchActionRow,
-  StageBenchBench,
-  useStageBenchDroppables,
-  STAGE_DROPPABLE_ID,
-  type SlotDragData,
-} from '../stage-bench'
-import {
-  getEmailDarkGradientSlots,
-  getEmailDarkGradientSizes,
-  getEmailDarkGradientContents,
-  getEmailDarkGradientLineHeights,
-} from '../template-configs/email-dark-gradient'
+import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
   EmailDarkGradient,
   type EmailDarkGradientBlockId,
 } from '../../templates/EmailDarkGradient'
-import type { StageBenchEditorProps } from '../StageBenchEditor'
+import type { ColorOption } from '../stage-bar/SelectorPrimitive'
 
 /**
- * Stage & Bench adapter for email-dark-gradient.
+ * Stage & Bench adapter for email-dark-gradient (factory-driven).
  *
- * Reference implementation for the per-template adapter pattern. Each
- * adapter is a self-contained component that:
- *   1. Subscribes to its template's store fields
- *   2. Computes slot / size / content / line-height configs from store
- *   3. Renders the StageBenchShell with shared sub-components
- *      (Header, ActionRow, Bench) plus its template-specific stage bar
- *   4. Renders the template inside the stage container, wiring renderBlock
- *      / renderInlineEditor / renderOverlay so each editable region gets
- *      <Editable> + drag config + the shared scrim
- *   5. Uses useStageBenchDroppables to wire stage + bench drop targets
- *      driven by slot.show() / slot.hide() — no per-template setShowX
- *      handlers needed
+ * 640×300 dark email banner. Editable: eyebrow / headline / subhead /
+ * body / cta. Logo is a brand-locked anchor. Stage-bar: 4-swatch color,
+ * content-stack alignment, text alignment.
  *
- * Fits the "escape hatch" Layer-2 of the architecture: the adapter is a
- * full React component because the template's render contract is
- * non-trivial (rich text formatting, spacer slots, gap config, etc.).
- * Simpler templates can use the upcoming Layer-1 declarative descriptor
- * instead.
+ * lineHeights is a sparse record edited via per-slot toolbars (not
+ * surfaced on the stage-bar); it flows through the extras → template.
  */
 
 const COLOR_STYLE_OPTIONS: ColorOption[] = [
@@ -72,313 +28,178 @@ const COLOR_STYLE_OPTIONS: ColorOption[] = [
   { value: '4', swatch: { backgroundImage: 'url(/assets/backgrounds/social-dark-gradient-4.png)' }, ariaLabel: 'Color 4' },
 ]
 
-const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
-  eyebrow: 'eyebrow',
-  headline: 'headline',
-  subhead: 'subheadline',
-  body: 'body',
-  cta: 'button',
-}
+export const EmailDarkGradientStageBench = defineStageBenchAdapter<EmailDarkGradientBlockId>({
+  templateId: 'email-dark-gradient',
+  slots: [
+    { blockId: 'logo', label: 'Logo', iconKey: 'logo', kind: 'image', benchable: false },
+    {
+      blockId: 'eyebrow',
+      label: 'Eyebrow',
+      iconKey: 'eyebrow',
+      chipKind: 'eyebrow',
+      kind: 'text',
+      content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+    },
+    {
+      blockId: 'headline',
+      label: 'Headline',
+      iconKey: 'headline',
+      kind: 'text',
+      content: { format: 'html', placeholder: 'Headline' },
+      size: { default: 38, min: 24, max: 60, step: 2 },
+    },
+    {
+      blockId: 'subhead',
+      label: 'Subhead',
+      iconKey: 'subhead',
+      chipKind: 'subheadline',
+      kind: 'text',
+      content: { format: 'html', placeholder: 'Subheadline' },
+      size: { default: 18, min: 12, max: 28, step: 1 },
+    },
+    {
+      blockId: 'body',
+      label: 'Body',
+      iconKey: 'body',
+      chipKind: 'body',
+      kind: 'text',
+      content: { format: 'html', placeholder: 'Body copy goes here.' },
+    },
+    {
+      blockId: 'cta',
+      label: 'CTA',
+      iconKey: 'cta',
+      kind: 'cta',
+      content: { format: 'plain', placeholder: 'Call to Action' },
+    },
+  ],
+  stageBar: [
+    { id: 'colorStyle', kind: 'color-4', label: 'color', options: COLOR_STYLE_OPTIONS },
+    { id: 'stackAlign', kind: 'stack', label: 'content stack' },
+    { id: 'alignment', kind: 'alignment', label: 'alignment' },
+  ],
+  contentStack: { templateKey: 'email-dark-gradient', maxGap: 96 },
+  useStoreBindings: () => {
+    const eyebrow = useStore((s) => s.eyebrow)
+    const setEyebrow = useStore((s) => s.setEyebrow)
+    const verbatimCopy = useStore((s) => s.verbatimCopy)
+    const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
+    const ctaText = useStore((s) => s.ctaText)
+    const setCtaText = useStore((s) => s.setCtaText)
 
-export function EmailDarkGradientStageBench(props: StageBenchEditorProps) {
-  const {
-    selectedAssets,
-    currentAssetIndex,
-    isExporting,
-    isEditingFromQueue,
-    colorsConfig,
-    typographyConfig,
-    onExport,
-    onAddToQueue,
-    onSaveToQueue,
-    onPreview,
-    onAddAsset,
-    onGoToAsset,
-    onDeleteAsset,
-    getAssetLabel,
-  } = props
+    const showEyebrow = useStore((s) => s.showEyebrow)
+    const setShowEyebrow = useStore((s) => s.setShowEyebrow)
+    const showHeadline = useStore((s) => s.showHeadline)
+    const setShowHeadline = useStore((s) => s.setShowHeadline)
+    const showSubhead = useStore((s) => s.showSubhead)
+    const setShowSubhead = useStore((s) => s.setShowSubhead)
+    const showBody = useStore((s) => s.showBody)
+    const setShowBody = useStore((s) => s.setShowBody)
+    const showCta = useStore((s) => s.showCta)
+    const setShowCta = useStore((s) => s.setShowCta)
 
-  // ---- store subscriptions ----
-  const eyebrow = useStore((s) => s.eyebrow)
-  const setEyebrow = useStore((s) => s.setEyebrow)
-  const verbatimCopy = useStore((s) => s.verbatimCopy)
-  const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
-  const ctaText = useStore((s) => s.ctaText)
-  const setCtaText = useStore((s) => s.setCtaText)
-  const showEyebrow = useStore((s) => s.showEyebrow)
-  const setShowEyebrow = useStore((s) => s.setShowEyebrow)
-  const showHeadline = useStore((s) => s.showHeadline)
-  const setShowHeadline = useStore((s) => s.setShowHeadline)
-  const showSubhead = useStore((s) => s.showSubhead)
-  const setShowSubhead = useStore((s) => s.setShowSubhead)
-  const showBody = useStore((s) => s.showBody)
-  const setShowBody = useStore((s) => s.setShowBody)
-  const showCta = useStore((s) => s.showCta)
-  const setShowCta = useStore((s) => s.setShowCta)
-  const colorStyle = useStore((s) => s.colorStyle)
-  const setColorStyle = useStore((s) => s.setColorStyle)
-  const alignment = useStore((s) => s.alignment)
-  const setAlignment = useStore((s) => s.setAlignment)
-  const ctaStyle = useStore((s) => s.ctaStyle)
-  const stackAlign = useStore((s) => s.stackAlign)
-  const setStackAlign = useStore((s) => s.setStackAlign)
-  const headlineFontSize = useStore((s) => s.headlineFontSize)
-  const setHeadlineFontSize = useStore((s) => s.setHeadlineFontSize)
-  const subheadFontSize = useStore((s) => s.subheadFontSize)
-  const setSubheadFontSize = useStore((s) => s.setSubheadFontSize)
-  const emailDarkGradientGaps = useStore((s) => s.templateGaps['email-dark-gradient'] ?? {})
-  const setTemplateGap = useStore((s) => s.setTemplateGap)
-  const lineHeights = useStore((s) => s.lineHeights)
-  const setLineHeight = useStore((s) => s.setLineHeight)
-  const theme = useStore((s) => s.theme)
-  const setTheme = useStore((s) => s.setTheme)
+    const colorStyle = useStore((s) => s.colorStyle)
+    const setColorStyle = useStore((s) => s.setColorStyle)
+    const alignment = useStore((s) => s.alignment)
+    const setAlignment = useStore((s) => s.setAlignment)
+    const ctaStyle = useStore((s) => s.ctaStyle)
 
-  const editingPath = useCanvasEditorStore((s) => s.editingPath)
+    const headlineFontSize = useStore((s) => s.headlineFontSize)
+    const setHeadlineFontSize = useStore((s) => s.setHeadlineFontSize)
+    const subheadFontSize = useStore((s) => s.subheadFontSize)
+    const setSubheadFontSize = useStore((s) => s.setSubheadFontSize)
 
-  // ---- slot config (from template-configs) ----
-  const slots = getEmailDarkGradientSlots({
-    showEyebrow, showHeadline, showSubhead, showBody, showCta,
-    setShowEyebrow, setShowHeadline, setShowSubhead, setShowBody, setShowCta,
-  })
+    const stackAlign = useStore((s) => s.stackAlign)
+    const setStackAlign = useStore((s) => s.setStackAlign)
+    const gaps = useStore((s) => s.templateGaps['email-dark-gradient'] ?? {})
+    const setTemplateGap = useStore((s) => s.setTemplateGap)
+    const lineHeights = useStore((s) => s.lineHeights)
 
-  // ---- preview state from active drag ----
-  const activeDrag = useActiveDrag<SlotDragData>()
-  const previewKey =
-    activeDrag &&
-    activeDrag.data.region === 'bench' &&
-    activeDrag.overTargetId === STAGE_DROPPABLE_ID
-      ? activeDrag.data.path.split('.').slice(1).join('.')
-      : null
-  const showStageScrim = previewKey !== null
-
-  // ---- effective content — raw value, empty when unset. The template
-  // file owns the canonical placeholder fallback (`value || 'Placeholder'`
-  // in its defaultInner) so the editor renders the same string the
-  // thumbnail and the export show. ----
-  const eyebrowEff  = eyebrow ?? ''
-  const headlineEff = verbatimCopy.headline ?? ''
-  const subheadEff  = verbatimCopy.subhead ?? ''
-  const bodyEff     = verbatimCopy.body ?? ''
-  const ctaEff      = ctaText ?? ''
-
-  const showEyebrowEff  = showEyebrow  || previewKey === 'eyebrow'
-  const showHeadlineEff = showHeadline || previewKey === 'headline'
-  const showSubheadEff  = showSubhead  || previewKey === 'subhead'
-  const showBodyEff     = showBody     || previewKey === 'body'
-  const showCtaEff      = showCta      || previewKey === 'cta'
-
-  // ---- FLIP + drop targets ----
-  const stageRef = useRef<HTMLDivElement | null>(null)
-  useFlipReflow(stageRef)
-  const { setStageNodeRef: setStageDropRef, setBenchNodeRef } =
-    useStageBenchDroppables(slots)
-
-  // Compose stage refs (FLIP container + drop target).
-  const setStageNodeRef = (el: HTMLDivElement | null) => {
-    stageRef.current = el
-    setStageDropRef(el)
-  }
-
-  // ---- stage bar ----
-  const stageBar = (
-    <>
-      <SelectorRow label="theme">
-        <SelectorPrimitive kind="theme" value={theme} onChange={setTheme} />
-      </SelectorRow>
-      <SelectorRow label="color">
-        <SelectorPrimitive
-          kind="color-4"
-          value={colorStyle}
-          onChange={(v) => setColorStyle(v as ColorStyle)}
-          options={COLOR_STYLE_OPTIONS}
-        />
-      </SelectorRow>
-      <SelectorRow label="content stack">
-        <SelectorPrimitive kind="stack" value={stackAlign} onChange={setStackAlign} />
-      </SelectorRow>
-      <SelectorRow label="alignment">
-        <SelectorPrimitive kind="alignment" value={alignment} onChange={setAlignment} />
-      </SelectorRow>
-    </>
-  )
-
-  // ---- per-block Editable wrapping (handles preview z-index + drag) ----
-  const slotConfig: Record<EmailDarkGradientBlockId, { storeKey: string; kind: 'text' | 'image' | 'cta' }> = {
-    logo: { storeKey: 'logo', kind: 'image' },
-    eyebrow: { storeKey: 'eyebrow', kind: 'text' },
-    headline: { storeKey: 'verbatimCopy.headline', kind: 'text' },
-    subhead: { storeKey: 'verbatimCopy.subhead', kind: 'text' },
-    body: { storeKey: 'verbatimCopy.body', kind: 'text' },
-    cta: { storeKey: 'ctaText', kind: 'cta' },
-  }
-
-  return (
-    <CanvasEditorProvider mode="edit">
-      <VisibilityRegistryProvider slots={slots}>
-        <SizeRegistryProvider
-          sizes={getEmailDarkGradientSizes({
-            headlineFontSize, subheadFontSize,
-            setHeadlineFontSize, setSubheadFontSize,
-          })}
-        >
-          <ContentRegistryProvider
-            contents={getEmailDarkGradientContents({
-              eyebrow,
-              headlineHtml: verbatimCopy.headline || '',
-              subheadHtml: verbatimCopy.subhead || '',
-              bodyHtml: verbatimCopy.body || '',
-              ctaText,
-              setEyebrow,
-              setHeadlineHtml: (v) => setVerbatimCopy({ headline: v }),
-              setSubheadHtml: (v) => setVerbatimCopy({ subhead: v }),
-              setBodyHtml: (v) => setVerbatimCopy({ body: v }),
-              setCtaText,
-            })}
-          >
-            <LineHeightRegistryProvider
-              lineHeights={getEmailDarkGradientLineHeights({ lineHeights, setLineHeight })}
-            >
-              <StageBenchShell
-                header={
-                  <StageBenchHeader
-                    selectedAssets={selectedAssets}
-                    currentAssetIndex={currentAssetIndex}
-                    isEditingFromQueue={isEditingFromQueue}
-                    onGoToAsset={onGoToAsset}
-                    onAddAsset={onAddAsset}
-                    onDeleteAsset={onDeleteAsset}
-                    getAssetLabel={getAssetLabel}
-                  />
-                }
-                bench={<StageBenchBench />}
-                stageBar={stageBar}
-                actionRow={
-                  <StageBenchActionRow
-                    isExporting={isExporting}
-                    isEditingFromQueue={isEditingFromQueue}
-                    onPreview={onPreview}
-                    onAddToQueue={onAddToQueue}
-                    onSaveToQueue={onSaveToQueue}
-                    onExport={onExport}
-                  />
-                }
-                benchRef={setBenchNodeRef}
-              >
-                <div
-                  ref={setStageNodeRef}
-                  data-canvas-stage
-                  data-canvas-preview-pad
-                  style={{ position: 'relative' }}
-                >
-                  <EmailDarkGradient
-                    headline={headlineEff}
-                    eyebrow={eyebrowEff}
-                    subhead={subheadEff}
-                    body={bodyEff}
-                    ctaText={ctaEff}
-                    colorStyle={colorStyle}
-                    alignment={alignment}
-                    ctaStyle={ctaStyle}
-                    showEyebrow={showEyebrowEff}
-                    showHeadline={showHeadlineEff}
-                    showSubhead={showSubheadEff}
-                    showBody={showBodyEff}
-                    showCta={showCtaEff}
-                    headlineFontSize={headlineFontSize ?? undefined}
-                    subheadFontSize={subheadFontSize ?? undefined}
-                    stackAlign={stackAlign}
-                    gaps={emailDarkGradientGaps}
-                    lineHeights={lineHeights}
-                    renderSpacerBetween={(key, value) => (
-                      <Editable
-                        templateId="email-dark-gradient"
-                        slotKey={key}
-                        storeKey="templateGaps"
-                        kind="spacer"
-                      >
-                        <SpacingHandle
-                          spacing={value}
-                          onChange={(next) => setTemplateGap('email-dark-gradient', key, next)}
-                          scale={1}
-                          direction={stackAlign === 'bottom' ? 'up' : 'down'}
-                          min={0}
-                          max={96}
-                          showUnit
-                        />
-                      </Editable>
-                    )}
-                    renderBlock={(blockId, content) => {
-                      const cfg = slotConfig[blockId]
-                      const slotPath = `email-dark-gradient.${blockId}`
-                      const slot = slots.find((s) => s.path === slotPath)
-                      const dragConfig = slot
-                        ? {
-                            data: { region: 'stage' as const, path: slotPath },
-                            preview: (
-                              <BenchChip
-                                kind={ICON_KIND_TO_CHIP_KIND[slot.iconKey ?? ''] ?? 'headline'}
-                                label={slot.label}
-                                isFloating
-                                draggable={false}
-                              />
-                            ),
-                          }
-                        : undefined
-                      return (
-                        <Editable
-                          templateId="email-dark-gradient"
-                          slotKey={blockId}
-                          storeKey={cfg.storeKey}
-                          kind={cfg.kind}
-                          drag={dragConfig}
-                          previewActive={previewKey === blockId}
-                        >
-                          {content}
-                        </Editable>
-                      )
-                    }}
-                    renderInlineEditor={(blockId, defaultInner) => {
-                      const path = `email-dark-gradient.${blockId}`
-                      if (editingPath !== path) return defaultInner
-                      const isPlainText = blockId === 'eyebrow' || blockId === 'cta'
-                      // Inline editor reads from the *real* store values.
-                      const value =
-                        blockId === 'eyebrow' ? eyebrow :
-                        blockId === 'headline' ? (verbatimCopy.headline || '') :
-                        blockId === 'subhead' ? (verbatimCopy.subhead || '') :
-                        blockId === 'body' ? (verbatimCopy.body || '') :
-                        blockId === 'cta' ? ctaText : ''
-                      const handleChange = (next: string) => {
-                        switch (blockId) {
-                          case 'eyebrow': setEyebrow(next); break
-                          case 'headline': setVerbatimCopy({ headline: next }); break
-                          case 'subhead': setVerbatimCopy({ subhead: next }); break
-                          case 'body': setVerbatimCopy({ body: next }); break
-                          case 'cta': setCtaText(next); break
-                        }
-                      }
-                      return (
-                        <InlineTextEdit
-                          value={value}
-                          onChange={handleChange}
-                          format={isPlainText ? 'plain' : 'html'}
-                          singleLine={isPlainText}
-                        />
-                      )
-                    }}
-                    colors={colorsConfig}
-                    typography={typographyConfig}
-                    scale={1}
-                    renderOverlay={() => <StageScrim visible={showStageScrim} />}
-                  />
-                </div>
-              </StageBenchShell>
-              <ContextualToolbar />
-              <SelectionRing />
-            </LineHeightRegistryProvider>
-          </ContentRegistryProvider>
-        </SizeRegistryProvider>
-      </VisibilityRegistryProvider>
-    </CanvasEditorProvider>
-  )
-}
+    return {
+      slotState: {
+        logo: {},
+        eyebrow: {
+          value: eyebrow,
+          visible: showEyebrow,
+          setValue: setEyebrow,
+          setVisible: setShowEyebrow,
+        },
+        headline: {
+          value: verbatimCopy.headline || '',
+          visible: showHeadline,
+          fontSize: headlineFontSize ?? undefined,
+          setValue: (v) => setVerbatimCopy({ headline: v }),
+          setVisible: setShowHeadline,
+          setFontSize: setHeadlineFontSize,
+        },
+        subhead: {
+          value: verbatimCopy.subhead || '',
+          visible: showSubhead,
+          fontSize: subheadFontSize ?? undefined,
+          setValue: (v) => setVerbatimCopy({ subhead: v }),
+          setVisible: setShowSubhead,
+          setFontSize: setSubheadFontSize,
+        },
+        body: {
+          value: verbatimCopy.body || '',
+          visible: showBody,
+          setValue: (v) => setVerbatimCopy({ body: v }),
+          setVisible: setShowBody,
+        },
+        cta: {
+          value: ctaText,
+          visible: showCta,
+          setValue: setCtaText,
+          setVisible: setShowCta,
+        },
+      },
+      stageBar: {
+        colorStyle: { value: colorStyle, set: (v) => setColorStyle(v as ColorStyle) },
+        stackAlign: { value: stackAlign, set: setStackAlign as (v: unknown) => void },
+        alignment: { value: alignment, set: (v) => setAlignment(v as TextAlignment) },
+      },
+      contentStack: {
+        stackAlign,
+        setStackAlign,
+        gaps,
+        setGap: (key, value) => setTemplateGap('email-dark-gradient', key, value),
+      },
+      extras: { colorStyle, ctaStyle, alignment, lineHeights },
+    }
+  },
+  renderTemplate: (ctx) => {
+    const colorStyle = ctx.extras.colorStyle as ColorStyle
+    const ctaStyle = ctx.extras.ctaStyle as CtaStyle
+    const alignment = ctx.extras.alignment as TextAlignment
+    const lineHeights = ctx.extras.lineHeights as Record<string, number>
+    return (
+      <EmailDarkGradient
+        eyebrow={ctx.textOf('eyebrow')}
+        headline={ctx.textOf('headline')}
+        subhead={ctx.textOf('subhead')}
+        body={ctx.textOf('body')}
+        ctaText={ctx.textOf('cta')}
+        colorStyle={colorStyle}
+        alignment={alignment}
+        ctaStyle={ctaStyle}
+        showEyebrow={ctx.visibilityOf('eyebrow')}
+        showHeadline={ctx.visibilityOf('headline')}
+        showSubhead={ctx.visibilityOf('subhead')}
+        showBody={ctx.visibilityOf('body')}
+        showCta={ctx.visibilityOf('cta')}
+        headlineFontSize={ctx.fontSizeOf('headline')}
+        subheadFontSize={ctx.fontSizeOf('subhead')}
+        stackAlign={ctx.stackAlign}
+        gaps={ctx.gaps}
+        lineHeights={lineHeights}
+        renderBlock={ctx.renderBlock}
+        renderInlineEditor={ctx.renderInlineEditor}
+        renderOverlay={ctx.renderOverlay}
+        renderSpacerBetween={ctx.renderSpacerBetween}
+        colors={ctx.colors}
+        typography={ctx.typography}
+        scale={ctx.scale}
+      />
+    )
+  },
+})

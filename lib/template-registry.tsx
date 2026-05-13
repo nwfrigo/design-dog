@@ -25,7 +25,6 @@ import { EmailCorityCustomerExchangeBanner } from '@/components/templates/EmailC
 import { SocialImage } from '@/components/templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from '@/components/templates/SocialGridDetail'
 import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
-import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 
@@ -666,56 +665,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
 
   // 'social-ehs-accelerate' — migrated to stage-bench-registry (Task 2 pilot).
   // Entry now lives in SocialEhsAccelerateRegistration.ts.
-
-  'email-dark-gradient': {
-    component: EmailDarkGradient,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      eyebrow: asset.eyebrow,
-      subhead: asset.subhead,
-      body: asset.body || '',
-      ctaText: asset.ctaText || '',
-      colorStyle: asset.colorStyle || '1',
-      alignment: asset.alignment || 'left',
-      ctaStyle: asset.ctaStyle || 'link',
-      showEyebrow: asset.showEyebrow && !!asset.eyebrow,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      showBody: asset.showBody && !!asset.body,
-      showCta: asset.showCta !== false,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      subheadFontSize: asset.subheadFontSize ?? undefined,
-      stackAlign: (asset.stackAlign as 'top' | 'center' | 'bottom') ?? 'top',
-      gaps: asset.templateGaps?.['email-dark-gradient'] ?? {},
-      lineHeights: (asset.lineHeights as Record<string, number>) ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 640,
-      height: 300,
-      background: '#000000',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'colorStyle', parser: 'enum', default: '1' },
-        { param: 'alignment', parser: 'enum', default: 'left' },
-        { param: 'ctaStyle', parser: 'enum', default: 'link' },
-        { param: 'showEyebrow', parser: 'boolFalse' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolFalse' },
-        { param: 'showBody', parser: 'boolTrue' },
-        { param: 'showCta', parser: 'boolTrue' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'subheadFontSize', parser: 'numberOrUndefined' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-        { param: 'lineHeights', parser: 'jsonRecord' },
-      ],
-    },
-  },
 
   'email-speakers': {
     component: EmailSpeakers,

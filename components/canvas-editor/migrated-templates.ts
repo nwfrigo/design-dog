@@ -21,7 +21,6 @@ import { getRegisteredStageBenchTemplateIds } from '@/lib/stage-bench-registry'
  *  hasn't yet been registered via the central registry. As adapters
  *  migrate to the registry, remove them from here. */
 const LEGACY_STAGE_BENCH_TEMPLATES: ReadonlyArray<TemplateType> = [
-  'email-dark-gradient',
   'email-speakers',
   'website-floating-banner-mobile',
   'website-floating-banner',
