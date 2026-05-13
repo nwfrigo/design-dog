@@ -94,6 +94,7 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     width: 420,
     height: 595,
     channelLabel: 'Event Invitation',
+    hidden: true,
   },
   {
     type: 'email-ehs-accelerate-signature',
