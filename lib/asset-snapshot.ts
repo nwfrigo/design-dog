@@ -51,8 +51,7 @@ const SNAPSHOT_FIELDS = [
   // Social Grid Detail
   'gridDetail4Type',
   'gridDetail4Text',
-  'showRow3',
-  'showRow4',
+  'showGridDetail3',
   // Social Dark Gradient
   'metadata',
   'ctaText',

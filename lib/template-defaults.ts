@@ -187,8 +187,8 @@ const DEFAULT_FLAGS: Record<string, TemplateDefaultFlags> = {
     showHeadline: true,
     showSubhead: true,
     showSolutionSet: true,
-    showRow3: true,
-    showRow4: true,
+    showGridDetail2: true,
+    showGridDetail3: true,
   },
 
   'social-ehs-accelerate': {
@@ -234,16 +234,16 @@ const DEFAULT_FLAGS: Record<string, TemplateDefaultFlags> = {
     showEyebrow: true,          // override: branded "LIVE EVENT" eyebrow
     showHeadline: true,
     showSubhead: true,
-    showRow3: true,
-    showRow4: true,
+    showGridDetail2: true,
+    showGridDetail3: true,
   },
 
   'website-ehs-accelerate-listing': {
     showEyebrow: true,          // override: branded eyebrow
     showHeadline: true,
     showSubhead: true,
-    showRow3: true,
-    showRow4: true,
+    showGridDetail2: true,
+    showGridDetail3: true,
   },
 
   'website-report': {
@@ -329,8 +329,7 @@ export const UNIVERSAL_FALLBACK_FLAGS = {
   showHeavyHeader: false as boolean,
   showSubheading: true as boolean,
   showGridDetail2: true as boolean,
-  showRow3: true as boolean,
-  showRow4: true as boolean,
+  showGridDetail3: true as boolean,
   showSpeaker1: true as boolean,
   showSpeaker2: true as boolean,
   showSpeaker3: true as boolean,

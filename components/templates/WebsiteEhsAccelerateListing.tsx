@@ -33,8 +33,8 @@ export interface WebsiteEhsAccelerateListingProps {
   gridDetail2Text: string
   gridDetail3Text: string
   gridDetail4Text: string
-  showRow3: boolean
-  showRow4: boolean
+  showGridDetail2: boolean
+  showGridDetail3: boolean
   showEyebrow: boolean
   showHeadline?: boolean
   showSubhead: boolean
@@ -69,8 +69,8 @@ export function WebsiteEhsAccelerateListing({
   gridDetail2Text,
   gridDetail3Text,
   gridDetail4Text,
-  showRow3,
-  showRow4,
+  showGridDetail2,
+  showGridDetail3,
   showEyebrow,
   showHeadline = true,
   showSubhead,
@@ -196,8 +196,8 @@ export function WebsiteEhsAccelerateListing({
 
   const gridRows: Array<{ id: 'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4'; text: string; isCta: boolean }> = [
     { id: 'gridDetail1', text: gridDetail1Text || 'Grid detail 1', isCta: false },
-    ...(showRow3 ? [{ id: 'gridDetail2' as const, text: gridDetail2Text || 'Grid detail 2', isCta: false }] : []),
-    ...(showRow4 ? [{ id: 'gridDetail3' as const, text: gridDetail3Text || 'Grid detail 3', isCta: false }] : []),
+    ...(showGridDetail2 ? [{ id: 'gridDetail2' as const, text: gridDetail2Text || 'Grid detail 2', isCta: false }] : []),
+    ...(showGridDetail3 ? [{ id: 'gridDetail3' as const, text: gridDetail3Text || 'Grid detail 3', isCta: false }] : []),
     { id: 'gridDetail4', text: gridDetail4Text || 'Grid detail 4', isCta: true },
   ]
 

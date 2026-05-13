@@ -716,8 +716,8 @@ function AssetPreviewRenderer({
           showSubhead={asset.showSubhead && !!copy.subhead}
           showSolutionSet={asset.showSolutionSet !== false}
           solution={asset.solution}
-          showRow3={asset.showRow3 !== false}
-          showRow4={asset.showRow4 !== false}
+          showGridDetail2={asset.showGridDetail2 !== false}
+          showGridDetail3={asset.showGridDetail3 !== false}
           gridDetail1={{ type: 'data', text: asset.gridDetail1Text || '' }}
           gridDetail2={{ type: 'data', text: asset.gridDetail2Text || 'Time: Midnight, EST' }}
           gridDetail3={{ type: asset.gridDetail3Type || 'data', text: asset.gridDetail3Text || 'Place: Wherever' }}

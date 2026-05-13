@@ -48,8 +48,7 @@ export interface ExportParamState {
   showLightHeader: boolean
   showSubheading: boolean
   showGridDetail2: boolean
-  showRow3: boolean
-  showRow4: boolean
+  showGridDetail3: boolean
   showSpeaker1: boolean
   showSpeaker2: boolean
   showSpeaker3: boolean
@@ -364,8 +363,7 @@ export function buildExportParamsFromAsset(
     showLightHeader: a.showLightHeader !== false,
     showSubheading: (a.showSubheading as boolean) ?? false,
     showGridDetail2: a.showGridDetail2 !== false,
-    showRow3: a.showRow3 !== false,
-    showRow4: a.showRow4 !== false,
+    showGridDetail3: a.showGridDetail3 !== false,
     showSpeaker1: a.showSpeaker1 !== false,
     showSpeaker2: a.showSpeaker2 !== false,
     showSpeaker3: a.showSpeaker3 !== false,

@@ -544,8 +544,7 @@ export interface GeneratedAsset {
   gridDetail3Text: string
   gridDetail4Type: GridDetailType
   gridDetail4Text: string
-  showRow3: boolean
-  showRow4: boolean
+  showGridDetail3: boolean
   metadata: string
   ctaText: string
   colorStyle: ColorStyle
@@ -725,8 +724,7 @@ export interface QueuedAsset {
   // Social Grid Detail specific (4th row)
   gridDetail4Type: GridDetailType
   gridDetail4Text: string
-  showRow3: boolean
-  showRow4: boolean
+  showGridDetail3: boolean
   // Social Dark Gradient specific
   metadata: string
   ctaText: string
@@ -922,8 +920,7 @@ export interface AppState {
   // Social Grid Detail specific settings
   gridDetail4Type: GridDetailType
   gridDetail4Text: string
-  showRow3: boolean
-  showRow4: boolean
+  showGridDetail3: boolean
 
   // Social Dark Gradient specific settings
   metadata: string
@@ -1137,8 +1134,7 @@ export interface AppState {
   // Social Grid Detail specific actions
   setGridDetail4Type: (type: GridDetailType) => void
   setGridDetail4Text: (text: string) => void
-  setShowRow3: (show: boolean) => void
-  setShowRow4: (show: boolean) => void
+  setShowGridDetail3: (show: boolean) => void
 
   // Social Dark Gradient specific actions
   setMetadata: (metadata: string) => void

@@ -14,11 +14,10 @@ import {
  * Stage & Bench adapter for social-grid-detail (factory-driven).
  *
  * Track 2 fixed-composition. Top half: logo+solutionPill + eyebrow /
- * headline / subhead stack. Bottom half: 4 grid-detail rows.
- *
- * Off-by-one warning: `showRow3` toggles `gridDetail2`, `showRow4`
- * toggles `gridDetail3`. Rows 1+4 are always visible. The names date
- * back to legacy code (see SUBSTRATE-DEBT §3.1 rename).
+ * headline / subhead stack. Bottom half: 4 grid-detail rows. Rows 1
+ * and 4 are always visible; rows 2 and 3 toggle via `showGridDetail2`
+ * / `showGridDetail3` (the same store flags EmailGrid uses for the
+ * same semantic — visibility of the matching `gridDetail<N>` field).
  */
 
 export const SocialGridDetailStageBench =
@@ -111,10 +110,10 @@ export const SocialGridDetailStageBench =
       const setShowSubhead = useStore((s) => s.setShowSubhead)
       const showSolutionSet = useStore((s) => s.showSolutionSet)
       const setShowSolutionSet = useStore((s) => s.setShowSolutionSet)
-      const showRow3 = useStore((s) => s.showRow3)
-      const setShowRow3 = useStore((s) => s.setShowRow3)
-      const showRow4 = useStore((s) => s.showRow4)
-      const setShowRow4 = useStore((s) => s.setShowRow4)
+      const showGridDetail2 = useStore((s) => s.showGridDetail2)
+      const setShowGridDetail2 = useStore((s) => s.setShowGridDetail2)
+      const showGridDetail3 = useStore((s) => s.showGridDetail3)
+      const setShowGridDetail3 = useStore((s) => s.setShowGridDetail3)
 
       const solution = useStore((s) => s.solution)
       const setSolution = useStore((s) => s.setSolution)
@@ -172,15 +171,15 @@ export const SocialGridDetailStageBench =
           },
           gridDetail2: {
             value: gridDetail2Text,
-            visible: showRow3,
+            visible: showGridDetail2,
             setValue: setGridDetail2Text,
-            setVisible: setShowRow3,
+            setVisible: setShowGridDetail2,
           },
           gridDetail3: {
             value: gridDetail3Text,
-            visible: showRow4,
+            visible: showGridDetail3,
             setValue: setGridDetail3Text,
-            setVisible: setShowRow4,
+            setVisible: setShowGridDetail3,
           },
           gridDetail4: {
             value: gridDetail4Text,
@@ -223,8 +222,8 @@ export const SocialGridDetailStageBench =
           showSubhead={ctx.visibilityOf('subhead')}
           showSolutionSet={showSolution}
           solution={showSolution ? (ctx.extras.solution as string) ?? '' : 'none'}
-          showRow3={ctx.visibilityOf('gridDetail2')}
-          showRow4={ctx.visibilityOf('gridDetail3')}
+          showGridDetail2={ctx.visibilityOf('gridDetail2')}
+          showGridDetail3={ctx.visibilityOf('gridDetail3')}
           gridDetail1={{ type: 'data', text: ctx.textOf('gridDetail1') }}
           gridDetail2={{ type: 'data', text: ctx.textOf('gridDetail2') }}
           gridDetail3={{ type: gridDetail3Type, text: ctx.textOf('gridDetail3') }}

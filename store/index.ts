@@ -581,8 +581,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Social Grid Detail specific actions
   setGridDetail4Type: (type: GridDetailType) => set({ gridDetail4Type: type }),
   setGridDetail4Text: (text: string) => set({ gridDetail4Text: text }),
-  setShowRow3: (show: boolean) => set({ showRow3: show }),
-  setShowRow4: (show: boolean) => set({ showRow4: show }),
+  setShowGridDetail3: (show: boolean) => set({ showGridDetail3: show }),
 
   // Social Dark Gradient specific actions
   setMetadata: (metadata: string) => set({ metadata }),
@@ -1990,8 +1989,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Social Grid Detail defaults
       gridDetail4Type: 'cta',
       gridDetail4Text: '',
-      showRow3: true,
-      showRow4: true,
+      showGridDetail3: true,
       // Social Dark Gradient defaults
       metadata: '',
       ctaText: '',
@@ -2075,8 +2073,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       gridDetail3Text: state.gridDetail3Text,
       gridDetail4Type: state.gridDetail4Type,
       gridDetail4Text: state.gridDetail4Text,
-      showRow3: state.showRow3,
-      showRow4: state.showRow4,
+      showGridDetail3: state.showGridDetail3,
       metadata: state.metadata,
       ctaText: state.ctaText,
       colorStyle: state.colorStyle,
@@ -2219,8 +2216,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       gridDetail3Text: draft.gridDetail3Text,
       gridDetail4Type: draft.gridDetail4Type,
       gridDetail4Text: draft.gridDetail4Text,
-      showRow3: draft.showRow3,
-      showRow4: draft.showRow4,
+      showGridDetail3: draft.showGridDetail3,
       metadata: draft.metadata,
       ctaText: draft.ctaText,
       colorStyle: draft.colorStyle,

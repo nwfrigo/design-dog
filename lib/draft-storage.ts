@@ -44,8 +44,7 @@ export interface DraftState {
   gridDetail3Text: string
   gridDetail4Type: GridDetailType
   gridDetail4Text: string
-  showRow3: boolean
-  showRow4: boolean
+  showGridDetail3: boolean
   metadata: string
   ctaText: string
   colorStyle: ColorStyle
@@ -233,8 +232,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       gridDetail3Text: state.gridDetail3Text ?? '',
       gridDetail4Type: state.gridDetail4Type || 'cta',
       gridDetail4Text: state.gridDetail4Text ?? '',
-      showRow3: state.showRow3 ?? UNIVERSAL_FALLBACK_FLAGS.showRow3,
-      showRow4: state.showRow4 ?? UNIVERSAL_FALLBACK_FLAGS.showRow4,
+      showGridDetail3: state.showGridDetail3 ?? UNIVERSAL_FALLBACK_FLAGS.showGridDetail3,
       metadata: state.metadata ?? '',
       ctaText: state.ctaText ?? '',
       colorStyle: state.colorStyle || '1',

@@ -43,8 +43,8 @@ export interface SocialGridDetailProps {
   showSubhead: boolean
   showSolutionSet: boolean
   solution: string
-  showRow3: boolean
-  showRow4: boolean
+  showGridDetail2: boolean
+  showGridDetail3: boolean
   gridDetail1: GridDetailRow
   gridDetail2: GridDetailRow
   gridDetail3: GridDetailRow
@@ -78,8 +78,8 @@ export function SocialGridDetail({
   showSubhead,
   showSolutionSet,
   solution,
-  showRow3,
-  showRow4,
+  showGridDetail2,
+  showGridDetail3,
   gridDetail1,
   gridDetail2,
   gridDetail3,
@@ -240,8 +240,8 @@ export function SocialGridDetail({
   const gridRows: Array<{ id: 'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4'; detail: GridDetailRow }> = [
     { id: 'gridDetail1', detail: gridDetail1 },
     { id: 'gridDetail2', detail: gridDetail2 },
-    ...(showRow3 ? [{ id: 'gridDetail3' as const, detail: gridDetail3 }] : []),
-    ...(showRow4 ? [{ id: 'gridDetail4' as const, detail: gridDetail4 }] : []),
+    ...(showGridDetail2 ? [{ id: 'gridDetail3' as const, detail: gridDetail3 }] : []),
+    ...(showGridDetail3 ? [{ id: 'gridDetail4' as const, detail: gridDetail4 }] : []),
   ]
 
   return (

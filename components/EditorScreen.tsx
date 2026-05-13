@@ -218,10 +218,8 @@ export function EditorScreen() {
     setGridDetail4Type,
     gridDetail4Text,
     setGridDetail4Text,
-    showRow3,
-    setShowRow3,
-    showRow4,
-    setShowRow4,
+    showGridDetail3,
+    setShowGridDetail3,
     // Email Speakers specific
     speakerCount,
     setSpeakerCount,
@@ -803,8 +801,7 @@ export function EditorScreen() {
         showLightHeader,
         showSubheading,
         showGridDetail2,
-        showRow3,
-        showRow4,
+        showGridDetail3,
         showSpeaker1,
         showSpeaker2,
         showSpeaker3,
@@ -3281,7 +3278,7 @@ export function EditorScreen() {
                             <option value="cta">CTA</option>
                           </select>
                         </div>
-                        <EyeIcon visible={showRow3} onClick={() => setShowRow3(!showRow3)} />
+                        <EyeIcon visible={showGridDetail2} onClick={() => setShowGridDetail2(!showGridDetail2)} />
                       </div>
                       <input
                         type="text"
@@ -3291,7 +3288,7 @@ export function EditorScreen() {
                         className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                          ${!showRow3 ? 'opacity-50' : ''}`}
+                          ${!showGridDetail2 ? 'opacity-50' : ''}`}
                       />
                     </div>
 
@@ -3310,7 +3307,7 @@ export function EditorScreen() {
                             <option value="cta">CTA</option>
                           </select>
                         </div>
-                        <EyeIcon visible={showRow4} onClick={() => setShowRow4(!showRow4)} />
+                        <EyeIcon visible={showGridDetail3} onClick={() => setShowGridDetail3(!showGridDetail3)} />
                       </div>
                       <input
                         type="text"
@@ -3320,7 +3317,7 @@ export function EditorScreen() {
                         className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                          ${!showRow4 ? 'opacity-50' : ''}`}
+                          ${!showGridDetail3 ? 'opacity-50' : ''}`}
                       />
                     </div>
                   </div>
@@ -3374,7 +3371,7 @@ export function EditorScreen() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="text-xs text-gray-400">Row 2</label>
-                        <EyeIcon visible={showRow3} onClick={() => setShowRow3(!showRow3)} />
+                        <EyeIcon visible={showGridDetail2} onClick={() => setShowGridDetail2(!showGridDetail2)} />
                       </div>
                       <input
                         type="text"
@@ -3384,7 +3381,7 @@ export function EditorScreen() {
                         className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                          ${!showRow3 ? 'opacity-50' : ''}`}
+                          ${!showGridDetail2 ? 'opacity-50' : ''}`}
                       />
                     </div>
 
@@ -3392,7 +3389,7 @@ export function EditorScreen() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="text-xs text-gray-400">Row 3</label>
-                        <EyeIcon visible={showRow4} onClick={() => setShowRow4(!showRow4)} />
+                        <EyeIcon visible={showGridDetail3} onClick={() => setShowGridDetail3(!showGridDetail3)} />
                       </div>
                       <input
                         type="text"
@@ -3402,7 +3399,7 @@ export function EditorScreen() {
                         className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-[#494a4c] rounded
                           bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary
                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                          ${!showRow4 ? 'opacity-50' : ''}`}
+                          ${!showGridDetail3 ? 'opacity-50' : ''}`}
                       />
                     </div>
 
@@ -4043,8 +4040,8 @@ export function EditorScreen() {
                   gridDetail2Text={gridDetail2Text || 'Add Details or Hide Me'}
                   gridDetail3Text={gridDetail3Text || 'Add Details or Hide Me'}
                   gridDetail4Text={gridDetail4Text || 'Add Details or Hide Me'}
-                  showRow3={showRow3}
-                  showRow4={showRow4}
+                  showGridDetail2={showGridDetail2}
+                  showGridDetail3={showGridDetail3}
                   showEyebrow={showEyebrow}
                   showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
@@ -4063,8 +4060,8 @@ export function EditorScreen() {
                   gridDetail2Text={gridDetail2Text || 'Add Details or Hide Me'}
                   gridDetail3Text={gridDetail3Text || 'Add Details or Hide Me'}
                   gridDetail4Text={gridDetail4Text || 'Add Details or Hide Me'}
-                  showRow3={showRow3}
-                  showRow4={showRow4}
+                  showGridDetail2={showGridDetail2}
+                  showGridDetail3={showGridDetail3}
                   showEyebrow={showEyebrow}
                   showHeadline={showHeadline}
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
@@ -4242,8 +4239,8 @@ export function EditorScreen() {
                   showSubhead={showSubhead && !!verbatimCopy.subhead}
                   showSolutionSet={showSolutionSet}
                   solution={solution}
-                  showRow3={showRow3}
-                  showRow4={showRow4}
+                  showGridDetail2={showGridDetail2}
+                  showGridDetail3={showGridDetail3}
                   gridDetail1={{ type: 'data', text: gridDetail1Text }}
                   gridDetail2={{ type: 'data', text: gridDetail2Text }}
                   gridDetail3={{ type: gridDetail3Type, text: gridDetail3Text }}

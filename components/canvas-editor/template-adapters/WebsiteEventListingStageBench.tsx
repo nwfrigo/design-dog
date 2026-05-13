@@ -15,10 +15,9 @@ import type { EnumOption } from '../stage-bar/SelectorPrimitive'
  * Stage & Bench adapter for website-event-listing (factory-driven).
  *
  * Track 2 fixed-composition. Editable: eyebrow / headline / subhead +
- * 4 grid-detail rows. Stage bar: 3-swatch variant.
- *
- * Off-by-one (see SUBSTRATE-DEBT §3.1): `showRow3` toggles `gridDetail2`,
- * `showRow4` toggles `gridDetail3`. Rows 1+4 are always-on.
+ * 4 grid-detail rows. Stage bar: 3-swatch variant. Rows 1 and 4 are
+ * always visible; rows 2 and 3 toggle via the universal
+ * `showGridDetail2` / `showGridDetail3` store flags.
  */
 
 const VARIANTS: EventListingVariant[] = ['orange', 'light', 'dark-gradient']
@@ -108,10 +107,10 @@ export const WebsiteEventListingStageBench =
       const showHeadline = useStore((s) => s.showHeadline)
       const showSubhead = useStore((s) => s.showSubhead)
       const setShowSubhead = useStore((s) => s.setShowSubhead)
-      const showRow3 = useStore((s) => s.showRow3)
-      const setShowRow3 = useStore((s) => s.setShowRow3)
-      const showRow4 = useStore((s) => s.showRow4)
-      const setShowRow4 = useStore((s) => s.setShowRow4)
+      const showGridDetail2 = useStore((s) => s.showGridDetail2)
+      const setShowGridDetail2 = useStore((s) => s.setShowGridDetail2)
+      const showGridDetail3 = useStore((s) => s.showGridDetail3)
+      const setShowGridDetail3 = useStore((s) => s.setShowGridDetail3)
 
       const variant = useStore((s) => s.eventListingVariant)
       const setVariant = useStore((s) => s.setEventListingVariant)
@@ -161,15 +160,15 @@ export const WebsiteEventListingStageBench =
           },
           gridDetail2: {
             value: gridDetail2Text,
-            visible: showRow3,
+            visible: showGridDetail2,
             setValue: setGridDetail2Text,
-            setVisible: setShowRow3,
+            setVisible: setShowGridDetail2,
           },
           gridDetail3: {
             value: gridDetail3Text,
-            visible: showRow4,
+            visible: showGridDetail3,
             setValue: setGridDetail3Text,
-            setVisible: setShowRow4,
+            setVisible: setShowGridDetail3,
           },
           gridDetail4: {
             value: gridDetail4Text,
@@ -201,8 +200,8 @@ export const WebsiteEventListingStageBench =
           gridDetail2Text={ctx.textOf('gridDetail2')}
           gridDetail3Text={ctx.textOf('gridDetail3')}
           gridDetail4Text={ctx.textOf('gridDetail4')}
-          showRow3={ctx.visibilityOf('gridDetail2')}
-          showRow4={ctx.visibilityOf('gridDetail3')}
+          showGridDetail2={ctx.visibilityOf('gridDetail2')}
+          showGridDetail3={ctx.visibilityOf('gridDetail3')}
           showEyebrow={ctx.visibilityOf('eyebrow')}
           showHeadline={ctx.rawVisibilityOf('headline')}
           showSubhead={ctx.visibilityOf('subhead')}

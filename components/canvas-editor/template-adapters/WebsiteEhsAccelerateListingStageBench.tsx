@@ -13,7 +13,8 @@ import {
  *
  * Sibling of website-event-listing with no variant selector (fixed
  * EHS Accelerate styling). Editable: eyebrow / headline / subhead +
- * 4 grid-detail rows. Off-by-one (see SUBSTRATE-DEBT §3.1).
+ * 4 grid-detail rows. Rows 1+4 always visible; rows 2 and 3 toggle
+ * via `showGridDetail2` / `showGridDetail3`.
  */
 
 export const WebsiteEhsAccelerateListingStageBench =
@@ -95,10 +96,10 @@ export const WebsiteEhsAccelerateListingStageBench =
       const showHeadline = useStore((s) => s.showHeadline)
       const showSubhead = useStore((s) => s.showSubhead)
       const setShowSubhead = useStore((s) => s.setShowSubhead)
-      const showRow3 = useStore((s) => s.showRow3)
-      const setShowRow3 = useStore((s) => s.setShowRow3)
-      const showRow4 = useStore((s) => s.showRow4)
-      const setShowRow4 = useStore((s) => s.setShowRow4)
+      const showGridDetail2 = useStore((s) => s.showGridDetail2)
+      const setShowGridDetail2 = useStore((s) => s.setShowGridDetail2)
+      const showGridDetail3 = useStore((s) => s.showGridDetail3)
+      const setShowGridDetail3 = useStore((s) => s.setShowGridDetail3)
 
       const gridDetail1Text = useStore((s) => s.gridDetail1Text)
       const setGridDetail1Text = useStore((s) => s.setGridDetail1Text)
@@ -140,8 +141,8 @@ export const WebsiteEhsAccelerateListingStageBench =
             setVisible: setShowSubhead,
           },
           gridDetail1: { value: gridDetail1Text, setValue: setGridDetail1Text },
-          gridDetail2: { value: gridDetail2Text, visible: showRow3, setValue: setGridDetail2Text, setVisible: setShowRow3 },
-          gridDetail3: { value: gridDetail3Text, visible: showRow4, setValue: setGridDetail3Text, setVisible: setShowRow4 },
+          gridDetail2: { value: gridDetail2Text, visible: showGridDetail2, setValue: setGridDetail2Text, setVisible: setShowGridDetail2 },
+          gridDetail3: { value: gridDetail3Text, visible: showGridDetail3, setValue: setGridDetail3Text, setVisible: setShowGridDetail3 },
           gridDetail4: { value: gridDetail4Text, setValue: setGridDetail4Text },
         },
         stageBar: {
@@ -164,8 +165,8 @@ export const WebsiteEhsAccelerateListingStageBench =
         gridDetail2Text={ctx.textOf('gridDetail2')}
         gridDetail3Text={ctx.textOf('gridDetail3')}
         gridDetail4Text={ctx.textOf('gridDetail4')}
-        showRow3={ctx.visibilityOf('gridDetail2')}
-        showRow4={ctx.visibilityOf('gridDetail3')}
+        showGridDetail2={ctx.visibilityOf('gridDetail2')}
+        showGridDetail3={ctx.visibilityOf('gridDetail3')}
         showEyebrow={ctx.visibilityOf('eyebrow')}
         showHeadline={ctx.rawVisibilityOf('headline')}
         showSubhead={ctx.visibilityOf('subhead')}
