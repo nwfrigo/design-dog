@@ -91,9 +91,11 @@ export function useFlipReflow(
           target.style.transform = `translate(${dx}px, ${dy}px)`
           // Force reflow so the browser commits the displaced position before
           // we set up the transition. Without this, the browser may batch the
-          // two style writes and skip the animation entirely.
-          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          target.offsetHeight
+          // two style writes and skip the animation entirely. `void` makes
+          // the discarded read explicit so eslint's no-unused-expressions
+          // rule is satisfied without a disable comment (the project doesn't
+          // load @typescript-eslint, so its rule name can't be referenced).
+          void target.offsetHeight
           // PLAY — animate back to natural position.
           target.style.transition = composedTransition
           target.style.transform = ''
