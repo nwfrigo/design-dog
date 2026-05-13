@@ -291,36 +291,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     gaps: s.templateGaps['email-grid'] ?? {},
   }),
 
-  'social-dark-gradient': (s) => ({
-    metadata: s.metadata,
-    ctaText: s.ctaText,
-    colorStyle: s.colorStyle,
-    headingSize: s.headingSize,
-    alignment: s.alignment,
-    ctaStyle: s.ctaStyle,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showMetadata: s.showMetadata,
-    showCta: s.showCta,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['social-dark-gradient'] ?? {},
-  }),
-
-  'social-blue-gradient': (s) => ({
-    metadata: s.metadata,
-    ctaText: s.ctaText,
-    colorStyle: s.colorStyle,
-    headingSize: s.headingSize,
-    alignment: s.alignment,
-    ctaStyle: s.ctaStyle,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showMetadata: s.showMetadata,
-    showCta: s.showCta,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['social-blue-gradient'] ?? {},
-  }),
-
   // 'social-image' + 'social-ehs-accelerate' — migrated to
   // stage-bench-registry (Task 2 pilots). Builders now live in their
   // respective *Registration.ts files.

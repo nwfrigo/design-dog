@@ -36,8 +36,6 @@ const LEGACY_STAGE_BENCH_TEMPLATES: ReadonlyArray<TemplateType> = [
   'website-event-listing',
   'website-ehs-accelerate-listing',
   'website-press-release',
-  'social-dark-gradient',
-  'social-blue-gradient',
   'social-image-meddbase',
   'website-thumbnail',
   'website-report',
