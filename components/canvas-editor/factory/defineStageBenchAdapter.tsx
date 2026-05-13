@@ -93,6 +93,7 @@ export type StageBarItemDescriptor =
   | { id: string; kind: 'theme'; label?: string }
   | { id: string; kind: 'alignment'; label?: string }
   | { id: string; kind: 'layout'; label?: string }
+  | { id: string; kind: 'layout-2'; label?: string }
   | { id: string; kind: 'enum'; label?: string; options: EnumOption[] }
   | { id: string; kind: 'color-2' | 'color-3' | 'color-4'; label?: string; options: ColorOption[] }
   | { id: string; kind: 'custom'; label?: string; render: () => ReactNode }
@@ -435,6 +436,16 @@ export function defineStageBenchAdapter<TBlockId extends string>(
                     kind="layout"
                     value={sb.value as 'image' | 'even' | 'text'}
                     onChange={sb.set as (v: 'image' | 'even' | 'text') => void}
+                  />
+                </SelectorRow>
+              )
+            case 'layout-2':
+              return (
+                <SelectorRow key={item.id} label={label}>
+                  <SelectorPrimitive
+                    kind="layout-2"
+                    value={sb.value as 'image' | 'text'}
+                    onChange={sb.set as (v: 'image' | 'text') => void}
                   />
                 </SelectorRow>
               )

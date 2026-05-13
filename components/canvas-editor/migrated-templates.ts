@@ -26,9 +26,6 @@ const LEGACY_STAGE_BENCH_TEMPLATES: ReadonlyArray<TemplateType> = [
   'social-grid-detail',
   'website-event-listing',
   'website-ehs-accelerate-listing',
-  'website-thumbnail',
-  'website-report',
-  'website-webinar',
 ]
 
 export const STAGE_BENCH_TEMPLATES: Set<TemplateType> = new Set<TemplateType>([

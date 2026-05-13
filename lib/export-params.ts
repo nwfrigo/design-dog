@@ -227,17 +227,6 @@ function buildImageParams(s: ExportParamState): Record<string, unknown> {
 }
 
 const BUILDERS: Record<string, ExportParamBuilder> = {
-  'website-thumbnail': (s) => ({
-    ...buildImageParams(s),
-    variant: s.ebookVariant,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-    showCta: s.showCta,
-    ctaText: s.ctaText,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['website-thumbnail'] ?? {},
-  }),
-
   'website-event-listing': (s) => ({
     variant: s.eventListingVariant,
     gridDetail1Text: s.gridDetail1Text,
@@ -330,34 +319,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   'newsletter-top-banner': (s) => ({
     variant: s.newsletterTopBannerVariant,
     showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-  }),
-
-  'website-report': (s) => ({
-    ...buildImageParams(s),
-    variant: s.reportVariant,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-    showCta: s.showCta,
-    ctaText: s.ctaText,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['website-report'] ?? {},
-  }),
-
-  'website-webinar': (s) => ({
-    variant: s.webinarVariant,
-    ...buildImageParams(s),
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-    showBody: s.showBody && !!s.verbatimCopy.body,
-    showCta: s.showCta,
-    ctaText: s.ctaText,
-    ...buildSpeakerParams(s),
-    showSpeaker1: s.showSpeaker1,
-    showSpeaker2: s.showSpeaker2,
-    showSpeaker3: s.showSpeaker3,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['website-webinar'] ?? {},
   }),
 
   'customer-library': (s) => ({
