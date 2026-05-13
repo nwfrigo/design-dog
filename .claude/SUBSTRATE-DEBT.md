@@ -100,3 +100,14 @@
 **Trigger condition:** After Cleanup Plan Task 1 lands (the factory makes this a non-issue going forward).
 **Estimate to pay:** ~1 hour audit after factory lands.
 **First step when you start:** List all templates with `imageFilters` prop. Verify each has the filter scalars in renderSchema.fields and the assembleProps reshape. Grep `imageFilterExposure` to inventory.
+
+---
+
+## Grid off-by-one rename (Cleanup Plan §3.1)
+
+**What:** In `WebsiteEventListing`, `WebsiteEhsAccelerateListing`, `SocialGridDetail`, the flags `showRow3` / `showRow4` control `gridDetail2` / `gridDetail3` visibility — off by one. Plan §3.1 calls for renaming the flags.
+**Why deferred:** First-pass rename (`showRow3` → `showGridDetail2`) collides with EmailGrid's existing `showGridDetail2` field. Needs either a different target name or a parallel rename of `gridDetail2/3` in the grid templates.
+**Cost to ignore:** Anyone touching these adapters has to re-learn the off-by-one. ~24 references in adapter code reinforce the wrong mental model.
+**Trigger condition:** Next time someone touches grid visibility logic (e.g., adding a 5th row, or adjusting bench-toggle behavior).
+**Estimate to pay:** ~2 hours. Pick the target name carefully — e.g., `showEventRow2` / `showEventRow3` to avoid the EmailGrid collision, OR rename the grid-detail indices in the 3 templates instead of the flags.
+**First step when you start:** Decide direction (rename flags vs. rename grid indices). Then `grep -l 'showRow3\|showRow4'` for the surface, ~13 files. Don't substitute blindly — verify EmailGrid's `showGridDetail2` is not touched.

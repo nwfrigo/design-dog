@@ -227,69 +227,9 @@ function buildImageParams(s: ExportParamState): Record<string, unknown> {
 }
 
 const BUILDERS: Record<string, ExportParamBuilder> = {
-  'website-event-listing': (s) => ({
-    variant: s.eventListingVariant,
-    gridDetail1Text: s.gridDetail1Text,
-    gridDetail2Text: s.gridDetail2Text,
-    gridDetail3Text: s.gridDetail3Text,
-    gridDetail4Text: s.gridDetail4Text,
-    showRow3: s.showRow3,
-    showRow4: s.showRow4,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['website-event-listing'] ?? {},
-  }),
-
-  'website-ehs-accelerate-listing': (s) => ({
-    gridDetail1Text: s.gridDetail1Text,
-    gridDetail2Text: s.gridDetail2Text,
-    gridDetail3Text: s.gridDetail3Text,
-    gridDetail4Text: s.gridDetail4Text,
-    showRow3: s.showRow3,
-    showRow4: s.showRow4,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['website-ehs-accelerate-listing'] ?? {},
-  }),
-
-  'email-grid': (s) => ({
-    subheading: s.subheading,
-    showLightHeader: s.showLightHeader,
-    showHeavyHeader: false,
-    showSubheading: s.showSubheading,
-    showBody: s.showBody,
-    showSolutionSet: s.showSolutionSet,
-    showGridDetail2: s.showGridDetail2,
-    gridDetail1Type: 'data',
-    gridDetail1Text: s.gridDetail1Text,
-    gridDetail2Type: 'data',
-    gridDetail2Text: s.gridDetail2Text,
-    gridDetail3Type: s.gridDetail3Type,
-    gridDetail3Text: s.gridDetail3Text,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['email-grid'] ?? {},
-  }),
-
   // 'social-image' + 'social-ehs-accelerate' — migrated to
   // stage-bench-registry (Task 2 pilots). Builders now live in their
   // respective *Registration.ts files.
-
-  'social-grid-detail': (s) => ({
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
-    showSolutionSet: s.showSolutionSet,
-    gridDetail1Text: s.gridDetail1Text,
-    gridDetail2Text: s.gridDetail2Text,
-    gridDetail3Type: s.gridDetail3Type,
-    gridDetail3Text: s.gridDetail3Text,
-    gridDetail4Type: s.gridDetail4Type,
-    gridDetail4Text: s.gridDetail4Text,
-    showRow3: s.showRow3,
-    showRow4: s.showRow4,
-    theme: s.theme,
-    stackAlign: s.stackAlign,
-    gaps: s.templateGaps['social-grid-detail'] ?? {},
-  }),
 
   'email-speakers': (s) => ({
     ctaText: s.ctaText,

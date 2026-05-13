@@ -1,63 +1,25 @@
 'use client'
 
-import { useRef } from 'react'
 import { useStore } from '@/store'
-import { useCanvasEditorStore } from '@/store/canvas-editor'
-import { useFlipReflow } from '@/lib/motion'
-import { useActiveDrag } from '@/lib/dnd'
 
-import { StageBenchShell } from '../StageBenchShell'
-import { CanvasEditorProvider } from '../CanvasEditorProvider'
-import { Editable } from '../Editable'
-import { ContextualToolbar } from '../ContextualToolbar'
-import { SelectionRing } from '../SelectionRing'
-import { InlineTextEdit } from '../InlineTextEdit'
-import { SpacingHandle } from '../handles/SpacingHandle'
-import { BenchChip, type BenchChipKind } from '../bench/BenchChip'
-import { SelectorRow } from '../stage-bar/SelectorRow'
-import { SelectorPrimitive, type EnumOption } from '../stage-bar/SelectorPrimitive'
-import { VisibilityRegistryProvider } from '../VisibilityRegistry'
-import { SizeRegistryProvider } from '../SizeRegistry'
-import { ContentRegistryProvider } from '../ContentRegistry'
-import {
-  StageScrim,
-  StageBenchHeader,
-  StageBenchActionRow,
-  StageBenchBench,
-  useStageBenchDroppables,
-  STAGE_DROPPABLE_ID,
-  type SlotDragData,
-} from '../stage-bench'
-import {
-  getWebsiteEventListingSlots,
-  getWebsiteEventListingSizes,
-  getWebsiteEventListingContents,
-} from '../template-configs/website-event-listing'
+import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
   WebsiteEventListing,
   EVENT_LISTING_VARIANT_COLORS,
   type WebsiteEventListingBlockId,
   type EventListingVariant,
 } from '../../templates/WebsiteEventListing'
-import type { StageBenchEditorProps } from '../StageBenchEditor'
+import type { EnumOption } from '../stage-bar/SelectorPrimitive'
 
 /**
- * Stage & Bench adapter for website-event-listing.
+ * Stage & Bench adapter for website-event-listing (factory-driven).
  *
- * Track 1 left column (eyebrow / headline / subhead via ContentStack;
- * logo as a sibling at the column footer) + right grid panel with 4
- * rows (gd1 always, gd2/gd3 toggleable, gd4 always-CTA).
+ * Track 2 fixed-composition. Editable: eyebrow / headline / subhead +
+ * 4 grid-detail rows. Stage bar: 3-swatch variant.
  *
- * Stage bar: 3-variant background selector via enum primitive
- * (orange / light / dark-gradient). Each swatch renders the variant's
- * background color.
+ * Off-by-one (see SUBSTRATE-DEBT §3.1): `showRow3` toggles `gridDetail2`,
+ * `showRow4` toggles `gridDetail3`. Rows 1+4 are always-on.
  */
-
-const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
-  eyebrow: 'eyebrow',
-  subhead: 'subheadline',
-  body: 'body',
-}
 
 const VARIANTS: EventListingVariant[] = ['orange', 'light', 'dark-gradient']
 const VARIANT_OPTIONS: EnumOption[] = VARIANTS.map((v) => ({
@@ -66,291 +28,195 @@ const VARIANT_OPTIONS: EnumOption[] = VARIANTS.map((v) => ({
   swatch: { backgroundColor: EVENT_LISTING_VARIANT_COLORS[v].background },
 }))
 
-export function WebsiteEventListingStageBench(props: StageBenchEditorProps) {
-  const {
-    selectedAssets,
-    currentAssetIndex,
-    isExporting,
-    isEditingFromQueue,
-    colorsConfig,
-    typographyConfig,
-    onExport,
-    onAddToQueue,
-    onSaveToQueue,
-    onPreview,
-    onAddAsset,
-    onGoToAsset,
-    onDeleteAsset,
-    getAssetLabel,
-  } = props
+export const WebsiteEventListingStageBench =
+  defineStageBenchAdapter<WebsiteEventListingBlockId>({
+    templateId: 'website-event-listing',
+    slots: [
+      { blockId: 'logo', label: 'Logo', iconKey: 'logo', kind: 'image', benchable: false },
+      {
+        blockId: 'eyebrow',
+        label: 'Eyebrow',
+        iconKey: 'eyebrow',
+        chipKind: 'eyebrow',
+        kind: 'text',
+        content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+      },
+      {
+        blockId: 'headline',
+        label: 'Headline',
+        iconKey: 'headline',
+        kind: 'text',
+        content: { format: 'html', placeholder: 'Headline' },
+        size: { default: 38, min: 24, max: 60, step: 2 },
+      },
+      {
+        blockId: 'subhead',
+        label: 'Subhead',
+        iconKey: 'subhead',
+        chipKind: 'subheadline',
+        kind: 'text',
+        content: { format: 'html', placeholder: 'Subheadline' },
+      },
+      {
+        blockId: 'gridDetail1',
+        label: 'Row 1',
+        iconKey: 'small-caption',
+        chipKind: 'small-caption',
+        kind: 'text',
+        benchable: false,
+        content: { format: 'plain', singleLine: true, placeholder: 'Row 1' },
+      },
+      {
+        blockId: 'gridDetail2',
+        label: 'Row 2',
+        iconKey: 'small-caption',
+        chipKind: 'small-caption',
+        kind: 'text',
+        content: { format: 'plain', singleLine: true, placeholder: 'Row 2' },
+      },
+      {
+        blockId: 'gridDetail3',
+        label: 'Row 3',
+        iconKey: 'small-caption',
+        chipKind: 'small-caption',
+        kind: 'text',
+        content: { format: 'plain', singleLine: true, placeholder: 'Row 3' },
+      },
+      {
+        blockId: 'gridDetail4',
+        label: 'Row 4',
+        iconKey: 'small-caption',
+        chipKind: 'small-caption',
+        kind: 'text',
+        benchable: false,
+        content: { format: 'plain', singleLine: true, placeholder: 'Row 4' },
+      },
+    ],
+    stageBar: [
+      { id: 'variant', kind: 'enum', label: 'variant', options: VARIANT_OPTIONS },
+      { id: 'stackAlign', kind: 'stack', label: 'content stack' },
+    ],
+    contentStack: { templateKey: 'website-event-listing', maxGap: 96 },
+    useStoreBindings: () => {
+      const eyebrow = useStore((s) => s.eyebrow)
+      const setEyebrow = useStore((s) => s.setEyebrow)
+      const verbatimCopy = useStore((s) => s.verbatimCopy)
+      const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
 
-  const eyebrow = useStore((s) => s.eyebrow)
-  const setEyebrow = useStore((s) => s.setEyebrow)
-  const verbatimCopy = useStore((s) => s.verbatimCopy)
-  const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
+      const showEyebrow = useStore((s) => s.showEyebrow)
+      const setShowEyebrow = useStore((s) => s.setShowEyebrow)
+      const showHeadline = useStore((s) => s.showHeadline)
+      const showSubhead = useStore((s) => s.showSubhead)
+      const setShowSubhead = useStore((s) => s.setShowSubhead)
+      const showRow3 = useStore((s) => s.showRow3)
+      const setShowRow3 = useStore((s) => s.setShowRow3)
+      const showRow4 = useStore((s) => s.showRow4)
+      const setShowRow4 = useStore((s) => s.setShowRow4)
 
-  const showEyebrow = useStore((s) => s.showEyebrow)
-  const setShowEyebrow = useStore((s) => s.setShowEyebrow)
-  const showHeadline = useStore((s) => s.showHeadline)
-  const showSubhead = useStore((s) => s.showSubhead)
-  const setShowSubhead = useStore((s) => s.setShowSubhead)
-  const showRow3 = useStore((s) => s.showRow3)
-  const setShowRow3 = useStore((s) => s.setShowRow3)
-  const showRow4 = useStore((s) => s.showRow4)
-  const setShowRow4 = useStore((s) => s.setShowRow4)
+      const variant = useStore((s) => s.eventListingVariant)
+      const setVariant = useStore((s) => s.setEventListingVariant)
 
-  const variant = useStore((s) => s.eventListingVariant)
-  const setVariant = useStore((s) => s.setEventListingVariant)
+      const gridDetail1Text = useStore((s) => s.gridDetail1Text)
+      const setGridDetail1Text = useStore((s) => s.setGridDetail1Text)
+      const gridDetail2Text = useStore((s) => s.gridDetail2Text)
+      const setGridDetail2Text = useStore((s) => s.setGridDetail2Text)
+      const gridDetail3Text = useStore((s) => s.gridDetail3Text)
+      const setGridDetail3Text = useStore((s) => s.setGridDetail3Text)
+      const gridDetail4Text = useStore((s) => s.gridDetail4Text)
+      const setGridDetail4Text = useStore((s) => s.setGridDetail4Text)
 
-  const gridDetail1Text = useStore((s) => s.gridDetail1Text)
-  const setGridDetail1Text = useStore((s) => s.setGridDetail1Text)
-  const gridDetail2Text = useStore((s) => s.gridDetail2Text)
-  const setGridDetail2Text = useStore((s) => s.setGridDetail2Text)
-  const gridDetail3Text = useStore((s) => s.gridDetail3Text)
-  const setGridDetail3Text = useStore((s) => s.setGridDetail3Text)
-  const gridDetail4Text = useStore((s) => s.gridDetail4Text)
-  const setGridDetail4Text = useStore((s) => s.setGridDetail4Text)
+      const headlineFontSize = useStore((s) => s.headlineFontSize)
+      const setHeadlineFontSize = useStore((s) => s.setHeadlineFontSize)
 
-  const headlineFontSize = useStore((s) => s.headlineFontSize)
-  const setHeadlineFontSize = useStore((s) => s.setHeadlineFontSize)
+      const stackAlign = useStore((s) => s.stackAlign)
+      const setStackAlign = useStore((s) => s.setStackAlign)
+      const gaps = useStore((s) => s.templateGaps['website-event-listing'] ?? {})
+      const setTemplateGap = useStore((s) => s.setTemplateGap)
 
-  const stackAlign = useStore((s) => s.stackAlign)
-  const setStackAlign = useStore((s) => s.setStackAlign)
-  const websiteEventListingGaps = useStore((s) => s.templateGaps['website-event-listing'] ?? {})
-  const setTemplateGap = useStore((s) => s.setTemplateGap)
-
-  const editingPath = useCanvasEditorStore((s) => s.editingPath)
-
-  const slots = getWebsiteEventListingSlots({
-    showEyebrow, showSubhead, showRow3, showRow4,
-    setShowEyebrow, setShowSubhead, setShowRow3, setShowRow4,
-  })
-
-  const activeDrag = useActiveDrag<SlotDragData>()
-  const previewKey =
-    activeDrag &&
-    activeDrag.data.region === 'bench' &&
-    activeDrag.overTargetId === STAGE_DROPPABLE_ID
-      ? activeDrag.data.path.split('.').slice(1).join('.')
-      : null
-  const showStageScrim = previewKey !== null
-
-  // ---- Effective content — raw value, empty when unset. The template
-  // file owns the canonical placeholder fallback so editor / thumbnail / export all render the same string. ----
-  const eyebrowEff     = eyebrow ?? ''
-  const headlineEff    = verbatimCopy.headline ?? ''
-  const subheadEff     = verbatimCopy.subhead ?? ''
-  const gridDetail1Eff = gridDetail1Text ?? ''
-  const gridDetail2Eff = gridDetail2Text ?? ''
-  const gridDetail3Eff = gridDetail3Text ?? ''
-  const gridDetail4Eff = gridDetail4Text ?? ''
-
-  const showEyebrowEff = showEyebrow || previewKey === 'eyebrow'
-  const showSubheadEff = showSubhead || previewKey === 'subhead'
-  const showRow3Eff    = showRow3    || previewKey === 'gridDetail2'
-  const showRow4Eff    = showRow4    || previewKey === 'gridDetail3'
-
-  const stageRef = useRef<HTMLDivElement | null>(null)
-  useFlipReflow(stageRef)
-  const { setStageNodeRef: setStageDropRef, setBenchNodeRef } =
-    useStageBenchDroppables(slots)
-  const setStageNodeRef = (el: HTMLDivElement | null) => {
-    stageRef.current = el
-    setStageDropRef(el)
-  }
-
-  const stageBar = (
-    <>
-      <SelectorRow label="variant">
-        <SelectorPrimitive
-          kind="enum"
-          value={variant}
-          onChange={(v) => setVariant(v as EventListingVariant)}
-          options={VARIANT_OPTIONS}
+      return {
+        slotState: {
+          logo: {},
+          eyebrow: {
+            value: eyebrow,
+            visible: showEyebrow,
+            setValue: setEyebrow,
+            setVisible: setShowEyebrow,
+          },
+          headline: {
+            value: verbatimCopy.headline || '',
+            visible: showHeadline,
+            fontSize: headlineFontSize ?? undefined,
+            setValue: (v) => setVerbatimCopy({ headline: v }),
+            setFontSize: setHeadlineFontSize,
+          },
+          subhead: {
+            value: verbatimCopy.subhead || '',
+            visible: showSubhead,
+            setValue: (v) => setVerbatimCopy({ subhead: v }),
+            setVisible: setShowSubhead,
+          },
+          gridDetail1: {
+            value: gridDetail1Text,
+            setValue: setGridDetail1Text,
+          },
+          gridDetail2: {
+            value: gridDetail2Text,
+            visible: showRow3,
+            setValue: setGridDetail2Text,
+            setVisible: setShowRow3,
+          },
+          gridDetail3: {
+            value: gridDetail3Text,
+            visible: showRow4,
+            setValue: setGridDetail3Text,
+            setVisible: setShowRow4,
+          },
+          gridDetail4: {
+            value: gridDetail4Text,
+            setValue: setGridDetail4Text,
+          },
+        },
+        stageBar: {
+          variant: { value: variant, set: (v) => setVariant(v as EventListingVariant) },
+          stackAlign: { value: stackAlign, set: setStackAlign as (v: unknown) => void },
+        },
+        contentStack: {
+          stackAlign,
+          setStackAlign,
+          gaps,
+          setGap: (key, value) => setTemplateGap('website-event-listing', key, value),
+        },
+        extras: { variant },
+      }
+    },
+    renderTemplate: (ctx) => {
+      const variant = ctx.extras.variant as EventListingVariant
+      return (
+        <WebsiteEventListing
+          eyebrow={ctx.textOf('eyebrow')}
+          headline={ctx.textOf('headline')}
+          subhead={ctx.textOf('subhead')}
+          variant={variant}
+          gridDetail1Text={ctx.textOf('gridDetail1')}
+          gridDetail2Text={ctx.textOf('gridDetail2')}
+          gridDetail3Text={ctx.textOf('gridDetail3')}
+          gridDetail4Text={ctx.textOf('gridDetail4')}
+          showRow3={ctx.visibilityOf('gridDetail2')}
+          showRow4={ctx.visibilityOf('gridDetail3')}
+          showEyebrow={ctx.visibilityOf('eyebrow')}
+          showHeadline={ctx.rawVisibilityOf('headline')}
+          showSubhead={ctx.visibilityOf('subhead')}
+          headlineFontSize={ctx.fontSizeOf('headline')}
+          stackAlign={ctx.stackAlign}
+          gaps={ctx.gaps}
+          renderBlock={ctx.renderBlock}
+          renderInlineEditor={ctx.renderInlineEditor}
+          renderOverlay={ctx.renderOverlay}
+          renderSpacerBetween={ctx.renderSpacerBetween}
+          colors={ctx.colors}
+          typography={ctx.typography}
+          scale={ctx.scale}
         />
-      </SelectorRow>
-      <SelectorRow label="content stack">
-        <SelectorPrimitive kind="stack" value={stackAlign} onChange={setStackAlign} />
-      </SelectorRow>
-    </>
-  )
-
-  const slotConfig: Record<WebsiteEventListingBlockId, { storeKey: string; kind: 'text' | 'image' | 'cta' }> = {
-    logo:         { storeKey: 'logo', kind: 'image' },
-    eyebrow:      { storeKey: 'eyebrow', kind: 'text' },
-    headline:     { storeKey: 'verbatimCopy.headline', kind: 'text' },
-    subhead:      { storeKey: 'verbatimCopy.subhead', kind: 'text' },
-    gridDetail1:  { storeKey: 'gridDetail1Text', kind: 'text' },
-    gridDetail2:  { storeKey: 'gridDetail2Text', kind: 'text' },
-    gridDetail3:  { storeKey: 'gridDetail3Text', kind: 'text' },
-    gridDetail4:  { storeKey: 'gridDetail4Text', kind: 'cta' },
-  }
-
-  return (
-    <CanvasEditorProvider mode="edit">
-      <VisibilityRegistryProvider slots={slots}>
-        <SizeRegistryProvider
-          sizes={getWebsiteEventListingSizes({ headlineFontSize, setHeadlineFontSize })}
-        >
-          <ContentRegistryProvider
-            contents={getWebsiteEventListingContents({
-              eyebrow,
-              headline: verbatimCopy.headline || '',
-              subhead: verbatimCopy.subhead || '',
-              gridDetail1Text,
-              gridDetail2Text,
-              gridDetail3Text,
-              gridDetail4Text,
-              setEyebrow,
-              setHeadline: (v) => setVerbatimCopy({ headline: v }),
-              setSubhead: (v) => setVerbatimCopy({ subhead: v }),
-              setGridDetail1Text,
-              setGridDetail2Text,
-              setGridDetail3Text,
-              setGridDetail4Text,
-            })}
-          >
-            <StageBenchShell
-              header={
-                <StageBenchHeader
-                  selectedAssets={selectedAssets}
-                  currentAssetIndex={currentAssetIndex}
-                  isEditingFromQueue={isEditingFromQueue}
-                  onGoToAsset={onGoToAsset}
-                  onAddAsset={onAddAsset}
-                  onDeleteAsset={onDeleteAsset}
-                  getAssetLabel={getAssetLabel}
-                />
-              }
-              bench={<StageBenchBench />}
-              stageBar={stageBar}
-              actionRow={
-                <StageBenchActionRow
-                  isExporting={isExporting}
-                  isEditingFromQueue={isEditingFromQueue}
-                  onPreview={onPreview}
-                  onAddToQueue={onAddToQueue}
-                  onSaveToQueue={onSaveToQueue}
-                  onExport={onExport}
-                />
-              }
-              benchRef={setBenchNodeRef}
-            >
-              <div
-                ref={setStageNodeRef}
-                data-canvas-stage
-                data-canvas-preview-pad
-                style={{ position: 'relative' }}
-              >
-                <WebsiteEventListing
-                  eyebrow={eyebrowEff}
-                  headline={headlineEff}
-                  subhead={subheadEff}
-                  variant={variant}
-                  gridDetail1Text={gridDetail1Eff}
-                  gridDetail2Text={gridDetail2Eff}
-                  gridDetail3Text={gridDetail3Eff}
-                  gridDetail4Text={gridDetail4Eff}
-                  showRow3={showRow3Eff}
-                  showRow4={showRow4Eff}
-                  showEyebrow={showEyebrowEff}
-                  showHeadline={showHeadline}
-                  showSubhead={showSubheadEff}
-                  headlineFontSize={headlineFontSize ?? undefined}
-                  stackAlign={stackAlign}
-                  gaps={websiteEventListingGaps}
-                  colors={colorsConfig}
-                  typography={typographyConfig}
-                  scale={1}
-                  renderSpacerBetween={(key, value) => (
-                    <Editable
-                      templateId="website-event-listing"
-                      slotKey={key}
-                      storeKey="templateGaps"
-                      kind="spacer"
-                    >
-                      <SpacingHandle
-                        spacing={value}
-                        onChange={(next) => setTemplateGap('website-event-listing', key, next)}
-                        scale={1}
-                        direction={stackAlign === 'bottom' ? 'up' : 'down'}
-                        min={0}
-                        max={96}
-                        showUnit
-                      />
-                    </Editable>
-                  )}
-                  renderBlock={(blockId, content) => {
-                    const cfg = slotConfig[blockId]
-                    const slotPath = `website-event-listing.${blockId}`
-                    const slot = slots.find((s) => s.path === slotPath)
-                    const dragConfig = blockId !== 'logo' && blockId !== 'gridDetail1' && blockId !== 'gridDetail4' && slot
-                      ? {
-                          data: { region: 'stage' as const, path: slotPath },
-                          preview: (
-                            <BenchChip
-                              kind={ICON_KIND_TO_CHIP_KIND[slot.iconKey ?? ''] ?? 'body'}
-                              label={slot.label}
-                              isFloating
-                              draggable={false}
-                            />
-                          ),
-                        }
-                      : undefined
-                    return (
-                      <Editable
-                        templateId="website-event-listing"
-                        slotKey={blockId}
-                        storeKey={cfg.storeKey}
-                        kind={cfg.kind}
-                        drag={dragConfig}
-                        previewActive={previewKey === blockId}
-                      >
-                        {content}
-                      </Editable>
-                    )
-                  }}
-                  renderInlineEditor={(blockId, defaultInner) => {
-                    const path = `website-event-listing.${blockId}`
-                    if (editingPath !== path) return defaultInner
-                    if (blockId === 'logo') return defaultInner
-                    const value =
-                      blockId === 'eyebrow'      ? eyebrow :
-                      blockId === 'headline'     ? (verbatimCopy.headline || '') :
-                      blockId === 'subhead'      ? (verbatimCopy.subhead || '') :
-                      blockId === 'gridDetail1'  ? gridDetail1Text :
-                      blockId === 'gridDetail2'  ? gridDetail2Text :
-                      blockId === 'gridDetail3'  ? gridDetail3Text :
-                      blockId === 'gridDetail4'  ? gridDetail4Text : ''
-                    const handleChange = (next: string) => {
-                      switch (blockId) {
-                        case 'eyebrow':      setEyebrow(next); break
-                        case 'headline':     setVerbatimCopy({ headline: next }); break
-                        case 'subhead':      setVerbatimCopy({ subhead: next }); break
-                        case 'gridDetail1':  setGridDetail1Text(next); break
-                        case 'gridDetail2':  setGridDetail2Text(next); break
-                        case 'gridDetail3':  setGridDetail3Text(next); break
-                        case 'gridDetail4':  setGridDetail4Text(next); break
-                      }
-                    }
-                    return (
-                      <InlineTextEdit
-                        value={value}
-                        onChange={handleChange}
-                        format="plain"
-                        singleLine={blockId !== 'headline' && blockId !== 'subhead'}
-                      />
-                    )
-                  }}
-                  renderOverlay={() => <StageScrim visible={showStageScrim} />}
-                />
-              </div>
-            </StageBenchShell>
-            <ContextualToolbar />
-            <SelectionRing />
-          </ContentRegistryProvider>
-        </SizeRegistryProvider>
-      </VisibilityRegistryProvider>
-    </CanvasEditorProvider>
-  )
-}
+      )
+    },
+  })

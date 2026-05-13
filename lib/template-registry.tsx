@@ -5,14 +5,10 @@ import { parseSpeakerParams } from '@/lib/render-params'
 import type { SearchParams } from '@/lib/render-params'
 
 // Import all template components
-import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
-import { WebsiteEhsAccelerateListing } from '@/components/templates/WebsiteEhsAccelerateListing'
 import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
-import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { SocialImage } from '@/components/templates/SocialImage'
-import { SocialGridDetail, type GridDetailRow } from '@/components/templates/SocialGridDetail'
 import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
@@ -73,75 +69,6 @@ export interface TemplateRegistryEntry {
 // spread below — keeps a single source of truth per template.
 const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEntry>> = {
 
-  'email-grid': {
-    component: EmailGrid,
-    renderProps: (asset, colors, typography) => {
-      const gridDetail1: GridDetail = { type: 'data', text: asset.gridDetail1Text }
-      const gridDetail2: GridDetail = { type: 'data', text: asset.gridDetail2Text }
-      const gridDetail3: GridDetail = { type: asset.gridDetail3Type, text: asset.gridDetail3Text }
-      return {
-        headline: asset.headline || '',
-        body: asset.body,
-        eyebrow: asset.eyebrow,
-        subheading: asset.subheading,
-        showEyebrow: asset.showEyebrow,
-        showLightHeader: asset.showLightHeader,
-        showHeavyHeader: false,
-        showSubheading: asset.showSubheading,
-        showBody: asset.showBody,
-        showSolutionSet: asset.showSolutionSet,
-        solution: asset.solution,
-        showGridDetail2: asset.showGridDetail2,
-        gridDetail1, gridDetail2, gridDetail3,
-        headlineFontSize: asset.headlineFontSize ?? undefined,
-        theme: asset.theme || 'light',
-        stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-        gaps: asset.templateGaps?.['email-grid'] ?? {},
-        colors, typography, scale: 1,
-      }
-    },
-    queueTextFields: [
-      { key: 'gridDetail1Text', label: 'Detail 1' },
-      { key: 'gridDetail2Text', label: 'Detail 2', showKey: 'showGridDetail2' },
-      { key: 'gridDetail3Text', label: 'Detail 3' },
-    ],
-    renderSchema: {
-      width: 640,
-      height: 300,
-      background: '#ffffff',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'subheading', parser: 'string', default: '' },
-        { param: 'solution', parser: 'string', default: 'environmental' },
-        { param: 'logoColor', parser: 'enum', default: 'black' },
-        { param: 'showEyebrow', parser: 'boolFalse' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showLightHeader', parser: 'boolTrue' },
-        { param: 'showHeavyHeader', parser: 'boolFalse' },
-        { param: 'showSubheading', parser: 'boolFalse' },
-        { param: 'showBody', parser: 'boolTrue' },
-        { param: 'showSolutionSet', parser: 'boolTrue' },
-        { param: 'showGridDetail2', parser: 'boolTrue' },
-        { param: 'gridDetail1Type', parser: 'enum', default: 'data' },
-        { param: 'gridDetail1Text', parser: 'string', default: '' },
-        { param: 'gridDetail2Type', parser: 'enum', default: 'data' },
-        { param: 'gridDetail2Text', parser: 'string', default: '' },
-        { param: 'gridDetail3Type', parser: 'enum', default: 'cta' },
-        { param: 'gridDetail3Text', parser: 'string', default: '' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'theme', parser: 'enum', default: 'light' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-      assembleProps: (parsed) => ({
-        gridDetail1: { type: parsed.gridDetail1Type, text: parsed.gridDetail1Text },
-        gridDetail2: { type: parsed.gridDetail2Type, text: parsed.gridDetail2Text },
-        gridDetail3: { type: parsed.gridDetail3Type, text: parsed.gridDetail3Text },
-      }),
-    },
-  },
 
 
 
@@ -191,68 +118,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
   // 'social-image' — migrated to stage-bench-registry (Task 2 pilot).
   // Entry now lives in SocialImageRegistration.ts.
 
-  'social-grid-detail': {
-    component: SocialGridDetail,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      subhead: asset.subhead || '',
-      eyebrow: asset.eyebrow || "Don't miss this.",
-      showEyebrow: asset.showEyebrow,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      showSolutionSet: asset.showSolutionSet !== false,
-      solution: asset.solution,
-      showRow3: asset.showRow3 !== false,
-      showRow4: asset.showRow4 !== false,
-      gridDetail1: { type: 'data' as const, text: asset.gridDetail1Text || '' },
-      gridDetail2: { type: 'data' as const, text: asset.gridDetail2Text || '' },
-      gridDetail3: { type: (asset.gridDetail3Type || 'data') as GridDetailRow['type'], text: asset.gridDetail3Text || '' },
-      gridDetail4: { type: (asset.gridDetail4Type || 'cta') as GridDetailRow['type'], text: asset.gridDetail4Text || '' },
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      theme: asset.theme || 'light',
-      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: asset.templateGaps?.['social-grid-detail'] ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'gridDetail1Text', label: 'Row 1' },
-      { key: 'gridDetail2Text', label: 'Row 2' },
-      { key: 'gridDetail3Text', label: 'Row 3', showKey: 'showRow3' },
-      { key: 'gridDetail4Text', label: 'Row 4', showKey: 'showRow4' },
-    ],
-    renderSchema: {
-      width: 1200,
-      height: 628,
-      background: '#ffffff',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'eyebrow', parser: 'string', default: "Don't miss this." },
-        { param: 'showEyebrow', parser: 'boolTrue' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolTrue' },
-        { param: 'showSolutionSet', parser: 'boolTrue' },
-        { param: 'solution', parser: 'string', default: 'environmental' },
-        { param: 'showRow3', parser: 'boolTrue' },
-        { param: 'showRow4', parser: 'boolTrue' },
-        { param: 'gridDetail1Text', parser: 'string', default: '' },
-        { param: 'gridDetail2Text', parser: 'string', default: '' },
-        { param: 'gridDetail3Text', parser: 'string', default: '' },
-        { param: 'gridDetail3Type', parser: 'enum', default: 'data' },
-        { param: 'gridDetail4Text', parser: 'string', default: '' },
-        { param: 'gridDetail4Type', parser: 'enum', default: 'cta' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'theme', parser: 'enum', default: 'light' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-      assembleProps: (parsed) => ({
-        gridDetail1: { type: 'data', text: parsed.gridDetail1Text },
-        gridDetail2: { type: 'data', text: parsed.gridDetail2Text },
-        gridDetail3: { type: parsed.gridDetail3Type, text: parsed.gridDetail3Text },
-        gridDetail4: { type: parsed.gridDetail4Type, text: parsed.gridDetail4Text },
-      }),
-    },
-  },
 
   // 'social-ehs-accelerate' — migrated to stage-bench-registry (Task 2 pilot).
   // Entry now lives in SocialEhsAccelerateRegistration.ts.
@@ -343,96 +208,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
   },
 
 
-  'website-event-listing': {
-    component: WebsiteEventListing,
-    renderProps: (asset, colors, typography) => ({
-      eyebrow: asset.eyebrow || '',
-      headline: asset.headline || '',
-      subhead: asset.subhead,
-      variant: asset.eventListingVariant,
-      gridDetail1Text: asset.gridDetail1Text || '',
-      gridDetail2Text: asset.gridDetail2Text || '',
-      gridDetail3Text: asset.gridDetail3Text || '',
-      gridDetail4Text: asset.gridDetail4Text || '',
-      showRow3: asset.showRow3,
-      showRow4: asset.showRow4,
-      showEyebrow: asset.showEyebrow,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: asset.templateGaps?.['website-event-listing'] ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 800,
-      height: 450,
-      background: null,
-      dynamicBackground: (p) => p.variant === 'light' ? '#F9F9F9' : p.variant === 'orange' ? '#D35F0B' : '#060015',
-      fields: [
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'variant', parser: 'enum', default: 'orange' },
-        { param: 'gridDetail1Text', parser: 'string', default: '' },
-        { param: 'gridDetail2Text', parser: 'string', default: '' },
-        { param: 'gridDetail3Text', parser: 'string', default: '' },
-        { param: 'gridDetail4Text', parser: 'string', default: '' },
-        { param: 'showRow3', parser: 'boolTrue' },
-        { param: 'showRow4', parser: 'boolTrue' },
-        { param: 'showEyebrow', parser: 'boolTrue' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolTrue' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-    },
-  },
-
-  'website-ehs-accelerate-listing': {
-    component: WebsiteEhsAccelerateListing,
-    renderProps: (asset, colors, typography) => ({
-      eyebrow: asset.eyebrow || '',
-      headline: asset.headline || '',
-      subhead: asset.subhead,
-      gridDetail1Text: asset.gridDetail1Text || '',
-      gridDetail2Text: asset.gridDetail2Text || '',
-      gridDetail3Text: asset.gridDetail3Text || '',
-      gridDetail4Text: asset.gridDetail4Text || '',
-      showRow3: asset.showRow3,
-      showRow4: asset.showRow4,
-      showEyebrow: asset.showEyebrow,
-      showSubhead: asset.showSubhead && !!asset.subhead,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
-      gaps: asset.templateGaps?.['website-ehs-accelerate-listing'] ?? {},
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 800,
-      height: 450,
-      background: '#FFFFFF',
-      fields: [
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'subhead', parser: 'string', default: '' },
-        { param: 'gridDetail1Text', parser: 'string', default: '' },
-        { param: 'gridDetail2Text', parser: 'string', default: '' },
-        { param: 'gridDetail3Text', parser: 'string', default: '' },
-        { param: 'gridDetail4Text', parser: 'string', default: '' },
-        { param: 'showRow3', parser: 'boolTrue' },
-        { param: 'showRow4', parser: 'boolTrue' },
-        { param: 'showEyebrow', parser: 'boolTrue' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showSubhead', parser: 'boolTrue' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'stackAlign', parser: 'enum', default: 'top' },
-        { param: 'gaps', parser: 'jsonRecord' },
-      ],
-    },
-  },
 
   'customer-library': {
     component: CustomerLibrary,
