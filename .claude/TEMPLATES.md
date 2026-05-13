@@ -5,51 +5,55 @@
 
 ---
 
-## Existing Templates (as of Mar 2026)
+## Existing Templates
+
+**Legend.** ✅ = on the Stage & Bench editor (28 templates). 📜 = on the legacy sidebar-form editor (3 PDFs). 🙈 = `hidden: true` in `lib/template-config.ts` — registered but not surfaced in the homepage tile grid / asset picker / template dropdowns (existing drafts still resolve).
 
 ### Email
-- `email-dark-gradient` — EmailDarkGradient (rich text headline/body)
-- `email-grid` — EmailGrid (**themed**: light/dark)
-- `email-image` — EmailImage (has image upload + grayscale, **themed**: light/dark)
-- `email-speakers` — EmailSpeakers (up to 3 speaker avatars, **themed**: light/dark)
-- `email-product-release` — EmailProductRelease
+- ✅ `email-dark-gradient` — EmailDarkGradient (rich text headline/body)
+- ✅ `email-grid` — EmailGrid (**themed**: light/dark)
+- ✅ `email-image` — EmailImage (image upload + grayscale, **themed**: light/dark)
+- ✅ `email-speakers` — EmailSpeakers (3 speakers; per-speaker name/role/avatar editable via nested slots, **themed**: light/dark)
+- ✅ `email-product-release` — EmailProductRelease
 
 ### Events (event-scoped, grouped under Events filter in AssetSelectionScreen)
-- `email-cority-connect-2026` — EmailCorityConnect2026 (640×370px; Cority Connect event)
-- `email-ehs-accelerate-banner` — EmailEhsAccelerateBanner (600×373px; EHS+ Accelerate event)
-- `email-ehs-accelerate-invitation` — EmailEhsAccelerateInvitation (420×595px; EHS+ Accelerate event; full rich text body)
-- `email-ehs-accelerate-signature` — EmailEhsAccelerateSignature (400×100px; EHS+ Accelerate event; email signature banner)
-- `social-ehs-accelerate` — SocialEhsAccelerate (1200×628px; EHS+ Accelerate event; light bg with `<EhsAccelerateLogo>`, headline/subhead/CTA only — no eyebrow/body/metadata/variants)
-- `website-ehs-accelerate-listing` — WebsiteEhsAccelerateListing (800×450px; EHS+ Accelerate event; full-canvas bg image with opaque white right grid panel; mirrors `website-event-listing` minus colorway variants)
-- `email-cority-customer-exchange-signature` — EmailCorityCustomerExchangeSignature (400×100px; Cority Customer Exchange event; bg image + coded `rgba(6,0,21,0.70)` right panel; date/location/time/CTA each with independent EyeIcon)
-- `email-cority-customer-exchange-banner` — EmailCorityCustomerExchangeBanner (640×300px; Cority Customer Exchange event; left dark panel with `<CorityCustomerExchangeStackedLogo>`, right content uses `justify-content: flex-end` so CTA pins bottom; reuses `colorStyle` field but picker is restricted to variants 2-4 with stale-`'1'` coercion in EditorScreen)
+- ✅ `email-cority-connect-2026` — EmailCorityConnect2026 (640×370px; Cority Connect event)
+- ✅ `email-ehs-accelerate-banner` — EmailEhsAccelerateBanner (600×373px; EHS+ Accelerate event)
+- ✅ 🙈 `email-ehs-accelerate-invitation` — EmailEhsAccelerateInvitation (420×595px; EHS+ Accelerate event; HTML body with bold/italic toolbar). Hidden from selection surfaces.
+- ✅ `email-ehs-accelerate-signature` — EmailEhsAccelerateSignature (400×100px; EHS+ Accelerate event; email signature banner)
+- ✅ `social-ehs-accelerate` — SocialEhsAccelerate (1200×628px; EHS+ Accelerate event; light bg with `<EhsAccelerateLogo>`, headline/subhead/CTA only)
+- ✅ `website-ehs-accelerate-listing` — WebsiteEhsAccelerateListing (800×450px; EHS+ Accelerate event; full-canvas bg image with opaque white right grid panel; mirrors `website-event-listing` minus colorway variants)
+- ✅ `email-cority-customer-exchange-signature` — EmailCorityCustomerExchangeSignature (400×100px; Cority Customer Exchange event; bg image + coded `rgba(6,0,21,0.70)` right panel; date/location/time/CTA each with independent EyeIcon)
+- ✅ `email-cority-customer-exchange-banner` — EmailCorityCustomerExchangeBanner (640×300px; Cority Customer Exchange event; left dark panel with `<CorityCustomerExchangeStackedLogo>`, right content uses `justify-content: flex-end` so CTA pins bottom; uses 4-color enum selector via `ccBackgroundVariant`)
 
 ### Social
-- `social-dark-gradient` — SocialDarkGradient
-- `social-blue-gradient` — SocialBlueGradient
-- `social-image` — SocialImage (has image upload + grayscale, **themed**: light/dark)
-- `social-grid-detail` — SocialGridDetail (**themed**: light/dark)
+- ✅ `social-dark-gradient` — SocialDarkGradient
+- ✅ `social-blue-gradient` — SocialBlueGradient
+- ✅ `social-image` — SocialImage (image upload + grayscale, **themed**: light/dark)
+- ✅ `social-image-meddbase` — SocialImageMeddbase (Meddbase logo + brand-primary arrow; twin of social-image)
+- ✅ `social-grid-detail` — SocialGridDetail (**themed**: light/dark)
+- 🙈 `social-carousel` — SocialCarousel (1080×1080px multi-slide). Hidden — multi-slide paradigm doesn't fit single-stage editing; code retained for existing drafts.
 
 ### Website
-- `website-thumbnail` — WebsiteThumbnail (ebook featured image, variants: image/none, **themed**: light/dark)
-- `website-press-release` — WebsitePressRelease (has image upload + grayscale, **themed**: light/dark)
-- `website-webinar` — WebsiteWebinar (variants: image/none, up to 3 speakers, **themed**: light/dark)
-- `website-event-listing` — WebsiteEventListing (3 colorway variants: orange/light/dark)
-- `website-report` — WebsiteReport (variants: image/none, image on LEFT, **themed**: light/dark)
-- `website-floating-banner` — WebsiteFloatingBanner (2256×100px, 7 style variants)
-- `website-floating-banner-mobile` — WebsiteFloatingBannerMobile (390×100px, mobile version)
+- ✅ `website-thumbnail` — WebsiteThumbnail (ebook featured image, variants: image/none, **themed**: light/dark)
+- ✅ `website-press-release` — WebsitePressRelease (image upload + grayscale, **themed**: light/dark)
+- ✅ `website-webinar` — WebsiteWebinar (variants: image/none, 3 speakers with per-speaker name/role/avatar, **themed**: light/dark)
+- ✅ `website-event-listing` — WebsiteEventListing (3 colorway variants: orange/light/dark)
+- ✅ `website-report` — WebsiteReport (variants: image/none, image on LEFT, **themed**: light/dark)
+- ✅ `website-floating-banner` — WebsiteFloatingBanner (2256×100px, 7 style variants)
+- ✅ `website-floating-banner-mobile` — WebsiteFloatingBannerMobile (390×100px, mobile, 7 variants + arrow-type toggle)
 
 ### Newsletter
-- `newsletter-dark-gradient` — NewsletterDarkGradient (has image + grayscale, rich text headline/body)
-- `newsletter-blue-gradient` — NewsletterBlueGradient (has image + grayscale, rich text headline/body)
-- `newsletter-light` — NewsletterLight (has image + grayscale, rich text headline/body, **themed**: light/dark)
-- `newsletter-top-banner` — NewsletterTopBanner
+- ✅ `newsletter-dark-gradient` — NewsletterDarkGradient (image + grayscale, rich text headline/body)
+- ✅ `newsletter-blue-gradient` — NewsletterBlueGradient (image + grayscale, rich text headline/body)
+- ✅ `newsletter-light` — NewsletterLight (image + grayscale, rich text headline/body, **themed**: light/dark)
+- ✅ `newsletter-top-banner` — NewsletterTopBanner (600×240px header banner; theme toggle)
 
 ### Collateral
-- `solution-overview-pdf` — SolutionOverviewPdf (3-page Letter PDF, 612×792px per page)
-- `faq-pdf` — FaqPdf (dynamic page count, Q&A format with tables support)
-- `stacker-pdf` — StackerPdf (modular document builder with drag-and-drop)
-- `customer-library` — CustomerLibrary (590×330px, 3 colorway variants: orange/dark/light, QR code upload, rich text headline/body)
+- 📜 `solution-overview-pdf` — SolutionOverviewPdf (3-page Letter PDF, 612×792px per page)
+- 📜 `faq-pdf` — FaqPdf (dynamic page count, Q&A format with tables support)
+- 📜 `stacker-pdf` — StackerPdf (modular document builder with drag-and-drop)
+- ✅ `customer-library` — CustomerLibrary (590×330px, 3 colorway variants: orange/dark/light, QR code upload, rich text headline/body)
 
 ---
 
@@ -351,95 +355,47 @@ Stacker uses AI to generate the initial document structure:
 
 ## Checklist: Adding a New Template
 
+This section covers adding a **Stage & Bench** template (the path for any new single-page asset). The legacy sidebar-form editor is reserved for the 3 multi-page PDFs — adding a new PDF template is out of scope here; see the existing PDF setup screens (`SolutionOverviewSetupScreen` / `FaqSetupScreen` / `StackerSetupScreen`).
+
 **Component file requirements (non-negotiable):**
-- [ ] First line is `'use client'` — required for the `[slug]` render route to pass the component across the Server→Client boundary into `GenericRenderContent`. Missing this causes a runtime crash on Vercel.
+- [ ] First line is `'use client'` — required for the dynamic render route at `app/render/[slug]/page.tsx` to pass the component across the Server→Client boundary. Missing this crashes the export on Vercel.
 - [ ] Use plain `<img>` — never `import Image from 'next/image'`. `next/image` routes through Vercel's optimization service, which Puppeteer's `networkidle2` waits on and times out.
 - [ ] Set `fontFamily` from `typography`: `const fontFamily = \`"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}\`` and apply it to the outer container. Never use `var(--font-fakt)` or any CSS variable — these are Next.js runtime-only and unavailable in Puppeteer, causing wrong/default fonts in exports.
 - [ ] No padding on outer container — padding inflates height in Puppeteer. Use an inner wrapper for spacing.
+- [ ] Apply Figma override rules (border not outline, SVG logo, remove unsupported CSS). See BRAND.md.
 
-1. [ ] Create template component in `components/templates/` (apply all four component requirements above)
-2. [ ] Apply Figma override rules (border not outline, SVG logo, remove unsupported CSS) — see BRAND.md
-3. [ ] Only expose text fields that exist in the design
-4. [ ] Use `RichTextEditor` for body/description fields (not `<textarea>`) — see Rich Text pattern in ARCHITECTURE.md
-5. [ ] Register in `lib/template-config.ts`
-6. [ ] Add to `types/index.ts` TemplateType union
-7. [ ] Add editor controls in `EditorScreen.tsx`
-8. [ ] Add export param builder in `lib/export-params.ts`
-9. [ ] Add to homepage grid in `AssetSelectionScreen.tsx` / `TemplateTile.tsx`
-10. [ ] Add template-specific state to store if needed (variants, etc.)
-11. [ ] **If template has variants:** Add variant fields to `ManualAssetSettings` in `types/index.ts` AND update `goToAsset` in `store/index.ts` to save/restore them (see Variant Persistence in ARCHITECTURE.md)
-12. [ ] **If template supports theming:** Add `theme` prop to component and use `TEMPLATE_THEMES[theme]` from `lib/template-themes.ts` for all theme-keyed colors (never hard-code hex on theme-sensitive surfaces). Add `theme` to registry renderProps + renderSchema, add `theme: s.theme` to export-params builder, pass `theme={theme}` to EditorScreen preview, add to theme picker condition, hide logo picker. The `theme` field is already wired globally in the store/snapshot/types pipeline.
-13. [ ] Add to image upload condition if template has images (use Vercel Blob upload — see ARCHITECTURE.md)
-14. [ ] Pass grayscale prop if template has images
-15. [ ] Add entry to `lib/template-registry.tsx` — see "Registry Entry Guide" below
-16. [ ] Add template dimensions to `app/api/export/route.ts` TEMPLATE_DIMENSIONS
-17. [ ] Test export works end-to-end (from both editor and queue)
-18. [ ] Test variant persistence: switch to another asset and back — variant should be preserved
-19. [ ] Build check: `npm run build`
+### Steps
 
-### Registry Entry Guide (`lib/template-registry.tsx`)
+1. **Create the template** at `components/templates/<Name>.tsx`. Export a `<Name>BlockId` union for every editable block. Define a Props interface accepting `renderBlock?`, `renderInlineEditor?`, and `renderOverlay?` render-props (the S&B factory passes these through). Inside the JSX, wrap each editable block with `wrapBlock('blockId', (...))` and (for text blocks) wrap the inner text with `wrapInline('blockId', value || 'Placeholder')`. Default `wrapBlock` and `wrapInline` to identity functions so export / preview contexts work without an adapter.
 
-Step 14 is the most important. A single registry entry replaces what used to require 3 separate blocks in ExportQueueScreen + 2 render page files. The entry has four parts:
+2. **Add to `types/index.ts`** — append the slug to the `TemplateType` union, plus any new store fields the template needs (variant enums, per-template show flags, etc.).
 
-**1. `component`** — the imported React component from `components/templates/`.
+3. **Add to `lib/template-config.ts`** — slot the template into the right channel/subchannel array (`EMAIL_TEMPLATES`, `SOCIAL_TEMPLATES`, etc.). Set `width`, `height`, `dimensions`, and optionally `hidden: true` if launching dark.
 
-**2. `renderProps`** — maps a `QueuedAsset` to the component's props for queue thumbnail and preview modal rendering. Include default values for empty fields:
-```tsx
-renderProps: (asset, colors, typography) => ({
-  headline: asset.headline || 'Headline',
-  eyebrow: asset.eyebrow || '',
-  variant: asset.myVariant || 'default',
-  // Image fields from the asset
-  imageUrl: asset.thumbnailImageUrl || undefined,
-  imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
-  imageZoom: asset.thumbnailImageZoom || 1,
-  // Show/hide toggles — gate on content existence
-  showEyebrow: asset.showEyebrow && !!asset.eyebrow,
-  showBody: asset.showBody && !!asset.body,
-  // Always pass brand config
-  colors, typography, scale: 1,
-})
-```
+4. **Add to the store** (`store/index.ts`) — any new variant/show fields + their setters. Add to `lib/asset-snapshot.ts`'s `SNAPSHOT_FIELDS` array so the field persists in queue/draft/export.
 
-**3. `queueTextFields`** — template-specific text fields shown on queue cards (beyond the shared headline/eyebrow/subhead/body). Most templates use `[]`. Only add fields unique to this template:
-```tsx
-queueTextFields: [
-  { key: 'metadata', label: 'Metadata', showKey: 'showMetadata' },
-  { key: 'ctaText', label: 'CTA', showKey: 'showCta' },
-]
-```
+5. **Build the adapter** at `components/canvas-editor/template-adapters/<Name>StageBench.tsx` using `defineStageBenchAdapter` from the factory. The adapter declares `slots[]` (each with `blockId`, `label`, `iconKey`, `kind`, optional `parent`/`benchable`/`content`/`size`), `stageBar[]` items, optional `image`/`childImages`/`category`/`contentStack` configs, plus `useStoreBindings` (reads from `useStore`, returns slot state + bindings) and `renderTemplate` (renders your `<Name>` component with `ctx.renderBlock`/`ctx.renderInlineEditor`/etc.). Reference existing factory adapters that look structurally similar.
 
-**4. `renderSchema`** — declarative field definitions that drive the dynamic render route at `app/render/[slug]/page.tsx`. **No separate render page files needed.** The schema declares dimensions, background, fields (with parser types and defaults), and optional post-parse assembly:
-```tsx
-renderSchema: {
-  width: 800,
-  height: 450,
-  background: '#F9F9F9',
-  // Or dynamic: dynamicBackground: (p) => p.variant === 'dark' ? '#060015' : '#F9F9F9',
-  fields: [
-    { param: 'headline', parser: 'string', default: 'Headline' },
-    { param: 'eyebrow', parser: 'string', default: '' },
-    { param: 'variant', parser: 'enum', default: 'default' },
-    { param: 'showEyebrow', parser: 'boolTrue' },     // default ON
-    { param: 'showBody', parser: 'boolFalse' },        // default OFF
-    { param: 'grayscale', parser: 'boolFalse' },
-    { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-    { param: 'imageUrl', parser: 'string', default: '/assets/images/placeholder.png' },
-    { param: 'imagePositionX', parser: 'number', default: 0 },
-    { param: 'imagePositionY', parser: 'number', default: 0 },
-    { param: 'imageZoom', parser: 'number', default: 1 },
-  ],
-  // assembleProps: post-parse transforms for complex fields
-  assembleProps: (parsed) => ({
-    imagePosition: { x: parsed.imagePositionX as number, y: parsed.imagePositionY as number },
-  }),
-}
-```
+6. **Build the registration** at `components/canvas-editor/template-adapters/<Name>Registration.ts` exporting a `StageBenchRegistrationData` object:
+   - `templateId`, `Template`, `Adapter`
+   - `renderProps(asset, colors, typography)` — maps a `QueuedAsset` to the component's props for queue thumbnails + Puppeteer rendering. **Every toggleable visibility flag must appear here.**
+   - `queueTextFields` — usually `[]`; add only template-unique text fields for the queue UI.
+   - `renderSchema` — declarative URL-param schema for the dynamic render route. `fields[]` lists each param with a parser type and default. Optional `assembleProps(parsed, raw)` post-processes flat params into nested objects (e.g. `imagePosition: { x, y }`).
+   - `exportBuilder(state)` — produces the URL params for export. **Every toggleable visibility flag must appear here too.**
 
-**Parser types:** Match the helpers in `lib/render-params.ts`:
+7. **Register** — import the Registration in `lib/stage-bench-registry.ts` and append to the `REGISTRATIONS` array. That single line wires the template into the central registry, the dynamic render route, the export params builder, and the adapter dispatch.
+
+8. **Validate** — run `npm run validate:registrations`. The static check ensures every toggleable `setVisible: setShowFoo` wired in your adapter is referenced in both `renderProps` and `exportBuilder` (either as a LHS key or via `s.<flag>` / `asset.<flag>` on the RHS for a renamed key). If it fails, fix before merging.
+
+9. **Typecheck + test:** `npx tsc --noEmit`, then in dev: drag a block to bench, deep-click to edit, change a variant, queue, and export from both the editor and the queue.
+
+### Parser types for `renderSchema.fields`
+
+Match the helpers in `lib/render-params.ts`:
+
 | Parser | Use for | Default behavior |
-|--------|---------|-----------------|
-| `'string'` | Text fields | Empty string if absent |
+|---|---|---|
+| `'string'` | Text fields | `default` or `''` if absent |
 | `'boolTrue'` | Toggles that default ON (showHeadline, showCta) | `true` if absent |
 | `'boolFalse'` | Toggles that default OFF (grayscale, showSubhead on some templates) | `false` if absent |
 | `'number'` | Numeric with fallback (imagePositionX, imageZoom) | Uses `default` value |
@@ -448,10 +404,12 @@ renderSchema: {
 | `'stringOrNull'` | Optional URLs (imageUrl that may be null) | `null` if absent |
 | `'int'` | Integer values (speakerCount) | Uses `default` value |
 
-**`assembleProps` patterns** (use when the component expects objects, not flat params):
-- **Image position:** `{ imagePosition: { x: parsed.imagePositionX, y: parsed.imagePositionY } }`
-- **CTA dual-key fallback:** `{ cta: (raw.ctaText as string) || (raw.cta as string) || 'Default' }` (for website templates that accept both `cta` and `ctaText`)
-- **Speaker assembly:** Use `parseSpeakerParams` from `lib/render-params.ts` to build speaker objects from flat URL params
-- **Grid detail objects:** `{ gridDetail1: { type: 'data', text: parsed.gridDetail1Text } }`
+### Reference templates (closest fit by shape)
 
-**Reference:** Look at an existing similar template's registry entry as a starting point. For a simple template, copy `customer-library`. For one with images, copy `website-thumbnail`. For speakers, copy `email-speakers`.
+| If your template is like… | Copy from |
+|---|---|
+| Single-stack, image, theme toggle | `WebsiteThumbnailRegistration.ts` + adapter |
+| Track 1 grid-detail rows | `EmailGridRegistration.ts` / `SocialGridDetailRegistration.ts` |
+| Track 2 absolute-positioned | `EmailEhsAccelerateBannerRegistration.ts` |
+| Per-card group (speakers / cards) | `WebsiteWebinarStageBench.tsx` + `EmailSpeakersStageBench.tsx` (uses `parent: 'speakerN'` + `childImages`) |
+| QR / image-as-anchor | `CustomerLibraryRegistration.ts` |

@@ -38,10 +38,9 @@ These files live alongside this one in `.claude/`. Always consult the relevant r
 | `TEMPLATES.md` | Full template catalog, multi-page collateral (SO, FAQ, Stacker), module types, "adding a new template" checklist, template-specific gotchas |
 | `BRAND.md` | Brand colors, typography, Figma override rules, solution pills, image handling, image libraries, template dimensions, dark mode colors |
 | `LESSONS.md` | Running log of QA feedback, error patterns, and design decisions — applied silently, graduated with approval |
-| `STAGE-AND-BENCH.md` | Stage & Bench editor substrate — architecture, registries, primitives, decisions, roadmap. The truth-source for what's in the substrate. |
-| `STAGE-BENCH-MIGRATION.md` | Pre-flight playbook for migrating existing templates onto the Stage & Bench substrate — substrate map, ordered steps, gotchas, post-flight verification, difficulty tiering |
-| `RENOVATION-PLAN.md` | Project-level strategic plan for the full renovation: per-template audit, two-paradigm split (Track 1 stack-based / Track 2 fixed-composition), phasing, ContentStack primitive design, anti-convergence guardrails, per-template status table |
+| `STAGE-AND-BENCH.md` | Stage & Bench editor substrate — architecture, registries, primitives, conventions. Truth-source for what's in the substrate today. |
 | `SUBSTRATE-DEBT.md` | Debt ledger for deferred substrate work. Each entry has a trigger condition naming when paying it down becomes urgent. |
+| `STAGE-BENCH-REFACTOR-POSTMORTEM.md` | Historical record of the 1.5 renovation — per-template scorecard, primitives shipped, lessons learned. Journal, not a plan. |
 | `GRADUATED_PENDING.md` | Queue of lessons proposed for promotion into reference docs — awaiting Nick's review |
 
 ---

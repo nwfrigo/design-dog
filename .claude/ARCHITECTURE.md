@@ -260,6 +260,8 @@ The export API route (`app/api/export/route.ts`) uses a generic forwarding loop 
 
 **Editor and queue exports now share the same builders:** Both paths use `buildExportParams()` in `lib/export-params.ts`. The editor calls it directly; the queue calls `buildExportParamsFromAsset()` which converts a `QueuedAsset` into `ExportParamState` and delegates to the same function. Adding a field to a builder function covers both paths automatically.
 
+**Visibility-flag drift catcher:** Run `npm run validate:registrations` after any change to a `*StageBench.tsx` adapter or `*Registration.ts` file. The script statically verifies that every toggleable slot (one with `setVisible: setShowFoo` wired) is referenced in both `renderProps` and `exportBuilder` — either as a direct LHS key or via `s.<flag>` / `asset.<flag>` on the RHS of a renamed key. Catches the class of bug where a user-toggleable flag silently drops out of the export pipeline. Required-passing before merge.
+
 ### Render Page Pattern
 
 Most templates use a **dynamic render route** at `app/render/[slug]/page.tsx`. This route reads the `renderSchema` from `lib/template-registry.tsx` and auto-parses URL params based on the field definitions. Adding a new render page means adding a `renderSchema` to the registry entry — no separate page file needed.
@@ -334,11 +336,7 @@ PDF uploads use a **three-step flow** to handle large files reliably:
 
 **Why Blob first?** Vercel serverless functions have a 4.5MB incoming request body limit. By uploading to Blob first (client-side), then having the server fetch from Blob (outgoing request, no limit), we support large PDFs while staying within Vercel's constraints.
 
-This architecture is used in BOTH:
-- **Auto-create flow** (`AutoCreateContentScreen.tsx`)
-- **Single-asset editor** (`EditorScreen.tsx`)
-
-Both flows MUST use the same pattern.
+This architecture is used by the single-asset editor (`EditorScreen.tsx`) and the FAQ / Stacker / Solution Overview setup screens that ingest source documents.
 
 ### API Endpoint Reference
 
@@ -381,15 +379,6 @@ const response = await fetch('/api/parse-pdf', {
 // 3. Sends base64 to Claude API
 ```
 
-### Content Source Flow
-
-1. PDF uploaded → stored in Vercel Blob (public URL)
-2. Blob URL sent to `/api/parse-pdf`
-3. Server fetches PDF from Blob, converts to base64, sends to Claude
-4. Claude extracts: title, main message, key points, CTA, raw summary
-5. User reviews/edits extracted content
-6. Edited content feeds into AI copy generation
-
 ### PDF Analysis Errors
 
 Claude may fail to process certain PDFs with "Could not process PDF" error:
@@ -405,11 +394,10 @@ Claude may fail to process certain PDFs with "Could not process PDF" error:
 ### Gotchas
 
 1. **Don't use `/api/upload` for PDFs** — hits 4.5MB limit. Always use Blob flow.
-2. **Both editor modes must stay aligned** — if changing PDF upload logic, update BOTH `EditorScreen.tsx` AND `AutoCreateContentScreen.tsx`
-3. **Blob URLs are public** — PDFs are publicly accessible (needed for Claude to fetch them)
-4. **Token must not be commented** — `# BLOB_READ_WRITE_TOKEN` won't work
-5. **Restart dev server** after adding env vars
-6. **Word docs use different endpoint** — `/api/upload-doc` for .docx files, NOT `/api/upload-pdf` (which validates for PDF only)
+2. **Blob URLs are public** — PDFs are publicly accessible (needed for Claude to fetch them)
+3. **Token must not be commented** — `# BLOB_READ_WRITE_TOKEN` won't work
+4. **Restart dev server** after adding env vars
+5. **Word docs use different endpoint** — `/api/upload-doc` for .docx files, NOT `/api/upload-pdf` (which validates for PDF only)
 
 ---
 
@@ -467,6 +455,27 @@ Identity is restored from localStorage in `app/editor/page.tsx` on mount via `se
 - **Chart:** Horizontal bar chart of exports by template name
 - **Table:** Paginated export log with thumbnail lightbox, name/template/format filters
 - **Thumbnails:** PNG exports show a Vercel Blob thumbnail in a click-to-open lightbox; PDF exports show a clickable "PDF" button that opens the actual PDF in a native `<embed>` lightbox (multi-page, browser-native navigation)
+- **Events sub-page** (`/admin/events`) — telemetry dashboard. See "Telemetry" section below.
+
+### Telemetry (`events` table + `/admin/events`)
+
+Append-only event log of editor interactions. Six event types fire from
+the factory and the store:
+
+| Event | Fires from | Payload |
+|---|---|---|
+| `slot_edited` | Factory adapter on `editingPath` → null transition | `template_id`, `slot_id` |
+| `block_dragged_to_bench` | Factory's slot `hide()` wrapper | `template_id`, `slot_id` |
+| `block_restored_from_bench` | Factory's slot `show()` wrapper | `template_id`, `slot_id` |
+| `variant_changed` | Factory's wrapped stage-bar setter | `template_id`, `slot_id` (stage-bar item id), `props: { kind, value }` |
+| `asset_queued` | Store's `addToQueue` action | `template_id`, `asset_id` |
+| `asset_exported` | `/api/export` route after success | `template_id`, `props: { format, scale }` |
+
+**Pipeline:** action → `useTelemetry()` / `trackEvent()` → `POST /api/track` (fire-and-forget) → `logEvent` → `events` table.
+
+**Admin view** at `/admin/events`: preset date ranges (today / 7d / 30d / all), three group-by tables (by event name, by template, top 20 users) with horizontal bar visualizations.
+
+**Failure mode:** all telemetry writes are `.catch()`-wrapped. A down DB cannot break the editor or export.
 
 ### Environment Variables
 

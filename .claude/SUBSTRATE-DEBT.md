@@ -6,8 +6,7 @@
 >
 > **Companion docs.**
 > - `STAGE-AND-BENCH.md` — substrate architecture (what exists today).
-> - `RENOVATION-PLAN.md` — per-template migration status.
-> - `STAGE-BENCH-CLEANUP-PLAN.md` — the post-migration cleanup playbook this ledger was seeded from.
+> - `STAGE-BENCH-REFACTOR-POSTMORTEM.md` — historical journal of the renovation that birthed this ledger.
 
 ---
 

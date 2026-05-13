@@ -1,13 +1,15 @@
 # Stage & Bench — Architecture & Substrate Reference
 
-> **Status (2026-05-11, branch `feature-drag-editor`).** Substrate complete. Three templates migrated: `email-dark-gradient` (pilot), `email-speakers`, `website-press-release`. Foundation owns selection bounds, toolbar anchoring, drag preview promotion, registry plumbing. Active work: rolling out to remaining single-page templates.
+> **Status (1.5).** All 28 single-page templates run on Stage & Bench via the factory adapter (`defineStageBenchAdapter`). Zero hand-rolled adapters. The 3 multi-page PDFs (solution-overview, faq, stacker) stay on the legacy sidebar-form editor.
 >
 > **Companion docs.**
-> - `STAGE-BENCH-MIGRATION.md` — playbook for migrating a template onto this substrate. Read after this one.
-> - `ARCHITECTURE.md` — global app architecture (state, export pipeline, two state systems).
-> - `BRAND.md` / `TEMPLATES.md` — orthogonal concerns.
+> - `ARCHITECTURE.md` — global app architecture (state, export pipeline, draft persistence, telemetry).
+> - `SUBSTRATE-DEBT.md` — open substrate work with trigger conditions.
+> - `STAGE-BENCH-REFACTOR-POSTMORTEM.md` — historical journal of how the substrate was built.
+> - `TEMPLATES.md` — adding a new template (the playbook).
+> - `BRAND.md` — orthogonal concerns.
 
-This doc describes **what the substrate is, what's in it, and how the pieces fit**. It is the architectural truth-source. It does **not** describe how to migrate a template — that's `STAGE-BENCH-MIGRATION.md`.
+This doc describes **what the substrate is, what's in it, and how the pieces fit**. It is the architectural truth-source for the *current* state. For the *history* of how we got here, see the postmortem; for *adding a new template*, see TEMPLATES.md.
 
 ---
 
@@ -68,7 +70,7 @@ Shell: `StageBenchShell` (header strip + 3-column body + ActionRow). Pure layout
 
 ## 4. Substrate inventory
 
-All paths relative to `web/`. The full migration-time file-by-file table lives in `STAGE-BENCH-MIGRATION.md §2`; this section is the conceptual breakdown.
+All paths relative to `web/`.
 
 ### 4.1 Stores
 
@@ -234,40 +236,53 @@ renderBlock?: (blockId: BlockId, content: ReactNode) => ReactNode
 renderInlineEditor?: (blockId: BlockId, defaultInner: ReactNode) => ReactNode
 renderSpacerBetween?: (gapKey: string, value: number, prevId: BlockId, nextId: BlockId) => ReactNode
 renderOverlay?: () => ReactNode
-// Nested groups (speakers, grid cells, etc.) add sibling render-props:
-renderSpeakerField?: (speakerId, field, defaultInner) => ReactNode
-renderSpeakerFieldInline?: (speakerId, field, defaultInner) => ReactNode
 ```
 
-Defaults are identity (`(_id, content) => content`). The export render page never passes them — by construction, export output equals legacy editor output for the same store state.
+Defaults are identity (`(_id, content) => content`). The export render page never passes them — by construction, export output equals editor output for the same store state.
+
+**Nested groups** (per-speaker name/role/avatar, per-card fields, etc.) flow through these same render-props using flat child `blockId`s. The factory's `SlotDescriptor.parent` and `AdapterDescriptor.childImages` configs handle the per-child wiring; templates just nest `wrapBlock(childId, ...)` inside the parent group. No per-template render-prop indirection.
+
+### 4.16 Registration validator
+
+`scripts/validate-registrations.ts` — runnable via `npm run validate:registrations`. Static check that, for each adapter, every toggleable slot (one with `setVisible: setShow*` wired in `slotState`) is referenced in both the registration's `renderProps` and `exportBuilder`. Accepts direct LHS keys (`showFoo: s.showFoo`) AND RHS rename patterns (`showRenamed: s.showFoo`). Catches the class of bug where a user-toggleable flag silently drops out of the export pipeline. Required-passing before merging template work.
+
+### 4.17 Telemetry hooks
+
+`useTelemetry()` and `trackEvent()` (`lib/telemetry.ts`) emit fire-and-forget events to `POST /api/track`. The factory wires 4 events internally — `slot_edited` (on `editingPath` end), `block_dragged_to_bench` (hide), `block_restored_from_bench` (show), `variant_changed` (stage-bar setter wrap). The store emits `asset_queued` from `addToQueue`; the export route emits `asset_exported`. See `ARCHITECTURE.md` → "Telemetry" for the wire format and admin view.
 
 ---
 
 ## 5. The adapter pattern
 
-`StageBenchEditor.tsx` dispatches to one of:
+`StageBenchEditor.tsx` reads the per-template adapter from a central registry:
 
 ```ts
-TEMPLATE_ADAPTERS = {
-  'email-dark-gradient':    EmailDarkGradientStageBench,
-  'email-speakers':         EmailSpeakersStageBench,
-  'website-press-release':  WebsitePressReleaseStageBench,
-}
+// components/canvas-editor/StageBenchEditor.tsx
+const Adapter = getStageBenchAdapter(props.currentTemplate)
 ```
 
-Each adapter is a self-contained React component that:
+That lookup pulls from `lib/stage-bench-registry.ts`'s `REGISTRATIONS` array — the single source of truth that feeds the adapter dispatch, the `template-registry` consumed by Puppeteer, and the `export-params` builder. Adding a template = one Registration entry; the four downstream registries pick it up automatically.
 
-1. Subscribes to its template's store fields one-by-one.
-2. Calls `getXSlots({...})`, `getXSizes({...})`, `getXContents({...})`, etc. from `template-configs/<id>.ts`.
-3. Computes `previewKey` from `useActiveDrag()` (the slot being previewed) and derives `showXEff` / `xEff` "effective" values for the template render.
-4. Wires `useFlipReflow(stageRef)` + `useStageBenchDroppables(slots)`.
-5. Assembles the stage bar (`SelectorRow` × N).
-6. Renders the provider stack → `StageBenchShell` → template render with render-props wired.
-7. Owns modal state for image flows (`useState` for `showImageLibrary` / `showCropModal`); binds handlers into `ImageRegistry` slot entries.
+All 28 adapters are produced by the **factory**:
 
-Reference implementation: **`EmailDarkGradientStageBench.tsx`** — the cleanest pattern, the one to copy from when migrating.
+```ts
+// components/canvas-editor/factory/defineStageBenchAdapter.tsx
+export const Foo = defineStageBenchAdapter<FooBlockId>({
+  templateId: 'foo',
+  slots: [...],
+  stageBar: [...],
+  image: {...},        // optional — single top-level image
+  childImages: [...],  // optional — nested per-blockId image slots
+  category: {...},     // optional — solution-pill chip
+  contentStack: {...}, // optional — Track 1 spacing primitive
+  useStoreBindings: () => ({...}),
+  renderTemplate: (ctx) => <Foo {...} />,
+})
+```
 
-Adapter is a *full React component* because the render contract is non-trivial (rich text formatting, spacer slots, gap config, nested groups). A future declarative descriptor for trivially simple templates is on the roadmap; not built yet.
+The factory owns the React wiring: store subscriptions, FLIP reflow, drop targets, stage-bar dispatch, registry providers, image-editor modal, contextual toolbar, selection ring. Adapters stay declarative.
+
+Reference implementations by shape: see the table in `TEMPLATES.md` → "Adding a New Template" → "Reference templates."
 
 ---
 
@@ -302,24 +317,26 @@ These are settled. Reopening requires a fresh round of justification.
 
 | # | Question | Decision |
 |---|---|---|
-| 1 | Sidebar fate on migrated templates | **Collapse entirely** in manual mode. The 340px reclaims as Stage area. Auto-create keeps its asset-navigation sidebar. |
+| 1 | Sidebar fate on migrated templates | **Collapse entirely.** The 340px reclaims as Stage area. (Sidebar form survives only for the 3 PDFs.) |
 | 2 | Visibility toggle location | **Bench, not sidebar.** Every kind's editbar has an EyeOff button → `VisibilityRegistry.hide()`. |
 | 3 | CTA is its own kind | **Yes.** `EditbarCta` is separate from `EditbarText`. No Bold/Italic — CTA styling is template-controlled. |
 | 4 | Stack alignment scope | **Canvas-wide (Stage Bar).** One value per asset. Group selection isn't a v1 primitive. |
 | 5 | Inline text editor implementation | **Custom uncontrolled contentEditable** (`InlineTextEdit.tsx`), not Tiptap. The uncontrolled approach sidesteps React reconciliation conflicts; Tiptap's bundle weight isn't justified for slot-scoped editing. |
-| 6 | Rich-text vs plain-text format | **Per-slot.** `ContentRegistry.format` declares; `InlineTextEdit.format` matches; B/I disabled on plain. |
+| 6 | Rich-text vs plain-text format | **Per-slot.** `SlotContentSpec.format` declares; `InlineTextEdit.format` matches; B/I disabled on plain. |
 | 7 | Selection identity | **Path-based** (`<templateId>.<slotKey>`), not UUIDs. Templates are rigid; paths are stable. |
 | 8 | Slot identity vs store keys | **Decoupled.** Slot path is for toolbar scoping; the storeKey is the actual write target. Same content surfaces across templates that share store keys (headline, ctaText, etc.) — this is intentional. |
-| 9 | Drop-target plumbing | **Foundation-owned via `useStageBenchDroppables(slots)`.** Adapters do not write `onDropToStage` / `onDropToBench` handlers. |
-| 10 | Toolbar anchor per kind | **Foundation-owned via `ANCHOR_BY_KIND`.** Image inset; everything else above. Adapters do not position toolbars. |
+| 9 | Drop-target plumbing | **Factory-owned via `useStageBenchDroppables(slots)`.** Adapters do not write `onDropToStage` / `onDropToBench` handlers. |
+| 10 | Toolbar anchor per kind | **Factory-owned via `ANCHOR_BY_KIND`.** Image inset; everything else above. Adapters do not position toolbars. |
 | 11 | DnD library | **Custom pointer-events** (`lib/dnd/`), not react-dnd / dnd-kit. We needed full control of cursor-follower preview + settleTo animation. |
-| 12 | History (undo/redo) | **Not built.** `commands.ts` exists as a stub for future use; no commands registered. Direct setter calls today. Re-evaluate after broader rollout. |
+| 12 | History (undo/redo) | **Not built.** `commands.ts` exists as a stub for future use; no commands registered. Direct setter calls today. Re-evaluate when multi-step edit flows demand it. |
 | 13 | Multi-select | **Out of scope for v1.** Foundation assumes single selection. |
-| 14 | Image lightbox modal | **In progress.** Current adapters route `slot.onEdit` → `ImageCropModal`. New lightbox is being designed; will swap in at marked `// SWAP-IN POINT` sites. `SlotImage.onEdit` contract stays. |
+| 14 | Image lightbox modal | **`ImageEditorModal` with embedded library view.** Universal modal contract via `ImageSlotSettings`. Factory mounts one modal per top-level image slot; `childImages` config adds per-blockId modal state for nested image children (per-speaker avatars). |
+| 15 | Adapter form | **Factory-driven.** Every adapter uses `defineStageBenchAdapter`. Zero hand-rolled adapters. |
+| 16 | Nested editing (per-card patterns) | **Flat blockIds + `parent` reference.** A child slot declares `parent: 'parentBlockId'` so it's excluded from the bench surface; deep-click cascades via DOM ancestor walking in `Editable.tsx`. Same pattern for text and image children. |
 
 ### 8.1 Adapter factory
 
-New adapters use `defineStageBenchAdapter` (`components/canvas-editor/factory/defineStageBenchAdapter.tsx`). The factory absorbs registry wiring, droppables, FLIP, drag preview-key, render dispatchers, image-editor modal, and stage-bar selectors. Per-template work is a declarative descriptor (slots, stage-bar items, optional image / category / contentStack configs) plus two small functions: `useStoreBindings()` for store reads and `renderTemplate(ctx)` for the template's JSX. See the playbook in `STAGE-BENCH-MIGRATION.md` and the 3 pilot adapters (`SocialEhsAccelerateStageBench`, `SocialImageStageBench`, `EmailCorityConnect2026StageBench`) for the canonical shape.
+Every adapter is produced by `defineStageBenchAdapter` (`components/canvas-editor/factory/defineStageBenchAdapter.tsx`). The factory absorbs registry wiring, droppables, FLIP, drag preview-key, render dispatchers, image-editor modal, and stage-bar selectors. Per-template work is a declarative descriptor (slots, stage-bar items, optional image / childImages / category / contentStack configs) plus two small functions: `useStoreBindings()` for store reads and `renderTemplate(ctx)` for the template's JSX. The "Adding a New Template" checklist in `TEMPLATES.md` walks through the full shape.
 
 ### 8.2 Visibility-flag naming
 
@@ -398,66 +415,26 @@ CTA blocks that include an `ArrowIcon` next to text: the arrow stays outside `wr
 
 ---
 
-## 9. Active risks & open items
+## 9. Known limits
 
-1. **Two state systems in the store.** Auto-create (`generatedAssets`, `templateType`) vs. manual (`selectedAssets`, `currentAssetIndex`). Adapters must read from the right one. The `solution` field was globally coupled before the press-release migration — moved into `ManualAssetSettings` to fix. Audit every field's scope when migrating.
-2. **Legacy `Bench.tsx`** (`components/canvas-editor/Bench.tsx`) and `SLOT_DRAG_MIME` constant still compile but are dead code for migrated templates. Delete after full migration.
-3. **No automated export diff.** Post-migration §7 is eyeball-verified per template. Treat byte-identical export as the highest bar a migration must clear.
-4. **Numeric defaults scattered** across `template-configs/*.ts` (font min/max/step, line-height bounds). Acceptable for now; consolidate to `lib/typography-bounds.ts` only if a typography system change forces it.
-5. **Lightbox swap-in pending.** Three adapters have `// SWAP-IN POINT` comments; comes due in one pass when the new modal lands.
-6. **Render-prop signatures duplicate** per template (each defines its own `BlockId` union + render-prop types). Extract a shared `TemplateRenderProps<BlockId>` only after ~5 templates have migrated and the shape has stabilized.
-7. **`StageBenchHeader` uses inline SVG** for plus/trash icons; inconsistent with Lucide elsewhere. Low-priority cleanup.
-8. **History/undo deferred.** When we ship multi-step edit flows (resequencing, batch operations), we'll need it. Until then, direct setter calls are simpler than a command bus.
+1. **No automated export diff.** Export visual regressions are eyeball-verified post-change. `npm run validate:registrations` covers the show-flag pipeline but doesn't catch visual drift.
+2. **History / undo deferred.** Multi-step edit flows (resequencing, batch operations) would need it; until then, direct setter calls are simpler than a command bus.
+3. **Per-speaker filter persistence** — `EmailSpeakers` and `WebsiteWebinar` speaker avatars feed `NEUTRAL_FILTERS` into the editor modal; the modal sliders move locally but don't persist across opens. Wiring 3× per-speaker `imageFilters` store fields is the follow-up if real-world feedback demands it.
+4. **Single-element selection.** Multi-select is not in v1.
+
+Open substrate work lives in `SUBSTRATE-DEBT.md` — currently one entry (image-source-key for newsletter dark/light variants).
 
 ---
 
-## 10. Roadmap
+## 10. References
 
-| Item | Status |
-|---|---|
-| Substrate complete (Editable, registries, editbars, DnD, FLIP, scrim, shell, header, action row, stage bar primitives) | **Done.** |
-| Pilot: `email-dark-gradient` | **Done.** |
-| Second template: `email-speakers` (nested groups) | **Done.** |
-| Third template: `website-press-release` (abs-positioned image) | **Done.** |
-| Image bounds + toolbar anchor foundation work | **Done** (2026-05-11). |
-| Image editor lightbox (`ImageEditorModal` + embedded library view) | **Done** (2026-05-11). Universal modal contract via `ImageSlotSettings`; replaces both `ImageCropModal` and the stacked `ImageLibraryModal` for migrated templates. |
-| Per-image filters (exposure / contrast / saturation) — CSS-filter rendering | **Done** end-to-end for press-release (live preview, draft, asset-switching, export). EmailSpeakers bridged (sliders move locally, per-speaker filter store fields TODO). |
-| Selection ring unified to single blue across all kinds | **Done** (2026-05-11). |
-| Design-system `borderRadius` Tailwind override (`rounded-sm` → 4px) | **Done** (2026-05-11). All radius utility names now align with design tokens. |
-| Tier-1 templates (mirror EmailDarkGradient) — Newsletter\*, Social\*, EmailImage, EmailProductRelease, etc. | **Next.** ~1 day each per `STAGE-BENCH-MIGRATION.md §10`. |
-| Tier-2 templates (press-release-shaped) — WebsiteWebinar, WebsiteReport, Email\*Banner | Queued. |
-| Tier-3 templates (nested groups) — EmailGrid, SocialGridDetail, listing pages | Queued. |
-| EmailSpeakers per-speaker filter store fields | Pending — mirrors press-release pattern, 3× per-speaker plumbing. |
-| Sparkle / AI generate image API ("Create Image") | Future. Lightbox tile already in place, renders disabled until handler wires up. |
-| Declarative template descriptor (Layer-1 simpler adapter form) | Considered, not built. Per-template adapter remains the only entry point. |
-| Multi-page collateral (Stacker, FAQ, Solution Overview, Carousel) | **Out of scope** for Stage & Bench v1. These need a different shell (page selector inside the stage column). |
-| Delete legacy `EditorScreen` form paths | **After every single-page template migrates.** One cleanup pass. |
-| Export queue retirement | Deferred. Keeping queue infrastructure in place against possible batch-export use case; new per-asset fields continue to flow through queue plumbing. |
-
----
-
-## 11. Appendix — historical phases (compressed)
-
-The substrate was built in phases on the `feature-drag-editor` branch. Each phase shipped cleanly and the substrate that emerged is what §4 describes. The phase log is preserved here only for archaeology; current work follows `STAGE-BENCH-MIGRATION.md`, not these phases.
-
-- **Phase 0 — Audit.** Slot inventory for EmailDarkGradient. Discovered that store keys (`headline`, `body`, `ctaText`) are shared scalars used by multiple templates — drove the slot-identity-vs-storeKey decoupling.
-- **Phase 1 — Substrate scaffold.** `Editable`, `CanvasEditorProvider`, `commands.ts` stub, `useCanvasEditorStore` (separate from `useStore`), `<ContextualToolbar>` shell. `/canvas-editor-test` validated 5 dummy slots.
-- **Phase 2 — Spacing handle consolidation.** `StackerSpacingHandle` + EmailDarkGradient's local `BottomSpacingHandle` → unified `SpacingHandle`. Three call sites (Stacker, FAQ, EmailDarkGradient) standardized. `BottomSpacingHandle` and `StackerSpacingHandle` deleted.
-- **Phase 2.5a — Layout refactor.** EmailDarkGradient's `bottomSpacing: number` → `stackAlign: 'top' | 'center' | 'bottom'`. 9 files touched (types, snapshot, draft storage, template-registry, export-params, store, template, EditorScreen, test page).
-- **Phase 2.5b — Per-gap drag handles.** Sparse `Record<string, number>` keyed `gap-{prev}-to-{next}`, with visibility-aware key collapse and `stackAlign`-aware drag direction. Drag-handle uses `renderSpacerBetween` render-prop on the template.
-- **Phase 3 — Substrate adoption (pilot).** EmailDarkGradient wrapped in `<Editable>`. Toolbars wired (Editbar*). InlineTextEdit shipped (uncontrolled contentEditable; Tiptap eval'd and rejected — bundle/complexity vs. value). VisibilityRegistry + SizeRegistry + ContentRegistry + LineHeightRegistry land.
-- **Phase 3.1 — Editor shell.** `StageBenchShell`, `StageBenchHeader`, `StageBenchActionRow`, `StageBenchBench`, `StageScrim`, `useStageBenchDroppables`. `lib/dnd/` (pointer-event DnD primitive) built. FLIP motion (`lib/motion/`).
-- **Phase 3.2 — Expansion.** `email-speakers` (nested groups + per-field render-props + 3 speakers worth of image slots), `website-press-release` (abs-positioned full-bleed image, plain-text throughout, bench-able category, non-bench-able image). `CategoryRegistry` + `ImageRegistry` siblings added. `EditbarCategory` + `EditbarImage` shipped. Deep-click semantics in `Editable` for nested groups.
-- **Phase 3.3 — Foundation hardening (2026-05-11).** Image-slot bounds were collapsing to 0×0 because each adapter wrapped `Editable`'s child in an extra `<div>` (originally for drag-preview z-index), which silently collapses when its content is `position: absolute`. Promoted that responsibility into `Editable` via `previewActive`; added a defensive descendant-walking bounds measure; kind-aware toolbar anchoring (`ANCHOR_BY_KIND`) so image toolbars hug the top-left edge of the image rather than floating above off-canvas. All three adapters simplified.
-
----
-
-## 12. References
-
-- `STAGE-BENCH-MIGRATION.md` — migration playbook (use this when adding a new template).
-- `components/canvas-editor/` — substrate code.
-- `components/canvas-editor/template-adapters/EmailDarkGradientStageBench.tsx` — canonical adapter shape.
-- `components/canvas-editor/template-adapters/EmailSpeakersStageBench.tsx` — nested groups pattern.
-- `components/canvas-editor/template-adapters/WebsitePressReleaseStageBench.tsx` — absolute-positioned image, non-bench-able slot.
+- `components/canvas-editor/factory/defineStageBenchAdapter.tsx` — the factory; lone canonical adapter entry point.
+- `lib/stage-bench-registry.ts` — central registry feeding adapter dispatch + template-registry + export-params.
+- `components/canvas-editor/Editable.tsx` — selection / deep-click / drag-source wiring; the foundation every adapter sits on.
+- `components/canvas-editor/InlineTextEdit.tsx` — contentEditable text editor; `format: 'html'` preserves bold/italic.
+- `components/canvas-editor/editbar/EditbarText.tsx` — bold/italic + font-size + line-height + visibility toolbar.
+- `scripts/validate-registrations.ts` — static validator for the export-pipeline visibility-flag wiring.
+- `lib/telemetry.ts` + `/api/track` + `/admin/events` — telemetry shell.
 - `app/stage-bench-atoms/page.tsx` — visual lab for substrate primitives (Editbar variants, BenchChip kinds, etc.).
-- `ARCHITECTURE.md`, `BRAND.md`, `TEMPLATES.md` — orthogonal references.
+- For the historical journal of how the substrate was built: `STAGE-BENCH-REFACTOR-POSTMORTEM.md`.
+- For "how to add a new template": `TEMPLATES.md` → "Checklist: Adding a New Template".
