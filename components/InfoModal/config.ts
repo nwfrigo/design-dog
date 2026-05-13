@@ -1,19 +1,14 @@
 /**
  * Config for the 1.5 launch info modal — a 4-page "what's new" walkthrough
- * that opens once per browser after the release, collapses to a bottom-left
- * toast on close, and auto-vanishes one week after the release.
+ * that opens once per browser, collapses to a bottom-left toast on close,
+ * and persists indefinitely (manual delete when the window has run its
+ * course).
  *
  * **Ephemeral feature.** All state and assets are scoped to this directory
  * for easy deletion. The whole `components/InfoModal/` folder + the mount
- * in `app/layout.tsx` + the four PNGs in `public/assets/info-modal/` can be
- * removed in one pass when the window closes.
+ * in `app/layout.tsx` + the four PNGs in `public/assets/info-modal/` are
+ * the surface to remove.
  */
-
-/** Date the 1.5 launch info window starts. Update if the rollout slips. */
-export const INFO_MODAL_RELEASE_TS = new Date('2026-05-13T00:00:00Z').getTime()
-
-/** How long after release the modal + toast remain available. */
-export const INFO_MODAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000
 
 /** localStorage key — set to '1' after the user closes the modal once.
  *  Presence flips the default state from modal → toast. */

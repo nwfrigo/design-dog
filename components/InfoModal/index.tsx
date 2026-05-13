@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import {
-  INFO_MODAL_DURATION_MS,
-  INFO_MODAL_RELEASE_TS,
-  INFO_MODAL_STORAGE_KEY,
-} from './config'
+import { INFO_MODAL_STORAGE_KEY } from './config'
 import { InfoModalDialog } from './InfoModalDialog'
 import { InfoToast } from './InfoToast'
 
@@ -14,19 +10,19 @@ type State = 'hidden' | 'modal' | 'toast'
 
 /**
  * Mounted once globally in `app/layout.tsx`. Three states:
- * - `modal` — open on first load post-release (until user closes once).
+ * - `modal` — open on first load (until user closes once).
  * - `toast` — collapsed chip at bottom-left. Re-opens the modal on click.
- * - `hidden` — past the release+7d window, or on /admin pages.
+ * - `hidden` — only on /admin pages (or pre-hydration).
  *
  * State transitions:
- *   first load (within window, no flag)   → modal
+ *   first load (no flag)                   → modal
  *   close button on modal                  → toast (+ writes localStorage flag)
  *   click on toast                         → modal (does not unset flag)
- *   any state, past release+7d              → hidden
  *   any state, pathname.startsWith('/admin')→ hidden
  *
- * Everything (component, assets, mount) is scoped to this folder for easy
- * removal after the window closes.
+ * Permanent fixture for the 1.5 launch — no auto-vanish. Delete the
+ * `components/InfoModal/` directory + `public/assets/info-modal/` +
+ * the mount in `app/layout.tsx` when the window has run its course.
  */
 export function InfoModal() {
   const pathname = usePathname()
@@ -36,10 +32,6 @@ export function InfoModal() {
   // Compute initial state after mount (localStorage isn't available SSR).
   useEffect(() => {
     setMounted(true)
-    if (Date.now() > INFO_MODAL_RELEASE_TS + INFO_MODAL_DURATION_MS) {
-      setState('hidden')
-      return
-    }
     const seen = typeof window !== 'undefined'
       ? window.localStorage.getItem(INFO_MODAL_STORAGE_KEY)
       : null

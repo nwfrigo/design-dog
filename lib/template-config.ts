@@ -19,25 +19,20 @@ export interface ChannelConfig {
   templates: TemplateInfo[]
 }
 
-// Subchannel within a distribution channel
+/** Flat user-facing category. Drives the homepage tile grouping + filter
+ *  chips. Add a parent tier later if/when a 2-level nav (e.g. "Digital |
+ *  Collateral" tabs) is needed; today the UI is single-tier. */
 export interface SubChannelConfig {
   id: string
   label: string
   icon: 'mail' | 'share' | 'globe' | 'newspaper'
   templates: TemplateInfo[]
-}
-
-// Distribution channel (top-level grouping)
-export interface DistributionChannel {
-  id: string
-  label: string
-  description: string
-  subChannels: SubChannelConfig[]
+  /** Render as a "coming soon" placeholder — no templates, no filter chip. */
   comingSoon?: boolean
 }
 
-// Template definitions for email
-const EMAIL_TEMPLATES: TemplateInfo[] = [
+// Email banners — everything email-shaped except the two signatures.
+const EMAIL_BANNER_TEMPLATES: TemplateInfo[] = [
   {
     type: 'email-grid',
     label: 'Grid Details',
@@ -97,12 +92,22 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     hidden: true,
   },
   {
+    type: 'email-cority-customer-exchange-banner',
+    label: 'Cority Customer Exchange Email Banner',
+    dimensions: '640 × 300px',
+    width: 640,
+    height: 300,
+  },
+]
+
+// Email signatures — small (400×100) email-footer chips.
+const EMAIL_SIGNATURE_TEMPLATES: TemplateInfo[] = [
+  {
     type: 'email-ehs-accelerate-signature',
     label: 'EHS+ Accelerate Email Signature',
     dimensions: '400 × 100px',
     width: 400,
     height: 100,
-    channelLabel: 'Email Signature',
   },
   {
     type: 'email-cority-customer-exchange-signature',
@@ -110,14 +115,6 @@ const EMAIL_TEMPLATES: TemplateInfo[] = [
     dimensions: '400 × 100px',
     width: 400,
     height: 100,
-    channelLabel: 'Email Signature',
-  },
-  {
-    type: 'email-cority-customer-exchange-banner',
-    label: 'Cority Customer Exchange Email Banner',
-    dimensions: '640 × 300px',
-    width: 640,
-    height: 300,
   },
 ]
 
@@ -267,100 +264,102 @@ const NEWSLETTER_TEMPLATES: TemplateInfo[] = [
   },
 ]
 
-// New: Distribution channels organized by use case
-export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
+/** Flat list of user-facing categories. Drives homepage tiles + filter
+ *  chips. Order here is intentional — it sets the display order on the
+ *  homepage when `CHANNEL_ORDER` (below) lists them. */
+const COLLATERAL_TEMPLATES: TemplateInfo[] = [
   {
-    id: 'digital',
-    label: 'Digital',
-    description: 'Email campaigns, social media, and web assets',
-    subChannels: [
-      {
-        id: 'email',
-        label: 'Email Banner',
-        icon: 'mail',
-        templates: EMAIL_TEMPLATES,
-      },
-      {
-        id: 'social',
-        label: 'Social Post',
-        icon: 'share',
-        templates: SOCIAL_TEMPLATES,
-      },
-      {
-        id: 'website',
-        label: 'Website Asset',
-        icon: 'globe',
-        templates: WEBSITE_TEMPLATES,
-      },
-      {
-        id: 'newsletter',
-        label: 'Newsletter Banner',
-        icon: 'newspaper',
-        templates: NEWSLETTER_TEMPLATES,
-      },
-    ],
+    type: 'solution-overview-pdf',
+    label: 'Solution Overview',
+    dimensions: 'Letter (8.5" × 11") • 3 pages',
+    width: 612,
+    height: 792,
   },
   {
-    id: 'collateral',
+    type: 'faq-pdf',
+    label: 'FAQs',
+    dimensions: 'Letter (8.5" × 11") • Multi-page',
+    width: 612,
+    height: 792,
+  },
+  {
+    type: 'stacker-pdf',
+    label: 'Stacker',
+    dimensions: 'Letter (8.5" × 11") • Variable height',
+    width: 612,
+    height: 792,
+  },
+  {
+    type: 'customer-library',
+    label: 'Customer Library',
+    dimensions: '590 × 330px',
+    width: 590,
+    height: 330,
+  },
+]
+
+export const SUBCHANNELS: SubChannelConfig[] = [
+  {
+    id: 'email-banners',
+    label: 'Email Banner',
+    icon: 'mail',
+    templates: EMAIL_BANNER_TEMPLATES,
+  },
+  {
+    id: 'email-signatures',
+    label: 'Email Signature',
+    icon: 'mail',
+    templates: EMAIL_SIGNATURE_TEMPLATES,
+  },
+  {
+    id: 'social',
+    label: 'Social Post',
+    icon: 'share',
+    templates: SOCIAL_TEMPLATES,
+  },
+  {
+    id: 'website',
+    label: 'Website Asset',
+    icon: 'globe',
+    templates: WEBSITE_TEMPLATES,
+  },
+  {
+    id: 'newsletter',
+    label: 'Newsletter Banner',
+    icon: 'newspaper',
+    templates: NEWSLETTER_TEMPLATES,
+  },
+  {
+    id: 'collateral-pdf',
     label: 'Collateral',
-    description: 'Sales and marketing materials',
-    subChannels: [
-      {
-        id: 'collateral-pdf',
-        label: 'Collateral',
-        icon: 'globe',
-        templates: [
-          {
-            type: 'solution-overview-pdf',
-            label: 'Solution Overview',
-            dimensions: 'Letter (8.5" × 11") • 3 pages',
-            width: 612,
-            height: 792,
-          },
-          {
-            type: 'faq-pdf',
-            label: 'FAQs',
-            dimensions: 'Letter (8.5" × 11") • Multi-page',
-            width: 612,
-            height: 792,
-          },
-          {
-            type: 'stacker-pdf',
-            label: 'Stacker',
-            dimensions: 'Letter (8.5" × 11") • Variable height',
-            width: 612,
-            height: 792,
-          },
-          {
-            type: 'customer-library',
-            label: 'Customer Library',
-            dimensions: '590 × 330px',
-            width: 590,
-            height: 330,
-          },
-        ],
-      },
-    ],
+    icon: 'globe',
+    templates: COLLATERAL_TEMPLATES,
   },
   {
     id: 'community',
     label: 'Community & Academy',
-    description: 'Community engagement and learning materials',
-    subChannels: [],
+    icon: 'globe',
+    templates: [],
     comingSoon: true,
   },
 ]
 
 // Legacy: All templates organized by channel (for backwards compatibility).
-// Hidden templates are excluded from CHANNELS so the in-editor template
-// pickers don't surface them; they remain in TEMPLATE_INFO /
-// TEMPLATE_DIMENSIONS below so existing drafts still resolve.
+// Used by in-editor template dropdowns (EditorScreen, ExportQueueScreen,
+// AssetSidebar). Keeps banners + signatures merged under "Email" so the
+// in-editor "switch template" UI shows everything email together — the
+// homepage split is only for selection.
+//
+// Hidden templates are excluded so the dropdowns don't surface them; they
+// remain in TEMPLATE_INFO / TEMPLATE_DIMENSIONS below so existing drafts
+// still resolve.
 const visible = <T extends TemplateInfo>(arr: T[]): T[] => arr.filter(t => !t.hidden)
+const ALL_EMAIL = [...EMAIL_BANNER_TEMPLATES, ...EMAIL_SIGNATURE_TEMPLATES]
 export const CHANNELS: ChannelConfig[] = [
   {
     id: 'email',
-    label: 'Email Banners',
-    templates: visible(EMAIL_TEMPLATES).map(t => ({ ...t, label: `Email - ${t.label}` })),
+    label: 'Email',
+    templates: visible(ALL_EMAIL).map(t => ({ ...t, label: `Email - ${t.label}` })),
   },
   {
     id: 'social',
@@ -380,28 +379,22 @@ export const CHANNELS: ChannelConfig[] = [
   {
     id: 'collateral',
     label: 'Collateral',
-    templates: visible(
-      DISTRIBUTION_CHANNELS
-        .find(ch => ch.id === 'collateral')!
-        .subChannels.flatMap(sc => sc.templates)
-    ).filter(t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type)),
+    templates: visible(COLLATERAL_TEMPLATES).filter(
+      t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type),
+    ),
   },
 ]
 
-// Flat list of all templates (includes collateral single-page templates for lookups).
-// Built from the raw per-channel arrays so hidden templates remain present
-// in TEMPLATE_INFO / TEMPLATE_DIMENSIONS for draft resolution.
-const COLLATERAL_SINGLE_PAGE: TemplateInfo[] = DISTRIBUTION_CHANNELS
-  .flatMap(ch => ch.subChannels)
-  .flatMap(sc => sc.templates)
-  .filter(t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type))
-
+// Flat list of all templates (includes hidden ones for draft resolution).
 export const ALL_TEMPLATES: TemplateInfo[] = [
-  ...EMAIL_TEMPLATES,
+  ...EMAIL_BANNER_TEMPLATES,
+  ...EMAIL_SIGNATURE_TEMPLATES,
   ...SOCIAL_TEMPLATES,
   ...WEBSITE_TEMPLATES,
   ...NEWSLETTER_TEMPLATES,
-  ...COLLATERAL_SINGLE_PAGE,
+  ...COLLATERAL_TEMPLATES.filter(
+    t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type),
+  ),
 ]
 
 // Quick lookup by template type

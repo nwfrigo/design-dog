@@ -3,15 +3,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
-import { DISTRIBUTION_CHANNELS, type TemplateInfo } from '@/lib/template-config'
+import { SUBCHANNELS, type TemplateInfo } from '@/lib/template-config'
 import { TemplateTileV2, RequestTemplateTile } from '@/components/TemplateTile'
 
 // Filter chip options
-type FilterType = 'all' | 'email' | 'social' | 'website' | 'newsletter' | 'sales-pm' | 'event:cority-connect' | 'event:ehs-accelerate' | 'event:cority-customer-exchange'
+type FilterType = 'all' | 'email-banners' | 'email-signatures' | 'social' | 'website' | 'newsletter' | 'sales-pm' | 'event:cority-connect' | 'event:ehs-accelerate' | 'event:cority-customer-exchange'
 
 const FILTER_OPTIONS: { id: FilterType; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'email', label: 'Email' },
+  { id: 'email-banners', label: 'Email Banners' },
+  { id: 'email-signatures', label: 'Email Signatures' },
   { id: 'website', label: 'Website' },
   { id: 'sales-pm', label: 'Collateral' },
   { id: 'social', label: 'Social' },
@@ -43,33 +44,28 @@ interface TemplateWithChannel extends TemplateInfo {
   channelLabel: string
 }
 
-// Channel order for grid display (matches filter chip order)
-const CHANNEL_ORDER = ['email', 'website', 'collateral-pdf', 'social', 'newsletter']
+// Channel order for grid display (matches filter chip order).
+const CHANNEL_ORDER = ['email-banners', 'email-signatures', 'website', 'collateral-pdf', 'social', 'newsletter']
 
-// Flatten all templates with channel info, ordered by channel
+// Flatten all templates with channel info, ordered by channel.
 function getAllTemplatesWithChannels(): TemplateWithChannel[] {
   const templatesByChannel: Record<string, TemplateWithChannel[]> = {}
 
-  // Collect templates by channel
-  for (const channel of DISTRIBUTION_CHANNELS) {
-    if (channel.comingSoon) continue
-
-    for (const subChannel of channel.subChannels) {
-      if (!templatesByChannel[subChannel.id]) {
-        templatesByChannel[subChannel.id] = []
-      }
-      for (const template of subChannel.templates) {
-        if (template.hidden) continue
-        templatesByChannel[subChannel.id].push({
-          ...template,
-          channel: subChannel.id,
-          channelLabel: template.channelLabel ?? subChannel.label,
-        })
-      }
+  for (const subChannel of SUBCHANNELS) {
+    if (subChannel.comingSoon) continue
+    if (!templatesByChannel[subChannel.id]) {
+      templatesByChannel[subChannel.id] = []
+    }
+    for (const template of subChannel.templates) {
+      if (template.hidden) continue
+      templatesByChannel[subChannel.id].push({
+        ...template,
+        channel: subChannel.id,
+        channelLabel: template.channelLabel ?? subChannel.label,
+      })
     }
   }
 
-  // Return templates in desired order
   const orderedTemplates: TemplateWithChannel[] = []
   for (const channelId of CHANNEL_ORDER) {
     if (templatesByChannel[channelId]) {
@@ -115,8 +111,10 @@ export function AssetSelectionScreen() {
 
     return allTemplates.filter(template => {
       switch (activeFilter) {
-        case 'email':
-          return template.channel === 'email'
+        case 'email-banners':
+          return template.channel === 'email-banners'
+        case 'email-signatures':
+          return template.channel === 'email-signatures'
         case 'social':
           return template.channel === 'social'
         case 'website':
