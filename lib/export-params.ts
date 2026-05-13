@@ -325,26 +325,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
   // 'email-cority-connect-2026' — migrated to stage-bench-registry
   // (Task 2 pilot). Builder lives in EmailCorityConnect2026Registration.ts.
 
-  'email-ehs-accelerate-banner': (s) => ({
-    headline: s.verbatimCopy.headline || '',
-    body: s.verbatimCopy.body || '',
-    showBody: s.showBody,
-    ctaText: s.ctaText || '',
-    headlineFontSize: s.headlineFontSize ?? undefined,
-    eventDate: s.eventDate || '',
-    eventLocation: s.eventLocation || '',
-  }),
-
-  'email-ehs-accelerate-signature': (s) => ({
-    workshopName: s.signatureWorkshopName || '',
-    eventDate: s.eventDate || '',
-    eventLocation: s.eventLocation || '',
-    ctaText: s.ctaText || '',
-    showWorkshopName: s.showSignatureWorkshopName,
-    showEventDetails: s.showSignatureEventDetails,
-    showCta: s.showCta,
-  }),
-
   'email-ehs-accelerate-invitation': (s) => ({
     invitationHeader: s.invitationHeader || '',
     invitationHeadline: s.invitationHeadline || '',
@@ -354,28 +334,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     invitationEventTime: s.invitationEventTime || '',
     invitationEventTimeNote: s.invitationEventTimeNote || '',
     invitationBody: s.invitationBody || '',
-  }),
-
-  'email-cority-customer-exchange-banner': (s) => ({
-    headline: s.verbatimCopy.headline || '',
-    body: s.verbatimCopy.body || '',
-    ctaText: s.ctaText || '',
-    colorStyle: s.colorStyle,
-    showHeadline: s.showHeadline,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showCta: s.showCta,
-    headlineFontSize: s.headlineFontSize ?? undefined,
-  }),
-
-  'email-cority-customer-exchange-signature': (s) => ({
-    eventDate: s.eventDate || '',
-    eventLocation: s.eventLocation || '',
-    eventTime: s.cceEventTime || '',
-    ctaText: s.ctaText || '',
-    showEventDate: s.showCceEventDate,
-    showEventLocation: s.showCceEventLocation,
-    showEventTime: s.showCceEventTime,
-    showCta: s.showCta,
   }),
 
   'email-product-release': (s) => ({
@@ -416,17 +374,6 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
     theme: s.theme,
     stackAlign: s.stackAlign,
     gaps: s.templateGaps['website-webinar'] ?? {},
-  }),
-
-  'website-floating-banner': (s) => ({
-    variant: s.floatingBannerVariant,
-    cta: s.ctaText,
-  }),
-
-  'website-floating-banner-mobile': (s) => ({
-    variant: s.floatingBannerMobileVariant,
-    arrowType: s.floatingBannerMobileArrowType,
-    cta: s.ctaText,
   }),
 
   'customer-library': (s) => ({

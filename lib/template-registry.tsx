@@ -12,16 +12,10 @@ import { WebsiteReport } from '@/components/templates/WebsiteReport'
 import { WebsiteEventListing } from '@/components/templates/WebsiteEventListing'
 import { WebsiteEhsAccelerateListing } from '@/components/templates/WebsiteEhsAccelerateListing'
 import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
-import { WebsiteFloatingBanner } from '@/components/templates/WebsiteFloatingBanner'
-import { WebsiteFloatingBannerMobile } from '@/components/templates/WebsiteFloatingBannerMobile'
 import { EmailGrid, type GridDetail } from '@/components/templates/EmailGrid'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
-import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
-import { EmailEhsAccelerateSignature } from '@/components/templates/EmailEhsAccelerateSignature'
-import { EmailCorityCustomerExchangeSignature } from '@/components/templates/EmailCorityCustomerExchangeSignature'
-import { EmailCorityCustomerExchangeBanner } from '@/components/templates/EmailCorityCustomerExchangeBanner'
 import { SocialImage } from '@/components/templates/SocialImage'
 import { SocialGridDetail, type GridDetailRow } from '@/components/templates/SocialGridDetail'
 import { SocialEhsAccelerate } from '@/components/templates/SocialEhsAccelerate'
@@ -411,146 +405,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
           saturation: parsed.imageFilterSaturation as number,
         },
       }),
-    },
-  },
-
-  'email-ehs-accelerate-banner': {
-    component: EmailEhsAccelerateBanner,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      body: asset.body || '',
-      showBody: asset.showBody !== false,
-      ctaText: asset.ctaText || '',
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      eventDate: asset.eventDate || '',
-      eventLocation: asset.eventLocation || '',
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'headline', label: 'Headline' },
-      { key: 'body', label: 'Body' },
-      { key: 'ctaText', label: 'CTA' },
-      { key: 'eventDate', label: 'Date' },
-      { key: 'eventLocation', label: 'Location' },
-    ],
-    renderSchema: {
-      width: 600,
-      height: 373,
-      background: '#ffffff',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'showBody', parser: 'boolTrue', default: true },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-        { param: 'eventDate', parser: 'string', default: '' },
-        { param: 'eventLocation', parser: 'string', default: '' },
-      ],
-    },
-  },
-
-  'email-ehs-accelerate-signature': {
-    component: EmailEhsAccelerateSignature,
-    renderProps: (asset, colors, typography) => ({
-      workshopName: asset.signatureWorkshopName || '',
-      eventDate: asset.eventDate || '',
-      eventLocation: asset.eventLocation || '',
-      ctaText: asset.ctaText || '',
-      showWorkshopName: asset.showSignatureWorkshopName !== false,
-      showEventDetails: asset.showSignatureEventDetails !== false,
-      showCta: asset.showCta !== false,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'signatureWorkshopName', label: 'Workshop' },
-      { key: 'eventDate', label: 'Date' },
-      { key: 'eventLocation', label: 'Location' },
-      { key: 'ctaText', label: 'CTA' },
-    ],
-    renderSchema: {
-      width: 400,
-      height: 100,
-      background: '#ffffff',
-      fields: [
-        { param: 'workshopName', parser: 'string', default: '' },
-        { param: 'eventDate', parser: 'string', default: '' },
-        { param: 'eventLocation', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'showWorkshopName', parser: 'boolTrue', default: true },
-        { param: 'showEventDetails', parser: 'boolTrue', default: true },
-        { param: 'showCta', parser: 'boolTrue', default: true },
-      ],
-    },
-  },
-
-  'email-cority-customer-exchange-banner': {
-    component: EmailCorityCustomerExchangeBanner,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      body: asset.body || '',
-      ctaText: asset.ctaText || '',
-      colorStyle: (asset.colorStyle || '1') as '1' | '2' | '3' | '4',
-      showHeadline: asset.showHeadline !== false,
-      showBody: asset.showBody && !!asset.body,
-      showCta: asset.showCta !== false,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'headline', label: 'Headline' },
-      { key: 'body', label: 'Body', isHtml: true },
-      { key: 'ctaText', label: 'CTA' },
-    ],
-    renderSchema: {
-      width: 640,
-      height: 300,
-      background: '#060015',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'colorStyle', parser: 'enum', default: '1' },
-        { param: 'showHeadline', parser: 'boolTrue', default: true },
-        { param: 'showBody', parser: 'boolTrue', default: true },
-        { param: 'showCta', parser: 'boolTrue', default: true },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-      ],
-    },
-  },
-
-  'email-cority-customer-exchange-signature': {
-    component: EmailCorityCustomerExchangeSignature,
-    renderProps: (asset, colors, typography) => ({
-      eventDate: asset.eventDate || '',
-      eventLocation: asset.eventLocation || '',
-      eventTime: asset.cceEventTime || '10:00–16:00',
-      ctaText: asset.ctaText || '',
-      showEventDate: asset.showCceEventDate !== false,
-      showEventLocation: asset.showCceEventLocation !== false,
-      showEventTime: asset.showCceEventTime !== false,
-      showCta: asset.showCta !== false,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [
-      { key: 'eventDate', label: 'Date' },
-      { key: 'eventLocation', label: 'Location' },
-      { key: 'cceEventTime', label: 'Time' },
-      { key: 'ctaText', label: 'CTA' },
-    ],
-    renderSchema: {
-      width: 400,
-      height: 100,
-      background: '#060015',
-      fields: [
-        { param: 'eventDate', parser: 'string', default: '' },
-        { param: 'eventLocation', parser: 'string', default: '' },
-        { param: 'eventTime', parser: 'string', default: '' },
-        { param: 'ctaText', parser: 'string', default: '' },
-        { param: 'showEventDate', parser: 'boolTrue', default: true },
-        { param: 'showEventLocation', parser: 'boolTrue', default: true },
-        { param: 'showEventTime', parser: 'boolTrue', default: true },
-        { param: 'showCta', parser: 'boolTrue', default: true },
-      ],
     },
   },
 
@@ -949,50 +803,6 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
     },
   },
 
-  'website-floating-banner': {
-    component: WebsiteFloatingBanner,
-    renderProps: (asset, colors, typography) => ({
-      eyebrow: asset.eyebrow || '',
-      headline: asset.headline || '',
-      cta: asset.ctaText || '',
-      showEyebrow: asset.showEyebrow,
-      variant: asset.floatingBannerVariant || 'dark',
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 2256,
-      height: 100,
-      background: null,
-      fields: [
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'showEyebrow', parser: 'boolFalse' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'variant', parser: 'enum', default: 'dark' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-      ],
-      assembleProps: (parsed, raw) => ({
-        cta: (raw.cta as string) || (raw.ctaText as string) || '',
-      }),
-    },
-  },
-
-  'website-floating-banner-mobile': {
-    component: WebsiteFloatingBannerMobile,
-    renderProps: (asset, colors, typography) => ({
-      eyebrow: asset.eyebrow || '',
-      headline: asset.headline || '',
-      cta: asset.ctaText || '',
-      showEyebrow: asset.showEyebrow,
-      variant: asset.floatingBannerMobileVariant || 'light',
-      arrowType: asset.floatingBannerMobileArrowType || 'text',
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-  },
 }
 
 // Merge in stage-bench-registry entries last so the central registry's

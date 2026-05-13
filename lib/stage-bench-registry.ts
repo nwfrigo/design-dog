@@ -50,6 +50,12 @@ import { socialDarkGradientRegistration } from '@/components/canvas-editor/templ
 import { socialImageMeddbaseRegistration } from '@/components/canvas-editor/template-adapters/SocialImageMeddbaseRegistration'
 import { emailImageRegistration } from '@/components/canvas-editor/template-adapters/EmailImageRegistration'
 import { emailDarkGradientRegistration } from '@/components/canvas-editor/template-adapters/EmailDarkGradientRegistration'
+import { emailCorityCustomerExchangeBannerRegistration } from '@/components/canvas-editor/template-adapters/EmailCorityCustomerExchangeBannerRegistration'
+import { emailCorityCustomerExchangeSignatureRegistration } from '@/components/canvas-editor/template-adapters/EmailCorityCustomerExchangeSignatureRegistration'
+import { emailEhsAccelerateBannerRegistration } from '@/components/canvas-editor/template-adapters/EmailEhsAccelerateBannerRegistration'
+import { emailEhsAccelerateSignatureRegistration } from '@/components/canvas-editor/template-adapters/EmailEhsAccelerateSignatureRegistration'
+import { websiteFloatingBannerRegistration } from '@/components/canvas-editor/template-adapters/WebsiteFloatingBannerRegistration'
+import { websiteFloatingBannerMobileRegistration } from '@/components/canvas-editor/template-adapters/WebsiteFloatingBannerMobileRegistration'
 
 // Each template has unique props — kept loose at the registry boundary
 // because `renderProps` is the bridge that produces the correctly-shaped
@@ -81,6 +87,12 @@ const REGISTRATIONS: ReadonlyArray<StageBenchRegistrationData> = [
   socialImageMeddbaseRegistration,
   emailImageRegistration,
   emailDarkGradientRegistration,
+  emailCorityCustomerExchangeBannerRegistration,
+  emailCorityCustomerExchangeSignatureRegistration,
+  emailEhsAccelerateBannerRegistration,
+  emailEhsAccelerateSignatureRegistration,
+  websiteFloatingBannerRegistration,
+  websiteFloatingBannerMobileRegistration,
 ]
 
 const BY_ID = new Map<TemplateType, StageBenchRegistrationData>(

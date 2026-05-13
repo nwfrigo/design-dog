@@ -22,12 +22,6 @@ import { getRegisteredStageBenchTemplateIds } from '@/lib/stage-bench-registry'
  *  migrate to the registry, remove them from here. */
 const LEGACY_STAGE_BENCH_TEMPLATES: ReadonlyArray<TemplateType> = [
   'email-speakers',
-  'website-floating-banner-mobile',
-  'website-floating-banner',
-  'email-cority-customer-exchange-banner',
-  'email-cority-customer-exchange-signature',
-  'email-ehs-accelerate-banner',
-  'email-ehs-accelerate-signature',
   'email-product-release',
   'email-grid',
   'social-grid-detail',
