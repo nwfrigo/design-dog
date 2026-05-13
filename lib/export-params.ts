@@ -229,16 +229,7 @@ const BUILDERS: Record<string, ExportParamBuilder> = {
 
   // 'newsletter-top-banner' — exportBuilder lives in NewsletterTopBannerRegistration.ts.
 
-  'customer-library': (s) => ({
-    variant: s.customerLibraryVariant,
-    footerText: s.verbatimCopy.subhead,
-    qrCodeUrl: s.thumbnailImageUrl,
-    hasQrCode: !!s.thumbnailImageUrl,
-    showHeadline: s.showHeadline,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showFooterText: s.showSubhead && !!s.verbatimCopy.subhead,
-  }),
+  // 'customer-library' — exportBuilder lives in CustomerLibraryRegistration.ts.
 
   'solution-overview-pdf': (s) => ({
     solutionOverviewSolution: s.solutionOverviewSolution,

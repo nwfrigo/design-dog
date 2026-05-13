@@ -1683,30 +1683,6 @@ export function EditorScreen() {
               </div>
             )}
 
-            {/* Customer Library Controls */}
-            {currentTemplate === 'customer-library' && (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs text-gray-500 dark:text-content-secondary mb-1">Style</label>
-                  <div className="flex gap-1 p-1 bg-gray-200 dark:bg-surface-tertiary rounded-lg">
-                    {(['orange', 'dark', 'light'] as const).map((variant) => (
-                      <button
-                        key={variant}
-                        onClick={() => setCustomerLibraryVariant(variant)}
-                        className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-                          customerLibraryVariant === variant
-                            ? 'bg-white dark:bg-surface-primary text-gray-900 dark:text-content-primary shadow-sm dark:border dark:border-[#494a4c]'
-                            : 'text-gray-600 dark:text-content-secondary'
-                        }`}
-                      >
-                        {variant === 'orange' ? 'Orange' : variant === 'dark' ? 'Dark' : 'Light'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Website Report Controls */}
             {currentTemplate === 'website-report' && (
               <div className="space-y-3">

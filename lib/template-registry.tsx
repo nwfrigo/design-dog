@@ -5,7 +5,6 @@ import { parseSpeakerParams } from '@/lib/render-params'
 import type { SearchParams } from '@/lib/render-params'
 
 // Import all template components
-import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { SocialImage } from '@/components/templates/SocialImage'
@@ -124,47 +123,8 @@ const LEGACY_TEMPLATE_REGISTRY: Partial<Record<TemplateType, TemplateRegistryEnt
   // 'newsletter-top-banner' — migrated to stage-bench-registry.
   // Entry now lives in NewsletterTopBannerRegistration.ts.
 
-  'customer-library': {
-    component: CustomerLibrary,
-    renderProps: (asset, colors, typography) => ({
-      headline: asset.headline || '',
-      eyebrow: asset.eyebrow || '',
-      body: asset.body || '',
-      footerText: asset.subhead || '',
-      variant: asset.customerLibraryVariant || 'dark',
-      qrCodeUrl: asset.thumbnailImageUrl || undefined,
-      showHeadline: asset.showHeadline,
-      showEyebrow: asset.showEyebrow,
-      showBody: asset.showBody && !!asset.body,
-      showFooterText: asset.showSubhead && !!asset.subhead,
-      headlineFontSize: asset.headlineFontSize ?? undefined,
-      colors, typography, scale: 1,
-    }),
-    queueTextFields: [],
-    renderSchema: {
-      width: 590,
-      height: 330,
-      background: null,
-      dynamicBackground: (p) => p.variant === 'light' ? 'white' : p.variant === 'orange' ? '#D35F0B' : '#060015',
-      fields: [
-        { param: 'headline', parser: 'string', default: '' },
-        { param: 'eyebrow', parser: 'string', default: '' },
-        { param: 'body', parser: 'string', default: '' },
-        { param: 'footerText', parser: 'string', default: 'Lorem ipsum' },
-        { param: 'variant', parser: 'enum', default: 'dark' },
-        { param: 'qrCodeUrl', parser: 'stringOrNull' },
-        { param: 'hasQrCode', parser: 'boolFalse' },
-        { param: 'showHeadline', parser: 'boolTrue' },
-        { param: 'showEyebrow', parser: 'boolTrue' },
-        { param: 'showBody', parser: 'boolTrue' },
-        { param: 'showFooterText', parser: 'boolTrue' },
-        { param: 'headlineFontSize', parser: 'numberOrUndefined' },
-      ],
-      assembleProps: (parsed) => ({
-        qrCodeUrl: (parsed.qrCodeUrl as string) || undefined,
-      }),
-    },
-  },
+  // 'customer-library' — migrated to stage-bench-registry.
+  // Entry now lives in CustomerLibraryRegistration.ts.
 
 }
 

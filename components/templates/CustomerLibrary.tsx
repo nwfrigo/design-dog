@@ -1,11 +1,20 @@
 'use client'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 
 export type CustomerLibraryVariant = 'orange' | 'dark' | 'light'
+
+/** Editable block ids for Stage & Bench wiring. "Powered by Cority"
+ *  pill and decorative arrow are brand-locked (baked in). */
+export type CustomerLibraryBlockId =
+  | 'headline'
+  | 'eyebrow'
+  | 'body'
+  | 'footerText'
+  | 'qrCode'
 
 export interface CustomerLibraryProps {
   headline: string
@@ -20,6 +29,12 @@ export interface CustomerLibraryProps {
   showBody: boolean
   showFooterText: boolean
   headlineFontSize?: number
+  /** Stage & Bench render-prop: wraps each editable region in <Editable>. */
+  renderBlock?: (blockId: CustomerLibraryBlockId, content: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: swaps a block's inner text for an in-place editor. */
+  renderInlineEditor?: (blockId: CustomerLibraryBlockId, defaultInner: ReactNode) => ReactNode
+  /** Stage & Bench render-prop: absolutely-positioned overlay (drag scrim). */
+  renderOverlay?: () => ReactNode
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
@@ -38,10 +53,18 @@ export function CustomerLibrary({
   showBody = true,
   showFooterText = true,
   headlineFontSize: headlineFontSizeProp,
+  renderBlock,
+  renderInlineEditor,
+  renderOverlay,
   colors,
   typography,
   scale = 1,
 }: CustomerLibraryProps) {
+  // Render-prop shims: in export/preview contexts these are no-ops; in
+  // the editor they wrap blocks with <Editable> and swap inner text for
+  // an in-place editor when selected.
+  const wrapBlock = renderBlock ?? ((_id, content) => content)
+  const wrapInline = renderInlineEditor ?? ((_id, defaultInner) => defaultInner)
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
 
   const getVariantColors = () => {
@@ -128,7 +151,7 @@ export function CustomerLibrary({
         }}
       >
         {/* Headline */}
-        {showHeadline && (
+        {showHeadline && wrapBlock('headline', (
           <div
             className="cl-rich-text"
             style={{
@@ -140,12 +163,16 @@ export function CustomerLibrary({
               wordWrap: 'break-word',
               textShadow: '0px 0px 6px rgba(0, 0, 0, 0.15)',
             }}
-            dangerouslySetInnerHTML={{ __html: headline || 'Chemical Library' }}
-          />
-        )}
+          >
+            {wrapInline(
+              'headline',
+              <span dangerouslySetInnerHTML={{ __html: headline || 'Chemical Library' }} />
+            )}
+          </div>
+        ))}
 
         {/* Eyebrow */}
-        {showEyebrow && eyebrow && (
+        {showEyebrow && wrapBlock('eyebrow', (
           <div
             style={{
               color: c.eyebrowColor,
@@ -157,15 +184,15 @@ export function CustomerLibrary({
               marginTop: 8,
             }}
           >
-            {eyebrow}
+            {wrapInline('eyebrow', eyebrow || 'EBOOK')}
           </div>
-        )}
+        ))}
 
         {/* Spacer to push body text down */}
         <div style={{ flex: 1 }} />
 
         {/* Body text + Arrow */}
-        {showBody && body && (
+        {showBody && wrapBlock('body', (
           <div
             style={{
               justifyContent: 'flex-start',
@@ -184,8 +211,12 @@ export function CustomerLibrary({
                 fontWeight: 350,
                 wordWrap: 'break-word',
               }}
-              dangerouslySetInnerHTML={{ __html: body }}
-            />
+            >
+              {wrapInline(
+                'body',
+                <span dangerouslySetInnerHTML={{ __html: body || 'Body text' }} />
+              )}
+            </div>
             <ArrowIcon
               color={c.arrowColor}
               width={60}
@@ -195,63 +226,65 @@ export function CustomerLibrary({
               strokeWidth={1.17}
             />
           </div>
-        )}
+        ))}
       </div>
 
       {/* QR Code container */}
-      <div
-        style={{
-          width: 213,
-          height: 213,
-          left: 360,
-          top: 17,
-          position: 'absolute',
-          background: 'white',
-          overflow: 'hidden',
-        }}
-      >
-        {qrCodeUrl || hasQrCode ? (
-          <img
-            src={qrCodeUrl || undefined}
-            alt="QR Code"
-            data-qr-code="true"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              padding: 7,
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: 199.51,
-              height: 199.51,
-              left: 6.75,
-              top: 6.75,
-              position: 'absolute',
-              background: '#EDEDED',
-              overflow: 'hidden',
-              border: '0.5px solid #C8C8C8',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
+      {wrapBlock('qrCode', (
+        <div
+          style={{
+            width: 213,
+            height: 213,
+            left: 360,
+            top: 17,
+            position: 'absolute',
+            background: 'white',
+            overflow: 'hidden',
+          }}
+        >
+          {qrCodeUrl || hasQrCode ? (
+            <img
+              src={qrCodeUrl || undefined}
+              alt="QR Code"
+              data-qr-code="true"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                padding: 7,
+              }}
+            />
+          ) : (
             <div
               style={{
-                color: '#1E1E1E',
-                fontSize: 6.75,
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: 0.74,
+                width: 199.51,
+                height: 199.51,
+                left: 6.75,
+                top: 6.75,
+                position: 'absolute',
+                background: '#EDEDED',
+                overflow: 'hidden',
+                border: '0.5px solid #C8C8C8',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
-              [place qr code here]
+              <div
+                style={{
+                  color: '#1E1E1E',
+                  fontSize: 6.75,
+                  fontWeight: 500,
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.74,
+                }}
+              >
+                [place qr code here]
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      ))}
 
       {/* Bottom bar */}
       <div
@@ -312,7 +345,7 @@ export function CustomerLibrary({
           </div>
 
           {/* Footer text */}
-          {showFooterText && footerText && (
+          {showFooterText && wrapBlock('footerText', (
             <div
               style={{
                 width: 240,
@@ -323,11 +356,12 @@ export function CustomerLibrary({
                 wordWrap: 'break-word',
               }}
             >
-              {footerText}
+              {wrapInline('footerText', footerText || 'Lorem ipsum')}
             </div>
-          )}
+          ))}
         </div>
       </div>
+      {renderOverlay?.()}
     </div>
   )
 }
