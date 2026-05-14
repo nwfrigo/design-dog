@@ -160,9 +160,9 @@ export function NewsletterBlueGradient({
   const textWidth = TEXT_WIDTHS[imageSize]
   const imageWidth = IMAGE_WIDTHS[imageSize]
 
-  // Text-block stack — eyebrow / headline / subhead with adjustable gaps.
-  // CTA renders as a sibling below, anchored bottom by space-between
-  // (mirrors NewsletterDarkGradient's renovation shape).
+  // Text-block stack — eyebrow / headline / subhead / cta with adjustable
+  // gaps. CTA participates in the stack so it gets inline editing,
+  // stackAlign-driven distribution, and user-controllable spacing.
   const stackBlocks: ContentStackBlock<NewsletterBlueGradientBlockId>[] = [
     {
       id: 'eyebrow',
@@ -211,6 +211,28 @@ export function NewsletterBlueGradient({
         }}>{inner}</div>
       ),
     },
+    {
+      id: 'cta',
+      visible: showCta,
+      defaultInner: ctaText || SLOT_PLACEHOLDERS.cta,
+      renderChrome: (inner) => (
+        <div style={{
+          display: 'inline-flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: 8,
+        }}>
+          <span style={{
+            textAlign: 'center',
+            color: textColor,
+            fontSize: 12,
+            fontWeight: 500,
+            lineHeight: '12px',
+          }}>{inner}</span>
+          <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
+        </div>
+      ),
+    },
   ]
 
   return (
@@ -239,7 +261,6 @@ export function NewsletterBlueGradient({
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}>
           <ContentStack<NewsletterBlueGradientBlockId>
@@ -252,27 +273,6 @@ export function NewsletterBlueGradient({
             stackAlign={stackAlign}
             alignItems="flex-start"
           />
-
-          {/* CTA — sibling, anchored bottom by space-between */}
-          {showCta && wrapBlock('cta', (
-            <div style={{
-              display: 'inline-flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 8,
-            }}>
-              <span style={{
-                textAlign: 'center',
-                color: textColor,
-                fontSize: 12,
-                fontWeight: 500,
-                lineHeight: '12px',
-              }}>
-                {ctaText || SLOT_PLACEHOLDERS.cta}
-              </span>
-              <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
-            </div>
-          ))}
         </div>
 
         {/* Image Area — wrapped for Stage & Bench so it surfaces the

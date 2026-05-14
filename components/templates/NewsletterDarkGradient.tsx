@@ -175,9 +175,9 @@ export function NewsletterDarkGradient({
   const textWidth = TEXT_WIDTHS[imageSize]
   const imageWidth = IMAGE_WIDTHS[imageSize]
 
-  // Text-block stack — eyebrow / headline / subhead with adjustable gaps.
-  // CTA sits OUTSIDE the stack, anchored to the bottom of the text column
-  // by the outer space-between, preserving the legacy layout shape.
+  // Text-block stack — eyebrow / headline / subhead / cta with adjustable
+  // gaps. CTA participates in the stack so it gets inline editing,
+  // stackAlign-driven distribution, and user-controllable spacing.
   const stackBlocks: ContentStackBlock<NewsletterDarkGradientBlockId>[] = [
     {
       id: 'eyebrow',
@@ -232,6 +232,28 @@ export function NewsletterDarkGradient({
         </div>
       ),
     },
+    {
+      id: 'cta',
+      visible: showCta,
+      defaultInner: ctaText || SLOT_PLACEHOLDERS.cta,
+      renderChrome: (inner) => (
+        <div style={{
+          display: 'inline-flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: 8,
+        }}>
+          <span style={{
+            textAlign: 'center',
+            color: textColor,
+            fontSize: 12,
+            fontWeight: 500,
+            lineHeight: '12px',
+          }}>{inner}</span>
+          <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
+        </div>
+      ),
+    },
   ]
 
   return (
@@ -253,16 +275,14 @@ export function NewsletterDarkGradient({
 
       {/* Content Overlay */}
       <div style={contentStyle}>
-        {/* Text Content Area — vertical flex with space-between:
-         *  ContentStack at top (text-block, adjustable spacing),
-         *  CTA at bottom (anchored sibling). */}
+        {/* Text Content Area — CTA is now inside the ContentStack so
+         *  its order and spacing are driven by stackAlign + spacer drags. */}
         <div style={{
           width: imageSize === 'none' ? '100%' : textWidth,
           alignSelf: 'stretch',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}>
           <ContentStack<NewsletterDarkGradientBlockId>
@@ -275,27 +295,6 @@ export function NewsletterDarkGradient({
             stackAlign={stackAlign}
             alignItems="flex-start"
           />
-
-          {/* CTA — sibling of ContentStack, anchored bottom by space-between */}
-          {showCta && wrapBlock('cta', (
-            <div style={{
-              display: 'inline-flex',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 8,
-            }}>
-              <span style={{
-                textAlign: 'center',
-                color: textColor,
-                fontSize: 12,
-                fontWeight: 500,
-                lineHeight: '12px',
-              }}>
-                {ctaText || SLOT_PLACEHOLDERS.cta}
-              </span>
-              <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
-            </div>
-          ))}
         </div>
 
         {/* Image Area — wrapped for Stage & Bench so it surfaces the
