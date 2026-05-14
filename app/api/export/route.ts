@@ -281,6 +281,19 @@ export async function POST(request: NextRequest) {
 
     const page = await browser.newPage()
 
+    // Preview deployments are gated by Vercel Deployment Protection. Puppeteer
+    // doesn't carry the SSO cookie a browser session does, so without a bypass
+    // it gets the Vercel login page instead of /render. Send the automation
+    // bypass secret as a header so the protection layer lets us through.
+    // Requires "Protection Bypass for Automation" enabled in project settings.
+    const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+    if (bypassSecret) {
+      await page.setExtraHTTPHeaders({
+        'x-vercel-protection-bypass': bypassSecret,
+        'x-vercel-set-bypass-cookie': 'samesitenone',
+      })
+    }
+
     // Set viewport to template dimensions
     const dimensions = TEMPLATE_DIMENSIONS[template] || TEMPLATE_DIMENSIONS['website-thumbnail']
     const { width, height } = dimensions
