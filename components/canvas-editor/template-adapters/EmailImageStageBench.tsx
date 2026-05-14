@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { ImageLayout } from '@/types'
 import { NEUTRAL_FILTERS } from '@/lib/image-filters'
@@ -35,7 +37,7 @@ export const EmailImageStageBench = defineStageBenchAdapter<EmailImageBlockId>({
       iconKey: 'headline',
       kind: 'text',
       benchable: false,
-      content: { format: 'html', placeholder: 'Headline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       size: { default: 38, min: 24, max: 60, step: 2 },
     },
     {
@@ -44,7 +46,7 @@ export const EmailImageStageBench = defineStageBenchAdapter<EmailImageBlockId>({
       iconKey: 'body',
       chipKind: 'body',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Body copy goes here.' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.body },
     },
     {
       blockId: 'cta',

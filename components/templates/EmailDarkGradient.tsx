@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -181,7 +183,7 @@ export function EmailDarkGradient({
     {
       id: 'eyebrow',
       visible: showEyebrow,
-      defaultInner: eyebrow || 'Eyebrow',
+      defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
       renderChrome: (inner) => (
         <div
           style={{
@@ -243,7 +245,7 @@ export function EmailDarkGradient({
     {
       id: 'body',
       visible: showBody,
-      defaultInner: <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />,
+      defaultInner: <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />,
       renderChrome: (inner) => (
         <div
           className="rich-text-white"
@@ -264,7 +266,7 @@ export function EmailDarkGradient({
     {
       id: 'cta',
       visible: showCta,
-      defaultInner: ctaText || 'Call to Action',
+      defaultInner: ctaText || SLOT_PLACEHOLDERS.cta,
       renderChrome: (inner) =>
         ctaStyle === 'link' ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

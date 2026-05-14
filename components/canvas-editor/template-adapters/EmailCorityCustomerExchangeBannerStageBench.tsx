@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
@@ -35,7 +37,7 @@ export const EmailCorityCustomerExchangeBannerStageBench =
         label: 'Headline',
         iconKey: 'headline',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Headline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
         size: { default: 38, min: 24, max: 60, step: 2 },
       },
       {
@@ -44,14 +46,14 @@ export const EmailCorityCustomerExchangeBannerStageBench =
         iconKey: 'body',
         chipKind: 'body',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Body copy goes here.' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.body },
       },
       {
         blockId: 'cta',
         label: 'CTA',
         iconKey: 'cta',
         kind: 'cta',
-        content: { format: 'plain', placeholder: 'Call to Action' },
+        content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
       },
     ],
     stageBar: [

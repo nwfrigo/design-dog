@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { TemplateTheme } from '@/types'
 
@@ -39,7 +41,7 @@ export const SocialGridDetailStageBench =
         label: 'Headline',
         iconKey: 'headline',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Headline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
         size: { default: 84, min: 40, max: 140, step: 4 },
       },
       {
@@ -48,7 +50,7 @@ export const SocialGridDetailStageBench =
         iconKey: 'subhead',
         chipKind: 'subheadline',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Subheadline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.subhead },
       },
       {
         blockId: 'gridDetail1',

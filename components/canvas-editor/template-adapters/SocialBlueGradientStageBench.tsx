@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { ColorStyle, TextAlignment, HeadingSize, CtaStyle } from '@/types'
 
@@ -36,14 +38,14 @@ export const SocialBlueGradientStageBench = defineStageBenchAdapter<SocialBlueGr
       iconKey: 'eyebrow',
       chipKind: 'eyebrow',
       kind: 'text',
-      content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+      content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.eyebrow },
     },
     {
       blockId: 'headline',
       label: 'Headline',
       iconKey: 'headline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Headline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       size: { default: 84, min: 40, max: 140, step: 4 },
     },
     {
@@ -52,7 +54,7 @@ export const SocialBlueGradientStageBench = defineStageBenchAdapter<SocialBlueGr
       iconKey: 'subhead',
       chipKind: 'subheadline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Subheadline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.subhead },
       size: { default: 36, min: 20, max: 48, step: 2 },
     },
     {
@@ -61,7 +63,7 @@ export const SocialBlueGradientStageBench = defineStageBenchAdapter<SocialBlueGr
       iconKey: 'body',
       chipKind: 'body',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Body copy goes here.' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.body },
     },
     {
       blockId: 'metadata',
@@ -69,14 +71,14 @@ export const SocialBlueGradientStageBench = defineStageBenchAdapter<SocialBlueGr
       iconKey: 'small-caption',
       chipKind: 'small-caption',
       kind: 'text',
-      content: { format: 'plain', singleLine: true, placeholder: 'Small Caption' },
+      content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.metadata },
     },
     {
       blockId: 'cta',
       label: 'CTA',
       iconKey: 'cta',
       kind: 'cta',
-      content: { format: 'plain', placeholder: 'Call to Action' },
+      content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
     },
   ],
   stageBar: [

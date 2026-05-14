@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityConnectLogo } from '@/components/shared/CorityConnectLogo'
@@ -142,7 +144,7 @@ export function EmailCorityConnect2026({
       lineHeight: '18px',
     }}>
       {wrapInline('cta', (
-        <span>{ctaText || 'Call to Action'}</span>
+        <span>{ctaText || SLOT_PLACEHOLDERS.cta}</span>
       ))}
       <ArrowIcon color="#0080FF" width={16.5} height={13.13} />
     </div>

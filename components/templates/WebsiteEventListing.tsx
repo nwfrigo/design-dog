@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -119,7 +121,7 @@ export function WebsiteEventListing({
     {
       id: 'eyebrow',
       visible: showEyebrow,
-      defaultInner: eyebrow || 'Eyebrow',
+      defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -134,7 +136,7 @@ export function WebsiteEventListing({
     {
       id: 'headline',
       visible: !!showHeadline,
-      defaultInner: headline || 'Headline',
+      defaultInner: headline || SLOT_PLACEHOLDERS.headline,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -148,7 +150,7 @@ export function WebsiteEventListing({
     {
       id: 'subhead',
       visible: showSubhead,
-      defaultInner: subhead || 'Subheadline',
+      defaultInner: subhead || SLOT_PLACEHOLDERS.subhead,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -207,10 +209,10 @@ export function WebsiteEventListing({
   }
 
   const gridRows: Array<{ id: 'gridDetail1' | 'gridDetail2' | 'gridDetail3' | 'gridDetail4'; text: string; isCta: boolean }> = [
-    { id: 'gridDetail1', text: gridDetail1Text || 'Grid detail 1', isCta: false },
-    ...(showGridDetail2 ? [{ id: 'gridDetail2' as const, text: gridDetail2Text || 'Grid detail 2', isCta: false }] : []),
-    ...(showGridDetail3 ? [{ id: 'gridDetail3' as const, text: gridDetail3Text || 'Grid detail 3', isCta: false }] : []),
-    { id: 'gridDetail4', text: gridDetail4Text || 'Grid detail 4', isCta: true },
+    { id: 'gridDetail1', text: gridDetail1Text || SLOT_PLACEHOLDERS.gridDetail1, isCta: false },
+    ...(showGridDetail2 ? [{ id: 'gridDetail2' as const, text: gridDetail2Text || SLOT_PLACEHOLDERS.gridDetail2, isCta: false }] : []),
+    ...(showGridDetail3 ? [{ id: 'gridDetail3' as const, text: gridDetail3Text || SLOT_PLACEHOLDERS.gridDetail3, isCta: false }] : []),
+    { id: 'gridDetail4', text: gridDetail4Text || SLOT_PLACEHOLDERS.gridDetail4, isCta: true },
   ]
 
   return (

@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
@@ -158,7 +160,7 @@ export function WebsiteFloatingBannerMobile({
       letterSpacing: 1.32,
       whiteSpace: 'nowrap',
     }}>
-      {wrapInline('eyebrow', <div>{eyebrow || 'Eyebrow'}</div>)}
+      {wrapInline('eyebrow', <div>{eyebrow || SLOT_PLACEHOLDERS.eyebrow}</div>)}
     </div>
   ))
 
@@ -170,7 +172,7 @@ export function WebsiteFloatingBannerMobile({
       fontWeight: 350,
       lineHeight: `${(headlineFontSize ?? 14) * (15.40 / 14)}px`,
     }}>
-      {wrapInline('headline', <div>{headline || 'Headline'}</div>)}
+      {wrapInline('headline', <div>{headline || SLOT_PLACEHOLDERS.headline}</div>)}
     </div>
   ))
 

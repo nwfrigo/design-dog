@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { ColorStyle, TextAlignment, CtaStyle } from '@/types'
 
@@ -38,14 +40,14 @@ export const EmailDarkGradientStageBench = defineStageBenchAdapter<EmailDarkGrad
       iconKey: 'eyebrow',
       chipKind: 'eyebrow',
       kind: 'text',
-      content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+      content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.eyebrow },
     },
     {
       blockId: 'headline',
       label: 'Headline',
       iconKey: 'headline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Headline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       size: { default: 38, min: 24, max: 60, step: 2 },
     },
     {
@@ -54,7 +56,7 @@ export const EmailDarkGradientStageBench = defineStageBenchAdapter<EmailDarkGrad
       iconKey: 'subhead',
       chipKind: 'subheadline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Subheadline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.subhead },
       size: { default: 18, min: 12, max: 28, step: 1 },
     },
     {
@@ -63,14 +65,14 @@ export const EmailDarkGradientStageBench = defineStageBenchAdapter<EmailDarkGrad
       iconKey: 'body',
       chipKind: 'body',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Body copy goes here.' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.body },
     },
     {
       blockId: 'cta',
       label: 'CTA',
       iconKey: 'cta',
       kind: 'cta',
-      content: { format: 'plain', placeholder: 'Call to Action' },
+      content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
     },
   ],
   stageBar: [

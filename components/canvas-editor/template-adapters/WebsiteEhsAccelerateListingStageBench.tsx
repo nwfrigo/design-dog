@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
@@ -28,14 +30,14 @@ export const WebsiteEhsAccelerateListingStageBench =
         iconKey: 'eyebrow',
         chipKind: 'eyebrow',
         kind: 'text',
-        content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.eyebrow },
       },
       {
         blockId: 'headline',
         label: 'Headline',
         iconKey: 'headline',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Headline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
         size: { default: 38, min: 24, max: 60, step: 2 },
       },
       {
@@ -44,7 +46,7 @@ export const WebsiteEhsAccelerateListingStageBench =
         iconKey: 'subhead',
         chipKind: 'subheadline',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Subheadline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.subhead },
       },
       {
         blockId: 'gridDetail1',

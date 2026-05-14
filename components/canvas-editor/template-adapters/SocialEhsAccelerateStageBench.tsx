@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
@@ -31,7 +33,7 @@ export const SocialEhsAccelerateStageBench = defineStageBenchAdapter<SocialEhsAc
       label: 'Headline',
       iconKey: 'headline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Headline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       size: { default: 84, min: 40, max: 140, step: 4 },
     },
     {
@@ -40,7 +42,7 @@ export const SocialEhsAccelerateStageBench = defineStageBenchAdapter<SocialEhsAc
       iconKey: 'subhead',
       chipKind: 'subheadline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Subheadline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.subhead },
       size: { default: 36, min: 20, max: 48, step: 2 },
     },
     {

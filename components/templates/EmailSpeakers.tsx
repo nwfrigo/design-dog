@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -282,7 +284,7 @@ export function EmailSpeakers({
             {
               id: 'eyebrow',
               visible: showEyebrow,
-              defaultInner: eyebrow || 'Eyebrow',
+              defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
               renderChrome: (inner) => (
                 <div style={{
                   color: textColor,
@@ -320,7 +322,7 @@ export function EmailSpeakers({
               id: 'body',
               visible: showBody,
               defaultInner: (
-                <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />
+                <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
               ),
               renderChrome: (inner) => (
                 <div
@@ -339,7 +341,7 @@ export function EmailSpeakers({
             {
               id: 'cta',
               visible: showCta,
-              defaultInner: ctaText || 'Call to Action',
+              defaultInner: ctaText || SLOT_PLACEHOLDERS.cta,
               renderChrome: (inner) => (
                 <div style={{
                   display: 'inline-flex',
@@ -450,7 +452,7 @@ export function EmailSpeakers({
                     fontSize: 18,
                     fontWeight: 350,
                   }}>
-                    {wrapInline(nameId, speaker.name || 'Firstname Lastname')}
+                    {wrapInline(nameId, speaker.name || SLOT_PLACEHOLDERS.speakerName)}
                   </div>
                 ))}
                 {wrapBlock(roleId, (
@@ -461,7 +463,7 @@ export function EmailSpeakers({
                     fontWeight: 350,
                     lineHeight: '16px',
                   }}>
-                    {wrapInline(roleId, speaker.role || 'Role, Company')}
+                    {wrapInline(roleId, speaker.role || SLOT_PLACEHOLDERS.speakerRole)}
                   </div>
                 ))}
               </div>

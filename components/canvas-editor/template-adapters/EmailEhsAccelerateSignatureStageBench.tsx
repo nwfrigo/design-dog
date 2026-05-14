@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
@@ -52,7 +54,7 @@ export const EmailEhsAccelerateSignatureStageBench =
         label: 'CTA',
         iconKey: 'cta',
         kind: 'cta',
-        content: { format: 'plain', placeholder: 'Call to Action' },
+        content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
       },
     ],
     useStoreBindings: () => {

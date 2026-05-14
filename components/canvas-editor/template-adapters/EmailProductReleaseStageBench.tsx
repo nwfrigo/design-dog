@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 
@@ -38,7 +40,7 @@ export const EmailProductReleaseStageBench =
         iconKey: 'headline',
         kind: 'text',
         benchable: false,
-        content: { format: 'html', placeholder: 'Headline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       },
       { blockId: 'image', label: 'Image', iconKey: 'image', kind: 'image', benchable: false },
     ],

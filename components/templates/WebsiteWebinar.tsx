@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -281,7 +283,7 @@ export function WebsiteWebinar({
     {
       id: 'eyebrow',
       visible: showEyebrow,
-      defaultInner: eyebrow || 'Eyebrow',
+      defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -296,7 +298,7 @@ export function WebsiteWebinar({
     {
       id: 'headline',
       visible: !!showHeadline,
-      defaultInner: headline || 'Headline',
+      defaultInner: headline || SLOT_PLACEHOLDERS.headline,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -310,7 +312,7 @@ export function WebsiteWebinar({
     {
       id: 'subhead',
       visible: showSubhead,
-      defaultInner: subhead || 'Subheadline',
+      defaultInner: subhead || SLOT_PLACEHOLDERS.subhead,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -323,7 +325,7 @@ export function WebsiteWebinar({
     {
       id: 'body',
       visible: showBody,
-      defaultInner: body || 'Body copy goes here.',
+      defaultInner: body || SLOT_PLACEHOLDERS.body,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -336,7 +338,7 @@ export function WebsiteWebinar({
     {
       id: 'cta',
       visible: showCta,
-      defaultInner: cta || 'Call to Action',
+      defaultInner: cta || SLOT_PLACEHOLDERS.cta,
       renderChrome: (inner) => (
         <div style={{
           display: 'inline-flex',

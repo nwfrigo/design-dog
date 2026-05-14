@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -145,7 +147,7 @@ export function EmailGrid({
     {
       id: 'eyebrow',
       visible: showEyebrow,
-      defaultInner: eyebrow || 'Eyebrow',
+      defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,
@@ -159,7 +161,7 @@ export function EmailGrid({
     {
       id: 'headline',
       visible: !!(showLightHeader && showHeadline),
-      defaultInner: headline || 'Headline',
+      defaultInner: headline || SLOT_PLACEHOLDERS.headline,
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,
@@ -172,7 +174,7 @@ export function EmailGrid({
     {
       id: 'subheading',
       visible: showSubheading,
-      defaultInner: subheading || 'Subheadline',
+      defaultInner: subheading || SLOT_PLACEHOLDERS.subhead,
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,
@@ -185,7 +187,7 @@ export function EmailGrid({
     {
       id: 'body',
       visible: !!showBody,
-      defaultInner: body || 'Body copy goes here.',
+      defaultInner: body || SLOT_PLACEHOLDERS.body,
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,

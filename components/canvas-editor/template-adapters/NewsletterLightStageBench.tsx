@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { TemplateTheme } from '@/types'
 import { NEUTRAL_FILTERS } from '@/lib/image-filters'
@@ -32,14 +34,14 @@ export const NewsletterLightStageBench = defineStageBenchAdapter<NewsletterLight
       iconKey: 'eyebrow',
       chipKind: 'eyebrow',
       kind: 'text',
-      content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+      content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.eyebrow },
     },
     {
       blockId: 'headline',
       label: 'Headline',
       iconKey: 'headline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Headline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       size: { default: 24, min: 14, max: 40, step: 2 },
     },
     {
@@ -48,7 +50,7 @@ export const NewsletterLightStageBench = defineStageBenchAdapter<NewsletterLight
       iconKey: 'subhead',
       chipKind: 'subheadline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Subheadline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.subhead },
       size: { default: 12, min: 10, max: 20, step: 1 },
     },
     {
@@ -56,7 +58,7 @@ export const NewsletterLightStageBench = defineStageBenchAdapter<NewsletterLight
       label: 'CTA',
       iconKey: 'cta',
       kind: 'cta',
-      content: { format: 'plain', placeholder: 'Call to Action' },
+      content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
     },
     { blockId: 'image', label: 'Image', iconKey: 'image', kind: 'image', benchable: false },
   ],

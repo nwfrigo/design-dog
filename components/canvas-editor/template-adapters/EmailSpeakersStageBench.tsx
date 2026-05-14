@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { TemplateTheme } from '@/types'
 import { NEUTRAL_FILTERS } from '@/lib/image-filters'
@@ -46,7 +48,7 @@ export const EmailSpeakersStageBench =
         iconKey: 'eyebrow',
         chipKind: 'eyebrow',
         kind: 'text',
-        content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.eyebrow },
       },
       {
         blockId: 'headline',
@@ -54,7 +56,7 @@ export const EmailSpeakersStageBench =
         iconKey: 'headline',
         kind: 'text',
         benchable: false,
-        content: { format: 'html', placeholder: 'Headline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
         size: { default: 38, min: 16, max: 50, step: 2 },
       },
       {
@@ -63,14 +65,14 @@ export const EmailSpeakersStageBench =
         iconKey: 'body',
         chipKind: 'body',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Body copy goes here.' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.body },
       },
       {
         blockId: 'cta',
         label: 'CTA',
         iconKey: 'cta',
         kind: 'cta',
-        content: { format: 'plain', placeholder: 'Call to Action' },
+        content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
       },
       // Each speaker is a bench-able group.
       { blockId: 'speaker1', label: 'Speaker 1', iconKey: 'speaker', chipKind: 'speaker', kind: 'group' },
@@ -80,32 +82,32 @@ export const EmailSpeakersStageBench =
       {
         blockId: 'speaker1Name', label: 'Speaker 1 Name', iconKey: 'speaker',
         chipKind: 'speaker', kind: 'text', parent: 'speaker1',
-        content: { format: 'plain', singleLine: true, placeholder: 'Firstname Lastname' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.speakerName },
       },
       {
         blockId: 'speaker1Role', label: 'Speaker 1 Role', iconKey: 'small-caption',
         chipKind: 'small-caption', kind: 'text', parent: 'speaker1',
-        content: { format: 'plain', singleLine: true, placeholder: 'Role, Company' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.speakerRole },
       },
       {
         blockId: 'speaker2Name', label: 'Speaker 2 Name', iconKey: 'speaker',
         chipKind: 'speaker', kind: 'text', parent: 'speaker2',
-        content: { format: 'plain', singleLine: true, placeholder: 'Firstname Lastname' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.speakerName },
       },
       {
         blockId: 'speaker2Role', label: 'Speaker 2 Role', iconKey: 'small-caption',
         chipKind: 'small-caption', kind: 'text', parent: 'speaker2',
-        content: { format: 'plain', singleLine: true, placeholder: 'Role, Company' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.speakerRole },
       },
       {
         blockId: 'speaker3Name', label: 'Speaker 3 Name', iconKey: 'speaker',
         chipKind: 'speaker', kind: 'text', parent: 'speaker3',
-        content: { format: 'plain', singleLine: true, placeholder: 'Firstname Lastname' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.speakerName },
       },
       {
         blockId: 'speaker3Role', label: 'Speaker 3 Role', iconKey: 'small-caption',
         chipKind: 'small-caption', kind: 'text', parent: 'speaker3',
-        content: { format: 'plain', singleLine: true, placeholder: 'Role, Company' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.speakerRole },
       },
       // Per-speaker avatar children — image kind opens own ImageEditorModal.
       { blockId: 'speaker1Avatar', label: 'Speaker 1 Avatar', iconKey: 'image', kind: 'image', parent: 'speaker1' },

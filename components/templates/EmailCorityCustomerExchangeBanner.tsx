@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityCustomerExchangeStackedLogo } from '@/components/shared/CorityCustomerExchangeStackedLogo'
@@ -119,7 +121,7 @@ export function EmailCorityCustomerExchangeBanner({
       }}
     >
       {wrapInline('body', (
-        <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />
+        <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
       ))}
     </div>
   ))
@@ -134,7 +136,7 @@ export function EmailCorityCustomerExchangeBanner({
       fontWeight: 500,
       lineHeight: 1,
     }}>
-      {wrapInline('cta', <span>{ctaText || 'Call to Action'}</span>)}
+      {wrapInline('cta', <span>{ctaText || SLOT_PLACEHOLDERS.cta}</span>)}
       <ArrowIcon
         color="#FFFFFF"
         width={16.5}

@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -149,7 +151,7 @@ export function SocialEhsAccelerate({
     {
       id: 'cta',
       visible: showCta,
-      defaultInner: <span>{ctaText || 'Call to Action'}</span>,
+      defaultInner: <span>{ctaText || SLOT_PLACEHOLDERS.cta}</span>,
       renderChrome: (inner) => (
         <div style={{
           display: 'flex',

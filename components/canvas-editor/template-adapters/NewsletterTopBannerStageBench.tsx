@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { NewsletterTopBannerVariant } from '@/types'
 
@@ -39,7 +41,7 @@ export const NewsletterTopBannerStageBench =
         label: 'Headline',
         iconKey: 'headline',
         kind: 'text',
-        content: { format: 'plain', placeholder: 'Headline' },
+        content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.headline },
       },
       {
         blockId: 'subhead',
@@ -47,7 +49,7 @@ export const NewsletterTopBannerStageBench =
         iconKey: 'subhead',
         chipKind: 'subheadline',
         kind: 'text',
-        content: { format: 'plain', placeholder: 'Subheadline' },
+        content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.subhead },
         size: { default: 22, min: 14, max: 32, step: 2 },
       },
     ],

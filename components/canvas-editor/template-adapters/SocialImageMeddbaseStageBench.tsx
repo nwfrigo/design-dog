@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 import type { ImageLayout } from '@/types'
 import { NEUTRAL_FILTERS } from '@/lib/image-filters'
@@ -34,7 +36,7 @@ export const SocialImageMeddbaseStageBench = defineStageBenchAdapter<SocialImage
       iconKey: 'headline',
       kind: 'text',
       benchable: false,
-      content: { format: 'html', placeholder: 'Headline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       size: { default: 84, min: 40, max: 140, step: 4 },
     },
     {
@@ -43,7 +45,7 @@ export const SocialImageMeddbaseStageBench = defineStageBenchAdapter<SocialImage
       iconKey: 'subhead',
       chipKind: 'subheadline',
       kind: 'text',
-      content: { format: 'html', placeholder: 'Subheadline' },
+      content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.subhead },
       size: { default: 36, min: 20, max: 48, step: 2 },
     },
     {
@@ -52,7 +54,7 @@ export const SocialImageMeddbaseStageBench = defineStageBenchAdapter<SocialImage
       iconKey: 'small-caption',
       chipKind: 'small-caption',
       kind: 'text',
-      content: { format: 'plain', singleLine: true, placeholder: 'Small Caption' },
+      content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.metadata },
     },
     {
       blockId: 'cta',

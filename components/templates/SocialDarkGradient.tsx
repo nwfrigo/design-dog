@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -185,7 +187,7 @@ export function SocialDarkGradient({
     {
       id: 'eyebrow',
       visible: showEyebrow,
-      defaultInner: eyebrow || 'Eyebrow',
+      defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
       renderChrome: (inner) => (
         <div
           style={{
@@ -247,7 +249,7 @@ export function SocialDarkGradient({
       id: 'body',
       visible: showBody,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />
+        <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
       ),
       renderChrome: (inner) => (
         <div
@@ -267,7 +269,7 @@ export function SocialDarkGradient({
     {
       id: 'metadata',
       visible: showMetadata,
-      defaultInner: metadata || 'Small Caption',
+      defaultInner: metadata || SLOT_PLACEHOLDERS.metadata,
       renderChrome: (inner) => (
         <div
           style={{
@@ -286,7 +288,7 @@ export function SocialDarkGradient({
     {
       id: 'cta',
       visible: showCta,
-      defaultInner: ctaText || 'Call to Action',
+      defaultInner: ctaText || SLOT_PLACEHOLDERS.cta,
       renderChrome: (inner) =>
         ctaStyle === 'link' ? (
           <div

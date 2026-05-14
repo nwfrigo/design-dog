@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
@@ -176,7 +178,7 @@ export function WebsiteFloatingBanner({
       letterSpacing: 1.76,
       textShadow: textShadowStyle,
     }}>
-      {wrapInline('eyebrow', <div>{eyebrow || 'Eyebrow'}</div>)}
+      {wrapInline('eyebrow', <div>{eyebrow || SLOT_PLACEHOLDERS.eyebrow}</div>)}
     </div>
   ))
 
@@ -189,7 +191,7 @@ export function WebsiteFloatingBanner({
       lineHeight: `${headlineFontSize ?? 32.73}px`,
       textShadow: textShadowStyle,
     }}>
-      {wrapInline('headline', <div>{headline || 'Headline'}</div>)}
+      {wrapInline('headline', <div>{headline || SLOT_PLACEHOLDERS.headline}</div>)}
     </div>
   ))
 

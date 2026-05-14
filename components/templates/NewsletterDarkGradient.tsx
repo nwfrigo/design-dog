@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -180,7 +182,7 @@ export function NewsletterDarkGradient({
     {
       id: 'eyebrow',
       visible: showEyebrow,
-      defaultInner: eyebrow || 'Eyebrow',
+      defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -198,7 +200,7 @@ export function NewsletterDarkGradient({
       id: 'headline',
       visible: !!showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
+        <div dangerouslySetInnerHTML={{ __html: headline || SLOT_PLACEHOLDERS.headline }} />
       ),
       renderChrome: (inner) => (
         <div className="nl-rich-text" style={{
@@ -216,7 +218,7 @@ export function NewsletterDarkGradient({
       id: 'subhead',
       visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: subhead || 'Subheadline' }} />
+        <div dangerouslySetInnerHTML={{ __html: subhead || SLOT_PLACEHOLDERS.subhead }} />
       ),
       renderChrome: (inner) => (
         <div className="nl-rich-text" style={{
@@ -289,7 +291,7 @@ export function NewsletterDarkGradient({
                 fontWeight: 500,
                 lineHeight: '12px',
               }}>
-                {ctaText || 'Call to Action'}
+                {ctaText || SLOT_PLACEHOLDERS.cta}
               </span>
               <ArrowIcon color={ctaColor} width={11} height={11 * 0.795} viewBox="0 0 11 8.75" pathD="M6.5 0.5L10.5 4.375M10.5 4.375L6.5 8.25M10.5 4.375H0.5" strokeWidth={0.75} />
             </div>

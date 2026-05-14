@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -218,7 +220,7 @@ export function WebsitePressRelease({
             {
               id: 'eyebrow',
               visible: showEyebrow,
-              defaultInner: eyebrow || 'Eyebrow',
+              defaultInner: eyebrow || SLOT_PLACEHOLDERS.eyebrow,
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -237,7 +239,7 @@ export function WebsitePressRelease({
             {
               id: 'headline',
               visible: showHeadline,
-              defaultInner: headline || 'Headline',
+              defaultInner: headline || SLOT_PLACEHOLDERS.headline,
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -255,7 +257,7 @@ export function WebsitePressRelease({
             {
               id: 'subhead',
               visible: showSubhead,
-              defaultInner: subhead || 'Subheadline',
+              defaultInner: subhead || SLOT_PLACEHOLDERS.subhead,
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -272,7 +274,7 @@ export function WebsitePressRelease({
             {
               id: 'body',
               visible: showBody,
-              defaultInner: body || 'Body copy goes here.',
+              defaultInner: body || SLOT_PLACEHOLDERS.body,
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -289,7 +291,7 @@ export function WebsitePressRelease({
             {
               id: 'cta',
               visible: showCta,
-              defaultInner: cta || 'Call to Action',
+              defaultInner: cta || SLOT_PLACEHOLDERS.cta,
               renderChrome: (inner) => (
                 <div
                   style={{

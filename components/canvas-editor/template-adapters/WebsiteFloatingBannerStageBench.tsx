@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { useStore } from '@/store'
 
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
@@ -40,14 +42,14 @@ export const WebsiteFloatingBannerStageBench =
         iconKey: 'eyebrow',
         chipKind: 'eyebrow',
         kind: 'text',
-        content: { format: 'plain', singleLine: true, placeholder: 'Eyebrow' },
+        content: { format: 'plain', singleLine: true, placeholder: SLOT_PLACEHOLDERS.eyebrow },
       },
       {
         blockId: 'headline',
         label: 'Headline',
         iconKey: 'headline',
         kind: 'text',
-        content: { format: 'html', placeholder: 'Headline' },
+        content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
         size: { default: 28, min: 18, max: 48, step: 2 },
       },
       {
@@ -55,7 +57,7 @@ export const WebsiteFloatingBannerStageBench =
         label: 'CTA',
         iconKey: 'cta',
         kind: 'cta',
-        content: { format: 'plain', placeholder: 'Call to Action' },
+        content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
       },
     ],
     stageBar: [

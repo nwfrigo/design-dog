@@ -1,5 +1,7 @@
 'use client'
 
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
@@ -209,7 +211,7 @@ export function EmailImage({
       id: 'body',
       visible: showBody,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: body || 'Body copy goes here.' }} />
+        <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
       ),
       renderChrome: (inner) => (
         <div
@@ -226,7 +228,7 @@ export function EmailImage({
     {
       id: 'cta',
       visible: showCta,
-      defaultInner: <span>{ctaText || 'Call to Action'}</span>,
+      defaultInner: <span>{ctaText || SLOT_PLACEHOLDERS.cta}</span>,
       renderChrome: (inner) => (
         <div style={{
           display: 'inline-flex',
