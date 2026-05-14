@@ -310,7 +310,7 @@ export function AssetSelectionScreen() {
         </div>
 
         {/* Template Grid — 3 cols on wider screens, 2 cols below. */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-12">
           {filteredTemplates.map((template) => (
             <TemplateTileV2
               key={template.type}

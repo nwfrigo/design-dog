@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { Plus, Check } from 'lucide-react'
 import type { TemplateInfo } from '@/lib/template-config'
 import type { TemplateType } from '@/types'
 import { TEMPLATE_DIMENSIONS } from '@/lib/template-config'
@@ -902,16 +903,22 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
           group relative flex flex-col rounded-xl overflow-hidden transition-all duration-200
           border
           ${isSelected
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20'
-            : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-secondary hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg'
+            ? 'border-line-focus bg-blue-50 dark:bg-blue-900/20 shadow-elevation-md'
+            : 'border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-secondary hover:shadow-elevation-md'
           }
         `}
       >
-        {/* Preview area - click to go to editor */}
+        {/* Preview area - click to go to editor.
+            Fixed height keeps the info section (label / name / dimensions /
+            Preview button) aligned horizontally across every tile, so the
+            cards stop "dancing" when templates have different aspect ratios.
+            256px = tallest visible scaled preview (EHS+ Accelerate Banner at
+            224) + 16px padding on each side. Shorter previews get extra
+            negative space above/below via the existing flex-center. */}
         <button
           onClick={onNavigateToEditor}
           className="relative overflow-hidden bg-gray-100 dark:bg-surface-secondary flex items-center justify-center"
-          style={{ minHeight: Math.max(previewHeight + 32, 180), padding: 16 }}
+          style={{ height: 256, padding: 16 }}
         >
           {/* Scaled template preview */}
           <div
@@ -950,32 +957,6 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
             )}
           </div>
 
-          {/* Multi-select checkbox in top right corner */}
-          <div
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggle()
-            }}
-            className={`
-              absolute top-4 right-4 w-7 h-7 rounded-lg cursor-pointer transition-all duration-150
-              flex items-center justify-center shadow-sm
-              ${isSelected
-                ? 'bg-blue-500'
-                : 'bg-white/90 dark:bg-surface-secondary hover:bg-white dark:hover:bg-interactive-hover border border-gray-200 dark:border-line-subtle'
-              }
-            `}
-          >
-            {isSelected ? (
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-            )}
-          </div>
-
         </button>
 
         {/* Info area */}
@@ -998,6 +979,24 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
               {template.dimensions}
             </span>
           </div>
+
+          {/* Multi-select toggle — square secondary button, matches Preview
+              button height/border. Switches to primary (inverse) styling +
+              Check icon when selected. */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle()
+            }}
+            aria-label={isSelected ? 'Deselect template' : 'Select template'}
+            className={`inline-flex flex-shrink-0 items-center justify-center h-7 w-7 border-[0.5px] rounded-[4px] transition-colors ${
+              isSelected
+                ? 'border-line-subtle bg-surface-inverse text-content-inverse hover:opacity-90'
+                : 'border-line-subtle bg-surface-primary text-content-secondary hover:bg-interactive-hover'
+            }`}
+          >
+            {isSelected ? <Check size={14} strokeWidth={2.5} /> : <Plus size={14} />}
+          </button>
 
           {/* Preview button — secondary style (matches ActionButton). */}
           <button
