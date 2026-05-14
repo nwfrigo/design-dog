@@ -1,7 +1,7 @@
 'use client'
 
 import type { TemplateType } from '@/types'
-import { TEMPLATE_LABELS } from '@/lib/template-config'
+import { TEMPLATE_LABELS, TEMPLATE_SUBCHANNEL_LABEL } from '@/lib/template-config'
 import { StageBenchTab } from '../StageBenchTab'
 
 /**
@@ -10,12 +10,9 @@ import { StageBenchTab } from '../StageBenchTab'
  *
  * Template-agnostic: just renders one tab per asset in `selectedAssets`,
  * with the active one styled differently. Channel breadcrumb (e.g.
- * "email / Dark & Simple") is derived from the template's id prefix.
+ * "EMAIL BANNER / GRID DETAILS") pulls the subchannel label from
+ * TEMPLATE_SUBCHANNEL_LABEL so it matches the homepage filter chip.
  */
-
-function getChannelFromTemplate(t: TemplateType): string {
-  return t.split('-')[0] ?? ''
-}
 
 export interface StageBenchHeaderProps {
   selectedAssets: TemplateType[]
@@ -41,7 +38,7 @@ export function StageBenchHeader({
       {selectedAssets.map((asset, idx) => {
         const isActive = idx === currentAssetIndex
         const label = getAssetLabel(asset, idx)
-        const channel = getChannelFromTemplate(asset)
+        const channel = TEMPLATE_SUBCHANNEL_LABEL[asset] ?? ''
         const baseLabel = TEMPLATE_LABELS[asset] ?? label
         return (
           <StageBenchTab

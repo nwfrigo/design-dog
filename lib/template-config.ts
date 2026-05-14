@@ -411,3 +411,13 @@ export const TEMPLATE_DIMENSIONS: Record<TemplateType, { width: number; height: 
 export const TEMPLATE_LABELS: Record<TemplateType, string> = Object.fromEntries(
   ALL_TEMPLATES.map(t => [t.type, t.label])
 ) as Record<TemplateType, string>
+
+// Subchannel label per template — drives the editor tab prefix
+// (e.g. "EMAIL BANNER / GRID DETAILS") so it matches the homepage filter
+// chip the template lives under. Honors `TemplateInfo.channelLabel`
+// overrides; falls back to the subchannel's own label.
+export const TEMPLATE_SUBCHANNEL_LABEL: Record<TemplateType, string> = Object.fromEntries(
+  SUBCHANNELS.flatMap(sc =>
+    sc.templates.map(t => [t.type, t.channelLabel ?? sc.label])
+  )
+) as Record<TemplateType, string>
