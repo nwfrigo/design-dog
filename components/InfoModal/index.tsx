@@ -12,13 +12,13 @@ type State = 'hidden' | 'modal' | 'toast'
  * Mounted once globally in `app/layout.tsx`. Three states:
  * - `modal` — open on first load (until user closes once).
  * - `toast` — collapsed chip at bottom-left. Re-opens the modal on click.
- * - `hidden` — only on /admin pages (or pre-hydration).
+ * - `hidden` — on /admin and /render pages (or pre-hydration).
  *
  * State transitions:
  *   first load (no flag)                   → modal
  *   close button on modal                  → toast (+ writes localStorage flag)
  *   click on toast                         → modal (does not unset flag)
- *   any state, pathname.startsWith('/admin')→ hidden
+ *   pathname.startsWith('/admin' | '/render')→ hidden
  *
  * Permanent fixture for the 1.5 launch — no auto-vanish. Delete the
  * `components/InfoModal/` directory + `public/assets/info-modal/` +
@@ -40,6 +40,7 @@ export function InfoModal() {
 
   if (!mounted) return null
   if (pathname?.startsWith('/admin')) return null
+  if (pathname?.startsWith('/render')) return null
   if (state === 'hidden') return null
 
   const handleClose = () => {
