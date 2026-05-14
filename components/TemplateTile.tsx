@@ -999,15 +999,13 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
             </span>
           </div>
 
-          {/* Preview button */}
+          {/* Preview button — secondary style (matches ActionButton). */}
           <button
             onClick={(e) => {
               e.stopPropagation()
               setShowPreview(true)
             }}
-            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-content-secondary
-              hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30
-              rounded-lg transition-colors border border-gray-200 dark:border-line-subtle"
+            className="inline-flex flex-shrink-0 items-center h-7 px-2 border-[0.5px] border-line-subtle rounded-[4px] bg-surface-primary text-content-secondary hover:bg-interactive-hover transition-colors font-mono text-[12px] uppercase leading-none"
           >
             Preview
           </button>

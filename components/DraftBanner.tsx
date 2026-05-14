@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { ChevronRight } from 'lucide-react'
 import { hasDraft, getDraftAssetCount, clearDraft, loadDraftFromStorage } from '@/lib/draft-storage'
 import { useStore } from '@/store'
 
@@ -114,20 +115,20 @@ export function DraftBanner() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Start Over — secondary style. */}
           <button
             onClick={handleStartOver}
-            className="px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+            className="inline-flex items-center h-7 px-2 border-[0.5px] border-line-subtle rounded-[4px] bg-surface-primary text-content-secondary hover:bg-interactive-hover transition-colors font-mono text-[12px] uppercase leading-none"
           >
             Start Over
           </button>
+          {/* Resume Editing — primary style (inverse). */}
           <button
             onClick={handleResume}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="inline-flex items-center gap-2 h-7 px-2 border-[0.5px] border-line-subtle rounded-[4px] bg-surface-inverse text-content-inverse hover:opacity-90 transition-colors font-mono text-[12px] uppercase leading-none"
           >
             Resume Editing
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight size={12} className="shrink-0" />
           </button>
         </div>
       </div>
