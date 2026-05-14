@@ -6,7 +6,6 @@
 
 import type { StackAlign } from '@/types'
 import { SocialImageMeddbase } from '@/components/templates/SocialImageMeddbase'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { SocialImageMeddbaseStageBench } from './SocialImageMeddbaseStageBench'
 
@@ -25,7 +24,7 @@ export const socialImageMeddbaseRegistration: StageBenchRegistrationData = {
     imageFilters: asset.thumbnailImageFilters,
     layout: asset.layout || 'even',
     solution: asset.solution,
-    showSubhead: asset.showSubhead && !!asset.subhead,
+    showSubhead: asset.showSubhead,
     showMetadata: asset.showMetadata !== false,
     showCta: asset.showCta !== false,
     showSolutionSet: asset.showSolutionSet !== false,
@@ -92,7 +91,7 @@ export const socialImageMeddbaseRegistration: StageBenchRegistrationData = {
       metadata: s.metadata,
       ctaText: s.ctaText,
       layout: s.layout,
-      showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
+      showSubhead: s.showSubhead,
       showMetadata: s.showMetadata,
       showCta: s.showCta,
       showSolutionSet: s.showSolutionSet,

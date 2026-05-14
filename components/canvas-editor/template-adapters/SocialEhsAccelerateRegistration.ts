@@ -26,7 +26,7 @@ export const socialEhsAccelerateRegistration: StageBenchRegistrationData = {
     subhead: asset.subhead || '',
     ctaText: asset.ctaText || '',
     showHeadline: asset.showHeadline !== false,
-    showSubhead: asset.showSubhead && !!asset.subhead,
+    showSubhead: asset.showSubhead,
     showCta: asset.showCta !== false,
     headlineFontSize: asset.headlineFontSize ?? undefined,
     subheadFontSize: asset.subheadFontSize ?? undefined,

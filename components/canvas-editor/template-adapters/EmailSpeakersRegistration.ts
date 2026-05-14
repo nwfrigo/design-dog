@@ -10,7 +10,6 @@
 import { parseSpeakerParams } from '@/lib/render-params'
 import type { SearchParams } from '@/lib/render-params'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { EmailSpeakersStageBench } from './EmailSpeakersStageBench'
 
@@ -25,8 +24,8 @@ export const emailSpeakersRegistration: StageBenchRegistrationData = {
     ctaText: asset.ctaText || '',
     solution: asset.solution,
     logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
-    showEyebrow: asset.showEyebrow && !!asset.eyebrow,
-    showBody: asset.showBody && !!asset.body,
+    showEyebrow: asset.showEyebrow,
+    showBody: asset.showBody,
     showCta: asset.showCta !== false,
     showSolutionSet: asset.showSolutionSet !== false,
     showSpeaker1: asset.showSpeaker1 !== false,
@@ -80,8 +79,8 @@ export const emailSpeakersRegistration: StageBenchRegistrationData = {
   },
   exportBuilder: (s) => ({
     ctaText: s.ctaText,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showEyebrow: s.showEyebrow,
+    showBody: s.showBody,
     showCta: s.showCta,
     showSolutionSet: s.showSolutionSet,
     showSpeaker1: s.showSpeaker1,

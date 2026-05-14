@@ -5,7 +5,6 @@
 
 import type { StackAlign } from '@/types'
 import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { EmailDarkGradientStageBench } from './EmailDarkGradientStageBench'
 
@@ -22,10 +21,10 @@ export const emailDarkGradientRegistration: StageBenchRegistrationData = {
     colorStyle: asset.colorStyle || '1',
     alignment: asset.alignment || 'left',
     ctaStyle: asset.ctaStyle || 'link',
-    showEyebrow: asset.showEyebrow && !!asset.eyebrow,
+    showEyebrow: asset.showEyebrow,
     showHeadline: asset.showHeadline !== false,
-    showSubhead: asset.showSubhead && !!asset.subhead,
-    showBody: asset.showBody && !!asset.body,
+    showSubhead: asset.showSubhead,
+    showBody: asset.showBody,
     showCta: asset.showCta !== false,
     headlineFontSize: asset.headlineFontSize ?? undefined,
     subheadFontSize: asset.subheadFontSize ?? undefined,
@@ -65,10 +64,10 @@ export const emailDarkGradientRegistration: StageBenchRegistrationData = {
     colorStyle: s.colorStyle,
     alignment: s.alignment,
     ctaStyle: s.ctaStyle,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
+    showEyebrow: s.showEyebrow,
     showHeadline: s.showHeadline,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showSubhead: s.showSubhead,
+    showBody: s.showBody,
     showCta: s.showCta,
     stackAlign: s.stackAlign,
     gaps: s.templateGaps['email-dark-gradient'] ?? {},

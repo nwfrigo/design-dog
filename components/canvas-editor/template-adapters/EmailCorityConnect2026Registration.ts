@@ -5,7 +5,6 @@
  */
 
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { EmailCorityConnect2026StageBench } from './EmailCorityConnect2026StageBench'
 
@@ -19,7 +18,7 @@ export const emailCorityConnect2026Registration: StageBenchRegistrationData = {
     ctaText: asset.ctaText || '',
     backgroundVariant: asset.ccBackgroundVariant || 'dark-blue-1',
     showHeadline: asset.showHeadline !== false,
-    showBody: asset.showBody && !!asset.body,
+    showBody: asset.showBody,
     showCta: asset.showCta !== false,
     headlineFontSize: asset.headlineFontSize ?? undefined,
     colors, typography, scale: 1,
@@ -46,7 +45,7 @@ export const emailCorityConnect2026Registration: StageBenchRegistrationData = {
     backgroundVariant: s.ccBackgroundVariant || 'dark-blue-1',
     ctaText: s.ctaText,
     showHeadline: s.showHeadline,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showBody: s.showBody,
     showCta: s.showCta,
   }),
 }

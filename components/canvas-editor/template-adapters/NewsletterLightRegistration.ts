@@ -5,7 +5,6 @@
 
 import type { StackAlign } from '@/types'
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { NewsletterLightStageBench } from './NewsletterLightStageBench'
 
@@ -23,9 +22,9 @@ export const newsletterLightRegistration: StageBenchRegistrationData = {
     imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
     imageZoom: asset.thumbnailImageZoom || 1,
     imageFilters: asset.thumbnailImageFilters,
-    showEyebrow: asset.showEyebrow && !!asset.eyebrow,
+    showEyebrow: asset.showEyebrow,
     showHeadline: asset.showHeadline !== false,
-    showSubhead: asset.showSubhead && !!asset.subhead,
+    showSubhead: asset.showSubhead,
     showCta: asset.showCta !== false,
     grayscale: asset.grayscale,
     headlineFontSize: asset.headlineFontSize ?? undefined,
@@ -85,9 +84,9 @@ export const newsletterLightRegistration: StageBenchRegistrationData = {
       imageFilterSaturation: f?.saturation ?? 0,
       ctaText: s.ctaText,
       imageSize: s.newsletterImageSize,
-      showEyebrow: s.showEyebrow && !!s.eyebrow,
+      showEyebrow: s.showEyebrow,
       showHeadline: s.showHeadline,
-      showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
+      showSubhead: s.showSubhead,
       showCta: s.showCta,
       grayscale: s.grayscale,
       theme: s.theme,

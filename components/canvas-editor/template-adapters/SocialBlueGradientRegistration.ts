@@ -5,7 +5,6 @@
 
 import type { StackAlign } from '@/types'
 import { SocialBlueGradient } from '@/components/templates/SocialBlueGradient'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { SocialBlueGradientStageBench } from './SocialBlueGradientStageBench'
 
@@ -26,8 +25,8 @@ export const socialBlueGradientRegistration: StageBenchRegistrationData = {
     ctaStyle: asset.ctaStyle,
     showEyebrow: asset.showEyebrow,
     showHeadline: asset.showHeadline !== false,
-    showSubhead: asset.showSubhead && !!asset.subhead,
-    showBody: asset.showBody && !!asset.body,
+    showSubhead: asset.showSubhead,
+    showBody: asset.showBody,
     showMetadata: asset.showMetadata,
     showCta: asset.showCta,
     headlineFontSize: asset.headlineFontSize ?? undefined,
@@ -76,8 +75,8 @@ export const socialBlueGradientRegistration: StageBenchRegistrationData = {
     ctaStyle: s.ctaStyle,
     showEyebrow: s.showEyebrow,
     showHeadline: s.showHeadline,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showSubhead: s.showSubhead,
+    showBody: s.showBody,
     showMetadata: s.showMetadata,
     showCta: s.showCta,
     stackAlign: s.stackAlign,

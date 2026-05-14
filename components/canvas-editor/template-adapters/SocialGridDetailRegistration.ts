@@ -16,7 +16,7 @@ export const socialGridDetailRegistration: StageBenchRegistrationData = {
     subhead: asset.subhead || '',
     eyebrow: asset.eyebrow || "Don't miss this.",
     showEyebrow: asset.showEyebrow,
-    showSubhead: asset.showSubhead && !!asset.subhead,
+    showSubhead: asset.showSubhead,
     showSolutionSet: asset.showSolutionSet !== false,
     solution: asset.solution,
     showGridDetail2: asset.showGridDetail2 !== false,
@@ -72,7 +72,7 @@ export const socialGridDetailRegistration: StageBenchRegistrationData = {
   },
   exportBuilder: (s) => ({
     showEyebrow: s.showEyebrow,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
+    showSubhead: s.showSubhead,
     showSolutionSet: s.showSolutionSet,
     gridDetail1Text: s.gridDetail1Text,
     gridDetail2Text: s.gridDetail2Text,

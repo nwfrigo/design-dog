@@ -5,7 +5,6 @@
 
 import type { ColorStyle, StackAlign } from '@/types'
 import { NewsletterDarkGradient } from '@/components/templates/NewsletterDarkGradient'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { NewsletterDarkGradientStageBench } from './NewsletterDarkGradientStageBench'
 
@@ -24,9 +23,9 @@ export const newsletterDarkGradientRegistration: StageBenchRegistrationData = {
     imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
     imageZoom: asset.thumbnailImageZoom || 1,
     imageFilters: asset.thumbnailImageFilters,
-    showEyebrow: asset.showEyebrow && !!asset.eyebrow,
+    showEyebrow: asset.showEyebrow,
     showHeadline: asset.showHeadline !== false,
-    showSubhead: asset.showSubhead && !!asset.subhead,
+    showSubhead: asset.showSubhead,
     showCta: asset.showCta !== false,
     grayscale: asset.grayscale,
     headlineFontSize: asset.headlineFontSize ?? undefined,
@@ -86,9 +85,9 @@ export const newsletterDarkGradientRegistration: StageBenchRegistrationData = {
       ctaText: s.ctaText,
       colorStyle: s.colorStyle,
       imageSize: s.newsletterImageSize,
-      showEyebrow: s.showEyebrow && !!s.eyebrow,
+      showEyebrow: s.showEyebrow,
       showHeadline: s.showHeadline,
-      showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
+      showSubhead: s.showSubhead,
       showCta: s.showCta,
       grayscale: s.grayscale,
       stackAlign: s.stackAlign,

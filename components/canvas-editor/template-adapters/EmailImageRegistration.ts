@@ -5,7 +5,6 @@
 
 import type { StackAlign } from '@/types'
 import { EmailImage } from '@/components/templates/EmailImage'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { EmailImageStageBench } from './EmailImageStageBench'
 
@@ -23,7 +22,7 @@ export const emailImageRegistration: StageBenchRegistrationData = {
     imageFilters: asset.thumbnailImageFilters,
     layout: asset.layout || 'even',
     solution: asset.solution,
-    showBody: asset.showBody && !!asset.body,
+    showBody: asset.showBody,
     showCta: asset.showCta !== false,
     showSolutionSet: asset.showSolutionSet !== false,
     grayscale: asset.grayscale,
@@ -85,7 +84,7 @@ export const emailImageRegistration: StageBenchRegistrationData = {
       grayscale: s.grayscale,
       ctaText: s.ctaText,
       layout: s.layout,
-      showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+      showBody: s.showBody,
       showCta: s.showCta,
       showSolutionSet: s.showSolutionSet,
       theme: s.theme,

@@ -3,7 +3,6 @@
  */
 
 import { WebsitePressRelease } from '@/components/templates/WebsitePressRelease'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { WebsitePressReleaseStageBench } from './WebsitePressReleaseStageBench'
 
@@ -26,8 +25,8 @@ export const websitePressReleaseRegistration: StageBenchRegistrationData = {
     imageZoom: asset.thumbnailImageZoom || 1,
     imageFilters: asset.thumbnailImageFilters,
     showEyebrow: asset.showEyebrow,
-    showSubhead: asset.showSubhead && !!asset.subhead,
-    showBody: asset.showBody && !!asset.body,
+    showSubhead: asset.showSubhead,
+    showBody: asset.showBody,
     showCta: asset.showCta,
     logoColor: asset.logoColor === 'white' ? 'black' : asset.logoColor,
     grayscale: asset.grayscale,
@@ -87,8 +86,8 @@ export const websitePressReleaseRegistration: StageBenchRegistrationData = {
       imageFilterContrast: f?.contrast ?? 0,
       imageFilterSaturation: f?.saturation ?? 0,
       showEyebrow: s.showEyebrow,
-      showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-      showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+      showSubhead: s.showSubhead,
+      showBody: s.showBody,
       showCta: s.showCta,
       ctaText: s.ctaText,
       theme: s.theme,

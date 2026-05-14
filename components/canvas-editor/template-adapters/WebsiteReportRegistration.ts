@@ -4,7 +4,6 @@
 
 import type { StackAlign } from '@/types'
 import { WebsiteReport } from '@/components/templates/WebsiteReport'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { WebsiteReportStageBench } from './WebsiteReportStageBench'
 
@@ -26,7 +25,7 @@ export const websiteReportRegistration: StageBenchRegistrationData = {
     imageZoom: asset.thumbnailImageZoom || 1,
     imageFilters: asset.thumbnailImageFilters,
     showEyebrow: asset.showEyebrow,
-    showSubhead: asset.showSubhead && !!asset.subhead,
+    showSubhead: asset.showSubhead,
     showCta: asset.showCta,
     grayscale: asset.grayscale,
     headlineFontSize: asset.headlineFontSize ?? undefined,
@@ -88,7 +87,7 @@ export const websiteReportRegistration: StageBenchRegistrationData = {
       imageFilterSaturation: f?.saturation ?? 0,
       variant: s.reportVariant,
       showEyebrow: s.showEyebrow,
-      showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
+      showSubhead: s.showSubhead,
       showCta: s.showCta,
       ctaText: s.ctaText,
       theme: s.theme,

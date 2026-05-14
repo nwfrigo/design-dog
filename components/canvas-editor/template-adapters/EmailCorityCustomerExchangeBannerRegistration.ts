@@ -3,7 +3,6 @@
  */
 
 import { EmailCorityCustomerExchangeBanner } from '@/components/templates/EmailCorityCustomerExchangeBanner'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { EmailCorityCustomerExchangeBannerStageBench } from './EmailCorityCustomerExchangeBannerStageBench'
 
@@ -17,7 +16,7 @@ export const emailCorityCustomerExchangeBannerRegistration: StageBenchRegistrati
     ctaText: asset.ctaText || '',
     colorStyle: (asset.colorStyle || '1') as '1' | '2' | '3' | '4',
     showHeadline: asset.showHeadline !== false,
-    showBody: asset.showBody && !!asset.body,
+    showBody: asset.showBody,
     showCta: asset.showCta !== false,
     headlineFontSize: asset.headlineFontSize ?? undefined,
     colors, typography, scale: 1,
@@ -48,7 +47,7 @@ export const emailCorityCustomerExchangeBannerRegistration: StageBenchRegistrati
     ctaText: s.ctaText || '',
     colorStyle: s.colorStyle,
     showHeadline: s.showHeadline,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showBody: s.showBody,
     showCta: s.showCta,
     headlineFontSize: s.headlineFontSize ?? undefined,
   }),

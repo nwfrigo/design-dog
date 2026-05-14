@@ -16,7 +16,7 @@ export const newsletterTopBannerRegistration: StageBenchRegistrationData = {
     subhead: asset.subhead || '',
     variant: asset.newsletterTopBannerVariant || 'dark',
     showHeadline: asset.showHeadline,
-    showSubhead: asset.showSubhead && !!asset.subhead,
+    showSubhead: asset.showSubhead,
     subheadFontSize: asset.subheadFontSize ?? undefined,
     colors, typography, scale: 1,
   }),
@@ -39,7 +39,7 @@ export const newsletterTopBannerRegistration: StageBenchRegistrationData = {
   exportBuilder: (s) => ({
     variant: s.newsletterTopBannerVariant,
     showHeadline: s.showHeadline,
-    showSubhead: s.showSubhead && !!s.verbatimCopy.subhead,
+    showSubhead: s.showSubhead,
     subheadFontSize: s.subheadFontSize ?? undefined,
   }),
 }

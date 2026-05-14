@@ -10,7 +10,6 @@ import type { StackAlign } from '@/types'
 import { parseSpeakerParams } from '@/lib/render-params'
 import type { SearchParams } from '@/lib/render-params'
 import { WebsiteWebinar } from '@/components/templates/WebsiteWebinar'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { WebsiteWebinarStageBench } from './WebsiteWebinarStageBench'
 
@@ -33,8 +32,8 @@ export const websiteWebinarRegistration: StageBenchRegistrationData = {
     imageZoom: asset.thumbnailImageZoom || 1,
     imageFilters: asset.thumbnailImageFilters,
     showEyebrow: asset.showEyebrow,
-    showSubhead: asset.showSubhead && !!asset.subhead,
-    showBody: asset.showBody && !!asset.body,
+    showSubhead: asset.showSubhead,
+    showBody: asset.showBody,
     showCta: asset.showCta,
     stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
     gaps: asset.templateGaps?.['website-webinar'] ?? {},
@@ -115,9 +114,9 @@ export const websiteWebinarRegistration: StageBenchRegistrationData = {
       imageFilterExposure: f?.exposure ?? 0,
       imageFilterContrast: f?.contrast ?? 0,
       imageFilterSaturation: f?.saturation ?? 0,
-      showEyebrow: s.showEyebrow && !!s.eyebrow,
-      showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-      showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+      showEyebrow: s.showEyebrow,
+      showSubhead: s.showSubhead,
+      showBody: s.showBody,
       showCta: s.showCta,
       ctaText: s.ctaText,
       speakerCount: s.speakerCount,

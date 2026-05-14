@@ -5,7 +5,6 @@
 
 import type { StackAlign } from '@/types'
 import { SocialDarkGradient } from '@/components/templates/SocialDarkGradient'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { SocialDarkGradientStageBench } from './SocialDarkGradientStageBench'
 
@@ -27,8 +26,8 @@ export const socialDarkGradientRegistration: StageBenchRegistrationData = {
     logoColor: asset.logoColor === 'black' ? 'white' : asset.logoColor,
     showEyebrow: asset.showEyebrow,
     showHeadline: asset.showHeadline !== false,
-    showSubhead: asset.showSubhead && !!asset.subhead,
-    showBody: asset.showBody && !!asset.body,
+    showSubhead: asset.showSubhead,
+    showBody: asset.showBody,
     showMetadata: asset.showMetadata,
     showCta: asset.showCta,
     headlineFontSize: asset.headlineFontSize ?? undefined,
@@ -78,8 +77,8 @@ export const socialDarkGradientRegistration: StageBenchRegistrationData = {
     ctaStyle: s.ctaStyle,
     showEyebrow: s.showEyebrow,
     showHeadline: s.showHeadline,
-    showSubhead: s.showSubhead && !isHtmlEmpty(s.verbatimCopy.subhead),
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
+    showSubhead: s.showSubhead,
+    showBody: s.showBody,
     showMetadata: s.showMetadata,
     showCta: s.showCta,
     stackAlign: s.stackAlign,

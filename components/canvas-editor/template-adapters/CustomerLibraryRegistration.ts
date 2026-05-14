@@ -4,7 +4,6 @@
 
 import { CustomerLibrary } from '@/components/templates/CustomerLibrary'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
-import { isHtmlEmpty } from '@/components/SimpleRichTextEditor'
 import { CustomerLibraryStageBench } from './CustomerLibraryStageBench'
 
 export const customerLibraryRegistration: StageBenchRegistrationData = {
@@ -21,8 +20,8 @@ export const customerLibraryRegistration: StageBenchRegistrationData = {
     hasQrCode: !!asset.thumbnailImageUrl,
     showHeadline: asset.showHeadline,
     showEyebrow: asset.showEyebrow,
-    showBody: asset.showBody && !!asset.body,
-    showFooterText: asset.showSubhead && !!asset.subhead,
+    showBody: asset.showBody,
+    showFooterText: asset.showSubhead,
     headlineFontSize: asset.headlineFontSize ?? undefined,
     colors, typography, scale: 1,
   }),
@@ -57,8 +56,8 @@ export const customerLibraryRegistration: StageBenchRegistrationData = {
     qrCodeUrl: s.thumbnailImageUrl,
     hasQrCode: !!s.thumbnailImageUrl,
     showHeadline: s.showHeadline,
-    showEyebrow: s.showEyebrow && !!s.eyebrow,
-    showBody: s.showBody && !isHtmlEmpty(s.verbatimCopy.body),
-    showFooterText: s.showSubhead && !!s.verbatimCopy.subhead,
+    showEyebrow: s.showEyebrow,
+    showBody: s.showBody,
+    showFooterText: s.showSubhead,
   }),
 }
