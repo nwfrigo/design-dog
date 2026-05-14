@@ -39,6 +39,7 @@ export const EmailGridStageBench = defineStageBenchAdapter<EmailGridBlockId>({
       label: 'Headline',
       iconKey: 'headline',
       kind: 'text',
+      benchable: false,
       content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
       size: { default: 38, min: 24, max: 60, step: 2 },
     },

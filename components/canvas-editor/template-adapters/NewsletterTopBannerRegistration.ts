@@ -15,6 +15,7 @@ export const newsletterTopBannerRegistration: StageBenchRegistrationData = {
     headline: asset.headline || '',
     subhead: asset.subhead || '',
     variant: asset.newsletterTopBannerVariant || 'dark',
+    showEyebrow: asset.showEyebrow,
     showHeadline: asset.showHeadline,
     showSubhead: asset.showSubhead,
     subheadFontSize: asset.subheadFontSize ?? undefined,
@@ -31,6 +32,7 @@ export const newsletterTopBannerRegistration: StageBenchRegistrationData = {
       { param: 'headline', parser: 'string', default: '' },
       { param: 'subhead', parser: 'string', default: '' },
       { param: 'variant', parser: 'enum', default: 'dark' },
+      { param: 'showEyebrow', parser: 'boolTrue' },
       { param: 'showHeadline', parser: 'boolTrue' },
       { param: 'showSubhead', parser: 'boolFalse' },
       { param: 'subheadFontSize', parser: 'numberOrUndefined' },
@@ -38,6 +40,7 @@ export const newsletterTopBannerRegistration: StageBenchRegistrationData = {
   },
   exportBuilder: (s) => ({
     variant: s.newsletterTopBannerVariant,
+    showEyebrow: s.showEyebrow,
     showHeadline: s.showHeadline,
     showSubhead: s.showSubhead,
     subheadFontSize: s.subheadFontSize ?? undefined,

@@ -26,8 +26,8 @@ export const EmailEhsAccelerateSignatureStageBench =
       {
         blockId: 'eventDate',
         label: 'Date',
-        iconKey: 'small-caption',
-        chipKind: 'small-caption',
+        iconKey: 'date',
+        chipKind: 'date',
         kind: 'text',
         benchable: false,
         content: { format: 'plain', singleLine: true, placeholder: 'Date' },

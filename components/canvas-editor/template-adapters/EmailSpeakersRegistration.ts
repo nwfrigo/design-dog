@@ -9,6 +9,7 @@
 
 import { parseSpeakerParams } from '@/lib/render-params'
 import type { SearchParams } from '@/lib/render-params'
+import type { StackAlign } from '@/types'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import type { StageBenchRegistrationData } from '@/lib/stage-bench-registry'
 import { EmailSpeakersStageBench } from './EmailSpeakersStageBench'
@@ -38,6 +39,7 @@ export const emailSpeakersRegistration: StageBenchRegistrationData = {
     grayscale: asset.grayscale,
     headlineFontSize: asset.headlineFontSize ?? undefined,
     theme: asset.theme || 'light',
+    stackAlign: (asset.stackAlign as StackAlign) ?? 'top',
     colors, typography, scale: 1,
   }),
   queueTextFields: [],
@@ -64,6 +66,7 @@ export const emailSpeakersRegistration: StageBenchRegistrationData = {
       { param: 'grayscale', parser: 'boolFalse' },
       { param: 'headlineFontSize', parser: 'numberOrUndefined' },
       { param: 'theme', parser: 'enum', default: 'light' },
+      { param: 'stackAlign', parser: 'enum', default: 'top' },
     ],
     assembleProps: (parsed, raw) => {
       const searchParams = raw as SearchParams
@@ -107,5 +110,6 @@ export const emailSpeakersRegistration: StageBenchRegistrationData = {
     speaker3ImageZoom: s.speaker3ImageZoom,
     grayscale: s.grayscale,
     theme: s.theme,
+    stackAlign: s.stackAlign,
   }),
 }

@@ -33,6 +33,8 @@ const ICON_KIND_TO_CHIP_KIND: Record<string, BenchChipKind> = {
   speaker: 'speaker',
   'grid-detail': 'grid-detail',
   'small-caption': 'small-caption',
+  date: 'date',
+  time: 'time',
   generic: 'headline',
 }
 

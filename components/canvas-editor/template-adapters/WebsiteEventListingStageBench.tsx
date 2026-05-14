@@ -95,7 +95,6 @@ export const WebsiteEventListingStageBench =
     ],
     stageBar: [
       { id: 'variant', kind: 'enum', label: 'variant', options: VARIANT_OPTIONS },
-      { id: 'stackAlign', kind: 'stack', label: 'content stack' },
     ],
     contentStack: { templateKey: 'website-event-listing', maxGap: 96 },
     useStoreBindings: () => {
@@ -179,7 +178,6 @@ export const WebsiteEventListingStageBench =
         },
         stageBar: {
           variant: { value: variant, set: (v) => setVariant(v as EventListingVariant) },
-          stackAlign: { value: stackAlign, set: setStackAlign as (v: unknown) => void },
         },
         contentStack: {
           stackAlign,

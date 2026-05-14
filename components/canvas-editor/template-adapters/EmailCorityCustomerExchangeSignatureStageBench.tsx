@@ -26,8 +26,8 @@ export const EmailCorityCustomerExchangeSignatureStageBench =
       {
         blockId: 'eventDate',
         label: 'Date',
-        iconKey: 'small-caption',
-        chipKind: 'small-caption',
+        iconKey: 'date',
+        chipKind: 'date',
         kind: 'text',
         content: { format: 'plain', singleLine: true, placeholder: 'Date' },
       },
@@ -42,8 +42,8 @@ export const EmailCorityCustomerExchangeSignatureStageBench =
       {
         blockId: 'eventTime',
         label: 'Time',
-        iconKey: 'small-caption',
-        chipKind: 'small-caption',
+        iconKey: 'time',
+        chipKind: 'time',
         kind: 'text',
         content: { format: 'plain', singleLine: true, placeholder: 'Time' },
       },

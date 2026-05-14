@@ -106,7 +106,7 @@ export function EmailEhsAccelerateBanner({
           lineHeight: `${hlLineHeight}px`,
           wordWrap: 'break-word',
         }}>
-          {wrapInline('headline', <div>{headlineText}</div>)}
+          {wrapInline('headline', <div dangerouslySetInnerHTML={{ __html: headlineText }} />)}
         </div>
       ))}
 
@@ -122,7 +122,7 @@ export function EmailEhsAccelerateBanner({
           lineHeight: '21.76px',
           wordWrap: 'break-word',
         }}>
-          {wrapInline('body', <div>{bodyText}</div>)}
+          {wrapInline('body', <div dangerouslySetInnerHTML={{ __html: bodyText }} />)}
         </div>
       ))}
 

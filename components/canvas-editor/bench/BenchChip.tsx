@@ -4,6 +4,7 @@ import { forwardRef, type HTMLAttributes } from 'react'
 import {
   BookA, TextCursor, BookType, TextCursorInput, MousePointerClick,
   SquareLibrary, CircleUserRound, Grid2x2X, SquareDot,
+  CalendarDays, Clock,
   GripVertical,
   type LucideIcon,
 } from 'lucide-react'
@@ -41,6 +42,8 @@ const KIND_ICON: Record<BenchChipKind, LucideIcon> = {
   speaker: CircleUserRound,
   'grid-detail': Grid2x2X,
   'small-caption': SquareDot,
+  date: CalendarDays,
+  time: Clock,
 }
 
 export type BenchChipKind =
@@ -53,6 +56,8 @@ export type BenchChipKind =
   | 'speaker'
   | 'grid-detail'
   | 'small-caption'
+  | 'date'
+  | 'time'
 
 export interface BenchChipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onDragStart' | 'onDragEnd' | 'onDrag'> {
   kind: BenchChipKind

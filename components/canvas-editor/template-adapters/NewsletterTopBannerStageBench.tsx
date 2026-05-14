@@ -18,9 +18,7 @@ import {
  * brand-locked. Editable: eyebrow / headline / subhead. Stage bar:
  * binary dark/light theme toggle.
  *
- * Eyebrow is always-on (benchable: false) — the design uses it as the
- * dated header ("Month | Year") that anchors the banner. Headline and
- * subhead are benchable.
+ * All three editable slots (eyebrow / headline / subhead) are benchable.
  */
 
 export const NewsletterTopBannerStageBench =
@@ -33,7 +31,6 @@ export const NewsletterTopBannerStageBench =
         iconKey: 'eyebrow',
         chipKind: 'eyebrow',
         kind: 'text',
-        benchable: false,
         content: { format: 'plain', singleLine: true, placeholder: 'Month | Year' },
       },
       {
@@ -62,6 +59,8 @@ export const NewsletterTopBannerStageBench =
       const verbatimCopy = useStore((s) => s.verbatimCopy)
       const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
 
+      const showEyebrow = useStore((s) => s.showEyebrow)
+      const setShowEyebrow = useStore((s) => s.setShowEyebrow)
       const showHeadline = useStore((s) => s.showHeadline)
       const setShowHeadline = useStore((s) => s.setShowHeadline)
       const showSubhead = useStore((s) => s.showSubhead)
@@ -77,7 +76,9 @@ export const NewsletterTopBannerStageBench =
         slotState: {
           eyebrow: {
             value: eyebrow,
+            visible: showEyebrow,
             setValue: setEyebrow,
+            setVisible: setShowEyebrow,
           },
           headline: {
             value: verbatimCopy.headline || '',
@@ -108,6 +109,7 @@ export const NewsletterTopBannerStageBench =
           headline={ctx.textOf('headline')}
           subhead={ctx.textOf('subhead')}
           variant={variant}
+          showEyebrow={ctx.visibilityOf('eyebrow')}
           showHeadline={ctx.rawVisibilityOf('headline')}
           showSubhead={ctx.visibilityOf('subhead')}
           subheadFontSize={ctx.fontSizeOf('subhead')}

@@ -25,6 +25,17 @@
 
 ---
 
+## EmailCorityCustomerExchangeBanner — no intra-block spacing
+
+**What:** The headline / body / cta column on this 640×300 banner uses absolute positioning rather than ContentStack, so there's no spacer-drag UX for adjusting gaps between blocks.
+**Why deferred:** Adding spacing requires migrating the right column to ContentStack — a template rewrite, not a config change. Substrate-conformant but not lightweight.
+**Cost to ignore:** Users can't fine-tune the rhythm between headline / body / cta the way they can on other Track 1 templates.
+**Trigger condition:** Either (a) ehs-accelerate-banner gets the same migration (since both are absolutely-positioned banners) and we batch the work, OR (b) a real export needs custom block spacing.
+**Estimate to pay:** Medium (~1–2h per template — port the right column to ContentStack, wire `contentStack.maxGap` in the adapter, port `renderSpacerBetween`).
+**First step when you start:** Read EmailDarkGradient.tsx for the ContentStack-with-absolutely-positioned-anchor pattern. Then convert the right column of EmailCorityCustomerExchangeBanner.tsx to use ContentStack while keeping the left logo panel absolute.
+
+---
+
 ## Image-source-key for shared image slots
 
 **What:** When the same image source is used across multiple templates (e.g., a newsletter image visible in dark + light variants of the same asset), there's no concept of a "shared image identity." Each template gets its own settings bundle, which is correct architecturally but creates a UX wrinkle: edit the image in one variant, the other variant doesn't pick it up.

@@ -26,6 +26,7 @@ export interface NewsletterTopBannerProps {
   headline: string
   subhead: string
   variant: TopBannerVariant
+  showEyebrow?: boolean
   showHeadline?: boolean
   showSubhead: boolean
   subheadFontSize?: number
@@ -45,6 +46,7 @@ export function NewsletterTopBanner({
   headline,
   subhead,
   variant = 'dark',
+  showEyebrow = true,
   showHeadline = true,
   showSubhead,
   subheadFontSize,
@@ -200,7 +202,7 @@ export function NewsletterTopBanner({
           display: 'flex',
         }}>
           {/* Eyebrow */}
-          {wrapBlock('eyebrow', (
+          {showEyebrow && wrapBlock('eyebrow', (
             <div style={{
               alignSelf: 'stretch',
               color: eyebrowColor,
