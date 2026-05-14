@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Loader2, Trash2 } from 'lucide-react'
 import { useStore } from '@/store'
 import type { QueuedAsset, TemplateType } from '@/types'
 import { TemplateRenderer } from './shared/TemplateRenderer'
+import { Dropdown } from './canvas-editor/editbar/Dropdown'
 import { getQueueTextFields } from '@/lib/template-registry'
 import { buildExportParamsFromAsset } from '@/lib/export-params'
 import {
@@ -13,6 +15,21 @@ import {
   type TypographyConfig
 } from '@/lib/brand-config'
 import { CHANNELS, TEMPLATE_DIMENSIONS } from '@/lib/template-config'
+
+// Shared scale-dropdown options for the page-level "Export All" and the
+// per-item Export. UPPERCASE in the dropdown is enforced by the primitive.
+const SCALE_OPTIONS = [
+  { value: '1x', label: '1x' },
+  { value: '2x', label: '2x' },
+]
+
+// Reusable class strings so the Queue header + per-item action row
+// stay consistent with the canonical ActionButton system without
+// importing the canvas-editor component into a non-editor surface.
+const BTN_BASE =
+  'inline-flex items-center gap-2 h-7 px-2 border-[0.5px] border-line-subtle rounded-[4px] font-mono text-[12px] uppercase leading-none transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed'
+const BTN_PRIMARY = `${BTN_BASE} bg-surface-inverse text-content-inverse hover:opacity-90`
+const BTN_SECONDARY = `${BTN_BASE} bg-surface-primary text-content-secondary hover:bg-interactive-hover`
 
 type ExportScale = '1x' | '2x'
 
@@ -129,11 +146,11 @@ export function ExportQueueScreen() {
     <div className="max-w-[1600px] mx-auto px-6 py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-content-primary">
-            Export Queue
+        <div className="flex items-center gap-3">
+          <h2 className="font-mono text-content-primary" style={{ fontSize: 14, lineHeight: '20px' }}>
+            Queue
           </h2>
-          <span className="text-sm text-gray-500 dark:text-content-secondary">
+          <span className="font-mono text-content-secondary" style={{ fontSize: 12 }}>
             {exportQueue.length} {exportQueue.length === 1 ? 'asset' : 'assets'}
           </span>
         </div>
@@ -142,41 +159,26 @@ export function ExportQueueScreen() {
           <div className="flex items-center gap-3">
             <button
               onClick={clearQueue}
-              className="px-3 py-2 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              className="font-mono text-[12px] uppercase leading-none text-content-destructive hover:opacity-80 transition-opacity"
             >
               Clear All
             </button>
 
-            <div className="flex items-center gap-2">
-              <select
-                value={exportAllScale}
-                onChange={(e) => setExportAllScale(e.target.value as ExportScale)}
-                className="px-3 py-2 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
-                  bg-white dark:bg-surface-secondary text-gray-900 dark:text-content-primary"
-              >
-                <option value="1x">1x</option>
-                <option value="2x">2x</option>
-              </select>
+            <Dropdown
+              ariaLabel="Export scale"
+              value={exportAllScale}
+              options={SCALE_OPTIONS}
+              onChange={(v) => setExportAllScale(v as ExportScale)}
+            />
 
-              <button
-                onClick={handleExportAll}
-                disabled={exportingAll}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400
-                  text-white rounded-lg font-medium transition-colors"
-              >
-                {exportingAll ? (
-                  <>
-                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Exporting...
-                  </>
-                ) : (
-                  'Export All'
-                )}
-              </button>
-            </div>
+            <button
+              onClick={handleExportAll}
+              disabled={exportingAll}
+              className={BTN_PRIMARY}
+            >
+              {exportingAll ? <Loader2 size={12} className="animate-spin shrink-0" /> : null}
+              {exportingAll ? 'Exporting…' : 'Export All'}
+            </button>
           </div>
         )}
       </div>
@@ -195,8 +197,7 @@ export function ExportQueueScreen() {
           </p>
           <button
             onClick={() => setCurrentScreen('select')}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-surface-secondary dark:hover:bg-interactive-hover
-              text-gray-700 dark:text-content-secondary rounded-lg font-medium transition-colors"
+            className={BTN_SECONDARY}
           >
             Go to Editor
           </button>
@@ -470,53 +471,33 @@ function QueueItem({
 
         {/* Actions */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Scale dropdown */}
-          <select
+          <Dropdown
+            ariaLabel="Export scale"
             value={scale}
-            onChange={(e) => setScale(e.target.value as ExportScale)}
-            disabled={isExporting}
-            className="px-2 py-1.5 text-sm border border-gray-300 dark:border-line-subtle rounded-lg
-              bg-white dark:bg-surface-secondary text-gray-900 dark:text-content-primary"
-          >
-            <option value="1x">1x</option>
-            <option value="2x">2x</option>
-          </select>
+            options={SCALE_OPTIONS}
+            onChange={(v) => setScale(v as ExportScale)}
+          />
 
-          {/* Export button - blue */}
           <button
             onClick={() => onExport(scale)}
             disabled={isExporting}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400
-              text-white text-sm rounded-lg font-medium transition-colors"
+            className={BTN_PRIMARY}
           >
-            {isExporting ? (
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-            ) : null}
+            {isExporting ? <Loader2 size={12} className="animate-spin shrink-0" /> : null}
             Export
           </button>
 
-          {/* Edit button - matches Add to Queue styling */}
-          <button
-            onClick={onEdit}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 rounded-lg
-              hover:bg-blue-100 text-sm font-medium transition-colors border border-blue-200
-              dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/30"
-          >
+          <button onClick={onEdit} className={BTN_SECONDARY}>
             Edit
           </button>
 
-          {/* Remove button */}
           <button
             onClick={onRemove}
-            className="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
             title="Remove from queue"
+            aria-label="Remove from queue"
+            className="p-1.5 text-content-secondary hover:text-content-destructive transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <Trash2 size={14} strokeWidth={1.5} />
           </button>
         </div>
       </div>
