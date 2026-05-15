@@ -212,6 +212,10 @@ const stageBar = (
 
 `action-row/ActionRow.tsx` + `action-row/ActionButton.tsx`. The shared "Preview / Add to Queue / Export" row. `StageBenchActionRow` is the bench-screen wrapper that hides "Add to Queue" when editing from the queue.
 
+### 4.13a Asset breadcrumb (Stage Bench Header)
+
+`StageBenchHeader.tsx` renders the asset tab as `<SUBCHANNEL LABEL> / <TEMPLATE LABEL>` (e.g. "EMAIL BANNER / GRID DETAILS"). Both halves come from `lib/template-config.ts`: `TEMPLATE_SUBCHANNEL_LABEL` (derived from the template's placement in `SUBCHANNELS`, honoring `TemplateInfo.channelLabel` overrides) and `TEMPLATE_LABELS`. Slotting a template into the right `SUBCHANNELS` entry lights up the prefix automatically — no per-template wiring. Editor tab + homepage filter chip stay aligned because they read the same source.
+
 ### 4.14 Editbar (per-kind contextual toolbars)
 
 `components/canvas-editor/editbar/`. All built out. New kinds add a new file here AND an entry in `ContextualToolbar.tsx`'s `EDITBAR_BY_KIND` table.
@@ -367,27 +371,13 @@ How to implement, by template paradigm:
 
 #### Canonical placeholder strings
 
-Use these unless the design calls for a flavored default (event-specific labels, product names, etc.):
+Canonical placeholders live in `lib/slot-placeholders.ts` as the constant `SLOT_PLACEHOLDERS`. Templates import it for `defaultInner: value || SLOT_PLACEHOLDERS.foo` fallbacks; adapter slot descriptors import it for `content: { placeholder: SLOT_PLACEHOLDERS.foo }`. Editor preview and Puppeteer export read the same string for empty slots — one source of truth.
 
-| Block kind | Canonical placeholder |
-|---|---|
-| `eyebrow` | `Eyebrow` |
-| `headline` | `Headline` |
-| `subhead` / `subheading` | `Subheadline` |
-| `body` | `Body copy goes here.` |
-| `metadata` | `Small Caption` |
-| `cta` | `Call to Action` |
-| `eventDate` | `Event date` |
-| `eventLocation` | `Event location` |
-| `eventTime` | `Event time` |
-| `workshopName` | `Workshop name` |
-| `speakerName` | `Firstname Lastname` |
-| `speakerRole` | `Role, Company` |
-| `gridDetail<N>` | `Grid detail <N>` |
+Keys: `eyebrow`, `headline`, `subhead`, `subheading`, `body`, `metadata`, `cta`, `eventDate`, `eventLocation`, `eventTime`, `workshopName`, `speakerName`, `speakerRole`, `gridDetail1`–`gridDetail4`.
 
 Eyebrow strings live in mixed case in source; CSS `text-transform: uppercase` handles the rendered casing.
 
-**When to override the canonical:** event-specific templates (EHS+ Accelerate, Cority Connect, Customer Exchange) keep their flavored defaults so the editor preview reads like a real banner instead of a blank scaffold. EmailProductRelease keeps `Product Release` / `GX2 2026.1` for the same reason. The rule of thumb is *would a non-designer expect to see this default copy on first open?* If yes, use a flavored default; if no, use canonical.
+**When to override the canonical:** event-specific templates (EHS+ Accelerate, Cority Connect, Customer Exchange) keep their flavored defaults inline so the editor preview reads like a real banner instead of a blank scaffold. EmailProductRelease keeps `Product Release` / `GX2 2026.1` for the same reason. The rule of thumb is *would a non-designer expect to see this default copy on first open?* If yes, inline a flavored default; if no, import from `SLOT_PLACEHOLDERS`.
 
 ### 8.5 Styling wrappers live outside `wrapInline`
 

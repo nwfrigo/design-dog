@@ -262,6 +262,8 @@ The export API route (`app/api/export/route.ts`) uses a generic forwarding loop 
 
 **Visibility-flag drift catcher:** Run `npm run validate:registrations` after any change to a `*StageBench.tsx` adapter or `*Registration.ts` file. The script statically verifies that every toggleable slot (one with `setVisible: setShowFoo` wired) is referenced in both `renderProps` and `exportBuilder` — either as a direct LHS key or via `s.<flag>` / `asset.<flag>` on the RHS of a renamed key. Catches the class of bug where a user-toggleable flag silently drops out of the export pipeline. Required-passing before merge.
 
+**Preview deployments are SSO-gated.** Vercel's Deployment Protection blocks Puppeteer's bare navigation to `/render/[slug]` — the browser receives the Vercel login HTML, not the template, and the export times out on `#render-ready`. The export route reads `VERCEL_AUTOMATION_BYPASS_SECRET` and sends it as `x-vercel-protection-bypass` on every page request. Enable "Protection Bypass for Automation" in project settings; the env var is auto-injected on every deployment. Symptom of misconfig: page content at timeout contains `--raw-sidebar-width` / `--raw-omniagent-panel-width` CSS variables (the Vercel login interstitial), not your template HTML.
+
 ### Render Page Pattern
 
 Most templates use a **dynamic render route** at `app/render/[slug]/page.tsx`. This route reads the `renderSchema` from `lib/template-registry.tsx` and auto-parses URL params based on the field definitions. Adding a new render page means adding a `renderSchema` to the registry entry — no separate page file needed.
@@ -301,10 +303,12 @@ If any location is missing props, you'll see discrepancies between what the user
    }
    ```
 
-2. **Show toggles need content checks** — Render pages have default placeholder text. To prevent it from appearing when a field is empty:
+2. **Show toggles render from `show*` alone — never `show* && !!content`.** Substrate §8.4: a slot renders whenever its `show*` flag is true, regardless of whether the user has typed anything. The template's `defaultInner: value || SLOT_PLACEHOLDERS.foo` is the placeholder source. Gating visibility on content presence in `renderProps` or `exportBuilder` drops slots out of the export that the editor still shows — that's the editor/export drift the Pattern A cleanup fixed. `npm run validate:registrations` catches missing flags; a visual sweep of empty-field exports catches this anti-pattern.
    ```tsx
-   // ✅ Only show when toggle is on AND content exists
-   showBody: asset.showBody && !!asset.body,
+   // ✅ Pass show flag through verbatim
+   showBody: asset.showBody,
+   // ❌ Don't gate on content presence — drops the slot from export
+   // showBody: asset.showBody && !!asset.body,
    ```
 
 3. **Per-template image settings use template key, not `templateType`** — In manual mode, `templateType` may not match the current asset. Always use:
