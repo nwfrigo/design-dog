@@ -363,31 +363,43 @@ This section covers adding a **Stage & Bench** template (the path for any new si
 - [ ] Set `fontFamily` from `typography`: `const fontFamily = \`"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}\`` and apply it to the outer container. Never use `var(--font-fakt)` or any CSS variable — these are Next.js runtime-only and unavailable in Puppeteer, causing wrong/default fonts in exports.
 - [ ] No padding on outer container — padding inflates height in Puppeteer. Use an inner wrapper for spacing.
 - [ ] Apply Figma override rules (border not outline, SVG logo, remove unsupported CSS). See BRAND.md.
+- [ ] **Canonical placeholders come from `lib/slot-placeholders.ts`.** Use `value || SLOT_PLACEHOLDERS.foo` for the `defaultInner` fallback (and `placeholder: SLOT_PLACEHOLDERS.foo` in the adapter slot descriptor's `content` field). Don't inline `'Headline'`, `'Body copy goes here.'`, etc. — every surface (editor preview / thumbnail / export) reads the same string from this map. Flavored event-specific defaults stay inline.
+- [ ] **`format: 'html'` slots must render via `dangerouslySetInnerHTML`.** If the adapter declares a slot with `content: { format: 'html' }`, the template render must produce `<div dangerouslySetInnerHTML={{ __html: value || SLOT_PLACEHOLDERS.foo }} />` — not `<div>{value}</div>`. Otherwise bold/italic from the inline editor renders as literal `<b>…</b>` text in both editor and export.
+- [ ] **Render visibility from `show*` alone — never `show* && !!content`.** Substrate §8.4: a slot renders whenever its `show*` flag is true, regardless of whether the user has typed anything. The `defaultInner: value || SLOT_PLACEHOLDERS.foo` fallback handles empty content; gating on content presence drops slots out of the export when the editor shows them. Apply this in **both** the template render *and* the registration (`renderProps` + `exportBuilder`).
 
 ### Steps
 
-1. **Create the template** at `components/templates/<Name>.tsx`. Export a `<Name>BlockId` union for every editable block. Define a Props interface accepting `renderBlock?`, `renderInlineEditor?`, and `renderOverlay?` render-props (the S&B factory passes these through). Inside the JSX, wrap each editable block with `wrapBlock('blockId', (...))` and (for text blocks) wrap the inner text with `wrapInline('blockId', value || 'Placeholder')`. Default `wrapBlock` and `wrapInline` to identity functions so export / preview contexts work without an adapter.
+1. **Create the template** at `components/templates/<Name>.tsx`. Export a `<Name>BlockId` union for every editable block. Define a Props interface accepting `renderBlock?`, `renderInlineEditor?`, and `renderOverlay?` render-props (the S&B factory passes these through). Inside the JSX, wrap each editable block with `wrapBlock('blockId', (...))` and (for text blocks) wrap the inner text with `wrapInline('blockId', value || SLOT_PLACEHOLDERS.foo)` (importing from `@/lib/slot-placeholders`). Default `wrapBlock` and `wrapInline` to identity functions so export / preview contexts work without an adapter. If the template uses `ContentStack`, prefer putting every editable block (including the CTA) inside `blocks[]` so it gets inline editing, stackAlign distribution, and spacer drags uniformly — avoid rendering blocks as siblings of `<ContentStack>` unless the layout truly requires it.
 
 2. **Add to `types/index.ts`** — append the slug to the `TemplateType` union, plus any new store fields the template needs (variant enums, per-template show flags, etc.).
 
-3. **Add to `lib/template-config.ts`** — slot the template into the right channel/subchannel array (`EMAIL_TEMPLATES`, `SOCIAL_TEMPLATES`, etc.). Set `width`, `height`, `dimensions`, and optionally `hidden: true` if launching dark.
+3. **Add to `lib/template-config.ts`** — slot the template into the right `SUBCHANNELS` entry (e.g. `EMAIL_BANNER_TEMPLATES`, `SOCIAL_TEMPLATES`). Set `width`, `height`, `dimensions`, and optionally `hidden: true` (launches dark) or `channelLabel: 'Override'` (overrides the subchannel label in the editor tab + tile copy). The `TEMPLATE_SUBCHANNEL_LABEL` map is derived from this placement, so the editor tab prefix (`"EMAIL BANNER / GRID DETAILS"`) lights up automatically — no separate registration needed.
 
 4. **Add to the store** (`store/index.ts`) — any new variant/show fields + their setters. Add to `lib/asset-snapshot.ts`'s `SNAPSHOT_FIELDS` array so the field persists in queue/draft/export.
 
 5. **Build the adapter** at `components/canvas-editor/template-adapters/<Name>StageBench.tsx` using `defineStageBenchAdapter` from the factory. The adapter declares `slots[]` (each with `blockId`, `label`, `iconKey`, `kind`, optional `parent`/`benchable`/`content`/`size`), `stageBar[]` items, optional `image`/`childImages`/`category`/`contentStack` configs, plus `useStoreBindings` (reads from `useStore`, returns slot state + bindings) and `renderTemplate` (renders your `<Name>` component with `ctx.renderBlock`/`ctx.renderInlineEditor`/etc.). Reference existing factory adapters that look structurally similar.
+   - **Always-on slots:** any slot whose design contract is "always shown" (mandatory headlines on banner templates, brand-locked logo lockups, baked-in decorative chrome) must declare `benchable: false`. Without it, drag-from-stage fires `slot.hide()` but the slot has no `show*` flag to flip, so the slot reappears on the next render — the "drag-and-flash-back" bug. Substrate §8.3.
+   - **Placeholder values** in `content: { placeholder: ... }` should reference `SLOT_PLACEHOLDERS.foo` from `@/lib/slot-placeholders` for canonical slots. Flavored event-specific labels (`'Date'`, `'Workshop Name'`) can stay inline.
+   - **Bench chip kind:** `iconKey` + `chipKind` should map to a registered `BenchChipKind` (see `components/canvas-editor/bench/BenchChip.tsx`). For date/time/location lines, use the dedicated `'date'` / `'time'` kinds rather than `'small-caption'`.
 
 6. **Build the registration** at `components/canvas-editor/template-adapters/<Name>Registration.ts` exporting a `StageBenchRegistrationData` object:
    - `templateId`, `Template`, `Adapter`
-   - `renderProps(asset, colors, typography)` — maps a `QueuedAsset` to the component's props for queue thumbnails + Puppeteer rendering. **Every toggleable visibility flag must appear here.**
+   - `renderProps(asset, colors, typography)` — maps a `QueuedAsset` to the component's props for queue thumbnails + Puppeteer rendering. **Every toggleable visibility flag must appear here, and must pass through verbatim — never `asset.showFoo && !!asset.foo`. The template's `defaultInner: value || SLOT_PLACEHOLDERS.foo` is the placeholder source; the registration must not second-guess it.** If the template supports `stackAlign`, include it here.
    - `queueTextFields` — usually `[]`; add only template-unique text fields for the queue UI.
-   - `renderSchema` — declarative URL-param schema for the dynamic render route. `fields[]` lists each param with a parser type and default. Optional `assembleProps(parsed, raw)` post-processes flat params into nested objects (e.g. `imagePosition: { x, y }`).
-   - `exportBuilder(state)` — produces the URL params for export. **Every toggleable visibility flag must appear here too.**
+   - `renderSchema` — declarative URL-param schema for the dynamic render route. `fields[]` lists each param with a parser type and default. Optional `assembleProps(parsed, raw)` post-processes flat params into nested objects (e.g. `imagePosition: { x, y }`). If the template supports `stackAlign`, declare `{ param: 'stackAlign', parser: 'enum', default: 'top' }` here too — missing it means the export defaults the editor's user-selected alignment back to 'top'.
+   - `exportBuilder(state)` — produces the URL params for export. **Same rule as renderProps: pass `s.showFoo` verbatim, never `s.showFoo && !isHtmlEmpty(...)`. Include `stackAlign` if the template uses ContentStack.**
 
 7. **Register** — import the Registration in `lib/stage-bench-registry.ts` and append to the `REGISTRATIONS` array. That single line wires the template into the central registry, the dynamic render route, the export params builder, and the adapter dispatch.
 
 8. **Validate** — run `npm run validate:registrations`. The static check ensures every toggleable `setVisible: setShowFoo` wired in your adapter is referenced in both `renderProps` and `exportBuilder` (either as a LHS key or via `s.<flag>` / `asset.<flag>` on the RHS for a renamed key). If it fails, fix before merging.
 
-9. **Typecheck + test:** `npx tsc --noEmit`, then in dev: drag a block to bench, deep-click to edit, change a variant, queue, and export from both the editor and the queue.
+9. **Typecheck + test:** `npx tsc --noEmit`, then in dev:
+   - Drag a benchable block to bench, drag it back — it animates cleanly without flashing.
+   - Drag a non-benchable block (e.g. a headline declared `benchable: false`) — it should not engage drag at all.
+   - Double-click each text slot to enter inline edit; verify Bold/Italic produce real styling, not literal `<b>…</b>` text (catches the `format: 'html'` + plain render mismatch).
+   - Toggle stack align in the stage bar; export the asset and confirm the export matches the editor (catches stackAlign-not-in-export-pipeline bugs).
+   - **Empty-field export:** create a fresh asset, change no fields, export. Every `show*=true` slot should render its canonical placeholder. If a slot is missing on export but visible in the editor, you've gated visibility on content presence somewhere in the registration.
+   - Queue the asset, then export from the queue. Same output as direct export.
 
 ### Parser types for `renderSchema.fields`
 
