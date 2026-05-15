@@ -7,7 +7,7 @@ import { ImageEditorPreview } from './ImageEditorPreview'
 import { ImageEditButton } from './ImageEditButton'
 import { ImageEditorSlider } from './ImageEditorSlider'
 import { SliderRow } from './SliderRow'
-import { PresetButtonGroup, type PresetOption } from './PresetButtonGroup'
+import { PresetButtonGroup } from './PresetButtonGroup'
 import { ImageLibraryView } from './ImageLibraryView'
 import {
   NEUTRAL_SLOT_SETTINGS,
@@ -37,8 +37,11 @@ import {
  * Frame is fixed at 840×538 so swapping views doesn't reflow the modal.
  *
  * Zoom/Pan/Drag mirrors the legacy ImageCropModal contract: position units
- * in −50..+50 per axis, zoom 1..3. Filters/presets are still visual-only
- * — local state, no persistence until the filter data model lands.
+ * in −50..+50 per axis, zoom 1..3. Filters persist via `ImageFilters`
+ * (exposure / contrast / saturation, −1..+1 per axis); presets just write
+ * those same numbers into `settings.filters`. No preset identity rides
+ * through the store or export — editor preview and Puppeteer render both
+ * read the three numbers via `filtersToCss()`.
  */
 
 export interface ImageEditorModalProps {
@@ -67,12 +70,23 @@ const ZOOM = { min: 1, max: 3, step: 0.01 } as const
 // brightness/contrast/saturate happens when the data model lands.
 const FILTER = { min: -1, max: 1, step: 0.01 } as const
 
-// Hardcoded preset list — values themselves are TBD per Nick's note.
-const PRESETS: Omit<PresetOption, 'onClick'>[] = [
-  { id: 'hi-contrast-light', label: 'Hi-contrast Light' },
-  { id: 'lighten', label: 'Lighten' },
-  { id: 'darken', label: 'Darken' },
-  { id: 'hi-contrast-dark', label: 'Hi-contrast Dark' },
+// Adjustment presets. Clicking one writes its `values` directly into
+// `settings.filters` — same shape the sliders write, no preset identity
+// rides through the store or export. Two surfaces (editor preview +
+// Puppeteer export) read the same `exposure / contrast / saturation`
+// numbers via `filtersToCss()`, so a preset click is byte-identical to
+// dragging the three sliders to those numbers by hand.
+type PresetEntry = {
+  id: string
+  label: string
+  values: ImageFilters
+}
+
+const PRESETS: PresetEntry[] = [
+  { id: 'hi-contrast-light', label: 'Hi-contrast Light', values: { exposure: 0.15, contrast: 0.25, saturation: 0.10 } },
+  { id: 'bw-pop',            label: 'B&W Pop',            values: { exposure: 0.10, contrast: 0.40, saturation: -1   } },
+  { id: 'bw-subtle',         label: 'B&W Subtle',         values: { exposure: 0.05, contrast: 0.10, saturation: -1   } },
+  { id: 'hi-contrast-dark',  label: 'Hi-contrast Dark',   values: { exposure: -0.15, contrast: 0.30, saturation: 0.10 } },
 ]
 
 type ModalView = 'editor' | 'library'
@@ -241,9 +255,13 @@ export function ImageEditorModal({
               <PresetButtonGroup
                 title="Adjustment Presets"
                 presets={PRESETS.map((p) => ({
-                  ...p,
+                  id: p.id,
+                  label: p.label,
                   active: activePreset === p.id,
-                  onClick: () => setActivePreset(p.id),
+                  onClick: () => {
+                    setSettings((s) => ({ ...s, filters: p.values }))
+                    setActivePreset(p.id)
+                  },
                 }))}
               />
 
