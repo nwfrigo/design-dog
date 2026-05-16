@@ -190,6 +190,15 @@ export interface EventCounts {
   byName: { event_name: string; count: number }[]
   byTemplate: { template_id: string; count: number }[]
   byUser: { user_id: string; count: number }[]
+  /** Per-user × per-template × per-event-name breakdown. Powers the
+   *  user-cards view on `/admin/events`. Sorted user_id → template_id →
+   *  event_name; client groups for display. */
+  byUserTemplateEvent: {
+    user_id: string
+    template_id: string
+    event_name: string
+    count: number
+  }[]
 }
 
 /**
@@ -259,11 +268,24 @@ export async function getEventCounts(opts: {
     GROUP BY user_id ORDER BY count DESC
     LIMIT 20
   `
+  const byUserTemplateEventRes = await sql`
+    SELECT
+      COALESCE(user_id, '(anon)') AS user_id,
+      COALESCE(template_id, '(none)') AS template_id,
+      event_name,
+      COUNT(*)::int AS count
+    FROM events
+    WHERE (${start}::timestamptz IS NULL OR created_at >= ${start}::timestamptz)
+      AND (${end}::timestamptz IS NULL OR created_at < ${end}::timestamptz)
+    GROUP BY user_id, template_id, event_name
+    ORDER BY user_id, template_id, event_name
+  `
 
   return {
     total: (totalRes.rows[0]?.count as number) ?? 0,
     byName: byNameRes.rows as { event_name: string; count: number }[],
     byTemplate: byTemplateRes.rows as { template_id: string; count: number }[],
     byUser: byUserRes.rows as { user_id: string; count: number }[],
+    byUserTemplateEvent: byUserTemplateEventRes.rows as EventCounts['byUserTemplateEvent'],
   }
 }
