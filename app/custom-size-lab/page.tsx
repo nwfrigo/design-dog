@@ -1,21 +1,21 @@
 'use client'
 
 /**
- * Custom-Size lab — SPIKE (exploration only, not linked from the app).
+ * Custom-Size ratio grid — SPIKE (exploration only, not linked from the app).
  *
  * Renders the layout engine across extreme ratios so we can SEE the judgment
- * and tune the per-band rules in lib/custom-size/resolve.ts to good. This page
- * is the tuning surface; nothing here is wired into the real editor/export.
- *
- * View at /custom-size-lab with the dev server running.
+ * and tune the per-band rules in lib/custom-size/resolve.ts. This page is the
+ * tuning surface; the live drag-to-resize feel lives at /custom-size-lab/resize.
  */
 
 import { useState } from 'react'
+import Link from 'next/link'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { TemplateTheme } from '@/lib/template-themes'
 import { CustomSizeCanvas } from '@/components/custom-size/CustomSizeCanvas'
+import { ContentControls, DEFAULT_CONTENT, fieldStyle, labelStyle } from '@/components/custom-size/labShared'
 import { resolveLayout, type CustomContent } from '@/lib/custom-size/resolve'
 
 const colors = colorsJson as ColorsConfig
@@ -42,12 +42,10 @@ const BOX_H = 300
 
 const REASON_LABEL: Record<string, string> = {
   'band-excluded': "doesn't suit this shape",
-  'no-space': "no room at this size",
+  'no-space': 'no room at this size',
   'too-small': 'would be illegible',
   'empty': 'no content',
 }
-
-const SOLUTIONS = ['safety', 'health', 'environmental', 'quality', 'sustainability', 'none']
 
 function SizeCard({
   label, w, h, content, theme,
@@ -83,28 +81,17 @@ function SizeCard({
 
 export default function CustomSizeLab() {
   const [theme, setTheme] = useState<TemplateTheme>('dark')
-  const [content, setContent] = useState<CustomContent>({
-    showLogo: true,
-    eyebrow: 'New platform release',
-    headline: 'Manage EHS risk with confidence',
-    subhead: 'One connected platform for safety, health, and sustainability.',
-    body: 'Cority brings compliance, incidents, and analytics together so your teams can act faster and prove impact.',
-    cta: 'Learn more',
-    solution: 'safety',
-    showSolutionPill: true,
-    hasImage: true,
-  })
+  const [content, setContent] = useState<CustomContent>(DEFAULT_CONTENT)
   const [customW, setCustomW] = useState(900)
   const [customH, setCustomH] = useState(1200)
-
   const set = (patch: Partial<CustomContent>) => setContent((c) => ({ ...c, ...patch }))
-
-  const fieldStyle: React.CSSProperties = { width: '100%', background: '#242527', color: '#f2f2f3', border: '1px solid #3a3b3d', borderRadius: 4, padding: '6px 8px', fontSize: 12, marginBottom: 8 }
-  const labelStyle: React.CSSProperties = { color: '#7c7d80', fontSize: 11, display: 'block', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.04em' }
 
   return (
     <div style={{ minHeight: '100vh', background: '#161719', color: '#f2f2f3', padding: 24, fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <h1 style={{ fontSize: 18, marginBottom: 4 }}>Custom-Size Layout Lab <span style={{ color: '#7c7d80', fontWeight: 400 }}>· spike</span></h1>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 4 }}>
+        <h1 style={{ fontSize: 18 }}>Custom-Size Layout Lab <span style={{ color: '#7c7d80', fontWeight: 400 }}>· spike</span></h1>
+        <Link href="/custom-size-lab/resize" style={{ color: '#5b9bd5', fontSize: 13 }}>drag-to-resize →</Link>
+      </div>
       <p style={{ color: '#7c7d80', fontSize: 13, marginBottom: 20, maxWidth: 720 }}>
         One pure resolver + one ContentStack-based renderer, across extreme ratios. The per-band rules in <code style={{ color: '#9aa0a6' }}>lib/custom-size/resolve.ts</code> are the design judgment — tune them here until each band reads well.
       </p>
@@ -112,27 +99,10 @@ export default function CustomSizeLab() {
       <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         {/* Controls */}
         <div style={{ width: 280, flexShrink: 0, background: '#1c1d1f', border: '1px solid #2c2d2f', borderRadius: 10, padding: 16 }}>
-          <label style={labelStyle}>Eyebrow</label>
-          <input style={fieldStyle} value={content.eyebrow} onChange={(e) => set({ eyebrow: e.target.value })} />
-          <label style={labelStyle}>Headline</label>
-          <textarea style={{ ...fieldStyle, height: 50 }} value={content.headline} onChange={(e) => set({ headline: e.target.value })} />
-          <label style={labelStyle}>Subhead</label>
-          <textarea style={{ ...fieldStyle, height: 44 }} value={content.subhead} onChange={(e) => set({ subhead: e.target.value })} />
-          <label style={labelStyle}>Body</label>
-          <textarea style={{ ...fieldStyle, height: 60 }} value={content.body} onChange={(e) => set({ body: e.target.value })} />
-          <label style={labelStyle}>CTA</label>
-          <input style={fieldStyle} value={content.cta} onChange={(e) => set({ cta: e.target.value })} />
-          <label style={labelStyle}>Solution</label>
-          <select style={fieldStyle} value={content.solution} onChange={(e) => set({ solution: e.target.value })}>
-            {SOLUTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6, fontSize: 12 }}>
-            <label><input type="checkbox" checked={content.showLogo} onChange={(e) => set({ showLogo: e.target.checked })} /> logo</label>
-            <label><input type="checkbox" checked={content.showSolutionPill} onChange={(e) => set({ showSolutionPill: e.target.checked })} /> solution pill</label>
-            <label><input type="checkbox" checked={content.hasImage} onChange={(e) => set({ hasImage: e.target.checked })} /> image</label>
-            <label><input type="checkbox" checked={theme === 'dark'} onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')} /> dark theme</label>
-          </div>
+          <ContentControls content={content} onChange={set} />
+          <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', letterSpacing: 0, fontSize: 12, color: '#cfd2d6', marginTop: 6 }}>
+            <input type="checkbox" checked={theme === 'dark'} onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')} /> dark theme
+          </label>
 
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #2c2d2f' }}>
             <label style={labelStyle}>Custom size (the real entry)</label>
