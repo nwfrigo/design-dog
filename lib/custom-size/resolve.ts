@@ -129,10 +129,18 @@ function estHeight(id: CustomBlockId, fontSize: number): number {
   return fontSize * 1.2 * EST_LINES[id]
 }
 
+export interface LayoutOverrides {
+  /** User-forced image side (drag-flip). Wins over the band default. */
+  imageSide?: 'left' | 'right'
+  /** User-chosen block order (survivor ids, drag-reorder). Unlisted ids fall to the end. */
+  order?: CustomBlockId[]
+}
+
 export function resolveLayout(
   content: CustomContent,
   width: number,
   height: number,
+  overrides?: LayoutOverrides,
 ): ResolvedLayout {
   const band = classifyBand(width, height)
   const triagedOut: TriagedBlock[] = []
@@ -153,7 +161,7 @@ export function resolveLayout(
   let textStackAlign: StackAlign = 'top'
   let textAlign: 'left' | 'center' = 'left'
   let alignItems: 'flex-start' | 'center' = 'flex-start'
-  const imageSide: 'left' | 'right' = 'right'
+  const imageSide: 'left' | 'right' = overrides?.imageSide ?? 'right'
   let imageFraction = 0.4
   let wantsImage = false
 
@@ -258,9 +266,16 @@ export function resolveLayout(
     }
   }
 
-  const blocks: ResolvedTextBlock[] = VISUAL_ORDER
+  let blocks: ResolvedTextBlock[] = VISUAL_ORDER
     .filter((id) => survivors.includes(id))
     .map((id) => ({ id, fontSize: sizeOf(id) }))
+  if (overrides?.order) {
+    const pos = (id: CustomBlockId) => {
+      const i = overrides.order!.indexOf(id)
+      return i < 0 ? 999 : i
+    }
+    blocks = [...blocks].sort((a, b) => pos(a.id) - pos(b.id))
+  }
 
   return {
     band,

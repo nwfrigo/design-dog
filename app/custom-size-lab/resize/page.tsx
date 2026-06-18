@@ -11,7 +11,7 @@ import Link from 'next/link'
 import type { TemplateTheme } from '@/lib/template-themes'
 import { ResizableCanvasStage } from '@/components/custom-size/ResizableCanvasStage'
 import { ContentControls, DEFAULT_CONTENT, fieldStyle, labelStyle } from '@/components/custom-size/labShared'
-import { resolveLayout, type CustomContent } from '@/lib/custom-size/resolve'
+import { resolveLayout, type CustomContent, type CustomBlockId } from '@/lib/custom-size/resolve'
 
 const PRESETS = [
   { label: '1:1', w: 1080, h: 1080 },
@@ -32,8 +32,11 @@ export default function ResizeLab() {
   const [w, setW] = useState(1080)
   const [h, setH] = useState(1080)
   const [snap, setSnap] = useState(true)
+  const [order, setOrder] = useState<CustomBlockId[] | null>(null)
+  const [imageSide, setImageSide] = useState<'left' | 'right' | null>(null)
   const set = (patch: Partial<CustomContent>) => setContent((c) => ({ ...c, ...patch }))
-  const layout = resolveLayout(content, w, h)
+  const arranged = order !== null || imageSide !== null
+  const layout = resolveLayout(content, w, h, { order: order ?? undefined, imageSide: imageSide ?? undefined })
 
   const chipStyle = (active: boolean): React.CSSProperties => ({
     padding: '5px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
@@ -48,7 +51,7 @@ export default function ResizeLab() {
         <Link href="/custom-size-lab" style={{ color: '#5b9bd5', fontSize: 13 }}>↩ ratio grid</Link>
       </div>
       <p style={{ color: '#7c7d80', fontSize: 13, marginBottom: 20, maxWidth: 760 }}>
-        Drag the canvas handles. The engine re-resolves live — content reflows and triages as the shape changes. Toggle snapping to feel the magnetic ratio stops.
+        <strong style={{ color: '#cfd2d6' }}>Resize:</strong> drag the canvas handles — the engine re-resolves live. <strong style={{ color: '#cfd2d6' }}>Reorder:</strong> drag a text block up/down. <strong style={{ color: '#cfd2d6' }}>Flip:</strong> drag the image across the centerline (landscape-with-image only). Toggle snapping to feel the magnetic ratio stops.
       </p>
 
       <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
@@ -71,7 +74,8 @@ export default function ResizeLab() {
               <span style={{ color: '#7c7d80' }}>×</span>
               <input style={fieldStyle} type="number" value={h} onChange={(e) => setH(Math.max(1, +e.target.value || 1))} />
             </div>
-            <button onClick={() => { setW(h); setH(w) }} style={{ ...chipStyle(false), width: '100%', marginBottom: 12 }}>⤢ flip orientation</button>
+            <button onClick={() => { setW(h); setH(w) }} style={{ ...chipStyle(false), width: '100%', marginBottom: 8 }}>⤢ flip orientation</button>
+            <button onClick={() => { setOrder(null); setImageSide(null) }} disabled={!arranged} style={{ ...chipStyle(false), width: '100%', marginBottom: 12, opacity: arranged ? 1 : 0.45, cursor: arranged ? 'pointer' : 'default' }}>↺ reset arrangement</button>
 
             <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', letterSpacing: 0, fontSize: 12, color: '#cfd2d6' }}>
               <input type="checkbox" checked={snap} onChange={(e) => setSnap(e.target.checked)} /> snap to presets
@@ -84,7 +88,7 @@ export default function ResizeLab() {
 
         {/* Stage + live readout */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <ResizableCanvasStage content={content} theme={theme} width={w} height={h} onResize={(nw, nh) => { setW(nw); setH(nh) }} snapEnabled={snap} />
+          <ResizableCanvasStage content={content} theme={theme} width={w} height={h} onResize={(nw, nh) => { setW(nw); setH(nh) }} snapEnabled={snap} order={order} imageSide={imageSide} onReorder={setOrder} onFlip={setImageSide} />
 
           <div style={{ marginTop: 12, display: 'flex', gap: 20, fontSize: 12, color: '#9aa0a6', flexWrap: 'wrap' }}>
             <span><span style={{ color: '#5b9bd5' }}>{layout.band}</span> · {layout.strategyLabel}</span>

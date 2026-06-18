@@ -3,14 +3,14 @@
 /**
  * CustomSizeCanvas — SPIKE renderer for the custom-size layout engine.
  *
- * Takes brand content + arbitrary dimensions, asks the pure resolver how to
- * lay it out, and renders the result using ONLY shared substrate primitives:
- *   - ContentStack for every vertical zone (spacing, distribution, blocks)
- *   - thin flex "frames" for horizontal / hero-top / strip arrangement
- *   - CorityLogo / ArrowIcon / SolutionPill / TEMPLATE_THEMES for brand chrome
+ * Takes brand content + arbitrary dimensions (+ optional user overrides), asks
+ * the pure resolver how to lay it out, and renders using ONLY shared substrate
+ * primitives: ContentStack for vertical zones, thin flex frames for
+ * row/hero-top/strip, and brand chrome.
  *
- * Deliberately NO bespoke layout language — that's the discipline that keeps a
- * future merge with real templates a snap-together job.
+ * `interactive` tags blocks/image with data-cs-* so the editor harness can
+ * hit-test drag gestures. When false (export / grid preview) output is pure +
+ * identical — no wrappers, no attrs.
  */
 
 import { CSSProperties, type ReactNode } from 'react'
@@ -28,6 +28,7 @@ import {
   type CustomContent,
   type CustomBlockId,
   type ResolvedTextBlock,
+  type LayoutOverrides,
 } from '@/lib/custom-size/resolve'
 
 export interface CustomSizeCanvasProps {
@@ -38,16 +39,23 @@ export interface CustomSizeCanvasProps {
   colors: ColorsConfig
   typography: TypographyConfig
   scale?: number
+  overrides?: LayoutOverrides
+  /** Tag blocks/image for drag gestures (editor only). */
+  interactive?: boolean
+  /** Block currently being dragged — dimmed for feedback. */
+  activeBlockId?: CustomBlockId | null
 }
 
-function ImagePlaceholder({ style }: { style?: CSSProperties }) {
+function ImagePlaceholder({ style, tag }: { style?: CSSProperties; tag?: boolean }) {
   return (
     <div
+      {...(tag ? { 'data-cs-image': 'true' } : {})}
       style={{
         background: 'rgba(127,127,127,0.18)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        cursor: tag ? 'grab' : undefined,
         ...style,
       }}
     >
@@ -63,8 +71,9 @@ function ImagePlaceholder({ style }: { style?: CSSProperties }) {
 
 export function CustomSizeCanvas({
   content, width, height, theme = 'dark', colors, typography, scale = 1,
+  overrides, interactive = false, activeBlockId = null,
 }: CustomSizeCanvasProps) {
-  const layout = resolveLayout(content, width, height)
+  const layout = resolveLayout(content, width, height, overrides)
   const t = TEMPLATE_THEMES[theme]
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const textColor = t.textPrimary
@@ -81,6 +90,11 @@ export function CustomSizeCanvas({
       case 'cta': return (i) => <div style={{ display: 'inline-flex', alignItems: 'center', gap: fontSize * 0.45, fontSize, fontWeight: 500, color: btnText, justifyContent: ta === 'center' ? 'center' : 'flex-start' }}>{i}<ArrowIcon color={btnText} width={fontSize * 0.92} height={fontSize * 0.72} /></div>
     }
   }
+
+  // Editor wrapper: full-width grab target tagged for drag-reorder hit-testing.
+  const wrapEditable = (id: CustomBlockId, node: ReactNode): ReactNode => (
+    <div data-cs-block={id} style={{ width: '100%', cursor: 'grab', opacity: activeBlockId === id ? 0.4 : 1, transition: 'opacity 0.12s' }}>{node}</div>
+  )
 
   const toBlocks = (items: ResolvedTextBlock[]): ContentStackBlock<CustomBlockId>[] =>
     items.map((b) => ({
@@ -106,6 +120,7 @@ export function CustomSizeCanvas({
       defaultGap={layout.gap}
       stackAlign={align}
       alignItems={layout.alignItems}
+      renderBlock={interactive ? wrapEditable : undefined}
     />
   )
 
@@ -151,7 +166,7 @@ export function CustomSizeCanvas({
         <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks)}</div>
       </div>
     )
-    const imageCol = <ImagePlaceholder style={{ width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }} />
+    const imageCol = <ImagePlaceholder tag={interactive} style={{ width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }} />
     inner = (
       <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
         {layout.imageSide === 'left' ? <>{imageCol}{textCol}</> : <>{textCol}{imageCol}</>}
