@@ -48,6 +48,9 @@ Design Dog's templates are fixed sizes. Users routinely need an on-brand asset a
 ### 5.3 Editing content
 - Standard Stage & Bench: double-click to edit text, contextual editbars, hide-to-bench.
 
+### 5.4 Background-image variant (image-led mode)
+A second composition mode: the user uploads (or picks from the image / graphics library) a **full-bleed background image** that scales elegantly with the canvas (`object-fit: cover` + a **focal point** so the subject survives every ratio), with text **overlaid** and kept legible (auto scrim / gradient, contrast-aware text color). The engine still owns layout — where the text sits and how it scales per ratio — but the arrangement is *overlay* rather than *zone* (a new resolver `kind`). Same scale-invariant rules. (Subject-aware smart crop and generative extend stay out of scope — see §8.)
+
 ## 6. The layout engine (validated by the spike)
 
 - **Pure resolver:** `(content, width, height) → resolved layout`. Five ratio **bands** (strip / landscape / square / portrait / tower), each a hand-tuned strategy. The per-band rules **are** the design judgment.
@@ -61,6 +64,7 @@ Design Dog's templates are fixed sizes. Users routinely need an on-brand asset a
 - **Saved doc** = `{ width, height, theme, content (field-based), arrangement overrides (imageSide, block order), shownElements }` — **not** an arbitrary element tree. Reuses the store, `SNAPSHOT_FIELDS`, draft/queue.
 - **Factory:** generalize `slots` from `array` to `array | resolver` (computed slots). **Do not fork** the 749-line `defineStageBenchAdapter`.
 - **Export:** dynamic render route + `width`/`height`/`strategy` params; the resolver runs inside the shared `CustomSizeCanvas` component, so editor and Puppeteer output are identical by construction.
+- **Image crop modal:** `ImageCropModal` / `ImagePreviewWithCrop` already accept the container's aspect ratio (done for S/M/L variants today). Custom-size makes that range **continuous and extreme**, and the image-zone aspect changes **live during a resize drag** — so the wiring must feed the modal the live resolved zone aspect and re-sync on resize. Known extension, not new infra.
 - **Five DRY disciplines** (from the CTO review): don't fork the factory; no new layout language; **collapse the 3 duplicate dimension sources into one** (feature pays down debt); don't fork EditorScreen / render page; no parallel hidden-state (triage writes existing `show*` flags).
 - **Undo** finally makes `commands.ts` real (currently a stub).
 
@@ -71,7 +75,7 @@ Design Dog's templates are fixed sizes. Users routinely need an on-brand asset a
 - Channel-named presets (dummy ratios for now).
 - **Retrofitting the 28 templates.** (Text-reordering *might* later be added to templates — separate, later decision; nothing else here leaks over.)
 - Free pixel placement, rotation, grouping, broad multi-select.
-- Image-led / background-image mode, subject-aware smart crop, generative background-extend. *(Noted as the most promising future frontier — explicitly not v1.)*
+- Subject-aware **smart crop** and **generative background-extend**. *(The basic background-image variant in §5.4 IS in scope; the AI-assisted crop/extend layered on top of it is the future frontier — not v1.)*
 
 ## 9. Open questions
 
@@ -79,6 +83,8 @@ Design Dog's templates are fixed sizes. Users routinely need an on-brand asset a
 - Is the **CTA** part of the free reorder set, or pinned to trail?
 - Placement of the **"snap to presets" toggle** (stage bar vs. near the size controls).
 - Minimum canvas size / how aggressively to triage at extreme ratios (tuning).
+- How the crop frame stays synced as the image-zone aspect changes live during a resize drag.
+- Background-image mode: focal-point UX, and how aggressive the legibility scrim should be.
 
 ## 10. Build sequence
 
