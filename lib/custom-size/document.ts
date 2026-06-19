@@ -53,6 +53,11 @@ export interface ReusedContent {
   cta: string
   solution: string
   showSolutionSet: boolean
+  // Per-block visibility (show flags). Drive the bench + are carried into export.
+  showEyebrow: boolean
+  showSubhead: boolean
+  showBody: boolean
+  showCta: boolean
   theme: 'light' | 'dark'
   grayscale: boolean
   /** Canonical image settings: position is a -50..+50 offset, zoom 1..3.
@@ -118,7 +123,19 @@ export function customSizeToProps(
     width: doc.width,
     height: doc.height,
     theme: reused.theme,
-    overrides: { order: doc.order ?? undefined, imageSide: doc.imageSide ?? undefined },
+    overrides: {
+      order: doc.order ?? undefined,
+      imageSide: doc.imageSide ?? undefined,
+      // Single source of visibility — editor + export both go through here, so
+      // a user-hidden block stays hidden in the exported PNG. (headline always-on.)
+      shownBlocks: {
+        eyebrow: reused.showEyebrow,
+        headline: true,
+        subhead: reused.showSubhead,
+        body: reused.showBody,
+        cta: reused.showCta,
+      },
+    },
   }
 }
 
@@ -140,6 +157,10 @@ export function customSizeExportBody(
     ctaText: reused.cta,
     solution: reused.solution,
     showSolutionSet: reused.showSolutionSet,
+    showEyebrow: reused.showEyebrow,
+    showSubhead: reused.showSubhead,
+    showBody: reused.showBody,
+    showCta: reused.showCta,
     theme: reused.theme,
     grayscale: reused.grayscale,
     imagePositionX: reused.imagePosition.x,

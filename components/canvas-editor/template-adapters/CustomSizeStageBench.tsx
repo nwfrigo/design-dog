@@ -137,16 +137,18 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
       cta: ctaText,
       solution,
       showSolutionSet,
+      showEyebrow,
+      showSubhead,
+      showBody,
+      showCta,
       theme,
       grayscale,
       imagePosition: position,
       imageZoom: zoom,
     }
     const mapped = customSizeToProps(doc, reused)
-    const overrides: LayoutOverrides = {
-      ...mapped.overrides,
-      shownBlocks: { eyebrow: showEyebrow, headline: true, subhead: showSubhead, body: showBody, cta: showCta },
-    }
+    // shownBlocks now comes from customSizeToProps (single source — editor==export).
+    const overrides = mapped.overrides
 
     // The bench shows everything that COULD be on the design but currently isn't —
     // whether the user hid it OR the engine triaged it off at this size. So a

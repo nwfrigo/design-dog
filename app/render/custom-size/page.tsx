@@ -43,6 +43,10 @@ export default function CustomSizeRenderPage({
     cta: parseString(searchParams, 'ctaText', ''),
     solution: parseString(searchParams, 'solution', 'none'),
     showSolutionSet: parseBoolTrue(searchParams, 'showSolutionSet'),
+    showEyebrow: parseBoolTrue(searchParams, 'showEyebrow'),
+    showSubhead: parseBoolTrue(searchParams, 'showSubhead'),
+    showBody: parseBoolTrue(searchParams, 'showBody'),
+    showCta: parseBoolTrue(searchParams, 'showCta'),
     theme: parseEnum<'light' | 'dark'>(searchParams, 'theme', 'dark'),
     grayscale: parseBoolFalse(searchParams, 'grayscale'),
     imagePosition: {
