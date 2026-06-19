@@ -25,6 +25,11 @@ import type { StackAlign } from '@/types'
 
 export type CustomBlockId = 'eyebrow' | 'headline' | 'subhead' | 'body' | 'cta'
 
+/** All editable slot ids in custom-size: the text blocks plus the non-text
+ *  brand elements (image, solution pill, logo). The Stage & Bench adapter keys
+ *  off this; render-props for non-text slots (image) use it. */
+export type CustomSizeSlotId = CustomBlockId | 'image' | 'solutionPill' | 'logo'
+
 export interface CustomContent {
   showLogo: boolean
   eyebrow: string

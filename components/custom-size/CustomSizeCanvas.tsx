@@ -20,6 +20,7 @@ import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 import { brandChrome, BrandHeaderRow } from '@/lib/brand-chrome'
+import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 import {
   ContentStack,
   type ContentStackBlock,
@@ -30,6 +31,7 @@ import {
   type CustomBlockId,
   type ResolvedTextBlock,
   type LayoutOverrides,
+  type CustomSizeSlotId,
 } from '@/lib/custom-size/resolve'
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
@@ -58,10 +60,15 @@ export interface CustomSizeCanvasProps {
   typography: TypographyConfig
   scale?: number
   overrides?: LayoutOverrides
-  /** Tag blocks/image for drag gestures (editor only). */
+  /** Tag blocks/image for drag gestures (lab only). */
   interactive?: boolean
   /** Block currently being dragged — dimmed for feedback. */
   activeBlockId?: CustomBlockId | null
+  // --- Stage & Bench render-prop contract (§4.15) ---
+  renderBlock?: (id: CustomSizeSlotId, content: ReactNode) => ReactNode
+  renderInlineEditor?: (id: CustomBlockId, defaultInner: ReactNode) => ReactNode
+  renderSpacerBetween?: (gapKey: string, value: number, prevId: CustomBlockId, nextId: CustomBlockId) => ReactNode
+  renderOverlay?: () => ReactNode
 }
 
 function ImagePlaceholder({
@@ -106,6 +113,7 @@ function ImagePlaceholder({
 export function CustomSizeCanvas({
   content, width, height, theme = 'dark', colors, typography, scale = 1,
   overrides, interactive = false, activeBlockId = null,
+  renderBlock, renderInlineEditor, renderSpacerBetween, renderOverlay,
 }: CustomSizeCanvasProps) {
   const layout = resolveLayout(content, width, height, overrides)
   const t = TEMPLATE_THEMES[theme]
@@ -126,16 +134,29 @@ export function CustomSizeCanvas({
   const chromeFor = (id: CustomBlockId, fontSize: number) =>
     brandChrome(id, { fontSize, textColor, btnText, align: layout.textAlign })
 
-  // Editor wrapper: full-width grab target tagged for drag-reorder hit-testing.
+  // Lab drag wrapper: full-width grab target tagged for drag-reorder hit-testing.
   const wrapEditable = (id: CustomBlockId, node: ReactNode): ReactNode => (
     <div data-cs-block={id} style={{ width: '100%', cursor: 'grab', opacity: activeBlockId === id ? 0.4 : 1, transition: 'opacity 0.12s' }}>{node}</div>
   )
+
+  // Factory render-prop wraps the image so it's selectable in the editor.
+  const wrapImage = (node: ReactNode): ReactNode => (renderBlock ? renderBlock('image', node) : node)
+
+  // html-format blocks render via dangerouslySetInnerHTML so inline bold/italic
+  // survives the edit; plain blocks render as text. Empty → canonical placeholder.
+  const HTML_BLOCKS = new Set<CustomBlockId>(['headline', 'subhead', 'body'])
+  const defaultInnerFor = (id: CustomBlockId): ReactNode => {
+    const val = content[id] || SLOT_PLACEHOLDERS[id]
+    return HTML_BLOCKS.has(id)
+      ? <div dangerouslySetInnerHTML={{ __html: val }} />
+      : <span>{val}</span>
+  }
 
   const toBlocks = (items: ResolvedTextBlock[]): ContentStackBlock<CustomBlockId>[] =>
     items.map((b) => ({
       id: b.id,
       visible: true,
-      defaultInner: <span>{content[b.id]}</span>,
+      defaultInner: defaultInnerFor(b.id),
       renderChrome: chromeFor(b.id, b.fontSize),
     }))
 
@@ -156,7 +177,9 @@ export function CustomSizeCanvas({
       defaultGap={layout.gap}
       stackAlign={align}
       alignItems={layout.alignItems}
-      renderBlock={interactive ? wrapEditable : undefined}
+      renderBlock={renderBlock ?? (interactive ? wrapEditable : undefined)}
+      renderInlineEditor={renderInlineEditor}
+      renderSpacerBetween={renderSpacerBetween}
     />
   )
 
@@ -233,7 +256,7 @@ export function CustomSizeCanvas({
         <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks)}</div>
       </div>
     )
-    const imageCol = <ImagePlaceholder tag={interactive} src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }} />
+    const imageCol = wrapImage(<ImagePlaceholder tag={interactive} src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }} />)
     inner = (
       <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
         {layout.imageSide === 'left' ? <>{imageCol}{textCol}</> : <>{textCol}{imageCol}</>}
@@ -242,7 +265,7 @@ export function CustomSizeCanvas({
   } else if (layout.kind === 'hero-top') {
     inner = (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <ImagePlaceholder src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: '100%', height: `${layout.imageFraction * 100}%`, flexShrink: 0 }} />
+        {wrapImage(<ImagePlaceholder src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: '100%', height: `${layout.imageFraction * 100}%`, flexShrink: 0 }} />)}
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: layout.gap, padding: layout.padding }}>
           {headerRow('flex-start')}
           <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks, 'top')}</div>
@@ -259,5 +282,5 @@ export function CustomSizeCanvas({
     )
   }
 
-  return <div style={container}>{inner}</div>
+  return <div style={container}>{inner}{renderOverlay?.()}</div>
 }
