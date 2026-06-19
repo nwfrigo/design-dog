@@ -120,3 +120,32 @@ export function customSizeToProps(
     overrides: { order: doc.order ?? undefined, imageSide: doc.imageSide ?? undefined },
   }
 }
+
+/** Build the POST body for the export API. Pairs exactly with the render route's
+ *  param parsing: the document rides as `customSizeConfig`; reused content rides
+ *  as the standard flat params. Pure — the editor calls this in handleExport. */
+export function customSizeExportBody(
+  doc: CustomSizeDocument,
+  reused: ReusedContent,
+  opts: { format: 'png' | 'pdf'; scale: number; exportedBy?: string | null },
+): Record<string, unknown> {
+  return {
+    template: 'custom-size',
+    customSizeConfig: doc,
+    eyebrow: reused.eyebrow,
+    headline: reused.headline,
+    subhead: reused.subhead,
+    body: reused.body,
+    ctaText: reused.cta,
+    solution: reused.solution,
+    showSolutionSet: reused.showSolutionSet,
+    theme: reused.theme,
+    grayscale: reused.grayscale,
+    imagePositionX: reused.imagePosition.x,
+    imagePositionY: reused.imagePosition.y,
+    imageZoom: reused.imageZoom,
+    format: opts.format,
+    scale: opts.scale,
+    ...(opts.exportedBy != null ? { exportedBy: opts.exportedBy } : {}),
+  }
+}

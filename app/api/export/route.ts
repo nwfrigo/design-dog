@@ -156,6 +156,8 @@ export async function POST(request: NextRequest) {
       'coverImagePosition',
       // Carousel: only forwarded when exporting all slides
       'slidesData',
+      // Custom-size: the whole document rides as one JSON-encoded param
+      'customSizeConfig',
     ])
 
     for (const [key, value] of Object.entries(body)) {
@@ -189,6 +191,12 @@ export async function POST(request: NextRequest) {
     // Carousel slidesData: only forwarded when exporting all slides as PDF
     if (body.slidesData && body.page === 'all') {
       params.set('slidesData', body.slidesData)
+    }
+
+    // Custom-size: the whole CustomSizeDocument rides as one JSON-encoded param
+    // (matches the render route's decodeURIComponent + JSON.parse).
+    if (body.customSizeConfig) {
+      params.set('customSizeConfig', encodeURIComponent(JSON.stringify(body.customSizeConfig)))
     }
 
     // FAQ PDF: strip data URLs from image blocks (they'll be injected via Puppeteer)
@@ -296,7 +304,13 @@ export async function POST(request: NextRequest) {
 
     // Set viewport to template dimensions
     const dimensions = TEMPLATE_DIMENSIONS[template] || TEMPLATE_DIMENSIONS['website-thumbnail']
-    const { width, height } = dimensions
+    let { width, height } = dimensions
+
+    // Custom-size: dimensions are dynamic — read them from the document.
+    if (template === 'custom-size' && body.customSizeConfig) {
+      width = Number(body.customSizeConfig.width) || width
+      height = Number(body.customSizeConfig.height) || height
+    }
 
     // For PDF exports with page=all, use taller viewport to render all pages
     const isSolutionOverviewPdf = template === 'solution-overview-pdf' && body.page === 'all'
