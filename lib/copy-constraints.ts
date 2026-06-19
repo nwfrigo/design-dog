@@ -202,6 +202,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'faq-pdf': 'collateral',
   'stacker-pdf': 'collateral',
   'customer-library': 'website',
+  'custom-size': 'website', // generic; custom-size has no AI copy gen in v1
   'email-cority-connect-2026': 'email',
   'email-ehs-accelerate-banner': 'email',
   'email-ehs-accelerate-invitation': 'email',

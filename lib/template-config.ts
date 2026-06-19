@@ -385,6 +385,19 @@ export const CHANNELS: ChannelConfig[] = [
   },
 ]
 
+// Custom-size: standalone, not in any channel grid. Dimensions are dynamic
+// (read from the CustomSizeDocument at render/export time); the values here are
+// placeholders so TEMPLATE_INFO / TEMPLATE_DIMENSIONS resolve. Hidden — its
+// homepage entry is a dedicated CTA (Phase B), not a channel tile.
+const CUSTOM_SIZE_TEMPLATE: TemplateInfo = {
+  type: 'custom-size',
+  label: 'Custom Size',
+  dimensions: 'Custom',
+  width: 1080,
+  height: 1080,
+  hidden: true,
+}
+
 // Flat list of all templates (includes hidden ones for draft resolution).
 export const ALL_TEMPLATES: TemplateInfo[] = [
   ...EMAIL_BANNER_TEMPLATES,
@@ -395,6 +408,7 @@ export const ALL_TEMPLATES: TemplateInfo[] = [
   ...COLLATERAL_TEMPLATES.filter(
     t => !['solution-overview-pdf', 'faq-pdf', 'stacker-pdf'].includes(t.type),
   ),
+  CUSTOM_SIZE_TEMPLATE,
 ]
 
 // Quick lookup by template type
