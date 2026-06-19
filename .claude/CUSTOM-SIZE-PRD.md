@@ -49,7 +49,11 @@ Design Dog's templates are fixed sizes. Users routinely need an on-brand asset a
 - Standard Stage & Bench: double-click to edit text, contextual editbars, hide-to-bench.
 
 ### 5.4 Background-image variant (image-led mode)
-A second composition mode: the user uploads (or picks from the image / graphics library) a **full-bleed background image** that scales elegantly with the canvas (`object-fit: cover` + a **focal point** so the subject survives every ratio), with text **overlaid** and kept legible (auto scrim / gradient, contrast-aware text color). The engine still owns layout — where the text sits and how it scales per ratio — but the arrangement is *overlay* rather than *zone* (a new resolver `kind`). Same scale-invariant rules. (Subject-aware smart crop and generative extend stay out of scope — see §8.)
+A second composition mode: the user uploads (or picks from the image / graphics library) a **full-bleed background image** that scales elegantly with the canvas (`object-fit: cover` + a **focal point** so the subject survives every ratio), with text **overlaid**. The engine still owns layout — where the text sits and how it scales per ratio — but the arrangement is *overlay* rather than *zone* (a new resolver `kind`). Same scale-invariant rules. (Subject-aware smart crop and generative extend stay out of scope — see §8.)
+
+**Image editing:** the background supports the **same edits as the main image editor** (zoom / pan / grayscale — via `ImageCropModal` in the real editor; focal + zoom + grayscale in the lab).
+
+**Editable overlay layer** (not a fixed scrim): the user controls **coverage** (full / fade-up / fade-down), **color** (brand-preset palette), **opacity** (adjustable within a sensible range), and **noise**. Text color is **contrast-aware** against the overlay; `fade-down` anchors text to the top. This is the legibility tool *and* a brand styling tool in one.
 
 ## 6. The layout engine (validated by the spike)
 
@@ -84,7 +88,7 @@ A second composition mode: the user uploads (or picks from the image / graphics 
 - Placement of the **"snap to presets" toggle** (stage bar vs. near the size controls).
 - Minimum canvas size / how aggressively to triage at extreme ratios (tuning).
 - How the crop frame stays synced as the image-zone aspect changes live during a resize drag.
-- Background-image mode: focal-point UX, and how aggressive the legibility scrim should be.
+- Background-image mode: focal-point UX (draggable dot vs sliders); per-preset overlay opacity *ranges*; whether to warn when a user's overlay choice makes text illegible.
 
 ## 10. Build sequence
 
