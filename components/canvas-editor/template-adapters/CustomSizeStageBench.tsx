@@ -63,7 +63,8 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
     const content = ex.content as CustomContent
     const overrides = ex.overrides as LayoutOverrides
     const doc = ex.doc as CustomSizeDocument
-    const layout = resolveLayout(content, doc.width, doc.height, overrides)
+    // Reuse the layout resolved in useStoreBindings (stashed in extras).
+    const layout = (ex.layout as ReturnType<typeof resolveLayout>) ?? resolveLayout(content, doc.width, doc.height, overrides)
     const bandExcluded = new Set(
       layout.triagedOut.filter((t) => t.reason === 'band-excluded').map((t) => t.id),
     )
@@ -147,13 +148,21 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
       shownBlocks: { eyebrow: showEyebrow, headline: true, subhead: showSubhead, body: showBody, cta: showCta },
     }
 
+    // The bench shows everything that COULD be on the design but currently isn't —
+    // whether the user hid it OR the engine triaged it off at this size. So a
+    // slot's on-canvas (`visible`) state mirrors the engine's resolved survivors,
+    // not the raw show-flag; `setVisible` still writes the user's show-flag.
+    // (Band-excluded blocks aren't slots at all, so they never reach the bench.)
+    const layout = resolveLayout(mapped.content, doc.width, doc.height, overrides)
+    const onCanvas = new Set<string>(layout.blocks.map((b) => b.id))
+
     return {
       slotState: {
-        eyebrow: { value: eyebrow, visible: showEyebrow, setValue: setEyebrow, setVisible: setShowEyebrow },
-        headline: { value: reused.headline, visible: true, fontSize: headlineFontSize ?? undefined, setValue: (v) => setVerbatimCopy({ headline: v }), setFontSize: setHeadlineFontSize },
-        subhead: { value: reused.subhead, visible: showSubhead, fontSize: subheadFontSize ?? undefined, setValue: (v) => setVerbatimCopy({ subhead: v }), setVisible: setShowSubhead, setFontSize: setSubheadFontSize },
-        body: { value: reused.body, visible: showBody, setValue: (v) => setVerbatimCopy({ body: v }), setVisible: setShowBody },
-        cta: { value: ctaText, visible: showCta, setValue: setCtaText, setVisible: setShowCta },
+        eyebrow: { value: eyebrow, visible: onCanvas.has('eyebrow'), setValue: setEyebrow, setVisible: setShowEyebrow },
+        headline: { value: reused.headline, visible: onCanvas.has('headline'), fontSize: headlineFontSize ?? undefined, setValue: (v) => setVerbatimCopy({ headline: v }), setFontSize: setHeadlineFontSize },
+        subhead: { value: reused.subhead, visible: onCanvas.has('subhead'), fontSize: subheadFontSize ?? undefined, setValue: (v) => setVerbatimCopy({ subhead: v }), setVisible: setShowSubhead, setFontSize: setSubheadFontSize },
+        body: { value: reused.body, visible: onCanvas.has('body'), setValue: (v) => setVerbatimCopy({ body: v }), setVisible: setShowBody },
+        cta: { value: ctaText, visible: onCanvas.has('cta'), setValue: setCtaText, setVisible: setShowCta },
         image: {},
         solutionPill: { visible: showSolutionSet, setVisible: setShowSolutionSet },
         logo: {},
@@ -174,7 +183,7 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
         frameHeight: doc.height,
       },
       category: { value: solution, set: setSolution },
-      extras: { content: mapped.content, overrides, doc, theme },
+      extras: { content: mapped.content, overrides, doc, theme, layout },
     }
   },
   renderTemplate: (ctx) => {
