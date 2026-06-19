@@ -19,6 +19,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import { brandChrome, BrandHeaderRow } from '@/lib/brand-chrome'
 import {
   ContentStack,
   type ContentStackBlock,
@@ -106,16 +107,8 @@ export function CustomSizeCanvas({
   const btnText = overlay ? onImageColor : t.buttonSecondaryText
   const logoFill = overlay ? onImageColor : t.logoFill
 
-  const chrome = (id: CustomBlockId, fontSize: number): ((inner: ReactNode) => ReactNode) => {
-    const ta = layout.textAlign
-    switch (id) {
-      case 'eyebrow': return (i) => <div style={{ fontSize, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: textColor, textAlign: ta }}>{i}</div>
-      case 'headline': return (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.12, color: textColor, textAlign: ta }}>{i}</div>
-      case 'subhead': return (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.3, color: textColor, opacity: 0.9, textAlign: ta }}>{i}</div>
-      case 'body': return (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.5, color: textColor, opacity: 0.8, textAlign: ta }}>{i}</div>
-      case 'cta': return (i) => <div style={{ display: 'inline-flex', alignItems: 'center', gap: fontSize * 0.45, fontSize, fontWeight: 500, color: btnText, justifyContent: ta === 'center' ? 'center' : 'flex-start' }}>{i}<ArrowIcon color={btnText} width={fontSize * 0.92} height={fontSize * 0.72} /></div>
-    }
-  }
+  const chromeFor = (id: CustomBlockId, fontSize: number) =>
+    brandChrome(id, { fontSize, textColor, btnText, align: layout.textAlign })
 
   // Editor wrapper: full-width grab target tagged for drag-reorder hit-testing.
   const wrapEditable = (id: CustomBlockId, node: ReactNode): ReactNode => (
@@ -127,18 +120,19 @@ export function CustomSizeCanvas({
       id: b.id,
       visible: true,
       defaultInner: <span>{content[b.id]}</span>,
-      renderChrome: chrome(b.id, b.fontSize),
+      renderChrome: chromeFor(b.id, b.fontSize),
     }))
 
-  const headerRow = (justify: CSSProperties['justifyContent']): ReactNode =>
-    (layout.showLogo || layout.showSolutionPill) ? (
-      <div style={{ display: 'flex', alignItems: 'center', gap: layout.gap, justifyContent: justify, flexShrink: 0 }}>
-        {layout.showLogo && <CorityLogo fill={logoFill} height={layout.logoHeight} />}
-        {layout.showSolutionPill && (
-          <SolutionPill variant="email" solutionColor={sol.color} solutionLabel={sol.label} textColor={textColor} background={t.bgCategoryChip} border={`0.79px solid ${t.borderFocus}`} />
-        )}
-      </div>
-    ) : null
+  const headerRow = (justify: CSSProperties['justifyContent']): ReactNode => (
+    <BrandHeaderRow
+      showLogo={layout.showLogo}
+      logoFill={logoFill}
+      logoHeight={layout.logoHeight}
+      pill={layout.showSolutionPill ? { solutionColor: sol.color, solutionLabel: sol.label, textColor, background: t.bgCategoryChip, border: `0.79px solid ${t.borderFocus}` } : null}
+      gap={layout.gap}
+      justify={justify}
+    />
+  )
 
   const stack = (items: ResolvedTextBlock[], align = layout.textStackAlign): ReactNode => (
     <ContentStack<CustomBlockId>
@@ -213,7 +207,7 @@ export function CustomSizeCanvas({
           {headerRow('flex-start')}
           {top.length > 0 && <div>{stack(top, 'top')}</div>}
         </div>
-        {cta && <div>{chrome('cta', cta.fontSize)(<span>{content.cta}</span>)}</div>}
+        {cta && <div>{chromeFor('cta', cta.fontSize)(<span>{content.cta}</span>)}</div>}
       </div>
     )
   } else if (layout.kind === 'row') {
