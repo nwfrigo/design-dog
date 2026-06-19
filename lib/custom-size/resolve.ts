@@ -35,6 +35,8 @@ export interface CustomContent {
   solution: string
   showSolutionPill: boolean
   hasImage: boolean
+  /** Zone (foreground) image URL — shown in row/hero-top image zones. */
+  zoneImageUrl?: string | null
   /** Image-led mode: full-bleed background. When set, layout → 'overlay'. */
   backgroundImage?: string | null
   bgFocalX?: number // 0-100, object-position X

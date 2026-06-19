@@ -64,11 +64,18 @@ export interface CustomSizeCanvasProps {
   activeBlockId?: CustomBlockId | null
 }
 
-function ImagePlaceholder({ style, tag }: { style?: CSSProperties; tag?: boolean }) {
+function ImagePlaceholder({
+  style, tag, src, focalX = 50, focalY = 50, zoom = 1, grayscale = false,
+}: {
+  style?: CSSProperties; tag?: boolean; src?: string | null
+  focalX?: number; focalY?: number; zoom?: number; grayscale?: boolean
+}) {
   return (
     <div
       {...(tag ? { 'data-cs-image': 'true' } : {})}
       style={{
+        position: 'relative',
+        overflow: 'hidden',
         background: 'rgba(127,127,127,0.18)',
         display: 'flex',
         alignItems: 'center',
@@ -77,12 +84,21 @@ function ImagePlaceholder({ style, tag }: { style?: CSSProperties; tag?: boolean
         ...style,
       }}
     >
-      <svg width="24%" height="24%" viewBox="0 0 24 24" fill="none"
-        stroke="rgba(160,160,160,0.65)" strokeWidth="1.4">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="8.5" cy="8.5" r="1.8" />
-        <path d="M21 15l-5-5L5 21" />
-      </svg>
+      {src ? (
+        <img
+          src={src}
+          alt=""
+          data-export-image="true"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${focalX}% ${focalY}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, filter: grayscale ? 'grayscale(100%)' : undefined }}
+        />
+      ) : (
+        <svg width="24%" height="24%" viewBox="0 0 24 24" fill="none"
+          stroke="rgba(160,160,160,0.65)" strokeWidth="1.4">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.8" />
+          <path d="M21 15l-5-5L5 21" />
+        </svg>
+      )}
     </div>
   )
 }
@@ -217,7 +233,7 @@ export function CustomSizeCanvas({
         <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks)}</div>
       </div>
     )
-    const imageCol = <ImagePlaceholder tag={interactive} style={{ width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }} />
+    const imageCol = <ImagePlaceholder tag={interactive} src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }} />
     inner = (
       <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
         {layout.imageSide === 'left' ? <>{imageCol}{textCol}</> : <>{textCol}{imageCol}</>}
@@ -226,7 +242,7 @@ export function CustomSizeCanvas({
   } else if (layout.kind === 'hero-top') {
     inner = (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <ImagePlaceholder style={{ width: '100%', height: `${layout.imageFraction * 100}%`, flexShrink: 0 }} />
+        <ImagePlaceholder src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: '100%', height: `${layout.imageFraction * 100}%`, flexShrink: 0 }} />
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: layout.gap, padding: layout.padding }}>
           {headerRow('flex-start')}
           <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks, 'top')}</div>
