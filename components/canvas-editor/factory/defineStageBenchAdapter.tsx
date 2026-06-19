@@ -217,7 +217,12 @@ export type AdapterRenderContext<TBlockId extends string> = {
 
 export type StageBenchAdapterDescriptor<TBlockId extends string> = {
   templateId: TemplateType
-  slots: SlotDescriptor<TBlockId>[]
+  /** Static slot list, OR a resolver computed from live bindings each render
+   *  (custom-size: the engine decides which slots exist for the current size).
+   *  Existing adapters pass an array and are unaffected. */
+  slots:
+    | SlotDescriptor<TBlockId>[]
+    | ((bindings: AdapterStoreBindings<TBlockId>) => SlotDescriptor<TBlockId>[])
   stageBar?: StageBarItemDescriptor[]
   image?: ImageSlotConfig<TBlockId>
   /** Nested image slots — e.g. per-speaker avatars. Each entry needs a
@@ -250,6 +255,9 @@ export function defineStageBenchAdapter<TBlockId extends string>(
     } = props
 
     const bindings = descriptor.useStoreBindings()
+    // Slots are either a static array or computed from live bindings each render
+    // (custom-size). `descriptor` is constant, so this is deterministic.
+    const slots = typeof descriptor.slots === 'function' ? descriptor.slots(bindings) : descriptor.slots
     const editingPath = useCanvasEditorStore((s) => s.editingPath)
     // Tracks which image slot's modal is open. null = closed. Used by
     // both the top-level descriptor.image and any descriptor.childImages.
@@ -276,14 +284,14 @@ export function defineStageBenchAdapter<TBlockId extends string>(
     }, [editingPath, track])
 
     const slotByBlockId = new Map<TBlockId, SlotDescriptor<TBlockId>>()
-    for (const s of descriptor.slots) slotByBlockId.set(s.blockId, s)
+    for (const s of slots) slotByBlockId.set(s.blockId, s)
 
     // Effective benchable: explicit value wins; otherwise children
     // (`parent` set) default to false, top-level slots default to true.
     const isBenchable = (s: SlotDescriptor<TBlockId>): boolean =>
       s.benchable ?? !s.parent
 
-    const visibilitySlots: SlotVisibility[] = descriptor.slots
+    const visibilitySlots: SlotVisibility[] = slots
       .filter(isBenchable)
       .map((s) => {
         const state = bindings.slotState[s.blockId]
@@ -314,7 +322,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         }
       })
 
-    const sizeSlots: SlotSize[] = descriptor.slots
+    const sizeSlots: SlotSize[] = slots
       .filter((s) => s.size !== undefined)
       .map((s) => {
         const cfg = s.size!
@@ -329,7 +337,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         }
       })
 
-    const contentSlots: SlotContent[] = descriptor.slots
+    const contentSlots: SlotContent[] = slots
       .filter((s) => s.content !== undefined)
       .map((s) => {
         const cfg = s.content!
