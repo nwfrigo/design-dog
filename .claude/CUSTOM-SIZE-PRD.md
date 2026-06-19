@@ -177,3 +177,26 @@ interface CustomSizeDocument {
 ```
 
 The lab's `CustomContent` is a prototype subset; reconciled during wiring (`bgFocalX/Y`→`imagePosition`; `backgroundImage`/`hasImage`→`imageMode`; drop `showLogo`).
+
+---
+
+## 13. Wiring status (overnight session)
+
+### Done — additive, tsc-clean, Puppeteer-verified, committed on `feature-custom-size`
+- **Schema encoded:** `lib/custom-size/document.ts` — `CustomSizeDocument`, `ReusedContent`, `customSizeToProps` (boundary mapper; canonical `imagePosition` −50..50 → renderer focal), `customSizeExportBody`, `defaultCustomSizeDocument`.
+- **Renderer:** `CustomSizeCanvas` now shows a real **zone image** when a URL is present (additive; placeholder fallback keeps labs unchanged).
+- **Bare render route:** `app/render/custom-size/page.tsx` (no app shell — mirrors stacker/faq/carousel). **Puppeteer-verified through the real route**: background-overlay (1080×1080) and zone-image (1200×628) both render production-quality, no InfoModal.
+- **Export pipeline (additive):** `customSizeConfig` in `COMPLEX_KEYS` + JSON-encoded; dimensions read dynamically from the doc when `template==='custom-size'`. All guarded → existing 28 templates untouched (`validate:registrations` green, 30 checked).
+- **Brand-chrome:** `lib/brand-chrome.tsx` (engine consumes it; templates migrate later per SUBSTRATE-DEBT.md).
+
+**Net: custom-size renders + exports through the REAL pipeline today**, using `'custom-size'` as a plain template string — no store/editor needed to prove it.
+
+### Deliberately DEFERRED to the attended session (Phase B) — stopped at the unattended-risk boundary, not forgotten
+1. **TemplateType registration** — add `'custom-size'` to the `TemplateType` union + `template-config` + `template-registry`. *Why deferred:* the union addition forces exhaustiveness across many `Record<TemplateType,…>` maps + switches (TemplateRenderer, export-params registry, etc.) — a cascading change best done with tsc + a human, not blind overnight.
+2. **Store persistence** — single nullable `customSizeDocument` field through types / store (setter + `getDefaultAssetSettings` + `goToAsset` save/restore) / `SNAPSHOT_FIELDS` / `draft-storage`. *Why deferred:* touches core editing logic (`goToAsset`/draft) used by all 28 templates; only exercisable via the editor → needs interactive QA. Additive but high blast radius.
+3. **Editor adapter + factory generalization** (`slots: array | resolver`), EditorScreen routing, homepage entry. *Why deferred:* interactive — needs dev server + clicking to confirm the existing editor isn't regressed.
+4. **Band / breakpoint taste-QA** — needs Nick's eye; decoupled from plumbing.
+
+**First step next session:** add `'custom-size'` to `TemplateType`, fix the tsc cascade (a custom-size case per switch/Record), then store persistence, then the factory/editor.
+
+**Note:** the full export-**API** round-trip (vs the render route) needs `BLOB_READ_WRITE_TOKEN` + `POSTGRES_URL` locally (blob upload + `logExport`). The render **output** is already verified; only the upload/log wrapper is unverified locally.
