@@ -39,6 +39,13 @@ export interface CustomContent {
   backgroundImage?: string | null
   bgFocalX?: number // 0-100, object-position X
   bgFocalY?: number // 0-100, object-position Y
+  bgZoom?: number // 1+ zoom on the background image
+  bgGrayscale?: boolean
+  /** Editable overlay layer (replaces the fixed scrim). */
+  overlayColor?: string // hex (brand preset)
+  overlayOpacity?: number // 0-1
+  overlayCoverage?: 'full' | 'fade-up' | 'fade-down'
+  overlayNoise?: boolean
 }
 
 export type Band = 'strip' | 'landscape' | 'square' | 'portrait' | 'tower'

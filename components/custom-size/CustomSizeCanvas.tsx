@@ -31,6 +31,23 @@ import {
   type LayoutOverrides,
 } from '@/lib/custom-size/resolve'
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const h = hex.replace('#', '')
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
+  const n = parseInt(full, 16)
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }
+}
+function rgba(hex: string, a: number): string {
+  const { r, g, b } = hexToRgb(hex)
+  return `rgba(${r}, ${g}, ${b}, ${a})`
+}
+function luminance(hex: string): number {
+  const { r, g, b } = hexToRgb(hex)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255
+}
+// Self-contained tiling noise (no asset needed).
+const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+
 export interface CustomSizeCanvasProps {
   content: CustomContent
   width: number
@@ -78,12 +95,16 @@ export function CustomSizeCanvas({
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const sol = colors.solutions[content.solution] || colors.solutions.none
 
-  // Over a full-bleed image, force white text + white logo regardless of theme;
-  // the scrim guarantees contrast. Otherwise use theme colors.
+  // Over a full-bleed image the overlay guarantees contrast; pick text color
+  // against the overlay (dark text only on a light, opaque overlay).
   const overlay = layout.kind === 'overlay'
-  const textColor = overlay ? '#ffffff' : t.textPrimary
-  const btnText = overlay ? '#ffffff' : t.buttonSecondaryText
-  const logoFill = overlay ? '#ffffff' : t.logoFill
+  const oColor = content.overlayColor ?? '#060015'
+  const oOpacity = content.overlayOpacity ?? 0.55
+  const overlayLight = overlay && luminance(oColor) > 0.6 && oOpacity >= 0.5
+  const onImageColor = overlayLight ? '#111111' : '#ffffff'
+  const textColor = overlay ? onImageColor : t.textPrimary
+  const btnText = overlay ? onImageColor : t.buttonSecondaryText
+  const logoFill = overlay ? onImageColor : t.logoFill
 
   const chrome = (id: CustomBlockId, fontSize: number): ((inner: ReactNode) => ReactNode) => {
     const ta = layout.textAlign
@@ -140,20 +161,31 @@ export function CustomSizeCanvas({
   if (layout.kind === 'overlay') {
     const fx = content.bgFocalX ?? 50
     const fy = content.bgFocalY ?? 50
+    const zoom = content.bgZoom ?? 1
+    const cov = content.overlayCoverage ?? 'fade-up'
+    const textTop = cov === 'fade-down'
     const owMax = width > height ? '62%' : '100%'
+    const overlayBg =
+      cov === 'full'
+        ? rgba(oColor, oOpacity)
+        : cov === 'fade-up'
+          ? `linear-gradient(to top, ${rgba(oColor, oOpacity)} 0%, ${rgba(oColor, oOpacity * 0.45)} 32%, ${rgba(oColor, 0)} 72%)`
+          : `linear-gradient(to bottom, ${rgba(oColor, oOpacity)} 0%, ${rgba(oColor, oOpacity * 0.45)} 32%, ${rgba(oColor, 0)} 72%)`
     inner = (
       <>
         <img
           src={content.backgroundImage || ''}
           alt=""
           data-export-image="true"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${fx}% ${fy}%` }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${fx}% ${fy}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, filter: content.bgGrayscale ? 'grayscale(100%)' : undefined }}
         />
-        {/* legibility scrim: strong at bottom (text), mild at top (logo) */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.32) 38%, rgba(0,0,0,0) 62%), linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0) 22%)' }} />
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: layout.padding }}>
+        <div style={{ position: 'absolute', inset: 0, background: overlayBg }} />
+        {content.overlayNoise && (
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: NOISE_BG, opacity: 0.12, mixBlendMode: 'overlay', pointerEvents: 'none' }} />
+        )}
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: textTop ? 'flex-start' : 'space-between', padding: layout.padding, gap: layout.gap }}>
           {headerRow('flex-start')}
-          <div style={{ maxWidth: owMax }}>{stack(layout.blocks, 'bottom')}</div>
+          <div style={{ maxWidth: owMax }}>{stack(layout.blocks, textTop ? 'top' : 'bottom')}</div>
         </div>
       </>
     )

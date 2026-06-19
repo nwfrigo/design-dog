@@ -35,21 +35,60 @@ const bgChip = (active: boolean): CSSProperties => ({
   border: `1px solid ${active ? '#5b9bd5' : '#3a3b3d'}`,
 })
 
+export const OVERLAY_COLORS: { label: string; hex: string }[] = [
+  { label: 'Dark', hex: '#060015' },
+  { label: 'Black', hex: '#000000' },
+  { label: 'Orange', hex: '#D35F0B' },
+  { label: 'White', hex: '#FFFFFF' },
+]
+const COVERAGES: CustomContent['overlayCoverage'][] = ['fade-up', 'fade-down', 'full']
+
+const BG_DEFAULTS: Partial<CustomContent> = {
+  bgFocalX: 50, bgFocalY: 50, bgZoom: 1, bgGrayscale: false,
+  overlayColor: '#060015', overlayOpacity: 0.55, overlayCoverage: 'fade-up', overlayNoise: false,
+}
+
 export function BackgroundControls({ content, onChange }: { content: CustomContent; onChange: (patch: Partial<CustomContent>) => void }) {
   return (
     <div>
       <label style={labelStyle}>Background image (image-led mode)</label>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
         {BG_IMAGES.map((b) => (
-          <button key={b.label} onClick={() => onChange({ backgroundImage: b.url, bgFocalX: 50, bgFocalY: 50 })} style={bgChip((content.backgroundImage ?? null) === b.url)}>{b.label}</button>
+          <button key={b.label} onClick={() => onChange(b.url ? { backgroundImage: b.url, ...BG_DEFAULTS } : { backgroundImage: null })} style={bgChip((content.backgroundImage ?? null) === b.url)}>{b.label}</button>
         ))}
       </div>
       {content.backgroundImage && (
         <>
+          {/* image edit — same functions as the main image editor */}
           <label style={labelStyle}>Focal X · {content.bgFocalX ?? 50}</label>
-          <input type="range" min={0} max={100} value={content.bgFocalX ?? 50} onChange={(e) => onChange({ bgFocalX: +e.target.value })} style={{ width: '100%', marginBottom: 8 }} />
+          <input type="range" min={0} max={100} value={content.bgFocalX ?? 50} onChange={(e) => onChange({ bgFocalX: +e.target.value })} style={{ width: '100%', marginBottom: 6 }} />
           <label style={labelStyle}>Focal Y · {content.bgFocalY ?? 50}</label>
-          <input type="range" min={0} max={100} value={content.bgFocalY ?? 50} onChange={(e) => onChange({ bgFocalY: +e.target.value })} style={{ width: '100%' }} />
+          <input type="range" min={0} max={100} value={content.bgFocalY ?? 50} onChange={(e) => onChange({ bgFocalY: +e.target.value })} style={{ width: '100%', marginBottom: 6 }} />
+          <label style={labelStyle}>Zoom · {(content.bgZoom ?? 1).toFixed(2)}×</label>
+          <input type="range" min={100} max={250} value={(content.bgZoom ?? 1) * 100} onChange={(e) => onChange({ bgZoom: +e.target.value / 100 })} style={{ width: '100%', marginBottom: 6 }} />
+          <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', letterSpacing: 0, fontSize: 12, color: '#cfd2d6' }}>
+            <input type="checkbox" checked={content.bgGrayscale ?? false} onChange={(e) => onChange({ bgGrayscale: e.target.checked })} /> grayscale
+          </label>
+
+          {/* overlay layer */}
+          <label style={{ ...labelStyle, marginTop: 12 }}>Overlay coverage</label>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+            {COVERAGES.map((c) => (
+              <button key={c} onClick={() => onChange({ overlayCoverage: c })} style={bgChip((content.overlayCoverage ?? 'fade-up') === c)}>{c}</button>
+            ))}
+          </div>
+          <label style={labelStyle}>Overlay color</label>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+            {OVERLAY_COLORS.map((c) => {
+              const active = (content.overlayColor ?? '#060015').toLowerCase() === c.hex.toLowerCase()
+              return <button key={c.hex} title={c.label} onClick={() => onChange({ overlayColor: c.hex })} style={{ width: 26, height: 26, borderRadius: 6, background: c.hex, cursor: 'pointer', border: `2px solid ${active ? '#5b9bd5' : '#3a3b3d'}` }} />
+            })}
+          </div>
+          <label style={labelStyle}>Overlay opacity · {Math.round((content.overlayOpacity ?? 0.55) * 100)}%</label>
+          <input type="range" min={0} max={100} value={Math.round((content.overlayOpacity ?? 0.55) * 100)} onChange={(e) => onChange({ overlayOpacity: +e.target.value / 100 })} style={{ width: '100%', marginBottom: 6 }} />
+          <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', letterSpacing: 0, fontSize: 12, color: '#cfd2d6' }}>
+            <input type="checkbox" checked={content.overlayNoise ?? false} onChange={(e) => onChange({ overlayNoise: e.target.checked })} /> add noise
+          </label>
         </>
       )}
     </div>
