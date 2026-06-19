@@ -106,3 +106,83 @@ A second composition mode: the user uploads (or picks from the image / graphics 
 - **Zero broken layouts** at any ratio — the engine always lands something brand-correct.
 - Editor preview and exported PNG are **pixel-identical**.
 - **Net code stays simple** — the five DRY disciplines hold, and the dimension-source redundancy is reduced, not increased.
+
+---
+
+## 12. Pre-wiring decisions (FROZEN) + document schema
+
+Settled with Nick before wiring, so the data model + export contract are built once.
+
+### 12.1 Decisions
+
+| Area | Decision |
+|---|---|
+| Graphics/images | **Backgrounds & fills only** — no placeable graphic objects (no element tree). |
+| Image count | **One at a time** — zone image XOR full-bleed background, never both, never an array. |
+| Arrangement picker | **Reserve the field, no UI in v1.** Engine picks structure; users adjust via drag + bg toggle. |
+| Font-size nudge | **Yes**, on the same fields templates allow it. Stored as a **relative factor** so it survives resize (stays proportional). |
+| Spacing drags | **Yes** — per-gap relative overrides (ContentStack spacers). |
+| Line-height | **No** UI in v1 (field reserved). |
+| Rich text (bold/italic) | **Headline, subhead, body** (stored HTML). Eyebrow + CTA stay plain. |
+| Always-on blocks | **Logo + headline** locked on (`benchable: false`). Eyebrow / subhead / body / CTA / solution pill / image are optional (hideable to bench). |
+| CTA role | **Freely reorderable** (not pinned). |
+| Overflow | **Auto-shrink to legibility floor, then triage** the lowest-priority block (with visible reason). |
+| Starting point | **Blank only** for v1. Start-from-template reserved as fast-follow. |
+| Undo/redo | **Full undo + redo**, via a command layer wired from day one (`commands.ts`). |
+| Draft behavior | **Re-flow to improved engine rules** (we persist inputs + re-resolve; exported PNGs already frozen). |
+
+### 12.2 Engineering contract (decided)
+
+- **Persist inputs, re-resolve at render.** Store `{content, size, overrides, arrangement}`; the pure resolver runs in the shared component for both editor and Puppeteer → identical output, tiny doc, drafts benefit from engine tuning.
+- **Export transport:** flat params for scalars; **JSON-encode** the complex fields (`order`, `gaps`, `overlay`, `imageSide`) via the render route's `jsonRecord` parser. No new transport.
+- **All mutations go through the command layer** (enables undo/redo + keeps history honest).
+- **Relative overrides only** (`fontScale`, `gapScale` as factors, default 1) so scale-invariance holds across resizes.
+- **One image-editor contract** covering both surfaces: zone image (live **dynamic-aspect** crop frame that re-syncs on resize) and background (focal + zoom + grayscale + the overlay panel).
+
+### 12.3 Document schema (the single contract everything wires to)
+
+```ts
+interface CustomSizeDoc {
+  // canvas
+  width: number
+  height: number
+  theme: 'light' | 'dark'
+
+  // composition
+  arrangement: string | null          // RESERVED — engine chooses when null
+
+  // content (shared field vocabulary)
+  eyebrow: string                     // plain
+  headline: string                    // html (rich)
+  subhead: string                     // html (rich)
+  body: string                        // html (rich)
+  cta: string                         // plain
+  solution: string
+  showSolutionPill: boolean
+  // logo is always-on (no toggle)
+
+  // per-block state, keyed by blockId
+  order: BlockId[] | null             // user reorder; null = engine order
+  hidden: BlockId[]                   // bench-hidden (never logo/headline)
+  fontScale: Record<BlockId, number>  // relative nudge, default 1
+  gapScale: Record<string, number>    // relative spacing, default 1 (key = gap-a-to-b)
+  lineHeight: Record<BlockId, number> // RESERVED, unused in v1
+
+  // image — one at a time
+  imageMode: 'none' | 'zone' | 'background'
+  imageUrl: string | null
+  imageFocalX: number                 // 0-100 (pan)
+  imageFocalY: number
+  imageZoom: number                   // 1+
+  imageGrayscale: boolean
+  imageSide: 'left' | 'right' | null  // zone mode; null = engine
+
+  // overlay (background mode only)
+  overlayColor: string
+  overlayOpacity: number              // 0-1
+  overlayCoverage: 'full' | 'fade-up' | 'fade-down'
+  overlayNoise: boolean
+}
+```
+
+The lab's `CustomContent` is a prototype subset; it gets reconciled to this schema during wiring (e.g. `hasImage`/`backgroundImage` → `imageMode`; drop `showLogo`).
