@@ -35,10 +35,14 @@ export interface CustomContent {
   solution: string
   showSolutionPill: boolean
   hasImage: boolean
+  /** Image-led mode: full-bleed background. When set, layout → 'overlay'. */
+  backgroundImage?: string | null
+  bgFocalX?: number // 0-100, object-position X
+  bgFocalY?: number // 0-100, object-position Y
 }
 
 export type Band = 'strip' | 'landscape' | 'square' | 'portrait' | 'tower'
-export type LayoutKind = 'strip' | 'row' | 'hero-top' | 'single' | 'tower'
+export type LayoutKind = 'strip' | 'row' | 'hero-top' | 'single' | 'tower' | 'overlay'
 export type TriageReason = 'band-excluded' | 'no-space' | 'too-small' | 'empty'
 
 export interface ResolvedTextBlock {
@@ -207,6 +211,18 @@ export function resolveLayout(
       strategyLabel = 'Tower — logo top · headline · CTA pinned bottom'
       candidates = ['eyebrow', 'headline', 'cta'] // no body/subhead/image room
       break
+  }
+
+  // Image-led override: a full-bleed background takes over the canvas; the band
+  // still sets type scale + triage, but the arrangement becomes a text overlay.
+  const overlay = !!content.backgroundImage
+  if (overlay) {
+    kind = 'overlay'
+    candidates = ['eyebrow', 'headline', 'subhead', 'body', 'cta']
+    textStackAlign = 'bottom'
+    textAlign = 'left'
+    alignItems = 'flex-start'
+    wantsImage = false
   }
 
   // Image triage note (only landscape/square/portrait want it)

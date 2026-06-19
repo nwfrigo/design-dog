@@ -76,9 +76,14 @@ export function CustomSizeCanvas({
   const layout = resolveLayout(content, width, height, overrides)
   const t = TEMPLATE_THEMES[theme]
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
-  const textColor = t.textPrimary
-  const btnText = t.buttonSecondaryText
   const sol = colors.solutions[content.solution] || colors.solutions.none
+
+  // Over a full-bleed image, force white text + white logo regardless of theme;
+  // the scrim guarantees contrast. Otherwise use theme colors.
+  const overlay = layout.kind === 'overlay'
+  const textColor = overlay ? '#ffffff' : t.textPrimary
+  const btnText = overlay ? '#ffffff' : t.buttonSecondaryText
+  const logoFill = overlay ? '#ffffff' : t.logoFill
 
   const chrome = (id: CustomBlockId, fontSize: number): ((inner: ReactNode) => ReactNode) => {
     const ta = layout.textAlign
@@ -107,7 +112,7 @@ export function CustomSizeCanvas({
   const headerRow = (justify: CSSProperties['justifyContent']): ReactNode =>
     (layout.showLogo || layout.showSolutionPill) ? (
       <div style={{ display: 'flex', alignItems: 'center', gap: layout.gap, justifyContent: justify, flexShrink: 0 }}>
-        {layout.showLogo && <CorityLogo fill={t.logoFill} height={layout.logoHeight} />}
+        {layout.showLogo && <CorityLogo fill={logoFill} height={layout.logoHeight} />}
         {layout.showSolutionPill && (
           <SolutionPill variant="email" solutionColor={sol.color} solutionLabel={sol.label} textColor={textColor} background={t.bgCategoryChip} border={`0.79px solid ${t.borderFocus}`} />
         )}
@@ -132,12 +137,32 @@ export function CustomSizeCanvas({
 
   let inner: ReactNode
 
-  if (layout.kind === 'strip') {
+  if (layout.kind === 'overlay') {
+    const fx = content.bgFocalX ?? 50
+    const fy = content.bgFocalY ?? 50
+    const owMax = width > height ? '62%' : '100%'
+    inner = (
+      <>
+        <img
+          src={content.backgroundImage || ''}
+          alt=""
+          data-export-image="true"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${fx}% ${fy}%` }}
+        />
+        {/* legibility scrim: strong at bottom (text), mild at top (logo) */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.32) 38%, rgba(0,0,0,0) 62%), linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0) 22%)' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: layout.padding }}>
+          {headerRow('flex-start')}
+          <div style={{ maxWidth: owMax }}>{stack(layout.blocks, 'bottom')}</div>
+        </div>
+      </>
+    )
+  } else if (layout.kind === 'strip') {
     const hl = layout.blocks.find((b) => b.id === 'headline')
     const ctaSize = Math.max(12, layout.logoHeight * 0.5)
     inner = (
       <div style={{ display: 'flex', alignItems: 'center', gap: layout.gap * 1.5, height: '100%', padding: `0 ${layout.padding}px` }}>
-        {layout.showLogo && <CorityLogo fill={t.logoFill} height={layout.logoHeight} />}
+        {layout.showLogo && <CorityLogo fill={logoFill} height={layout.logoHeight} />}
         {layout.showSolutionPill && <SolutionPill variant="email" solutionColor={sol.color} solutionLabel={sol.label} textColor={textColor} background={t.bgCategoryChip} border={`0.79px solid ${t.borderFocus}`} />}
         {hl && (
           <div style={{ flex: 1, minWidth: 0, fontSize: hl.fontSize, fontWeight: 300, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{content.headline}</div>

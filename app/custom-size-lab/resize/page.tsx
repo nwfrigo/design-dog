@@ -10,7 +10,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { TemplateTheme } from '@/lib/template-themes'
 import { ResizableCanvasStage } from '@/components/custom-size/ResizableCanvasStage'
-import { ContentControls, DEFAULT_CONTENT, fieldStyle, labelStyle } from '@/components/custom-size/labShared'
+import { BackgroundControls, ContentControls, DEFAULT_CONTENT, fieldStyle, labelStyle } from '@/components/custom-size/labShared'
 import { resolveLayout, type CustomContent, type CustomBlockId } from '@/lib/custom-size/resolve'
 
 const PRESETS = [
@@ -58,6 +58,10 @@ export default function ResizeLab() {
         {/* Controls */}
         <div style={{ width: 280, flexShrink: 0, background: '#1c1d1f', border: '1px solid #2c2d2f', borderRadius: 10, padding: 16 }}>
           <ContentControls content={content} onChange={set} />
+
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #2c2d2f' }}>
+            <BackgroundControls content={content} onChange={set} />
+          </div>
 
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #2c2d2f' }}>
             <label style={labelStyle}>Presets</label>

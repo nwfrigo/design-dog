@@ -15,7 +15,7 @@ import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { TemplateTheme } from '@/lib/template-themes'
 import { CustomSizeCanvas } from '@/components/custom-size/CustomSizeCanvas'
-import { ContentControls, DEFAULT_CONTENT, fieldStyle, labelStyle } from '@/components/custom-size/labShared'
+import { BackgroundControls, ContentControls, DEFAULT_CONTENT, fieldStyle, labelStyle } from '@/components/custom-size/labShared'
 import { resolveLayout, type CustomContent } from '@/lib/custom-size/resolve'
 
 const colors = colorsJson as ColorsConfig
@@ -103,6 +103,10 @@ export default function CustomSizeLab() {
           <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', letterSpacing: 0, fontSize: 12, color: '#cfd2d6', marginTop: 6 }}>
             <input type="checkbox" checked={theme === 'dark'} onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')} /> dark theme
           </label>
+
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #2c2d2f' }}>
+            <BackgroundControls content={content} onChange={set} />
+          </div>
 
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #2c2d2f' }}>
             <label style={labelStyle}>Custom size (the real entry)</label>
