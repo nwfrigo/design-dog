@@ -131,58 +131,49 @@ Settled with Nick before wiring, so the data model + export contract are built o
 | Undo/redo | **Full undo + redo**, via a command layer wired from day one (`commands.ts`). |
 | Draft behavior | **Re-flow to improved engine rules** (we persist inputs + re-resolve; exported PNGs already frozen). |
 
-### 12.2 Engineering contract (decided)
+### 12.2 Engineering contract (decided — revised after CTO/codebase audit)
 
-- **Persist inputs, re-resolve at render.** Store `{content, size, overrides, arrangement}`; the pure resolver runs in the shared component for both editor and Puppeteer → identical output, tiny doc, drafts benefit from engine tuning.
-- **Export transport:** flat params for scalars; **JSON-encode** the complex fields (`order`, `gaps`, `overlay`, `imageSide`) via the render route's `jsonRecord` parser. No new transport.
-- **All mutations go through the command layer** (enables undo/redo + keeps history honest).
-- **Relative overrides only** (`fontScale`, `gapScale` as factors, default 1) so scale-invariance holds across resizes.
-- **One image-editor contract** covering both surfaces: zone image (live **dynamic-aspect** crop frame that re-syncs on resize) and background (focal + zoom + grayscale + the overlay panel).
+- **Thin blob + reuse globals (do NOT duplicate state).** Store only custom-specific state in a single nested `customSizeDocument` field — precedent: `carouselSlides`, `stackerContentModules`. REUSE the existing per-asset global fields (`verbatimCopy.headline/subhead/body`, `ctaText`, `eyebrow`, `solution`, `showSolutionSet`, `theme`, `grayscale`, `thumbnailImageSettings`); they already persist via `manualAssetSettings`/`goToAsset`. (The earlier §12.3 flat schema duplicated ~9 of these — corrected below.)
+- **Persist inputs, re-resolve at render.** The pure resolver runs in the shared component for both editor and Puppeteer → identical output, tiny doc, drafts benefit from engine tuning.
+- **Image model = canonical, not reinvented.** Reuse `imagePosition{x,y}` (−50..+50 offset), `imageZoom` (1–3), `grayscale`, and `filters` (exposure/contrast/saturation) + `ImageCropModal` (already takes dynamic `frameWidth/frameHeight`; pass canvas dims for full-bleed). Distinguish full-bleed vs zone via the doc's `imageMode`. Drop the lab's `bgFocalX/Y`/`bgZoom`. Bonus: the exposure/contrast/saturation sliders come for free (= "same functions as the main image editor").
+- **Export rides the existing pipeline — no new infra.** Add `customSizeConfig` to `COMPLEX_KEYS` in `app/api/export/route.ts`; the generic loop JSON-encodes it; the render page parses it (mirror Stacker/FAQ/Carousel). Strip data-URLs + inject post-load if an uploaded image is involved. (~32KB URL limit is a non-issue for this small doc.)
+- **Collapse the dimension sources.** Delete the export route's hardcoded `TEMPLATE_DIMENSIONS` (~lines 86–121); import the canonical derived map from `lib/template-config.ts`. Zero behavior change; do it as part of wiring.
+- **All mutations through the command layer** (undo/redo).
+- **Relative overrides only** (`fontScale`, `gapScale` factors, default 1) so scale-invariance holds.
+- **Future-proof seams (near-zero cost):** make `BAND_REF` and `TYPE_RATIO` injectable params on `resolveLayout` (via the existing `LayoutOverrides` pattern), so "a template = pinned dims + a BandRef + a TYPE_RATIO" stays possible later without touching the resolver body.
+- **Framing correction:** the resolver is really ~3 arrangements (`single`-family, `strip`, `tower`) + `overlay`, not 5 strategies — the 5 *bands* are the input taxonomy that maps to `kind`. Don't add a 6th band expecting a 6th branch.
 
-### 12.3 Document schema (the single contract everything wires to)
+### 12.3 Document schema (REVISED — the single contract everything wires to)
+
+Two parts: **(a) reused** existing per-asset fields, and **(b) a new `customSizeDocument` blob** holding only custom-specific state.
 
 ```ts
-interface CustomSizeDoc {
-  // canvas
+// (a) REUSED — already in store / ManualAssetSettings / SNAPSHOT_FIELDS; do NOT redeclare:
+//   headline · subhead · body (verbatimCopy) · ctaText · eyebrow · solution ·
+//   showSolutionSet · theme · grayscale · thumbnailImageSettings (imagePosition / imageZoom / filters)
+
+// (b) NEW — the only net-new persisted state, stored as one nested field:
+interface CustomSizeDocument {
   width: number
   height: number
-  theme: 'light' | 'dark'
+  arrangement: string | null            // RESERVED — engine chooses when null
 
-  // composition
-  arrangement: string | null          // RESERVED — engine chooses when null
+  // per-block state (logo + headline are always-on; never in `hidden`)
+  order: BlockId[] | null               // user reorder; null = engine order
+  hidden: BlockId[]                     // bench-hidden
+  fontScale: Record<BlockId, number>    // relative nudge, default 1
+  gapScale: Record<string, number>      // relative spacing, default 1 (key = gap-a-to-b)
+  lineHeight: Record<BlockId, number>   // RESERVED, unused in v1
 
-  // content (shared field vocabulary)
-  eyebrow: string                     // plain
-  headline: string                    // html (rich)
-  subhead: string                     // html (rich)
-  body: string                        // html (rich)
-  cta: string                         // plain
-  solution: string
-  showSolutionPill: boolean
-  // logo is always-on (no toggle)
-
-  // per-block state, keyed by blockId
-  order: BlockId[] | null             // user reorder; null = engine order
-  hidden: BlockId[]                   // bench-hidden (never logo/headline)
-  fontScale: Record<BlockId, number>  // relative nudge, default 1
-  gapScale: Record<string, number>    // relative spacing, default 1 (key = gap-a-to-b)
-  lineHeight: Record<BlockId, number> // RESERVED, unused in v1
-
-  // image — one at a time
-  imageMode: 'none' | 'zone' | 'background'
+  // image — one at a time. position / zoom / grayscale / filters come from the
+  // REUSED thumbnailImageSettings + global grayscale, NOT redeclared here.
+  imageMode: 'none' | 'zone' | 'background'   // 'background' ⇒ full-bleed
   imageUrl: string | null
-  imageFocalX: number                 // 0-100 (pan)
-  imageFocalY: number
-  imageZoom: number                   // 1+
-  imageGrayscale: boolean
-  imageSide: 'left' | 'right' | null  // zone mode; null = engine
+  imageSide: 'left' | 'right' | null    // zone mode; null = engine
 
-  // overlay (background mode only)
-  overlayColor: string
-  overlayOpacity: number              // 0-1
-  overlayCoverage: 'full' | 'fade-up' | 'fade-down'
-  overlayNoise: boolean
+  // overlay (background mode only) — genuinely net-new
+  overlay: { color: string; opacity: number; coverage: 'full' | 'fade-up' | 'fade-down'; noise: boolean }
 }
 ```
 
-The lab's `CustomContent` is a prototype subset; it gets reconciled to this schema during wiring (e.g. `hasImage`/`backgroundImage` → `imageMode`; drop `showLogo`).
+The lab's `CustomContent` is a prototype subset; reconciled during wiring (`bgFocalX/Y`→`imagePosition`; `backgroundImage`/`hasImage`→`imageMode`; drop `showLogo`).

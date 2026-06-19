@@ -45,3 +45,25 @@
 **Estimate to pay:** Medium — depends on data model.
 **First step when you start:** Only when the newsletter→universal-image migration above runs.
 
+---
+
+## Brand chrome extraction (shared invariant block styling)
+
+**What:** The invariant styling of rendered brand blocks — eyebrow (uppercase / letter-spacing / weight 500), headline (weight 300/350), CTA (label + `ArrowIcon`, weight 500), and the logo + solution-pill header row — is copy-pasted across the custom-size engine (`CustomSizeCanvas.tsx` `chrome()` / `headerRow()`) **and** ~19 ContentStack templates' `renderChrome` blocks (EmailImage, WebsiteThumbnail, SocialGridDetail, …).
+**Why deferred:** It's a cross-cutting refactor of all ContentStack templates + the engine; not required to *ship* custom-size, but it's the thing that stops the engine and templates from drifting into two definitions of the brand look.
+**Cost to ignore:** A brand-typography change (e.g. headline weight 300→350, new CTA arrow) must be hand-edited in ~20 places; the custom-size engine becomes an (N+1)th copy that silently diverges.
+**Trigger condition:** Before wiring custom-size into the real editor (so the engine consumes the shared chrome rather than adding another copy), OR the next brand-typography change that would touch multiple templates.
+**Estimate to pay:** Medium (~half day) — extract `brandChrome(id, { fontSize, theme, align })` + a `BrandHeaderRow`. Centralize ONLY the invariants (weight, casing, letter-spacing ratio, arrow geometry); keep per-template font sizes as params (they legitimately differ: 38.15 vs 35 vs 84).
+**First step when you start:** Diff `chrome()` in `CustomSizeCanvas.tsx` against the `renderChrome` blocks in `EmailImage.tsx` / `WebsiteThumbnail.tsx` / `SocialGridDetail.tsx`; pull the common styling into `lib/brand-chrome.tsx`; have the engine import it first, then migrate templates opportunistically.
+
+---
+
+## Custom-size triage uses estimated, not measured, heights
+
+**What:** The resolver's vertical-fit triage (`lib/custom-size/resolve.ts`) estimates block heights from a hardcoded `EST_LINES` table × 1.2 line-height, not measured layout — so it can mispredict drops for real wrapped text.
+**Why deferred:** Estimation is fine for the spike and avoids a measure→render→remeasure loop; measured layout only matters once exports depend on pixel-exact, deterministic drop decisions.
+**Cost to ignore:** A block may drop (or survive) when the opposite visibly looks right at certain content lengths.
+**Trigger condition:** First time a user reports a block dropping that visibly fit (or vice versa), OR export-fidelity QA flags a triage mismatch.
+**Estimate to pay:** Medium — move triage to a post-render measurement pass (measure actual block heights, then drop), keeping the resolver pure by doing the measure step in the editor/render layer.
+**First step when you start:** Instrument the editor to log estimated vs actual block heights across the test ratios; if the gap is material, add a measured-fit pass.
+
