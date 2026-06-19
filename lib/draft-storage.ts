@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, StackAlign } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, StackAlign, CustomSizeDocument } from '@/types'
 import { UNIVERSAL_FALLBACK_FLAGS } from './template-defaults'
 
 const DRAFT_KEY = 'design-dog-active-draft'
@@ -165,6 +165,8 @@ export interface DraftState {
   // Social Carousel
   carouselSlides: CarouselSlide[]
   carouselCurrentSlideIndex: number
+  // Custom Size
+  customSizeDocument: CustomSizeDocument | null
 }
 
 // Bumped to 2 for the 1.5 Auto-Create sunset — drafts saved against
@@ -348,6 +350,8 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       // Social Carousel
       carouselSlides: state.carouselSlides || [],
       carouselCurrentSlideIndex: state.carouselCurrentSlideIndex ?? 0,
+      // Custom Size
+      customSizeDocument: state.customSizeDocument ?? null,
     }
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
