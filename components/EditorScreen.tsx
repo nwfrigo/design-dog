@@ -427,6 +427,8 @@ export function EditorScreen() {
     templateType,
     // User identity
     exportedBy,
+    // Custom size
+    customSizeDocument,
   } = useStore()
 
   // Check if we're editing an item from the queue
@@ -759,6 +761,7 @@ export function EditorScreen() {
       const paramState: ExportParamState = {
         eyebrow,
         verbatimCopy,
+        customSizeDocument,
         solution,
         logoColor,
         showEyebrow,

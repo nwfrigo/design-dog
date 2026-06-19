@@ -126,7 +126,13 @@ function main() {
   let failures = 0
   const results: { name: string; issues: string[] }[] = []
 
+  // Computed-slot adapters: the slot set is resolved at runtime and visibility
+  // rides inside a serialized document (customSizeConfig), not as show* params,
+  // so the static show*-flag check doesn't apply. (Substrate carve-out.)
+  const COMPUTED_SLOT_ADAPTERS = new Set(['CustomSize'])
+
   for (const name of files) {
+    if (COMPUTED_SLOT_ADAPTERS.has(name)) continue
     const summary = readAdapterPair(name)
     if (!summary) continue
 

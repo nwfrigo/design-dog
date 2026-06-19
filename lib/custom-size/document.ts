@@ -55,7 +55,8 @@ export interface ReusedContent {
   showSolutionSet: boolean
   theme: 'light' | 'dark'
   grayscale: boolean
-  /** Canonical image settings: position is a -50..+50 offset, zoom 1..3. */
+  /** Canonical image settings: position is a -50..+50 offset, zoom 1..3.
+   *  (The image URL lives in the doc; the mode decides zone vs background.) */
   imagePosition: { x: number; y: number }
   imageZoom: number
 }

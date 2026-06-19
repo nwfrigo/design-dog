@@ -57,7 +57,7 @@ export interface CustomContent {
 
 export type Band = 'strip' | 'landscape' | 'square' | 'portrait' | 'tower'
 export type LayoutKind = 'strip' | 'row' | 'hero-top' | 'single' | 'tower' | 'overlay'
-export type TriageReason = 'band-excluded' | 'no-space' | 'too-small' | 'empty'
+export type TriageReason = 'band-excluded' | 'no-space' | 'too-small' | 'empty' | 'hidden'
 
 export interface ResolvedTextBlock {
   id: CustomBlockId
@@ -152,6 +152,10 @@ export interface LayoutOverrides {
   imageSide?: 'left' | 'right'
   /** User-chosen block order (survivor ids, drag-reorder). Unlisted ids fall to the end. */
   order?: CustomBlockId[]
+  /** Editor visibility (show flags). When provided, a block is present iff
+   *  shown !== false — empty-but-shown blocks still render a placeholder (WYSIWYG).
+   *  When absent (lab/export-from-content), presence falls back to content emptiness. */
+  shownBlocks?: Partial<Record<CustomBlockId, boolean>>
 }
 
 export function resolveLayout(
@@ -257,10 +261,13 @@ export function resolveLayout(
 
   const sizeOf = (id: CustomBlockId): number => headlineSize * TYPE_RATIO[id]
 
-  // Start from candidates that actually have content, then run triage.
+  // Presence: in the editor, show-flags decide (empty-but-shown blocks still
+  // render a placeholder, per WYSIWYG); otherwise fall back to content emptiness.
+  const shown = overrides?.shownBlocks
   let survivors = candidates.filter((id) => {
-    if (textOf(content, id).trim() === '') {
-      triagedOut.push({ id, reason: 'empty' })
+    const present = shown ? shown[id] !== false : textOf(content, id).trim() !== ''
+    if (!present) {
+      triagedOut.push({ id, reason: shown ? 'hidden' : 'empty' })
       return false
     }
     return true
