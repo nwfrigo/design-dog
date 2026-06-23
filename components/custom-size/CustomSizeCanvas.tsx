@@ -20,6 +20,7 @@ import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 import { filtersToCss, applyGrayscaleBoolean, NEUTRAL_FILTERS } from '@/lib/image-filters'
+import { overlayBackground, NOISE_BG } from '@/lib/custom-size/overlay'
 import { brandChrome, BrandHeaderRow } from '@/lib/brand-chrome'
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 import {
@@ -49,8 +50,6 @@ function luminance(hex: string): number {
   const { r, g, b } = hexToRgb(hex)
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255
 }
-// Self-contained tiling noise (no asset needed).
-const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
 
 export interface CustomSizeCanvasProps {
   content: CustomContent
@@ -281,12 +280,8 @@ export function CustomSizeCanvas({
     const cov = content.overlayCoverage ?? 'fade-up'
     const textTop = cov === 'fade-down'
     const owMax = width > height ? '62%' : '100%'
-    const overlayBg =
-      cov === 'full'
-        ? rgba(oColor, oOpacity)
-        : cov === 'fade-up'
-          ? `linear-gradient(to top, ${rgba(oColor, oOpacity)} 0%, ${rgba(oColor, oOpacity * 0.45)} 32%, ${rgba(oColor, 0)} 72%)`
-          : `linear-gradient(to bottom, ${rgba(oColor, oOpacity)} 0%, ${rgba(oColor, oOpacity * 0.45)} 32%, ${rgba(oColor, 0)} 72%)`
+    // Single source — the modal preview paints the exact same scrim (overlay.ts).
+    const overlayBg = overlayBackground({ color: oColor, opacity: oOpacity, coverage: cov, noise: content.overlayNoise ?? false })
     inner = (
       <>
         <img

@@ -11,6 +11,7 @@ import { PresetButtonGroup } from '@/components/ui/PresetButtonGroup'
 import { ImageLibraryView } from './ImageLibraryView'
 import {
   NEUTRAL_SLOT_SETTINGS,
+  IMAGE_FILTER_PRESETS,
   type ImageFilters,
   type ImageSlotSettings,
 } from '@/lib/image-filters'
@@ -76,18 +77,7 @@ const FILTER = { min: -1, max: 1, step: 0.01 } as const
 // Puppeteer export) read the same `exposure / contrast / saturation`
 // numbers via `filtersToCss()`, so a preset click is byte-identical to
 // dragging the three sliders to those numbers by hand.
-type PresetEntry = {
-  id: string
-  label: string
-  values: ImageFilters
-}
-
-const PRESETS: PresetEntry[] = [
-  { id: 'hi-contrast-light', label: 'Hi-contrast Light', values: { exposure: 0.15, contrast: 0.25, saturation: 0.10 } },
-  { id: 'bw-pop',            label: 'B&W Pop',            values: { exposure: 0.10, contrast: 0.40, saturation: -1   } },
-  { id: 'bw-subtle',         label: 'B&W Subtle',         values: { exposure: 0.05, contrast: 0.10, saturation: -1   } },
-  { id: 'hi-contrast-dark',  label: 'Hi-contrast Dark',   values: { exposure: -0.15, contrast: 0.30, saturation: 0.10 } },
-]
+const PRESETS = IMAGE_FILTER_PRESETS
 
 type ModalView = 'editor' | 'library'
 

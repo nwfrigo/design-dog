@@ -13,6 +13,7 @@ import { SelectorPrimitive, type EnumOption } from '@/components/ui'
 import { SelectorRow } from '../canvas-editor/stage-bar/SelectorRow'
 import {
   NEUTRAL_SLOT_SETTINGS,
+  IMAGE_FILTER_PRESETS,
   type ImageFilters,
   type ImageSlotSettings,
 } from '@/lib/image-filters'
@@ -33,13 +34,6 @@ import type { CustomSizeOverlay } from '@/lib/custom-size/document'
 
 const ZOOM = { min: 1, max: 3, step: 0.01 } as const
 const FILTER = { min: -1, max: 1, step: 0.01 } as const
-
-const PRESETS: { id: string; label: string; values: ImageFilters }[] = [
-  { id: 'hi-contrast-light', label: 'Hi-contrast Light', values: { exposure: 0.15, contrast: 0.25, saturation: 0.1 } },
-  { id: 'hi-contrast-dark', label: 'Hi-contrast Dark', values: { exposure: -0.15, contrast: 0.3, saturation: 0.1 } },
-  { id: 'lighten', label: 'Lighten', values: { exposure: 0.25, contrast: -0.05, saturation: 0 } },
-  { id: 'darken', label: 'Darken', values: { exposure: -0.25, contrast: 0.05, saturation: 0 } },
-]
 
 // DIR (coverage) swatches — a dark gradient over a neutral base previews where
 // the scrim concentrates. fade-up = dark at bottom; full = even; fade-down =
@@ -140,6 +134,7 @@ export function BackgroundImageModal({
               zoom={settings.zoom}
               filters={settings.filters}
               onPositionChange={setPosition}
+              overlay={overlay}
             />
 
             <div className="flex flex-col justify-between h-[490px] w-[270px]">
@@ -159,7 +154,7 @@ export function BackgroundImageModal({
               <PresetButtonGroup
                 title="Presets"
                 size="sm"
-                presets={PRESETS.map((p) => ({
+                presets={IMAGE_FILTER_PRESETS.map((p) => ({
                   id: p.id,
                   label: p.label,
                   active: activePreset === p.id,

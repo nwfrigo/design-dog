@@ -48,6 +48,19 @@ export const NEUTRAL_SLOT_SETTINGS: ImageSlotSettings = {
   filters: NEUTRAL_FILTERS,
 }
 
+/** A one-tap filter preset. */
+export type ImageFilterPreset = { id: string; label: string; values: ImageFilters }
+
+/** Shared preset list for ALL image editors (legacy ImageEditorModal + the
+ *  custom-size BackgroundImageModal). One source so the two can't drift —
+ *  append here to add a preset everywhere at once. */
+export const IMAGE_FILTER_PRESETS: ImageFilterPreset[] = [
+  { id: 'hi-contrast-light', label: 'Hi-contrast Light', values: { exposure: 0.15, contrast: 0.25, saturation: 0.10 } },
+  { id: 'bw-pop',            label: 'B&W Pop',           values: { exposure: 0.10, contrast: 0.40, saturation: -1 } },
+  { id: 'bw-subtle',         label: 'B&W Subtle',        values: { exposure: 0.05, contrast: 0.10, saturation: -1 } },
+  { id: 'hi-contrast-dark',  label: 'Hi-contrast Dark',  values: { exposure: -0.15, contrast: 0.30, saturation: 0.10 } },
+]
+
 export function isNeutral(filters: ImageFilters): boolean {
   return filters.exposure === 0 && filters.contrast === 0 && filters.saturation === 0
 }

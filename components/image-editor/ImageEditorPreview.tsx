@@ -8,6 +8,8 @@ import {
   type CSSProperties,
 } from 'react'
 import { filtersToCss, NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
+import { overlayBackground, NOISE_BG } from '@/lib/custom-size/overlay'
+import type { CustomSizeOverlay } from '@/lib/custom-size/document'
 
 /**
  * ImageEditorPreview — the 490×490 image preview with crop overlay.
@@ -51,6 +53,10 @@ export interface ImageEditorPreviewProps {
   /** Exposure / Contrast / Saturation filter values. Defaults to neutral
    *  (no-op CSS filter) when omitted. */
   filters?: ImageFilters
+  /** Background-image mode only: when set, paints the brand overlay scrim over
+   *  the crop frame's interior (the exported region) so the user sees the scrim
+   *  effect live. Uses the same `overlay.ts` source as the canvas. */
+  overlay?: CustomSizeOverlay
 }
 
 export function ImageEditorPreview({
@@ -61,6 +67,7 @@ export function ImageEditorPreview({
   zoom,
   onPositionChange,
   filters = NEUTRAL_FILTERS,
+  overlay,
 }: ImageEditorPreviewProps) {
   const filterCss = filtersToCss(filters)
   const [imageDims, setImageDims] = useState<{ w: number; h: number } | null>(null)
@@ -175,7 +182,26 @@ export function ImageEditorPreview({
             />
           </div>
 
-          {/* Scrim — 4 panels around the dashed frame so the frame's
+          {/* Brand overlay scrim — painted over the FRAME INTERIOR (the exported
+           *  region) so the user sees the coverage/colour/opacity effect live.
+           *  Same source as the canvas (overlay.ts). Clipped to the frame. */}
+          {overlay && (
+            <div
+              className="absolute left-1/2 top-1/2 pointer-events-none overflow-hidden"
+              style={{
+                width: display.frameW,
+                height: display.frameH,
+                transform: `translate(calc(-50% - ${frameOffset.x}px), calc(-50% - ${frameOffset.y}px))`,
+              }}
+            >
+              <div className="absolute inset-0" style={{ background: overlayBackground(overlay) }} />
+              {overlay.noise && (
+                <div className="absolute inset-0" style={{ backgroundImage: NOISE_BG, opacity: 0.12, mixBlendMode: 'overlay' }} />
+              )}
+            </div>
+          )}
+
+          {/* Crop dimming — 4 panels around the dashed frame so the frame's
            *  interior stays bright while everything outside dims. */}
           <Scrim
             previewSize={PREVIEW_SIZE}
