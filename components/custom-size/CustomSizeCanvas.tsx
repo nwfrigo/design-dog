@@ -307,7 +307,16 @@ export function CustomSizeCanvas({
     )
   } else if (layout.kind === 'strip') {
     const hl = layout.blocks.find((b) => b.id === 'headline')
-    const ctaSize = Math.max(12, layout.logoHeight * 0.5)
+    const cta = layout.blocks.find((b) => b.id === 'cta')
+    const ctaSize = cta ? cta.fontSize : Math.max(14, layout.logoHeight * 0.55)
+    // Headline + CTA ride the same renderInlineEditor → renderBlock path as every
+    // other block, so they select / inline-edit / move to the bench. The Editable
+    // wrapper is display:contents, so the flex layout (flex:1 headline) survives.
+    const stripBlock = (id: CustomBlockId, styleWrap: (n: ReactNode) => ReactNode): ReactNode => {
+      const withEditor = renderInlineEditor ? renderInlineEditor(id, defaultInnerFor(id)) : defaultInnerFor(id)
+      const styled = styleWrap(withEditor)
+      return renderBlock ? renderBlock(id, styled) : styled
+    }
     inner = (
       <div style={{ display: 'flex', alignItems: 'center', gap: layout.gap * 1.5, height: '100%', padding: `0 ${layout.padding}px` }}>
         {layout.showLogo && <CorityLogo fill={logoFill} height={layout.logoHeight} />}
@@ -315,12 +324,12 @@ export function CustomSizeCanvas({
           const pillNode = <SolutionPill variant="email" scale={layout.pillScale} solutionColor={sol.color} solutionLabel={sol.label} textColor={textColor} background={t.bgCategoryChip} border={`0.79px solid ${t.borderFocus}`} />
           return renderPill ? renderPill(pillNode) : pillNode
         })()}
-        {hl && (
-          <div style={{ flex: 1, minWidth: 0, fontSize: hl.fontSize, fontWeight: 300, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{content.headline}</div>
-        )}
-        {content.cta.trim() !== '' && (
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: ctaSize * 0.45, fontSize: ctaSize, fontWeight: 500, color: btnText, flexShrink: 0 }}>{content.cta}<ArrowIcon color={btnText} width={ctaSize * 0.92} height={ctaSize * 0.72} /></div>
-        )}
+        {hl && stripBlock('headline', (node) => (
+          <div style={{ flex: 1, minWidth: 0, fontSize: hl.fontSize, fontWeight: 300, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{node}</div>
+        ))}
+        {cta && stripBlock('cta', (node) => (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: ctaSize * 0.45, fontSize: ctaSize, fontWeight: 500, color: btnText, flexShrink: 0 }}>{node}<ArrowIcon color={btnText} width={ctaSize * 0.92} height={ctaSize * 0.72} /></div>
+        ))}
       </div>
     )
   } else if (layout.kind === 'tower') {

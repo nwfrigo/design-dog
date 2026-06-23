@@ -121,7 +121,10 @@ const LOGO_FLOOR = 32      // never smaller than this (small canvases)
 const LOGO_POWER = 0.78    // sub-linear growth above the reference
 const LOGO_REF_GM = 1080   // geometric mean at which LOGO_REF applies (1080² square)
 const CHIP_REF = 2.0       // category-chip scale at the reference; tracks the logo
-const OWN_LOGO_BANDS = new Set<Band>(['landscape', 'square', 'portrait'])
+// Strip joins the shared curve too: a thin banner wants the same ~constant-size
+// logo as everything else, NOT a logo scaled to 40% of its tiny height. Tower
+// stays bespoke (its narrow-width logo nuance is a separate question).
+const OWN_LOGO_BANDS = new Set<Band>(['landscape', 'square', 'portrait', 'strip'])
 const VISUAL_ORDER: CustomBlockId[] = ['eyebrow', 'headline', 'subhead', 'body', 'cta']
 /** Dropped first → last when vertical space runs out. Headline + CTA are never
  *  dropped for space (only legibility can remove them at brutal ratios). */
@@ -160,13 +163,22 @@ const TYPE_RATIO: Record<CustomBlockId, number> = {
   headline: 1, eyebrow: 0.32, subhead: 0.52, body: 0.42, cta: 0.46,
 }
 
+// Absolute-size gates for the two content-stripping bands. Ratio alone can't
+// tell a roomy wide rectangle (1754×630) from a thin banner (728×90) — both are
+// "wide". So strip/tower only apply when the CONSTRAINED axis is genuinely too
+// small to host a stacked layout; otherwise the canvas falls through to
+// landscape/portrait and keeps full content + image. (Taste knobs — the px below
+// which stacking stops being viable.)
+const STRIP_MIN_H = 100 // wide + shorter than this → one-line strip bar (true banner)
+const TOWER_MIN_W = 420 // tall + narrower than this → vertical-only tower
+
 function classifyBand(w: number, h: number): Band {
   const r = w / h
-  if (r >= 2.5) return 'strip'
+  if (r >= 2.5 && h < STRIP_MIN_H) return 'strip'
+  if (r < 0.45 && w < TOWER_MIN_W) return 'tower'
   if (r >= 1.18) return 'landscape'
   if (r >= 0.85) return 'square'
-  if (r >= 0.45) return 'portrait'
-  return 'tower'
+  return 'portrait'
 }
 
 function textOf(content: CustomContent, id: CustomBlockId): string {
@@ -245,7 +257,9 @@ export function resolveLayout(
     case 'strip':
       kind = 'strip'
       strategyLabel = 'Strip — logo · headline · CTA in one row'
-      candidates = ['headline'] // cta handled in renderer; rest excluded
+      // headline + cta are real survivor blocks (so they select / edit / bench
+      // like everywhere else); eyebrow/subhead/body/image don't fit one line.
+      candidates = ['headline', 'cta']
       break
     case 'landscape':
       kind = content.hasImage ? 'row' : 'single'
