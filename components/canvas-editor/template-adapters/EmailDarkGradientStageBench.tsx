@@ -10,7 +10,7 @@ import {
   EmailDarkGradient,
   type EmailDarkGradientBlockId,
 } from '../../templates/EmailDarkGradient'
-import type { ColorOption } from '../stage-bar/SelectorPrimitive'
+import type { ColorOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for email-dark-gradient (factory-driven).

@@ -12,6 +12,12 @@ export type SlotVisibility = {
    *  render unknown values (falls back to the 'headline' chip). */
   iconKey?: string
   isHidden: boolean
+  /** Optional reason the slot is benched and can't be restored at the current
+   *  state (e.g. an engine-driven template with no room for it at this size).
+   *  When set, the bench renders the chip dimmed + non-draggable with this note
+   *  instead of a normal draggable restore chip. Omitted for user-hidden slots,
+   *  which restore normally. */
+  note?: string
   hide: () => void
   show: () => void
 }

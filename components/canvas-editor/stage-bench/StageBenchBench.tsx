@@ -87,9 +87,22 @@ export function StageBenchBench({ iconKeyToChipKind }: StageBenchBenchProps = {}
 
   return (
     <>
-      {hidden.map((slot) => (
-        <DraggableChip key={slot.path} slot={slot} chipKind={resolveChipKind(slot.iconKey)} />
-      ))}
+      {hidden.map((slot) =>
+        slot.note ? (
+          // Benched but not restorable at the current state (e.g. no room at
+          // this size) — render a dimmed, non-draggable hint instead of a
+          // restore chip. Frees up automatically when the constraint lifts.
+          <BenchChip
+            key={slot.path}
+            kind={resolveChipKind(slot.iconKey)}
+            label={slot.label}
+            note={slot.note}
+            draggable={false}
+          />
+        ) : (
+          <DraggableChip key={slot.path} slot={slot} chipKind={resolveChipKind(slot.iconKey)} />
+        ),
+      )}
       {showPreview && previewSlot && (
         <BenchChip
           kind={resolveChipKind(previewSlot.iconKey)}

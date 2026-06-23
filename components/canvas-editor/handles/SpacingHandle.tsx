@@ -215,6 +215,11 @@ export function SpacingHandle({
               userSelect: 'none',
               whiteSpace: 'nowrap',
               boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              // Counter the stage's CSS transform so the pill stays at UI scale
+              // (constant size) even when the design is heavily scaled down.
+              // `--cs-scale` is published by ScaledStage; defaults to 1 elsewhere.
+              transform: 'scale(calc(1 / var(--cs-scale, 1)))',
+              transformOrigin: 'center',
             }}
           >
             <svg
@@ -227,7 +232,7 @@ export function SpacingHandle({
               <path d="M4 0L6 2.5H2L4 0Z" fill="currentColor" />
               <path d="M4 8L6 5.5H2L4 8Z" fill="currentColor" />
             </svg>
-            {showUnit ? `${spacing}px` : spacing}
+            {showUnit ? `${Math.round(spacing)}px` : Math.round(spacing)}
           </div>
         </div>
       )}

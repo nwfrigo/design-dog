@@ -25,6 +25,17 @@ export interface StageBenchShellProps {
   bench: ReactNode
   stageBar: ReactNode
   actionRow: ReactNode
+  /** Optional control strip rendered in the center column between the Stage
+   *  and the ActionRow (e.g. custom-size's dimension row). Omit for templates
+   *  that don't need it. */
+  belowStage?: ReactNode
+  /** Optional full-width bar rendered ABOVE the 3-column body, below the header
+   *  (custom-size's toolbar + action row). Omit for the standard layout. */
+  topBar?: ReactNode
+  /** When true, render `children` directly (the template owns its own scaling/
+   *  centering) instead of wrapping in ScaledStage, and let the center column
+   *  fill the body height. Used by custom-size's bespoke stage. */
+  rawStage?: boolean
   /** The Stage itself — the design preview + drop-zone. */
   children: ReactNode
   /** Optional ref on the bench column's <aside>. Lets the consumer wire
@@ -38,6 +49,9 @@ export function StageBenchShell({
   bench,
   stageBar,
   actionRow,
+  belowStage,
+  topBar,
+  rawStage,
   children,
   benchRef,
 }: StageBenchShellProps) {
@@ -51,6 +65,9 @@ export function StageBenchShell({
         {header}
       </div>
 
+      {/* Optional top bar (custom-size: toolbar + action row) above the body. */}
+      {topBar && <div className="px-12 pt-6">{topBar}</div>}
+
       {/* Body — 3-column cluster centered in the viewport. The columns
        * hug the stage at 48px on either side rather than pinning to the
        * viewport edges, so the visual rhythm stays tight regardless of
@@ -59,7 +76,7 @@ export function StageBenchShell({
        * Bench column has a fixed width so the layout doesn't reflow when
        * chips drain in/out of the rail. Stage Bar's content is fixed-width
        * by nature (selectors), so it doesn't need explicit sizing. */}
-      <div className="flex-1 flex items-start py-12 px-12">
+      <div className={`flex-1 flex py-12 px-12 ${rawStage ? 'items-stretch' : 'items-start'}`}>
         {/* The cluster fills the viewport's available width with `w-full`
          * so `<main>` (flex-1) has a real parent width to flex against.
          * Bench + stageBar stay fixed-width via flex-shrink-0; main
@@ -67,7 +84,7 @@ export function StageBenchShell({
          * intrinsic content width — that shrinkage is what gives the
          * ScaledStage's parent.clientWidth a value smaller than the
          * template's intrinsic dims, which is what drives the scale. */}
-        <div className="flex items-start gap-12 w-full">
+        <div className={`flex gap-12 w-full ${rawStage ? 'items-stretch' : 'items-start'}`}>
           {/* self-stretch so the bench column matches the height of the
            * tallest sibling (main column = stage + action row). Without
            * stretch, an empty bench has 0 height — fine visually, but
@@ -77,9 +94,10 @@ export function StageBenchShell({
             {bench}
           </aside>
 
-          <main className="flex-1 min-w-0 flex flex-col items-center gap-12">
-            <ScaledStage>{children}</ScaledStage>
-            <div>{actionRow}</div>
+          <main className={`flex-1 min-w-0 flex flex-col items-center gap-12${rawStage ? ' self-stretch' : ''}`}>
+            {rawStage ? children : <ScaledStage>{children}</ScaledStage>}
+            {belowStage && <div>{belowStage}</div>}
+            {actionRow && <div>{actionRow}</div>}
           </main>
 
           <aside className="w-[240px] flex-shrink-0 flex flex-col gap-4">
@@ -182,8 +200,11 @@ function ScaledStage({ children }: { children: ReactNode }) {
         height: stageSize.h,
         transform: `scale(${scale})`,
         transformOrigin: 'top left',
+        // Publish the live scale so descendants (e.g. spacing pills) can
+        // counter-scale to stay at constant UI size.
+        ['--cs-scale' as string]: scale,
       }
-    : {}
+    : { ['--cs-scale' as string]: 1 }
 
   return (
     <div ref={containerRef} style={outerStyle}>

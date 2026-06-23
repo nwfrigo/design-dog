@@ -10,7 +10,7 @@ import {
   SocialDarkGradient,
   type SocialDarkGradientBlockId,
 } from '../../templates/SocialDarkGradient'
-import type { ColorOption } from '../stage-bar/SelectorPrimitive'
+import type { ColorOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for social-dark-gradient (factory-driven).

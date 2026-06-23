@@ -10,7 +10,7 @@ import {
   SocialBlueGradient,
   type SocialBlueGradientBlockId,
 } from '../../templates/SocialBlueGradient'
-import type { ColorOption } from '../stage-bar/SelectorPrimitive'
+import type { ColorOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for social-blue-gradient (factory-driven).

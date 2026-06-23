@@ -5,7 +5,7 @@ import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 import type { CustomerLibraryVariant } from '@/types'
 
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
-import type { EnumOption } from '../stage-bar/SelectorPrimitive'
+import type { EnumOption } from '@/components/ui/SelectorPrimitive'
 import {
   CustomerLibrary,
   type CustomerLibraryBlockId,

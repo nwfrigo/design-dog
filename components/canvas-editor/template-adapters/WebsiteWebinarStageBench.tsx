@@ -11,7 +11,7 @@ import {
   WebsiteWebinar,
   type WebsiteWebinarBlockId,
 } from '../../templates/WebsiteWebinar'
-import type { EnumOption } from '../stage-bar/SelectorPrimitive'
+import type { EnumOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for website-webinar (factory-driven).

@@ -18,11 +18,14 @@ import { type ReactNode } from 'react'
 export interface SelectorRowProps {
   label: string
   children: ReactNode
+  /** `md` = stage-bar spacing (gap 16px, default); `sm` = compact in-modal
+   *  spacing (gap 8px), pairs with `SelectorPrimitive size="sm"`. */
+  size?: 'md' | 'sm'
 }
 
-export function SelectorRow({ label, children }: SelectorRowProps) {
+export function SelectorRow({ label, children, size = 'md' }: SelectorRowProps) {
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center ${size === 'sm' ? 'gap-2' : 'gap-4'}`}>
       <span className="font-mono text-[12px] uppercase text-content-secondary whitespace-nowrap">
         {label}
       </span>

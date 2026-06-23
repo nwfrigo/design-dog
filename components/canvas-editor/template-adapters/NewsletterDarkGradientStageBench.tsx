@@ -11,7 +11,7 @@ import {
   NewsletterDarkGradient,
   type NewsletterDarkGradientBlockId,
 } from '../../templates/NewsletterDarkGradient'
-import type { ColorOption } from '../stage-bar/SelectorPrimitive'
+import type { ColorOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for newsletter-dark-gradient (factory-driven).

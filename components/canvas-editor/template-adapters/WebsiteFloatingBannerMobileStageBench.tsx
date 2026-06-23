@@ -12,7 +12,7 @@ import {
   type FloatingBannerMobileVariant,
   type FloatingBannerMobileArrowType,
 } from '../../templates/WebsiteFloatingBannerMobile'
-import type { EnumOption } from '../stage-bar/SelectorPrimitive'
+import type { EnumOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for website-floating-banner-mobile.

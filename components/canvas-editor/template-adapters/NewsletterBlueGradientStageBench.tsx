@@ -11,7 +11,7 @@ import {
   NewsletterBlueGradient,
   type NewsletterBlueGradientBlockId,
 } from '../../templates/NewsletterBlueGradient'
-import type { ColorOption } from '../stage-bar/SelectorPrimitive'
+import type { ColorOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for newsletter-blue-gradient (factory-driven).

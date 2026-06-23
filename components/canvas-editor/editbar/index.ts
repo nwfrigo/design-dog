@@ -20,5 +20,4 @@ export { EditbarSlider } from './EditbarSlider'
 export type { EditbarSliderProps } from './EditbarSlider'
 export { Dropdown } from './Dropdown'
 export type { DropdownOption, DropdownProps } from './Dropdown'
-export { Toggle } from './Toggle'
-export type { ToggleOption, ToggleProps } from './Toggle'
+// Toggle moved to the design-system root — import from '@/components/ui'.

@@ -5,7 +5,7 @@ import {
   BookA, TextCursor, BookType, TextCursorInput, MousePointerClick,
   SquareLibrary, CircleUserRound, Grid2x2X, SquareDot,
   CalendarDays, Clock,
-  GripVertical,
+  GripVertical, TriangleAlert,
   type LucideIcon,
 } from 'lucide-react'
 import { MOTION } from '@/lib/motion'
@@ -73,6 +73,10 @@ export interface BenchChipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
   /** Whether the chip is interactive — when true, shows a grab cursor.
    *  When false (e.g., the floating drag preview), no cursor change. */
   draggable?: boolean
+  /** When set, the chip renders as a non-restorable hint: dimmed, with this
+   *  reason text after the label and a warning glyph replacing the grip. Used
+   *  by engine-driven templates for "benched but no room at this size" slots. */
+  note?: string
 }
 
 export const BenchChip = forwardRef<HTMLDivElement, BenchChipProps>(function BenchChip(
@@ -83,6 +87,7 @@ export const BenchChip = forwardRef<HTMLDivElement, BenchChipProps>(function Ben
     isPreview,
     isFloating,
     draggable = true,
+    note,
     className = '',
     style,
     ...rest
@@ -90,6 +95,7 @@ export const BenchChip = forwardRef<HTMLDivElement, BenchChipProps>(function Ben
   ref,
 ) {
   const Icon = KIND_ICON[kind]
+  const isNote = !!note
   // Default label = kind with hyphens replaced by spaces, so 'grid-detail'
   // renders as "GRID DETAIL" (matching Figma) rather than "GRID-DETAIL".
   // Single-word kinds are unaffected.
@@ -97,7 +103,7 @@ export const BenchChip = forwardRef<HTMLDivElement, BenchChipProps>(function Ben
 
   // Ghost: instant snap to invisible (synchronizes with the cursor follower
   // taking over). Preview: 60% opacity, soft fade. Otherwise: fully visible.
-  const opacity = isGhosting ? 0 : isPreview ? 0.6 : 1
+  const opacity = isGhosting ? 0 : isPreview ? 0.6 : isNote ? 0.5 : 1
   // Compose transform (pickup tilt — see globals.css) with opacity so both
   // animate cleanly. Ghosting suppresses the opacity transition for an
   // instant snap; transform transition stays so the chip un-tilts smoothly
@@ -144,8 +150,17 @@ export const BenchChip = forwardRef<HTMLDivElement, BenchChipProps>(function Ben
           <span className="font-mono text-[12px] uppercase text-content-secondary whitespace-nowrap">
             {displayLabel}
           </span>
+          {isNote && (
+            <span className="font-mono text-[11px] normal-case text-content-secondary whitespace-nowrap opacity-80">
+              {note}
+            </span>
+          )}
         </span>
-        <GripVertical size={16} className="text-content-secondary shrink-0" />
+        {isNote ? (
+          <TriangleAlert size={14} className="text-content-secondary shrink-0" />
+        ) : (
+          <GripVertical size={16} className="text-content-secondary shrink-0" />
+        )}
       </div>
     </div>
   )

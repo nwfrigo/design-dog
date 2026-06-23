@@ -22,6 +22,7 @@
  */
 
 import type { StackAlign } from '@/types'
+import type { ImageFilters } from '@/lib/image-filters'
 
 export type CustomBlockId = 'eyebrow' | 'headline' | 'subhead' | 'body' | 'cta'
 
@@ -48,6 +49,10 @@ export interface CustomContent {
   bgFocalY?: number // 0-100, object-position Y
   bgZoom?: number // 1+ zoom on the background image
   bgGrayscale?: boolean
+  /** Image colour edits (exposure/contrast/saturation) — applied via the shared
+   *  `filtersToCss` to both the zone and background image, same as every other
+   *  template. Combined with bgGrayscale through `applyGrayscaleBoolean`. */
+  imageFilters?: ImageFilters
   /** Editable overlay layer (replaces the fixed scrim). */
   overlayColor?: string // hex (brand preset)
   overlayOpacity?: number // 0-1
@@ -79,10 +84,15 @@ export interface ResolvedLayout {
   padding: number
   gap: number
   logoHeight: number
+  /** Category-chip size multiplier — its own curve (tracks the logo), not the
+   *  linear sizeScale. CustomSizeCanvas passes this to SolutionPill. */
+  pillScale: number
   showLogo: boolean
   showSolutionPill: boolean
   showImage: boolean
   imageSide: 'left' | 'right'
+  /** Vertical position of the zone image in the hero-top layout. */
+  imageVPos: 'top' | 'bottom'
   imageFraction: number
   textStackAlign: StackAlign
   textAlign: 'left' | 'center'
@@ -94,6 +104,24 @@ export interface ResolvedLayout {
 }
 
 const LEGIBILITY_FLOOR = 11 // px — below this, text isn't worth showing
+/** Type scales SUB-linearly with the canvas (vs. padding/gap/logo, which stay
+ *  linear). < 1 means small/medium canvases get a step-up in type size relative
+ *  to a pure zoom — filling negative space and keeping eyebrow/body above the
+ *  legibility floor — while huge canvases don't blow up. Tune to taste. */
+const TYPE_POWER = 0.78
+/** Logo + category chip ride their OWN curve, decoupled from the per-band linear
+ *  scaling: a floor (min readable px) + gentle sub-linear growth, keyed off the
+ *  canvas's geometric-mean size √(w·h). A brand mark should read at a roughly
+ *  constant size across canvases, not scale 1:1 with the design — so small
+ *  canvases keep a legible logo and huge ones don't balloon. Applied to the
+ *  content bands only; strip (logo-forward bar) and tower (narrow) keep their
+ *  bespoke scaling. Calibrated in /custom-size-lab/logo-scale. */
+const LOGO_REF = 48        // logo height at the reference geometric mean
+const LOGO_FLOOR = 32      // never smaller than this (small canvases)
+const LOGO_POWER = 0.78    // sub-linear growth above the reference
+const LOGO_REF_GM = 1080   // geometric mean at which LOGO_REF applies (1080² square)
+const CHIP_REF = 2.0       // category-chip scale at the reference; tracks the logo
+const OWN_LOGO_BANDS = new Set<Band>(['landscape', 'square', 'portrait'])
 const VISUAL_ORDER: CustomBlockId[] = ['eyebrow', 'headline', 'subhead', 'body', 'cta']
 /** Dropped first → last when vertical space runs out. Headline + CTA are never
  *  dropped for space (only legibility can remove them at brutal ratios). */
@@ -115,12 +143,15 @@ interface BandRef {
   gap: number
   logo: number
 }
+// `headline` values are the reference (1×) sizes; the effective size is
+// `headline × sizeScale^TYPE_POWER`. Raised from the original spike values for a
+// step-change in fill (the originals read tiny on small/medium canvases).
 const BAND_REF: Record<Band, BandRef> = {
-  strip:     { driver: 'h', refDriver: 120,  headline: 34, padding: 24, gap: 16, logo: 48 },
-  landscape: { driver: 'h', refDriver: 700,  headline: 54, padding: 44, gap: 22, logo: 28 },
-  square:    { driver: 'w', refDriver: 1080, headline: 60, padding: 56, gap: 26, logo: 30 },
-  portrait:  { driver: 'w', refDriver: 1080, headline: 54, padding: 52, gap: 24, logo: 28 },
-  tower:     { driver: 'w', refDriver: 320,  headline: 30, padding: 22, gap: 14, logo: 22 },
+  strip:     { driver: 'h', refDriver: 120,  headline: 40, padding: 24, gap: 16, logo: 48 },
+  landscape: { driver: 'h', refDriver: 700,  headline: 74, padding: 44, gap: 22, logo: 28 },
+  square:    { driver: 'w', refDriver: 1080, headline: 96, padding: 56, gap: 26, logo: 30 },
+  portrait:  { driver: 'w', refDriver: 1080, headline: 92, padding: 52, gap: 24, logo: 28 },
+  tower:     { driver: 'w', refDriver: 320,  headline: 40, padding: 22, gap: 14, logo: 22 },
 }
 
 /** Derived text sizes as ratios of the headline — keeps the type hierarchy
@@ -148,14 +179,27 @@ function estHeight(id: CustomBlockId, fontSize: number): number {
 }
 
 export interface LayoutOverrides {
-  /** User-forced image side (drag-flip). Wins over the band default. */
+  /** User-forced image side (drag-flip, row layout). Wins over the band default. */
   imageSide?: 'left' | 'right'
+  /** User-forced image vertical position (drag-flip, hero-top layout). */
+  imageVPos?: 'top' | 'bottom'
+  /** User-dragged zone-image size as a fraction of the canvas (row = width,
+   *  hero-top = height). Clamped to [0.2, 0.8]; null/undefined = band default. */
+  imageFraction?: number
+  /** User-chosen content-stack alignment (top/middle/bottom). Wins over the
+   *  band default; undefined = engine default. (Stage-bar control.) */
+  stackAlign?: StackAlign
   /** User-chosen block order (survivor ids, drag-reorder). Unlisted ids fall to the end. */
   order?: CustomBlockId[]
   /** Editor visibility (show flags). When provided, a block is present iff
    *  shown !== false — empty-but-shown blocks still render a placeholder (WYSIWYG).
    *  When absent (lab/export-from-content), presence falls back to content emptiness. */
   shownBlocks?: Partial<Record<CustomBlockId, boolean>>
+  /** Per-block font-size nudge — a RELATIVE multiplier on the engine's computed
+   *  (canvas-scaled) size, default 1. Because it multiplies the scaled base, the
+   *  user's size choice persists PROPORTIONALLY across canvas resizes. Pushed far
+   *  enough, it can trip legibility/space triage — the engine re-art-directs. */
+  fontScale?: Partial<Record<CustomBlockId, number>>
 }
 
 export function resolveLayout(
@@ -173,8 +217,17 @@ export function resolveLayout(
   const sizeScale = driverLen / ref.refDriver
   const padding = ref.padding * sizeScale
   const gap = ref.gap * sizeScale
-  const logoHeight = ref.logo * sizeScale
-  const headlineSize = ref.headline * sizeScale
+  // Logo + chip on their own curve (content bands); strip/tower stay bespoke.
+  const ownLogo = OWN_LOGO_BANDS.has(band)
+  const gmScale = Math.sqrt(width * height) / LOGO_REF_GM
+  const logoHeight = ownLogo
+    ? Math.max(LOGO_FLOOR, LOGO_REF * Math.pow(gmScale, LOGO_POWER))
+    : ref.logo * sizeScale
+  // Chip tracks the logo's effective multiplier so the lockup moves as one.
+  const pillScale = ownLogo ? CHIP_REF * (logoHeight / LOGO_REF) : sizeScale
+  // Type grows sub-linearly (see TYPE_POWER) — bigger on small canvases, damped
+  // on huge ones — while padding/gap/logo stay linear (true zoom).
+  const headlineSize = ref.headline * Math.pow(sizeScale, TYPE_POWER)
 
   // --- per-band arrangement + which text blocks the strategy wants ---------
   let candidates: CustomBlockId[]
@@ -184,6 +237,7 @@ export function resolveLayout(
   let textAlign: 'left' | 'center' = 'left'
   let alignItems: 'flex-start' | 'center' = 'flex-start'
   const imageSide: 'left' | 'right' = overrides?.imageSide ?? 'right'
+  const imageVPos: 'top' | 'bottom' = overrides?.imageVPos ?? 'top'
   let imageFraction = 0.4
   let wantsImage = false
 
@@ -197,22 +251,22 @@ export function resolveLayout(
       kind = content.hasImage ? 'row' : 'single'
       strategyLabel = content.hasImage
         ? 'Landscape — text left / image right'
-        : 'Landscape — centered text column'
+        : 'Landscape — left text column'
       candidates = ['eyebrow', 'headline', 'subhead', 'body', 'cta']
       textStackAlign = 'center'
       wantsImage = content.hasImage
-      if (!content.hasImage) { textAlign = 'center'; alignItems = 'center' }
+      // Left-aligned by default (textAlign/alignItems keep their left defaults).
       break
     case 'square':
       kind = content.hasImage ? 'hero-top' : 'single'
       strategyLabel = content.hasImage
         ? 'Square — image top / text below'
-        : 'Square — centered stack'
+        : 'Square — left stack'
       candidates = ['eyebrow', 'headline', 'subhead', 'body', 'cta']
       textStackAlign = content.hasImage ? 'top' : 'center'
       imageFraction = 0.46
       wantsImage = content.hasImage
-      if (!content.hasImage) { textAlign = 'center'; alignItems = 'center' }
+      // Left-aligned by default.
       break
     case 'portrait':
       kind = content.hasImage ? 'hero-top' : 'single'
@@ -243,6 +297,16 @@ export function resolveLayout(
     wantsImage = false
   }
 
+  // User-dragged zone-image size wins over the band default (row = width frac,
+  // hero-top = height frac). Clamp so neither the image nor the text zone can be
+  // crushed; engine still owns triage of what fits in the remaining space.
+  if (wantsImage && overrides?.imageFraction != null) {
+    imageFraction = Math.min(0.8, Math.max(0.2, overrides.imageFraction))
+  }
+
+  // User alignment wins over the band default (content no longer pinned top).
+  if (overrides?.stackAlign) textStackAlign = overrides.stackAlign
+
   // Image triage note (only landscape/square/portrait want it)
   if (content.hasImage && !wantsImage) {
     triagedOut.push({ id: 'image', reason: 'band-excluded' })
@@ -259,7 +323,11 @@ export function resolveLayout(
     if (!candidates.includes(id)) triagedOut.push({ id, reason: 'band-excluded' })
   }
 
-  const sizeOf = (id: CustomBlockId): number => headlineSize * TYPE_RATIO[id]
+  // Per-block size = canvas-scaled base × type-hierarchy ratio × the user's
+  // relative nudge (default 1). The nudge rides on the scaled base, so it stays
+  // proportional as the canvas changes size.
+  const sizeOf = (id: CustomBlockId): number =>
+    headlineSize * TYPE_RATIO[id] * (overrides?.fontScale?.[id] ?? 1)
 
   // Presence: in the editor, show-flags decide (empty-but-shown blocks still
   // render a placeholder, per WYSIWYG); otherwise fall back to content emptiness.
@@ -322,10 +390,12 @@ export function resolveLayout(
     padding,
     gap,
     logoHeight,
+    pillScale,
     showLogo: content.showLogo,
     showSolutionPill,
     showImage: wantsImage,
     imageSide,
+    imageVPos,
     imageFraction,
     textStackAlign,
     textAlign,

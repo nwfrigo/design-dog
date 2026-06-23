@@ -311,6 +311,25 @@ export function AssetSelectionScreen() {
 
         {/* Template Grid — 3 cols on wider screens, 2 cols below. */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-12">
+          {/* Custom-size entry — arbitrary-dimension asset. Temporary card until
+              the designed Custom entry lands; launches the custom editor. */}
+          <button
+            onClick={() => handleNavigateToEditor('custom-size')}
+            className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-surface-secondary hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
+          >
+            <div className="flex-1 min-h-[136px] flex items-center justify-center p-6">
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-100 dark:bg-surface-secondary group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center transition-colors">
+                  <svg className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
+                  </svg>
+                </div>
+                <span className="text-sm font-medium text-gray-500 dark:text-content-secondary group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  Custom
+                </span>
+              </div>
+            </div>
+          </button>
           {filteredTemplates.map((template) => (
             <TemplateTileV2
               key={template.type}

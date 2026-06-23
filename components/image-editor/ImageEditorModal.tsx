@@ -7,7 +7,7 @@ import { ImageEditorPreview } from './ImageEditorPreview'
 import { ImageEditButton } from './ImageEditButton'
 import { ImageEditorSlider } from './ImageEditorSlider'
 import { SliderRow } from './SliderRow'
-import { PresetButtonGroup } from './PresetButtonGroup'
+import { PresetButtonGroup } from '@/components/ui/PresetButtonGroup'
 import { ImageLibraryView } from './ImageLibraryView'
 import {
   NEUTRAL_SLOT_SETTINGS,

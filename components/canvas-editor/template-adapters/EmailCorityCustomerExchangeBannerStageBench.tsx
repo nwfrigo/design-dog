@@ -11,7 +11,7 @@ import {
   type CCEBannerColorStyle,
   CCE_BANNER_BACKGROUND_IMAGES,
 } from '../../templates/EmailCorityCustomerExchangeBanner'
-import type { EnumOption } from '../stage-bar/SelectorPrimitive'
+import type { EnumOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for email-cority-customer-exchange-banner.

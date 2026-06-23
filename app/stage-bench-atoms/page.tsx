@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import {
   SelectorPrimitive,
   type ColorOption,
-} from '@/components/canvas-editor/stage-bar/SelectorPrimitive'
+} from '@/components/ui/SelectorPrimitive'
 import { BenchChip, type BenchChipKind } from '@/components/canvas-editor/bench/BenchChip'
-import { ActionButton, type ActionFn } from '@/components/canvas-editor/action-row/ActionButton'
+import { ActionButton, type ActionFn } from '@/components/ui/ActionButton'
 import { ActionRow } from '@/components/canvas-editor/action-row/ActionRow'
 import { SelectorRow } from '@/components/canvas-editor/stage-bar/SelectorRow'
 import { StageBenchShell } from '@/components/canvas-editor/StageBenchShell'
@@ -18,12 +18,12 @@ import {
   EditbarIconButton,
   EditbarImage,
   EditbarSlider,
-  Toggle,
 } from '@/components/canvas-editor/editbar'
+import { Toggle, Field, InfoToast } from '@/components/ui'
 import { ImageEditorModal } from '@/components/image-editor'
 import { NEUTRAL_SLOT_SETTINGS, type ImageSlotSettings } from '@/lib/image-filters'
 import {
-  EyeOff, Bold, Italic, AArrowUp, AArrowDown, MoveVertical,
+  EyeOff, Bold, Italic, AArrowUp, AArrowDown, MoveVertical, MoveHorizontal, X,
 } from 'lucide-react'
 
 /**
@@ -156,6 +156,21 @@ export default function StageBenchAtomsPage() {
             <span className="text-[10px] font-mono uppercase tracking-wider text-content-secondary">loading state:</span>
             <ActionButton fn="export" loading onClick={() => {}} />
           </div>
+        </div>
+
+        <div className="space-y-6 p-6 rounded-lg border border-line-subtle bg-surface-secondary">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-content-secondary">
+            DS primitives (new)
+          </h2>
+          <Section label="toggle">
+            <DsPrimitivesPreview />
+          </Section>
+          <Section label="field (w × h)">
+            <FieldsPreview />
+          </Section>
+          <Section label="info-toast">
+            <InfoToast label="See what's new" onClick={() => {}} />
+          </Section>
         </div>
 
         <div className="space-y-6 p-6 rounded-lg border border-line-subtle bg-surface-secondary">
@@ -383,13 +398,9 @@ function CtaToolbarPreview() {
       <EditbarDivider />
       <EditbarSection gap="default">
         <span className="font-mono text-[12px] uppercase text-content-secondary">Button</span>
-        <Toggle<'button' | 'link'>
-          value={style}
-          onChange={setStyle}
-          options={[
-            { value: 'button', label: 'Button' },
-            { value: 'link', label: 'Link' },
-          ]}
+        <Toggle
+          checked={style === 'link'}
+          onChange={(next) => setStyle(next ? 'link' : 'button')}
         />
         <span className="font-mono text-[12px] uppercase text-content-secondary">Link</span>
       </EditbarSection>
@@ -413,15 +424,30 @@ function SliderPreview() {
 }
 
 function TogglePreview() {
-  const [side, setSide] = useState<'left' | 'right'>('right')
+  const [on, setOn] = useState(true)
+  return <Toggle checked={on} onChange={setOn} />
+}
+
+function DsPrimitivesPreview() {
+  const [on, setOn] = useState(false)
   return (
-    <Toggle<'left' | 'right'>
-      value={side}
-      onChange={setSide}
-      options={[
-        { value: 'left', label: 'Left' },
-        { value: 'right', label: 'Right' },
-      ]}
-    />
+    <div className="flex items-center gap-4">
+      <Toggle checked={on} onChange={setOn} ariaLabel="Demo toggle" />
+      <span className="text-[10px] font-mono uppercase text-content-secondary">
+        {on ? 'on' : 'off'}
+      </span>
+    </div>
+  )
+}
+
+function FieldsPreview() {
+  const [w, setW] = useState('1080')
+  const [h, setH] = useState('1080')
+  return (
+    <div className="flex items-center gap-1">
+      <Field value={w} onChange={setW} icon={MoveHorizontal} type="number" widthPx={72} ariaLabel="Width" />
+      <X size={12} className="text-content-secondary" />
+      <Field value={h} onChange={setH} icon={MoveVertical} type="number" widthPx={72} ariaLabel="Height" />
+    </div>
   )
 }

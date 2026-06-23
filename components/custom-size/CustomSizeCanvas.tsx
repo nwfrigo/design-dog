@@ -19,6 +19,7 @@ import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
+import { filtersToCss, applyGrayscaleBoolean, NEUTRAL_FILTERS } from '@/lib/image-filters'
 import { brandChrome, BrandHeaderRow } from '@/lib/brand-chrome'
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 import {
@@ -69,13 +70,79 @@ export interface CustomSizeCanvasProps {
   renderInlineEditor?: (id: CustomBlockId, defaultInner: ReactNode) => ReactNode
   renderSpacerBetween?: (gapKey: string, value: number, prevId: CustomBlockId, nextId: CustomBlockId) => ReactNode
   renderOverlay?: () => ReactNode
+  /** Per-gap overrides (absolute px, keyed `gap-${prev}-to-${next}`). Sparse;
+   *  missing keys use the engine's computed gap. */
+  gaps?: Record<string, number>
+  /** Editor-only: drag the zone image's inner edge to resize how much of the
+   *  canvas it occupies (row = width fraction, hero-top = height fraction).
+   *  Receives the new fraction (unclamped — the engine clamps). */
+  onResizeImageFraction?: (next: number) => void
+}
+
+/**
+ * ImageFractionHandle — the draggable divider on the zone image's INNER edge.
+ * Drag it to grow/shrink the image's share of the canvas. Lives inside the
+ * scale-transformed canvas, so its thickness is divided by `scale` to stay a
+ * constant on-screen size; it reveals on stage hover like the resize chrome.
+ */
+function ImageFractionHandle({
+  axis, edge, scale, total, fraction, onResize,
+}: {
+  axis: 'x' | 'y'
+  /** The image edge the handle sits on (its inner edge). */
+  edge: 'left' | 'right' | 'top' | 'bottom'
+  scale: number
+  /** Canvas dimension the fraction is measured against (width for x, height for y). */
+  total: number
+  fraction: number
+  onResize: (next: number) => void
+}) {
+  const THICK = 6 // on-screen px
+  const grow = edge === 'left' || edge === 'top' ? -1 : 1 // drag toward the text → bigger
+  const onDown = (e: import('react').PointerEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const startPos = axis === 'x' ? e.clientX : e.clientY
+    const startFraction = fraction
+    const onMove = (ev: globalThis.PointerEvent) => {
+      const cur = axis === 'x' ? ev.clientX : ev.clientY
+      const deltaCanvas = (cur - startPos) / scale
+      onResize(startFraction + (grow * deltaCanvas) / total)
+    }
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
+  const t = THICK / scale
+  const vertical = axis === 'x' // a vertical bar that resizes width
+  const style: CSSProperties = vertical
+    ? { top: '50%', height: '38%', width: t, transform: 'translateY(-50%)', [edge]: -t / 2, cursor: 'ew-resize' }
+    : { left: '50%', width: '38%', height: t, transform: 'translateX(-50%)', [edge]: -t / 2, cursor: 'ns-resize' }
+  return (
+    <div
+      onPointerDown={onDown}
+      data-cs-image-resize={axis}
+      className="opacity-0 group-hover:opacity-100 transition-opacity"
+      style={{
+        position: 'absolute',
+        zIndex: 25,
+        borderRadius: t,
+        background: '#ffffff',
+        boxShadow: `0 0 0 ${1 / scale}px rgba(0,0,0,0.18), 0 ${1 / scale}px ${3 / scale}px rgba(0,0,0,0.35)`,
+        ...style,
+      }}
+    />
+  )
 }
 
 function ImagePlaceholder({
-  style, tag, src, focalX = 50, focalY = 50, zoom = 1, grayscale = false,
+  style, tag, src, focalX = 50, focalY = 50, zoom = 1, filterCss,
 }: {
   style?: CSSProperties; tag?: boolean; src?: string | null
-  focalX?: number; focalY?: number; zoom?: number; grayscale?: boolean
+  focalX?: number; focalY?: number; zoom?: number; filterCss?: string
 }) {
   return (
     <div
@@ -96,7 +163,7 @@ function ImagePlaceholder({
           src={src}
           alt=""
           data-export-image="true"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${focalX}% ${focalY}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, filter: grayscale ? 'grayscale(100%)' : undefined }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${focalX}% ${focalY}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, filter: filterCss }}
         />
       ) : (
         <svg width="24%" height="24%" viewBox="0 0 24 24" fill="none"
@@ -113,9 +180,16 @@ function ImagePlaceholder({
 export function CustomSizeCanvas({
   content, width, height, theme = 'dark', colors, typography, scale = 1,
   overrides, interactive = false, activeBlockId = null,
-  renderBlock, renderInlineEditor, renderSpacerBetween, renderOverlay,
+  renderBlock, renderInlineEditor, renderSpacerBetween, renderOverlay, gaps,
+  onResizeImageFraction,
 }: CustomSizeCanvasProps) {
   const layout = resolveLayout(content, width, height, overrides)
+  // Image colour edits via the shared pipeline (same as every other template):
+  // exposure/contrast/saturation → filtersToCss, grayscale folded in. Applies to
+  // both the zone image and the full-bleed background.
+  const imageFilterCss = filtersToCss(
+    applyGrayscaleBoolean(content.imageFilters ?? NEUTRAL_FILTERS, content.bgGrayscale ?? false),
+  )
   const t = TEMPLATE_THEMES[theme]
   const fontFamily = `"${typography.fontFamily.primary}", ${typography.fontFamily.fallback}`
   const sol = colors.solutions[content.solution] || colors.solutions.none
@@ -139,8 +213,11 @@ export function CustomSizeCanvas({
     <div data-cs-block={id} style={{ width: '100%', cursor: 'grab', opacity: activeBlockId === id ? 0.4 : 1, transition: 'opacity 0.12s' }}>{node}</div>
   )
 
-  // Factory render-prop wraps the image so it's selectable in the editor.
-  const wrapImage = (node: ReactNode): ReactNode => (renderBlock ? renderBlock('image', node) : node)
+  // The zone image is NOT wrapped in the factory Editable: custom-size owns its
+  // interaction entirely via CustomSizeStage (click → editor, drag → flip/hide).
+  // Wrapping it in Editable would re-introduce a mousedown-select that opens the
+  // editor mid-drag. `data-cs-image` (set on the placeholder) is the hit target.
+  const wrapImage = (node: ReactNode): ReactNode => node
 
   // html-format blocks render via dangerouslySetInnerHTML so inline bold/italic
   // survives the edit; plain blocks render as text. Empty → canonical placeholder.
@@ -160,14 +237,19 @@ export function CustomSizeCanvas({
       renderChrome: chromeFor(b.id, b.fontSize),
     }))
 
+  // The chip wraps through renderBlock — same as the text blocks — so it's
+  // selectable and hideable to the bench (typical Stage & Bench behavior).
+  const renderPill = renderBlock ? (node: ReactNode) => renderBlock('solutionPill', node) : undefined
   const headerRow = (justify: CSSProperties['justifyContent']): ReactNode => (
     <BrandHeaderRow
       showLogo={layout.showLogo}
       logoFill={logoFill}
       logoHeight={layout.logoHeight}
       pill={layout.showSolutionPill ? { solutionColor: sol.color, solutionLabel: sol.label, textColor, background: t.bgCategoryChip, border: `0.79px solid ${t.borderFocus}` } : null}
-      gap={layout.gap}
+      pillScale={layout.pillScale}
+      gap={layout.gap * 2}
       justify={justify}
+      renderPill={renderPill}
     />
   )
 
@@ -175,6 +257,7 @@ export function CustomSizeCanvas({
     <ContentStack<CustomBlockId>
       blocks={toBlocks(items)}
       defaultGap={layout.gap}
+      gaps={gaps}
       stackAlign={align}
       alignItems={layout.alignItems}
       renderBlock={renderBlock ?? (interactive ? wrapEditable : undefined)}
@@ -210,7 +293,7 @@ export function CustomSizeCanvas({
           src={content.backgroundImage || ''}
           alt=""
           data-export-image="true"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${fx}% ${fy}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, filter: content.bgGrayscale ? 'grayscale(100%)' : undefined }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: `${fx}% ${fy}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, filter: imageFilterCss }}
         />
         <div style={{ position: 'absolute', inset: 0, background: overlayBg }} />
         {content.overlayNoise && (
@@ -228,7 +311,10 @@ export function CustomSizeCanvas({
     inner = (
       <div style={{ display: 'flex', alignItems: 'center', gap: layout.gap * 1.5, height: '100%', padding: `0 ${layout.padding}px` }}>
         {layout.showLogo && <CorityLogo fill={logoFill} height={layout.logoHeight} />}
-        {layout.showSolutionPill && <SolutionPill variant="email" solutionColor={sol.color} solutionLabel={sol.label} textColor={textColor} background={t.bgCategoryChip} border={`0.79px solid ${t.borderFocus}`} />}
+        {layout.showSolutionPill && (() => {
+          const pillNode = <SolutionPill variant="email" scale={layout.pillScale} solutionColor={sol.color} solutionLabel={sol.label} textColor={textColor} background={t.bgCategoryChip} border={`0.79px solid ${t.borderFocus}`} />
+          return renderPill ? renderPill(pillNode) : pillNode
+        })()}
         {hl && (
           <div style={{ flex: 1, minWidth: 0, fontSize: hl.fontSize, fontWeight: 300, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{content.headline}</div>
         )}
@@ -256,20 +342,41 @@ export function CustomSizeCanvas({
         <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks)}</div>
       </div>
     )
-    const imageCol = wrapImage(<ImagePlaceholder tag={interactive} src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }} />)
+    // Image on a relative wrapper so the inner-edge resize handle can overhang
+    // the divider (overflow visible) without clipping. The placeholder keeps the
+    // `data-cs-image` tag for the stage's flip/hide gesture; the handle sits
+    // outside it (sibling) so a divider drag never triggers a flip.
+    const imageCol = wrapImage(
+      <div style={{ position: 'relative', width: `${layout.imageFraction * 100}%`, height: '100%', flexShrink: 0 }}>
+        <ImagePlaceholder tag={interactive || !!renderBlock} src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} filterCss={imageFilterCss} style={{ width: '100%', height: '100%' }} />
+        {onResizeImageFraction && (
+          <ImageFractionHandle axis="x" edge={layout.imageSide === 'left' ? 'right' : 'left'} scale={scale} total={width} fraction={layout.imageFraction} onResize={onResizeImageFraction} />
+        )}
+      </div>,
+    )
     inner = (
       <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
         {layout.imageSide === 'left' ? <>{imageCol}{textCol}</> : <>{textCol}{imageCol}</>}
       </div>
     )
   } else if (layout.kind === 'hero-top') {
+    const heroImage = wrapImage(
+      <div style={{ position: 'relative', width: '100%', height: `${layout.imageFraction * 100}%`, flexShrink: 0 }}>
+        <ImagePlaceholder tag={interactive || !!renderBlock} src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} filterCss={imageFilterCss} style={{ width: '100%', height: '100%' }} />
+        {onResizeImageFraction && (
+          <ImageFractionHandle axis="y" edge={layout.imageVPos === 'bottom' ? 'top' : 'bottom'} scale={scale} total={height} fraction={layout.imageFraction} onResize={onResizeImageFraction} />
+        )}
+      </div>,
+    )
+    const heroText = (
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: layout.gap, padding: layout.padding }}>
+        {headerRow('flex-start')}
+        <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks)}</div>
+      </div>
+    )
     inner = (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        {wrapImage(<ImagePlaceholder src={content.zoneImageUrl} focalX={content.bgFocalX} focalY={content.bgFocalY} zoom={content.bgZoom} grayscale={content.bgGrayscale} style={{ width: '100%', height: `${layout.imageFraction * 100}%`, flexShrink: 0 }} />)}
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: layout.gap, padding: layout.padding }}>
-          {headerRow('flex-start')}
-          <div style={{ flex: 1, minHeight: 0 }}>{stack(layout.blocks, 'top')}</div>
-        </div>
+        {layout.imageVPos === 'bottom' ? <>{heroText}{heroImage}</> : <>{heroImage}{heroText}</>}
       </div>
     )
   } else {

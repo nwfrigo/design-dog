@@ -17,7 +17,7 @@ import { InlineTextEdit } from '../InlineTextEdit'
 import { SpacingHandle } from '../handles/SpacingHandle'
 import { BenchChip, type BenchChipKind } from '../bench/BenchChip'
 import { SelectorRow } from '../stage-bar/SelectorRow'
-import { SelectorPrimitive, type EnumOption, type ColorOption } from '../stage-bar/SelectorPrimitive'
+import { SelectorPrimitive, type EnumOption, type ColorOption } from '@/components/ui/SelectorPrimitive'
 import { VisibilityRegistryProvider, type SlotVisibility } from '../VisibilityRegistry'
 import { SizeRegistryProvider, type SlotSize } from '../SizeRegistry'
 import { ContentRegistryProvider, type SlotContent } from '../ContentRegistry'
@@ -155,6 +155,10 @@ export type AdapterStoreBindings<TBlockId extends string> = {
     setValue?: (next: string) => void
     setVisible?: (next: boolean) => void
     setFontSize?: (next: number) => void
+    /** Reason this slot is benched and can't be restored at the current state
+     *  (engine-driven templates only). Surfaces as a dimmed, non-draggable
+     *  bench chip with this note. Omit for normal user-hidden slots. */
+    benchNote?: string
   }>
   /** Image slot bundle — required iff `descriptor.image` is set. */
   image?: ImageBinding & {
@@ -178,6 +182,10 @@ export type AdapterStoreBindings<TBlockId extends string> = {
     setStackAlign: (next: StackAlign) => void
     gaps: Record<string, number>
     setGap: (key: string, value: number) => void
+    /** Optional dynamic max gap (px) — overrides `descriptor.contentStack.maxGap`.
+     *  Lets size-varying templates (custom-size) scale the ceiling with the
+     *  canvas instead of the fixed template-era 120. */
+    maxGap?: number
   }
   /** Stage-bar selector values keyed by item id. Required iff `descriptor.stageBar` has non-custom items. */
   stageBar?: Record<string, { value: unknown; set: (next: unknown) => void }>
@@ -223,7 +231,23 @@ export type StageBenchAdapterDescriptor<TBlockId extends string> = {
   slots:
     | SlotDescriptor<TBlockId>[]
     | ((bindings: AdapterStoreBindings<TBlockId>) => SlotDescriptor<TBlockId>[])
-  stageBar?: StageBarItemDescriptor[]
+  /** Static stage-bar item list, OR a resolver computed from live bindings each
+   *  render (custom-size: hides THEME when the background is an image). Existing
+   *  adapters pass an array and are unaffected. */
+  stageBar?:
+    | StageBarItemDescriptor[]
+    | ((bindings: AdapterStoreBindings<TBlockId>) => StageBarItemDescriptor[])
+  /** Optional control strip rendered between the Stage and the ActionRow
+   *  (custom-size's dimension row). Receives the same render context as
+   *  `renderTemplate`. */
+  belowStage?: (ctx: AdapterRenderContext<TBlockId>) => ReactNode
+  /** Optional node rendered immediately LEFT of the action row (PREVIEW / ADD TO
+   *  QUEUE), in the top bar's right group — e.g. custom-size's zoom readout. */
+  actionRowLead?: (ctx: AdapterRenderContext<TBlockId>) => ReactNode
+  /** `bottom` (default): action row below the stage, belowStage strip under it.
+   *  `top`: both move into a full-width top bar above the body — the belowStage
+   *  strip on the left, the action row on the right (custom-size, Figma 537:3679). */
+  controlsPlacement?: 'top' | 'bottom'
   image?: ImageSlotConfig<TBlockId>
   /** Nested image slots — e.g. per-speaker avatars. Each entry needs a
    *  matching SlotDescriptor (kind: 'image', parent: 'parentBlockId')
@@ -232,7 +256,18 @@ export type StageBenchAdapterDescriptor<TBlockId extends string> = {
   category?: CategorySlotConfig<TBlockId>
   contentStack?: ContentStackConfig
   useStoreBindings: () => AdapterStoreBindings<TBlockId>
-  renderTemplate: (ctx: AdapterRenderContext<TBlockId>) => ReactNode
+  /** Standard path: renders the template inside the shared ScaledStage. Required
+   *  unless `customStage` is provided. */
+  renderTemplate?: (ctx: AdapterRenderContext<TBlockId>) => ReactNode
+  /** Escape hatch: own the entire stage area (bypasses ScaledStage). Receives the
+   *  render context + the stage drop/FLIP ref to wire onto its canvas box. Used
+   *  by custom-size for its centre-anchored, freeze-during-drag resize stage. */
+  customStage?: (args: {
+    ctx: AdapterRenderContext<TBlockId>
+    setStageNodeRef: (el: HTMLDivElement | null) => void
+    /** Opens the image editor for the descriptor's image slot (if any). */
+    openImageEditor?: () => void
+  }) => ReactNode
 }
 
 const DEFAULT_CHIP_KIND: Record<SlotKind, BenchChipKind> = {
@@ -303,6 +338,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           label: s.label,
           iconKey: s.iconKey,
           isHidden: !visible,
+          note: state?.benchNote,
           hide: () => {
             setVisible(false)
             track({
@@ -456,7 +492,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
                 scale={1}
                 direction={cs.stackAlign === 'bottom' ? 'up' : 'down'}
                 min={0}
-                max={descriptor.contentStack!.maxGap ?? 120}
+                max={bindings.contentStack!.maxGap ?? descriptor.contentStack!.maxGap ?? 120}
                 showUnit
               />
             </Editable>
@@ -473,9 +509,12 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         }
       : null
 
-    const stageBar = descriptor.stageBar && descriptor.stageBar.length > 0 ? (
+    const stageBarItems = typeof descriptor.stageBar === 'function'
+      ? descriptor.stageBar(bindings)
+      : descriptor.stageBar
+    const stageBar = stageBarItems && stageBarItems.length > 0 ? (
       <>
-        {descriptor.stageBar.map((item) => {
+        {stageBarItems.map((item) => {
           const label = item.label ?? item.id
           if (item.kind === 'custom') {
             return <SelectorRow key={item.id} label={label}>{item.render()}</SelectorRow>
@@ -602,6 +641,20 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       extras: bindings.extras ?? {},
     }
 
+    const belowStageNode = descriptor.belowStage?.(ctx)
+    const actionRowLeadNode = descriptor.actionRowLead?.(ctx)
+    const actionRowNode = (
+      <StageBenchActionRow
+        isExporting={isExporting}
+        isEditingFromQueue={isEditingFromQueue}
+        onPreview={onPreview}
+        onAddToQueue={onAddToQueue}
+        onSaveToQueue={onSaveToQueue}
+        onExport={onExport}
+      />
+    )
+    const controlsOnTop = descriptor.controlsPlacement === 'top'
+
     const inner = (
       <StageBenchShell
         header={
@@ -617,26 +670,41 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         }
         bench={<StageBenchBench />}
         stageBar={stageBar}
-        actionRow={
-          <StageBenchActionRow
-            isExporting={isExporting}
-            isEditingFromQueue={isEditingFromQueue}
-            onPreview={onPreview}
-            onAddToQueue={onAddToQueue}
-            onSaveToQueue={onSaveToQueue}
-            onExport={onExport}
-          />
-        }
+        // controlsPlacement='top' → toolbar (left) + action row (right) in the
+        // top bar; otherwise the standard below-stage placement.
+        topBar={controlsOnTop ? (
+          <div className="flex items-center justify-between gap-8">
+            <div>{belowStageNode}</div>
+            <div className="flex items-center gap-5">
+              {actionRowLeadNode}
+              {actionRowNode}
+            </div>
+          </div>
+        ) : undefined}
+        belowStage={controlsOnTop ? undefined : belowStageNode}
+        actionRow={controlsOnTop ? null : actionRowNode}
         benchRef={setBenchNodeRef}
+        rawStage={!!descriptor.customStage}
       >
-        <div
-          ref={setStageNodeRef}
-          data-canvas-stage
-          data-canvas-preview-pad
-          style={{ position: 'relative' }}
-        >
-          {descriptor.renderTemplate(ctx)}
-        </div>
+        {descriptor.customStage ? (
+          descriptor.customStage({
+            ctx,
+            setStageNodeRef,
+            openImageEditor: descriptor.image ? () => setEditorForBlockId(descriptor.image!.blockId) : undefined,
+          })
+        ) : (
+          <div
+            ref={setStageNodeRef}
+            data-canvas-stage
+            data-canvas-preview-pad
+            // `max-content` so this hugs the template's TRUE intrinsic size even
+            // when it changes at runtime. Without it the element stays pinned to
+            // the parent's previous width, so ScaledStage measures a stale value.
+            style={{ position: 'relative', width: 'max-content', height: 'max-content' }}
+          >
+            {descriptor.renderTemplate?.(ctx)}
+          </div>
+        )}
       </StageBenchShell>
     )
 

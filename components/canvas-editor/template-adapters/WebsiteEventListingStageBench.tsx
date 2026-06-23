@@ -11,7 +11,7 @@ import {
   type WebsiteEventListingBlockId,
   type EventListingVariant,
 } from '../../templates/WebsiteEventListing'
-import type { EnumOption } from '../stage-bar/SelectorPrimitive'
+import type { EnumOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for website-event-listing (factory-driven).

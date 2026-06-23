@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionRow } from '../action-row/ActionRow'
-import { ActionButton } from '../action-row/ActionButton'
+import { ActionButton } from '@/components/ui/ActionButton'
 
 /**
  * StageBenchActionRow — preview / queue / export buttons below the stage.

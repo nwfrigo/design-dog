@@ -43,6 +43,10 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     stackerFooterModule,
     // Carousel fields for auto-save
     carouselSlides,
+    // Custom-size doc (dims/overlay/image) — must be watched so canvas-size
+    // edits persist to the draft; otherwise an HMR/remount restores a stale
+    // doc and the canvas reverts to the 1080² default.
+    customSizeDocument,
   } = useStore()
 
   // Check if we're editing from queue
@@ -95,6 +99,8 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     stackerFooterModule,
     // Carousel
     carouselSlides,
+    // Custom-size doc — persist dim/overlay/image edits promptly.
+    customSizeDocument,
   ])
 
   const handleLogoClick = () => {

@@ -7,6 +7,7 @@ import {
   type CustomSizeDocument,
   type ReusedContent,
 } from '@/lib/custom-size/document'
+import { resolveLayout } from '@/lib/custom-size/resolve'
 import colorsJson from '@/public/assets/brand-config/colors.json'
 import typographyJson from '@/public/assets/brand-config/typography.json'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
@@ -54,16 +55,30 @@ export default function CustomSizeRenderPage({
       y: parseNumber(searchParams, 'imagePositionY', 0),
     },
     imageZoom: parseNumber(searchParams, 'imageZoom', 1),
+    imageFilters: {
+      exposure: parseNumber(searchParams, 'imageExposure', 0),
+      contrast: parseNumber(searchParams, 'imageContrast', 0),
+      saturation: parseNumber(searchParams, 'imageSaturation', 0),
+    },
   }
 
   const { content, width, height, theme, overrides } = customSizeToProps(doc, reused)
+
+  // Spacer drags persist as relative factors in doc.gapScale; convert to the
+  // absolute px the renderer expects (factor × the engine's computed gap), so
+  // the exported PNG matches the editor exactly.
+  const layout = resolveLayout(content, width, height, overrides)
+  const gaps: Record<string, number> = {}
+  for (const [k, factor] of Object.entries(doc.gapScale)) {
+    gaps[k] = factor * layout.gap
+  }
 
   return (
     <div style={{ width, height, margin: 0, padding: 0, overflow: 'hidden' }}>
       <Suspense fallback={<div style={{ width, height, background: '#060015' }} />}>
         <GenericRenderContent
           Component={CustomSizeCanvas}
-          props={{ content, width, height, theme, overrides, colors: colorsConfig, typography: typographyConfig, scale: 1 }}
+          props={{ content, width, height, theme, overrides, gaps, colors: colorsConfig, typography: typographyConfig, scale: 1 }}
         />
       </Suspense>
     </div>

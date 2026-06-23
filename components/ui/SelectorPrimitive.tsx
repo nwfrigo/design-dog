@@ -101,7 +101,13 @@ type Layout2Props   = { kind: 'layout-2';  value: 'image' | 'text'; onChange: (v
 type ColorProps     = { kind: 'color-2' | 'color-3' | 'color-4'; value: string; onChange: (v: string) => void; options: ColorOption[] }
 type EnumProps      = { kind: 'enum';      value: string; onChange: (v: string) => void; options: EnumOption[] }
 
-export type SelectorPrimitiveProps = ThemeProps | AlignmentProps | StackProps | LayoutProps | Layout2Props | ColorProps | EnumProps
+/** Cell size: `md` = 36px (stage-bar default), `sm` = 24px (compact rows, e.g.
+ *  the image modal's DIR / OVERLAY selectors). */
+export type SelectorSize = 'md' | 'sm'
+
+export type SelectorPrimitiveProps =
+  (ThemeProps | AlignmentProps | StackProps | LayoutProps | Layout2Props | ColorProps | EnumProps)
+  & { size?: SelectorSize }
 
 // ---- shared cell button ------------------------------------------------------
 
@@ -146,6 +152,7 @@ function Cell({
   isColor,
   swatch,
   wide,
+  size = 'md',
   overlapTop,
   overlapLeft,
   children,
@@ -153,6 +160,7 @@ function Cell({
   ariaLabel: string
   active: boolean
   onClick: () => void
+  size?: SelectorSize
   /** Which corners of this cell should round. Outer-edge corners only —
    *  interior corners stay square so neighbors' shared borders meet
    *  flush. See `computeCellRadii`. */
@@ -215,12 +223,14 @@ function Cell({
       onClick={onClick}
       style={swatchStyle}
       className={[
-        // 36px tall cell — matches the toolbar height so the stage chrome
-        // (toolbars + selectors) shares one consistent control size.
-        // Width is 36px fixed for icon/swatch cells, auto for text-label
-        // cells (with 12px horizontal padding).
-        'relative shrink-0 h-9',
-        wide ? 'min-w-9 px-3 text-xs font-medium' : 'w-9',
+        // md (36px) matches the toolbar height for stage chrome; sm (24px) is
+        // the compact variant for in-modal rows. Width is square for
+        // icon/swatch cells, auto for text-label cells (12px horizontal pad).
+        'relative shrink-0',
+        size === 'sm' ? 'h-6' : 'h-9',
+        wide
+          ? (size === 'sm' ? 'min-w-6 px-2 text-xs font-medium' : 'min-w-9 px-3 text-xs font-medium')
+          : (size === 'sm' ? 'w-6' : 'w-9'),
         'flex items-center justify-center overflow-hidden',
         'border-[0.5px] border-line-subtle',
         'transition-colors',
@@ -249,6 +259,7 @@ function Cell({
 const WRAP_AT = 4
 
 export function SelectorPrimitive(props: SelectorPrimitiveProps) {
+  const size: SelectorSize = props.size ?? 'md'
   if (props.kind === 'color-2' || props.kind === 'color-3' || props.kind === 'color-4') {
     const { value, onChange, options } = props
     const expectedLen = props.kind === 'color-2' ? 2 : props.kind === 'color-3' ? 3 : 4
@@ -266,6 +277,7 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
           swatch: opt.swatch,
         }))}
         perRow={cells.length}
+        size={size}
       />
     )
   }
@@ -292,10 +304,11 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
             isColor: isSwatch,
             swatch: opt.swatch,
             wide: isWide,
-            content: Icon ? <Icon size={ICON_SIZE} /> : isSwatch ? null : opt.label,
+            content: Icon ? <Icon size={size === 'sm' ? 14 : ICON_SIZE} /> : isSwatch ? null : opt.label,
           }
         })}
         perRow={perRow}
+        size={size}
       />
     )
   }
@@ -321,6 +334,7 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
         }
       })}
       perRow={cells.length}
+      size={size}
     />
   )
 }
@@ -337,6 +351,7 @@ export function SelectorPrimitive(props: SelectorPrimitiveProps) {
 function CellGrid({
   cells,
   perRow,
+  size = 'md',
 }: {
   cells: Array<{
     key: string
@@ -349,6 +364,7 @@ function CellGrid({
     content?: ReactNode
   }>
   perRow: number
+  size?: SelectorSize
 }) {
   const total = cells.length
   const rowCount = Math.max(1, Math.ceil(total / perRow))
@@ -372,6 +388,7 @@ function CellGrid({
                   isColor={c.isColor}
                   swatch={c.swatch}
                   wide={c.wide}
+                  size={size}
                   overlapLeft={colIdx > 0}
                   overlapTop={rowIdx > 0}
                 >

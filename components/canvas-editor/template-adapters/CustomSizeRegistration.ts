@@ -16,6 +16,8 @@ import {
   defaultCustomSizeDocument,
   type ReusedContent,
 } from '@/lib/custom-size/document'
+import { resolveLayout } from '@/lib/custom-size/resolve'
+import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 
 export const customSizeRegistration: StageBenchRegistrationData = {
   templateId: 'custom-size',
@@ -39,14 +41,23 @@ export const customSizeRegistration: StageBenchRegistrationData = {
       grayscale: asset.grayscale,
       imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
       imageZoom: asset.thumbnailImageZoom || 1,
+      imageFilters: asset.thumbnailImageFilters ?? NEUTRAL_FILTERS,
     }
     const m = customSizeToProps(doc, reused)
+    // gapScale rides as relative factors; convert to absolute px (× engine gap)
+    // so the queue thumbnail matches the editor + export.
+    const layout = resolveLayout(m.content, doc.width, doc.height, m.overrides)
+    const gaps: Record<string, number> = {}
+    for (const [k, factor] of Object.entries(doc.gapScale)) {
+      gaps[k] = factor * layout.gap
+    }
     return {
       content: m.content,
       width: doc.width,
       height: doc.height,
       theme: m.theme,
       overrides: m.overrides,
+      gaps,
       colors,
       typography,
       scale: 1,
@@ -73,6 +84,9 @@ export const customSizeRegistration: StageBenchRegistrationData = {
       imagePositionX: s.thumbnailImagePosition?.x ?? 0,
       imagePositionY: s.thumbnailImagePosition?.y ?? 0,
       imageZoom: s.thumbnailImageZoom ?? 1,
+      imageExposure: s.thumbnailImageFilters?.exposure ?? 0,
+      imageContrast: s.thumbnailImageFilters?.contrast ?? 0,
+      imageSaturation: s.thumbnailImageFilters?.saturation ?? 0,
     }
   },
 }

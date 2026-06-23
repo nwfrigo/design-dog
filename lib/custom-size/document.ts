@@ -13,6 +13,8 @@
  */
 
 import type { CustomContent, CustomBlockId, LayoutOverrides } from './resolve'
+import type { StackAlign } from '@/types'
+import { type ImageFilters, NEUTRAL_FILTERS } from '@/lib/image-filters'
 
 export interface CustomSizeOverlay {
   color: string
@@ -38,7 +40,12 @@ export interface CustomSizeDocument {
   // REUSED thumbnail image settings + global grayscale, NOT redeclared here.
   imageMode: 'none' | 'zone' | 'background'
   imageUrl: string | null
-  imageSide: 'left' | 'right' | null                  // zone mode; null = engine
+  imageSide: 'left' | 'right' | null                  // zone (row); null = engine
+  imageVPos: 'top' | 'bottom' | null                  // zone (hero-top); null = engine
+  imageFraction: number | null                        // zone size (drag inner edge); null = engine default
+
+  /** User content-stack alignment; null = engine's per-band default. */
+  stackAlign: StackAlign | null
 
   overlay: CustomSizeOverlay
 }
@@ -64,6 +71,8 @@ export interface ReusedContent {
    *  (The image URL lives in the doc; the mode decides zone vs background.) */
   imagePosition: { x: number; y: number }
   imageZoom: number
+  /** Image colour edits (exposure/contrast/saturation) from the image modal. */
+  imageFilters: ImageFilters
 }
 
 export function defaultCustomSizeDocument(width = 1080, height = 1080): CustomSizeDocument {
@@ -79,6 +88,9 @@ export function defaultCustomSizeDocument(width = 1080, height = 1080): CustomSi
     imageMode: 'none',
     imageUrl: null,
     imageSide: null,
+    imageVPos: null,
+    imageFraction: null,
+    stackAlign: null,
     overlay: { color: '#060015', opacity: 0.55, coverage: 'fade-up', noise: false },
   }
 }
@@ -112,6 +124,7 @@ export function customSizeToProps(
     bgFocalY: focalY,
     bgZoom: reused.imageZoom,
     bgGrayscale: reused.grayscale,
+    imageFilters: reused.imageFilters,
     overlayColor: doc.overlay.color,
     overlayOpacity: doc.overlay.opacity,
     overlayCoverage: doc.overlay.coverage,
@@ -126,6 +139,10 @@ export function customSizeToProps(
     overrides: {
       order: doc.order ?? undefined,
       imageSide: doc.imageSide ?? undefined,
+      imageVPos: doc.imageVPos ?? undefined,
+      imageFraction: doc.imageFraction ?? undefined,
+      stackAlign: doc.stackAlign ?? undefined,
+      fontScale: doc.fontScale,
       // Single source of visibility — editor + export both go through here, so
       // a user-hidden block stays hidden in the exported PNG. (headline always-on.)
       shownBlocks: {
@@ -166,6 +183,9 @@ export function customSizeExportBody(
     imagePositionX: reused.imagePosition.x,
     imagePositionY: reused.imagePosition.y,
     imageZoom: reused.imageZoom,
+    imageExposure: reused.imageFilters.exposure,
+    imageContrast: reused.imageFilters.contrast,
+    imageSaturation: reused.imageFilters.saturation,
     format: opts.format,
     scale: opts.scale,
     ...(opts.exportedBy != null ? { exportedBy: opts.exportedBy } : {}),

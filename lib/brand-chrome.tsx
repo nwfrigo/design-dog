@@ -80,17 +80,23 @@ export interface BrandHeaderRowProps {
   pill?: BrandPill | null
   gap: number
   justify?: CSSProperties['justifyContent']
+  /** Size multiplier for the pill so it scales with the canvas (custom-size). */
+  pillScale?: number
+  /** Wrap the pill so it participates in selection/visibility (Stage & Bench
+   *  `renderBlock`). When omitted, the pill renders raw (export / preview). */
+  renderPill?: (pill: ReactNode) => ReactNode
 }
 
 /** Logo + (optional) solution-pill header row. Returns null when neither shows. */
-export function BrandHeaderRow({ showLogo = true, logoFill, logoHeight, pill, gap, justify = 'flex-start' }: BrandHeaderRowProps) {
+export function BrandHeaderRow({ showLogo = true, logoFill, logoHeight, pill, gap, justify = 'flex-start', pillScale = 1, renderPill }: BrandHeaderRowProps) {
   if (!showLogo && !pill) return null
+  const pillNode = pill ? (
+    <SolutionPill variant="email" scale={pillScale} solutionColor={pill.solutionColor} solutionLabel={pill.solutionLabel} textColor={pill.textColor} background={pill.background} border={pill.border} />
+  ) : null
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap, justifyContent: justify, flexShrink: 0 }}>
       {showLogo && <CorityLogo fill={logoFill} height={logoHeight} />}
-      {pill && (
-        <SolutionPill variant="email" solutionColor={pill.solutionColor} solutionLabel={pill.solutionLabel} textColor={pill.textColor} background={pill.background} border={pill.border} />
-      )}
+      {pillNode && (renderPill ? renderPill(pillNode) : pillNode)}
     </div>
   )
 }

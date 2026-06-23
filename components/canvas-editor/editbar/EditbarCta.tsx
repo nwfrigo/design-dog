@@ -8,11 +8,10 @@ import {
   EditbarIconButton,
   EDITBAR_TOKENS,
 } from './shell'
-import { Toggle } from './Toggle'
+import { Toggle } from '@/components/ui'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import { useSlotVisibility } from '../VisibilityRegistry'
 import { useStore } from '@/store'
-import type { CtaStyle } from '@/types'
 
 /**
  * EditbarCta — contextual toolbar for `kind: 'cta'` slots.
@@ -63,14 +62,10 @@ export function EditbarCta() {
         >
           Button
         </span>
-        <Toggle<CtaStyle>
-          value={ctaStyle}
-          onChange={setCtaStyle}
-          options={[
-            { value: 'button', label: 'Button' },
-            { value: 'link', label: 'Link' },
-          ]}
-          ariaLabel="CTA Style"
+        <Toggle
+          checked={ctaStyle === 'link'}
+          onChange={(next) => setCtaStyle(next ? 'link' : 'button')}
+          ariaLabel="CTA Style — off is Button, on is Link"
         />
         <span
           style={{

@@ -138,6 +138,15 @@ export interface SolutionPillProps {
   border?: string
   /** Additional inline styles applied to the outermost container. */
   style?: CSSProperties
+  /** Uniform size multiplier on every dimension (padding/radius/gap/dot/font/
+   *  border/letter-spacing). Default 1 — existing templates are unaffected. Used
+   *  by custom-size so the pill scales with the canvas like the logo. */
+  scale?: number
+}
+
+/** Multiply every `Npx` in a CSS string (padding shorthand, border) by `s`. */
+function scalePx(value: string, s: number): string {
+  return value.replace(/([\d.]+)px/g, (_, n) => `${parseFloat(n) * s}px`)
 }
 
 export function SolutionPill({
@@ -148,6 +157,7 @@ export function SolutionPill({
   background,
   border,
   style,
+  scale = 1,
 }: SolutionPillProps) {
   const v = VARIANTS[variant]
 
@@ -158,14 +168,14 @@ export function SolutionPill({
   return (
     <div
       style={{
-        padding: v.padding,
+        padding: scale === 1 ? v.padding : scalePx(v.padding, scale),
         background: resolvedBackground,
-        borderRadius: v.borderRadius,
-        border: resolvedBorder,
+        borderRadius: v.borderRadius * scale,
+        border: scale === 1 ? resolvedBorder : scalePx(resolvedBorder, scale),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: v.gap,
+        gap: v.gap * scale,
         ...(variant === 'faq-cover' ? { display: 'inline-flex', alignSelf: 'flex-start' } : {}),
         ...style,
       }}
@@ -173,20 +183,20 @@ export function SolutionPill({
       {/* Color dot */}
       <div
         style={{
-          width: v.dotSize,
-          height: v.dotSize,
+          width: v.dotSize * scale,
+          height: v.dotSize * scale,
           background: solutionColor,
-          borderRadius: v.dotRadius,
+          borderRadius: v.dotRadius * scale,
         }}
       />
       {/* Label */}
       <span
         style={{
           color: resolvedTextColor,
-          fontSize: v.fontSize,
+          fontSize: v.fontSize * scale,
           fontWeight: 500,
           textTransform: 'uppercase',
-          letterSpacing: v.letterSpacing,
+          letterSpacing: v.letterSpacing * scale,
           ...(v.lineHeight != null ? { lineHeight: v.lineHeight } : {}),
         }}
       >

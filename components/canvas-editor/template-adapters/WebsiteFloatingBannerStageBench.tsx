@@ -11,7 +11,7 @@ import {
   type WebsiteFloatingBannerBlockId,
   type FloatingBannerVariant,
 } from '../../templates/WebsiteFloatingBanner'
-import type { EnumOption } from '../stage-bar/SelectorPrimitive'
+import type { EnumOption } from '@/components/ui/SelectorPrimitive'
 
 /**
  * Stage & Bench adapter for website-floating-banner.
