@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Undo2, MoveHorizontal, MoveVertical, Lock, Unlock } from 'lucide-react'
+import { MoveHorizontal, MoveVertical, Lock, Unlock } from 'lucide-react'
 import { Field, PresetChip, Toggle } from '@/components/ui'
 import { RATIO_PRESETS } from '@/lib/custom-size/ratioPresets'
 
@@ -26,6 +26,8 @@ export interface CustomSizeRowProps {
   onCommitHeight: (n: number) => void
   /** Apply a ratio, anchored on the current width. */
   onApplyPreset: (rw: number, rh: number) => void
+  /** Dimension undo — wired but the UI chip is hidden for now (kept so it can be
+   *  reintroduced without re-plumbing). The adapter still tracks history. */
   onUndo: () => void
   canUndo: boolean
   /** Magnetic snap-to-preset-ratios while edge-dragging the canvas (PRD).
@@ -50,8 +52,8 @@ export function CustomSizeRow({
   onCommitWidth,
   onCommitHeight,
   onApplyPreset,
-  onUndo,
-  canUndo,
+  // onUndo / canUndo intentionally not destructured — UI chip removed for now,
+  // the prop contract + adapter wiring stay so it can be dropped back in.
   snapToPresets,
   onToggleSnap,
   constrainProportions,
@@ -69,8 +71,6 @@ export function CustomSizeRow({
 
   return (
     <div className="flex items-center gap-8">
-      <PresetChip icon={Undo2} label="undo" onClick={onUndo} disabled={!canUndo} />
-
       <div className="flex items-center gap-1">
         <Field
           icon={MoveHorizontal}
