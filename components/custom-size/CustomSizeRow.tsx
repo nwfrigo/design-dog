@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Undo2, MoveHorizontal, MoveVertical, Lock, Unlock } from 'lucide-react'
 import { Field, PresetChip, Toggle } from '@/components/ui'
+import { RATIO_PRESETS } from '@/lib/custom-size/ratioPresets'
 
 /**
  * CustomSizeRow — the custom-size editor's dimension control strip (Figma
@@ -17,13 +18,6 @@ import { Field, PresetChip, Toggle } from '@/components/ui'
 
 const MIN_DIM = 1
 const MAX_DIM = 9999
-
-const RATIO_PRESETS: { label: string; rw: number; rh: number }[] = [
-  { label: '3:4', rw: 3, rh: 4 },
-  { label: '1:1', rw: 1, rh: 1 },
-  { label: '4:3', rw: 4, rh: 3 },
-  { label: '16:9', rw: 16, rh: 9 },
-]
 
 export interface CustomSizeRowProps {
   width: number
@@ -110,18 +104,6 @@ export function CustomSizeRow({
         />
       </div>
 
-      {/* Preset ratio chips — always visible (persistent quick-apply). */}
-      <div className="flex items-center gap-1">
-        {RATIO_PRESETS.map((p) => (
-          <PresetChip
-            key={p.label}
-            label={p.label}
-            onClick={() => onApplyPreset(p.rw, p.rh)}
-            active={isActive(p.rw, p.rh)}
-          />
-        ))}
-      </div>
-
       {/* Toggle: magnetic snap to preset ratios while edge-dragging the canvas. */}
       <div className="flex items-center gap-2">
         <span className="font-mono text-[12px] uppercase text-content-secondary whitespace-nowrap">
@@ -133,6 +115,21 @@ export function CustomSizeRow({
           ariaLabel="Snap to preset ratios while resizing"
         />
       </div>
+
+      {/* Preset ratio chips — shown to the right of the toggle only when snapping
+       *  is on (they ARE the snap presets). Click to apply a ratio. */}
+      {snapToPresets && (
+        <div className="flex items-center gap-1">
+          {RATIO_PRESETS.map((p) => (
+            <PresetChip
+              key={p.label}
+              label={p.label}
+              onClick={() => onApplyPreset(p.rw, p.rh)}
+              active={isActive(p.rw, p.rh)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

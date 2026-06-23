@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { PRESET_RATIOS } from '@/lib/custom-size/ratioPresets'
 
 /**
  * CustomSizeResizeHandles — drag any edge/corner to resize the asset (live
@@ -30,8 +31,6 @@ const SNAP_PX = 22
 /** At-rest "is this an exact preset" epsilon, as a fraction of the ratio.
  *  Tight on purpose — green must mean *at* a preset, not merely near one. */
 const AT_PRESET_EPS = 0.006
-/** Landscape + portrait + square stops (matches the lab's SNAP_STOPS). */
-const PRESET_RATIOS = [9 / 16, 3 / 4, 1, 4 / 3, 16 / 9]
 
 const BLUE = '#3B82F6'
 const GREEN = '#22C55E'
