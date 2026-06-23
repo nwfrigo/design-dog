@@ -305,7 +305,9 @@ export function resolveLayout(
   if (overlay) {
     kind = 'overlay'
     candidates = ['eyebrow', 'headline', 'subhead', 'body', 'cta']
-    textStackAlign = 'bottom'
+    // Default text position follows the scrim direction (dark edge); the user's
+    // stackAlign override (applied below) still wins — same as every other band.
+    textStackAlign = content.overlayCoverage === 'fade-down' ? 'top' : 'bottom'
     textAlign = 'left'
     alignItems = 'flex-start'
     wantsImage = false

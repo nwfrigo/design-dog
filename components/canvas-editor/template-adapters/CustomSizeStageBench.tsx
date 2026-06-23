@@ -114,11 +114,10 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
     ]
     if (doc.imageMode !== 'background') {
       items.push({ id: 'theme', kind: 'theme', label: 'theme' })
-      // Content-stack alignment (top/middle/bottom) — the static-template standard,
-      // so content isn't locked to the top. Engine default per band; user overrides.
-      // (Full-bleed image mode drives text position by overlay coverage instead.)
-      items.push({ id: 'stackAlign', kind: 'stack', label: 'content stack' })
     }
+    // Content-stack alignment (top/middle/bottom) — available in ALL modes incl.
+    // full-bleed image. Engine default per band/coverage; user overrides.
+    items.push({ id: 'stackAlign', kind: 'stack', label: 'content stack' })
     return items
   },
   belowStage: (ctx) => <CustomSizeRow {...(ctx.extras.csRow as CustomSizeRowProps)} />,

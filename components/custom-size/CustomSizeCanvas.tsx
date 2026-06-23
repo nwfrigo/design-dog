@@ -278,7 +278,6 @@ export function CustomSizeCanvas({
     const fy = content.bgFocalY ?? 50
     const zoom = content.bgZoom ?? 1
     const cov = content.overlayCoverage ?? 'fade-up'
-    const textTop = cov === 'fade-down'
     const owMax = width > height ? '62%' : '100%'
     // Single source — the modal preview paints the exact same scrim (overlay.ts).
     const overlayBg = overlayBackground({ color: oColor, opacity: oOpacity, coverage: cov, noise: content.overlayNoise ?? false })
@@ -294,9 +293,9 @@ export function CustomSizeCanvas({
         {content.overlayNoise && (
           <div style={{ position: 'absolute', inset: 0, backgroundImage: NOISE_BG, opacity: 0.12, mixBlendMode: 'overlay', pointerEvents: 'none' }} />
         )}
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: textTop ? 'flex-start' : 'space-between', padding: layout.padding, gap: layout.gap }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', padding: layout.padding, gap: layout.gap }}>
           {headerRow('flex-start')}
-          <div style={{ maxWidth: owMax }}>{stack(layout.blocks, textTop ? 'top' : 'bottom')}</div>
+          <div style={{ maxWidth: owMax, flex: 1, minHeight: 0 }}>{stack(layout.blocks)}</div>
         </div>
       </>
     )
