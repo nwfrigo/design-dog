@@ -119,7 +119,7 @@ export function CustomSizeRow({
       {/* Preset ratio chips — shown to the right of the toggle only when snapping
        *  is on (they ARE the snap presets). Click to apply a ratio. */}
       {snapToPresets && (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2.5">
           {RATIO_PRESETS.map((p) => (
             <PresetChip
               key={p.label}

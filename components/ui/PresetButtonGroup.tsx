@@ -33,7 +33,9 @@ export function PresetChip({ label, onClick, icon: Icon, active, disabled, size 
         'inline-flex items-center justify-center gap-2 rounded-sm',
         sm ? 'p-[6px] text-[8px]' : 'px-2 py-[10px] text-[12px]',
         'border-[0.5px] border-btn-secondary-border',
-        'bg-btn-secondary text-btn-secondary-text',
+        // Text uses content-secondary to match the action-bar buttons (Preview /
+        // Add to Queue / Export), not the darker btn-secondary-text.
+        'bg-btn-secondary text-content-secondary',
         'font-mono uppercase whitespace-nowrap leading-none',
         'transition-colors hover:bg-btn-secondary-hover',
         'disabled:opacity-40 disabled:cursor-not-allowed',
