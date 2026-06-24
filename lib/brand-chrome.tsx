@@ -45,23 +45,22 @@ export function brandChrome(
   id: BrandBlockId,
   { fontSize, textColor, btnText = textColor, align = 'left' }: BrandChromeOpts,
 ): (inner: ReactNode) => ReactNode {
-  switch (id) {
-    case 'eyebrow':
-      return (i) => <div style={{ fontSize, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: textColor, textAlign: align }}>{i}</div>
-    case 'headline':
-      return (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.12, color: textColor, textAlign: align }}>{i}</div>
-    case 'subhead':
-      return (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.3, color: textColor, opacity: 0.9, textAlign: align }}>{i}</div>
-    case 'body':
-      return (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.5, color: textColor, opacity: 0.8, textAlign: align }}>{i}</div>
-    case 'cta':
-      return (i) => (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: fontSize * 0.45, fontSize, fontWeight: 500, color: btnText, justifyContent: align === 'center' ? 'center' : 'flex-start' }}>
-          {i}
-          <ArrowIcon color={btnText} width={fontSize * 0.92} height={fontSize * 0.72} />
-        </div>
-      )
+  // Keyed by block id — arrows live in object-property position (the same idiom
+  // the per-template `renderChrome` blocks use). The Record is exhaustive over
+  // BrandBlockId, so the compiler enforces every block is handled.
+  const chromeById: Record<BrandBlockId, (inner: ReactNode) => ReactNode> = {
+    eyebrow: (i) => <div style={{ fontSize, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: textColor, textAlign: align }}>{i}</div>,
+    headline: (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.12, color: textColor, textAlign: align }}>{i}</div>,
+    subhead: (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.3, color: textColor, opacity: 0.9, textAlign: align }}>{i}</div>,
+    body: (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.5, color: textColor, opacity: 0.8, textAlign: align }}>{i}</div>,
+    cta: (i) => (
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: fontSize * 0.45, fontSize, fontWeight: 500, color: btnText, justifyContent: align === 'center' ? 'center' : 'flex-start' }}>
+        {i}
+        <ArrowIcon color={btnText} width={fontSize * 0.92} height={fontSize * 0.72} />
+      </div>
+    ),
   }
+  return chromeById[id]
 }
 
 export interface BrandPill {
