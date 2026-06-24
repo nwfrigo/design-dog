@@ -14,8 +14,7 @@ import {
 import { SizeRegistryProvider } from './canvas-editor/SizeRegistry'
 import { ContentRegistryProvider } from './canvas-editor/ContentRegistry'
 import { LineHeightRegistryProvider } from './canvas-editor/LineHeightRegistry'
-import { StageBar } from './canvas-editor/stage-bar/StageBar'
-import { StageBarActions } from './canvas-editor/stage-bar/StageBarActions'
+import { ExportScaleSelect } from './ui/ExportScaleSelect'
 import { isStageBenchTemplate } from './canvas-editor/migrated-templates'
 import { StageBenchEditor } from './canvas-editor/StageBenchEditor'
 import { ContextualToolbar } from './canvas-editor/ContextualToolbar'
@@ -441,7 +440,6 @@ export function EditorScreen() {
 
   // Export state
   const [exportScale, setExportScale] = useState(2)
-  const [showScaleDropdown, setShowScaleDropdown] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
 
   // Upload state
@@ -547,15 +545,6 @@ export function EditorScreen() {
       setColorStyle('2')
     }
   }, [currentTemplate, colorStyle, setColorStyle])
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setShowScaleDropdown(false)
-    if (showScaleDropdown) {
-      document.addEventListener('click', handleClickOutside)
-      return () => document.removeEventListener('click', handleClickOutside)
-    }
-  }, [showScaleDropdown])
 
   // Measure floating banner container width for responsive scaling
   // useLayoutEffect ensures measurement happens before paint
@@ -3393,38 +3382,6 @@ export function EditorScreen() {
           {/* Action Bar - above preview (only shown for solution-overview-pdf) */}
           <div className={`flex items-center justify-between mb-4 ${currentTemplate !== 'solution-overview-pdf' ? 'hidden' : ''}`}>
             <div className="flex items-center gap-2">
-              {/* Scale Selector - hide for solution-overview-pdf */}
-              {currentTemplate !== 'solution-overview-pdf' && (
-                <div className="relative">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setShowScaleDropdown(!showScaleDropdown) }}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-content-secondary
-                      bg-gray-100 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle rounded-md
-                      hover:bg-gray-200 dark:hover:bg-interactive-hover transition-colors"
-                  >
-                    {exportScale}x
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {showScaleDropdown && (
-                    <div className="absolute left-0 mt-1 w-16 bg-white dark:bg-surface-secondary border border-gray-200
-                      dark:border-line-subtle rounded-md shadow-lg overflow-hidden z-10">
-                      {[1, 2, 3].map((scale) => (
-                        <button
-                          key={scale}
-                          onClick={(e) => { e.stopPropagation(); setExportScale(scale); setShowScaleDropdown(false) }}
-                          className={`w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-interactive-hover
-                            ${exportScale === scale ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-gray-600 dark:text-content-secondary'}`}
-                        >
-                          {scale}x
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
 
               {/* Export Button - hide for solution-overview-pdf */}
               {currentTemplate !== 'solution-overview-pdf' && (
@@ -3597,29 +3554,6 @@ export function EditorScreen() {
               </button>
             )}
           </div>
-
-          {/* Stage Bar — canvas-wide controls for migrated templates. Renders nothing for legacy templates. */}
-          {isStageBenchTemplate(currentTemplate) && (
-            <StageBar
-              template={currentTemplate}
-              onGenerate={() => setContentMode('generate')}
-              actions={
-                <StageBarActions
-                  isExporting={isExporting}
-                  isEditingFromQueue={isEditingFromQueue}
-                  exportScale={exportScale}
-                  onPreview={() => setShowPreviewLightbox(true)}
-                  onAddToQueue={() => {
-                    addToQueue()
-                    setShowQueuedFeedback(true)
-                    setTimeout(() => setShowQueuedFeedback(false), 2000)
-                  }}
-                  onSetExportScale={setExportScale}
-                  onExport={handleExport}
-                />
-              }
-            />
-          )}
 
           {/* Preview */}
           <div
@@ -4360,35 +4294,8 @@ export function EditorScreen() {
                   </button>
                 )}
 
-                {/* Scale selector */}
-                <div className="relative">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setShowScaleDropdown(!showScaleDropdown) }}
-                    className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 dark:text-content-secondary
-                      bg-white dark:bg-surface-primary rounded hover:bg-gray-50 dark:hover:bg-interactive-hover
-                      border border-gray-200 dark:border-[#494a4c] transition-colors"
-                  >
-                    {exportScale}x
-                    <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {showScaleDropdown && (
-                    <div className="absolute bottom-full left-0 mb-1 w-16 bg-white dark:bg-surface-secondary border border-gray-200
-                      dark:border-[#494a4c] rounded shadow-lg overflow-hidden z-10">
-                      {[1, 2, 3].map((scale) => (
-                        <button
-                          key={scale}
-                          onClick={(e) => { e.stopPropagation(); setExportScale(scale); setShowScaleDropdown(false) }}
-                          className={`w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-interactive-hover
-                            ${exportScale === scale ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' : 'text-gray-600 dark:text-content-secondary'}`}
-                        >
-                          {scale}x
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                {/* Scale selector — shared component (opens upward in this below-preview toolbar) */}
+                <ExportScaleSelect value={exportScale} onChange={setExportScale} direction="up" />
 
                 {/* Export button */}
                 <button

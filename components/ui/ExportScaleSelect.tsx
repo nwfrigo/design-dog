@@ -17,9 +17,12 @@ export interface ExportScaleSelectProps {
   onChange: (scale: number) => void
   /** Selectable multipliers, low → high. Default 1×/2×/3×. */
   options?: number[]
+  /** Which way the menu opens. Use 'up' when the control sits near the bottom
+   *  of its container (e.g. a below-stage toolbar). Default 'down'. */
+  direction?: 'up' | 'down'
 }
 
-export function ExportScaleSelect({ value, onChange, options = [1, 2, 3] }: ExportScaleSelectProps) {
+export function ExportScaleSelect({ value, onChange, options = [1, 2, 3], direction = 'down' }: ExportScaleSelectProps) {
   const [open, setOpen] = useState(false)
 
   // Close on any outside click (the toggle stops propagation so its own click
@@ -50,8 +53,11 @@ export function ExportScaleSelect({ value, onChange, options = [1, 2, 3] }: Expo
       </button>
       {open && (
         <div
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 min-w-[3rem] z-20
-            bg-surface-primary border-[0.5px] border-line-subtle rounded-[4px] shadow-lg overflow-hidden"
+          className={[
+            'absolute left-1/2 -translate-x-1/2 min-w-[3rem] z-20',
+            direction === 'up' ? 'bottom-full mb-1' : 'top-full mt-1',
+            'bg-surface-primary border-[0.5px] border-line-subtle rounded-[4px] shadow-lg overflow-hidden',
+          ].join(' ')}
         >
           {options.map((scale) => (
             <button
