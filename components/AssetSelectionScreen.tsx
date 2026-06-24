@@ -11,10 +11,20 @@ import {
   Globe,
   CalendarCheck,
   File as FileIcon,
-  Plus,
   type LucideIcon,
 } from 'lucide-react'
 import { CustomCanvasThumbnail } from '@/components/custom-size/CustomCanvasThumbnail'
+
+// Synthetic tile info for the Custom-size entry. Rendered via TemplateTileV2
+// with a preview override, so width/height/type are unused for display — they
+// just satisfy the TemplateInfo shape. label/dimensions drive the footer copy.
+const CUSTOM_TILE_INFO: TemplateInfo = {
+  type: 'custom-size',
+  label: 'Custom',
+  dimensions: 'Any dimensions',
+  width: 640,
+  height: 300,
+}
 import { useStore } from '@/store'
 import { SUBCHANNELS, type TemplateInfo } from '@/lib/template-config'
 import { TemplateTileV2, RequestTemplateTile } from '@/components/TemplateTile'
@@ -313,42 +323,23 @@ export function AssetSelectionScreen() {
 
         {/* Template Grid — 3 cols on wider screens, 2 cols below. */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-12">
-          {/* Custom-size entry — arbitrary-dimension asset. Launches the custom
-              editor. Preview is a themeable vector montage (CustomCanvasThumbnail);
-              its hairlines flip light↔dark via the line-subtle token. */}
-          <div className="group relative flex flex-col rounded-lg overflow-hidden border-[0.75px] border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-secondary hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200">
-            {/* Preview area — click to launch the custom editor */}
-            <button
-              onClick={() => handleNavigateToEditor('custom-size')}
-              aria-label="Create a custom-size asset"
-              className="relative aspect-video overflow-hidden bg-gray-100 dark:bg-surface-secondary text-line-subtle"
-            >
-              <CustomCanvasThumbnail
-                className="absolute left-1/2 top-1/2 h-auto w-[165%] -translate-x-1/2 -translate-y-1/2 -rotate-[20deg]"
-              />
-            </button>
-
-            {/* Info area — mono footer matching the designed card */}
-            <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <span className="block text-sm font-mono font-bold text-gray-900 dark:text-content-primary truncate">
-                  Custom
-                </span>
-                <span className="block text-[10px] font-mono text-gray-400 dark:text-content-secondary">
-                  Any dimensions
-                </span>
-              </div>
-
-              {/* Add button */}
-              <button
-                onClick={() => handleNavigateToEditor('custom-size')}
-                aria-label="Create a custom-size asset"
-                className="flex-shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-[4px] border-[0.5px] border-line-subtle text-gray-500 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors"
-              >
-                <Plus size={14} />
-              </button>
-            </div>
-          </div>
+          {/* Custom-size entry — arbitrary-dimension asset. Rendered through
+              TemplateTileV2 (same chrome/footer/tokens as every other tile) with
+              a full-bleed preview override: a themeable vector montage whose
+              hairlines flip light↔dark via the line-subtle token. */}
+          <TemplateTileV2
+            template={CUSTOM_TILE_INFO}
+            channelLabel="Custom size"
+            isSelected={false}
+            onToggle={() => {}}
+            onNavigateToEditor={() => handleNavigateToEditor('custom-size')}
+            launchOnly
+            previewOverride={
+              <span className="absolute inset-0 block text-line-subtle">
+                <CustomCanvasThumbnail className="absolute left-1/2 top-1/2 h-auto w-[165%] -translate-x-1/2 -translate-y-1/2 -rotate-[20deg]" />
+              </span>
+            }
+          />
           {filteredTemplates.map((template) => (
             <TemplateTileV2
               key={template.type}

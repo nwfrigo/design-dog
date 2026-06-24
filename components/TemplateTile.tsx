@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, type ReactNode } from 'react'
 import { Plus, Check } from 'lucide-react'
 import type { TemplateInfo } from '@/lib/template-config'
 import type { TemplateType } from '@/types'
@@ -876,20 +876,27 @@ interface TemplateTileV2Props {
   isSelected: boolean
   onToggle: () => void
   onNavigateToEditor: () => void
+  /** Full-bleed preview override (e.g. the Custom montage). When set, the scaled
+   *  template preview and the colors/typography fetch are skipped. */
+  previewOverride?: ReactNode
+  /** Launcher mode: a single + button that opens the editor (no select toggle,
+   *  no Preview). For entries that launch directly, like Custom. */
+  launchOnly?: boolean
 }
 
-export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, onNavigateToEditor }: TemplateTileV2Props) {
+export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, onNavigateToEditor, previewOverride, launchOnly }: TemplateTileV2Props) {
   const [colors, setColors] = useState<ColorsConfig | null>(null)
   const [typography, setTypography] = useState<TypographyConfig | null>(null)
   const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
+    if (previewOverride) return // override path doesn't render a template
     Promise.all([fetchColorsConfig(), fetchTypographyConfig()])
       .then(([c, t]) => {
         setColors(c)
         setTypography(t)
       })
-  }, [])
+  }, [previewOverride])
 
   // Calculate preview scale - larger cards for 2-column grid
   const targetWidth = 360
@@ -917,10 +924,11 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
             negative space above/below via the existing flex-center. */}
         <button
           onClick={onNavigateToEditor}
-          className="relative overflow-hidden bg-gray-100 dark:bg-surface-secondary flex items-center justify-center"
-          style={{ height: 256, padding: 16 }}
+          className={`relative overflow-hidden bg-gray-100 dark:bg-surface-secondary ${previewOverride ? '' : 'flex items-center justify-center'}`}
+          style={{ height: 256, padding: previewOverride ? 0 : 16 }}
         >
-          {/* Scaled template preview */}
+          {previewOverride ?? (
+          /* Scaled template preview */
           <div
             className="rounded-lg overflow-hidden shadow-md bg-white [&_*]:!text-left"
             style={{
@@ -956,7 +964,7 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
               />
             )}
           </div>
-
+          )}
         </button>
 
         {/* Info area */}
@@ -980,6 +988,18 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
             </span>
           </div>
 
+          {launchOnly ? (
+            /* Launcher mode — single + button opens the editor directly. Same
+               secondary styling as the select toggle below. */
+            <button
+              onClick={onNavigateToEditor}
+              aria-label="Open the custom-size editor"
+              className="inline-flex flex-shrink-0 items-center justify-center h-7 w-7 border-[0.5px] rounded-[4px] border-line-subtle bg-surface-primary text-content-secondary hover:bg-interactive-hover transition-colors"
+            >
+              <Plus size={14} />
+            </button>
+          ) : (
+          <>
           {/* Multi-select toggle — square secondary button, matches Preview
               button height/border. Switches to primary (inverse) styling +
               Check icon when selected. */}
@@ -1008,6 +1028,8 @@ export function TemplateTileV2({ template, channelLabel, isSelected, onToggle, o
           >
             Preview
           </button>
+          </>
+          )}
         </div>
       </div>
 
