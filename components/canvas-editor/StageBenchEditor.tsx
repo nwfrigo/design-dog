@@ -23,6 +23,8 @@ export interface StageBenchEditorProps {
   currentAssetIndex: number
   isExporting: boolean
   isEditingFromQueue: boolean
+  exportScale: number
+  onSetExportScale: (scale: number) => void
   colorsConfig: ColorsConfig
   typographyConfig: TypographyConfig
   onExport: () => void

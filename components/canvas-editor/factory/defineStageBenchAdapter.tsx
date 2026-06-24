@@ -284,6 +284,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
   function StageBenchAdapter(props: StageBenchEditorProps) {
     const {
       selectedAssets, currentAssetIndex, isExporting, isEditingFromQueue,
+      exportScale, onSetExportScale,
       colorsConfig, typographyConfig,
       onExport, onAddToQueue, onSaveToQueue, onPreview,
       onAddAsset, onGoToAsset, onDeleteAsset, getAssetLabel,
@@ -647,6 +648,8 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       <StageBenchActionRow
         isExporting={isExporting}
         isEditingFromQueue={isEditingFromQueue}
+        exportScale={exportScale}
+        onSetExportScale={onSetExportScale}
         onPreview={onPreview}
         onAddToQueue={onAddToQueue}
         onSaveToQueue={onSaveToQueue}

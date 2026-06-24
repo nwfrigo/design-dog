@@ -1294,6 +1294,8 @@ export function EditorScreen() {
           currentAssetIndex={currentAssetIndex}
           isExporting={isExporting}
           isEditingFromQueue={isEditingFromQueue}
+          exportScale={exportScale}
+          onSetExportScale={setExportScale}
           colorsConfig={colorsConfig}
           typographyConfig={typographyConfig}
           onExport={handleExport}
