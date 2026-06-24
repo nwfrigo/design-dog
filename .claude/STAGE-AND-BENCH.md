@@ -7,6 +7,7 @@
 > - `SUBSTRATE-DEBT.md` — open substrate work with trigger conditions.
 > - `STAGE-BENCH-REFACTOR-POSTMORTEM.md` — historical journal of how the substrate was built.
 > - `TEMPLATES.md` — adding a new template (the playbook).
+> - `CUSTOM-SIZE.md` — the custom-size feature (arbitrary-dimension assets) built on this substrate.
 > - `BRAND.md` — orthogonal concerns.
 
 This doc describes **what the substrate is, what's in it, and how the pieces fit**. It is the architectural truth-source for the *current* state. For the *history* of how we got here, see the postmortem; for *adding a new template*, see TEMPLATES.md.
@@ -210,7 +211,7 @@ const stageBar = (
 
 ### 4.13 Action row
 
-`action-row/ActionRow.tsx` + `action-row/ActionButton.tsx`. The shared "Preview / Add to Queue / Export" row. `StageBenchActionRow` is the bench-screen wrapper that hides "Add to Queue" when editing from the queue.
+`action-row/ActionRow.tsx` + `ui/ActionButton.tsx`. The shared "Preview / Add to Queue / Export" row. `StageBenchActionRow` is the bench-screen wrapper that hides "Add to Queue" when editing from the queue, and renders the export-resolution selector (`ui/ExportScaleSelect`, 1×/2×/3×) just before Export — one shared picker, used here and in the legacy editor toolbar.
 
 ### 4.13a Asset breadcrumb (Stage Bench Header)
 
@@ -224,6 +225,8 @@ const stageBar = (
 |---|---|---|
 | `EditbarText.tsx` | `text` | EyeOff · Bold · Italic · A↑ · A↓ · LineHeight popout |
 | `EditbarCta.tsx` | `cta` | EyeOff · Style toggle (link/button) · A↑ · A↓ · Arrow color |
+
+> The link/button **Style toggle** flips the shared `ctaStyle` and shows on every `kind:'cta'` slot, but is only *meaningful* where a template's CTA chrome branches on `ctaStyle` (custom-size + the social gradients today). Gating it off rigid templates is open — see `SUBSTRATE-DEBT.md`.
 | `EditbarImage.tsx` | `image` | Change · Generate (ghosted until API) · Edit |
 | `EditbarCategory.tsx` | `pill` | EyeOff · Category dropdown |
 | `EditbarColor.tsx` | `color` | (template-specific color affordances) |

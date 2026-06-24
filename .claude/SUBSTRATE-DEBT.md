@@ -67,3 +67,14 @@
 **Estimate to pay:** Medium — move triage to a post-render measurement pass (measure actual block heights, then drop), keeping the resolver pure by doing the measure step in the editor/render layer.
 **First step when you start:** Instrument the editor to log estimated vs actual block heights across the test ratios; if the gap is material, add a measured-fit pass.
 
+---
+
+## CTA button/link toggle shows on templates that can't switch
+
+**What:** `EditbarCta`'s BUTTON⟷LINK toggle renders on *every* `kind:'cta'` slot, but most templates hardcode their CTA style — only the ones whose CTA chrome branches on `ctaStyle` (custom-size + the social gradients) actually change. On rigid templates the toggle is inert.
+**Why deferred:** Surfaced while wiring custom-size's live CTA switch; gating is its own change with its own QA, intentionally scoped to a separate branch.
+**Cost to ignore:** Misleading UX — a user flips the toggle on a rigid template and nothing happens.
+**Trigger condition:** A user reports the dead toggle, OR the next time CTA styling / the editbar slot-kind dispatch is touched.
+**Estimate to pay:** Small — add a "cta style switchable" capability (slot config or registry flag) and gate `EditbarCta`'s toggle on it.
+**First step when you start:** `grep ctaStyle components/templates` to enumerate which CTAs actually branch; add the capability flag at the slot/registration level and read it in `EditbarCta`.
+

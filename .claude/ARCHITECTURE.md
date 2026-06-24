@@ -268,7 +268,7 @@ The export API route (`app/api/export/route.ts`) uses a generic forwarding loop 
 
 Most templates use a **dynamic render route** at `app/render/[slug]/page.tsx`. This route reads the `renderSchema` from `lib/template-registry.tsx` and auto-parses URL params based on the field definitions. Adding a new render page means adding a `renderSchema` to the registry entry — no separate page file needed.
 
-**Custom render pages** are kept for templates with complex logic beyond standard param parsing: `solution-overview-pdf`, `faq-pdf`, `stacker-pdf`, `social-carousel`, `website-floating-banner-mobile`.
+**Custom render pages** are kept for templates with complex logic beyond standard param parsing: `solution-overview-pdf`, `faq-pdf`, `stacker-pdf`, `social-carousel`, `website-floating-banner-mobile`, `custom-size`. (Custom-size rides `customSizeConfig` — the whole document, JSON — via `COMPLEX_KEYS`; its dedicated route re-runs the pure layout engine so editor and export match. See `CUSTOM-SIZE.md`.)
 
 All param parsing (both dynamic and custom pages) must use the shared helpers in `lib/render-params.ts`:
 

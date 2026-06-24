@@ -9,6 +9,8 @@
 
 **Legend.** ✅ = on the Stage & Bench editor (28 templates). 📜 = on the legacy sidebar-form editor (3 PDFs). 🙈 = `hidden: true` in `lib/template-config.ts` — registered but not surfaced in the homepage tile grid / asset picker / template dropdowns (existing drafts still resolve).
 
+> **`custom-size` is not a fixed template** — it's an arbitrary-dimension asset whose layout is resolved live by an engine. Its homepage entry is a bespoke first tile in `AssetSelectionScreen`, rendered through `TemplateTileV2` via its `previewOverride` (a themeable vector montage) + `launchOnly` props rather than a scaled template preview. Full details in `CUSTOM-SIZE.md`.
+
 ### Email
 - ✅ `email-dark-gradient` — EmailDarkGradient (rich text headline/body)
 - ✅ `email-grid` — EmailGrid (**themed**: light/dark)
