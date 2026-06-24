@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { CustomSizeResizeHandles } from './CustomSizeResizeHandles'
+import { STAGE_EDGE_SHADOW } from '@/lib/canvas-stage-style'
 
 /**
  * CustomSizeStage — the custom-size canvas stage (ports the lab's resize feel,
@@ -153,6 +154,9 @@ export function CustomSizeStage({
           transform: 'translate(-50%, -50%)',
           width: renderedW,
           height: renderedH,
+          // Same hairline edge as ScaledStage (standard templates) so the
+          // custom canvas reads as a canvas too.
+          boxShadow: STAGE_EDGE_SHADOW,
           ['--cs-scale' as string]: scale,
         }}
       >

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
+import { STAGE_EDGE_SHADOW } from '@/lib/canvas-stage-style'
 
 /**
  * StageBenchShell — pure layout primitive for the new editor screen.
@@ -187,7 +188,7 @@ function ScaledStage({ children }: { children: ReactNode }) {
         width: stageSize.w * scale,
         height: stageSize.h * scale,
         position: 'relative',
-        boxShadow: '0 0 0 1px rgba(0,0,0,0.08)',
+        boxShadow: STAGE_EDGE_SHADOW,
       }
     : { display: 'flex', justifyContent: 'center' }
 
