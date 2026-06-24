@@ -11,8 +11,10 @@ import {
   Globe,
   CalendarCheck,
   File as FileIcon,
+  Plus,
   type LucideIcon,
 } from 'lucide-react'
+import { CustomCanvasThumbnail } from '@/components/custom-size/CustomCanvasThumbnail'
 import { useStore } from '@/store'
 import { SUBCHANNELS, type TemplateInfo } from '@/lib/template-config'
 import { TemplateTileV2, RequestTemplateTile } from '@/components/TemplateTile'
@@ -311,25 +313,42 @@ export function AssetSelectionScreen() {
 
         {/* Template Grid — 3 cols on wider screens, 2 cols below. */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-12">
-          {/* Custom-size entry — arbitrary-dimension asset. Temporary card until
-              the designed Custom entry lands; launches the custom editor. */}
-          <button
-            onClick={() => handleNavigateToEditor('custom-size')}
-            className="flex flex-col rounded-lg overflow-hidden bg-gray-50 dark:bg-surface-secondary hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 group"
-          >
-            <div className="flex-1 min-h-[136px] flex items-center justify-center p-6">
-              <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-100 dark:bg-surface-secondary group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center transition-colors">
-                  <svg className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
-                  </svg>
-                </div>
-                <span className="text-sm font-medium text-gray-500 dark:text-content-secondary group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          {/* Custom-size entry — arbitrary-dimension asset. Launches the custom
+              editor. Preview is a themeable vector montage (CustomCanvasThumbnail);
+              its hairlines flip light↔dark via the line-subtle token. */}
+          <div className="group relative flex flex-col rounded-lg overflow-hidden border-[0.75px] border-gray-200 dark:border-line-subtle bg-white dark:bg-surface-secondary hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200">
+            {/* Preview area — click to launch the custom editor */}
+            <button
+              onClick={() => handleNavigateToEditor('custom-size')}
+              aria-label="Create a custom-size asset"
+              className="relative aspect-video overflow-hidden bg-gray-100 dark:bg-surface-secondary text-line-subtle"
+            >
+              <CustomCanvasThumbnail
+                className="absolute left-1/2 top-1/2 h-auto w-[165%] -translate-x-1/2 -translate-y-1/2 -rotate-[20deg]"
+              />
+            </button>
+
+            {/* Info area — mono footer matching the designed card */}
+            <div className="px-3 py-2.5 border-t border-gray-100 dark:border-line-subtle flex items-center justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <span className="block text-sm font-mono font-bold text-gray-900 dark:text-content-primary truncate">
                   Custom
                 </span>
+                <span className="block text-[10px] font-mono text-gray-400 dark:text-content-secondary">
+                  Any dimensions
+                </span>
               </div>
+
+              {/* Add button */}
+              <button
+                onClick={() => handleNavigateToEditor('custom-size')}
+                aria-label="Create a custom-size asset"
+                className="flex-shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-[4px] border-[0.5px] border-line-subtle text-gray-500 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-interactive-hover transition-colors"
+              >
+                <Plus size={14} />
+              </button>
             </div>
-          </button>
+          </div>
           {filteredTemplates.map((template) => (
             <TemplateTileV2
               key={template.type}
