@@ -73,6 +73,7 @@ export const customSizeRegistration: StageBenchRegistrationData = {
       subhead: s.verbatimCopy.subhead || '',
       body: s.verbatimCopy.body || '',
       ctaText: s.ctaText || '',
+      ctaStyle: s.ctaStyle,
       solution: s.solution,
       showSolutionSet: s.showSolutionSet,
       showEyebrow: s.showEyebrow,

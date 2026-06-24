@@ -63,6 +63,7 @@ export default function CustomSizeRenderPage({
   }
 
   const { content, width, height, theme, overrides } = customSizeToProps(doc, reused)
+  const ctaStyle = parseEnum<'link' | 'button'>(searchParams, 'ctaStyle', 'link')
 
   // Spacer drags persist as relative factors in doc.gapScale; convert to the
   // absolute px the renderer expects (factor × the engine's computed gap), so
@@ -78,7 +79,7 @@ export default function CustomSizeRenderPage({
       <Suspense fallback={<div style={{ width, height, background: '#060015' }} />}>
         <GenericRenderContent
           Component={CustomSizeCanvas}
-          props={{ content, width, height, theme, overrides, gaps, colors: colorsConfig, typography: typographyConfig, scale: 1 }}
+          props={{ content, width, height, theme, ctaStyle, overrides, gaps, colors: colorsConfig, typography: typographyConfig, scale: 1 }}
         />
       </Suspense>
     </div>

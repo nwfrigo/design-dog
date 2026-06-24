@@ -16,12 +16,11 @@
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
-import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { SolutionPill } from '@/components/shared/SolutionPill'
 import { TEMPLATE_THEMES, type TemplateTheme } from '@/lib/template-themes'
 import { filtersToCss, applyGrayscaleBoolean, NEUTRAL_FILTERS } from '@/lib/image-filters'
 import { overlayBackground, NOISE_BG } from '@/lib/custom-size/overlay'
-import { brandChrome, BrandHeaderRow } from '@/lib/brand-chrome'
+import { brandChrome, BrandHeaderRow, type CtaStyle } from '@/lib/brand-chrome'
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 import {
   ContentStack,
@@ -64,6 +63,8 @@ export interface CustomSizeCanvasProps {
   interactive?: boolean
   /** Block currently being dragged — dimmed for feedback. */
   activeBlockId?: CustomBlockId | null
+  /** CTA styling: `link` (text + arrow, default) or `button` (filled pill). */
+  ctaStyle?: CtaStyle
   // --- Stage & Bench render-prop contract (§4.15) ---
   renderBlock?: (id: CustomSizeSlotId, content: ReactNode) => ReactNode
   renderInlineEditor?: (id: CustomBlockId, defaultInner: ReactNode) => ReactNode
@@ -178,7 +179,7 @@ function ImagePlaceholder({
 
 export function CustomSizeCanvas({
   content, width, height, theme = 'dark', colors, typography, scale = 1,
-  overrides, interactive = false, activeBlockId = null,
+  overrides, interactive = false, activeBlockId = null, ctaStyle = 'link',
   renderBlock, renderInlineEditor, renderSpacerBetween, renderOverlay, gaps,
   onResizeImageFraction,
 }: CustomSizeCanvasProps) {
@@ -204,8 +205,14 @@ export function CustomSizeCanvas({
   const btnText = overlay ? onImageColor : t.buttonSecondaryText
   const logoFill = overlay ? onImageColor : t.logoFill
 
+  // Primary-button (filled pill) colors. Inverse of the surface so it adapts
+  // across light/dark; over an image, the pill takes the on-image contrast
+  // colour with opposite-colour text so it reads on the photo.
+  const buttonBg = overlay ? onImageColor : t.textPrimary
+  const buttonText = overlay ? (overlayLight ? '#ffffff' : '#111111') : t.backgroundPrimary
+
   const chromeFor = (id: CustomBlockId, fontSize: number) =>
-    brandChrome(id, { fontSize, textColor, btnText, align: layout.textAlign })
+    brandChrome(id, { fontSize, textColor, btnText, align: layout.textAlign, ctaStyle, buttonBg, buttonText })
 
   // Lab drag wrapper: full-width grab target tagged for drag-reorder hit-testing.
   const wrapEditable = (id: CustomBlockId, node: ReactNode): ReactNode => (
@@ -322,7 +329,9 @@ export function CustomSizeCanvas({
           <div style={{ flex: 1, minWidth: 0, fontSize: hl.fontSize, fontWeight: 300, color: textColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{node}</div>
         ))}
         {cta && stripBlock('cta', (node) => (
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: ctaSize * 0.45, fontSize: ctaSize, fontWeight: 500, color: btnText, flexShrink: 0 }}>{node}<ArrowIcon color={btnText} width={ctaSize * 0.92} height={ctaSize * 0.72} /></div>
+          // Same brandChrome path as every other band, so link/button switches
+          // here too. flex-shrink:0 keeps the CTA from collapsing in the row.
+          <span style={{ flexShrink: 0 }}>{brandChrome('cta', { fontSize: ctaSize, textColor, btnText, align: 'left', ctaStyle, buttonBg, buttonText })(node)}</span>
         ))}
       </div>
     )

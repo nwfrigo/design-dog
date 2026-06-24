@@ -30,6 +30,8 @@ import { SolutionPill } from '@/components/shared/SolutionPill'
 
 export type BrandBlockId = 'eyebrow' | 'headline' | 'subhead' | 'body' | 'cta'
 
+export type CtaStyle = 'link' | 'button'
+
 export interface BrandChromeOpts {
   /** Resolved font size in px — per-context, NOT an invariant. */
   fontSize: number
@@ -37,13 +39,19 @@ export interface BrandChromeOpts {
   /** CTA text/arrow color. Defaults to textColor. */
   btnText?: string
   align?: 'left' | 'center'
+  /** CTA rendering: `link` (text + arrow, default) or `button` (filled pill). */
+  ctaStyle?: CtaStyle
+  /** Filled-pill background for `ctaStyle: 'button'`. Defaults to btnText. */
+  buttonBg?: string
+  /** Filled-pill text color for `ctaStyle: 'button'`. Defaults to textColor. */
+  buttonText?: string
 }
 
 /** Returns the `renderChrome` function for a brand block: wraps inner content in
  *  the block's invariant styling at the given font size. */
 export function brandChrome(
   id: BrandBlockId,
-  { fontSize, textColor, btnText = textColor, align = 'left' }: BrandChromeOpts,
+  { fontSize, textColor, btnText = textColor, align = 'left', ctaStyle = 'link', buttonBg, buttonText }: BrandChromeOpts,
 ): (inner: ReactNode) => ReactNode {
   // Keyed by block id — arrows live in object-property position (the same idiom
   // the per-template `renderChrome` blocks use). The Record is exhaustive over
@@ -53,12 +61,19 @@ export function brandChrome(
     headline: (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.12, color: textColor, textAlign: align }}>{i}</div>,
     subhead: (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.3, color: textColor, opacity: 0.9, textAlign: align }}>{i}</div>,
     body: (i) => <div style={{ fontSize, fontWeight: 300, lineHeight: 1.5, color: textColor, opacity: 0.8, textAlign: align }}>{i}</div>,
-    cta: (i) => (
-      <div style={{ display: 'inline-flex', alignItems: 'center', gap: fontSize * 0.45, fontSize, fontWeight: 500, color: btnText, justifyContent: align === 'center' ? 'center' : 'flex-start' }}>
-        {i}
-        <ArrowIcon color={btnText} width={fontSize * 0.92} height={fontSize * 0.72} />
-      </div>
-    ),
+    cta: (i) =>
+      ctaStyle === 'button' ? (
+        // Filled pill (primary). Padding tracks the font size; no trailing arrow.
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: `${fontSize * 0.7}px ${fontSize * 1.4}px`, background: buttonBg ?? btnText, color: buttonText ?? textColor, borderRadius: 999, fontSize, fontWeight: 500, lineHeight: 1, whiteSpace: 'nowrap' }}>
+          {i}
+        </div>
+      ) : (
+        // Link (secondary): text + trailing arrow.
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: fontSize * 0.45, fontSize, fontWeight: 500, color: btnText, justifyContent: align === 'center' ? 'center' : 'flex-start' }}>
+          {i}
+          <ArrowIcon color={btnText} width={fontSize * 0.92} height={fontSize * 0.72} />
+        </div>
+      ),
   }
   return chromeById[id]
 }

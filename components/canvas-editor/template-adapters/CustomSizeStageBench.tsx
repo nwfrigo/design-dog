@@ -146,6 +146,7 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
     const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
     const ctaText = useStore((s) => s.ctaText)
     const setCtaText = useStore((s) => s.setCtaText)
+    const ctaStyle = useStore((s) => s.ctaStyle)
 
     const showEyebrow = useStore((s) => s.showEyebrow)
     const setShowEyebrow = useStore((s) => s.setShowEyebrow)
@@ -339,6 +340,7 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
         overrides,
         doc,
         theme,
+        ctaStyle,
         layout,
         // Props for the dimension control strip (rendered via `belowStage`).
         csRow: {
@@ -409,6 +411,7 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
     const overrides = ctx.extras.overrides as LayoutOverrides
     const doc = ctx.extras.doc as CustomSizeDocument
     const theme = ctx.extras.theme as TemplateTheme
+    const ctaStyle = ctx.extras.ctaStyle as 'link' | 'button'
     const resize = ctx.extras.resize as {
       snapToPresets: boolean
       lockAspect: boolean
@@ -437,6 +440,7 @@ export const CustomSizeStageBench = defineStageBenchAdapter<CustomSizeSlotId>({
               width={doc.width}
               height={doc.height}
               theme={theme}
+              ctaStyle={ctaStyle}
               overrides={overrides}
               colors={ctx.colors}
               typography={ctx.typography}
