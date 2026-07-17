@@ -137,6 +137,7 @@ Each registry has the same shape: `Provider` + `useSlot<Name>(path)` hook. **Do 
 | `LineHeightRegistry` | `value`, `min`, `max`, `step`, `set()` | EditbarText line-spacing slider. |
 | `ImageRegistry` | `onChange?`, `onEdit?`, `onGenerate?` | EditbarImage three-button row. Missing handler → button ghosted. |
 | `CategoryRegistry` | `options: { value, label, color? }[]`, `value`, `set()` | EditbarCategory dropdown. |
+| `IconRegistry` | `icon` (Lucide id), `set()` | EditbarChip Replace button (opens the Lucide `IconPickerModal`). One entry per `kind:'chip'` slot. |
 
 Adapter pattern: subscribe to store fields → call `getXSlots({...})` / `getXSizes({...})` / etc. from the template config → spread into the corresponding provider.
 
@@ -229,6 +230,7 @@ const stageBar = (
 > The link/button **Style toggle** flips the shared `ctaStyle` and shows on every `kind:'cta'` slot, but is only *meaningful* where a template's CTA chrome branches on `ctaStyle` (custom-size + the social gradients today). Gating it off rigid templates is open — see `SUBSTRATE-DEBT.md`.
 | `EditbarImage.tsx` | `image` | Change · Generate (ghosted until API) · Edit |
 | `EditbarCategory.tsx` | `pill` | EyeOff · Category dropdown |
+| `EditbarChip.tsx` | `chip` | EyeOff · Replace icon (opens `IconPickerModal`). Label stays inline-editable (Editable allows `kind:'chip'`). First used by `executive-overview` detail chips. |
 | `EditbarColor.tsx` | `color` | (template-specific color affordances) |
 | `EditbarSlider.tsx`, `Dropdown.tsx`, `Toggle.tsx`, `shell.tsx` | — | Editbar internals (primitives + chrome) |
 

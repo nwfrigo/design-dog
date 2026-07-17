@@ -58,17 +58,6 @@
 
 ---
 
-## Executive Overview chip icons aren't user-editable
-
-**What:** On `executive-overview` page 2, each feature chip's LABEL is an editable text slot, but its ICON is a fixed default (`EXEC_DEFAULT_CHIP_ICONS` in the template constants). A user who rewrites a chip label can't change the (now possibly mismatched) Lucide icon.
-**Why deferred:** There's no "icon" editbar kind in the substrate; wiring a per-chip icon picker (the Stacker-style `IconPickerModal`) into the S&B editbar is its own change. Labels are the meaningful editable content for v1.
-**Cost to ignore:** A chip icon can read as mismatched after a label rewrite.
-**Trigger condition:** User feedback that chip icons feel wrong/locked, OR any other S&B template needs per-element icon selection (build the icon editbar kind once, reuse).
-**Estimate to pay:** Medium — add an `icon` editbar kind + registry that opens `IconPickerModal` and writes the chip's `icon` via an adapter setter (`updateExecChip(doc, i, j, { icon })` already exists).
-**First step when you start:** Model it after `EditbarCategory` (dropdown editbar) but opening the Lucide picker; add an `IconRegistry` slot for chip blockIds.
-
----
-
 ## Per-page thumbnails in the PageSelector
 
 **What:** The `PageSelector` pager shows text labels ("1 Page 1 / 2 Page 2"), not live mini-thumbnails of each page.
