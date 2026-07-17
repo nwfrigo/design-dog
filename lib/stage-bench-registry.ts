@@ -71,6 +71,7 @@ import { newsletterTopBannerRegistration } from '@/components/canvas-editor/temp
 import { customerLibraryRegistration } from '@/components/canvas-editor/template-adapters/CustomerLibraryRegistration'
 import { emailEhsAccelerateInvitationRegistration } from '@/components/canvas-editor/template-adapters/EmailEhsAccelerateInvitationRegistration'
 import { customSizeRegistration } from '@/components/canvas-editor/template-adapters/CustomSizeRegistration'
+import { executiveOverviewRegistration } from '@/components/canvas-editor/template-adapters/ExecutiveOverviewRegistration'
 
 // Each template has unique props — kept loose at the registry boundary
 // because `renderProps` is the bridge that produces the correctly-shaped
@@ -93,6 +94,13 @@ export interface StageBenchRegistrationData {
   renderSchema?: TemplateRenderSchema
   queueTextFields?: QueueTextField[]
   exportBuilder: ExportParamBuilder
+  /** Optional multi-page preview node (shown in the editor Preview lightbox).
+   *  Omit for single-page templates — they preview via `Template`. */
+  renderPreview?: (
+    asset: QueuedAsset,
+    colors: ColorsConfig,
+    typography: TypographyConfig,
+  ) => import('react').ReactNode
 }
 
 const REGISTRATIONS: ReadonlyArray<StageBenchRegistrationData> = [
@@ -127,6 +135,7 @@ const REGISTRATIONS: ReadonlyArray<StageBenchRegistrationData> = [
   customerLibraryRegistration,
   emailEhsAccelerateInvitationRegistration,
   customSizeRegistration,
+  executiveOverviewRegistration,
 ]
 
 const BY_ID = new Map<TemplateType, StageBenchRegistrationData>(
@@ -166,6 +175,7 @@ export function toTemplateRegistryEntry(
     renderProps: reg.renderProps,
     queueTextFields: reg.queueTextFields ?? [],
     renderSchema: reg.renderSchema,
+    renderPreview: reg.renderPreview,
   }
 }
 

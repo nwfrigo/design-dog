@@ -30,6 +30,9 @@ export interface StageBenchShellProps {
    *  and the ActionRow (e.g. custom-size's dimension row). Omit for templates
    *  that don't need it. */
   belowStage?: ReactNode
+  /** Optional control rendered in the center column ABOVE the Stage (e.g. the
+   *  multi-page PageSelector). Omit for single-page templates. */
+  aboveStage?: ReactNode
   /** Optional full-width bar rendered ABOVE the 3-column body, below the header
    *  (custom-size's toolbar + action row). Omit for the standard layout. */
   topBar?: ReactNode
@@ -51,6 +54,7 @@ export function StageBenchShell({
   stageBar,
   actionRow,
   belowStage,
+  aboveStage,
   topBar,
   rawStage,
   children,
@@ -96,6 +100,7 @@ export function StageBenchShell({
           </aside>
 
           <main className={`flex-1 min-w-0 flex flex-col items-center gap-12${rawStage ? ' self-stretch' : ''}`}>
+            {aboveStage && <div>{aboveStage}</div>}
             {rawStage ? children : <ScaledStage>{children}</ScaledStage>}
             {belowStage && <div>{belowStage}</div>}
             {actionRow && <div>{actionRow}</div>}

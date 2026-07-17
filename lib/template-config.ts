@@ -290,6 +290,13 @@ const COLLATERAL_TEMPLATES: TemplateInfo[] = [
     height: 792,
   },
   {
+    type: 'executive-overview',
+    label: 'Executive Overview',
+    dimensions: 'Letter (8.5" × 11") • 2 pages',
+    width: 612,
+    height: 792,
+  },
+  {
     type: 'customer-library',
     label: 'Customer Library',
     dimensions: '590 × 330px',

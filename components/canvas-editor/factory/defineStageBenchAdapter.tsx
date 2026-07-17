@@ -29,6 +29,7 @@ import {
   StageBenchHeader,
   StageBenchActionRow,
   StageBenchBench,
+  PageSelector,
   useStageBenchDroppables,
   STAGE_DROPPABLE_ID,
   type SlotDragData,
@@ -61,6 +62,9 @@ export type SlotContentSpec = {
   format: 'html' | 'plain'
   /** Default: true for `kind: 'cta'`, false otherwise. */
   singleLine?: boolean
+  /** Hard cap on rendered line count while editing (1 = one line, 4 = four).
+   *  Input that would overflow is rejected. Omit for no cap. */
+  maxLines?: number
   /** Shown via `textOf(blockId)` when the real value is empty. */
   placeholder?: string
 }
@@ -146,6 +150,17 @@ export type ContentStackConfig = {
   maxGap?: number
 }
 
+/** Multi-page config. When set, the factory renders a PageSelector above the
+ *  stage, threads the active page into the `slots` resolver + render context,
+ *  and resets to page 1 when the asset changes. One page is "on stage" at a
+ *  time — single-canvas substrate assumptions (one bench, single selection)
+ *  still hold. Omit for single-page templates. See STAGE-AND-BENCH.md §11. */
+export type PagesConfig = {
+  count: number
+  /** Per-page labels shown in the pager (length should === count). */
+  labels: string[]
+}
+
 export type AdapterStoreBindings<TBlockId extends string> = {
   /** Per-slot store state + setters. Factory builds visibility/size/content registries from this. */
   slotState: Record<TBlockId, {
@@ -215,6 +230,11 @@ export type AdapterRenderContext<TBlockId extends string> = {
   stackAlign: StackAlign | undefined
   gaps: Record<string, number> | undefined
 
+  /** Active page (1-based) for multi-page templates. Always 1 for
+   *  single-page templates. `renderTemplate` branches on this to render the
+   *  current page. */
+  currentPage: number
+
   colors: ColorsConfig
   typography: TypographyConfig
   scale: number
@@ -225,12 +245,16 @@ export type AdapterRenderContext<TBlockId extends string> = {
 
 export type StageBenchAdapterDescriptor<TBlockId extends string> = {
   templateId: TemplateType
+  /** Multi-page config. Omit for single-page templates (the default). */
+  pages?: PagesConfig
   /** Static slot list, OR a resolver computed from live bindings each render
-   *  (custom-size: the engine decides which slots exist for the current size).
-   *  Existing adapters pass an array and are unaffected. */
+   *  (custom-size: the engine decides which slots exist for the current size;
+   *  multi-page: the resolver returns the current page's slots). Existing
+   *  adapters pass an array and are unaffected. The second arg is the active
+   *  page (1 for single-page templates). */
   slots:
     | SlotDescriptor<TBlockId>[]
-    | ((bindings: AdapterStoreBindings<TBlockId>) => SlotDescriptor<TBlockId>[])
+    | ((bindings: AdapterStoreBindings<TBlockId>, currentPage: number) => SlotDescriptor<TBlockId>[])
   /** Static stage-bar item list, OR a resolver computed from live bindings each
    *  render (custom-size: hides THEME when the background is an image). Existing
    *  adapters pass an array and are unaffected. */
@@ -291,9 +315,27 @@ export function defineStageBenchAdapter<TBlockId extends string>(
     } = props
 
     const bindings = descriptor.useStoreBindings()
+
+    // Multi-page: read the active page from the editor UI store, clamped to
+    // the declared page count. Single-page templates pin to 1. `descriptor`
+    // is constant, so hook order is stable across renders.
+    const pageCount = descriptor.pages?.count ?? 1
+    const rawStagePage = useCanvasEditorStore((s) => s.currentStagePage)
+    const setCurrentStagePage = useCanvasEditorStore((s) => s.setCurrentStagePage)
+    const currentPage = descriptor.pages
+      ? Math.min(Math.max(1, rawStagePage), pageCount)
+      : 1
+    // Reset to page 1 when switching assets so a new asset doesn't inherit the
+    // previous asset's page. No-op for single-page templates.
+    useEffect(() => {
+      if (descriptor.pages) setCurrentStagePage(1)
+    }, [currentAssetIndex, setCurrentStagePage])
+
     // Slots are either a static array or computed from live bindings each render
-    // (custom-size). `descriptor` is constant, so this is deterministic.
-    const slots = typeof descriptor.slots === 'function' ? descriptor.slots(bindings) : descriptor.slots
+    // (custom-size / multi-page). `descriptor` is constant, so this is deterministic.
+    const slots = typeof descriptor.slots === 'function'
+      ? descriptor.slots(bindings, currentPage)
+      : descriptor.slots
     const editingPath = useCanvasEditorStore((s) => s.editingPath)
     // Tracks which image slot's modal is open. null = closed. Used by
     // both the top-level descriptor.image and any descriptor.childImages.
@@ -471,6 +513,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           onChange={setValue}
           format={slot.content.format}
           singleLine={singleLine}
+          maxLines={slot.content.maxLines}
         />
       )
     }
@@ -636,6 +679,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       renderBlock, renderInlineEditor, renderOverlay, renderSpacerBetween,
       stackAlign: bindings.contentStack?.stackAlign,
       gaps: bindings.contentStack?.gaps,
+      currentPage,
       colors: colorsConfig,
       typography: typographyConfig,
       scale: 1,
@@ -643,6 +687,14 @@ export function defineStageBenchAdapter<TBlockId extends string>(
     }
 
     const belowStageNode = descriptor.belowStage?.(ctx)
+    const aboveStageNode = descriptor.pages ? (
+      <PageSelector
+        value={currentPage}
+        count={descriptor.pages.count}
+        labels={descriptor.pages.labels}
+        onChange={setCurrentStagePage}
+      />
+    ) : undefined
     const actionRowLeadNode = descriptor.actionRowLead?.(ctx)
     const actionRowNode = (
       <StageBenchActionRow
@@ -685,6 +737,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           </div>
         ) : undefined}
         belowStage={controlsOnTop ? undefined : belowStageNode}
+        aboveStage={aboveStageNode}
         actionRow={controlsOnTop ? null : actionRowNode}
         benchRef={setBenchNodeRef}
         rawStage={!!descriptor.customStage}

@@ -19,6 +19,7 @@ export interface ExportParamState {
   eyebrow: string
   verbatimCopy: { headline: string; subhead: string; body: string }
   customSizeDocument: import('@/lib/custom-size/document').CustomSizeDocument | null
+  executiveOverviewDocument: import('@/lib/executive-overview/document').ExecutiveOverviewDocument | null
   solution: string
   logoColor: string
   showEyebrow: boolean
@@ -329,6 +330,7 @@ export function buildExportParamsFromAsset(
       body: (a.body as string) || '',
     },
     customSizeDocument: (a.customSizeDocument as ExportParamState['customSizeDocument']) ?? null,
+    executiveOverviewDocument: (a.executiveOverviewDocument as ExportParamState['executiveOverviewDocument']) ?? null,
     solution: (a.solution as string) || '',
     logoColor: (a.logoColor as string) || 'black',
     showEyebrow: a.showEyebrow !== false,

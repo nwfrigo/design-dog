@@ -158,6 +158,8 @@ const SNAPSHOT_FIELDS = [
   'carouselCurrentSlideIndex',
   // Custom Size
   'customSizeDocument',
+  // Executive Overview
+  'executiveOverviewDocument',
   // Email Cority Connect 2026
   'ccBackgroundVariant',
   // Email EHS Accelerate Banner

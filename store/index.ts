@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, CustomSizeDocument } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, CustomSizeDocument, ExecutiveOverviewDocument } from '@/types'
 import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
 import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
@@ -214,6 +214,8 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => {
   carouselCurrentSlideIndex: 0,
   // Custom Size
   customSizeDocument: null,
+  // Executive Overview (2-page collateral)
+  executiveOverviewDocument: null,
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: 'dark-blue-1' as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant,
   // Email EHS Accelerate Banner specific
@@ -473,6 +475,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   carouselCurrentSlideIndex: 0,
   // Custom Size
   customSizeDocument: null as CustomSizeDocument | null,
+  executiveOverviewDocument: null as ExecutiveOverviewDocument | null,
 
   // Email Cority Connect 2026
   ccBackgroundVariant: 'dark-blue-1' as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant,
@@ -775,6 +778,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setCarouselSlides: (slides: CarouselSlide[]) => set({ carouselSlides: slides }),
   setCarouselCurrentSlideIndex: (index: number) => set({ carouselCurrentSlideIndex: index }),
   setCustomSizeDocument: (doc: CustomSizeDocument | null) => set({ customSizeDocument: doc }),
+  setExecutiveOverviewDocument: (doc: ExecutiveOverviewDocument | null) => set({ executiveOverviewDocument: doc }),
   setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => set({ ccBackgroundVariant: variant }),
   setEventDate: (date: string) => set({ eventDate: date }),
   setEventLocation: (location: string) => set({ eventLocation: location }),
@@ -809,7 +813,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, templateGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, customSizeDocument, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, templateGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, customSizeDocument, executiveOverviewDocument, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -919,6 +923,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         carouselCurrentSlideIndex,
         // Custom Size
         customSizeDocument,
+        // Executive Overview
+        executiveOverviewDocument,
         // Email Cority Connect 2026
         ccBackgroundVariant,
         // Email EHS Accelerate Banner
@@ -1045,6 +1051,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         carouselCurrentSlideIndex: targetTemplateDefaults.carouselCurrentSlideIndex,
         // Custom Size
         customSizeDocument: targetTemplateDefaults.customSizeDocument,
+        executiveOverviewDocument: targetTemplateDefaults.executiveOverviewDocument,
         // Email Cority Connect 2026
         ccBackgroundVariant: targetTemplateDefaults.ccBackgroundVariant,
         // Email EHS Accelerate Banner
@@ -1179,6 +1186,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         carouselCurrentSlideIndex: targetSettings.carouselCurrentSlideIndex,
         // Custom Size
         customSizeDocument: targetSettings.customSizeDocument ?? null,
+        executiveOverviewDocument: targetSettings.executiveOverviewDocument ?? null,
         // Email Cority Connect 2026
         ccBackgroundVariant: targetSettings.ccBackgroundVariant,
         // Email EHS Accelerate Banner
@@ -1604,6 +1612,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       carouselCurrentSlideIndex: state.carouselCurrentSlideIndex,
       // Custom Size
       customSizeDocument: state.customSizeDocument,
+      executiveOverviewDocument: state.executiveOverviewDocument,
     })
   },
 
@@ -1781,6 +1790,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       carouselCurrentSlideIndex: draft.carouselCurrentSlideIndex ?? 0,
       // Custom Size
       customSizeDocument: draft.customSizeDocument ?? null,
+      executiveOverviewDocument: draft.executiveOverviewDocument ?? null,
     })
     return true
   },

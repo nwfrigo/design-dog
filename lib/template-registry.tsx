@@ -58,6 +58,10 @@ export interface TemplateRegistryEntry {
   renderProps: (asset: QueuedAsset, colors: ColorsConfig, typography: TypographyConfig) => Record<string, unknown>
   queueTextFields: QueueTextField[]
   renderSchema?: TemplateRenderSchema
+  /** Optional full-asset preview node. Multi-page templates provide this so
+   *  the editor's Preview lightbox shows ALL pages (stacked), not just the
+   *  single `component`. Falls back to `<component {...renderProps} />`. */
+  renderPreview?: (asset: QueuedAsset, colors: ColorsConfig, typography: TypographyConfig) => React.ReactNode
 }
 
 // Legacy-shape entries. Templates that have migrated onto the central

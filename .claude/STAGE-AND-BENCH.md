@@ -419,7 +419,33 @@ Open substrate work lives in `SUBSTRATE-DEBT.md` — currently one entry (image-
 
 ---
 
-## 10. References
+## 10. Multi-page templates (page selector)
+
+> **Status.** Substrate primitive shipped for the first fixed multi-page collateral (`executive-overview`, 2 pages). Single-page templates are entirely unaffected — the primitive is dormant unless an adapter declares `pages`.
+
+The multi-page paradigm the postmortem flagged as "would need a different shell (page selector inside the stage column)" is exactly this: **one page is on stage at a time**, switched by a pager. This preserves every single-canvas assumption — one active stage, one bench reflecting the current page's slots, single-element selection (§2, §8 decisions #4/#6/#13). It is *not* a multi-canvas / free-scroll surface.
+
+**The pieces:**
+
+- **`currentStagePage`** (`store/canvas-editor.ts`) — ephemeral editor UI state (1-based), sibling to `selection`/`editingPath`. `setCurrentStagePage(n)` also clears `selection` + `editingPath` so a stale ring / inline editor doesn't trail across the page swap.
+- **`PageSelector`** (`stage-bench/PageSelector.tsx`) — pure segmented pager. Rendered in the stage column via the shell's `aboveStage` seam. Distinct from the header's asset tabs (which switch *assets*); this switches *pages within one asset*.
+- **`StageBenchShell.aboveStage`** — optional center-column slot above the Stage (mirrors the existing `belowStage`). Single-page templates pass nothing.
+- **Factory (`defineStageBenchAdapter`)** — an optional `pages: { count, labels }` descriptor. When present the factory: (a) reads/clamps `currentStagePage` → `currentPage`; (b) passes `currentPage` as the **second arg to the `slots` resolver** so the adapter returns *the current page's slots* (the bench, droppables, FLIP, registries all follow automatically); (c) exposes `ctx.currentPage` so `renderTemplate` renders the active page; (d) renders the `PageSelector`; (e) resets to page 1 when the asset changes. `descriptor.slots` may now be an array (single-page, unchanged) or `(bindings, page) => SlotDescriptor[]`.
+
+**Adapter contract for a multi-page template:**
+
+1. Declare `pages: { count, labels }`.
+2. Make `slots` a resolver: `(bindings, page) => page === 1 ? PAGE1_SLOTS(bindings) : PAGE2_SLOTS(bindings)`.
+3. In `renderTemplate(ctx)`, branch on `ctx.currentPage` to render the matching page component (each page is its own `components/templates/<Name>/PageN.tsx`, threaded with `ctx.renderBlock`/`renderInlineEditor`).
+4. `useStoreBindings` must return `slotState` for **all** blockIds across all pages (bench/registries only read the current page's, but the render context resolves text/visibility for whichever page is mounted).
+
+**Invariants preserved:** export purity is untouched — the render route renders **all** pages (page-break-separated) with identity render-props, so editor-page N is byte-identical to export-page N. `currentStagePage` is editor-only and never enters the export params. Selection stays single-element (only the on-stage page has interactive slots).
+
+**Deferred (see `SUBSTRATE-DEBT.md`):** page reordering / add-remove (fixed-count only for v1); cross-page slot references; per-page thumbnails in the pager.
+
+---
+
+## 11. References
 
 - `components/canvas-editor/factory/defineStageBenchAdapter.tsx` — the factory; lone canonical adapter entry point.
 - `lib/stage-bench-registry.ts` — central registry feeding adapter dispatch + template-registry + export-params.

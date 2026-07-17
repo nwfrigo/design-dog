@@ -428,6 +428,8 @@ export function EditorScreen() {
     exportedBy,
     // Custom size
     customSizeDocument,
+    // Executive Overview
+    executiveOverviewDocument,
   } = useStore()
 
   // Check if we're editing an item from the queue
@@ -751,6 +753,7 @@ export function EditorScreen() {
         eyebrow,
         verbatimCopy,
         customSizeDocument,
+        executiveOverviewDocument,
         solution,
         logoColor,
         showEyebrow,
@@ -886,7 +889,15 @@ export function EditorScreen() {
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.download = `${currentTemplate}-${exportScale}x.png`
+      // Multi-page collateral (e.g. executive-overview) returns a PDF, not a
+      // PNG — name the download from the response's Content-Disposition /
+      // Content-Type instead of hardcoding .png.
+      const contentType = response.headers.get('content-type') || ''
+      const disposition = response.headers.get('content-disposition') || ''
+      const dispositionName = disposition.match(/filename="?([^"]+)"?/)?.[1]
+      link.download =
+        dispositionName ||
+        `${currentTemplate}-${exportScale}x.${contentType.includes('pdf') ? 'pdf' : 'png'}`
       link.href = url
       link.click()
       URL.revokeObjectURL(url)
@@ -1260,17 +1271,22 @@ export function EditorScreen() {
           subhead: verbatimCopy.subhead || '',
           body: verbatimCopy.body || '',
         } as Record<string, unknown>
-        const props = entry.renderProps(asset as never, colorsConfig, typographyConfig)
         const Component = entry.component
         return (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-pointer"
             onClick={() => setShowPreviewLightbox(false)}
           >
-            <div className="relative" onClick={(e) => e.stopPropagation()}>
-              <div className="shadow-2xl rounded overflow-hidden">
-                <Component {...props} />
-              </div>
+            <div className="relative max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+              {entry.renderPreview ? (
+                // Multi-page templates own their preview layout (all pages
+                // stacked). Single-page templates render the one component.
+                entry.renderPreview(asset as never, colorsConfig, typographyConfig)
+              ) : (
+                <div className="shadow-2xl rounded overflow-hidden">
+                  <Component {...entry.renderProps(asset as never, colorsConfig, typographyConfig)} />
+                </div>
+              )}
             </div>
           </div>
         )

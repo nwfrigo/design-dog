@@ -9,6 +9,11 @@ type InlineTextEditProps = {
   format?: 'html' | 'plain'
   /** Suppresses Enter (no newlines). Used for plain-text fields like eyebrow / CTA. */
   singleLine?: boolean
+  /** Hard cap on visible line count. Input (typing or paste) that would push
+   *  the field past `maxLines` rendered lines is rejected (reverts to the last
+   *  valid value). Measured from the element's own line-height, so it's
+   *  content-independent — 1 keeps a field to a single line, 4 to four. */
+  maxLines?: number
   /** Visual style applied to the editor so it matches the block's static rendering. */
   style?: CSSProperties
   /** Auto-focus on mount (default true). */
@@ -32,11 +37,31 @@ export function InlineTextEdit({
   onChange,
   format = 'html',
   singleLine = false,
+  maxLines,
   style,
   autoFocus = true,
 }: InlineTextEditProps) {
   const ref = useRef<HTMLDivElement>(null)
   const initialRef = useRef(value)
+  // Last value that was within the maxLines cap — reverted to when input overflows.
+  const lastValidRef = useRef(value)
+
+  const placeCursorEnd = (el: HTMLElement) => {
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    range.collapse(false)
+    const sel = window.getSelection()
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+  }
+
+  const withinMaxLines = (el: HTMLElement): boolean => {
+    if (!maxLines) return true
+    const cs = getComputedStyle(el)
+    let lh = parseFloat(cs.lineHeight)
+    if (!lh || Number.isNaN(lh)) lh = parseFloat(cs.fontSize) * 1.3
+    return el.scrollHeight <= lh * maxLines + 1
+  }
 
   useLayoutEffect(() => {
     if (!ref.current) return
@@ -72,7 +97,29 @@ export function InlineTextEdit({
       suppressContentEditableWarning
       onInput={(e) => {
         const el = e.currentTarget as HTMLElement
-        onChange(format === 'html' ? el.innerHTML : el.innerText)
+        if (!withinMaxLines(el)) {
+          // Overflow past the line cap. For plain text, trim from the end until
+          // it fits — keeps as much as possible (handles both overflow typing
+          // AND large pastes, rather than dropping everything). For rich text,
+          // revert to the last valid value (char-slicing HTML could split tags).
+          if (format === 'html') {
+            el.innerHTML = lastValidRef.current
+            placeCursorEnd(el)
+            return
+          }
+          let text = el.innerText
+          while (text.length > 0 && !withinMaxLines(el)) {
+            text = text.slice(0, -1)
+            el.innerText = text
+          }
+          placeCursorEnd(el)
+          lastValidRef.current = text
+          onChange(text)
+          return
+        }
+        const next = format === 'html' ? el.innerHTML : el.innerText
+        lastValidRef.current = next
+        onChange(next)
       }}
       onKeyDown={(e) => {
         if (singleLine && e.key === 'Enter') {

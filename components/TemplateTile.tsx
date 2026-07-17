@@ -40,6 +40,7 @@ import { NewsletterBlueGradient } from '@/components/templates/NewsletterBlueGra
 import { NewsletterLight } from '@/components/templates/NewsletterLight'
 import { NewsletterTopBanner } from '@/components/templates/NewsletterTopBanner'
 import { Page1Cover } from '@/components/templates/SolutionOverviewPdf/Page1Cover'
+import { Page1 as ExecutiveOverviewPage1 } from '@/components/templates/ExecutiveOverview/Page1'
 import { CoverPage as FaqCoverPage } from '@/components/templates/FaqPdf'
 import { StackerPdf } from '@/components/templates/StackerPdf'
 import { SocialCarousel } from '@/components/templates/SocialCarousel'
@@ -660,6 +661,23 @@ export function TemplateRenderer({
           showBody={true}
           showFooterText={true}
           colors={colors}
+          typography={typography}
+          scale={scale}
+        />
+      )
+
+    case 'executive-overview':
+      return (
+        <ExecutiveOverviewPage1
+          partnerLogoUrl={null}
+          introHeadline=""
+          introBody=""
+          quote=""
+          quoteAttribution=""
+          heroImageUrl={null}
+          showPartnerLogo={true}
+          showQuote={true}
+          showQuoteAttribution={true}
           typography={typography}
           scale={scale}
         />

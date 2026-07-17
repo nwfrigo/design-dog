@@ -114,6 +114,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'newsletter-light': { width: 640, height: 179 },
   'newsletter-top-banner': { width: 600, height: 240 },
   'solution-overview-pdf': { width: 612, height: 792 },
+  'executive-overview': { width: 612, height: 792 },
   'faq-pdf': { width: 612, height: 792 },
   'stacker-pdf': { width: 612, height: 2000 }, // Dynamic height, this is a fallback
   'social-carousel': { width: 1080, height: 1080 },
@@ -158,6 +159,8 @@ export async function POST(request: NextRequest) {
       'slidesData',
       // Custom-size: the whole document rides as one JSON-encoded param
       'customSizeConfig',
+      // Executive Overview: the whole 2-page document rides as one JSON param
+      'executiveOverviewConfig',
     ])
 
     for (const [key, value] of Object.entries(body)) {
@@ -195,6 +198,10 @@ export async function POST(request: NextRequest) {
 
     // Custom-size: the whole CustomSizeDocument rides as one JSON-encoded param
     // (matches the render route's decodeURIComponent + JSON.parse).
+    if (body.executiveOverviewConfig) {
+      params.set('executiveOverviewConfig', encodeURIComponent(JSON.stringify(body.executiveOverviewConfig)))
+    }
+
     if (body.customSizeConfig) {
       params.set('customSizeConfig', encodeURIComponent(JSON.stringify(body.customSizeConfig)))
     }
@@ -314,14 +321,15 @@ export async function POST(request: NextRequest) {
 
     // For PDF exports with page=all, use taller viewport to render all pages
     const isSolutionOverviewPdf = template === 'solution-overview-pdf' && body.page === 'all'
+    const isExecutiveOverview = template === 'executive-overview' && body.page === 'all'
     const isFaqPdf = template === 'faq-pdf' && body.page === 'all'
     const isStackerPdf = template === 'stacker-pdf'
     const isCarouselPdf = template === 'social-carousel' && body.page === 'all'
-    const isPdfExport = isSolutionOverviewPdf || isFaqPdf || isStackerPdf || isCarouselPdf
+    const isPdfExport = isSolutionOverviewPdf || isExecutiveOverview || isFaqPdf || isStackerPdf || isCarouselPdf
     // For FAQ PDF, calculate pages from the pages array; for SO PDF, fixed at 3 pages
     // For Stacker PDF, use a tall initial viewport (will measure actual height later)
     // For Carousel PDF, calculate from number of slides
-    const numPages = isFaqPdf ? (body.numPages || 1) : isCarouselPdf ? (body.numSlides || 1) : 3
+    const numPages = isFaqPdf ? (body.numPages || 1) : isCarouselPdf ? (body.numSlides || 1) : isExecutiveOverview ? 2 : 3
     const viewportHeight = isStackerPdf ? 4000 : (isPdfExport ? height * numPages : height)
 
     // For Stacker PDF export, use scale 1 to preserve thin CSS borders
@@ -604,7 +612,7 @@ export async function POST(request: NextRequest) {
       const faqFilename = body.title
         ? `${body.title.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '-')}.pdf`
         : 'faq.pdf'
-      const filename = isCarouselPdf ? 'social-carousel.pdf' : isFaqPdf ? faqFilename : (isStackerPdf ? (body.filename || 'stacker.pdf') : 'solution-overview.pdf')
+      const filename = isCarouselPdf ? 'social-carousel.pdf' : isExecutiveOverview ? 'executive-overview.pdf' : isFaqPdf ? faqFilename : (isStackerPdf ? (body.filename || 'stacker.pdf') : 'solution-overview.pdf')
       return new NextResponse(faqPdfBuf, {
         headers: {
           'Content-Type': 'application/pdf',

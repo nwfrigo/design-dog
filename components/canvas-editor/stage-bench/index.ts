@@ -1,4 +1,6 @@
 export { StageScrim } from './StageScrim'
+export { PageSelector } from './PageSelector'
+export type { PageSelectorProps } from './PageSelector'
 export { StageBenchHeader } from './StageBenchHeader'
 export type { StageBenchHeaderProps } from './StageBenchHeader'
 export { StageBenchActionRow } from './StageBenchActionRow'

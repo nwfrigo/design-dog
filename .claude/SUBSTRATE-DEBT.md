@@ -36,6 +36,50 @@
 
 ---
 
+## Multi-page templates: fixed count only (no reorder / add-remove)
+
+**What:** The multi-page primitive (`pages: { count, labels }` + `PageSelector`, STAGE-AND-BENCH.md §10) supports a **fixed** page count declared at build time. Users can't add, remove, or reorder pages, and there's no cross-page slot reference (a value edited on page 1 that echoes on page 2 must be two independent slots today — e.g. `executive-overview`'s partner name appears in both the page-1 headline and the page-2 tagline as separate editable slots).
+**Why deferred:** The first consumer (`executive-overview`) is a fixed 2-pager; dynamic page management is a FAQ-style paradigm (auto-pagination) that needs its own design. Shipping fixed-count keeps the primitive honest and small.
+**Cost to ignore:** A future variable-length multi-page asset (e.g. a paginated brief) can't reuse this primitive as-is; a user editing the partner name must type it on both pages.
+**Trigger condition:** (a) a second multi-page template needs a variable page count, OR (b) real usage shows the duplicate partner-name edit is a genuine friction point.
+**Estimate to pay:** Medium for reorder/add-remove (page list becomes store state, not a static descriptor); Small for partner-name propagation (a shared store field both slots read, with the page-1 headline composing `Cority & {partnerName}`).
+**First step when you start:** For propagation — add a single `executiveOverviewPartnerName` field the headline and tagline both derive from, and decide whether on-canvas editing targets the whole headline or just the name token. For dynamic pages — promote `PagesConfig.count` to a store-backed page array and add pager add/remove affordances.
+
+---
+
+## Image slots can't be toggled off (no bench/eye affordance for kind:'image')
+
+**What:** `kind:'image'` slots have no hide affordance — images don't drag to the bench (factory suppresses drag for images) and `EditbarImage` has no EyeOff button. So an image is either always-on or absent; there's no user toggle. `executive-overview` works around this by making its 3 images (partner logo, hero, contact avatar) always-on `benchable:false` with empty-state placeholders. This means a Cority-only prospect (no partner logo) still shows the partner-logo placeholder area, and the placeholder prints on export.
+**Why deferred:** Adding image visibility is a substrate change (image visibility flag + an EyeOff in `EditbarImage`, or a stage-bar toggle) with its own QA; not required to ship the first multi-page collateral.
+**Cost to ignore:** Templates can't offer optional images; empty image placeholders render in exports when the user has no asset to supply.
+**Trigger condition:** A real request to omit the partner logo / hero on `executive-overview`, OR the next template that needs a genuinely optional image.
+**Estimate to pay:** Small–Medium — add an EyeOff to `EditbarImage` wired to a `setVisible` on the image slot (bench chip for images), OR a per-image stage-bar on/off toggle; then gate the template's image render on the flag.
+**First step when you start:** Add a `showX` flag for the image in the doc + a `setVisible` in the adapter's `slotState`, and surface a hide control (EditbarImage EyeOff is the substrate-consistent home).
+
+---
+
+## Executive Overview chip icons aren't user-editable
+
+**What:** On `executive-overview` page 2, each feature chip's LABEL is an editable text slot, but its ICON is a fixed default (`EXEC_DEFAULT_CHIP_ICONS` in the template constants). A user who rewrites a chip label can't change the (now possibly mismatched) Lucide icon.
+**Why deferred:** There's no "icon" editbar kind in the substrate; wiring a per-chip icon picker (the Stacker-style `IconPickerModal`) into the S&B editbar is its own change. Labels are the meaningful editable content for v1.
+**Cost to ignore:** A chip icon can read as mismatched after a label rewrite.
+**Trigger condition:** User feedback that chip icons feel wrong/locked, OR any other S&B template needs per-element icon selection (build the icon editbar kind once, reuse).
+**Estimate to pay:** Medium — add an `icon` editbar kind + registry that opens `IconPickerModal` and writes the chip's `icon` via an adapter setter (`updateExecChip(doc, i, j, { icon })` already exists).
+**First step when you start:** Model it after `EditbarCategory` (dropdown editbar) but opening the Lucide picker; add an `IconRegistry` slot for chip blockIds.
+
+---
+
+## Per-page thumbnails in the PageSelector
+
+**What:** The `PageSelector` pager shows text labels ("1 Page 1 / 2 Page 2"), not live mini-thumbnails of each page.
+**Why deferred:** Labels are enough to navigate a 2-page asset; thumbnails add a render/scale pass per page.
+**Cost to ignore:** Slightly less glanceable navigation as page counts grow.
+**Trigger condition:** A multi-page template with 4+ pages, OR user feedback that page identity is unclear.
+**Estimate to pay:** Small–Medium — render each page through a scaled preview (reuse ScaledStage math) into the pager cells.
+**First step when you start:** Render `renderTemplate` at each page index into a fixed-size, non-interactive scaled box inside `PageSelector`.
+
+---
+
 ## Image-source-key for shared image slots
 
 **What:** When the same image source is used across multiple templates (e.g., a newsletter image visible in dark + light variants of the same asset), there's no concept of a "shared image identity." Each template gets its own settings bundle, which is correct architecturally but creates a UX wrinkle: edit the image in one variant, the other variant doesn't pick it up.

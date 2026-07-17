@@ -1,7 +1,9 @@
 // Copy Types
 import type { CustomSizeDocument } from '@/lib/custom-size/document'
 export type { CustomSizeDocument }
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-ehs-accelerate-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'email-ehs-accelerate-signature' | 'email-cority-customer-exchange-signature' | 'email-cority-customer-exchange-banner' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'social-ehs-accelerate' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library' | 'custom-size'
+import type { ExecutiveOverviewDocument } from '@/lib/executive-overview/document'
+export type { ExecutiveOverviewDocument }
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-ehs-accelerate-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'email-ehs-accelerate-signature' | 'email-cority-customer-exchange-signature' | 'email-cority-customer-exchange-banner' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'social-ehs-accelerate' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library' | 'custom-size' | 'executive-overview'
 
 // Shared variant/setting union types (extracted to avoid repeating inline unions)
 export type LogoColor = 'black' | 'orange' | 'white'
@@ -427,6 +429,8 @@ export interface ManualAssetSettings {
   carouselCurrentSlideIndex: number
   // Custom Size
   customSizeDocument: CustomSizeDocument | null
+  // Executive Overview (2-page collateral)
+  executiveOverviewDocument: ExecutiveOverviewDocument | null
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
   // Email EHS Accelerate Banner specific
@@ -618,6 +622,8 @@ export interface QueuedAsset {
   carouselCurrentSlideIndex: number
   // Custom Size
   customSizeDocument: CustomSizeDocument | null
+  // Executive Overview (2-page collateral)
+  executiveOverviewDocument: ExecutiveOverviewDocument | null
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
   // Email EHS Accelerate Banner specific
@@ -850,6 +856,8 @@ export interface AppState {
 
   // Custom Size
   customSizeDocument: CustomSizeDocument | null
+  // Executive Overview (2-page collateral)
+  executiveOverviewDocument: ExecutiveOverviewDocument | null
 
   // Email Cority Connect 2026
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
@@ -1064,6 +1072,7 @@ export interface AppState {
   // Social Carousel actions
   setCarouselSlides: (slides: CarouselSlide[]) => void
   setCustomSizeDocument: (doc: CustomSizeDocument | null) => void
+  setExecutiveOverviewDocument: (doc: ExecutiveOverviewDocument | null) => void
   setCarouselCurrentSlideIndex: (index: number) => void
   setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => void
   setEventDate: (date: string) => void

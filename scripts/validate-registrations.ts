@@ -40,13 +40,20 @@ type AdapterSummary = {
 }
 
 function readAdapterPair(name: string): AdapterSummary | null {
-  const registrationPath = join(ADAPTERS_DIR, `${name}Registration.ts`)
   const adapterPath = join(ADAPTERS_DIR, `${name}StageBench.tsx`)
 
   let registration: string
+  let registrationPath: string
   let adapter: string
   try {
-    registration = readFileSync(registrationPath, 'utf8')
+    // Registrations may be .ts or .tsx (the latter when they carry preview JSX).
+    registrationPath = join(ADAPTERS_DIR, `${name}Registration.ts`)
+    try {
+      registration = readFileSync(registrationPath, 'utf8')
+    } catch {
+      registrationPath = join(ADAPTERS_DIR, `${name}Registration.tsx`)
+      registration = readFileSync(registrationPath, 'utf8')
+    }
     adapter = readFileSync(adapterPath, 'utf8')
   } catch {
     return null
@@ -119,8 +126,8 @@ function validateFlag(flag: string, builderText: string, renderPropsText: string
 
 function main() {
   const files = readdirSync(ADAPTERS_DIR)
-    .filter((f) => f.endsWith('Registration.ts'))
-    .map((f) => f.replace(/Registration\.ts$/, ''))
+    .filter((f) => /Registration\.tsx?$/.test(f))
+    .map((f) => f.replace(/Registration\.tsx?$/, ''))
     .sort()
 
   let failures = 0

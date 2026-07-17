@@ -91,9 +91,11 @@ export function ImageEditorModal({
   onSettingsChange,
   onImageChange,
 }: ImageEditorModalProps) {
-  // View state. Always reset to 'editor' on (re)open so the user lands on
-  // the primary surface, never stuck in a half-finished library state.
-  const [view, setView] = useState<ModalView>('editor')
+  // View state. Land on the editor when there's already an image to adjust;
+  // when the slot is empty (no src), open straight to the library so the user
+  // can pick one — otherwise the editor preview would sit on an empty src and
+  // show "loading…" forever. Re-evaluated per open (the modal remounts).
+  const [view, setView] = useState<ModalView>(imageSrc ? 'editor' : 'library')
 
   // Bundled live state — drives the preview. Single useState so the
   // commit-on-dismiss handler sees coherent settings (no half-updated
@@ -110,13 +112,15 @@ export function ImageEditorModal({
   }
 
   // Reset state on (re)open so cancelling out of a previous session doesn't
-  // leak into the next one.
+  // leak into the next one. Land on the editor when there's an image to adjust,
+  // or the library when the slot is empty (an empty src would otherwise sit on
+  // a perpetual "loading…").
   useEffect(() => {
     if (!isOpen) return
-    setView('editor')
+    setView(imageSrc ? 'editor' : 'library')
     setSettings(initialSettings)
     setActivePreset(null)
-  }, [isOpen, initialSettings])
+  }, [isOpen, initialSettings, imageSrc])
 
   // When zoom changes, re-clamp position. Overflow at the new zoom may be
   // smaller, in which case prior pan extents would be out of bounds.

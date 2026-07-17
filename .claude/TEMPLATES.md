@@ -7,7 +7,7 @@
 
 ## Existing Templates
 
-**Legend.** ✅ = on the Stage & Bench editor (28 templates). 📜 = on the legacy sidebar-form editor (3 PDFs). 🙈 = `hidden: true` in `lib/template-config.ts` — registered but not surfaced in the homepage tile grid / asset picker / template dropdowns (existing drafts still resolve).
+**Legend.** ✅ = on the Stage & Bench editor (29 templates; `executive-overview` is the first multi-page one). 📜 = on the legacy sidebar-form editor (3 PDFs). 🙈 = `hidden: true` in `lib/template-config.ts` — registered but not surfaced in the homepage tile grid / asset picker / template dropdowns (existing drafts still resolve).
 
 > **`custom-size` is not a fixed template** — it's an arbitrary-dimension asset whose layout is resolved live by an engine. Its homepage entry is a bespoke first tile in `AssetSelectionScreen`, rendered through `TemplateTileV2` via its `previewOverride` (a themeable vector montage) + `launchOnly` props rather than a scaled template preview. Full details in `CUSTOM-SIZE.md`.
 
@@ -56,6 +56,7 @@
 - 📜 `faq-pdf` — FaqPdf (dynamic page count, Q&A format with tables support)
 - 📜 `stacker-pdf` — StackerPdf (modular document builder with drag-and-drop)
 - ✅ `customer-library` — CustomerLibrary (590×330px, 3 colorway variants: orange/dark/light, QR code upload, rich text headline/body)
+- ✅ `executive-overview` — ExecutiveOverview (**first multi-page Stage & Bench template**; fixed 2-page Letter PDF, 612×792px per page; prospect-facing partnership summary — intro + hero on page 1, value cards + stats + contact on page 2; light-mode only). Uses the page-selector substrate primitive (STAGE-AND-BENCH.md §10) + the `executiveOverviewDocument` blob + the legacy multi-page PDF export path. Page components: `components/templates/ExecutiveOverview/{Page1,Page2}.tsx`; render route `app/render/executive-overview/`.
 
 ---
 
