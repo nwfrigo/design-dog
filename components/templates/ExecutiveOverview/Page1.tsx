@@ -150,7 +150,7 @@ export function Page1({
         </div>
       </div>
 
-      {/* Right hero rail (full height, hairline on left edge, clipped to page) */}
+      {/* Right hero rail (full height, clipped to page) */}
       {wrapBlock('heroImage', (
         <div style={{
           position: 'absolute',
@@ -158,7 +158,6 @@ export function Page1({
           top: 0,
           width: HERO_W,
           height: EXEC_PAGE_H,
-          borderLeft: `${T.borderXs}px solid ${T.border}`,
           overflow: 'hidden',
         }}>
           <HeroImage
