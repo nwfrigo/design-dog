@@ -35,10 +35,10 @@ These files live alongside this one in `.claude/`. Always consult the relevant r
 | File | Scope |
 |------|-------|
 | `ARCHITECTURE.md` | Template architecture, props, state management (Zustand), export system, PDF upload flow, API endpoints, draft persistence, editor patterns |
-| `TEMPLATES.md` | Full template catalog, multi-page collateral (SO, FAQ, Stacker), module types, "adding a new template" checklist, template-specific gotchas |
+| `TEMPLATES.md` | Full template catalog; multi-page collateral (legacy PDFs: SO/FAQ/Stacker) **and multi-page Stage & Bench (executive-overview)**; module types; the single-page **and multi-page** "adding a template" checklists; template-specific gotchas |
 | `BRAND.md` | Brand colors, typography, Figma override rules, solution pills, image handling, image libraries, template dimensions, dark mode colors |
 | `LESSONS.md` | Running log of QA feedback, error patterns, and design decisions — applied silently, graduated with approval |
-| `STAGE-AND-BENCH.md` | Stage & Bench editor substrate — architecture, registries, primitives, conventions. Truth-source for what's in the substrate today. |
+| `STAGE-AND-BENCH.md` | Stage & Bench editor substrate — architecture, registries, primitives, conventions (incl. the multi-page page-selector primitive §10 + the `chip`/icon editbar). Truth-source for what's in the substrate today. |
 | `CUSTOM-SIZE.md` | Custom-size feature — the arbitrary-dimension asset editor (layout engine, document model, editor, export). Built on Stage & Bench. |
 | `SUBSTRATE-DEBT.md` | Debt ledger for deferred substrate work. Each entry has a trigger condition naming when paying it down becomes urgent. |
 | `STAGE-BENCH-REFACTOR-POSTMORTEM.md` | Historical record of the 1.5 renovation — per-template scorecard, primitives shipped, lessons learned. Journal, not a plan. |

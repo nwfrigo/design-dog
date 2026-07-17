@@ -156,7 +156,11 @@ Adapter pattern: subscribe to store fields → call `getXSlots({...})` / `getXSi
 
 `InlineTextEdit.tsx`. Uncontrolled in-place editor. Initialized once on mount (`innerHTML` for HTML format, `innerText` for plain), then never re-touched by React — outflow via `onInput`. This is the key trick: React reconciliation cannot clobber edits in progress.
 
-Activation: adapter's `renderInlineEditor` swaps the static inner for `<InlineTextEdit>` only when `editingPath === slotPath`. `Editable`'s double-click on `kind: 'text' | 'cta'` sets `editingPath`. `Esc` clears it. Click outside a slot also clears it (via `CanvasEditorProvider`).
+Activation: adapter's `renderInlineEditor` swaps the static inner for `<InlineTextEdit>` only when `editingPath === slotPath`. `Editable`'s double-click on `kind: 'text' | 'cta' | 'chip'` sets `editingPath`. `Esc` clears it. Click outside a slot also clears it (via `CanvasEditorProvider`).
+
+**Line cap (`maxLines`).** `SlotContentSpec.maxLines` (threaded into `InlineTextEdit`) hard-caps the rendered line count — input that would overflow is measured (`scrollHeight` vs `lineHeight × maxLines`) and, for plain text, trimmed from the end to fit (keeps as much as possible, handles paste); rich text reverts to the last valid value. Content-independent, so `maxLines: 1` is a true one-line field and `maxLines: 4` a true four-line field (used by executive-overview's headline/card title/card body).
+
+**Paste-and-match-style.** `InlineTextEdit`'s `onPaste` inserts the clipboard's PLAIN text at the caret (`document.execCommand('insertText')`), stripping source formatting (Word highlights/colors/fonts); newlines collapse to spaces on single-line fields. Any bold/italic already in the field survives. Substrate-wide — every S&B slot gets it.
 
 Rich text Bold/Italic operates at two levels (see EditbarText):
 - While editing: `document.execCommand` on the current text-range selection (character-level).
@@ -339,7 +343,7 @@ These are settled. Reopening requires a fresh round of justification.
 | 11 | DnD library | **Custom pointer-events** (`lib/dnd/`), not react-dnd / dnd-kit. We needed full control of cursor-follower preview + settleTo animation. |
 | 12 | History (undo/redo) | **Not built.** `commands.ts` exists as a stub for future use; no commands registered. Direct setter calls today. Re-evaluate when multi-step edit flows demand it. |
 | 13 | Multi-select | **Out of scope for v1.** Foundation assumes single selection. |
-| 14 | Image lightbox modal | **`ImageEditorModal` with embedded library view.** Universal modal contract via `ImageSlotSettings`. Factory mounts one modal per top-level image slot; `childImages` config adds per-blockId modal state for nested image children (per-speaker avatars). |
+| 14 | Image lightbox modal | **`ImageEditorModal` with embedded library view.** Universal modal contract via `ImageSlotSettings`. Factory mounts one modal per top-level image slot; `childImages` config adds per-blockId modal state for nested image children (per-speaker avatars). Opens to the **library view when the slot is empty** (no src), the editor view otherwise — an empty src in the editor view would sit on a perpetual "loading…". |
 | 15 | Adapter form | **Factory-driven.** Every adapter uses `defineStageBenchAdapter`. Zero hand-rolled adapters. |
 | 16 | Nested editing (per-card patterns) | **Flat blockIds + `parent` reference.** A child slot declares `parent: 'parentBlockId'` so it's excluded from the bench surface; deep-click cascades via DOM ancestor walking in `Editable.tsx`. Same pattern for text and image children. |
 
@@ -442,6 +446,8 @@ The multi-page paradigm the postmortem flagged as "would need a different shell 
 4. `useStoreBindings` must return `slotState` for **all** blockIds across all pages (bench/registries only read the current page's, but the render context resolves text/visibility for whichever page is mounted).
 
 **Invariants preserved:** export purity is untouched — the render route renders **all** pages (page-break-separated) with identity render-props, so editor-page N is byte-identical to export-page N. `currentStagePage` is editor-only and never enters the export params. Selection stays single-element (only the on-stage page has interactive slots).
+
+**Preview (all pages).** The editor's Preview lightbox shows one page (the registration's `Template`) for single-page templates. Multi-page templates add an optional **`renderPreview(asset, colors, typography)`** to their registration (carried into `TemplateRegistryEntry`) that returns all pages stacked; the S&B lightbox renders it when present. So Preview shows the whole asset, matching export.
 
 **Deferred (see `SUBSTRATE-DEBT.md`):** page reordering / add-remove (fixed-count only for v1); cross-page slot references; per-page thumbnails in the pager.
 

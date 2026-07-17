@@ -64,15 +64,20 @@
 
 Multi-page collateral assets differ from single-page banner templates in architecture and workflow.
 
+**Two paths exist:**
+1. **Legacy sidebar-form PDFs** — `solution-overview-pdf`, `faq-pdf`, `stacker-pdf`. Word/PDF upload → parse → a bespoke setup + editor + export screen. Documented in the sections below.
+2. **Stage & Bench multi-page** — `executive-overview` (the first). Direct on-canvas editing via the page-selector substrate primitive; content in one document blob; reuses the legacy PDF export pipeline. **This is the path for any NEW multi-page collateral** — see "Executive Overview" (reference implementation) and "Checklist: Adding a Multi-Page Stage & Bench Collateral Template" below.
+
 ### Architecture Differences
 
-| Aspect | Single-Page Templates | Multi-Page Collateral |
-|--------|----------------------|----------------------|
-| Component | Single `TemplateComponent.tsx` | Multiple page components in subfolder |
-| Dimensions | Various (640×300, 1200×628, etc.) | Standard paper (Letter: 612×792) |
-| Export | PNG via Puppeteer screenshot | Multi-page PDF export |
-| Content source | AI copy generation from PDF | Verbatim extraction from Word doc |
-| Editor | Standard EditorScreen | Custom export screen |
+| Aspect | Single-Page S&B | Multi-Page S&B (executive-overview) | Legacy Multi-Page PDF (SO/FAQ/Stacker) |
+|--------|-----------------|--------------------------------------|-----------------------------------------|
+| Component | Single `TemplateComponent.tsx` | One component per page in a subfolder | Multiple page components in subfolder |
+| Dimensions | Various | Letter (612×792) | Letter (612×792) |
+| Editor | StageBenchEditor | StageBenchEditor + page selector | Legacy sidebar-form + custom screens |
+| Content | Store fields / blob | One document blob | ~50 flat `solutionOverview*` store fields |
+| Export | PNG via Puppeteer | Multi-page PDF (reuses legacy path) | Multi-page PDF |
+| Content source | AI copy / direct edit | Direct on-canvas edit | Verbatim Word extraction / AI |
 
 ### Content Extraction vs AI Generation
 
@@ -356,9 +361,49 @@ Stacker uses AI to generate the initial document structure:
 
 ---
 
-## Checklist: Adding a New Template
+## Executive Overview (first multi-page Stage & Bench collateral)
 
-This section covers adding a **Stage & Bench** template (the path for any new single-page asset). The legacy sidebar-form editor is reserved for the 3 multi-page PDFs — adding a new PDF template is out of scope here; see the existing PDF setup screens (`SolutionOverviewSetupScreen` / `FaqSetupScreen` / `StackerSetupScreen`).
+`executive-overview` is a fixed 2-page, Letter-portrait, prospect-facing partnership summary — and the **first multi-page template on the Stage & Bench editor** (direct on-canvas editing, not the legacy sidebar-form PDF path). It's the reference implementation for the multi-page playbook below.
+
+### What it demonstrates
+- The **page-selector substrate primitive** ([STAGE-AND-BENCH.md §10](STAGE-AND-BENCH.md)): a `pages` descriptor + ephemeral `currentStagePage` + per-page computed slots. One page is on stage at a time, so single-canvas assumptions (one bench, single selection) hold.
+- The **document-blob state model** (the custom-size precedent): all content in one `executiveOverviewDocument` field — not ~50 flat store fields.
+- **Reuse of the legacy multi-page PDF export pipeline** — `page:'all'` → one Letter PDF, no new export engine.
+- The **`chip` editbar kind** — icon + editable label, via `IconRegistry` + `EditbarChip`.
+
+### File structure
+```
+components/templates/ExecutiveOverview/
+├── Page1.tsx                    # Cover: co-brand logos, headline, intro body, quote, hero rail
+├── Page2.tsx                    # Details: 2×2 value cards (chips), stats, contact
+├── ExecutiveOverviewPrint.tsx   # both pages stacked w/ page breaks (export render composite)
+├── constants.ts                 # block-id union, content model, tokens, placeholders, default hero
+└── index.tsx                    # barrel
+
+lib/executive-overview/document.ts   # ExecutiveOverviewDocument + factory + immutable update helpers + doc→props mappers
+components/canvas-editor/template-adapters/
+├── ExecutiveOverviewStageBench.tsx   # adapter (pages, per-page slot resolver, chip/image bindings)
+└── ExecutiveOverviewRegistration.tsx # Template, renderProps, renderPreview, exportBuilder (.tsx: has preview JSX)
+app/render/executive-overview/page.tsx  # bare Puppeteer render route (decodes the doc, page breaks)
+```
+
+### Document model
+`executiveOverviewDocument` (`lib/executive-overview/document.ts`) is a **self-contained blob**: partner logo/name, intro headline/body, quote + attribution, hero image (url/position/zoom/**filters**/grayscale), tagline, `cards[4]{title, body, chips[]{label, icon, show}}`, section header/subhead, `stats[5]{label, show}`, footer CTA, contact `{name, role, email, avatar}`. Persisted through `SNAPSHOT_FIELDS` + draft as one field. The `doc→page1Props`/`doc→page2Props` mappers are shared by the editor adapter and the export render route, so editor == export.
+
+### Slots & interactions
+- **Text** (headline, body, quote, tagline, card titles/bodies, stats, contact) — inline-editable, with per-slot line caps via `SlotContentSpec.maxLines` (headline 4, card title 1, card body 4).
+- **Chips** — `kind:'chip'`: `EditbarChip` `[hide | replace-icon]`, `IconRegistry` for the icon, inline label editing preserved.
+- **Images** (partner logo, hero, avatar) — always-on with empty-state placeholders. Hero supports crop + color filters/presets (`heroImageFilters`, applied via `filtersToCss`). Ships with a default hero. The partner-logo placeholder renders only in the editor (`interactive` prop) so it doesn't print when unset.
+- Light-mode only (matches the design).
+
+### Export
+Reuses the legacy multi-page PDF path: `exportBuilder` emits `page:'all'` + `executiveOverviewConfig` (the whole doc, a `COMPLEX_KEY`); `app/api/export/route.ts` detects `isExecutiveOverview` (`numPages=2`); the bare `/render/executive-overview` route decodes the doc and renders both pages split by `pageBreakAfter:'always'` inside `GenericRenderContent` (the `#render-ready` fonts signal). The editor's **Export** names the download from the response's Content-Disposition (`.pdf`, not `.png`); **Preview** shows both pages via the registration's `renderPreview`.
+
+---
+
+## Checklist: Adding a New (single-page) Stage & Bench Template
+
+This section covers adding a **single-page Stage & Bench** template. For a **multi-page** collateral asset, follow "Checklist: Adding a Multi-Page Stage & Bench Collateral Template" (below) — it builds on this one. The legacy sidebar-form editor is now reserved only for the 3 existing multi-page PDFs (`solution-overview-pdf` / `faq-pdf` / `stacker-pdf`); don't add new templates there.
 
 **Component file requirements (non-negotiable):**
 - [ ] First line is `'use client'` — required for the dynamic render route at `app/render/[slug]/page.tsx` to pass the component across the Server→Client boundary. Missing this crashes the export on Vercel.
@@ -428,3 +473,36 @@ Match the helpers in `lib/render-params.ts`:
 | Track 2 absolute-positioned | `EmailEhsAccelerateBannerRegistration.ts` |
 | Per-card group (speakers / cards) | `WebsiteWebinarStageBench.tsx` + `EmailSpeakersStageBench.tsx` (uses `parent: 'speakerN'` + `childImages`) |
 | QR / image-as-anchor | `CustomerLibraryRegistration.ts` |
+
+---
+
+## Checklist: Adding a Multi-Page Stage & Bench Collateral Template
+
+For a **fixed multi-page** asset (e.g. a 2–3 page brief) that should use direct on-canvas editing rather than the legacy sidebar-form PDF path. **`executive-overview` is the reference implementation** — copy from it. This builds on the single-page checklist above; the deltas are the page selector, the document blob, and the multi-page PDF export. Substrate details in [STAGE-AND-BENCH.md §10](STAGE-AND-BENCH.md).
+
+**Prereqs / decisions:**
+- **Fixed page count.** The page-selector primitive is fixed-count. Dynamic/auto-pagination (FAQ-style) is a different paradigm and out of scope — see `SUBSTRATE-DEBT.md`.
+- **Self-contained document blob** (the custom-size / carousel pattern) rather than flat store fields. Collateral content is bespoke, so a blob collapses the SO-style ~50-field, four-place-per-field sync down to one JSON param.
+
+### Steps
+
+1. **Page components** — `components/templates/<Name>/Page1.tsx`, `Page2.tsx`, … one per page. Each follows the standard S&B render-prop contract (`renderBlock`/`renderInlineEditor`/`renderOverlay`, identity defaults) and the same non-negotiables as single-page (`'use client'`, plain `<img>`, font from `typography`, Figma override rules). Add a shared `constants.ts` (block-id union, content model, tokens, placeholders) — keep it dependency-free so it doesn't import the barrel (avoid a page↔barrel cycle).
+
+2. **Document model** — `lib/<name>/document.ts`: a `<Name>Document` interface (all per-asset content), a `default<Name>Document()` factory, immutable update helpers (`patch`, `updateCard`, …), and `doc→pageNProps` mappers **shared by the editor adapter and the export render route** (this is what guarantees editor == export). Wire the blob field everywhere a blob field goes — grep an existing one (`customSizeDocument`) to find every site: `types/index.ts` (AppState/QueuedAsset/GeneratedAsset + setter type), `store/index.ts` (initial + defaultState + setter + the big destructure/spread + target-defaults + draft save/rehydrate), `lib/asset-snapshot.ts` (`SNAPSHOT_FIELDS`), `lib/draft-storage.ts` (`DraftState` + save), `lib/export-params.ts` (`ExportParamState` + its builder).
+
+3. **Adapter** — `defineStageBenchAdapter` with `pages: { count, labels }`. Make `slots` a resolver: `(bindings, page) => page === 1 ? PAGE1_SLOTS : PAGE2_SLOTS`. `useStoreBindings` reads the doc and returns `slotState` for **all** blockIds across **all** pages (the factory only consumes the current page's, but the render context resolves whichever page is mounted). Setters patch the doc — **read the freshest doc via `useStore.getState()`**, not the render-time closure (the image modal fires `setUrl` then `setSettings` synchronously; a stale closure clobbers the URL). `renderTemplate(ctx)` branches on `ctx.currentPage`. Use `childImages` for image slots and `kind:'chip'` + `slotState.icon/setIcon` for icon-replaceable chips.
+
+4. **Registration** — `<Name>Registration.tsx` (`.tsx` when it carries a `renderPreview`, which needs JSX): `Template` (a page component for the queue thumbnail) + `renderProps`; **`renderPreview(asset, colors, typography)`** returning all pages stacked (the editor Preview lightbox uses it); `exportBuilder` emitting **`page:'all'`** + `<name>Config` (the whole doc). Register in `lib/stage-bench-registry.ts` (auto-joins `STAGE_BENCH_TEMPLATES`).
+
+5. **Multi-page PDF export** (`app/api/export/route.ts`): add to `TEMPLATE_DIMENSIONS`; add `<name>Config` to `COMPLEX_KEYS` + a dedicated encode block (`params.set('<name>Config', encodeURIComponent(JSON.stringify(body.<name>Config)))`); add an `is<Name> = template === '<name>' && body.page === 'all'` branch, fold it into `isPdfExport`, set `numPages`, add the filename. Build `app/render/<name>/page.tsx` that decodes the config and renders a print composite stacking pages split by `pageBreakAfter:'always'`, wrapped in `GenericRenderContent` (supplies the `#render-ready` fonts signal). Copy `/render/custom-size` + `ExecutiveOverviewPrint.tsx` verbatim as the shape.
+
+6. **Homepage + config** — add to `COLLATERAL_TEMPLATES` in `lib/template-config.ts`. **Do NOT exclude it from `ALL_TEMPLATES`** like the legacy PDFs — it's a real S&B template and must resolve in `TEMPLATE_INFO`/`TEMPLATE_DIMENSIONS`/`TEMPLATE_LABELS`. Add a homepage-tile case in `components/TemplateTile.tsx` (hardcoded per-template switch; `default: return null` = blank tile). Add the slug to `TemplateType` in `types/index.ts` — `tsc` then flags every exhaustive `Record<TemplateType>` that needs an entry (`lib/copy-constraints.ts`, `app/api/export`'s dims, …).
+
+7. **Validate** — `npm run validate:registrations` (scans `.ts` **and** `.tsx` registrations), `npx tsc --noEmit`, `npm run build`. Browser-verify: page switch swaps stage + bench, inline edit writes to the doc, images pick/apply, Preview shows all pages, Export downloads a multi-page PDF (check `%PDF` magic + `/Count N`).
+
+### Multi-page gotchas (beyond the single-page list)
+- **`page:'all'` in the exportBuilder is the PDF trigger** — the export route decides PDF-ness from `body.page === 'all'`, not `format`.
+- **`slotState` must include every blockId** (`Record<TBlockId>`), even off the current page.
+- **Freshest-doc reads on mutation** (`useStore.getState()`) — see step 3.
+- **Registration is `.tsx`** if it has `renderPreview`. The validator scans both extensions.
+- **Editor download naming**: `handleExport` reads the response Content-Disposition/Content-Type so a PDF response downloads as `.pdf` (not the hardcoded `.png`).
