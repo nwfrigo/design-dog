@@ -95,6 +95,17 @@ export function InlineTextEdit({
       className={format === 'html' ? 'rich-text-white' : undefined}
       contentEditable
       suppressContentEditableWarning
+      onPaste={(e) => {
+        // Paste-and-match-style: insert the clipboard's PLAIN text at the caret,
+        // stripping all source formatting (Word highlights, colors, fonts). Any
+        // bold/italic already in the field survives. Newlines collapse to spaces
+        // on single-line fields. execCommand fires the input path, so onChange +
+        // the maxLines cap still run.
+        e.preventDefault()
+        let text = e.clipboardData.getData('text/plain')
+        if (singleLine) text = text.replace(/[\r\n]+/g, ' ')
+        document.execCommand('insertText', false, text)
+      }}
       onInput={(e) => {
         const el = e.currentTarget as HTMLElement
         if (!withinMaxLines(el)) {

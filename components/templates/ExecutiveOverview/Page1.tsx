@@ -2,7 +2,7 @@
 
 import { CSSProperties, type ReactNode } from 'react'
 import type { TypographyConfig } from '@/lib/brand-config'
-import type { ImageFilters } from '@/lib/image-filters'
+import { NEUTRAL_FILTERS, applyGrayscaleBoolean, filtersToCss, type ImageFilters } from '@/lib/image-filters'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import {
   EXEC_TOKENS as T,
@@ -27,10 +27,15 @@ export interface Page1Props {
   heroImageUrl?: string | null
   heroImagePosition?: { x: number; y: number }
   heroImageZoom?: number
+  heroImageFilters?: ImageFilters
   grayscale?: boolean
   showPartnerLogo: boolean
   showQuote: boolean
   showQuoteAttribution: boolean
+  /** True in the editor (shows the clickable empty-state placeholders); false/
+   *  omitted in export + preview (empty optional slots render nothing so an
+   *  un-set partner logo doesn't print). */
+  interactive?: boolean
   renderBlock?: (blockId: ExecutiveOverviewBlockId, content: ReactNode) => ReactNode
   renderInlineEditor?: (blockId: ExecutiveOverviewBlockId, defaultInner: ReactNode) => ReactNode
   renderOverlay?: () => ReactNode
@@ -65,10 +70,12 @@ export function Page1({
   heroImageUrl,
   heroImagePosition = { x: 0, y: 0 },
   heroImageZoom = 1,
+  heroImageFilters = NEUTRAL_FILTERS,
   grayscale = false,
   showPartnerLogo,
   showQuote,
   showQuoteAttribution,
+  interactive = false,
   renderBlock,
   renderInlineEditor,
   renderOverlay,
@@ -115,7 +122,7 @@ export function Page1({
         <div style={{ width: 218, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <CorityLogo fill={T.text} height={22} />
           {showPartnerLogo && wrapBlock('partnerLogo', (
-            <PartnerLogo url={partnerLogoUrl} />
+            <PartnerLogo url={partnerLogoUrl} interactive={interactive} />
           ))}
         </div>
 
@@ -158,6 +165,7 @@ export function Page1({
             url={heroImageUrl}
             position={heroImagePosition}
             zoom={heroImageZoom}
+            filters={heroImageFilters}
             grayscale={grayscale}
           />
         </div>
@@ -172,8 +180,11 @@ export function Page1({
 /* Image sub-components                                                */
 /* ------------------------------------------------------------------ */
 
-function PartnerLogo({ url }: { url?: string | null }) {
+function PartnerLogo({ url, interactive }: { url?: string | null; interactive?: boolean }) {
   if (!url) {
+    // In export/preview an un-set partner logo renders nothing (so it doesn't
+    // print); in the editor it's a subtle clickable placeholder.
+    if (!interactive) return null
     return (
       <div style={{
         width: 78,
@@ -206,11 +217,13 @@ function HeroImage({
   url,
   position,
   zoom,
+  filters,
   grayscale,
 }: {
   url?: string | null
   position: { x: number; y: number }
   zoom: number
+  filters: ImageFilters
   grayscale: boolean
 }) {
   if (!url) {
@@ -245,7 +258,9 @@ function HeroImage({
           ? `translate(${position.x * (zoom - 1)}%, ${position.y * (zoom - 1)}%) scale(${zoom})`
           : undefined,
         transformOrigin: 'center',
-        filter: grayscale ? 'grayscale(100%)' : undefined,
+        // Exposure/contrast/saturation (+ presets) ride through filtersToCss;
+        // the legacy grayscale boolean folds in via applyGrayscaleBoolean.
+        filter: filtersToCss(applyGrayscaleBoolean(filters, grayscale)),
       }}
     />
   )

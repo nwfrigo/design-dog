@@ -17,10 +17,12 @@ import {
   EXEC_CHIPS_PER_CARD,
   EXEC_STAT_COUNT,
   EXEC_DEFAULT_CHIP_ICONS,
+  EXEC_DEFAULT_HERO_IMAGE,
   type ExecutiveOverviewCard,
   type ExecutiveOverviewChip,
   type ExecutiveOverviewStat,
 } from '@/components/templates/ExecutiveOverview/constants'
+import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
 
 export interface ExecutiveOverviewDocument {
   // ---- page 1 ----
@@ -35,6 +37,7 @@ export interface ExecutiveOverviewDocument {
   heroImageUrl: string | null
   heroImagePosition: { x: number; y: number }
   heroImageZoom: number
+  heroImageFilters: ImageFilters // exposure/contrast/saturation + presets
   grayscale: boolean // applies to the hero image
   // ---- page 2 ----
   tagline: string
@@ -81,9 +84,12 @@ export function defaultExecutiveOverviewDocument(): ExecutiveOverviewDocument {
     quoteAttribution: '',
     showQuote: true,
     showQuoteAttribution: true,
-    heroImageUrl: null,
+    // Ships with a default hero image so the cover reads complete out of the
+    // box; users can swap or keep it (same frame — no layout effect).
+    heroImageUrl: EXEC_DEFAULT_HERO_IMAGE,
     heroImagePosition: { x: 0, y: 0 },
     heroImageZoom: 1,
+    heroImageFilters: NEUTRAL_FILTERS,
     grayscale: false,
     tagline: '',
     showTagline: true,
@@ -162,6 +168,7 @@ export type ExecPage1ContentProps = {
   heroImageUrl: string | null
   heroImagePosition: { x: number; y: number }
   heroImageZoom: number
+  heroImageFilters: ImageFilters
   grayscale: boolean
   showPartnerLogo: boolean
   showQuote: boolean
@@ -195,6 +202,7 @@ export function execDocToPage1Props(doc: ExecutiveOverviewDocument): ExecPage1Co
     heroImageUrl: doc.heroImageUrl,
     heroImagePosition: doc.heroImagePosition,
     heroImageZoom: doc.heroImageZoom,
+    heroImageFilters: doc.heroImageFilters,
     grayscale: doc.grayscale,
     showPartnerLogo: doc.showPartnerLogo,
     showQuote: doc.showQuote,

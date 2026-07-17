@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useStore } from '@/store'
-import { NEUTRAL_FILTERS, type ImageSlotSettings } from '@/lib/image-filters'
+import { NEUTRAL_FILTERS, type ImageFilters, type ImageSlotSettings } from '@/lib/image-filters'
 
 import {
   defineStageBenchAdapter,
@@ -75,7 +75,7 @@ const imageSlot = (blockId: Id, label: string): SlotDescriptor<Id> => ({
 
 const PAGE1_SLOTS: SlotDescriptor<Id>[] = [
   imageSlot('partnerLogo', 'Partner logo'),
-  textSlot('introHeadline', 'Headline', { singleLine: false, placeholder: PH.introHeadline }),
+  textSlot('introHeadline', 'Headline', { singleLine: false, maxLines: 4, placeholder: PH.introHeadline }),
   textSlot('introBody', 'Body', { format: 'html', singleLine: false, iconKey: 'body', placeholder: PH.introBody }),
   textSlot('quote', 'Quote', { benchable: true, singleLine: false, iconKey: 'quote', placeholder: PH.quote }),
   textSlot('quoteAttribution', 'Attribution', { benchable: true, iconKey: 'caption', placeholder: PH.quoteAttribution }),
@@ -179,9 +179,10 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
       url: string | null,
       position: { x: number; y: number },
       zoom: number,
+      filters: ImageFilters,
       setUrl: (next: string) => void,
       setSettings: (next: ImageSlotSettings) => void,
-    ) => ({ url: url ?? undefined, position, zoom, filters: NEUTRAL_FILTERS, setUrl, setSettings })
+    ) => ({ url: url ?? undefined, position, zoom, filters, setUrl, setSettings })
 
     return {
       slotState,
@@ -190,13 +191,17 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
           doc.heroImageUrl,
           doc.heroImagePosition,
           doc.heroImageZoom,
+          doc.heroImageFilters,
           (url) => patch({ heroImageUrl: url }),
-          (s) => patch({ heroImagePosition: s.position, heroImageZoom: s.zoom }),
+          // Persist ALL three settings — position, zoom, AND filters — so the
+          // modal's color adjustments + presets actually apply (and survive).
+          (s) => patch({ heroImagePosition: s.position, heroImageZoom: s.zoom, heroImageFilters: s.filters }),
         ),
         partnerLogo: imageBinding(
           doc.partnerLogoUrl,
           { x: 0, y: 0 },
           1,
+          NEUTRAL_FILTERS,
           (url) => patch({ partnerLogoUrl: url }),
           () => {},
         ),
@@ -204,6 +209,7 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
           doc.contactAvatarUrl,
           { x: 0, y: 0 },
           1,
+          NEUTRAL_FILTERS,
           (url) => patch({ contactAvatarUrl: url }),
           () => {},
         ),
@@ -228,10 +234,12 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
           heroImageUrl={doc.heroImageUrl}
           heroImagePosition={doc.heroImagePosition}
           heroImageZoom={doc.heroImageZoom}
+          heroImageFilters={doc.heroImageFilters}
           grayscale={doc.grayscale}
           showPartnerLogo={doc.showPartnerLogo}
           showQuote={ctx.visibilityOf('quote')}
           showQuoteAttribution={ctx.visibilityOf('quoteAttribution')}
+          interactive
           renderBlock={renderBlock}
           renderInlineEditor={renderInlineEditor}
           renderOverlay={renderOverlay}
