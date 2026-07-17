@@ -19,6 +19,7 @@ const RING_COLOR_BY_KIND: Record<EditableKind, string> = {
   spacer: '#3B82F6',
   color: '#3B82F6',
   pill: '#3B82F6',
+  chip: '#3B82F6',
   group: '#3B82F6',
 }
 

@@ -157,8 +157,9 @@ export function Editable({
 
   const handleDoubleClick = useCallback(() => {
     // CTA is a constrained text variant (capabilities.ts marks it canEditText),
-    // so it shares the double-click-to-edit affordance with regular text.
-    if (kind !== 'text' && kind !== 'cta') return
+    // so it shares the double-click-to-edit affordance with regular text. Chips
+    // carry an editable label too (the icon is swapped via EditbarChip).
+    if (kind !== 'text' && kind !== 'cta' && kind !== 'chip') return
     setEditingPath(path)
   }, [path, kind, setEditingPath])
 

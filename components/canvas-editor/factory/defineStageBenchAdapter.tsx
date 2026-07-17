@@ -22,6 +22,7 @@ import { VisibilityRegistryProvider, type SlotVisibility } from '../VisibilityRe
 import { SizeRegistryProvider, type SlotSize } from '../SizeRegistry'
 import { ContentRegistryProvider, type SlotContent } from '../ContentRegistry'
 import { CategoryRegistryProvider, type CategoryOption } from '../CategoryRegistry'
+import { IconRegistryProvider, type SlotIcon } from '../IconRegistry'
 import { ImageRegistryProvider, useImageSelectionEffect, type SlotImage } from '../ImageRegistry'
 import { ImageEditorModal } from '../../image-editor'
 import {
@@ -56,7 +57,7 @@ import { useTelemetry } from '@/lib/telemetry'
  *  - any template-specific scalars (theme, layout vocabulary, custom flags)
  */
 
-export type SlotKind = 'text' | 'cta' | 'image' | 'pill' | 'group'
+export type SlotKind = 'text' | 'cta' | 'image' | 'pill' | 'group' | 'chip'
 
 export type SlotContentSpec = {
   format: 'html' | 'plain'
@@ -167,9 +168,13 @@ export type AdapterStoreBindings<TBlockId extends string> = {
     value?: string
     visible?: boolean
     fontSize?: number | undefined
+    /** Current Lucide icon id — required for `kind: 'chip'` slots (drives
+     *  EditbarChip's Replace button via IconRegistry). */
+    icon?: string
     setValue?: (next: string) => void
     setVisible?: (next: boolean) => void
     setFontSize?: (next: number) => void
+    setIcon?: (next: string) => void
     /** Reason this slot is benched and can't be restored at the current state
      *  (engine-driven templates only). Surfaces as a dimmed, non-draggable
      *  bench chip with this note. Omit for normal user-hidden slots. */
@@ -300,6 +305,7 @@ const DEFAULT_CHIP_KIND: Record<SlotKind, BenchChipKind> = {
   image: 'category',
   pill: 'category',
   group: 'headline',
+  chip: 'small-caption',
 }
 
 export function defineStageBenchAdapter<TBlockId extends string>(
@@ -426,6 +432,17 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           format: cfg.format,
           value: state?.value ?? '',
           set: state?.setValue ?? (() => {}),
+        }
+      })
+
+    const iconSlots: SlotIcon[] = slots
+      .filter((s) => s.kind === 'chip')
+      .map((s) => {
+        const state = bindings.slotState[s.blockId]
+        return {
+          path: `${descriptor.templateId}.${s.blockId}`,
+          icon: state?.icon ?? '',
+          set: state?.setIcon ?? (() => {}),
         }
       })
 
@@ -864,7 +881,9 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         <VisibilityRegistryProvider slots={visibilitySlots}>
           <SizeRegistryProvider sizes={sizeSlots}>
             <ContentRegistryProvider contents={contentSlots}>
-              {categoryWrapped}
+              <IconRegistryProvider icons={iconSlots}>
+                {categoryWrapped}
+              </IconRegistryProvider>
             </ContentRegistryProvider>
           </SizeRegistryProvider>
         </VisibilityRegistryProvider>

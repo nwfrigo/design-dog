@@ -73,6 +73,17 @@ const imageSlot = (blockId: Id, label: string): SlotDescriptor<Id> => ({
   benchable: false,
 })
 
+// Feature chip: editable one-line label (inline) + a swappable Lucide icon
+// (EditbarChip's Replace button, via IconRegistry).
+const chipSlot = (blockId: Id, label: string): SlotDescriptor<Id> => ({
+  blockId,
+  label,
+  iconKey: 'caption',
+  kind: 'chip',
+  benchable: true,
+  content: { format: 'plain', singleLine: true, maxLines: 1, placeholder: PH.chipLabel },
+})
+
 const PAGE1_SLOTS: SlotDescriptor<Id>[] = [
   imageSlot('partnerLogo', 'Partner logo'),
   textSlot('introHeadline', 'Headline', { singleLine: false, maxLines: 4, placeholder: PH.introHeadline }),
@@ -88,7 +99,7 @@ const PAGE2_SLOTS: SlotDescriptor<Id>[] = [
     textSlot(cardTitleId(n), `Card ${n} title`, { maxLines: 1, placeholder: PH.cardTitle }),
     textSlot(cardBodyId(n), `Card ${n} body`, { singleLine: false, maxLines: 4, iconKey: 'body', placeholder: PH.cardBody }),
     ...Array.from({ length: EXEC_CHIPS_PER_CARD }, (_, j) => j + 1).map((j) =>
-      textSlot(cardChipId(n, j), `Card ${n} chip ${j}`, { benchable: true, iconKey: 'caption', placeholder: PH.chipLabel }),
+      chipSlot(cardChipId(n, j), `Card ${n} chip ${j}`),
     ),
   ]),
   textSlot('trustedHeader', 'Section header', { benchable: true, placeholder: PH.trustedHeader }),
@@ -106,8 +117,10 @@ const PAGE2_SLOTS: SlotDescriptor<Id>[] = [
 type SlotEntry = {
   value?: string
   visible?: boolean
+  icon?: string
   setValue?: (next: string) => void
   setVisible?: (next: boolean) => void
+  setIcon?: (next: string) => void
 }
 
 export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
@@ -154,8 +167,10 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
         slotState[cardChipId(n, j + 1)] = {
           value: chip.label,
           visible: chip.show,
+          icon: chip.icon,
           setValue: (v) => setDoc(updateExecChip(getDoc(), i, j,{ label: v })),
           setVisible: (v) => setDoc(updateExecChip(getDoc(), i, j,{ show: v })),
+          setIcon: (v) => setDoc(updateExecChip(getDoc(), i, j,{ icon: v })),
         }
       })
     })

@@ -19,6 +19,9 @@ export const DEFAULTS_BY_KIND: Record<EditableKind, CapabilitySet> = {
   spacer: { ...NONE, canDragSpacing: true },
   color: { ...NONE, canRecolor: true },
   pill: { ...NONE, canTogglePill: true, canRecolor: true },
+  // Chip = icon + editable label. Label edits inline (canEditText); the icon is
+  // swapped via EditbarChip's Replace button + IconRegistry (not a generic flag).
+  chip: { ...NONE, canEditText: true },
   group: { ...NONE },
 }
 
