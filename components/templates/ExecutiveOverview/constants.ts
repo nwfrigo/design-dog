@@ -117,9 +117,10 @@ export const EXEC_PLACEHOLDERS = {
 /** Default Lucide icon ids per card/chip, matching the source design. Used
  *  by the document factory — the template renders whatever it's given and
  *  falls back to a neutral dot when an icon id doesn't resolve. */
-/** Default cover hero image (a library scene) — ships so the cover reads
- *  complete out of the box. Users swap or keep it; same frame, no layout effect. */
-export const EXEC_DEFAULT_HERO_IMAGE = '/assets/image-library/images/scenes/design-dog-library_001.jpg'
+/** Default cover hero image — a branded Cority graphic (153×792, matches the
+ *  hero frame) that ships so the cover reads complete out of the box. Users
+ *  swap or keep it; same frame, no layout effect. */
+export const EXEC_DEFAULT_HERO_IMAGE = '/assets/images/executive_overview_default.png'
 
 export const EXEC_DEFAULT_CHIP_ICONS: string[][] = [
   ['building', 'waypoints', 'link'],
