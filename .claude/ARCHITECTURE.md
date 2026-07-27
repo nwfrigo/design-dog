@@ -622,6 +622,15 @@ setImageUrl(blob.url)  // Store public URL, not data URL
 
 **Fallback for local dev:** If `BLOB_READ_WRITE_TOKEN` is missing, fall back to `FileReader.readAsDataURL`. This works for preview but images may fail in export.
 
+**The fallback is conditional — don't widen it.** It applies *only* when no Blob store is configured. It used to catch every failure, which meant a genuine rejection was indistinguishable from success: the image appeared on the canvas as a multi-MB base64 string and the export then broke silently, with no error shown at any point.
+
+Two rules keep that from coming back, both in `lib/image-upload.ts`:
+
+- **Validate before uploading.** `validateImageFile(file)` checks the file against `ALLOWED_IMAGE_EXTENSIONS` — the same constant the upload route imports, so client and server can't drift. Predictable rejections get a specific message with no round trip.
+- **Ask the server, don't read the error.** `isBlobConfigured()` hits `GET /api/upload-image`. Never branch on the thrown error's text: `@vercel/blob` reports a 400 from the token route and a missing token with the *identical* message ("Failed to retrieve the client token"), so the two are indistinguishable from the error alone. `isBlobConfigured()` defaults to `true` on any doubt, so an unexpected condition surfaces an error rather than silently degrading.
+
+Every uploader shows failures in its existing status slot (the "Uploading…" text / label), so there's no new UI surface — see `IMAGE_UPLOAD_*` in `lib/image-upload.ts` for the strings.
+
 **Where this applies:**
 - `EditorScreen.tsx` — main image upload (`handleImageUpload`), newsletter image upload (`handleNewsletterImageUpload`), QR code upload
 - `ImageLibraryModal.tsx` — user upload tab

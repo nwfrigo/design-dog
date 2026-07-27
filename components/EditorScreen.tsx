@@ -77,6 +77,7 @@ import { CHANNELS, TEMPLATE_DIMENSIONS, TEMPLATE_LABELS } from '@/lib/template-c
 import { ToggleSwitch } from '@/components/shared/ToggleSwitch'
 import { ImagePreviewWithCrop } from '@/components/shared/ImagePreviewWithCrop'
 import type { TemplateType } from '@/types'
+import { IMAGE_UPLOAD_FAILED, isBlobConfigured, validateImageFile } from '@/lib/image-upload'
 
 // Headline font size configuration per template
 const HEADLINE_SIZE_CONFIG: Record<string, { default: number; min: number; max: number; step: number }> = {
@@ -658,9 +659,17 @@ export function EditorScreen() {
   // Handle image upload for thumbnail - upload to Vercel Blob for export compatibility
   // This avoids 413 Payload Too Large errors when exporting large images
   const [isImageUploading, setIsImageUploading] = useState(false)
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null)
 
   const handleImageUpload = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) return
+    // Pre-flight against the route's own rules so a predictable rejection is
+    // reported instantly, with a reason, instead of as a generic failure.
+    const invalid = validateImageFile(file)
+    if (invalid) {
+      setImageUploadError(invalid)
+      return
+    }
+    setImageUploadError(null)
 
     setIsImageUploading(true)
     try {
@@ -678,12 +687,22 @@ export function EditorScreen() {
       setThumbnailImageUrl(blob.url)
     } catch (error) {
       console.error('Image upload failed:', error)
-      // Fallback to data URL for local development without Blob token
+      // The data-URL fallback is only correct when there's no Blob store to
+      // upload to (local dev, no token). Ask the server rather than sniffing
+      // the error: @vercel/blob reports a 400 file rejection and a missing
+      // token with the identical message. Any real failure must reach the user
+      // instead of quietly becoming a multi-MB base64 string that can then
+      // break the export.
+      if (await isBlobConfigured()) {
+        setImageUploadError(IMAGE_UPLOAD_FAILED)
+        return
+      }
       const reader = new FileReader()
       reader.onload = () => {
         const dataUrl = reader.result as string
         setThumbnailImageUrl(dataUrl)
       }
+      reader.onerror = () => setImageUploadError(IMAGE_UPLOAD_FAILED)
       reader.readAsDataURL(file)
     } finally {
       setIsImageUploading(false)
@@ -2110,6 +2129,8 @@ export function EditorScreen() {
                             </svg>
                             Uploading...
                           </>
+                        ) : imageUploadError ? (
+                          <span className="text-red-500">{imageUploadError}</span>
                         ) : (
                           <>
                             <svg className="w-4 h-4 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

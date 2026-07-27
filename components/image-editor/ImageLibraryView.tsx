@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { upload } from '@vercel/blob/client'
 import { ArrowLeft, ImageUp, Search, WandSparkles } from 'lucide-react'
 import { ImageEditButton } from './ImageEditButton'
+import { IMAGE_UPLOAD_FAILED, isBlobConfigured, validateImageFile } from '@/lib/image-upload'
 
 /**
  * ImageLibraryView — chrome-less library view (Figma 373:509).
@@ -50,6 +51,7 @@ export function ImageLibraryView({ onSelect, onBack }: ImageLibraryViewProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // ---- data load ----
@@ -103,7 +105,14 @@ export function ImageLibraryView({ onSelect, onBack }: ImageLibraryViewProps) {
 
   // ---- upload ----
   const handleFileUpload = async (file: File) => {
-    if (!file.type.startsWith('image/')) return
+    // Pre-flight against the route's own rules so a predictable rejection is
+    // reported instantly, with a reason, instead of as a generic failure.
+    const invalid = validateImageFile(file)
+    if (invalid) {
+      setUploadError(invalid)
+      return
+    }
+    setUploadError(null)
     setIsUploading(true)
     try {
       const ext = file.name.split('.').pop() || file.type.split('/')[1] || 'png'
@@ -114,15 +123,29 @@ export function ImageLibraryView({ onSelect, onBack }: ImageLibraryViewProps) {
       })
       setIsUploading(false)
       onSelect(blob.url)
-    } catch {
-      // Local dev fallback when BLOB_READ_WRITE_TOKEN isn't set — data URL.
+    } catch (error) {
+      // The data-URL fallback is only correct when there's no Blob store to
+      // upload to (local dev, no token). Ask the server rather than sniffing
+      // the error: @vercel/blob reports a 400 file rejection and a missing
+      // token with the identical message. Any real failure must reach the
+      // user instead of quietly becoming a multi-MB base64 string that can
+      // then break the export.
+      if (await isBlobConfigured()) {
+        console.error('Image upload failed:', error)
+        setIsUploading(false)
+        setUploadError(IMAGE_UPLOAD_FAILED)
+        return
+      }
       const reader = new FileReader()
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string
         setIsUploading(false)
         onSelect(dataUrl)
       }
-      reader.onerror = () => setIsUploading(false)
+      reader.onerror = () => {
+        setIsUploading(false)
+        setUploadError(IMAGE_UPLOAD_FAILED)
+      }
       reader.readAsDataURL(file)
     }
   }
@@ -244,7 +267,10 @@ export function ImageLibraryView({ onSelect, onBack }: ImageLibraryViewProps) {
         />
         <ImageEditButton
           icon={<ImageUp className="w-full h-full" strokeWidth={1.5} />}
-          label={isUploading ? 'Uploading…' : 'Drag or Upload'}
+          // The label doubles as the status slot: idle → uploading → error.
+          // Clicking to retry clears the error (handleFileUpload resets it).
+          label={uploadError ?? (isUploading ? 'Uploading…' : 'Drag or Upload')}
+          labelClassName={uploadError ? 'text-red-500' : undefined}
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
           className="h-[100px] flex-1"

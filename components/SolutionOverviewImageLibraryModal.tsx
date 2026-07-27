@@ -8,6 +8,7 @@ import {
   heroCategoryLabels,
   type HeroLibraryImage,
 } from '@/config/solution-overview-hero-images'
+import { IMAGE_UPLOAD_FAILED, isBlobConfigured, validateImageFile } from '@/lib/image-upload'
 
 interface SolutionOverviewImageLibraryModalProps {
   solution: SolutionCategory
@@ -26,6 +27,7 @@ export function SolutionOverviewImageLibraryModal({
     solution === 'converged' ? null : solution
   )
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Get images sorted by relevance to current solution
@@ -43,9 +45,14 @@ export function SolutionOverviewImageLibraryModal({
 
   // Handle file upload — uses Vercel Blob to avoid 413 Payload Too Large
   const handleFileUpload = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
+    // Pre-flight against the route's own rules so a predictable rejection is
+    // reported instantly, with a reason, instead of as a generic failure.
+    const invalid = validateImageFile(file)
+    if (invalid) {
+      setUploadError(invalid)
       return
     }
+    setUploadError(null)
 
     setIsUploading(true)
 
@@ -58,7 +65,19 @@ export function SolutionOverviewImageLibraryModal({
       })
       setIsUploading(false)
       onSelect(blob.url)
-    } catch {
+    } catch (error) {
+      // The data-URL fallback is only correct when there's no Blob store to
+      // upload to (local dev, no token). Ask the server rather than sniffing
+      // the error: @vercel/blob reports a 400 file rejection and a missing
+      // token with the identical message. Any real failure must reach the
+      // user instead of quietly becoming a multi-MB base64 string that can
+      // then break the export.
+      if (await isBlobConfigured()) {
+        console.error('Image upload failed:', error)
+        setIsUploading(false)
+        setUploadError(IMAGE_UPLOAD_FAILED)
+        return
+      }
       const reader = new FileReader()
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string
@@ -67,6 +86,7 @@ export function SolutionOverviewImageLibraryModal({
       }
       reader.onerror = () => {
         setIsUploading(false)
+        setUploadError(IMAGE_UPLOAD_FAILED)
       }
       reader.readAsDataURL(file)
     }
@@ -122,6 +142,8 @@ export function SolutionOverviewImageLibraryModal({
           >
             {isUploading ? (
               <span className="text-sm text-gray-500">Uploading...</span>
+            ) : uploadError ? (
+              <span className="text-sm text-red-500">{uploadError}</span>
             ) : (
               <>
                 <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
