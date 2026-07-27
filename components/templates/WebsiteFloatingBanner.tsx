@@ -6,6 +6,7 @@ import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { RichText } from '@/components/shared/RichText'
 
 export type FloatingBannerVariant =
   | 'white'
@@ -191,7 +192,7 @@ export function WebsiteFloatingBanner({
       lineHeight: `${headlineFontSize ?? 32.73}px`,
       textShadow: textShadowStyle,
     }}>
-      {wrapInline('headline', <div>{headline || SLOT_PLACEHOLDERS.headline}</div>)}
+      {wrapInline('headline', <RichText html={headline || SLOT_PLACEHOLDERS.headline} />)}
     </div>
   ))
 

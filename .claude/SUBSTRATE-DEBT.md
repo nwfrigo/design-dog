@@ -111,3 +111,14 @@
 **Estimate to pay:** Small — add a "cta style switchable" capability (slot config or registry flag) and gate `EditbarCta`'s toggle on it.
 **First step when you start:** `grep ctaStyle components/templates` to enumerate which CTAs actually branch; add the capability flag at the slot/registration level and read it in `EditbarCta`.
 
+
+---
+
+## Multi-line plain slots have no `maxLines` cap
+
+**What:** The 5 multi-line `format: 'plain'` slots (`NewsletterTopBanner.headline`/`.subhead`, `CustomerLibrary.footerText`, `EmailEhsAccelerateInvitation.invitationHeadline`/`.invitationEventTitle`) declare no `maxLines`, so nothing stops a user from adding line breaks past the fixed-height frame they sit in. On `newsletter-top-banner` a two-line subhead already clips at the banner's bottom edge.
+**Why deferred:** Surfaced while fixing the line-break-collapse bug — before that fix the breaks were being silently swallowed, so the overflow was invisible. Choosing each slot's correct cap is a per-template design decision (what's the intended maximum for a newsletter banner headline?), not a substrate change, and picking numbers unilaterally would be design drift.
+**Cost to ignore:** A user can push text out of a fixed-height banner and only notice in the export. The substrate already has the primitive to prevent it (`SlotContentSpec.maxLines`, measured against `lineHeight`), so this is unclaimed capability rather than missing capability.
+**Trigger condition:** A user reports clipped text on any of those 5 slots, OR the next design pass over `newsletter-top-banner` / the EHS+ invitation.
+**Estimate to pay:** Small — one `maxLines: n` per slot descriptor, plus a visual check per template that the cap matches the frame.
+**First step when you start:** For each of the 5 slots, measure how many rendered lines the frame actually accommodates at the slot's font size, then set `maxLines` in the adapter's `SlotContentSpec`. `executive-overview` is the reference for slots that already declare caps.

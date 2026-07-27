@@ -11,6 +11,7 @@ import {
   ContentStack,
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
+import { RichText } from '@/components/shared/RichText'
 
 /** Logical IDs for editable blocks + the `logo` topAnchor (always-visible,
  *  brand-locked baked-in lockup). */
@@ -56,12 +57,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
   return html.replace(/<[^>]*>/g, '').trim() === ''
 }
 
-const RICH_TEXT_STYLES = `
-  .social-ehs-rich-text strong { font-weight: 500; }
-  .social-ehs-rich-text em { font-style: italic; }
-  .social-ehs-rich-text p { margin: 0; }
-  .social-ehs-rich-text p + p { margin-top: 0.3em; }
-`
 
 export function SocialEhsAccelerate({
   headline,
@@ -112,11 +107,10 @@ export function SocialEhsAccelerate({
       id: 'headline',
       visible: showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+        <RichText html={hasHeadline ? headline : 'Headline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="social-ehs-rich-text"
           style={{
             color: textColor,
             fontSize: headlineFontSize ?? HEADLINE_DEFAULT,
@@ -132,11 +126,10 @@ export function SocialEhsAccelerate({
       id: 'subhead',
       visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead : 'Subheadline' }} />
+        <RichText html={hasSubhead ? subhead : 'Subheadline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="social-ehs-rich-text"
           style={{
             color: textColor,
             fontSize: subheadFontSize ?? SUBHEAD_DEFAULT,
@@ -171,7 +164,6 @@ export function SocialEhsAccelerate({
 
   return (
     <div style={containerStyle}>
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       {/* Background image (gradients + lockup-adjacent art baked in) */}
       <img

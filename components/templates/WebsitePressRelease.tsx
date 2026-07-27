@@ -1,6 +1,7 @@
 'use client'
 
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+import { RichText } from '@/components/shared/RichText'
 
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
@@ -239,7 +240,7 @@ export function WebsitePressRelease({
             {
               id: 'headline',
               visible: showHeadline,
-              defaultInner: headline || SLOT_PLACEHOLDERS.headline,
+              defaultInner: <RichText html={headline || SLOT_PLACEHOLDERS.headline} />,
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -257,7 +258,7 @@ export function WebsitePressRelease({
             {
               id: 'subhead',
               visible: showSubhead,
-              defaultInner: subhead || SLOT_PLACEHOLDERS.subhead,
+              defaultInner: <RichText html={subhead || SLOT_PLACEHOLDERS.subhead} />,
               renderChrome: (inner) => (
                 <div
                   style={{
@@ -274,7 +275,7 @@ export function WebsitePressRelease({
             {
               id: 'body',
               visible: showBody,
-              defaultInner: body || SLOT_PLACEHOLDERS.body,
+              defaultInner: <RichText html={body || SLOT_PLACEHOLDERS.body} />,
               renderChrome: (inner) => (
                 <div
                   style={{

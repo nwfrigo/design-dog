@@ -17,6 +17,7 @@ import {
   filtersToCss,
   type ImageFilters,
 } from '@/lib/image-filters'
+import { RichText } from '@/components/shared/RichText'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type ImageSize = 'none' | 'small' | 'large'
@@ -200,10 +201,10 @@ export function NewsletterDarkGradient({
       id: 'headline',
       visible: !!showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: headline || SLOT_PLACEHOLDERS.headline }} />
+        <RichText html={headline || SLOT_PLACEHOLDERS.headline} />
       ),
       renderChrome: (inner) => (
-        <div className="nl-rich-text" style={{
+        <div style={{
           alignSelf: 'stretch',
           color: textColor,
           fontSize: headlineFontSize ?? 24,
@@ -218,10 +219,10 @@ export function NewsletterDarkGradient({
       id: 'subhead',
       visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: subhead || SLOT_PLACEHOLDERS.subhead }} />
+        <RichText html={subhead || SLOT_PLACEHOLDERS.subhead} />
       ),
       renderChrome: (inner) => (
-        <div className="nl-rich-text" style={{
+        <div style={{
           alignSelf: 'stretch',
           color: textColor,
           fontSize: subheadFontSize ?? 12,
@@ -258,7 +259,6 @@ export function NewsletterDarkGradient({
 
   return (
     <div style={containerStyle}>
-      <style>{`.nl-rich-text p { margin: 0; }`}</style>
       {/* Background Image */}
       <img
         src={BACKGROUND_IMAGES[colorStyle]}

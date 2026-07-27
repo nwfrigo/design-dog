@@ -163,8 +163,40 @@ Activation: adapter's `renderInlineEditor` swaps the static inner for `<InlineTe
 **Paste-and-match-style.** `InlineTextEdit`'s `onPaste` inserts the clipboard's PLAIN text at the caret (`document.execCommand('insertText')`), stripping source formatting (Word highlights/colors/fonts); newlines collapse to spaces on single-line fields. Any bold/italic already in the field survives. Substrate-wide — every S&B slot gets it.
 
 Rich text Bold/Italic operates at two levels (see EditbarText):
-- While editing: `document.execCommand` on the current text-range selection (character-level).
-- While block-selected only: the registry setter wraps/unwraps the whole content in `<strong>` / `<em>` via `ContentRegistry.set()` (block-level). Plain-text slots disable B/I in block mode.
+- While editing: `document.execCommand` on the current text-range selection (character-level). **Chrome emits `<b>` / `<i>` here, not `<strong>` / `<em>`** — both spellings must be handled downstream.
+- While block-selected only: the registry setter wraps/unwraps the whole content in `<strong>` / `<em>` via `ContentRegistry.set()` (block-level).
+
+**B/I are disabled on plain-text slots in *both* modes.** They used to re-enable on entering edit mode, which meant `execCommand` visibly bolted the selection and then the `innerText` read dropped the tag on commit — formatting that appeared to work and silently didn't. `InlineTextEdit` also swallows Cmd/Ctrl+B/I/U on plain slots, because contentEditable handles those natively and disabling a toolbar button does nothing about a keystroke. A control that can't persist its effect isn't offered.
+
+#### The render-site contract (load-bearing)
+
+Each `SlotContentSpec.format` has a matching render primitive. Declaring the format in the adapter is only half the wiring — the template's render site is the other half, and both halves are gated by `npm run validate:registrations` (§4.16).
+
+| Slot | Renders through | Why |
+|---|---|---|
+| `format: 'html'` | `<RichText html={…} />` | Stores real HTML; a React text child escapes it → literal `<strong>` / `<div>` on canvas *and* export. |
+| `format: 'plain'`, multi-line | `<PlainText text={…} />` | Stores a literal `\n`; HTML collapses it → the user's line break vanishes on commit. |
+| `format: 'plain'`, single-line | plain text child | Can hold neither a tag nor a newline; needs no primitive. |
+
+"Multi-line" means the factory would allow Enter: `singleLine` not `true`, and not `kind: 'cta'` (which defaults to single-line).
+
+Both shapes, in both template tracks:
+
+```tsx
+import { RichText } from '@/components/shared/RichText'
+import { PlainText } from '@/components/shared/PlainText'
+
+// ContentStack (Track 1)
+defaultInner: <RichText html={headline || SLOT_PLACEHOLDERS.headline} />
+// Track 2
+{wrapInline('headline', <RichText html={headline || SLOT_PLACEHOLDERS.headline} />)}
+// multi-line plain
+{wrapInline('subhead', <PlainText text={subhead || SLOT_PLACEHOLDERS.subhead} />)}
+```
+
+Both primitives carry a canonical class — `.dd-rich-text` and `.dd-plain-text` — whose rules live **once** in `app/globals.css`, inherited by the editor and the Puppeteer render route alike. So bold reads as Fakt Pro Medium (500) rather than the browser default 700 everywhere, and a `\n` survives as a line break. `InlineTextEdit` applies `.dd-rich-text` too, so the editing view matches the committed view matches the export. Per-template deviations layer a second class on top (`<RichText className="exec-rich-text" …>`, double-class selector so it wins on specificity, not stylesheet order); they never restate the canonical rules.
+
+**Why this needed a gate rather than a doc.** The legacy sidebar editor gated rich text behind a hardcoded template allow-list (still visible in `EditorScreen.tsx`), and only those templates ever had their render sites converted to accept HTML. The Stage & Bench migration then handed `format: 'html'` to *every* template's headline/subhead/body. Nothing connected the two halves, so 21 slots across 11 templates shipped rendering escaped markup — invisible until a user actually pressed ⌘B or Enter. `TEMPLATES.md` had documented the rule the whole time; documentation alone did not hold it. Consolidating 14 copy-pasted `RICH_TEXT_STYLES` blocks (under 8 class names) into one rule set removed the substrate-level cause; the validator prevents the next instance.
 
 ### 4.8 DnD primitive
 
@@ -257,7 +289,11 @@ Defaults are identity (`(_id, content) => content`). The export render page neve
 
 ### 4.16 Registration validator
 
-`scripts/validate-registrations.ts` — runnable via `npm run validate:registrations`. Static check that, for each adapter, every toggleable slot (one with `setVisible: setShow*` wired in `slotState`) is referenced in both the registration's `renderProps` and `exportBuilder`. Accepts direct LHS keys (`showFoo: s.showFoo`) AND RHS rename patterns (`showRenamed: s.showFoo`). Catches the class of bug where a user-toggleable flag silently drops out of the export pipeline. Required-passing before merging template work.
+`scripts/validate-registrations.ts` — runnable via `npm run validate:registrations`. Required-passing before merging template work. Two static checks:
+
+1. **Visibility-flag wiring.** For each adapter, every toggleable slot (one with `setVisible: setShow*` wired in `slotState`) is referenced in both the registration's `renderProps` and `exportBuilder`. Accepts direct LHS keys (`showFoo: s.showFoo`) AND RHS rename patterns (`showRenamed: s.showFoo`). Catches the class of bug where a user-toggleable flag silently drops out of the export pipeline.
+
+2. **Text render sites.** Every `format: 'html'` slot must render through `<RichText>`, and every multi-line `format: 'plain'` slot through `<PlainText>` (§4.7). The script resolves the adapter's `templates/` imports, locates each slot's render site (`defaultInner:` for ContentStack, `wrapInline('id', …)` for Track 2), and fails if the site doesn't use the right primitive. A render site it cannot locate is reported as a failure too — silence never counts as a pass. Applies to computed-slot adapters as well; the format↔render-site contract is independent of how the slot set is resolved.
 
 ### 4.17 Telemetry hooks
 
@@ -335,7 +371,7 @@ These are settled. Reopening requires a fresh round of justification.
 | 3 | CTA is its own kind | **Yes.** `EditbarCta` is separate from `EditbarText`. No Bold/Italic — CTA styling is template-controlled. |
 | 4 | Stack alignment scope | **Canvas-wide (Stage Bar).** One value per asset. Group selection isn't a v1 primitive. |
 | 5 | Inline text editor implementation | **Custom uncontrolled contentEditable** (`InlineTextEdit.tsx`), not Tiptap. The uncontrolled approach sidesteps React reconciliation conflicts; Tiptap's bundle weight isn't justified for slot-scoped editing. |
-| 6 | Rich-text vs plain-text format | **Per-slot.** `SlotContentSpec.format` declares; `InlineTextEdit.format` matches; B/I disabled on plain. |
+| 6 | Rich-text vs plain-text format | **Per-slot.** `SlotContentSpec.format` declares; `InlineTextEdit.format` matches; B/I disabled on plain in both modes (toolbar *and* the native ⌘B/I/U). The render site must use the primitive matching the format — `<RichText>` / `<PlainText>` — since declaration and render site are two halves of one contract, gated by `validate:registrations` (§4.7, §4.16). |
 | 7 | Selection identity | **Path-based** (`<templateId>.<slotKey>`), not UUIDs. Templates are rigid; paths are stable. |
 | 8 | Slot identity vs store keys | **Decoupled.** Slot path is for toolbar scoping; the storeKey is the actual write target. Same content surfaces across templates that share store keys (headline, ctaText, etc.) — this is intentional. |
 | 9 | Drop-target plumbing | **Factory-owned via `useStageBenchDroppables(slots)`.** Adapters do not write `onDropToStage` / `onDropToBench` handlers. |
@@ -375,7 +411,7 @@ Why: WYSIWYG editing depends on the slot existing on stage so the user can doubl
 
 How to implement, by template paradigm:
 
-- **ContentStack (Track 1):** in the block's `defaultInner`, fall back to the placeholder string when the value is empty (e.g. `defaultInner: subhead || 'Subheadline'`). `renderChrome` already wraps the inner; the placeholder inherits the chrome's styling.
+- **ContentStack (Track 1):** in the block's `defaultInner`, fall back to the placeholder string when the value is empty (e.g. `defaultInner: <RichText html={subhead || 'Subheadline'} />` for an `html` slot, or `defaultInner: subhead || 'Subheadline'` for a `plain` one — see §4.7). `renderChrome` already wraps the inner; the placeholder inherits the chrome's styling.
 - **Track 2 (inline `wrapInline`):** put the styled wrapper *outside* `wrapInline` (see §8.5 below) and pass `value || 'Placeholder'` into the body that `wrapInline` receives.
 
 #### Canonical placeholder strings
@@ -401,12 +437,12 @@ wrapInline('headline', (
 ))
 
 // ✅ Right — styled wrapper survives the editor swap
-<div className="rich-text" style={{ color, fontSize, fontWeight }}>
-  {wrapInline('headline', (
-    <div dangerouslySetInnerHTML={{ __html: headline || 'Headline' }} />
-  ))}
+<div style={{ color, fontSize, fontWeight }}>
+  {wrapInline('headline', <RichText html={headline || 'Headline'} />)}
 </div>
 ```
+
+(`<RichText>` because `headline` is an `html`-format slot — see §4.7. A `plain` slot passes `<span>{value || 'Placeholder'}</span>` instead.)
 
 For ContentStack templates the `renderChrome` callback already implements this pattern — `renderChrome((inner) => <styled-wrapper>{inner}</styled-wrapper>)` wraps the inline editor when it takes over from `defaultInner`. Track 2 templates have to hand-wire it.
 
@@ -460,7 +496,8 @@ The multi-page paradigm the postmortem flagged as "would need a different shell 
 - `components/canvas-editor/Editable.tsx` — selection / deep-click / drag-source wiring; the foundation every adapter sits on.
 - `components/canvas-editor/InlineTextEdit.tsx` — contentEditable text editor; `format: 'html'` preserves bold/italic.
 - `components/canvas-editor/editbar/EditbarText.tsx` — bold/italic + font-size + line-height + visibility toolbar.
-- `scripts/validate-registrations.ts` — static validator for the export-pipeline visibility-flag wiring.
+- `components/shared/RichText.tsx` / `PlainText.tsx` + `.dd-rich-text` / `.dd-plain-text` in `app/globals.css` — the one way to render each slot format's value (§4.7).
+- `scripts/validate-registrations.ts` — static validator for the export-pipeline visibility-flag wiring **and** the slot-format render-site contract.
 - `lib/telemetry.ts` + `/api/track` + `/admin/events` — telemetry shell.
 - `app/stage-bench-atoms/page.tsx` — visual lab for substrate primitives (Editbar variants, BenchChip kinds, etc.).
 - For the historical journal of how the substrate was built: `STAGE-BENCH-REFACTOR-POSTMORTEM.md`.

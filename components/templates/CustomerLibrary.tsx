@@ -4,6 +4,8 @@ import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { RichText } from '@/components/shared/RichText'
+import { PlainText } from '@/components/shared/PlainText'
 
 export type CustomerLibraryVariant = 'orange' | 'dark' | 'light'
 
@@ -133,9 +135,6 @@ export function CustomerLibrary({
 
   return (
     <div style={containerStyle}>
-      <style>{`
-        .cl-rich-text p { margin: 0; }
-      `}</style>
       {/* Left content area — flows naturally so eyebrow tracks headline height */}
       <div
         style={{
@@ -153,7 +152,6 @@ export function CustomerLibrary({
         {/* Headline */}
         {showHeadline && wrapBlock('headline', (
           <div
-            className="cl-rich-text"
             style={{
               width: 298,
               color: c.headlineColor,
@@ -166,7 +164,7 @@ export function CustomerLibrary({
           >
             {wrapInline(
               'headline',
-              <span dangerouslySetInnerHTML={{ __html: headline || 'Chemical Library' }} />
+              <RichText as="span" html={headline || 'Chemical Library'} />
             )}
           </div>
         ))}
@@ -203,7 +201,6 @@ export function CustomerLibrary({
             }}
           >
             <div
-              className="cl-rich-text"
               style={{
                 width: 210,
                 color: c.bodyColor,
@@ -214,7 +211,7 @@ export function CustomerLibrary({
             >
               {wrapInline(
                 'body',
-                <span dangerouslySetInnerHTML={{ __html: body || 'Body text' }} />
+                <RichText as="span" html={body || 'Body text'} />
               )}
             </div>
             <ArrowIcon
@@ -356,7 +353,7 @@ export function CustomerLibrary({
                 wordWrap: 'break-word',
               }}
             >
-              {wrapInline('footerText', footerText || 'Lorem ipsum')}
+              {wrapInline('footerText', <PlainText text={footerText || 'Lorem ipsum'} />)}
             </div>
           ))}
         </div>

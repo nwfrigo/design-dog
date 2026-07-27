@@ -5,6 +5,7 @@ import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { RichText } from '@/components/shared/RichText'
 
 export type FloatingBannerMobileVariant =
   | 'light'
@@ -172,7 +173,7 @@ export function WebsiteFloatingBannerMobile({
       fontWeight: 350,
       lineHeight: `${(headlineFontSize ?? 14) * (15.40 / 14)}px`,
     }}>
-      {wrapInline('headline', <div>{headline || SLOT_PLACEHOLDERS.headline}</div>)}
+      {wrapInline('headline', <RichText html={headline || SLOT_PLACEHOLDERS.headline} />)}
     </div>
   ))
 

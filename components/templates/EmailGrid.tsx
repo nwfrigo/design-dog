@@ -1,6 +1,7 @@
 'use client'
 
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+import { RichText } from '@/components/shared/RichText'
 
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
@@ -161,7 +162,7 @@ export function EmailGrid({
     {
       id: 'headline',
       visible: !!(showLightHeader && showHeadline),
-      defaultInner: headline || SLOT_PLACEHOLDERS.headline,
+      defaultInner: <RichText html={headline || SLOT_PLACEHOLDERS.headline} />,
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,
@@ -187,7 +188,7 @@ export function EmailGrid({
     {
       id: 'body',
       visible: !!showBody,
-      defaultInner: body || SLOT_PLACEHOLDERS.body,
+      defaultInner: <RichText html={body || SLOT_PLACEHOLDERS.body} />,
       renderChrome: (inner) => (
         <div style={{
           color: themeColors.textPrimary,

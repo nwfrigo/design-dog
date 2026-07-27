@@ -1,6 +1,7 @@
 'use client'
 
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
+import { RichText } from '@/components/shared/RichText'
 
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
@@ -158,7 +159,7 @@ export function SocialGridDetail({
     {
       id: 'headline',
       visible: !!showHeadline,
-      defaultInner: headline || SLOT_PLACEHOLDERS.headline,
+      defaultInner: <RichText html={headline || SLOT_PLACEHOLDERS.headline} />,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',
@@ -172,7 +173,7 @@ export function SocialGridDetail({
     {
       id: 'subhead',
       visible: showSubhead,
-      defaultInner: subhead || SLOT_PLACEHOLDERS.subhead,
+      defaultInner: <RichText html={subhead || SLOT_PLACEHOLDERS.subhead} />,
       renderChrome: (inner) => (
         <div style={{
           alignSelf: 'stretch',

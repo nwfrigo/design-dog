@@ -6,6 +6,7 @@ import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityConnectLogo } from '@/components/shared/CorityConnectLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { RichText } from '@/components/shared/RichText'
 
 // Background variant format: '{mode}-{color}-{number}'
 // e.g. 'dark-blue-1', 'light-orange-3'
@@ -52,12 +53,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
   return html.replace(/<[^>]*>/g, '').trim() === ''
 }
 
-const RICH_TEXT_STYLES = `
-  .cc-rich-text strong { font-weight: 500; }
-  .cc-rich-text em { font-style: italic; }
-  .cc-rich-text p { margin: 0; }
-  .cc-rich-text p + p { margin-top: 0.3em; }
-`
 
 export function EmailCorityConnect2026({
   headline,
@@ -102,7 +97,6 @@ export function EmailCorityConnect2026({
   // inherits typography from a div that survives edit mode (WYSIWYG).
   const headlineNode: ReactNode = wrapBlock('headline', (
     <div
-      className="cc-rich-text"
       style={{
         alignSelf: 'stretch',
         color: textColor,
@@ -112,14 +106,13 @@ export function EmailCorityConnect2026({
       }}
     >
       {wrapInline('headline', (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+        <RichText html={hasHeadline ? headline : 'Headline'} />
       ))}
     </div>
   ))
 
   const bodyNode: ReactNode = wrapBlock('body', (
     <div
-      className="cc-rich-text"
       style={{
         alignSelf: 'stretch',
         color: textColor,
@@ -128,7 +121,7 @@ export function EmailCorityConnect2026({
       }}
     >
       {wrapInline('body', (
-        <div dangerouslySetInnerHTML={{ __html: hasBody ? body : 'Body copy goes here.' }} />
+        <RichText html={hasBody ? body : 'Body copy goes here.'} />
       ))}
     </div>
   ))
@@ -152,7 +145,6 @@ export function EmailCorityConnect2026({
 
   return (
     <div style={containerStyle}>
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       <img
         src={backgroundUrl(backgroundVariant)}

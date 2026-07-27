@@ -3,6 +3,8 @@
 import { type ReactNode } from 'react'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
+import { RichText } from '@/components/shared/RichText'
+import { PlainText } from '@/components/shared/PlainText'
 
 /** Editable block ids for Stage & Bench wiring. Logo + RSVP button +
  *  background image are brand-locked. */
@@ -92,7 +94,7 @@ export function EmailEhsAccelerateInvitation({
           color: '#060015', fontSize: 40.93, fontWeight: 350, lineHeight: '38.47px',
           wordWrap: 'break-word',
         }}>
-          {wrapInline('invitationHeadline', invitationHeadline || 'Exclusive EHS+ Leader Workshop')}
+          {wrapInline('invitationHeadline', <PlainText text={invitationHeadline || 'Exclusive EHS+ Leader Workshop'} />)}
         </div>
       ))}
 
@@ -108,7 +110,7 @@ export function EmailEhsAccelerateInvitation({
             color: '#060015', fontSize: 8, fontWeight: 400,
             textTransform: 'uppercase', lineHeight: '9.92px',
           }}>
-            {wrapInline('invitationEventTitle', invitationEventTitle || 'EHS+ Accelerate: Tech Convergence Workshop')}
+            {wrapInline('invitationEventTitle', <PlainText text={invitationEventTitle || 'EHS+ Accelerate: Tech Convergence Workshop'} />)}
           </div>
         ))}
 
@@ -167,7 +169,7 @@ export function EmailEhsAccelerateInvitation({
           >
             {wrapInline(
               'invitationBody',
-              <span dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+              <RichText as="span" html={bodyHtml} />
             )}
           </div>
         ))}
@@ -200,7 +202,6 @@ export function EmailEhsAccelerateInvitation({
         .ehs-invite-body ol li { position: relative; padding-left: 14px; margin: 2px 0; counter-increment: item; }
         .ehs-invite-body ol li::before { content: counter(item) '.'; position: absolute; left: 0; top: 0; }
         .ehs-invite-body li p { display: inline; margin: 0; }
-        .ehs-invite-body strong { font-weight: 500; }
       `}</style>
       {renderOverlay?.()}
     </div>

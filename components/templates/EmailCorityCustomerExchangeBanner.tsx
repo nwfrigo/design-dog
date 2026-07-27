@@ -6,6 +6,7 @@ import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityCustomerExchangeStackedLogo } from '@/components/shared/CorityCustomerExchangeStackedLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { RichText } from '@/components/shared/RichText'
 
 export type CCEBannerColorStyle = '1' | '2' | '3' | '4'
 
@@ -46,15 +47,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
   return html.replace(/<[^>]*>/g, '').trim() === ''
 }
 
-const RICH_TEXT_STYLES = `
-  .cce-rich-text strong { font-weight: 500; }
-  .cce-rich-text em { font-style: italic; }
-  .cce-rich-text p { margin: 0; }
-  .cce-rich-text p + p { margin-top: 0.3em; }
-  .cce-rich-text ul { list-style-type: disc; padding-left: 16px; margin: 0; }
-  .cce-rich-text ol { list-style-type: decimal; padding-left: 16px; margin: 0; }
-  .cce-rich-text a { color: #D35F0B; text-decoration: none; }
-`
 
 const PANEL_WIDTH = 233
 const LOGO_WIDTH = 125
@@ -96,7 +88,6 @@ export function EmailCorityCustomerExchangeBanner({
 
   const headlineNode: ReactNode = wrapBlock('headline', (
     <div
-      className="cce-rich-text"
       style={{
         color: '#FFFFFF',
         fontSize: headlineFontSize ?? HEADLINE_DEFAULT,
@@ -105,14 +96,13 @@ export function EmailCorityCustomerExchangeBanner({
       }}
     >
       {wrapInline('headline', (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+        <RichText html={hasHeadline ? headline : 'Headline'} />
       ))}
     </div>
   ))
 
   const bodyNode: ReactNode = wrapBlock('body', (
     <div
-      className="cce-rich-text"
       style={{
         color: '#969899',
         fontSize: 18,
@@ -121,7 +111,7 @@ export function EmailCorityCustomerExchangeBanner({
       }}
     >
       {wrapInline('body', (
-        <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
+        <RichText html={body || SLOT_PLACEHOLDERS.body} />
       ))}
     </div>
   ))
@@ -150,7 +140,6 @@ export function EmailCorityCustomerExchangeBanner({
 
   return (
     <div style={containerStyle}>
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       <img
         src={CCE_BANNER_BACKGROUND_IMAGES[colorStyle]}

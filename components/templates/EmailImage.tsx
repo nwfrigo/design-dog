@@ -20,6 +20,7 @@ import {
   filtersToCss,
   type ImageFilters,
 } from '@/lib/image-filters'
+import { RichText } from '@/components/shared/RichText'
 
 export type LayoutVariant = 'even' | 'more-image' | 'more-text'
 
@@ -85,12 +86,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
   return html.replace(/<[^>]*>/g, '').trim() === ''
 }
 
-const RICH_TEXT_STYLES = `
-  .email-img-rich-text strong { font-weight: 500; }
-  .email-img-rich-text em { font-style: italic; }
-  .email-img-rich-text p { margin: 0; }
-  .email-img-rich-text p + p { margin-top: 0.3em; }
-`
 
 export function EmailImage({
   headline,
@@ -192,11 +187,10 @@ export function EmailImage({
       id: 'headline',
       visible: !!showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+        <RichText html={hasHeadline ? headline : 'Headline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="email-img-rich-text"
           style={{
             alignSelf: 'stretch',
             color: textColor,
@@ -211,11 +205,10 @@ export function EmailImage({
       id: 'body',
       visible: showBody,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
+        <RichText html={body || SLOT_PLACEHOLDERS.body} />
       ),
       renderChrome: (inner) => (
         <div
-          className="email-img-rich-text"
           style={{
             alignSelf: 'stretch',
             color: textColor,
@@ -250,7 +243,6 @@ export function EmailImage({
 
   return (
     <div style={containerStyle}>
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       {/* Left content column — header (logo + pill) topAnchor; rest is
        *  ContentStack-distributed by stackAlign with adjustable per-gap

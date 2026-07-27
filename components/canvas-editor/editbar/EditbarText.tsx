@@ -156,23 +156,26 @@ export function EditbarText({ noDragHandle = true }: EditbarTextProps) {
     }
   }
 
+  // Format guard first in both handlers: a plain slot can't persist inline tags
+  // (InlineTextEdit reads it back with `innerText`), so neither the character-
+  // level nor the block-level path may run on one.
   const onBold = () => {
+    if (!content || content.format !== 'html') return
     if (isEditing) {
       document.execCommand('bold')
       refreshActiveStates()
       return
     }
-    if (!content || content.format !== 'html') return
     content.set(toggleFormat(content.value, BOLD_TAGS, 'strong'))
   }
 
   const onItalic = () => {
+    if (!content || content.format !== 'html') return
     if (isEditing) {
       document.execCommand('italic')
       refreshActiveStates()
       return
     }
-    if (!content || content.format !== 'html') return
     content.set(toggleFormat(content.value, ITALIC_TAGS, 'em'))
   }
   const onSizeUp = () => {
@@ -209,11 +212,17 @@ export function EditbarText({ noDragHandle = true }: EditbarTextProps) {
         </>
       )}
       <EditbarSection gap="default">
+        {/* Disabled on plain-text slots in BOTH modes. The old condition
+         *  (`!supportsRichText && !isEditing`) re-enabled B/I as soon as the
+         *  user entered edit mode on a plain slot: execCommand would visibly
+         *  bold the selection, then InlineTextEdit's `innerText` read stripped
+         *  the tag on commit and the formatting silently vanished. A control
+         *  that can't persist its effect shouldn't be offerable. */}
         <EditbarIconButton
           ariaLabel="Bold"
           size="sm"
           active={boldActive}
-          disabled={!supportsRichText && !isEditing}
+          disabled={!supportsRichText}
           onClick={onBold}
         >
           <Bold size={18} />
@@ -222,7 +231,7 @@ export function EditbarText({ noDragHandle = true }: EditbarTextProps) {
           ariaLabel="Italic"
           size="sm"
           active={italicActive}
-          disabled={!supportsRichText && !isEditing}
+          disabled={!supportsRichText}
           onClick={onItalic}
         >
           <Italic size={18} />
