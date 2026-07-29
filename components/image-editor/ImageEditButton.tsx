@@ -31,6 +31,10 @@ export interface ImageEditButtonProps {
    *  drag-and-drop receivers (onDrop / onDragOver) when the tile doubles
    *  as a file-drop target. */
   buttonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>
+  /** Override the label's colour. The tile's label doubles as a status slot
+   *  on the upload variant (idle → "Uploading…" → an error), so the caller
+   *  needs to tint it without restyling the whole tile. */
+  labelClassName?: string
 }
 
 export function ImageEditButton({
@@ -40,6 +44,7 @@ export function ImageEditButton({
   disabled = false,
   className = 'h-20 w-[129px]',
   buttonProps,
+  labelClassName,
 }: ImageEditButtonProps) {
   return (
     <button
@@ -62,7 +67,12 @@ export function ImageEditButton({
       <span className="block w-[18px] h-[18px] text-content-primary">
         {icon}
       </span>
-      <span className="font-mono text-[12px] uppercase text-content-primary leading-none">
+      <span
+        className={[
+          'font-mono text-[12px] uppercase leading-none',
+          labelClassName ?? 'text-content-primary',
+        ].join(' ')}
+      >
         {label}
       </span>
     </button>

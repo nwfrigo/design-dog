@@ -34,6 +34,7 @@ import {
   type LayoutOverrides,
   type CustomSizeSlotId,
 } from '@/lib/custom-size/resolve'
+import { RichText } from '@/components/shared/RichText'
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const h = hex.replace('#', '')
@@ -225,13 +226,14 @@ export function CustomSizeCanvas({
   // editor mid-drag. `data-cs-image` (set on the placeholder) is the hit target.
   const wrapImage = (node: ReactNode): ReactNode => node
 
-  // html-format blocks render via dangerouslySetInnerHTML so inline bold/italic
-  // survives the edit; plain blocks render as text. Empty → canonical placeholder.
+  // html-format blocks render through <RichText> so inline bold/italic and
+  // Enter-inserted line breaks survive the edit (substrate §4.7); plain blocks
+  // render as text. Empty → canonical placeholder.
   const HTML_BLOCKS = new Set<CustomBlockId>(['headline', 'subhead', 'body'])
   const defaultInnerFor = (id: CustomBlockId): ReactNode => {
     const val = content[id] || SLOT_PLACEHOLDERS[id]
     return HTML_BLOCKS.has(id)
-      ? <div dangerouslySetInnerHTML={{ __html: val }} />
+      ? <RichText html={val} />
       : <span>{val}</span>
   }
 

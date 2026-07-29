@@ -92,7 +92,13 @@ export function InlineTextEdit({
     <div
       ref={ref}
       style={{ ...style, outline: 'none', whiteSpace: 'pre-wrap' }}
-      className={format === 'html' ? 'rich-text-white' : undefined}
+      // Same canonical class the committed value renders under (see
+      // components/shared/RichText.tsx), so bold/italic look identical while
+      // editing, after commit, and in the export. This used to be
+      // `rich-text-white`, which only had rules inside 4 templates — so in
+      // every other template bold rendered at the browser default 700 during
+      // editing and then changed weight the moment the edit committed.
+      className={format === 'html' ? 'dd-rich-text' : undefined}
       contentEditable
       suppressContentEditableWarning
       onPaste={(e) => {
@@ -135,6 +141,18 @@ export function InlineTextEdit({
       onKeyDown={(e) => {
         if (singleLine && e.key === 'Enter') {
           e.preventDefault()
+          return
+        }
+        // Suppress the browser-native formatting shortcuts on plain slots.
+        // contentEditable handles Cmd/Ctrl+B/I/U itself, so disabling the
+        // editbar buttons isn't enough — the keystroke would still wrap the
+        // selection in <b>/<i>/<u>, the user would see it apply, and the
+        // `innerText` read below would drop it again on the next input.
+        if (format === 'plain' && (e.metaKey || e.ctrlKey)) {
+          const key = e.key.toLowerCase()
+          if (key === 'b' || key === 'i' || key === 'u') {
+            e.preventDefault()
+          }
         }
       }}
     />

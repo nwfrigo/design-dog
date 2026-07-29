@@ -3,6 +3,7 @@
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
+import { RichText } from '@/components/shared/RichText'
 import {
   NEUTRAL_FILTERS,
   applyGrayscaleBoolean,
@@ -97,7 +98,7 @@ export function EmailProductRelease({
       fontWeight: 300,
       lineHeight: '46.10px',
     }}>
-      {wrapInline('headline', <div>{headline || 'GX2 2026.1'}</div>)}
+      {wrapInline('headline', <RichText html={headline || 'GX2 2026.1'} />)}
     </div>
   ))
 

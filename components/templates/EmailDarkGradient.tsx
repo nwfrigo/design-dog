@@ -11,6 +11,7 @@ import {
   ContentStack,
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
+import { RichText } from '@/components/shared/RichText'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type Alignment = 'left' | 'center'
@@ -73,12 +74,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
 // and may insert either tag. Without normalization, <b> renders at the browser default
 // (bolder of parent's 350 ≈ 400) instead of the brand's 500, producing a multi-step
 // weight cycle on bold-toggle.
-const RICH_TEXT_STYLES = `
-  .rich-text-white strong, .rich-text-white b { font-weight: 500; }
-  .rich-text-white em, .rich-text-white i { font-style: italic; }
-  .rich-text-white p { margin: 0; }
-  .rich-text-white p + p { margin-top: 0.3em; }
-`
 
 const BACKGROUND_IMAGES: Record<ColorStyle, string> = {
   '1': '/assets/backgrounds/social-dark-gradient-1.png',
@@ -203,10 +198,9 @@ export function EmailDarkGradient({
     {
       id: 'headline',
       visible: !!showHeadline,
-      defaultInner: <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />,
+      defaultInner: <RichText html={hasHeadline ? headline : 'Headline'} />,
       renderChrome: (inner) => (
         <div
-          className="rich-text-white"
           style={{
             color: textColor,
             fontSize: headlineFontSize ?? 38,
@@ -224,10 +218,9 @@ export function EmailDarkGradient({
     {
       id: 'subhead',
       visible: showSubhead,
-      defaultInner: <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead! : 'Subheadline' }} />,
+      defaultInner: <RichText html={hasSubhead ? subhead! : 'Subheadline'} />,
       renderChrome: (inner) => (
         <div
-          className="rich-text-white"
           style={{
             color: textColor,
             fontSize: subheadFontSize ?? 24,
@@ -245,10 +238,9 @@ export function EmailDarkGradient({
     {
       id: 'body',
       visible: showBody,
-      defaultInner: <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />,
+      defaultInner: <RichText html={body || SLOT_PLACEHOLDERS.body} />,
       renderChrome: (inner) => (
         <div
-          className="rich-text-white"
           style={{
             color: textColor,
             fontSize: 18,
@@ -309,7 +301,6 @@ export function EmailDarkGradient({
 
   return (
     <div style={containerStyle}>
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       <img
         src={BACKGROUND_IMAGES[colorStyle]}

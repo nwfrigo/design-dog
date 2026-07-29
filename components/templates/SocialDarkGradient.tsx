@@ -11,6 +11,7 @@ import {
   ContentStack,
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
+import { RichText } from '@/components/shared/RichText'
 
 export type ColorStyle = '1' | '2' | '3' | '4'
 export type HeadingSize = 'S' | 'M' | 'L'
@@ -114,12 +115,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
 }
 
 // Inline styles for rich text elements (white text on dark background)
-const RICH_TEXT_STYLES = `
-  .rich-text-white strong { font-weight: 500; }
-  .rich-text-white em { font-style: italic; }
-  .rich-text-white p { margin: 0; }
-  .rich-text-white p + p { margin-top: 0.3em; }
-`
 
 export function SocialDarkGradient({
   eyebrow,
@@ -207,11 +202,10 @@ export function SocialDarkGradient({
       id: 'headline',
       visible: !!showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+        <RichText html={hasHeadline ? headline : 'Headline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="rich-text-white"
           style={{
             color: textColor,
             fontSize: headlineFontSize ?? HEADING_SIZES[headingSize],
@@ -228,11 +222,10 @@ export function SocialDarkGradient({
       id: 'subhead',
       visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead : 'Subheadline' }} />
+        <RichText html={hasSubhead ? subhead : 'Subheadline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="rich-text-white"
           style={{
             color: textColor,
             fontSize: subheadFontSize ?? SUBHEAD_SIZES[headingSize],
@@ -249,11 +242,10 @@ export function SocialDarkGradient({
       id: 'body',
       visible: showBody,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
+        <RichText html={body || SLOT_PLACEHOLDERS.body} />
       ),
       renderChrome: (inner) => (
         <div
-          className="rich-text-white"
           style={{
             color: textColor,
             fontSize: BODY_SIZES[headingSize],
@@ -339,7 +331,6 @@ export function SocialDarkGradient({
   return (
     <div style={containerStyle}>
       {/* Rich text styles for HTML content */}
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       {/* Background Image */}
       <img

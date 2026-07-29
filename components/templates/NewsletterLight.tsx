@@ -18,6 +18,7 @@ import {
   filtersToCss,
   type ImageFilters,
 } from '@/lib/image-filters'
+import { RichText } from '@/components/shared/RichText'
 
 export type ImageSize = 'none' | 'small' | 'large'
 
@@ -176,10 +177,10 @@ export function NewsletterLight({
       id: 'headline',
       visible: !!showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: headline || SLOT_PLACEHOLDERS.headline }} />
+        <RichText html={headline || SLOT_PLACEHOLDERS.headline} />
       ),
       renderChrome: (inner) => (
-        <div className="nl-rich-text" style={{
+        <div style={{
           alignSelf: 'stretch',
           color: textColor,
           fontSize: headlineFontSize ?? 24,
@@ -192,10 +193,10 @@ export function NewsletterLight({
       id: 'subhead',
       visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: subhead || SLOT_PLACEHOLDERS.subhead }} />
+        <RichText html={subhead || SLOT_PLACEHOLDERS.subhead} />
       ),
       renderChrome: (inner) => (
-        <div className="nl-rich-text" style={{
+        <div style={{
           alignSelf: 'stretch',
           color: textColor,
           fontSize: subheadFontSize ?? 12,
@@ -230,7 +231,6 @@ export function NewsletterLight({
 
   return (
     <div style={containerStyle}>
-      <style>{`.nl-rich-text p { margin: 0; }`}</style>
       {/* Content */}
       <div style={contentStyle}>
         {/* Text Content Area */}

@@ -4,6 +4,7 @@ import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { RichText } from '@/components/shared/RichText'
 
 /** Track 2 (fixed-composition) editable block ids. Logo is brand-
  *  locked. Date/location/cta live inside the bottom info bar; each
@@ -106,7 +107,7 @@ export function EmailEhsAccelerateBanner({
           lineHeight: `${hlLineHeight}px`,
           wordWrap: 'break-word',
         }}>
-          {wrapInline('headline', <div dangerouslySetInnerHTML={{ __html: headlineText }} />)}
+          {wrapInline('headline', <RichText html={headlineText} />)}
         </div>
       ))}
 
@@ -122,7 +123,7 @@ export function EmailEhsAccelerateBanner({
           lineHeight: '21.76px',
           wordWrap: 'break-word',
         }}>
-          {wrapInline('body', <div dangerouslySetInnerHTML={{ __html: bodyText }} />)}
+          {wrapInline('body', <RichText html={bodyText} />)}
         </div>
       ))}
 

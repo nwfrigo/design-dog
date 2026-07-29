@@ -5,6 +5,7 @@ import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
+import { PlainText } from '@/components/shared/PlainText'
 
 // Category chips configuration
 const CATEGORIES = [
@@ -235,7 +236,7 @@ export function NewsletterTopBanner({
                 fontWeight: '350',
                 wordWrap: 'break-word',
               }}>
-                {wrapInline('headline', headline || SLOT_PLACEHOLDERS.headline)}
+                {wrapInline('headline', <PlainText text={headline || SLOT_PLACEHOLDERS.headline} />)}
               </div>
             ))}
 
@@ -248,7 +249,7 @@ export function NewsletterTopBanner({
                 fontWeight: '350',
                 wordWrap: 'break-word',
               }}>
-                {wrapInline('subhead', subhead || SLOT_PLACEHOLDERS.subhead)}
+                {wrapInline('subhead', <PlainText text={subhead || SLOT_PLACEHOLDERS.subhead} />)}
               </div>
             ))}
           </div>

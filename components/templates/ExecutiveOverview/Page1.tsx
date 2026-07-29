@@ -11,6 +11,7 @@ import {
   EXEC_PLACEHOLDERS as PH,
   type ExecutiveOverviewBlockId,
 } from './constants'
+import { RichText } from '@/components/shared/RichText'
 
 /**
  * Executive Overview — Page 1 (intro + hero).
@@ -43,12 +44,13 @@ export interface Page1Props {
   scale?: number
 }
 
+/* Delta over the canonical `.dd-rich-text` rules (app/globals.css): this page
+ * runs a much wider paragraph rhythm than the 0.3em default. Everything else
+ * (bold/italic weights, link colour, list styling) comes from the shared set.
+ * Double-class selector so it outranks the canonical rule on specificity
+ * rather than relying on stylesheet order. */
 const RICH_TEXT_STYLES = `
-  .exec-rich-text strong { font-weight: 500; }
-  .exec-rich-text em { font-style: italic; }
-  .exec-rich-text p { margin: 0; }
-  .exec-rich-text p + p { margin-top: 18px; }
-  .exec-rich-text a { color: ${T.orange}; text-decoration: none; }
+  .dd-rich-text.exec-rich-text p + p { margin-top: 18px; }
 `
 
 // Hero rail: the Figma frame sits at x=453 (w=226) and clips to the 612 page
@@ -105,9 +107,9 @@ export function Page1({
   ))
 
   const bodyNode = wrapBlock('introBody', (
-    <div className="exec-rich-text" style={{ width: 343, fontSize: 18, fontWeight: 350, lineHeight: 1.28, color: T.text }}>
+    <div style={{ width: 343, fontSize: 18, fontWeight: 350, lineHeight: 1.28, color: T.text }}>
       {wrapInline('introBody', (
-        <div dangerouslySetInnerHTML={{ __html: isHtmlEmpty(introBody) ? PH.introBody : introBody }} />
+        <RichText className="exec-rich-text" html={isHtmlEmpty(introBody) ? PH.introBody : introBody} />
       ))}
     </div>
   ))

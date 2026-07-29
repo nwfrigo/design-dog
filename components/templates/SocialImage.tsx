@@ -20,6 +20,7 @@ import {
   filtersToCss,
   type ImageFilters,
 } from '@/lib/image-filters'
+import { RichText } from '@/components/shared/RichText'
 
 export type LayoutVariant = 'even' | 'more-image' | 'more-text'
 
@@ -85,12 +86,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
   return html.replace(/<[^>]*>/g, '').trim() === ''
 }
 
-const RICH_TEXT_STYLES = `
-  .social-img-rich-text strong { font-weight: 500; }
-  .social-img-rich-text em { font-style: italic; }
-  .social-img-rich-text p { margin: 0; }
-  .social-img-rich-text p + p { margin-top: 0.3em; }
-`
 
 export function SocialImage({
   headline,
@@ -189,11 +184,10 @@ export function SocialImage({
       id: 'headline',
       visible: !!showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+        <RichText html={hasHeadline ? headline : 'Headline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="social-img-rich-text"
           style={{
             color: textColor,
             fontSize: headlineFontSize ?? 84,
@@ -207,11 +201,10 @@ export function SocialImage({
       id: 'subhead',
       visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead : 'Subheadline' }} />
+        <RichText html={hasSubhead ? subhead : 'Subheadline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="social-img-rich-text"
           style={{
             color: textColor,
             fontSize: subheadFontSize ?? 36,
@@ -258,7 +251,6 @@ export function SocialImage({
 
   return (
     <div style={containerStyle}>
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       {/* Left content column — header (logo + pill) at top via ContentStack
        *  topAnchor; rest of the column is ContentStack-distributed by

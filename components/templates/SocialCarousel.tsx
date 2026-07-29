@@ -5,6 +5,7 @@ import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { CarouselSlide, CarouselBackgroundStyle } from '@/types'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
+import { RichText } from '@/components/shared/RichText'
 
 const BACKGROUND_IMAGES: Record<CarouselBackgroundStyle, string> = {
   '1': '/assets/backgrounds/carousel-dark-gradient-1.png',
@@ -24,12 +25,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
 }
 
 // Rich text styles for HTML content
-const RICH_TEXT_STYLES = `
-  .rich-text-white strong { font-weight: 500; }
-  .rich-text-white em { font-style: italic; }
-  .rich-text-white p { margin: 0; }
-  .rich-text-white p + p { margin-top: 0.3em; }
-`
 
 export interface SocialCarouselProps {
   slide: CarouselSlide
@@ -90,7 +85,6 @@ export function SocialCarousel({
   function renderCoverText() {
     return (
       <div style={containerStyle}>
-        <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
         <img src={BACKGROUND_IMAGES[slide.backgroundStyle]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 64, display: 'flex', flexDirection: 'column' }}>
           {/* Logo */}
@@ -106,15 +100,15 @@ export function SocialCarousel({
             )}
             {/* Headline */}
             {slide.showHeadline && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.05 }} dangerouslySetInnerHTML={{ __html: hasHeadline ? slide.headline : 'Headline' }} />
+              <RichText style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.05 }} html={hasHeadline ? slide.headline : 'Headline'} />
             )}
             {/* Subhead */}
             {slide.showSubhead && hasSubhead && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} dangerouslySetInnerHTML={{ __html: slide.subhead }} />
+              <RichText style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} html={slide.subhead} />
             )}
             {/* Body */}
             {slide.showBody && hasBody && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: 24, fontWeight: 350, lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: slide.body }} />
+              <RichText style={{ color: textColor, fontSize: 24, fontWeight: 350, lineHeight: 1.4 }} html={slide.body} />
             )}
           </div>
         </div>
@@ -125,7 +119,6 @@ export function SocialCarousel({
   function renderCoverImage() {
     return (
       <div style={containerStyle}>
-        <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
         <img src={BACKGROUND_IMAGES[slide.backgroundStyle]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'inline-flex', flexDirection: 'row' }}>
           {/* Left column */}
@@ -143,11 +136,11 @@ export function SocialCarousel({
               )}
               {/* Headline */}
               {slide.showHeadline && (
-                <div className="rich-text-white" style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.05 }} dangerouslySetInnerHTML={{ __html: hasHeadline ? slide.headline : 'Headline' }} />
+                <RichText style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.05 }} html={hasHeadline ? slide.headline : 'Headline'} />
               )}
               {/* Subhead */}
               {slide.showSubhead && hasSubhead && (
-                <div className="rich-text-white" style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} dangerouslySetInnerHTML={{ __html: slide.subhead }} />
+                <RichText style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} html={slide.subhead} />
               )}
             </div>
           </div>
@@ -211,7 +204,6 @@ export function SocialCarousel({
   function renderText() {
     return (
       <div style={containerStyle}>
-        <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
         <img src={BACKGROUND_IMAGES[slide.backgroundStyle]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 64, display: 'flex', flexDirection: 'column' }}>
           {/* Logo */}
@@ -227,15 +219,15 @@ export function SocialCarousel({
             )}
             {/* Headline */}
             {slide.showHeadline && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.1 }} dangerouslySetInnerHTML={{ __html: hasHeadline ? slide.headline : 'Headline' }} />
+              <RichText style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.1 }} html={hasHeadline ? slide.headline : 'Headline'} />
             )}
             {/* Subhead */}
             {slide.showSubhead && hasSubhead && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} dangerouslySetInnerHTML={{ __html: slide.subhead }} />
+              <RichText style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} html={slide.subhead} />
             )}
             {/* Body */}
             {slide.showBody && hasBody && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: 24, fontWeight: 350, lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: slide.body }} />
+              <RichText style={{ color: textColor, fontSize: 24, fontWeight: 350, lineHeight: 1.4 }} html={slide.body} />
             )}
           </div>
         </div>
@@ -246,7 +238,6 @@ export function SocialCarousel({
   function renderTextImage() {
     return (
       <div style={containerStyle}>
-        <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
         <img src={BACKGROUND_IMAGES[slide.backgroundStyle]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 64, display: 'flex', flexDirection: 'column' }}>
           {/* Logo */}
@@ -262,11 +253,11 @@ export function SocialCarousel({
             )}
             {/* Headline */}
             {slide.showHeadline && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.1 }} dangerouslySetInnerHTML={{ __html: hasHeadline ? slide.headline : 'Headline' }} />
+              <RichText style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.1 }} html={hasHeadline ? slide.headline : 'Headline'} />
             )}
             {/* Subhead */}
             {slide.showSubhead && hasSubhead && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} dangerouslySetInnerHTML={{ __html: slide.subhead }} />
+              <RichText style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} html={slide.subhead} />
             )}
           </div>
 
@@ -326,7 +317,6 @@ export function SocialCarousel({
   function renderOutro() {
     return (
       <div style={containerStyle}>
-        <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
         <img src={BACKGROUND_IMAGES[slide.backgroundStyle]} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 64, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           {/* Logo */}
@@ -342,11 +332,11 @@ export function SocialCarousel({
             )}
             {/* Headline */}
             {slide.showHeadline && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.05 }} dangerouslySetInnerHTML={{ __html: hasHeadline ? slide.headline : 'Headline' }} />
+              <RichText style={{ color: textColor, fontSize: headlineSize, fontWeight: 350, lineHeight: 1.05 }} html={hasHeadline ? slide.headline : 'Headline'} />
             )}
             {/* Subhead */}
             {slide.showSubhead && hasSubhead && (
-              <div className="rich-text-white" style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} dangerouslySetInnerHTML={{ __html: slide.subhead }} />
+              <RichText style={{ color: textColor, fontSize: subheadSize, fontWeight: 350, lineHeight: 1.3 }} html={slide.subhead} />
             )}
           </div>
 

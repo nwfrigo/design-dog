@@ -19,6 +19,7 @@ import {
   filtersToCss,
   type ImageFilters,
 } from '@/lib/image-filters'
+import { RichText } from '@/components/shared/RichText'
 
 export type LayoutVariant = 'even' | 'more-image' | 'more-text'
 
@@ -79,12 +80,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
   return html.replace(/<[^>]*>/g, '').trim() === ''
 }
 
-const RICH_TEXT_STYLES = `
-  .social-md-rich-text strong { font-weight: 500; }
-  .social-md-rich-text em { font-style: italic; }
-  .social-md-rich-text p { margin: 0; }
-  .social-md-rich-text p + p { margin-top: 0.3em; }
-`
 
 export function SocialImageMeddbase({
   headline,
@@ -177,11 +172,10 @@ export function SocialImageMeddbase({
       id: 'headline',
       visible: !!showHeadline,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+        <RichText html={hasHeadline ? headline : 'Headline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="social-md-rich-text"
           style={{
             color: textColor,
             fontSize: headlineFontSize ?? 84,
@@ -195,11 +189,10 @@ export function SocialImageMeddbase({
       id: 'subhead',
       visible: showSubhead,
       defaultInner: (
-        <div dangerouslySetInnerHTML={{ __html: hasSubhead ? subhead : 'Subheadline' }} />
+        <RichText html={hasSubhead ? subhead : 'Subheadline'} />
       ),
       renderChrome: (inner) => (
         <div
-          className="social-md-rich-text"
           style={{
             color: textColor,
             fontSize: subheadFontSize ?? 36,
@@ -246,7 +239,6 @@ export function SocialImageMeddbase({
 
   return (
     <div style={containerStyle}>
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       <div style={{
         flex: '1 1 0',

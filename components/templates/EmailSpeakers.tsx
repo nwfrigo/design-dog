@@ -14,6 +14,7 @@ import {
   ContentStack,
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
+import { RichText } from '@/components/shared/RichText'
 
 export type EmailSpeakersBlockId =
   | 'eyebrow'
@@ -120,12 +121,6 @@ function isHtmlEmpty(html: string | undefined): boolean {
 }
 
 // Inline styles for rich text elements (dark text on light background)
-const RICH_TEXT_STYLES = `
-  .rich-text-dark strong { font-weight: 500; }
-  .rich-text-dark em { font-style: italic; }
-  .rich-text-dark p { margin: 0; }
-  .rich-text-dark p + p { margin-top: 0.3em; }
-`
 
 // Component to render a circular speaker avatar with optional grayscale
 function SpeakerAvatar({
@@ -267,7 +262,6 @@ export function EmailSpeakers({
   return (
     <div style={containerStyle}>
       {/* Rich text styles for HTML content */}
-      <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_STYLES }} />
 
       {/* Left content area — header anchored top, ContentStack handles
        *  the body blocks (eyebrow / headline / body / cta). Solution pill
@@ -301,11 +295,10 @@ export function EmailSpeakers({
               id: 'headline',
               visible: showHeadline,
               defaultInner: (
-                <div dangerouslySetInnerHTML={{ __html: hasHeadline ? headline : 'Headline' }} />
+                <RichText html={hasHeadline ? headline : 'Headline'} />
               ),
               renderChrome: (inner) => (
                 <div
-                  className="rich-text-dark"
                   style={{
                     alignSelf: 'stretch',
                     color: textColor,
@@ -322,11 +315,10 @@ export function EmailSpeakers({
               id: 'body',
               visible: showBody,
               defaultInner: (
-                <div dangerouslySetInnerHTML={{ __html: body || SLOT_PLACEHOLDERS.body }} />
+                <RichText html={body || SLOT_PLACEHOLDERS.body} />
               ),
               renderChrome: (inner) => (
                 <div
-                  className="rich-text-dark"
                   style={{
                     alignSelf: 'stretch',
                     color: textColor,

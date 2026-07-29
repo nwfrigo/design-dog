@@ -622,6 +622,15 @@ setImageUrl(blob.url)  // Store public URL, not data URL
 
 **Fallback for local dev:** If `BLOB_READ_WRITE_TOKEN` is missing, fall back to `FileReader.readAsDataURL`. This works for preview but images may fail in export.
 
+**The fallback is conditional — don't widen it.** It applies *only* when no Blob store is configured. It used to catch every failure, which meant a genuine rejection was indistinguishable from success: the image appeared on the canvas as a multi-MB base64 string and the export then broke silently, with no error shown at any point.
+
+Two rules keep that from coming back, both in `lib/image-upload.ts`:
+
+- **Validate before uploading.** `validateImageFile(file)` checks the file against `ALLOWED_IMAGE_EXTENSIONS` — the same constant the upload route imports, so client and server can't drift. Predictable rejections get a specific message with no round trip.
+- **Ask the server, don't read the error.** `isBlobConfigured()` hits `GET /api/upload-image`. Never branch on the thrown error's text: `@vercel/blob` reports a 400 from the token route and a missing token with the *identical* message ("Failed to retrieve the client token"), so the two are indistinguishable from the error alone. `isBlobConfigured()` defaults to `true` on any doubt, so an unexpected condition surfaces an error rather than silently degrading.
+
+Every uploader shows failures in its existing status slot (the "Uploading…" text / label), so there's no new UI surface — see `IMAGE_UPLOAD_*` in `lib/image-upload.ts` for the strings.
+
 **Where this applies:**
 - `EditorScreen.tsx` — main image upload (`handleImageUpload`), newsletter image upload (`handleNewsletterImageUpload`), QR code upload
 - `ImageLibraryModal.tsx` — user upload tab
@@ -669,13 +678,19 @@ All body/description text fields in editors MUST use `RichTextEditor` (`componen
 
 **Which fields get rich text:** Any field where a user might want formatting — body, description, subheader, answer. Short single-value fields (titles, eyebrows, CTAs, stat values, labels) stay as plain `<input>` or `<textarea>`.
 
-**Render side:** Template components receiving rich text must render with `dangerouslySetInnerHTML={{ __html: value }}` and include scoped CSS for lists, links, and paragraph spacing. Use the `stacker-rich-text` class pattern (see `StackerPdf/index.tsx`) or per-block scoped styles (see FAQ `ContentPage.tsx`).
+**Render side — use the shared primitive.** Never hand-roll `dangerouslySetInnerHTML` plus a per-template `<style>` block; that duplication is exactly what let bold/line-break rendering drift across 11 templates. Render the value through `RichText`:
 
-**Scoped CSS required:**
-- `p { margin: 0; }` — prevent double paragraph spacing
-- `ul { list-style-type: disc; padding-left: 16px; }` — bullet lists
-- `ol { list-style-type: decimal; padding-left: 16px; }` — numbered lists
-- `a { color: #D35F0B; text-decoration: none; }` — brand orange links
+```tsx
+import { RichText } from '@/components/shared/RichText'
+
+<RichText html={value} />
+```
+
+It carries the canonical `.dd-rich-text` class, whose rules live once in `app/globals.css` and cover `strong`/`b`, `em`/`i`, `p`, `div`, `br`, `ul`/`ol`, and links — including both spellings of bold, since the editbar emits `<strong>` while Chrome's `execCommand` emits `<b>`. Because the Puppeteer render route inherits the root layout, editor and export get identical rules from one source. Typography (font, size, colour, line-height) stays with the template's chrome. Layer a second class for a genuine per-template deviation (`<RichText className="exec-rich-text" …>`) and define only the delta, using a double-class selector so it wins on specificity rather than stylesheet order.
+
+For Stage & Bench slots this is enforced: any slot declaring `content: { format: 'html' }` whose render site isn't a `<RichText>` fails `npm run validate:registrations`. The plain-text counterpart is `<PlainText>` (`components/shared/PlainText.tsx`, class `.dd-plain-text`), required on any multi-line `format: 'plain'` slot — those store a literal `\n` that HTML would otherwise collapse to a space. Same gate. See `STAGE-AND-BENCH.md` §4.7.
+
+The multi-page PDF collateral (Stacker / FAQ / Solution Overview) still uses its own scoped patterns (`stacker-rich-text`, FAQ `ContentPage.tsx`) — those carry print-specific spacing and haven't been folded in.
 
 **Backward compatible:** Plain text strings render correctly in `dangerouslySetInnerHTML`, so no migration is needed when upgrading a field from textarea to rich text. Type definitions stay as `string` (HTML strings are valid strings).
 

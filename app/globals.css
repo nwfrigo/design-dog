@@ -207,6 +207,68 @@ body {
   @apply inline-flex items-center px-1.5 py-0.5 text-xs font-mono bg-gray-100 dark:bg-surface-secondary rounded border border-gray-200 dark:border-line-subtle;
 }
 
+/* ── Canonical rich-text rules ────────────────────────────────────────────
+ * The single styling contract for every `format: 'html'` slot. Applied via
+ * the `<RichText>` primitive (components/shared/RichText.tsx), which is the
+ * only sanctioned way to render an HTML slot value — and by InlineTextEdit,
+ * so the in-place editing view matches the committed view matches the export.
+ *
+ * Lives in globals.css (not a per-template <style> block) because the
+ * Puppeteer render route inherits the root layout, so editor and export get
+ * byte-identical rules from one source. This replaced 14 copy-pasted
+ * RICH_TEXT_STYLES blocks under 8 different class names — the duplication
+ * that let per-template coverage drift in the first place.
+ *
+ * Tag coverage is driven by what the editors actually emit:
+ *   strong/b  — the editbar's block-level toggle emits <strong>; Chrome's
+ *               execCommand('bold') emits <b>. Both must land on Fakt Pro
+ *               Medium (500), never the browser's default 700.
+ *   em/i      — same split for italic.
+ *   div/br    — contentEditable wraps lines in <div> on Enter.
+ *   p         — Tiptap (legacy sidebar editors) emits <p>.
+ *   ul/ol/a   — only the full-toolbar RichTextEditor emits these; kept so
+ *               previously-saved content keeps rendering correctly.
+ * Colors/sizes stay with the template — this owns inline formatting only. */
+.dd-rich-text strong,
+.dd-rich-text b {
+  font-weight: 500;
+}
+.dd-rich-text em,
+.dd-rich-text i {
+  font-style: italic;
+}
+.dd-rich-text p,
+.dd-rich-text div {
+  margin: 0;
+}
+.dd-rich-text p + p {
+  margin-top: 0.3em;
+}
+.dd-rich-text ul {
+  list-style-type: disc;
+  padding-left: 16px;
+  margin: 0;
+}
+.dd-rich-text ol {
+  list-style-type: decimal;
+  padding-left: 16px;
+  margin: 0;
+}
+.dd-rich-text a {
+  color: #d35f0b;
+  text-decoration: none;
+}
+
+/* Companion to `.dd-rich-text` for multi-line `format: 'plain'` slots, applied
+ * via the `<PlainText>` primitive. Plain slots store a bare string, so a user's
+ * Enter arrives as a literal `\n` — which HTML collapses to a space. InlineTextEdit
+ * edits under pre-wrap, so without this the break shows while editing and vanishes
+ * on commit. Same one-source-of-truth reasoning as the rich-text rules above:
+ * the editor and the Puppeteer render route read this from the same stylesheet. */
+.dd-plain-text {
+  white-space: pre-wrap;
+}
+
 /* Bench chip pickup tilt — applied on press to the *inner* element so the
  * draggable outer element's bounds stay stable. Rotating the outer element
  * shifts its rect mid-press, which can prevent HTML5 DnD from initiating
