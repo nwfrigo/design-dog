@@ -32,6 +32,13 @@ export type SlotImage = {
   /** Fired when this slot becomes the selected slot. Adapter opens its
    *  image-editor modal here. */
   onSelect?: () => void
+  /** Default true: selecting the slot opens the image editor immediately.
+   *
+   *  Set false for slots that need to stay *selected* — a resizable slot
+   *  shows drag handles on its selection ring, which is impossible if the
+   *  modal steals focus and clears selection on the first click. Those slots
+   *  open the editor on double-click instead (see `useImageEditingEffect`). */
+  openOnSelect?: boolean
   /** Direct invocation of the change-image flow (library / file picker).
    *  Optional — the lightbox typically wires this internally now. */
   onChange?: () => void
@@ -81,6 +88,7 @@ export function useImageSelectionEffect(): void {
   useEffect(() => {
     if (!selection || selection.kind !== 'image') return
     const slot = images.find((i) => i.path === selection.path)
+    if (slot?.openOnSelect === false) return
     if (slot?.onSelect) {
       slot.onSelect()
       // Clear AFTER onSelect so adapters that read selection.path in their
@@ -88,4 +96,29 @@ export function useImageSelectionEffect(): void {
       useCanvasEditorStore.getState().clearSelection()
     }
   }, [selection, images])
+}
+
+/**
+ * Companion to `useImageSelectionEffect` for slots that opted out of
+ * open-on-select (`openOnSelect: false`). Those keep their selection — so the
+ * resize handles can live on it — and open the image editor on double-click,
+ * which `Editable` surfaces by setting `editingPath`.
+ *
+ * Mount alongside `useImageSelectionEffect`, inside the provider.
+ */
+export function useImageEditingEffect(): void {
+  const editingPath = useCanvasEditorStore((s) => s.editingPath)
+  const images = useContext(Ctx)
+
+  useEffect(() => {
+    if (!editingPath) return
+    const slot = images.find((i) => i.path === editingPath)
+    if (!slot) return
+    // Only opt-out slots use double-click to open; the rest already opened on
+    // select. Either way we release the editing state: image slots have no
+    // inline editor, so a lingering editingPath is dead state that would also
+    // emit a spurious `slot_edited` telemetry event when it later cleared.
+    if (slot.openOnSelect === false) slot.onSelect?.()
+    useCanvasEditorStore.getState().setEditingPath(null)
+  }, [editingPath, images])
 }

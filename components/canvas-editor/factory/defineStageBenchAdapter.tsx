@@ -13,6 +13,7 @@ import { CanvasEditorProvider } from '../CanvasEditorProvider'
 import { Editable } from '../Editable'
 import { ContextualToolbar } from '../ContextualToolbar'
 import { SelectionRing } from '../SelectionRing'
+import { ResizeHandles } from '../handles/ResizeHandles'
 import { InlineTextEdit } from '../InlineTextEdit'
 import { SpacingHandle } from '../handles/SpacingHandle'
 import { BenchChip, type BenchChipKind } from '../bench/BenchChip'
@@ -23,7 +24,12 @@ import { SizeRegistryProvider, type SlotSize } from '../SizeRegistry'
 import { ContentRegistryProvider, type SlotContent } from '../ContentRegistry'
 import { CategoryRegistryProvider, type CategoryOption } from '../CategoryRegistry'
 import { IconRegistryProvider, type SlotIcon } from '../IconRegistry'
-import { ImageRegistryProvider, useImageSelectionEffect, type SlotImage } from '../ImageRegistry'
+import {
+  ImageRegistryProvider,
+  useImageSelectionEffect,
+  useImageEditingEffect,
+  type SlotImage,
+} from '../ImageRegistry'
 import { ImageEditorModal } from '../../image-editor'
 import {
   StageScrim,
@@ -126,6 +132,11 @@ export type ChildImageSlotConfig<TBlockId extends string> = {
   placeholderSrc: string
   frameWidth: number
   frameHeight: number
+  /** Skip the crop/adjust view — the modal opens straight to the library and
+   *  dismisses on pick. For slots the template renders `objectFit: contain`
+   *  (logos, marks): nothing is cropped, so a crop frame would describe an
+   *  operation that never happens. */
+  replaceOnly?: boolean
 }
 
 /** Per-image binding bundle. Used for both top-level and child image
@@ -677,16 +688,23 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       </>
     ) : null
 
+    // A slot that declares `size` is drag-resizable, so it must STAY selected
+    // (the handles hang off the selection ring). Those open the image editor
+    // on double-click instead of on select — see ImageRegistry.
+    const isResizable = (blockId: TBlockId) => slotByBlockId.get(blockId)?.size !== undefined
+
     const slotImages: SlotImage[] = [
       ...(descriptor.image
         ? [{
             path: `${descriptor.templateId}.${descriptor.image.blockId}`,
             onSelect: () => setEditorForBlockId(descriptor.image!.blockId),
+            openOnSelect: !isResizable(descriptor.image.blockId),
           }]
         : []),
       ...(descriptor.childImages ?? []).map((cfg) => ({
         path: `${descriptor.templateId}.${cfg.blockId}`,
         onSelect: () => setEditorForBlockId(cfg.blockId),
+        openOnSelect: !isResizable(cfg.blockId),
       })),
     ]
 
@@ -789,6 +807,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         {inner}
         <ContextualToolbar />
         <SelectionRing />
+        <ResizeHandles />
       </>
     )
 
@@ -800,6 +819,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
       placeholderSrc: string
       frameWidth: number
       frameHeight: number
+      replaceOnly?: boolean
     } | null => {
       if (!editorForBlockId) return null
       if (descriptor.image && bindings.image && editorForBlockId === descriptor.image.blockId) {
@@ -818,6 +838,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
           placeholderSrc: childCfg.placeholderSrc,
           frameWidth: childCfg.frameWidth,
           frameHeight: childCfg.frameHeight,
+          replaceOnly: childCfg.replaceOnly,
         }
       }
       return null
@@ -836,6 +857,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
             imageSrc={modalCfg.binding.url ?? modalCfg.placeholderSrc}
             frameWidth={modalCfg.frameWidth}
             frameHeight={modalCfg.frameHeight}
+            replaceOnly={modalCfg.replaceOnly}
             initialSettings={{
               position: modalCfg.binding.position,
               zoom: modalCfg.binding.zoom,
@@ -896,5 +918,6 @@ export function defineStageBenchAdapter<TBlockId extends string>(
 
 function ImageSelectionEffect() {
   useImageSelectionEffect()
+  useImageEditingEffect()
   return null
 }

@@ -63,6 +63,15 @@ export interface ImageEditorModalProps {
    *  per-slot settings to neutral. The modal stays open and swaps back
    *  to the editor view. */
   onImageChange: (url: string) => void
+  /** Replace-only slots (logos, marks) skip the adjust view entirely.
+   *
+   *  The editor view presents a cover-fit CROP frame and position/zoom/filter
+   *  controls. Both are wrong for a slot the template renders `objectFit:
+   *  contain` at an intrinsic aspect — nothing is ever cropped, so the dashed
+   *  frame describes a crop that doesn't happen, and the adapters for these
+   *  slots bind `setSettings` to a no-op so the controls were inert anyway.
+   *  Pinning to the library view keeps the modal honest: pick an image, done. */
+  replaceOnly?: boolean
 }
 
 const ZOOM = { min: 1, max: 3, step: 0.01 } as const
@@ -90,12 +99,13 @@ export function ImageEditorModal({
   initialSettings,
   onSettingsChange,
   onImageChange,
+  replaceOnly = false,
 }: ImageEditorModalProps) {
   // View state. Land on the editor when there's already an image to adjust;
   // when the slot is empty (no src), open straight to the library so the user
   // can pick one — otherwise the editor preview would sit on an empty src and
   // show "loading…" forever. Re-evaluated per open (the modal remounts).
-  const [view, setView] = useState<ModalView>(imageSrc ? 'editor' : 'library')
+  const [view, setView] = useState<ModalView>(replaceOnly || !imageSrc ? 'library' : 'editor')
 
   // Bundled live state — drives the preview. Single useState so the
   // commit-on-dismiss handler sees coherent settings (no half-updated
@@ -117,7 +127,7 @@ export function ImageEditorModal({
   // a perpetual "loading…").
   useEffect(() => {
     if (!isOpen) return
-    setView(imageSrc ? 'editor' : 'library')
+    setView(replaceOnly || !imageSrc ? 'library' : 'editor')
     setSettings(initialSettings)
     setActivePreset(null)
   }, [isOpen, initialSettings, imageSrc])
@@ -273,10 +283,13 @@ export function ImageEditorModal({
           </div>
         ) : (
           <ImageLibraryView
-            onBack={() => setView('editor')}
+            // Replace-only slots have no editor view to go back to (or return
+            // to after picking), so both paths dismiss the modal instead.
+            onBack={() => (replaceOnly ? onClose() : setView('editor'))}
             onSelect={(url) => {
               onImageChange(url)
-              setView('editor')
+              if (replaceOnly) onClose()
+              else setView('editor')
             }}
           />
         )}

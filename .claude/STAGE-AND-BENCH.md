@@ -210,6 +210,20 @@ The Stage & Bench specifics live in `components/canvas-editor/stage-bench/useSta
 
 Adapters call `useStageBenchDroppables(slots)` once and spread the returned refs onto the stage `<div>` and `StageBenchShell`'s `benchRef`. **No per-template drop-side handlers needed.**
 
+### 4.8a Drag-to-resize (`ResizeHandles`)
+
+`components/canvas-editor/handles/ResizeHandles.tsx`. Portal sibling of `SelectionRing` / `ContextualToolbar`, mounted once by the factory and driven by the same `selection.bounds`.
+
+Renders four corner handles **only when the selected slot has a `SizeRegistry` entry** — i.e. the adapter declared `size` on its descriptor. Slots without one are untouched, so this is opt-in per slot.
+
+**Aspect is locked by construction, not by a lock flag.** The registry carries a single scalar and the element it drives is authored `width: auto` against its intrinsic aspect, so there is no second axis to desynchronise. Corner drags map to that one value; there is deliberately no free-transform mode. (Contrast `CustomSizeResizeHandles`, which drives width *and* height and therefore needs an explicit `lockAspect`.)
+
+Screen → design conversion reads the live scale off the stage node (`getBoundingClientRect().width / offsetWidth` — `offsetWidth` ignores transforms) at drag start and holds it for the drag, because `ScaledStage` transform-scales the stage to fit the viewport.
+
+**Interaction consequence for image slots.** `kind: 'image'` normally opens `ImageEditorModal` on select and clears the selection (`useImageSelectionEffect`), which makes a persistent selection — and therefore handles — impossible. A resizable image slot must stay selected, so the factory sets `SlotImage.openOnSelect: false` for any image slot declaring `size`; those open the editor on **double-click** instead (`useImageEditingEffect`). Non-resizable image slots keep the single-click-opens behaviour.
+
+**Layout caveat.** Resizing only *looks* like it works if the surrounding layout can accommodate growth. A fixed-width flex row will silently squeeze the element instead (this is what happened to executive-overview's co-brand band — fixed `width: 218` + `space-between` clamped the logo). Give the mark `flexShrink: 0` and let the container size to content (`minWidth` for the design's resting width, `width: fit-content` to grow).
+
 ### 4.9 Bench rail
 
 `stage-bench/StageBenchBench.tsx`. Reads `useVisibilitySlots()`, renders one chip per hidden slot, plus a translucent preview chip when a stage block is being dragged toward the bench. Maps `slot.iconKey` → `BenchChipKind` via `ICON_KIND_TO_CHIP_KIND` (extendable via prop or by extending the default table).
@@ -268,6 +282,7 @@ const stageBar = (
 | `EditbarCategory.tsx` | `pill` | EyeOff · Category dropdown |
 | `EditbarChip.tsx` | `chip` | EyeOff · Replace icon (opens `IconPickerModal`). Label stays inline-editable (Editable allows `kind:'chip'`). First used by `executive-overview` detail chips. |
 | `EditbarColor.tsx` | `color` | (template-specific color affordances) |
+| `EditbarGroup.tsx` | `group` | EyeOff only. A group owns no content of its own — the one thing it can offer is "hide the whole lockup", which its `show*` flag drives. Renders nothing for always-on groups (no VisibilityRegistry entry). |
 | `EditbarSlider.tsx`, `Dropdown.tsx`, `Toggle.tsx`, `shell.tsx` | — | Editbar internals (primitives + chrome) |
 
 Each editbar reads from the registries via `useSlot<Name>(selection?.path)` — no prop drilling from the adapter.
@@ -495,6 +510,7 @@ The multi-page paradigm the postmortem flagged as "would need a different shell 
 - `lib/stage-bench-registry.ts` — central registry feeding adapter dispatch + template-registry + export-params.
 - `components/canvas-editor/Editable.tsx` — selection / deep-click / drag-source wiring; the foundation every adapter sits on.
 - `components/canvas-editor/InlineTextEdit.tsx` — contentEditable text editor; `format: 'html'` preserves bold/italic.
+- `components/canvas-editor/handles/ResizeHandles.tsx` — corner drag-to-scale for slots declaring `size` (§4.8a).
 - `components/canvas-editor/editbar/EditbarText.tsx` — bold/italic + font-size + line-height + visibility toolbar.
 - `components/shared/RichText.tsx` / `PlainText.tsx` + `.dd-rich-text` / `.dd-plain-text` in `app/globals.css` — the one way to render each slot format's value (§4.7).
 - `scripts/validate-registrations.ts` — static validator for the export-pipeline visibility-flag wiring **and** the slot-format render-site contract.
