@@ -39,6 +39,9 @@ export type ExecutiveOverviewBlockId =
   | 'trustedSubhead'
   | `stat${StatIndex}`
   | 'footerCta'
+  // Group wrapper for the footer contact lockup (avatar + name + role + email).
+  // Hiding the group hides all four together — the byline is one unit.
+  | 'contact'
   | 'contactName'
   | 'contactRole'
   | 'contactEmail'
@@ -84,6 +87,27 @@ export const EXEC_TOKENS = {
   radiusS: 6, // radius/s
   radiusXs: 4, // radius/xs
 } as const
+
+/* Partner (customer) logo sizing on the cover.
+ *
+ * The logo renders `width: auto` against its intrinsic aspect, so ONE value —
+ * height — drives the whole lockup and the ratio stays locked by construction.
+ * `maxWidth` scales off the same value (preserving the original 18px→100px
+ * relationship) so a wide logo letterboxes at the same proportion at every
+ * size instead of hitting a fixed ceiling as it grows. */
+export const EXEC_LOGO_HEIGHT_DEFAULT = 18
+export const EXEC_LOGO_HEIGHT_MIN = 10
+export const EXEC_LOGO_HEIGHT_MAX = 96
+/** Fixed x (within the left content column) of the partner logo's left edge.
+ *  Scaling anchors on the mid-LEFT: the left edge never moves, so the mark
+ *  grows rightward and symmetrically about its vertical centre, and can never
+ *  creep toward the Cority lockup. Matches the original resting position
+ *  (the 218px band's right edge minus the default mark width). */
+export const EXEC_LOGO_LEFT = 140
+/** Hard right-edge limit: the left column is 381 wide, so this stops the mark
+ *  before it can run into the hero rail. A mark wider than this ratio letterboxes
+ *  (objectFit: contain) rather than overflowing the column. */
+export const EXEC_LOGO_MAX_WIDTH = 241
 
 export const EXEC_PAGE_W = 612
 export const EXEC_PAGE_H = 792

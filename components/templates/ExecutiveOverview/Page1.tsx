@@ -9,6 +9,9 @@ import {
   EXEC_PAGE_W,
   EXEC_PAGE_H,
   EXEC_PLACEHOLDERS as PH,
+  EXEC_LOGO_HEIGHT_DEFAULT,
+  EXEC_LOGO_LEFT,
+  EXEC_LOGO_MAX_WIDTH,
   type ExecutiveOverviewBlockId,
 } from './constants'
 import { RichText } from '@/components/shared/RichText'
@@ -21,6 +24,8 @@ import { RichText } from '@/components/shared/RichText'
 
 export interface Page1Props {
   partnerLogoUrl?: string | null
+  /** Rendered logo height in px; width follows the intrinsic aspect. */
+  partnerLogoHeight?: number
   introHeadline: string
   introBody: string // html
   quote: string
@@ -65,6 +70,7 @@ function isHtmlEmpty(html: string | undefined): boolean {
 
 export function Page1({
   partnerLogoUrl,
+  partnerLogoHeight = EXEC_LOGO_HEIGHT_DEFAULT,
   introHeadline,
   introBody,
   quote,
@@ -121,11 +127,29 @@ export function Page1({
       {/* Left content column */}
       <div style={{ position: 'absolute', left: 48, top: 48, width: 381, display: 'flex', flexDirection: 'column', gap: 96 }}>
         {/* Co-brand logo row */}
-        <div style={{ width: 218, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        {/* Co-brand band.
+         *
+         *  The band keeps a FIXED height (the Cority mark's) and positions the
+         *  partner mark absolutely, so scaling the partner logo neither pushes
+         *  the page's content down nor drags the mark toward the Cority
+         *  lockup:
+         *    - `left: EXEC_LOGO_LEFT` pins the left edge — the horizontal half
+         *      of the mid-left scaling anchor.
+         *    - `top: 50%` + `translateY(-50%)` pins the vertical centre — so the
+         *      mark grows symmetrically up and down, and the two logos stay
+         *      centred on one another at every size.
+         *  (A flex row with `alignItems: center` would also centre them, but the
+         *  row's height would track the larger mark and shove the headline down
+         *  as the user scaled up.) */}
+        <div style={{ position: 'relative', width: 218, height: 22 }}>
           <CorityLogo fill={T.text} height={22} />
-          {showPartnerLogo && wrapBlock('partnerLogo', (
-            <PartnerLogo url={partnerLogoUrl} interactive={interactive} />
-          ))}
+          {showPartnerLogo && (
+            <div style={{ position: 'absolute', left: EXEC_LOGO_LEFT, top: '50%', transform: 'translateY(-50%)' }}>
+              {wrapBlock('partnerLogo', (
+                <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={interactive} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Intro copy + quote */}
@@ -181,15 +205,24 @@ export function Page1({
 /* Image sub-components                                                */
 /* ------------------------------------------------------------------ */
 
-function PartnerLogo({ url, interactive }: { url?: string | null; interactive?: boolean }) {
+function PartnerLogo({
+  url,
+  height,
+  interactive,
+}: {
+  url?: string | null
+  height: number
+  interactive?: boolean
+}) {
   if (!url) {
     // In export/preview an un-set partner logo renders nothing (so it doesn't
     // print); in the editor it's a subtle clickable placeholder.
     if (!interactive) return null
     return (
       <div style={{
-        width: 78,
-        height: 18,
+        width: height * (78 / EXEC_LOGO_HEIGHT_DEFAULT),
+        height,
+        flexShrink: 0,
         border: `1px dashed ${T.border}`,
         borderRadius: 2,
         display: 'flex',
@@ -209,7 +242,18 @@ function PartnerLogo({ url, interactive }: { url?: string | null; interactive?: 
       src={url}
       alt=""
       data-export-image="true"
-      style={{ height: 18, width: 'auto', maxWidth: 100, objectFit: 'contain', display: 'block' }}
+      // Height is the only driver — `width: auto` keeps the intrinsic aspect,
+      // so scaling stays locked. maxWidth tracks height at the original
+      // 18px→100px proportion rather than a fixed ceiling, which would
+      // otherwise letterbox wide logos as soon as the user scaled up.
+      style={{
+        height,
+        width: 'auto',
+        flexShrink: 0,
+        maxWidth: EXEC_LOGO_MAX_WIDTH,
+        objectFit: 'contain',
+        display: 'block',
+      }}
     />
   )
 }

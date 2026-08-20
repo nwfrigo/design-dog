@@ -14,6 +14,9 @@ import {
   EXEC_CHIPS_PER_CARD,
   EXEC_STAT_COUNT,
   EXEC_PLACEHOLDERS as PH,
+  EXEC_LOGO_HEIGHT_DEFAULT,
+  EXEC_LOGO_HEIGHT_MIN,
+  EXEC_LOGO_HEIGHT_MAX,
   type ExecutiveOverviewBlockId,
   type ExecutiveOverviewCard,
   type ExecutiveOverviewStat,
@@ -50,12 +53,13 @@ const statId = (k: number) => `stat${k}` as Id
 const textSlot = (
   blockId: Id,
   label: string,
-  opts: { benchable?: boolean; format?: 'html' | 'plain'; singleLine?: boolean; maxLines?: number; placeholder?: string; iconKey?: string } = {},
+  opts: { benchable?: boolean; parent?: Id; format?: 'html' | 'plain'; singleLine?: boolean; maxLines?: number; placeholder?: string; iconKey?: string } = {},
 ): SlotDescriptor<Id> => ({
   blockId,
   label,
   iconKey: opts.iconKey ?? 'headline',
   kind: 'text',
+  parent: opts.parent,
   benchable: opts.benchable ?? false,
   content: {
     format: opts.format ?? 'plain',
@@ -65,12 +69,18 @@ const textSlot = (
   },
 })
 
-const imageSlot = (blockId: Id, label: string): SlotDescriptor<Id> => ({
+const imageSlot = (
+  blockId: Id,
+  label: string,
+  opts: { parent?: Id; size?: SlotDescriptor<Id>['size'] } = {},
+): SlotDescriptor<Id> => ({
   blockId,
   label,
   iconKey: 'image',
   kind: 'image',
+  parent: opts.parent,
   benchable: false,
+  size: opts.size,
 })
 
 // Feature chip: editable one-line label (inline) + a swappable Lucide icon
@@ -85,7 +95,13 @@ const chipSlot = (blockId: Id, label: string): SlotDescriptor<Id> => ({
 })
 
 const PAGE1_SLOTS: SlotDescriptor<Id>[] = [
-  imageSlot('partnerLogo', 'Partner logo'),
+  // Drag-resizable: `size` drives the corner handles (ResizeHandles) and, as a
+  // side effect, makes this slot open its image editor on double-click rather
+  // than on select — it has to stay selected for the handles to show.
+  // One scalar (height) with `width: auto` on the <img> keeps the ratio locked.
+  imageSlot('partnerLogo', 'Partner logo', {
+    size: { default: EXEC_LOGO_HEIGHT_DEFAULT, min: EXEC_LOGO_HEIGHT_MIN, max: EXEC_LOGO_HEIGHT_MAX, step: 1 },
+  }),
   textSlot('introHeadline', 'Headline', { singleLine: false, maxLines: 4, placeholder: PH.introHeadline }),
   textSlot('introBody', 'Body', { format: 'html', singleLine: false, iconKey: 'body', placeholder: PH.introBody }),
   textSlot('quote', 'Quote', { benchable: true, singleLine: false, iconKey: 'quote', placeholder: PH.quote }),
@@ -108,16 +124,25 @@ const PAGE2_SLOTS: SlotDescriptor<Id>[] = [
     textSlot(statId(k), `Stat ${k}`, { benchable: true, iconKey: 'caption', placeholder: PH.stat }),
   ),
   textSlot('footerCta', 'Footer message', { placeholder: PH.footerCta }),
-  textSlot('contactName', 'Contact name', { iconKey: 'caption', placeholder: PH.contactName }),
-  textSlot('contactRole', 'Contact role', { iconKey: 'caption', placeholder: PH.contactRole }),
-  textSlot('contactEmail', 'Contact email', { iconKey: 'caption', placeholder: PH.contactEmail }),
-  imageSlot('contactAvatar', 'Contact photo'),
+  // The footer byline is one unit: the group carries the bench chip + eye
+  // toggle (doc.showContact), and the four fields are its children so they
+  // stay individually editable but don't each get their own chip. Same
+  // pattern as the speaker groups on email-speakers / website-webinar.
+  { blockId: 'contact', label: 'Contact', iconKey: 'speaker', chipKind: 'speaker', kind: 'group', benchable: true },
+  textSlot('contactName', 'Contact name', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactName }),
+  textSlot('contactRole', 'Contact role', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactRole }),
+  textSlot('contactEmail', 'Contact email', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactEmail }),
+  imageSlot('contactAvatar', 'Contact photo', { parent: 'contact' }),
 ]
 
 type SlotEntry = {
   value?: string
   visible?: boolean
   icon?: string
+  /** SizeRegistry channel. Named for its original font-size use; the registry
+   *  itself is kind-agnostic, so the partner logo drives its height through it. */
+  fontSize?: number
+  setFontSize?: (next: number) => void
   setValue?: (next: string) => void
   setVisible?: (next: boolean) => void
   setIcon?: (next: string) => void
@@ -129,7 +154,12 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
   slots: (_bindings, page) => (page === 1 ? PAGE1_SLOTS : PAGE2_SLOTS),
   childImages: [
     { blockId: 'heroImage', placeholderSrc: '', frameWidth: 159, frameHeight: 792 },
-    { blockId: 'partnerLogo', placeholderSrc: '', frameWidth: 120, frameHeight: 32 },
+    // Replace-only: the cover renders this mark `objectFit: contain` at its
+    // intrinsic aspect, so there is no crop to adjust — and its binding
+    // deliberately discards position/zoom/filters. Opening straight to the
+    // library keeps the modal honest (its crop frame otherwise described a
+    // crop that never happened).
+    { blockId: 'partnerLogo', placeholderSrc: '', frameWidth: 120, frameHeight: 32, replaceOnly: true },
     { blockId: 'contactAvatar', placeholderSrc: '', frameWidth: 38, frameHeight: 38 },
   ],
   useStoreBindings: () => {
@@ -150,7 +180,10 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
     const slotState = {} as Record<Id, SlotEntry>
 
     // ---- page 1 ----
-    slotState.partnerLogo = {}
+    slotState.partnerLogo = {
+      fontSize: doc.partnerLogoHeight ?? EXEC_LOGO_HEIGHT_DEFAULT,
+      setFontSize: (v) => patch({ partnerLogoHeight: v }),
+    }
     slotState.heroImage = {}
     slotState.introHeadline = { value: doc.introHeadline, setValue: (v) => patch({ introHeadline: v }) }
     slotState.introBody = { value: doc.introBody, setValue: (v) => patch({ introBody: v }) }
@@ -185,6 +218,7 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
       }
     })
     slotState.footerCta = { value: doc.footerCta, setValue: (v) => patch({ footerCta: v }) }
+    slotState.contact = { visible: doc.showContact, setVisible: (v) => patch({ showContact: v }) }
     slotState.contactName = { value: doc.contactName, setValue: (v) => patch({ contactName: v }) }
     slotState.contactRole = { value: doc.contactRole, setValue: (v) => patch({ contactRole: v }) }
     slotState.contactEmail = { value: doc.contactEmail, setValue: (v) => patch({ contactEmail: v }) }
@@ -242,6 +276,7 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
       return (
         <Page1
           partnerLogoUrl={doc.partnerLogoUrl}
+          partnerLogoHeight={ctx.fontSizeOf('partnerLogo') ?? EXEC_LOGO_HEIGHT_DEFAULT}
           introHeadline={ctx.rawTextOf('introHeadline')}
           introBody={ctx.rawTextOf('introBody')}
           quote={ctx.rawTextOf('quote')}
@@ -296,7 +331,7 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
         showTagline={ctx.visibilityOf('tagline')}
         showTrustedHeader={ctx.visibilityOf('trustedHeader')}
         showTrustedSubhead={ctx.visibilityOf('trustedSubhead')}
-        showContact={doc.showContact}
+        showContact={ctx.visibilityOf('contact')}
         renderBlock={renderBlock as (id: Id, content: ReactNode) => ReactNode}
         renderInlineEditor={renderInlineEditor as (id: Id, defaultInner: ReactNode) => ReactNode}
         renderOverlay={renderOverlay}
