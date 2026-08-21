@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useCanvasEditorStore } from '@/store/canvas-editor'
 import type { EditableKind } from './types'
-import { EditbarText, EditbarCta, EditbarColor, EditbarCategory, EditbarChip } from './editbar'
+import { EditbarText, EditbarCta, EditbarColor, EditbarCategory, EditbarChip, EditbarGroup } from './editbar'
 
 const EDITBAR_BY_KIND: Record<EditableKind, () => ReactNode> = {
   text: () => <EditbarText />,
@@ -21,7 +21,9 @@ const EDITBAR_BY_KIND: Record<EditableKind, () => ReactNode> = {
   pill: () => <EditbarCategory />,
   // Chip = icon + label. Eye-off (hide) + Replace (swap Lucide icon).
   chip: () => <EditbarChip />,
-  group: () => null,
+  // Groups own no content of their own — just "hide the whole lockup", which
+  // their show* flag drives. Renders nothing for always-on groups.
+  group: () => <EditbarGroup />,
 }
 
 const TOOLBAR_GAP = 12

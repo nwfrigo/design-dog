@@ -159,7 +159,12 @@ export function Editable({
     // CTA is a constrained text variant (capabilities.ts marks it canEditText),
     // so it shares the double-click-to-edit affordance with regular text. Chips
     // carry an editable label too (the icon is swapped via EditbarChip).
-    if (kind !== 'text' && kind !== 'cta' && kind !== 'chip') return
+    // Images are included so resizable image slots (which stay selected rather
+    // than opening the editor on the first click) can open it on double-click;
+    // `useImageEditingEffect` consumes the signal. Image slots have no
+    // `content` spec, so `renderInlineEditor` still returns the static inner —
+    // no inline editor is mounted.
+    if (kind !== 'text' && kind !== 'cta' && kind !== 'chip' && kind !== 'image') return
     setEditingPath(path)
   }, [path, kind, setEditingPath])
 

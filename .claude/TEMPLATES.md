@@ -388,12 +388,12 @@ app/render/executive-overview/page.tsx  # bare Puppeteer render route (decodes t
 ```
 
 ### Document model
-`executiveOverviewDocument` (`lib/executive-overview/document.ts`) is a **self-contained blob**: partner logo/name, intro headline/body, quote + attribution, hero image (url/position/zoom/**filters**/grayscale), tagline, `cards[4]{title, body, chips[]{label, icon, show}}`, section header/subhead, `stats[5]{label, show}`, footer CTA, contact `{name, role, email, avatar}`. Persisted through `SNAPSHOT_FIELDS` + draft as one field. The `doc→page1Props`/`doc→page2Props` mappers are shared by the editor adapter and the export render route, so editor == export.
+`executiveOverviewDocument` (`lib/executive-overview/document.ts`) is a **self-contained blob**: partner logo (url + `partnerLogoHeight`), intro headline/body, quote + attribution, hero image (url/position/zoom/**filters**/grayscale), tagline, `cards[4]{title, body, chips[]{label, icon, show}}`, section header/subhead, `stats[5]{label, show}`, footer CTA, contact `{name, role, email, avatar}` (hideable as one unit via `showContact` — the footer byline is a `kind:'group'` slot with the four fields parented to it, so it gets a single bench chip + eye rather than four). Persisted through `SNAPSHOT_FIELDS` + draft as one field. The `doc→page1Props`/`doc→page2Props` mappers are shared by the editor adapter and the export render route, so editor == export.
 
 ### Slots & interactions
 - **Text** (headline, body, quote, tagline, card titles/bodies, stats, contact) — inline-editable, with per-slot line caps via `SlotContentSpec.maxLines` (headline 4, card title 1, card body 4).
 - **Chips** — `kind:'chip'`: `EditbarChip` `[hide | replace-icon]`, `IconRegistry` for the icon, inline label editing preserved.
-- **Images** (partner logo, hero, avatar) — always-on with empty-state placeholders. Hero supports crop + color filters/presets (`heroImageFilters`, applied via `filtersToCss`). Ships with a default hero. The partner-logo placeholder renders only in the editor (`interactive` prop) so it doesn't print when unset.
+- **Images** (partner logo, hero, avatar) — always-on with empty-state placeholders. The **partner logo is drag-resizable**: it declares `size` on its slot descriptor, which lights up the substrate's `ResizeHandles` (§4.8a) and — because a resizable image must stay selected — flips it to *double*-click to open the image editor. One scalar (height) with `width: auto` keeps the ratio locked; the co-brand band is `width: fit-content` with `minWidth: 218` so the logo grows rightward instead of being squeezed. Hero supports crop + color filters/presets (`heroImageFilters`, applied via `filtersToCss`). Ships with a default hero. The partner-logo placeholder renders only in the editor (`interactive` prop) so it doesn't print when unset.
 - Light-mode only (matches the design).
 
 ### Export

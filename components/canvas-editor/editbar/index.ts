@@ -22,3 +22,4 @@ export type { EditbarSliderProps } from './EditbarSlider'
 export { Dropdown } from './Dropdown'
 export type { DropdownOption, DropdownProps } from './Dropdown'
 // Toggle moved to the design-system root — import from '@/components/ui'.
+export { EditbarGroup } from './EditbarGroup'

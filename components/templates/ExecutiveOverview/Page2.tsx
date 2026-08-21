@@ -235,7 +235,7 @@ export function Page2({
             {wrapInline('footerCta', <span>{footerCta || PH.footerCta}</span>)}
           </div>
         ))}
-        {showContact && (
+        {showContact && wrapBlock('contact', (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {wrapBlock('contactAvatar', (
               <ContactAvatar url={contactAvatarUrl} />
@@ -258,7 +258,7 @@ export function Page2({
               ))}
             </div>
           </div>
-        )}
+        ))}
       </div>
 
       {renderOverlay?.()}

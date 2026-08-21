@@ -18,6 +18,7 @@ import {
   EXEC_STAT_COUNT,
   EXEC_DEFAULT_CHIP_ICONS,
   EXEC_DEFAULT_HERO_IMAGE,
+  EXEC_LOGO_HEIGHT_DEFAULT,
   type ExecutiveOverviewCard,
   type ExecutiveOverviewChip,
   type ExecutiveOverviewStat,
@@ -28,6 +29,10 @@ export interface ExecutiveOverviewDocument {
   // ---- page 1 ----
   partnerLogoUrl: string | null
   showPartnerLogo: boolean
+  /** Rendered height in px; width follows the intrinsic aspect (locked ratio).
+   *  Optional so documents saved before this field existed still parse — read
+   *  it through the page-1 mapper, which resolves the default. */
+  partnerLogoHeight?: number
   introHeadline: string
   introBody: string // html
   quote: string
@@ -78,6 +83,7 @@ export function defaultExecutiveOverviewDocument(): ExecutiveOverviewDocument {
   return {
     partnerLogoUrl: null,
     showPartnerLogo: true,
+    partnerLogoHeight: EXEC_LOGO_HEIGHT_DEFAULT,
     introHeadline: '',
     introBody: '',
     quote: '',
@@ -161,6 +167,7 @@ export function updateExecStat(
 
 export type ExecPage1ContentProps = {
   partnerLogoUrl: string | null
+  partnerLogoHeight: number
   introHeadline: string
   introBody: string
   quote: string
@@ -195,6 +202,9 @@ export type ExecPage2ContentProps = {
 export function execDocToPage1Props(doc: ExecutiveOverviewDocument): ExecPage1ContentProps {
   return {
     partnerLogoUrl: doc.partnerLogoUrl,
+    // Resolve here (not at the render site) so the editor, the preview
+    // lightbox and the export route all read one already-defaulted number.
+    partnerLogoHeight: doc.partnerLogoHeight ?? EXEC_LOGO_HEIGHT_DEFAULT,
     introHeadline: doc.introHeadline,
     introBody: doc.introBody,
     quote: doc.quote,
