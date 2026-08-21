@@ -95,6 +95,7 @@ The split is deliberate: editor-UI state is ephemeral and doesn't belong in the 
               <StageBenchShell>...</StageBenchShell>
               <ContextualToolbar />                        ← portal: toolbar
               <SelectionRing />                            ← portal: selection ring
+              <ResizeHandles />                            ← portal: corner drag (slots declaring `size`)
 ```
 
 Order is conventional, not load-bearing. Wire only the registries you need.
@@ -132,7 +133,7 @@ Each registry has the same shape: `Provider` + `useSlot<Name>(path)` hook. **Do 
 | Registry | Drives | Toolbar consumer |
 |---|---|---|
 | `VisibilityRegistry` | `path`, `label`, `iconKey`, `isHidden`, `hide()`, `show()` | EyeOff button across all kinds; bench rail rendering. |
-| `SizeRegistry` | `value`, `min`, `max`, `step`, `set()` | EditbarText `A↑ / A↓`. |
+| `SizeRegistry` | `value`, `min`, `max`, `step`, `set()` | EditbarText `A↑ / A↓`; `ResizeHandles` corner drag (§4.8a). Kind-agnostic — any slot declaring `size` gets an entry. |
 | `ContentRegistry` | `value`, `format: 'html' \| 'plain'`, `set()` | EditbarText Bold/Italic block toggle. Must match the InlineTextEdit `format`. |
 | `LineHeightRegistry` | `value`, `min`, `max`, `step`, `set()` | EditbarText line-spacing slider. |
 | `ImageRegistry` | `onChange?`, `onEdit?`, `onGenerate?` | EditbarImage three-button row. Missing handler → button ghosted. |
@@ -148,7 +149,7 @@ Adapter pattern: subscribe to store fields → call `getXSlots({...})` / `getXSi
 - **Ring color** is `#3B82F6` (blue) **uniformly across every kind**. Earlier iterations colored by kind (purple/green/etc.) — that turned the canvas into a candy palette and worked against the ring's job as a single "this is the active edit" signal. `RING_COLOR_BY_KIND` still exists as the lookup table; every entry just maps to the same blue. 4px padding around the visible rect.
 - **Toolbar anchor** is keyed by `EditableKind` (`ANCHOR_BY_KIND`):
   - `text` / `cta` / `pill` / `spacer` / `color` / `group` → **above** (12px gap + 48px toolbar height).
-  - `image` → no toolbar (the image editor lightbox replaces it; selection-of-image opens the modal directly via `useImageSelectionEffect`).
+  - `image` → no toolbar (the image editor lightbox replaces it; selection-of-image opens the modal directly via `useImageSelectionEffect`). **Exception:** an image slot declaring `size` is drag-resizable and must stay selected, so the factory opts it out (`openOnSelect: false`) and it opens on double-click instead — see §4.8a.
 - **Z-index ordering** (portaled overlays): SelectionRing `999`, ContextualToolbar `1000`, Lightbox `1100`. Any future portaled overlay claims its layer relative to these.
 - Adding a new kind = one entry in each table. Do not work around anchor placement in the adapter.
 
@@ -156,7 +157,7 @@ Adapter pattern: subscribe to store fields → call `getXSlots({...})` / `getXSi
 
 `InlineTextEdit.tsx`. Uncontrolled in-place editor. Initialized once on mount (`innerHTML` for HTML format, `innerText` for plain), then never re-touched by React — outflow via `onInput`. This is the key trick: React reconciliation cannot clobber edits in progress.
 
-Activation: adapter's `renderInlineEditor` swaps the static inner for `<InlineTextEdit>` only when `editingPath === slotPath`. `Editable`'s double-click on `kind: 'text' | 'cta' | 'chip'` sets `editingPath`. `Esc` clears it. Click outside a slot also clears it (via `CanvasEditorProvider`).
+Activation: adapter's `renderInlineEditor` swaps the static inner for `<InlineTextEdit>` only when `editingPath === slotPath`. `Editable`'s double-click on `kind: 'text' | 'cta' | 'chip'` sets `editingPath` (`'image'` too, but only as the open-the-editor signal for resize-opted-out slots — image slots have no `content` spec, so no inline editor mounts). `Esc` clears it. Click outside a slot also clears it (via `CanvasEditorProvider`).
 
 **Line cap (`maxLines`).** `SlotContentSpec.maxLines` (threaded into `InlineTextEdit`) hard-caps the rendered line count — input that would overflow is measured (`scrollHeight` vs `lineHeight × maxLines`) and, for plain text, trimmed from the end to fit (keeps as much as possible, handles paste); rich text reverts to the last valid value. Content-independent, so `maxLines: 1` is a true one-line field and `maxLines: 4` a true four-line field (used by executive-overview's headline/card title/card body).
 
@@ -394,7 +395,7 @@ These are settled. Reopening requires a fresh round of justification.
 | 11 | DnD library | **Custom pointer-events** (`lib/dnd/`), not react-dnd / dnd-kit. We needed full control of cursor-follower preview + settleTo animation. |
 | 12 | History (undo/redo) | **Not built.** `commands.ts` exists as a stub for future use; no commands registered. Direct setter calls today. Re-evaluate when multi-step edit flows demand it. |
 | 13 | Multi-select | **Out of scope for v1.** Foundation assumes single selection. |
-| 14 | Image lightbox modal | **`ImageEditorModal` with embedded library view.** Universal modal contract via `ImageSlotSettings`. Factory mounts one modal per top-level image slot; `childImages` config adds per-blockId modal state for nested image children (per-speaker avatars). Opens to the **library view when the slot is empty** (no src), the editor view otherwise — an empty src in the editor view would sit on a perpetual "loading…". |
+| 14 | Image lightbox modal | **`ImageEditorModal` with embedded library view.** Universal modal contract via `ImageSlotSettings`. Factory mounts one modal per top-level image slot; `childImages` config adds per-blockId modal state for nested image children (per-speaker avatars). Opens to the **library view when the slot is empty** (no src), the editor view otherwise — an empty src in the editor view would sit on a perpetual "loading…". A slot flagged `replaceOnly` pins to the library view and dismisses on pick: the editor view's crop frame describes a crop that `objectFit: contain` slots never perform. |
 | 15 | Adapter form | **Factory-driven.** Every adapter uses `defineStageBenchAdapter`. Zero hand-rolled adapters. |
 | 16 | Nested editing (per-card patterns) | **Flat blockIds + `parent` reference.** A child slot declares `parent: 'parentBlockId'` so it's excluded from the bench surface; deep-click cascades via DOM ancestor walking in `Editable.tsx`. Same pattern for text and image children. |
 
@@ -472,7 +473,7 @@ CTA blocks that include an `ArrowIcon` next to text: the arrow stays outside `wr
 3. **Per-speaker filter persistence** — `EmailSpeakers` and `WebsiteWebinar` speaker avatars feed `NEUTRAL_FILTERS` into the editor modal; the modal sliders move locally but don't persist across opens. Wiring 3× per-speaker `imageFilters` store fields is the follow-up if real-world feedback demands it.
 4. **Single-element selection.** Multi-select is not in v1.
 
-Open substrate work lives in `SUBSTRATE-DEBT.md` — currently one entry (image-source-key for newsletter dark/light variants).
+Open substrate work lives in `SUBSTRATE-DEBT.md`.
 
 ---
 
