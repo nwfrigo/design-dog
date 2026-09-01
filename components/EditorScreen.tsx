@@ -64,6 +64,8 @@ import { ZoomableImage } from './ZoomableImage'
 import { ImageCropModal } from './ImageCropModal'
 import { SimpleRichTextEditor } from './SimpleRichTextEditor'
 import { buildExportParams, type ExportParamState } from '@/lib/export-params'
+import { captureEditorSnapshot } from '@/lib/asset-snapshot'
+import { DRAFT_SHAPE_VERSION } from '@/lib/draft-storage'
 import { TEMPLATE_REGISTRY } from '@/lib/template-registry'
 import { EyeIcon } from './shared/EyeIcon'
 import type { TemplateInfo } from '@/lib/template-config'
@@ -895,10 +897,15 @@ export function EditorScreen() {
 
       const exportParams = buildExportParams(currentTemplate, exportScale, paramState)
 
+      // Snapshot the full editor state alongside the export. The export log
+      // stores it so My Work's Clone/Edit can restore this exact asset later —
+      // same capture the queue serialization uses.
+      const assetSnapshot = captureEditorSnapshot(useStore.getState())
+
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...exportParams, exportedBy }),
+        body: JSON.stringify({ ...exportParams, exportedBy, assetSnapshot, assetSnapshotVersion: DRAFT_SHAPE_VERSION }),
       })
 
       if (!response.ok) {

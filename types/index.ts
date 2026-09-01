@@ -1109,6 +1109,8 @@ export interface AppState {
   removeFromQueue: (id: string) => void
   clearQueue: () => void
   editQueuedAsset: (id: string) => void
+  /** My Work sidebar: restore an export-time snapshot as a fresh editor draft. */
+  loadExportSnapshotIntoEditor: (snapshot: Record<string, unknown>) => void
   editingQueueItemId: string | null
   saveQueuedAssetEdit: () => void
   cancelQueueEdit: () => void

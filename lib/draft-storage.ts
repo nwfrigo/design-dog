@@ -5,6 +5,38 @@ import { UNIVERSAL_FALLBACK_FLAGS } from './template-defaults'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
+/**
+ * Drafts are scoped to the picked identity (the NamePickerModal's
+ * `design-dog-user` localStorage value), so switching users on one machine
+ * switches drafts instead of sharing one. Reads the identity directly from
+ * localStorage rather than importing the modal — draft-storage stays a pure
+ * lib module with no component dependency.
+ *
+ * Migration: drafts saved before scoping lived under the bare key. The first
+ * scoped read adopts a bare draft into the current user's key and removes the
+ * bare one, so nobody loses in-flight work on upgrade.
+ */
+function draftKey(): string {
+  if (typeof window === 'undefined') return DRAFT_KEY
+  const user = localStorage.getItem('design-dog-user')
+  return user ? `${DRAFT_KEY}::${user}` : DRAFT_KEY
+}
+
+function migrateLegacyDraft(): void {
+  if (typeof window === 'undefined') return
+  try {
+    const scoped = draftKey()
+    if (scoped === DRAFT_KEY) return // no identity picked yet — bare key IS the key
+    if (localStorage.getItem(scoped) !== null) return
+    const legacy = localStorage.getItem(DRAFT_KEY)
+    if (legacy === null) return
+    localStorage.setItem(scoped, legacy)
+    localStorage.removeItem(draftKey())
+  } catch {
+    /* migration is best-effort */
+  }
+}
+
 export interface DraftState {
   version: number
   savedAt: number
@@ -175,6 +207,11 @@ export interface DraftState {
 // the prior shape carry now-removed fields (generatedAssets, autoCreate,
 // etc.) and are cleared on next load.
 const CURRENT_VERSION = 2
+
+/** Draft-shape version, exported so export-time snapshots can be stamped with
+ *  the shape they were captured under (My Work clone refuses a mismatch
+ *  gracefully instead of restoring an incompatible shape). */
+export const DRAFT_SHAPE_VERSION = CURRENT_VERSION
 
 export function saveDraftToStorage(state: Partial<DraftState>): void {
   if (typeof window === 'undefined') return
@@ -358,7 +395,7 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       executiveOverviewDocument: state.executiveOverviewDocument ?? null,
     }
 
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+    localStorage.setItem(draftKey(), JSON.stringify(draft))
   } catch (error) {
     console.error('Failed to save draft:', error)
   }
@@ -368,7 +405,8 @@ export function loadDraftFromStorage(): DraftState | null {
   if (typeof window === 'undefined') return null
 
   try {
-    const stored = localStorage.getItem(DRAFT_KEY)
+    migrateLegacyDraft()
+    const stored = localStorage.getItem(draftKey())
     if (!stored) return null
 
     const draft = JSON.parse(stored) as DraftState
@@ -390,7 +428,7 @@ export function clearDraft(): void {
   if (typeof window === 'undefined') return
 
   try {
-    localStorage.removeItem(DRAFT_KEY)
+    localStorage.removeItem(draftKey())
   } catch (error) {
     console.error('Failed to clear draft:', error)
   }
@@ -400,7 +438,8 @@ export function hasDraft(): boolean {
   if (typeof window === 'undefined') return false
 
   try {
-    const stored = localStorage.getItem(DRAFT_KEY)
+    migrateLegacyDraft()
+    const stored = localStorage.getItem(draftKey())
     if (!stored) return false
 
     const draft = JSON.parse(stored) as DraftState
@@ -441,7 +480,8 @@ export function getDraftAssetCount(): number {
   if (typeof window === 'undefined') return 0
 
   try {
-    const stored = localStorage.getItem(DRAFT_KEY)
+    migrateLegacyDraft()
+    const stored = localStorage.getItem(draftKey())
     if (!stored) return 0
 
     const draft = JSON.parse(stored) as DraftState

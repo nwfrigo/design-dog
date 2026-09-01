@@ -28,6 +28,20 @@ export async function POST(request: NextRequest) {
     // Add thumbnail_url column if it doesn't exist (for existing tables)
     await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS thumbnail_url TEXT`
 
+    // My Work sidebar (feature-memory-1):
+    // - snapshot: the editor state captured at export time (SNAPSHOT_FIELDS
+    //   shape) — what Clone/Edit restore. NULL for exports made before this
+    //   shipped; those rows are download-only in the UI.
+    // - snapshot_version: draft-storage CURRENT_VERSION at capture time, so a
+    //   future incompatible shape can refuse gracefully instead of restoring
+    //   garbage into the editor.
+    // - label: dormant Gmail-style project label for future organization.
+    //   Costs nothing now; lets history rows be grouped later without backfill.
+    await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS snapshot JSONB`
+    await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS snapshot_version INTEGER`
+    await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS label TEXT`
+    await sql`CREATE INDEX IF NOT EXISTS idx_export_logs_exported_by ON export_logs(exported_by, created_at DESC)`
+
     await sql`CREATE INDEX IF NOT EXISTS idx_export_logs_created_at ON export_logs(created_at DESC)`
     await sql`CREATE INDEX IF NOT EXISTS idx_export_logs_exported_by ON export_logs(exported_by)`
     await sql`CREATE INDEX IF NOT EXISTS idx_export_logs_template ON export_logs(template_type)`

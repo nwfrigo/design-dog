@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useStore } from '@/store'
 import { AssetSelectionScreen } from '@/components/AssetSelectionScreen'
+import { MyWorkSidebar } from '@/components/MyWorkSidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { DraftBanner } from '@/components/DraftBanner'
 import { Header } from '@/components/Header'
@@ -112,7 +113,16 @@ function HomeContent() {
 
       {/* Main content */}
       <div className="max-w-[1600px] mx-auto px-6 py-8">
-        {currentScreen === 'select' && <AssetSelectionScreen />}
+        {/* My Work rides the home screen only — inside the editor the left
+         *  edge belongs to the Stage & Bench rail. */}
+        {currentScreen === 'select' ? (
+          <div className="flex items-start">
+            <MyWorkSidebar />
+            <div className="flex-1 min-w-0">
+              <AssetSelectionScreen />
+            </div>
+          </div>
+        ) : null}
       </div>
     </main>
   )

@@ -1306,6 +1306,38 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     set({ exportQueue: [] })
   },
 
+  /** My Work sidebar Clone/Edit: restore an export-time snapshot (fetched
+   *  from the export log) into the editor as a fresh working copy. Follows
+   *  editQueuedAsset's entering-the-editor shape, minus editingQueueItemId —
+   *  a clone is a NEW draft, not a queue edit, so nothing points back at the
+   *  original export and exporting again writes a new log row. */
+  loadExportSnapshotIntoEditor: (snapshot: Record<string, unknown>) => {
+    const state = get()
+    const restored = restoreEditorSnapshot(snapshot)
+    const templateType = (snapshot.templateType as TemplateType) ?? state.templateType
+    const position = (snapshot.thumbnailImagePosition as { x: number; y: number } | undefined) ?? { x: 0, y: 0 }
+    const zoom = (snapshot.thumbnailImageZoom as number | undefined) ?? 1
+    const filters = (snapshot.thumbnailImageFilters as ImageFilters | undefined) ?? NEUTRAL_FILTERS
+    set({
+      ...restored,
+      currentScreen: 'editor',
+      templateType,
+      selectedAssets: [templateType],
+      currentAssetIndex: 0,
+      verbatimCopy: {
+        headline: (snapshot.headline as string) ?? '',
+        subhead: (snapshot.subhead as string) ?? '',
+        body: (snapshot.body as string) ?? '',
+        cta: '',
+      },
+      thumbnailImageSettings: {
+        ...state.thumbnailImageSettings,
+        [templateType]: { position, zoom, filters },
+      },
+      editingQueueItemId: null,
+    })
+  },
+
   editQueuedAsset: (id: string) => {
     const state = get()
     const asset = state.exportQueue.find((a) => a.id === id)

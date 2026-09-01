@@ -10,6 +10,10 @@ export interface ExportLog {
   scale: number
   thumbnail_url: string | null
   created_at: string
+  /** True when a restorable snapshot exists (list queries return the flag,
+   *  not the blob — snapshots are fetched one at a time on Clone). */
+  has_snapshot?: boolean
+  snapshot_version?: number | null
 }
 
 export interface ExportStats {
@@ -32,9 +36,14 @@ export function logExport(data: {
   format?: string
   scale?: number
   thumbnailUrl?: string
+  /** Editor state captured at export time (SNAPSHOT_FIELDS shape). Restoring
+   *  it is what the My Work sidebar's Clone/Edit do. Optional: legacy callers
+   *  and failures leave it NULL, which the UI renders as download-only. */
+  snapshot?: Record<string, unknown>
+  snapshotVersion?: number
 }): void {
   sql`
-    INSERT INTO export_logs (template_type, exported_by, headline, solution, format, scale, thumbnail_url)
+    INSERT INTO export_logs (template_type, exported_by, headline, solution, format, scale, thumbnail_url, snapshot, snapshot_version)
     VALUES (
       ${data.templateType},
       ${data.exportedBy || null},
@@ -42,7 +51,9 @@ export function logExport(data: {
       ${data.solution || null},
       ${data.format || 'png'},
       ${data.scale || 1},
-      ${data.thumbnailUrl || null}
+      ${data.thumbnailUrl || null},
+      ${data.snapshot ? JSON.stringify(data.snapshot) : null},
+      ${data.snapshotVersion ?? null}
     )
   `.catch((err) => {
     console.error('Failed to log export:', err)
@@ -93,7 +104,10 @@ export async function getExportLogs(opts: {
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const countQuery = `SELECT COUNT(*) as count FROM export_logs ${where}`
-  const dataQuery = `SELECT * FROM export_logs ${where} ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`
+  // Explicit columns: snapshots can be multi-KB JSONB, and lists (admin page,
+  // My Work sidebar) only need to know whether one EXISTS. The blob itself is
+  // fetched per-row by getExportSnapshot when the user actually clones.
+  const dataQuery = `SELECT id, template_type, exported_by, headline, solution, format, scale, thumbnail_url, created_at, snapshot_version, (snapshot IS NOT NULL) AS has_snapshot FROM export_logs ${where} ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`
 
   const allValues = [...values, limit, offset]
 
@@ -149,6 +163,24 @@ export async function getExportStats(): Promise<ExportStats> {
 /**
  * Get all team members from the database.
  */
+/** The one-row snapshot fetch behind Clone/Edit in the My Work sidebar. */
+export async function getExportSnapshot(id: number): Promise<{
+  snapshot: Record<string, unknown> | null
+  snapshot_version: number | null
+  template_type: string
+} | null> {
+  const result = await sql`
+    SELECT snapshot, snapshot_version, template_type FROM export_logs WHERE id = ${id}
+  `
+  if (result.rows.length === 0) return null
+  const row = result.rows[0]
+  return {
+    snapshot: (row.snapshot as Record<string, unknown> | null) ?? null,
+    snapshot_version: (row.snapshot_version as number | null) ?? null,
+    template_type: row.template_type as string,
+  }
+}
+
 export async function getTeamMembers(): Promise<{ id: number; name: string }[]> {
   const result = await sql`SELECT id, name FROM team_members ORDER BY name ASC`
   return result.rows as { id: number; name: string }[]
