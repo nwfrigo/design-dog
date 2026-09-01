@@ -47,6 +47,12 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     // edits persist to the draft; otherwise an HMR/remount restores a stale
     // doc and the canvas reverts to the 1080² default.
     customSizeDocument,
+    // Executive-overview doc — ALL of this template's content lives in this one
+    // blob (copy, cards, chips, stats, contact, images, logo size, footer
+    // variant), and none of it touches any other watched field. Without it here
+    // the auto-save never fires for an executive-overview edit, so a refresh
+    // loses everything since the last incidental save.
+    executiveOverviewDocument,
   } = useStore()
 
   // Check if we're editing from queue
@@ -101,6 +107,8 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     carouselSlides,
     // Custom-size doc — persist dim/overlay/image edits promptly.
     customSizeDocument,
+    // Executive-overview doc — same reasoning; it's the template's only store field.
+    executiveOverviewDocument,
   ])
 
   const handleLogoClick = () => {
