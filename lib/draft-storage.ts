@@ -6,32 +6,80 @@ import { UNIVERSAL_FALLBACK_FLAGS } from './template-defaults'
 const DRAFT_KEY = 'design-dog-active-draft'
 
 /**
- * Drafts are scoped to the picked identity (the NamePickerModal's
- * `design-dog-user` localStorage value), so switching users on one machine
- * switches drafts instead of sharing one. Reads the identity directly from
- * localStorage rather than importing the modal — draft-storage stays a pure
- * lib module with no component dependency.
+ * Multi-draft store: each identity keeps a LIST of drafts (a draft = a
+ * project), newest first, under `design-dog-drafts::<name>`. A fresh project
+ * gets a fresh id (the store assigns one when the user leaves the template
+ * picker); auto-save upserts the entry for the ACTIVE id, so parallel drafts
+ * no longer overwrite each other. Capped at MAX_DRAFTS, oldest falls off.
  *
- * Migration: drafts saved before scoping lived under the bare key. The first
- * scoped read adopts a bare draft into the current user's key and removes the
- * bare one, so nobody loses in-flight work on upgrade.
+ * Identity comes straight from localStorage (`design-dog-user`) so this stays
+ * a pure lib module. Migration adopts both earlier shapes — the original
+ * single bare key and the interim per-user single key — into the list so
+ * nobody loses in-flight work.
  */
-function draftKey(): string {
-  if (typeof window === 'undefined') return DRAFT_KEY
+export type DraftEntry = { id: string; draft: DraftState }
+
+const DRAFTS_KEY = 'design-dog-drafts'
+const MAX_DRAFTS = 20
+
+export function newDraftId(): string {
+  return `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+function draftsKey(): string {
+  if (typeof window === 'undefined') return DRAFTS_KEY
   const user = localStorage.getItem('design-dog-user')
-  return user ? `${DRAFT_KEY}::${user}` : DRAFT_KEY
+  return user ? `${DRAFTS_KEY}::${user}` : DRAFTS_KEY
+}
+
+function readEntries(): DraftEntry[] {
+  if (typeof window === 'undefined') return []
+  try {
+    migrateLegacyDraft()
+    const stored = localStorage.getItem(draftsKey())
+    if (!stored) return []
+    const parsed = JSON.parse(stored) as { entries?: DraftEntry[] }
+    const entries = Array.isArray(parsed.entries) ? parsed.entries : []
+    // Version-gate per entry — one stale draft shouldn't nuke the list.
+    return entries
+      .filter((e) => e && e.id && e.draft && e.draft.version === CURRENT_VERSION)
+      .sort((a, b) => (b.draft.savedAt ?? 0) - (a.draft.savedAt ?? 0))
+  } catch {
+    return []
+  }
+}
+
+function writeEntries(entries: DraftEntry[]): void {
+  if (typeof window === 'undefined') return
+  try {
+    const capped = entries
+      .sort((a, b) => (b.draft.savedAt ?? 0) - (a.draft.savedAt ?? 0))
+      .slice(0, MAX_DRAFTS)
+    localStorage.setItem(draftsKey(), JSON.stringify({ entries: capped }))
+  } catch (error) {
+    console.error('Failed to write drafts:', error)
+  }
 }
 
 function migrateLegacyDraft(): void {
   if (typeof window === 'undefined') return
   try {
-    const scoped = draftKey()
-    if (scoped === DRAFT_KEY) return // no identity picked yet — bare key IS the key
-    if (localStorage.getItem(scoped) !== null) return
-    const legacy = localStorage.getItem(DRAFT_KEY)
-    if (legacy === null) return
-    localStorage.setItem(scoped, legacy)
-    localStorage.removeItem(draftKey())
+    const listKey = draftsKey()
+    if (localStorage.getItem(listKey) !== null) return
+    const user = localStorage.getItem('design-dog-user')
+    const candidates = [user ? `${DRAFT_KEY}::${user}` : null, DRAFT_KEY].filter(Boolean) as string[]
+    for (const key of candidates) {
+      const legacy = localStorage.getItem(key)
+      if (!legacy) continue
+      try {
+        const draft = JSON.parse(legacy) as DraftState
+        if (draft.version === CURRENT_VERSION) {
+          localStorage.setItem(listKey, JSON.stringify({ entries: [{ id: newDraftId(), draft }] }))
+        }
+      } catch { /* unparseable legacy draft — drop it */ }
+      localStorage.removeItem(key)
+      return
+    }
   } catch {
     /* migration is best-effort */
   }
@@ -213,7 +261,7 @@ const CURRENT_VERSION = 2
  *  gracefully instead of restoring an incompatible shape). */
 export const DRAFT_SHAPE_VERSION = CURRENT_VERSION
 
-export function saveDraftToStorage(state: Partial<DraftState>): void {
+export function saveDraftToStorage(state: Partial<DraftState>, draftId?: string): void {
   if (typeof window === 'undefined') return
 
   try {
@@ -395,54 +443,55 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       executiveOverviewDocument: state.executiveOverviewDocument ?? null,
     }
 
-    localStorage.setItem(draftKey(), JSON.stringify(draft))
+    // Upsert into the multi-draft list. No id (legacy caller) → update the
+    // newest entry, creating one if the list is empty.
+    const entries = readEntries()
+    const id = draftId ?? entries[0]?.id ?? newDraftId()
+    const idx = entries.findIndex((e) => e.id === id)
+    if (idx >= 0) entries[idx] = { id, draft }
+    else entries.unshift({ id, draft })
+    writeEntries(entries)
   } catch (error) {
     console.error('Failed to save draft:', error)
   }
 }
 
+/** Newest draft (banner + legacy callers). */
 export function loadDraftFromStorage(): DraftState | null {
-  if (typeof window === 'undefined') return null
-
-  try {
-    migrateLegacyDraft()
-    const stored = localStorage.getItem(draftKey())
-    if (!stored) return null
-
-    const draft = JSON.parse(stored) as DraftState
-
-    // Version check - if version mismatch, clear and return null
-    if (draft.version !== CURRENT_VERSION) {
-      clearDraft()
-      return null
-    }
-
-    return draft
-  } catch (error) {
-    console.error('Failed to load draft:', error)
-    return null
-  }
+  return readEntries()[0]?.draft ?? null
 }
 
-export function clearDraft(): void {
-  if (typeof window === 'undefined') return
+/** All of this identity's drafts, newest first (My Work sidebar). */
+export function listDrafts(): DraftEntry[] {
+  return readEntries()
+}
 
-  try {
-    localStorage.removeItem(draftKey())
-  } catch (error) {
-    console.error('Failed to clear draft:', error)
-  }
+export function loadDraftById(id: string): DraftState | null {
+  return readEntries().find((e) => e.id === id)?.draft ?? null
+}
+
+export function deleteDraftById(id: string): void {
+  writeEntries(readEntries().filter((e) => e.id !== id))
+}
+
+/** Id of the newest draft — what the banner's Start Over targets. */
+export function newestDraftId(): string | null {
+  return readEntries()[0]?.id ?? null
+}
+
+/** Legacy signature: clears the NEWEST draft (the one the banner shows).
+ *  Sidebar deletes pass an explicit id via deleteDraftById. */
+export function clearDraft(): void {
+  const newest = readEntries()[0]
+  if (newest) deleteDraftById(newest.id)
 }
 
 export function hasDraft(): boolean {
   if (typeof window === 'undefined') return false
 
   try {
-    migrateLegacyDraft()
-    const stored = localStorage.getItem(draftKey())
-    if (!stored) return false
-
-    const draft = JSON.parse(stored) as DraftState
+    const draft = readEntries()[0]?.draft
+    if (!draft) return false
 
     // Check if draft has any actual content
     const hasAssets = draft.selectedAssets.length > 0
@@ -480,11 +529,8 @@ export function getDraftAssetCount(): number {
   if (typeof window === 'undefined') return 0
 
   try {
-    migrateLegacyDraft()
-    const stored = localStorage.getItem(draftKey())
-    if (!stored) return 0
-
-    const draft = JSON.parse(stored) as DraftState
+    const draft = readEntries()[0]?.draft
+    if (!draft) return 0
     const selectedCount = draft.selectedAssets.length
     const queueCount = draft.exportQueue.length
 

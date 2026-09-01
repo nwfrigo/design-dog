@@ -1111,6 +1111,8 @@ export interface AppState {
   editQueuedAsset: (id: string) => void
   /** My Work sidebar: restore an export-time snapshot as a fresh editor draft. */
   loadExportSnapshotIntoEditor: (snapshot: Record<string, unknown>) => void
+  /** Auto-save target in the multi-draft store; null until a project starts. */
+  activeDraftId: string | null
   editingQueueItemId: string | null
   saveQueuedAssetEdit: () => void
   cancelQueueEdit: () => void
@@ -1123,6 +1125,6 @@ export interface AppState {
 
   // Draft persistence
   saveDraft: () => void
-  loadDraft: () => boolean
+  loadDraft: (draftId?: string) => boolean
   clearDraft: () => void
 }

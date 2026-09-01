@@ -31,6 +31,16 @@ export default function EditorPage() {
   }, [setExportedBy])
 
   useEffect(() => {
+    // A project already live in the store (a sidebar resume, a clone, or a
+    // fresh pick this session) must NOT be stomped by the storage restore —
+    // with multiple drafts, loadDraft() loads the NEWEST entry, which may be
+    // a different project than the one just resumed. The storage path is only
+    // for cold arrivals (hard refresh / deep link straight to /editor).
+    if (useStore.getState().activeDraftId) {
+      setHasValidDraft(true)
+      setIsLoading(false)
+      return
+    }
     // Check for draft and load it
     if (hasDraft()) {
       const loaded = loadDraft()

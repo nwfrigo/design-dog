@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, CustomSizeDocument, ExecutiveOverviewDocument } from '@/types'
-import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
+import { saveDraftToStorage, loadDraftFromStorage, loadDraftById, newDraftId, newestDraftId, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
 import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
 import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS, getBrandedSeed } from '@/lib/template-defaults'
@@ -476,6 +476,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Custom Size
   customSizeDocument: null as CustomSizeDocument | null,
   executiveOverviewDocument: null as ExecutiveOverviewDocument | null,
+  // Which entry in the multi-draft store auto-save writes to. Fresh id when a
+  // new project starts (leaving the template picker, or cloning); bound to the
+  // resumed entry's id on resume. Ephemeral — never serialized into drafts.
+  activeDraftId: null as string | null,
 
   // Email Cority Connect 2026
   ccBackgroundVariant: 'dark-blue-1' as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant,
@@ -1229,6 +1233,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         // branded seeds + flag overrides line up with the thumbnail.
         ...defaults,
         verbatimCopy: { ...initialVerbatimCopy },
+        // Leaving the picker = a NEW project → its own draft entry.
+        activeDraftId: newDraftId(),
       })
     }
   },
@@ -1236,6 +1242,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Navigate directly to editor with a single template (for single-click)
   goToEditorWithTemplate: (templateType: TemplateType) => {
     const defaults = getDefaultAssetSettings(templateType)
+    // Single-click from the picker = a NEW project → its own draft entry.
+    set({ activeDraftId: newDraftId() })
 
     // Social Carousel gets its own editor screen
     if (templateType === 'social-carousel') {
@@ -1320,6 +1328,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     const filters = (snapshot.thumbnailImageFilters as ImageFilters | undefined) ?? NEUTRAL_FILTERS
     set({
       ...restored,
+      // A clone is a NEW project — its own draft entry, never the source's.
+      activeDraftId: newDraftId(),
       currentScreen: 'editor',
       templateType,
       selectedAssets: [templateType],
@@ -1425,6 +1435,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   reset: () =>
     set({
+      activeDraftId: null,
       currentScreen: 'select',
       contentMode: 'verbatim',
       verbatimCopy: { ...initialVerbatimCopy },
@@ -1509,6 +1520,13 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Draft persistence actions
   saveDraft: () => {
     const state = get()
+    // Bind a draft id lazily so every legacy entry path still saves; from
+    // then on auto-save upserts THIS entry instead of the newest one.
+    let id = state.activeDraftId
+    if (!id) {
+      id = newDraftId()
+      set({ activeDraftId: id })
+    }
     saveDraftToStorage({
       currentScreen: state.currentScreen,
       selectedAssets: state.selectedAssets,
@@ -1645,14 +1663,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Custom Size
       customSizeDocument: state.customSizeDocument,
       executiveOverviewDocument: state.executiveOverviewDocument,
-    })
+    }, id)
   },
 
-  loadDraft: () => {
-    const draft = loadDraftFromStorage()
+  loadDraft: (draftId?: string) => {
+    const draft = draftId ? loadDraftById(draftId) : loadDraftFromStorage()
     if (!draft) return false
 
     set({
+      // Resuming — bind auto-save to the resumed entry (newest when unspecified).
+      activeDraftId: draftId ?? newestDraftId(),
       currentScreen: draft.currentScreen || 'select',
       selectedAssets: draft.selectedAssets,
       currentAssetIndex: draft.currentAssetIndex,

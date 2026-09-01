@@ -1,14 +1,18 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
-import { PanelLeft, Copy, Pencil, Eye, Trash2, Search, Loader2, ArrowUpRight, FileText } from 'lucide-react'
+import { PanelLeft, Copy, Pencil, Eye, Trash2, Search, Loader2, ArrowUpRight, Mail, Newspaper, MessageSquareHeart, Globe, FileText, type LucideIcon } from 'lucide-react'
 import { useStore } from '@/store'
 import { getStoredUser } from '@/components/NamePickerModal'
 import { DeleteConfirmModal } from '@/components/shared/DeleteConfirmModal'
-import { DRAFT_SHAPE_VERSION, loadDraftFromStorage, clearDraft, type DraftState } from '@/lib/draft-storage'
-import { TEMPLATE_LABELS } from '@/lib/template-config'
-import type { TemplateType } from '@/types'
+import { TemplateRenderer } from '@/components/shared/TemplateRenderer'
+import { DRAFT_SHAPE_VERSION, listDrafts, deleteDraftById, type DraftEntry, type DraftState } from '@/lib/draft-storage'
+import { TEMPLATE_LABELS, TEMPLATE_DIMENSIONS } from '@/lib/template-config'
+import { TEMPLATE_REGISTRY } from '@/lib/template-registry'
+import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
+import type { QueuedAsset, TemplateType } from '@/types'
 
 /**
  * MyWorkSidebar — the persistent "your previous work" rail on the home screen.
@@ -67,6 +71,74 @@ function matchesSearch(row: ExportRow, q: string): boolean {
   return hay.includes(q.toLowerCase())
 }
 
+/** Channel icon per template family — mirrors the home filter chips. */
+function channelIcon(templateType: string): LucideIcon {
+  if (templateType.startsWith('email')) return Mail
+  if (templateType.startsWith('newsletter')) return Newspaper
+  if (templateType.startsWith('social')) return MessageSquareHeart
+  if (templateType.startsWith('website')) return Globe
+  return FileText
+}
+
+/**
+ * A draft is store-shaped (verbatimCopy nested, per-template image settings
+ * map); TemplateRenderer wants a QueuedAsset (flattened). Bridge the deltas
+ * and spread the rest — DraftState persists the same field names renderProps
+ * reads for everything else.
+ */
+function draftToRenderableAsset(draft: DraftState): QueuedAsset {
+  const t = draft.templateType
+  const img = draft.thumbnailImageSettings?.[t]
+  return {
+    ...(draft as unknown as Record<string, unknown>),
+    id: 'draft-preview',
+    templateType: t,
+    headline: draft.verbatimCopy?.headline ?? '',
+    subhead: draft.verbatimCopy?.subhead ?? '',
+    body: draft.verbatimCopy?.body ?? '',
+    thumbnailImageUrl: draft.thumbnailImageUrl ?? null,
+    thumbnailImagePosition: img?.position ?? { x: 0, y: 0 },
+    thumbnailImageZoom: img?.zoom ?? 1,
+    thumbnailImageFilters: img?.filters,
+  } as unknown as QueuedAsset
+}
+
+/** Live mini-render of a draft's current design — the queue-thumbnail
+ *  pattern (TemplateRenderer scaled into a fixed box). Falls back to the
+ *  channel icon for templates outside the registry (legacy PDFs). */
+function DraftThumb({ draft, colors, typography }: {
+  draft: DraftState
+  colors: ColorsConfig | null
+  typography: TypographyConfig | null
+}) {
+  const t = draft.templateType
+  const dims = TEMPLATE_DIMENSIONS[t]
+  const Icon = channelIcon(t)
+  if (!TEMPLATE_REGISTRY[t] || !dims || !colors || !typography) {
+    return (
+      <div className="w-[84px] h-[54px] rounded flex-shrink-0 bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle flex items-center justify-center">
+        <Icon size={14} strokeWidth={1.5} className="text-gray-400 dark:text-content-secondary" />
+      </div>
+    )
+  }
+  const scale = Math.min(84 / dims.width, 54 / dims.height)
+  return (
+    <div className="w-[84px] h-[54px] rounded flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle relative pointer-events-none">
+      <div style={{
+        position: 'absolute',
+        left: (84 - dims.width * scale) / 2,
+        top: (54 - dims.height * scale) / 2,
+        width: dims.width,
+        height: dims.height,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
+      }}>
+        <TemplateRenderer asset={draftToRenderableAsset(draft)} colorsConfig={colors} typographyConfig={typography} />
+      </div>
+    </div>
+  )
+}
+
 function relativeDate(iso: string | number): string {
   const then = typeof iso === 'number' ? iso : new Date(iso).getTime()
   const mins = Math.floor((Date.now() - then) / 60000)
@@ -92,7 +164,7 @@ function ActionIcon({ title, onClick, children }: { title: string; onClick: () =
   return (
     <button
       title={title}
-      onClick={onClick}
+      onClick={(e) => { e.stopPropagation(); onClick() }}
       className="p-1 rounded text-gray-400 dark:text-content-secondary hover:text-gray-900 dark:hover:text-content-primary transition-colors"
     >
       {children}
@@ -109,18 +181,22 @@ export function MyWorkSidebar() {
   const [collapsed, setCollapsed] = useState(true)
   const [width, setWidth] = useState(DEFAULT_W)
   const [rows, setRows] = useState<ExportRow[] | null>(null)
-  const [draft, setDraft] = useState<DraftState | null>(null)
+  const [drafts, setDrafts] = useState<DraftEntry[]>([])
+  const [brand, setBrand] = useState<{ colors: ColorsConfig; typography: TypographyConfig } | null>(null)
   const [filter, setFilter] = useState<TypeFilter>('all')
   const [query, setQuery] = useState('')
   const [busyId, setBusyId] = useState<number | null>(null)
   const [previewRow, setPreviewRow] = useState<ExportRow | null>(null)
-  const [confirmDelete, setConfirmDelete] = useState<{ kind: 'draft' } | { kind: 'export'; row: ExportRow } | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<{ kind: 'draft'; entry: DraftEntry } | { kind: 'export'; row: ExportRow } | null>(null)
   const [user, setUser] = useState<string | null>(null)
   const dragState = useRef<{ startX: number; startW: number } | null>(null)
 
   useEffect(() => {
     setUser(getStoredUser())
-    setDraft(loadDraftFromStorage())
+    setDrafts(listDrafts())
+    Promise.all([fetchColorsConfig(), fetchTypographyConfig()])
+      .then(([colors, typography]) => setBrand({ colors, typography }))
+      .catch(() => { /* thumbs fall back to channel icons */ })
     try {
       setCollapsed(localStorage.getItem(COLLAPSE_KEY) === 'true')
       const w = Number(localStorage.getItem(WIDTH_KEY))
@@ -190,10 +266,10 @@ export function MyWorkSidebar() {
     }
   }, [loadExportSnapshotIntoEditor, setCurrentScreen, router])
 
-  const resumeDraft = useCallback(() => {
+  const resumeDraft = useCallback((id: string) => {
     // loadDraft restores currentScreen from the draft itself; the banner's
     // extra per-template screen logic stays the nuanced path.
-    if (loadDraft()) router.push('/editor')
+    if (loadDraft(id)) router.push('/editor')
   }, [loadDraft, router])
 
   const handleConfirmDelete = useCallback(async () => {
@@ -201,8 +277,8 @@ export function MyWorkSidebar() {
     setConfirmDelete(null)
     if (!target) return
     if (target.kind === 'draft') {
-      clearDraft()
-      setDraft(null)
+      deleteDraftById(target.entry.id)
+      setDrafts(listDrafts())
       return
     }
     // Optimistic: drop from the list, then soft-hide server-side. Nothing is
@@ -230,8 +306,6 @@ export function MyWorkSidebar() {
   }
 
   const visible = (rows ?? []).filter((r) => matchesFilter(r, filter) && matchesSearch(r, query))
-  const draftTemplate = draft?.templateType ? (TEMPLATE_LABELS[draft.templateType as TemplateType] ?? draft.templateType) : 'Draft'
-  const draftHeadline = draft?.verbatimCopy?.headline || ''
 
   return (
     <aside
@@ -281,30 +355,44 @@ export function MyWorkSidebar() {
       {/* Groups — independently scrolled from the template grid */}
       <div className="mt-5 overflow-y-auto min-h-0 flex-1 pb-4 flex flex-col gap-6">
 
-        {/* DRAFTS */}
+        {/* DRAFTS — every in-progress project, newest first */}
         <div>
-          <GroupLabel>Drafts &middot; {draft ? 1 : 0}</GroupLabel>
-          {draft ? (
-            <div className="group mt-2 rounded-md border border-gray-200 dark:border-line-subtle transition-[border-color,box-shadow] duration-150 hover:border-gray-300 dark:hover:border-content-secondary/40 hover:shadow-[0_2px_10px_rgba(6,0,21,0.08)]">
-              <div className="flex items-center gap-2.5 px-3 py-2.5">
-                <FileText size={14} strokeWidth={1.5} className="text-gray-400 dark:text-content-secondary flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <div className="text-[12.5px] text-gray-900 dark:text-content-primary truncate">
-                    {draftHeadline || draftTemplate}
-                  </div>
-                  <div className="font-mono text-[8px] uppercase tracking-wide text-gray-400 dark:text-content-secondary mt-0.5">
-                    {draftTemplate} &middot; saved {relativeDate(draft.savedAt)}
-                  </div>
-                </div>
-                <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                  <ActionIcon title="Resume editing" onClick={resumeDraft}><Pencil size={11} strokeWidth={1.5} /></ActionIcon>
-                  <ActionIcon title="Delete draft" onClick={() => setConfirmDelete({ kind: 'draft' })}><Trash2 size={11} strokeWidth={1.5} /></ActionIcon>
-                </div>
-              </div>
+          <GroupLabel>Drafts &middot; {drafts.length}</GroupLabel>
+          {drafts.length === 0 ? (
+            <div className="font-mono text-[9px] uppercase tracking-wide text-gray-300 dark:text-content-secondary/60 mt-2">
+              No drafts in progress
             </div>
           ) : (
-            <div className="font-mono text-[9px] uppercase tracking-wide text-gray-300 dark:text-content-secondary/60 mt-2">
-              No draft in progress
+            <div className="flex flex-col gap-2 mt-2">
+              {drafts.map((entry) => {
+                const d = entry.draft
+                const label = TEMPLATE_LABELS[d.templateType as TemplateType] ?? d.templateType
+                const ChannelIcon = channelIcon(d.templateType)
+                return (
+                  <div
+                    key={entry.id}
+                    onClick={() => resumeDraft(entry.id)}
+                    className="group cursor-pointer rounded-md border border-gray-200 dark:border-line-subtle transition-[border-color,box-shadow] duration-150 hover:border-gray-300 dark:hover:border-content-secondary/40 hover:shadow-[0_2px_10px_rgba(6,0,21,0.08)]"
+                  >
+                    <div className="flex items-center gap-3 px-2.5 py-2">
+                      <DraftThumb draft={d} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[12.5px] text-gray-900 dark:text-content-primary truncate">
+                          {d.verbatimCopy?.headline || label}
+                        </div>
+                        <div className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-wide text-gray-400 dark:text-content-secondary mt-1">
+                          <ChannelIcon size={9} strokeWidth={1.5} />
+                          <span className="truncate">{label} &middot; saved {relativeDate(d.savedAt)}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                        <ActionIcon title="Resume editing" onClick={() => resumeDraft(entry.id)}><Pencil size={11} strokeWidth={1.5} /></ActionIcon>
+                        <ActionIcon title="Delete draft" onClick={() => setConfirmDelete({ kind: 'draft', entry })}><Trash2 size={11} strokeWidth={1.5} /></ActionIcon>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
@@ -369,8 +457,8 @@ export function MyWorkSidebar() {
         <div className="h-full w-px bg-gray-200 dark:bg-line-subtle transition-colors group-hover/handle:bg-gray-400 dark:group-hover/handle:bg-content-secondary" />
       </div>
 
-      {/* Preview lightbox */}
-      {previewRow && (
+      {/* Preview lightbox — portaled for the same stacking-context reason. */}
+      {previewRow && createPortal(
         <div
           className="fixed inset-0 z-[1100] bg-black/80 flex items-center justify-center p-10 cursor-zoom-out"
           onClick={() => setPreviewRow(null)}
@@ -390,16 +478,25 @@ export function MyWorkSidebar() {
           >
             Open file <ArrowUpRight size={12} />
           </a>
-        </div>
+        </div>,
+        document.body,
       )}
 
-      <DeleteConfirmModal
-        isOpen={confirmDelete !== null}
-        itemType={confirmDelete?.kind === 'draft' ? 'Draft' : 'Export'}
-        itemLabel={confirmDelete?.kind === 'export' ? (confirmDelete.row.headline ?? undefined) : (draftHeadline || draftTemplate)}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setConfirmDelete(null)}
-      />
+      {/* Modals PORTAL to body: the aside is sticky (its own stacking
+       *  context), so a fixed overlay rendered inside it paints UNDER the
+       *  main column's content. */}
+      {confirmDelete !== null && createPortal(
+        <DeleteConfirmModal
+          isOpen
+          itemType={confirmDelete.kind === 'draft' ? 'Draft' : 'Export'}
+          itemLabel={confirmDelete.kind === 'export'
+            ? (confirmDelete.row.headline ?? undefined)
+            : (confirmDelete.entry.draft.verbatimCopy?.headline || (TEMPLATE_LABELS[confirmDelete.entry.draft.templateType as TemplateType] ?? 'Draft'))}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setConfirmDelete(null)}
+        />,
+        document.body,
+      )}
     </aside>
   )
 }
