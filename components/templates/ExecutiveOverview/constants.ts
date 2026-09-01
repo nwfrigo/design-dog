@@ -38,6 +38,13 @@ export type ExecutiveOverviewBlockId =
   | 'trustedHeader'
   | 'trustedSubhead'
   | `stat${StatIndex}`
+  // The footer band is one of two mutually exclusive variants; each is a
+  // benchable slot, so dragging the parked one onto the stage swaps them.
+  | 'footerSignoff'
+  | 'footerStandard'
+  // Fine-print disclaimer under the value cards. Benchable, on stage by
+  // default; absolutely positioned so dragging it off moves nothing.
+  | 'disclaimer'
   | 'footerCta'
   // Group wrapper for the footer contact lockup (avatar + name + role + email).
   // Hiding the group hides all four together — the byline is one unit.
@@ -81,6 +88,7 @@ export const EXEC_TOKENS = {
   footerBg: '#FFFFFF',
   text: '#060015', // text/primary
   textSecondary: '#767676', // text/secondary
+  textTertiary: '#969899', // text/tertiary — fine print (disclaimer)
   orange: '#D35F0B', // button/primary/bg-default
   border: '#D9D8D6', // border/default
   borderXs: 0.5, // border/xs
@@ -109,6 +117,17 @@ export const EXEC_LOGO_LEFT = 140
  *  (objectFit: contain) rather than overflowing the column. */
 export const EXEC_LOGO_MAX_WIDTH = 241
 
+/** Footer band variants. `signoff` (default) is the contact byline; `standard`
+ *  is the brand statement + Always Ahead lockup. Both are 612×88 at y=704, so
+ *  they swap without moving anything else on the page. */
+export type ExecutiveOverviewFooterVariant = 'signoff' | 'standard'
+
+/** Brand boilerplate for the standard footer. Fixed, not user-editable —
+ *  it's corporate copy that shouldn't drift per asset, so it lives here
+ *  rather than in the document blob. */
+export const EXEC_FOOTER_STANDARD_COPY =
+  'Cority is the intelligent EHS+ platform that helps customers see and prevent risks across their operations.'
+
 export const EXEC_PAGE_W = 612
 export const EXEC_PAGE_H = 792
 
@@ -132,6 +151,9 @@ export const EXEC_PLACEHOLDERS = {
   trustedHeader: 'A trusted partner.',
   trustedSubhead: 'Choose the team of experts committed to your success.',
   stat: 'Proof point or metric',
+  // Sentence case in source; CSS `text-transform: uppercase` renders the caps,
+  // matching how the other cap-labels on this page are stored.
+  disclaimer: 'All figures are estimates only',
   footerCta: 'Let’s build a path forward together.',
   contactName: 'Firstname Lastname',
   contactRole: 'Role, Company',
