@@ -18,6 +18,7 @@ import {
   EXEC_LOGO_HEIGHT_MIN,
   EXEC_LOGO_HEIGHT_MAX,
   type ExecutiveOverviewBlockId,
+  type ExecutiveOverviewFooterVariant,
   type ExecutiveOverviewCard,
   type ExecutiveOverviewStat,
 } from '@/components/templates/ExecutiveOverview/constants'
@@ -109,7 +110,9 @@ const PAGE1_SLOTS: SlotDescriptor<Id>[] = [
   imageSlot('heroImage', 'Hero image'),
 ]
 
-const PAGE2_SLOTS: SlotDescriptor<Id>[] = [
+/** Page-2 slots. The footer's inner slots follow the active variant so the
+ *  bench never shows chips for a footer that isn't on stage. */
+const page2Slots = (footerVariant: ExecutiveOverviewFooterVariant): SlotDescriptor<Id>[] => [
   textSlot('tagline', 'Tagline', { benchable: true, singleLine: false, placeholder: PH.tagline }),
   ...Array.from({ length: EXEC_CARD_COUNT }, (_, i) => i + 1).flatMap((n) => [
     textSlot(cardTitleId(n), `Card ${n} title`, { maxLines: 1, placeholder: PH.cardTitle }),
@@ -123,16 +126,35 @@ const PAGE2_SLOTS: SlotDescriptor<Id>[] = [
   ...Array.from({ length: EXEC_STAT_COUNT }, (_, k) => k + 1).map((k) =>
     textSlot(statId(k), `Stat ${k}`, { benchable: true, iconKey: 'caption', placeholder: PH.stat }),
   ),
-  textSlot('footerCta', 'Footer message', { placeholder: PH.footerCta }),
-  // The footer byline is one unit: the group carries the bench chip + eye
-  // toggle (doc.showContact), and the four fields are its children so they
-  // stay individually editable but don't each get their own chip. Same
-  // pattern as the speaker groups on email-speakers / website-webinar.
-  { blockId: 'contact', label: 'Contact', iconKey: 'speaker', chipKind: 'speaker', kind: 'group', benchable: true },
-  textSlot('contactName', 'Contact name', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactName }),
-  textSlot('contactRole', 'Contact role', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactRole }),
-  textSlot('contactEmail', 'Contact email', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactEmail }),
-  imageSlot('contactAvatar', 'Contact photo', { parent: 'contact' }),
+  // On stage by default; benchable so it can be dragged off. It's absolutely
+  // positioned in Page2, so removing it doesn't reflow anything.
+  textSlot('disclaimer', 'Disclaimer', {
+    benchable: true, singleLine: true, maxLines: 1, iconKey: 'caption', placeholder: PH.disclaimer,
+  }),
+  // The two footer bands are a mutually exclusive PAIR: exactly one is on the
+  // stage and exactly one is on the bench, always. The swap needs no substrate
+  // support — bench→stage drop just calls the slot's `show()`, and each
+  // variant's `setVisible` (in useStoreBindings) flips the shared
+  // `footerVariant`, which implicitly hides the other. Dragging the on-stage
+  // one off flips it back, so you can never end up with no footer.
+  { blockId: 'footerSignoff', label: 'Footer — Signoff', iconKey: 'speaker', chipKind: 'speaker', kind: 'group', benchable: true },
+  { blockId: 'footerStandard', label: 'Footer — Standard', iconKey: 'logo', chipKind: 'category', kind: 'group', benchable: true },
+  // Signoff's editable pieces only exist while the signoff is on stage.
+  // Footer — Standard is brand boilerplate + logo: nothing to edit.
+  ...(footerVariant === 'signoff'
+    ? [
+        textSlot('footerCta', 'Footer message', { placeholder: PH.footerCta }),
+        // The byline is one unit: the group carries the bench chip + eye
+        // toggle (doc.showContact), and the four fields are its children so
+        // they stay individually editable but don't each get their own chip.
+        // Same pattern as the speaker groups on email-speakers / website-webinar.
+        { blockId: 'contact', label: 'Contact', iconKey: 'speaker', chipKind: 'speaker', kind: 'group', benchable: true } as SlotDescriptor<Id>,
+        textSlot('contactName', 'Contact name', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactName }),
+        textSlot('contactRole', 'Contact role', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactRole }),
+        textSlot('contactEmail', 'Contact email', { parent: 'contact', iconKey: 'caption', placeholder: PH.contactEmail }),
+        imageSlot('contactAvatar', 'Contact photo', { parent: 'contact' }),
+      ]
+    : []),
 ]
 
 type SlotEntry = {
@@ -151,7 +173,10 @@ type SlotEntry = {
 export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
   templateId: 'executive-overview',
   pages: { count: 2, labels: ['Cover', 'Details'] },
-  slots: (_bindings, page) => (page === 1 ? PAGE1_SLOTS : PAGE2_SLOTS),
+  slots: (bindings, page) =>
+    page === 1
+      ? PAGE1_SLOTS
+      : page2Slots((bindings.extras?.doc as ExecutiveOverviewDocument | undefined)?.footerVariant ?? 'signoff'),
   childImages: [
     { blockId: 'heroImage', placeholderSrc: '', frameWidth: 159, frameHeight: 792 },
     // Replace-only: the cover renders this mark `objectFit: contain` at its
@@ -217,6 +242,27 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
         setVisible: (v) => setDoc(updateExecStat(getDoc(), k,{ show: v })),
       }
     })
+    // The swap, in full. Each variant reports itself visible only when it IS
+    // the active one, and its `setVisible(true)` selects it — which implicitly
+    // deselects the other. The bench→stage drop calls exactly this `show()`,
+    // so dragging the parked chip onto the stage performs the swap with no
+    // substrate involvement. `setVisible(false)` (drag the on-stage one off)
+    // selects the opposite variant rather than leaving the band empty.
+    const footerVariant = doc.footerVariant ?? 'signoff'
+    slotState.footerSignoff = {
+      visible: footerVariant === 'signoff',
+      setVisible: (on) => patch({ footerVariant: on ? 'signoff' : 'standard' }),
+    }
+    slotState.footerStandard = {
+      visible: footerVariant === 'standard',
+      setVisible: (on) => patch({ footerVariant: on ? 'standard' : 'signoff' }),
+    }
+    slotState.disclaimer = {
+      value: doc.disclaimer ?? '',
+      visible: doc.showDisclaimer ?? true,
+      setValue: (v) => patch({ disclaimer: v }),
+      setVisible: (v) => patch({ showDisclaimer: v }),
+    }
     slotState.footerCta = { value: doc.footerCta, setValue: (v) => patch({ footerCta: v }) }
     slotState.contact = { visible: doc.showContact, setVisible: (v) => patch({ showContact: v }) }
     slotState.contactName = { value: doc.contactName, setValue: (v) => patch({ contactName: v }) }
@@ -323,6 +369,8 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
         trustedHeader={ctx.rawTextOf('trustedHeader')}
         trustedSubhead={ctx.rawTextOf('trustedSubhead')}
         stats={stats}
+        disclaimer={ctx.rawTextOf('disclaimer')}
+        showDisclaimer={ctx.visibilityOf('disclaimer')}
         footerCta={ctx.rawTextOf('footerCta')}
         contactName={ctx.rawTextOf('contactName')}
         contactRole={ctx.rawTextOf('contactRole')}
@@ -332,6 +380,9 @@ export const ExecutiveOverviewStageBench = defineStageBenchAdapter<Id>({
         showTrustedHeader={ctx.visibilityOf('trustedHeader')}
         showTrustedSubhead={ctx.visibilityOf('trustedSubhead')}
         showContact={ctx.visibilityOf('contact')}
+        // visibilityOf (not the raw doc) so the bench→stage drag PREVIEW swaps
+        // the band live, matching what the drop will produce.
+        footerVariant={ctx.visibilityOf('footerStandard') ? 'standard' : 'signoff'}
         renderBlock={renderBlock as (id: Id, content: ReactNode) => ReactNode}
         renderInlineEditor={renderInlineEditor as (id: Id, defaultInner: ReactNode) => ReactNode}
         renderOverlay={renderOverlay}

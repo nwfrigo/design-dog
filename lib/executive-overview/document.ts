@@ -20,6 +20,7 @@ import {
   EXEC_DEFAULT_HERO_IMAGE,
   EXEC_LOGO_HEIGHT_DEFAULT,
   type ExecutiveOverviewCard,
+  type ExecutiveOverviewFooterVariant,
   type ExecutiveOverviewChip,
   type ExecutiveOverviewStat,
 } from '@/components/templates/ExecutiveOverview/constants'
@@ -53,12 +54,18 @@ export interface ExecutiveOverviewDocument {
   trustedSubhead: string
   showTrustedSubhead: boolean
   stats: ExecutiveOverviewStat[] // length EXEC_STAT_COUNT
+  /** Fine-print disclaimer under the value cards. */
+  disclaimer?: string
+  showDisclaimer?: boolean
   footerCta: string
   contactName: string
   contactRole: string
   contactEmail: string
   contactAvatarUrl: string | null
   showContact: boolean
+  /** Which footer band renders. Optional so documents saved before the second
+   *  variant existed still parse; the page-2 mapper resolves the default. */
+  footerVariant?: ExecutiveOverviewFooterVariant
 }
 
 /** Default chip visibility per card, matching the source design (card 2 has a
@@ -109,12 +116,15 @@ export function defaultExecutiveOverviewDocument(): ExecutiveOverviewDocument {
     trustedSubhead: '',
     showTrustedSubhead: true,
     stats: Array.from({ length: EXEC_STAT_COUNT }, () => ({ label: '', show: true })),
+    disclaimer: '',
+    showDisclaimer: true,
     footerCta: '',
     contactName: '',
     contactRole: '',
     contactEmail: '',
     contactAvatarUrl: null,
     showContact: true,
+    footerVariant: 'signoff',
   }
 }
 
@@ -188,6 +198,8 @@ export type ExecPage2ContentProps = {
   trustedHeader: string
   trustedSubhead: string
   stats: ExecutiveOverviewStat[]
+  disclaimer: string
+  showDisclaimer: boolean
   footerCta: string
   contactName: string
   contactRole: string
@@ -197,6 +209,7 @@ export type ExecPage2ContentProps = {
   showTrustedHeader: boolean
   showTrustedSubhead: boolean
   showContact: boolean
+  footerVariant: ExecutiveOverviewFooterVariant
 }
 
 export function execDocToPage1Props(doc: ExecutiveOverviewDocument): ExecPage1ContentProps {
@@ -227,6 +240,9 @@ export function execDocToPage2Props(doc: ExecutiveOverviewDocument): ExecPage2Co
     trustedHeader: doc.trustedHeader,
     trustedSubhead: doc.trustedSubhead,
     stats: doc.stats,
+    disclaimer: doc.disclaimer ?? '',
+    // Defaults resolved here so editor, preview and export read one value.
+    showDisclaimer: doc.showDisclaimer ?? true,
     footerCta: doc.footerCta,
     contactName: doc.contactName,
     contactRole: doc.contactRole,
@@ -236,5 +252,8 @@ export function execDocToPage2Props(doc: ExecutiveOverviewDocument): ExecPage2Co
     showTrustedHeader: doc.showTrustedHeader,
     showTrustedSubhead: doc.showTrustedSubhead,
     showContact: doc.showContact,
+    // Resolved here so the editor, preview and export all read one already-
+    // defaulted value rather than each re-deriving it.
+    footerVariant: doc.footerVariant ?? 'signoff',
   }
 }

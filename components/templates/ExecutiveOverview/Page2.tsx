@@ -3,13 +3,16 @@
 import { CSSProperties, Fragment, type ReactNode } from 'react'
 import type { TypographyConfig } from '@/lib/brand-config'
 import { CorityLogo } from '@/components/shared/CorityLogo'
+import { CorityAlwaysAheadLogo } from '@/components/shared/CorityAlwaysAheadLogo'
 import { getIconByName } from '@/components/IconPickerModal'
 import {
   EXEC_TOKENS as T,
   EXEC_PAGE_W,
   EXEC_PAGE_H,
   EXEC_PLACEHOLDERS as PH,
+  EXEC_FOOTER_STANDARD_COPY,
   type ExecutiveOverviewBlockId,
+  type ExecutiveOverviewFooterVariant,
   type ExecutiveOverviewCard,
   type ExecutiveOverviewStat,
 } from './constants'
@@ -25,6 +28,8 @@ export interface Page2Props {
   trustedHeader: string
   trustedSubhead: string
   stats: ExecutiveOverviewStat[] // length EXEC_STAT_COUNT
+  disclaimer: string
+  showDisclaimer: boolean
   footerCta: string
   contactName: string
   contactRole: string
@@ -34,6 +39,9 @@ export interface Page2Props {
   showTrustedHeader: boolean
   showTrustedSubhead: boolean
   showContact: boolean
+  /** Which of the two 612×88 footer bands renders. Both occupy the same box,
+   *  so swapping moves nothing else on the page. */
+  footerVariant: ExecutiveOverviewFooterVariant
   renderBlock?: (blockId: ExecutiveOverviewBlockId, content: ReactNode) => ReactNode
   renderInlineEditor?: (blockId: ExecutiveOverviewBlockId, defaultInner: ReactNode) => ReactNode
   renderOverlay?: () => ReactNode
@@ -55,6 +63,8 @@ export function Page2({
   trustedHeader,
   trustedSubhead,
   stats,
+  disclaimer,
+  showDisclaimer,
   footerCta,
   contactName,
   contactRole,
@@ -64,6 +74,7 @@ export function Page2({
   showTrustedHeader,
   showTrustedSubhead,
   showContact,
+  footerVariant,
   renderBlock,
   renderInlineEditor,
   renderOverlay,
@@ -194,18 +205,34 @@ export function Page2({
 
       {/* Section header row */}
       {showTrustedHeader && wrapBlock('trustedHeader', (
-        <div style={{ position: 'absolute', left: 48, top: 576, fontSize: 30, fontWeight: 350, lineHeight: 1.2, color: T.text, whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'absolute', left: 48, top: 585, fontSize: 30, fontWeight: 350, lineHeight: 1.2, color: T.text, whiteSpace: 'nowrap' }}>
           {wrapInline('trustedHeader', <span>{trustedHeader || PH.trustedHeader}</span>)}
         </div>
       ))}
       {showTrustedSubhead && wrapBlock('trustedSubhead', (
-        <div style={{ position: 'absolute', left: 318, top: 576, width: 210, fontSize: 14, fontWeight: 350, lineHeight: '18px', color: T.text }}>
+        <div style={{ position: 'absolute', left: 318, top: 585, width: 210, fontSize: 14, fontWeight: 350, lineHeight: '18px', color: T.text }}>
           {wrapInline('trustedSubhead', <span>{trustedSubhead || PH.trustedSubhead}</span>)}
         </div>
       ))}
 
+      {/* Fine-print disclaimer (Figma 89:306 — x=48, y=554).
+       *  Absolutely positioned like every other page-2 block, so dragging it
+       *  to the bench leaves the rest of the page exactly where it was. */}
+      {showDisclaimer && wrapBlock('disclaimer', (
+        <div style={{
+          position: 'absolute',
+          left: 48,
+          top: 554,
+          ...CAP_LABEL,
+          color: T.textTertiary,
+          whiteSpace: 'nowrap',
+        }}>
+          {wrapInline('disclaimer', <span>{disclaimer || PH.disclaimer}</span>)}
+        </div>
+      ))}
+
       {/* Stats — two centered rows */}
-      <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: 646, width: 506, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+      <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: 651, width: 506, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
         <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center' }}>
           {stats.slice(0, 3).map((s, k) => renderStat(s, k))}
         </div>
@@ -214,7 +241,14 @@ export function Page2({
         </div>
       </div>
 
-      {/* Footer band */}
+      {/* Footer band — one of two mutually exclusive variants, both 612×88 at
+       *  y=704 with the same surface and hairline, so the swap moves nothing
+       *  else on the page. The two are rendered from ONE condition rather than
+       *  two independent flags: during a bench→stage drag the factory reports
+       *  the incoming slot as visible while the outgoing one still is, so
+       *  independent flags would stack both bands on top of each other
+       *  mid-drag. Branching means the drag preview *replaces*, which is also
+       *  the honest preview of what a drop produces. */}
       <div style={{
         position: 'absolute',
         left: 0,
@@ -230,6 +264,28 @@ export function Page2({
         paddingRight: 48,
         boxSizing: 'border-box',
       }}>
+      {footerVariant === 'standard' ? wrapBlock('footerStandard', (
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <p style={{
+            margin: 0,
+            width: 352,
+            fontSize: 14,
+            fontWeight: 350,
+            lineHeight: '18px',
+            color: T.text,
+            wordBreak: 'break-word',
+          }}>
+            {EXEC_FOOTER_STANDARD_COPY}
+          </p>
+          <CorityAlwaysAheadLogo markFill={T.orange} taglineFill={T.text} />
+        </div>
+      )) : wrapBlock('footerSignoff', (
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 24 }}>
         {wrapBlock('footerCta', (
           <div style={{ width: 246, fontSize: 14, fontWeight: 350, lineHeight: '18px', color: T.text }}>
             {wrapInline('footerCta', <span>{footerCta || PH.footerCta}</span>)}
@@ -259,6 +315,8 @@ export function Page2({
             </div>
           </div>
         ))}
+        </div>
+      ))}
       </div>
 
       {renderOverlay?.()}
