@@ -40,6 +40,10 @@ export async function POST(request: NextRequest) {
     await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS snapshot JSONB`
     await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS snapshot_version INTEGER`
     await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS label TEXT`
+    // Soft-hide for the My Work sidebar's Delete: removes the row from the
+    // OWNER's UI only. Admin keeps seeing everything (its queries don't
+    // exclude hidden rows) and the Blob file is untouched.
+    await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS hidden_at TIMESTAMP WITH TIME ZONE`
     await sql`CREATE INDEX IF NOT EXISTS idx_export_logs_exported_by ON export_logs(exported_by, created_at DESC)`
 
     await sql`CREATE INDEX IF NOT EXISTS idx_export_logs_created_at ON export_logs(created_at DESC)`

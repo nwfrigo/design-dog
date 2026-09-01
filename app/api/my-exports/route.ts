@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getExportLogs, getExportSnapshot } from '@/lib/db'
+import { getExportLogs, getExportSnapshot, hideExport } from '@/lib/db'
 
 /**
  * My Work sidebar data.
@@ -37,10 +37,30 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(searchParams.get('page')) || 1)
 
   try {
-    const { logs, total } = await getExportLogs({ exportedBy: by, page, limit: 60 })
+    const { logs, total } = await getExportLogs({ exportedBy: by, page, limit: 60, excludeHidden: true })
     return NextResponse.json({ logs, total })
   } catch (error) {
     console.error('My exports fetch failed:', error)
     return NextResponse.json({ error: 'Fetch failed' }, { status: 500 })
+  }
+}
+
+/**
+ * DELETE ?id=<n> — soft-hide one export from the owner's list. Nothing is
+ * destroyed: the log row, thumbnail and Blob file survive for admin.
+ */
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const id = Number(searchParams.get('id'))
+  if (!Number.isInteger(id) || id <= 0) {
+    return NextResponse.json({ error: 'Invalid id' }, { status: 400 })
+  }
+  try {
+    const hidden = await hideExport(id)
+    if (!hidden) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error('Hide export failed:', error)
+    return NextResponse.json({ error: 'Hide failed' }, { status: 500 })
   }
 }

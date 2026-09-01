@@ -71,6 +71,9 @@ export async function getExportLogs(opts: {
   search?: string
   startDate?: string
   endDate?: string
+  /** My Work passes true so user-deleted rows disappear from THEIR list.
+   *  Admin omits it and keeps seeing everything. */
+  excludeHidden?: boolean
 }): Promise<{ logs: ExportLog[]; total: number }> {
   const page = opts.page || 1
   const limit = opts.limit || 50
@@ -99,6 +102,9 @@ export async function getExportLogs(opts: {
   if (opts.endDate) {
     conditions.push(`created_at <= $${paramIndex++}`)
     values.push(opts.endDate)
+  }
+  if (opts.excludeHidden) {
+    conditions.push('hidden_at IS NULL')
   }
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
@@ -179,6 +185,15 @@ export async function getExportSnapshot(id: number): Promise<{
     snapshot_version: (row.snapshot_version as number | null) ?? null,
     template_type: row.template_type as string,
   }
+}
+
+/** Soft-hide an export from its owner's My Work list. The row, thumbnail and
+ *  Blob file all remain — admin dashboards are unaffected. */
+export async function hideExport(id: number): Promise<boolean> {
+  const result = await sql`
+    UPDATE export_logs SET hidden_at = NOW() WHERE id = ${id} AND hidden_at IS NULL
+  `
+  return (result.rowCount ?? 0) > 0
 }
 
 export async function getTeamMembers(): Promise<{ id: number; name: string }[]> {
