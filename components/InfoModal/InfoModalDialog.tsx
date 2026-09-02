@@ -87,8 +87,15 @@ export function InfoModalDialog({ onClose }: InfoModalDialogProps) {
           <img
             src={INFO_MODAL_COPY.imageSrc}
             alt="The My Work rail: search, filters, and a draft card"
-            className="absolute max-w-none rounded-[7px] object-cover"
-            style={{ left: -68, top: 67, width: 458, height: 403 }}
+            className="absolute max-w-none rounded-lg object-cover"
+            style={{
+              left: -68,
+              top: 67,
+              width: 458,
+              height: 403,
+              boxShadow:
+                '0 var(--elevation-md-y) var(--elevation-md-blur) var(--elevation-md-color)',
+            }}
             draggable={false}
           />
         </div>
