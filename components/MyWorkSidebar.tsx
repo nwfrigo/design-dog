@@ -12,7 +12,29 @@ import { DRAFT_SHAPE_VERSION, listDrafts, deleteDraftById, saveDraftToStorage, n
 import { TEMPLATE_LABELS, TEMPLATE_DIMENSIONS } from '@/lib/template-config'
 import { TEMPLATE_REGISTRY } from '@/lib/template-registry'
 import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
+import { restoreEditorSnapshot } from '@/lib/asset-snapshot'
+import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
 import type { QueuedAsset, TemplateType } from '@/types'
+
+// The display name of a piece of work. Most templates title themselves by
+// verbatim headline; executive overview's name is the cover's big intro
+// headline, which lives in its document, not in verbatimCopy.
+function draftDisplayTitle(d: DraftState): string {
+  if (d.templateType === 'executive-overview') {
+    const t = d.executiveOverviewDocument?.introHeadline?.trim()
+    if (t) return t
+  }
+  return d.verbatimCopy?.headline || (TEMPLATE_LABELS[d.templateType as TemplateType] ?? 'Draft')
+}
+
+// Write a new display name back into a draft — the same field the title
+// reads from, so clones named "<name> 2" actually SHOW as "<name> 2".
+function withDraftTitle<T extends Partial<DraftState>>(d: T, title: string): T {
+  if (d.templateType === 'executive-overview' && d.executiveOverviewDocument) {
+    return { ...d, executiveOverviewDocument: { ...d.executiveOverviewDocument, introHeadline: title } }
+  }
+  return { ...d, verbatimCopy: { ...(d.verbatimCopy ?? { headline: '', subhead: '', body: '', cta: '' }), headline: title } }
+}
 
 /**
  * MyWorkSidebar — the persistent "your previous work" rail on the home screen.
@@ -318,13 +340,71 @@ export function MyWorkSidebar() {
 
   const [previewDraft, setPreviewDraft] = useState<DraftState | null>(null)
 
-  // Clone a draft: duplicate its entry under a fresh id and open the copy —
-  // same verb as export-clone (open a copy in the editor), original untouched.
+  // Escape dismisses whichever preview lightbox is open.
+  useEffect(() => {
+    if (!previewDraft && !previewRow) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setPreviewDraft(null)
+        setPreviewRow(null)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [previewDraft, previewRow])
+
+  // Clone a draft: duplicate its entry in place as "<name> 2". The copy lands
+  // at the top of DRAFTS (it's the newest save) so the user SEES the clone —
+  // it does not open in the editor; they pick it up via the card's actions.
   const cloneDraft = useCallback((entry: DraftEntry) => {
-    const id = newDraftId()
-    saveDraftToStorage(entry.draft, id)
-    if (loadDraft(id)) router.push('/editor')
-  }, [loadDraft, router])
+    saveDraftToStorage(withDraftTitle(entry.draft, `${draftDisplayTitle(entry.draft)} 2`), newDraftId())
+    setDrafts(listDrafts())
+  }, [])
+
+  // Clone an export: its snapshot becomes a NEW DRAFT named "<name> 2" —
+  // it has not been exported yet, so it belongs in DRAFTS, not EXPORTS.
+  // (Edit still opens the snapshot straight into the editor via `restore`.)
+  const cloneExportToDraft = useCallback(async (row: ExportRow) => {
+    setBusyId(row.id)
+    try {
+      const res = await fetch(`/api/my-exports?snapshot=${row.id}`)
+      if (!res.ok) throw new Error('snapshot fetch failed')
+      const data = await res.json()
+      if (!data.snapshot || (data.snapshot_version ?? DRAFT_SHAPE_VERSION) !== DRAFT_SHAPE_VERSION) {
+        throw new Error('incompatible snapshot')
+      }
+      const snapshot = data.snapshot as Record<string, unknown>
+      const templateType = (snapshot.templateType as TemplateType) ?? (row.template_type as TemplateType)
+      const baseName = row.headline || (snapshot.headline as string) || (TEMPLATE_LABELS[templateType] ?? 'Draft')
+      const restored = restoreEditorSnapshot(snapshot) as Partial<DraftState>
+      saveDraftToStorage(withDraftTitle({
+        ...restored,
+        currentScreen: 'editor',
+        templateType,
+        selectedAssets: [templateType],
+        currentAssetIndex: 0,
+        verbatimCopy: {
+          headline: (snapshot.headline as string) ?? '',
+          subhead: (snapshot.subhead as string) ?? '',
+          body: (snapshot.body as string) ?? '',
+          cta: '',
+        },
+        thumbnailImageSettings: {
+          [templateType]: {
+            position: (snapshot.thumbnailImagePosition as { x: number; y: number } | undefined) ?? { x: 0, y: 0 },
+            zoom: (snapshot.thumbnailImageZoom as number | undefined) ?? 1,
+            filters: (snapshot.thumbnailImageFilters as ImageFilters | undefined) ?? NEUTRAL_FILTERS,
+          },
+        },
+        exportQueue: [],
+      }, `${baseName} 2`), newDraftId())
+      setDrafts(listDrafts())
+    } catch (error) {
+      console.error('Clone failed:', error)
+    } finally {
+      setBusyId(null)
+    }
+  }, [])
 
   const resumeDraft = useCallback((id: string) => {
     // loadDraft restores currentScreen from the draft itself; the banner's
@@ -413,7 +493,7 @@ export function MyWorkSidebar() {
       </div>
 
       {/* Groups — independently scrolled from the template grid */}
-      <div className="mt-5 overflow-y-auto min-h-0 flex-1 pb-4 flex flex-col gap-6">
+      <div className="mt-5 overflow-y-auto min-h-0 flex-1 pb-4 pr-2 flex flex-col gap-6 [scrollbar-width:thin] [scrollbar-color:rgb(209_213_219)_transparent] dark:[scrollbar-color:rgba(255,255,255,0.15)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-white/15">
 
         {/* DRAFTS — every in-progress project, newest first */}
         <div>
@@ -431,12 +511,12 @@ export function MyWorkSidebar() {
                   <WorkCard
                     key={entry.id}
                     thumb={<DraftLiveRender draft={d} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />}
-                    title={d.verbatimCopy?.headline || label}
+                    title={draftDisplayTitle(d)}
                     CaptionIcon={channelIcon(d.templateType)}
                     caption={`${label} · saved ${relativeDate(d.savedAt)}`}
                     onOpen={() => resumeDraft(entry.id)}
                     actions={[
-                      { title: 'Clone — start from a copy', icon: <Copy size={12} strokeWidth={1.5} />, onClick: () => cloneDraft(entry) },
+                      { title: 'Clone — duplicate this draft', icon: <Copy size={12} strokeWidth={1.5} />, onClick: () => cloneDraft(entry) },
                       { title: 'Edit — resume this draft', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => resumeDraft(entry.id) },
                       { title: 'Preview', icon: <Eye size={12} strokeWidth={1.5} />, onClick: () => setPreviewDraft(d) },
                       { title: 'Delete draft', icon: <Trash2 size={12} strokeWidth={1.5} />, onClick: () => setConfirmDelete({ kind: 'draft', entry }) },
@@ -448,8 +528,8 @@ export function MyWorkSidebar() {
           )}
         </div>
 
-        {/* EXPORTS */}
-        <div>
+        {/* EXPORTS — hairline + extra air separates it from DRAFTS */}
+        <div className="pt-6 border-t border-gray-200 dark:border-line-subtle">
           <GroupLabel>Exports &middot; {rows?.length ?? '—'}</GroupLabel>
           {rows === null ? (
             <div className="flex items-center gap-2 text-gray-400 dark:text-content-secondary font-mono text-[10px] uppercase pt-3">
@@ -480,7 +560,7 @@ export function MyWorkSidebar() {
                   onOpen={row.has_snapshot ? () => restore(row) : (row.thumbnail_url ? () => setPreviewRow(row) : undefined)}
                   actions={[
                     ...(row.has_snapshot ? [
-                      { title: 'Clone — start from a copy', icon: (busyId === row.id ? <Loader2 size={12} className="animate-spin" /> : <Copy size={12} strokeWidth={1.5} />), onClick: () => restore(row) },
+                      { title: 'Clone — copy to drafts', icon: (busyId === row.id ? <Loader2 size={12} className="animate-spin" /> : <Copy size={12} strokeWidth={1.5} />), onClick: () => cloneExportToDraft(row) },
                       { title: 'Edit — reopen this asset', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => restore(row) },
                     ] : []),
                     ...(row.thumbnail_url ? [
@@ -504,15 +584,30 @@ export function MyWorkSidebar() {
         <div className="h-full w-px bg-gray-200 dark:bg-line-subtle transition-colors group-hover/handle:bg-gray-400 dark:group-hover/handle:bg-content-secondary" />
       </div>
 
-      {/* Draft preview lightbox — large live render of the current design. */}
+      {/* Draft preview lightbox — large live render of the current design.
+          Multi-page templates (registry `renderPreview`) reuse the editor
+          lightbox's pattern: all pages stacked at native size in a
+          scrollable frame. Single-page drafts scale-to-fit as before. */}
       {previewDraft && createPortal(
         <div
           className="fixed inset-0 z-[1100] bg-black/80 flex items-center justify-center p-10 cursor-zoom-out"
           onClick={() => setPreviewDraft(null)}
         >
-          <div className="relative w-full h-full max-w-5xl">
-            <DraftLiveRender draft={previewDraft} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />
-          </div>
+          {(() => {
+            const entry = TEMPLATE_REGISTRY[previewDraft.templateType as TemplateType]
+            if (entry?.renderPreview && brand?.colors && brand?.typography) {
+              return (
+                <div className="relative max-h-full max-w-full overflow-auto cursor-default" onClick={(e) => e.stopPropagation()}>
+                  {entry.renderPreview(draftToRenderableAsset(previewDraft) as never, brand.colors, brand.typography)}
+                </div>
+              )
+            }
+            return (
+              <div className="relative w-full h-full max-w-5xl">
+                <DraftLiveRender draft={previewDraft} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />
+              </div>
+            )
+          })()}
         </div>,
         document.body,
       )}
@@ -551,7 +646,7 @@ export function MyWorkSidebar() {
           itemType={confirmDelete.kind === 'draft' ? 'Draft' : 'Export'}
           itemLabel={confirmDelete.kind === 'export'
             ? (confirmDelete.row.headline ?? undefined)
-            : (confirmDelete.entry.draft.verbatimCopy?.headline || (TEMPLATE_LABELS[confirmDelete.entry.draft.templateType as TemplateType] ?? 'Draft'))}
+            : draftDisplayTitle(confirmDelete.entry.draft)}
           onConfirm={handleConfirmDelete}
           onCancel={() => setConfirmDelete(null)}
         />,

@@ -6,7 +6,6 @@ import { useStore } from '@/store'
 import { AssetSelectionScreen } from '@/components/AssetSelectionScreen'
 import { MyWorkSidebar } from '@/components/MyWorkSidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { DraftBanner } from '@/components/DraftBanner'
 import { Header } from '@/components/Header'
 import { ReportBugModal, ReportBugLink } from '@/components/ReportBugModal'
 import { NamePickerModal, getStoredUser, clearStoredUser, UserBadge } from '@/components/NamePickerModal'
@@ -69,7 +68,6 @@ function HomeContent() {
       {showNamePicker && <NamePickerModal onSelect={handleNameSelect} />}
 
       {/* Draft Banner */}
-      {isSelectScreen && <DraftBanner />}
 
       {/* No project message */}
       {message === 'no-project' && isSelectScreen && (
