@@ -20,7 +20,7 @@ type State = 'hidden' | 'modal' | 'toast'
  *   click on toast                         → modal (does not unset flag)
  *   pathname.startsWith('/admin' | '/render')→ hidden
  *
- * Permanent fixture for the 1.5 launch — no auto-vanish. Delete the
+ * Permanent fixture for the current announcement — no auto-vanish. Delete the
  * `components/InfoModal/` directory + `public/assets/info-modal/` +
  * the mount in `app/layout.tsx` when the window has run its course.
  */

@@ -17,7 +17,7 @@ export function InfoToast({ onClick }: InfoToastProps) {
     <button
       type="button"
       onClick={onClick}
-      aria-label="See what's new in Design Dog 1.5"
+      aria-label="See what's new in Design Dog"
       className="fixed bottom-5 left-5 z-[10001] flex h-10 items-center gap-12 rounded-md bg-surface-secondary px-3 font-mono text-xs uppercase tracking-wider text-content-primary transition-colors hover:opacity-90"
       style={{
         boxShadow:

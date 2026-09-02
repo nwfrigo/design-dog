@@ -1,16 +1,12 @@
-Info-modal feature images (1.5 launch announcement).
+Info-modal image ("Introducing 'My Work'" announcement).
 
-Drop 4 PNGs here, named exactly:
+One PNG, named exactly:
 
-  direct-edit.png
-  drag-drop.png
-  diy-spacing.png
-  image-editing.png
+  my-work.png
 
-Recommended size: 420×359 (the size of the modal's image frame). The
-component uses `object-cover` so any aspect ratio above ~1.17:1 works
-without distortion. PNGs with transparent backgrounds also work — the
-frame's surface color will show through.
+Rendered at 458x403 inside the modal's right panel (asset is 2x). The
+component uses `object-cover`, so matching that aspect (~1.14:1) avoids
+cropping.
 
-This whole directory + the InfoModal component should be deleted ~1 week
-after launch.
+This whole directory + the InfoModal component should be deleted when the
+announcement has run its course.
