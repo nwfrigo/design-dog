@@ -17,7 +17,10 @@ const DRAFT_KEY = 'design-dog-active-draft'
  * single bare key and the interim per-user single key — into the list so
  * nobody loses in-flight work.
  */
-export type DraftEntry = { id: string; draft: DraftState }
+// `name` is card metadata, not design state: unset, the card titles itself
+// from the design's headline; once set (rename, clone) it is decoupled —
+// later headline edits don't change it, and renames never touch the design.
+export type DraftEntry = { id: string; draft: DraftState; name?: string }
 
 const DRAFTS_KEY = 'design-dog-drafts'
 const MAX_DRAFTS = 20
@@ -486,7 +489,7 @@ export function saveDraftToStorage(state: Partial<DraftState>, draftId?: string)
     const entries = readEntries()
     const id = draftId ?? entries[0]?.id ?? newDraftId()
     const idx = entries.findIndex((e) => e.id === id)
-    if (idx >= 0) entries[idx] = { id, draft }
+    if (idx >= 0) entries[idx] = { ...entries[idx], id, draft }
     else entries.unshift({ id, draft })
     writeEntries(entries)
   } catch (error) {
@@ -506,6 +509,22 @@ export function listDrafts(): DraftEntry[] {
 
 export function loadDraftById(id: string): DraftState | null {
   return readEntries().find((e) => e.id === id)?.draft ?? null
+}
+
+/** Set an entry's display name — card metadata only. The design (and its
+ *  headline) is untouched, savedAt is untouched (no reorder), and auto-save
+ *  preserves the name from then on. */
+export function renameDraft(id: string, name: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    const entries = readEntries()
+    const idx = entries.findIndex((e) => e.id === id)
+    if (idx === -1) return
+    entries[idx] = { ...entries[idx], name }
+    writeEntries(entries)
+  } catch {
+    /* quota/private-browsing — rename just doesn't stick */
+  }
 }
 
 export function deleteDraftById(id: string): void {

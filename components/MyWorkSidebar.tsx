@@ -8,7 +8,7 @@ import { useStore } from '@/store'
 import { getStoredUser } from '@/components/NamePickerModal'
 import { DeleteConfirmModal } from '@/components/shared/DeleteConfirmModal'
 import { TemplateRenderer } from '@/components/shared/TemplateRenderer'
-import { DRAFT_SHAPE_VERSION, listDrafts, deleteDraftById, saveDraftToStorage, newDraftId, type DraftEntry, type DraftState } from '@/lib/draft-storage'
+import { DRAFT_SHAPE_VERSION, listDrafts, deleteDraftById, saveDraftToStorage, renameDraft, newDraftId, type DraftEntry, type DraftState } from '@/lib/draft-storage'
 import { TEMPLATE_LABELS, TEMPLATE_DIMENSIONS } from '@/lib/template-config'
 import { TEMPLATE_REGISTRY } from '@/lib/template-registry'
 import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
@@ -27,13 +27,10 @@ function draftDisplayTitle(d: DraftState): string {
   return d.verbatimCopy?.headline || (TEMPLATE_LABELS[d.templateType as TemplateType] ?? 'Draft')
 }
 
-// Write a new display name back into a draft — the same field the title
-// reads from, so clones named "<name> 2" actually SHOW as "<name> 2".
-function withDraftTitle<T extends Partial<DraftState>>(d: T, title: string): T {
-  if (d.templateType === 'executive-overview' && d.executiveOverviewDocument) {
-    return { ...d, executiveOverviewDocument: { ...d.executiveOverviewDocument, introHeadline: title } }
-  }
-  return { ...d, verbatimCopy: { ...(d.verbatimCopy ?? { headline: '', subhead: '', body: '', cta: '' }), headline: title } }
+// A card's display name: the pinned per-entry name when the user has set
+// one (rename/clone), else derived live from the design's headline.
+function entryDisplayTitle(entry: DraftEntry): string {
+  return entry.name || draftDisplayTitle(entry.draft)
 }
 
 /**
@@ -102,9 +99,10 @@ function draftMatchesFilter(d: DraftState, filter: TypeFilter): boolean {
   return t.startsWith('website')
 }
 
-function draftMatchesSearch(d: DraftState, q: string): boolean {
+function entryMatchesSearch(entry: DraftEntry, q: string): boolean {
   if (!q) return true
-  const hay = `${draftDisplayTitle(d)} ${TEMPLATE_LABELS[d.templateType as TemplateType] ?? d.templateType}`.toLowerCase()
+  const d = entry.draft
+  const hay = `${entryDisplayTitle(entry)} ${TEMPLATE_LABELS[d.templateType as TemplateType] ?? d.templateType}`.toLowerCase()
   return hay.includes(q.toLowerCase())
 }
 
@@ -193,14 +191,24 @@ function DraftLiveRender({ draft, colors, typography }: {
  * caption below. One shape for drafts AND exports — uniform height per group
  * (the thumb keeps a fixed aspect, so every card in the rail matches).
  */
-function WorkCard({ thumb, title, CaptionIcon, caption, actions, onOpen }: {
+function WorkCard({ thumb, title, CaptionIcon, caption, actions, onOpen, onRename }: {
   thumb: React.ReactNode
   title: string
   CaptionIcon: LucideIcon
   caption: string
   actions: { title: string; icon: React.ReactNode; onClick: () => void }[]
   onOpen?: () => void
+  /** When set, double-clicking the title edits it in place (Enter/blur
+   *  commits, Escape cancels) — the Claude-desktop rename UX. */
+  onRename?: (title: string) => void
 }) {
+  const [editing, setEditing] = useState(false)
+  const [draftTitle, setDraftTitle] = useState(title)
+  const commit = () => {
+    setEditing(false)
+    const next = draftTitle.trim()
+    if (onRename && next && next !== title) onRename(next)
+  }
   return (
     <div className="flex gap-2 items-start">
       <div className="min-w-0 flex-1">
@@ -210,7 +218,28 @@ function WorkCard({ thumb, title, CaptionIcon, caption, actions, onOpen }: {
         >
           {thumb}
         </div>
-        <div className="text-[12.5px] text-gray-900 dark:text-content-primary truncate mt-1.5">{title}</div>
+        {editing ? (
+          <input
+            autoFocus
+            value={draftTitle}
+            onChange={(e) => setDraftTitle(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') commit()
+              if (e.key === 'Escape') { setDraftTitle(title); setEditing(false) }
+            }}
+            className="w-full text-[12.5px] text-gray-900 dark:text-content-primary mt-1.5 bg-transparent border-b border-gray-300 dark:border-content-secondary/50 focus:outline-none focus:border-gray-500 dark:focus:border-content-secondary p-0"
+          />
+        ) : (
+          <div
+            onDoubleClick={onRename ? () => { setDraftTitle(title); setEditing(true) } : undefined}
+            title={onRename ? 'Double-click to rename' : undefined}
+            className={`text-[12.5px] text-gray-900 dark:text-content-primary truncate mt-1.5 ${onRename ? 'cursor-text' : ''}`}
+          >
+            {title}
+          </div>
+        )}
         <div className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-wide text-gray-400 dark:text-content-secondary mt-1 min-w-0">
           <CaptionIcon size={9} strokeWidth={1.5} className="flex-shrink-0" />
           <span className="truncate">{caption}</span>
@@ -400,7 +429,9 @@ export function MyWorkSidebar() {
   // at the top of DRAFTS (it's the newest save) so the user SEES the clone —
   // it does not open in the editor; they pick it up via the card's actions.
   const cloneDraft = useCallback((entry: DraftEntry) => {
-    saveDraftToStorage(withDraftTitle(entry.draft, `${draftDisplayTitle(entry.draft)} 2`), newDraftId())
+    const id = newDraftId()
+    saveDraftToStorage(entry.draft, id)
+    renameDraft(id, `${entryDisplayTitle(entry)} 2`)
     setDrafts(listDrafts())
   }, [])
 
@@ -420,7 +451,8 @@ export function MyWorkSidebar() {
       const templateType = (snapshot.templateType as TemplateType) ?? (row.template_type as TemplateType)
       const baseName = row.headline || (snapshot.headline as string) || (TEMPLATE_LABELS[templateType] ?? 'Draft')
       const restored = restoreEditorSnapshot(snapshot) as Partial<DraftState>
-      saveDraftToStorage(withDraftTitle({
+      const cloneId = newDraftId()
+      saveDraftToStorage({
         ...restored,
         currentScreen: 'editor',
         templateType,
@@ -440,7 +472,8 @@ export function MyWorkSidebar() {
           },
         },
         exportQueue: [],
-      }, `${baseName} 2`), newDraftId())
+      }, cloneId)
+      renameDraft(cloneId, `${baseName} 2`)
       setDrafts(listDrafts())
     } catch (error) {
       console.error('Clone failed:', error)
@@ -498,7 +531,7 @@ export function MyWorkSidebar() {
     | { kind: 'export'; ts: number; row: ExportRow }
   const items: WorkItem[] = [
     ...drafts
-      .filter((e) => draftMatchesFilter(e.draft, filter) && draftMatchesSearch(e.draft, query))
+      .filter((e) => draftMatchesFilter(e.draft, filter) && entryMatchesSearch(e, query))
       .map((entry): WorkItem => ({ kind: 'draft', ts: entry.draft.savedAt ?? 0, entry })),
     ...(rows ?? [])
       .filter((r) => matchesFilter(r, filter) && matchesSearch(r, query))
@@ -575,10 +608,14 @@ export function MyWorkSidebar() {
                     <WorkCard
                       key={entry.id}
                       thumb={<DraftLiveRender draft={d} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />}
-                      title={draftDisplayTitle(d)}
+                      title={entryDisplayTitle(entry)}
                       CaptionIcon={channelIcon(d.templateType)}
                       caption={`${label} · saved ${relativeDate(d.savedAt)}`}
                       onOpen={() => setPreviewDraft(d)}
+                      onRename={(t) => {
+                        renameDraft(entry.id, t)
+                        setDrafts(listDrafts())
+                      }}
                       actions={[
                         { title: 'Clone — duplicate this design', icon: <Copy size={12} strokeWidth={1.5} />, onClick: () => cloneDraft(entry) },
                         { title: 'Edit', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => resumeDraft(entry.id) },
@@ -695,7 +732,7 @@ export function MyWorkSidebar() {
           itemType={confirmDelete.kind === 'draft' ? 'Draft' : 'Export'}
           itemLabel={confirmDelete.kind === 'export'
             ? (confirmDelete.row.headline ?? undefined)
-            : draftDisplayTitle(confirmDelete.entry.draft)}
+            : entryDisplayTitle(confirmDelete.entry)}
           onConfirm={handleConfirmDelete}
           onCancel={() => setConfirmDelete(null)}
         />,
