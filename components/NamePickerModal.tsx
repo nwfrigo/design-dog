@@ -48,6 +48,10 @@ export function NamePickerModal({ onSelect }: NamePickerModalProps) {
 
   const saveAndSelect = (name: string) => {
     localStorage.setItem(USER_KEY, name)
+    // Broadcast so identity-scoped UI (My Work rail) re-reads immediately —
+    // it renders on first pick and swaps lists on a user switch without a
+    // page refresh.
+    window.dispatchEvent(new Event('dd-user-changed'))
     onSelect(name)
   }
 

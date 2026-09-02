@@ -281,6 +281,16 @@ export function MyWorkSidebar() {
   useEffect(() => {
     setUser(getStoredUser())
     setDrafts(listDrafts())
+    // Identity can change after mount (first name pick, or switching users) —
+    // re-read the user and their per-user drafts when it does. The exports
+    // fetch keys off `user`, so it refetches on its own. `storage` covers a
+    // switch made in another tab.
+    const onUserChanged = () => {
+      setUser(getStoredUser())
+      setDrafts(listDrafts())
+    }
+    window.addEventListener('dd-user-changed', onUserChanged)
+    window.addEventListener('storage', onUserChanged)
     Promise.all([fetchColorsConfig(), fetchTypographyConfig()])
       .then(([colors, typography]) => setBrand({ colors, typography }))
       .catch(() => { /* thumbs fall back to channel icons */ })
@@ -289,6 +299,10 @@ export function MyWorkSidebar() {
       const w = Number(localStorage.getItem(WIDTH_KEY))
       if (w >= MIN_W && w <= MAX_W) setWidth(w)
     } catch { /* defaults */ }
+    return () => {
+      window.removeEventListener('dd-user-changed', onUserChanged)
+      window.removeEventListener('storage', onUserChanged)
+    }
   }, [])
 
   const toggleCollapsed = () => {
