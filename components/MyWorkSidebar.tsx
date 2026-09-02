@@ -8,7 +8,7 @@ import { useStore } from '@/store'
 import { getStoredUser } from '@/components/NamePickerModal'
 import { DeleteConfirmModal } from '@/components/shared/DeleteConfirmModal'
 import { TemplateRenderer } from '@/components/shared/TemplateRenderer'
-import { DRAFT_SHAPE_VERSION, listDrafts, deleteDraftById, type DraftEntry, type DraftState } from '@/lib/draft-storage'
+import { DRAFT_SHAPE_VERSION, listDrafts, deleteDraftById, saveDraftToStorage, newDraftId, type DraftEntry, type DraftState } from '@/lib/draft-storage'
 import { TEMPLATE_LABELS, TEMPLATE_DIMENSIONS } from '@/lib/template-config'
 import { TEMPLATE_REGISTRY } from '@/lib/template-registry'
 import { fetchColorsConfig, fetchTypographyConfig, type ColorsConfig, type TypographyConfig } from '@/lib/brand-config'
@@ -103,37 +103,87 @@ function draftToRenderableAsset(draft: DraftState): QueuedAsset {
   } as unknown as QueuedAsset
 }
 
-/** Live mini-render of a draft's current design — the queue-thumbnail
- *  pattern (TemplateRenderer scaled into a fixed box). Falls back to the
- *  channel icon for templates outside the registry (legacy PDFs). */
-function DraftThumb({ draft, colors, typography }: {
+/** Live render of a draft's current design, scaled to fill a measured box —
+ *  the queue-thumbnail pattern. Falls back to the channel icon for templates
+ *  outside the registry (legacy PDFs). Fills whatever box it's placed in. */
+function DraftLiveRender({ draft, colors, typography }: {
   draft: DraftState
   colors: ColorsConfig | null
   typography: TypographyConfig | null
 }) {
+  const boxRef = useRef<HTMLDivElement>(null)
+  const [box, setBox] = useState<{ w: number; h: number } | null>(null)
+  useEffect(() => {
+    const el = boxRef.current
+    if (!el) return
+    const compute = () => setBox({ w: el.clientWidth, h: el.clientHeight })
+    compute()
+    const ro = new ResizeObserver(compute)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
   const t = draft.templateType
   const dims = TEMPLATE_DIMENSIONS[t]
   const Icon = channelIcon(t)
-  if (!TEMPLATE_REGISTRY[t] || !dims || !colors || !typography) {
-    return (
-      <div className="w-[84px] h-[54px] rounded flex-shrink-0 bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle flex items-center justify-center">
-        <Icon size={14} strokeWidth={1.5} className="text-gray-400 dark:text-content-secondary" />
-      </div>
-    )
-  }
-  const scale = Math.min(84 / dims.width, 54 / dims.height)
+  const renderable = TEMPLATE_REGISTRY[t] && dims && colors && typography
+  const scale = renderable && box ? Math.min(box.w / dims.width, box.h / dims.height) : 0
   return (
-    <div className="w-[84px] h-[54px] rounded flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-line-subtle relative pointer-events-none">
-      <div style={{
-        position: 'absolute',
-        left: (84 - dims.width * scale) / 2,
-        top: (54 - dims.height * scale) / 2,
-        width: dims.width,
-        height: dims.height,
-        transform: `scale(${scale})`,
-        transformOrigin: 'top left',
-      }}>
-        <TemplateRenderer asset={draftToRenderableAsset(draft)} colorsConfig={colors} typographyConfig={typography} />
+    <div ref={boxRef} className="absolute inset-0 pointer-events-none">
+      {renderable && box ? (
+        <div style={{
+          position: 'absolute',
+          left: (box.w - dims.width * scale) / 2,
+          top: (box.h - dims.height * scale) / 2,
+          width: dims.width,
+          height: dims.height,
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+        }}>
+          <TemplateRenderer asset={draftToRenderableAsset(draft)} colorsConfig={colors} typographyConfig={typography} />
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Icon size={16} strokeWidth={1.5} className="text-gray-400 dark:text-content-secondary" />
+        </div>
+      )}
+    </div>
+  )
+}
+
+/**
+ * The shared My Work card (Figma 660:3043): big thumbnail with a vertical
+ * action rail beside it, then title (ellipsis-truncated) and the micro
+ * caption below. One shape for drafts AND exports — uniform height per group
+ * (the thumb keeps a fixed aspect, so every card in the rail matches).
+ */
+function WorkCard({ thumb, title, CaptionIcon, caption, actions, onOpen }: {
+  thumb: React.ReactNode
+  title: string
+  CaptionIcon: LucideIcon
+  caption: string
+  actions: { title: string; icon: React.ReactNode; onClick: () => void }[]
+  onOpen?: () => void
+}) {
+  return (
+    <div className="flex gap-2 items-start">
+      <div className="min-w-0 flex-1">
+        <div
+          onClick={onOpen}
+          className={`relative aspect-[9/5] rounded-md overflow-hidden border border-gray-200 dark:border-line-subtle bg-gray-50 dark:bg-surface-secondary transition-[border-color,box-shadow] duration-150 ${onOpen ? 'cursor-pointer hover:border-gray-300 dark:hover:border-content-secondary/40 hover:shadow-[0_2px_10px_rgba(6,0,21,0.08)]' : ''}`}
+        >
+          {thumb}
+        </div>
+        <div className="text-[12.5px] text-gray-900 dark:text-content-primary truncate mt-1.5">{title}</div>
+        <div className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-wide text-gray-400 dark:text-content-secondary mt-1 min-w-0">
+          <CaptionIcon size={9} strokeWidth={1.5} className="flex-shrink-0" />
+          <span className="truncate">{caption}</span>
+        </div>
+      </div>
+      {/* Action rail — clone / edit / preview / delete, always present, quiet. */}
+      <div className="flex flex-col gap-1.5 flex-shrink-0 pt-0.5">
+        {actions.map((a) => (
+          <ActionIcon key={a.title} title={a.title} onClick={a.onClick}>{a.icon}</ActionIcon>
+        ))}
       </div>
     </div>
   )
@@ -266,6 +316,16 @@ export function MyWorkSidebar() {
     }
   }, [loadExportSnapshotIntoEditor, setCurrentScreen, router])
 
+  const [previewDraft, setPreviewDraft] = useState<DraftState | null>(null)
+
+  // Clone a draft: duplicate its entry under a fresh id and open the copy —
+  // same verb as export-clone (open a copy in the editor), original untouched.
+  const cloneDraft = useCallback((entry: DraftEntry) => {
+    const id = newDraftId()
+    saveDraftToStorage(entry.draft, id)
+    if (loadDraft(id)) router.push('/editor')
+  }, [loadDraft, router])
+
   const resumeDraft = useCallback((id: string) => {
     // loadDraft restores currentScreen from the draft itself; the banner's
     // extra per-template screen logic stays the nuanced path.
@@ -363,34 +423,25 @@ export function MyWorkSidebar() {
               No drafts in progress
             </div>
           ) : (
-            <div className="flex flex-col gap-2 mt-2">
+            <div className="flex flex-col gap-4 mt-2">
               {drafts.map((entry) => {
                 const d = entry.draft
                 const label = TEMPLATE_LABELS[d.templateType as TemplateType] ?? d.templateType
-                const ChannelIcon = channelIcon(d.templateType)
                 return (
-                  <div
+                  <WorkCard
                     key={entry.id}
-                    onClick={() => resumeDraft(entry.id)}
-                    className="group cursor-pointer rounded-md border border-gray-200 dark:border-line-subtle transition-[border-color,box-shadow] duration-150 hover:border-gray-300 dark:hover:border-content-secondary/40 hover:shadow-[0_2px_10px_rgba(6,0,21,0.08)]"
-                  >
-                    <div className="flex items-center gap-3 px-2.5 py-2">
-                      <DraftThumb draft={d} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[12.5px] text-gray-900 dark:text-content-primary truncate">
-                          {d.verbatimCopy?.headline || label}
-                        </div>
-                        <div className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-wide text-gray-400 dark:text-content-secondary mt-1">
-                          <ChannelIcon size={9} strokeWidth={1.5} />
-                          <span className="truncate">{label} &middot; saved {relativeDate(d.savedAt)}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                        <ActionIcon title="Resume editing" onClick={() => resumeDraft(entry.id)}><Pencil size={11} strokeWidth={1.5} /></ActionIcon>
-                        <ActionIcon title="Delete draft" onClick={() => setConfirmDelete({ kind: 'draft', entry })}><Trash2 size={11} strokeWidth={1.5} /></ActionIcon>
-                      </div>
-                    </div>
-                  </div>
+                    thumb={<DraftLiveRender draft={d} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />}
+                    title={d.verbatimCopy?.headline || label}
+                    CaptionIcon={channelIcon(d.templateType)}
+                    caption={`${label} · saved ${relativeDate(d.savedAt)}`}
+                    onOpen={() => resumeDraft(entry.id)}
+                    actions={[
+                      { title: 'Clone — start from a copy', icon: <Copy size={12} strokeWidth={1.5} />, onClick: () => cloneDraft(entry) },
+                      { title: 'Edit — resume this draft', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => resumeDraft(entry.id) },
+                      { title: 'Preview', icon: <Eye size={12} strokeWidth={1.5} />, onClick: () => setPreviewDraft(d) },
+                      { title: 'Delete draft', icon: <Trash2 size={12} strokeWidth={1.5} />, onClick: () => setConfirmDelete({ kind: 'draft', entry }) },
+                    ]}
+                  />
                 )
               })}
             </div>
@@ -409,46 +460,42 @@ export function MyWorkSidebar() {
               {rows.length === 0 ? 'Nothing yet — your exports will collect here.' : 'No matches.'}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="flex flex-col gap-4 mt-2">
               {visible.map((row) => (
-                <div key={row.id} className="group">
-                  <div className="relative h-[74px] rounded-md overflow-hidden border border-gray-200 dark:border-line-subtle bg-gray-50 dark:bg-surface-secondary transition-[border-color,box-shadow] duration-150 group-hover:border-gray-300 dark:group-hover:border-content-secondary/40 group-hover:shadow-[0_2px_10px_rgba(6,0,21,0.08)]">
-                    {row.thumbnail_url && row.format !== 'pdf' ? (
+                <WorkCard
+                  key={row.id}
+                  thumb={
+                    row.thumbnail_url && row.format !== 'pdf' ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={row.thumbnail_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center font-mono text-[9px] uppercase tracking-wide text-gray-400 dark:text-content-secondary">
                         {row.format === 'pdf' ? 'PDF' : 'No preview'}
                       </div>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <div className="font-mono text-[7.5px] uppercase tracking-wide text-gray-400 dark:text-content-secondary truncate pr-1">
-                      {(TEMPLATE_LABELS[row.template_type as TemplateType] ?? row.template_type)} &middot; {relativeDate(row.created_at)}
-                    </div>
-                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      {row.has_snapshot && (
-                        <>
-                          <ActionIcon title="Edit — reopen this asset" onClick={() => restore(row)}>
-                            {busyId === row.id ? <Loader2 size={11} className="animate-spin" /> : <Pencil size={11} strokeWidth={1.5} />}
-                          </ActionIcon>
-                          <ActionIcon title="Clone — start from a copy" onClick={() => restore(row)}><Copy size={11} strokeWidth={1.5} /></ActionIcon>
-                        </>
-                      )}
-                      {row.thumbnail_url && (
-                        <ActionIcon title="Preview" onClick={() => setPreviewRow(row)}><Eye size={11} strokeWidth={1.5} /></ActionIcon>
-                      )}
-                      <ActionIcon title="Remove from my list" onClick={() => setConfirmDelete({ kind: 'export', row })}><Trash2 size={11} strokeWidth={1.5} /></ActionIcon>
-                    </div>
-                  </div>
-                </div>
+                    )
+                  }
+                  title={row.headline || (TEMPLATE_LABELS[row.template_type as TemplateType] ?? row.template_type)}
+                  CaptionIcon={channelIcon(row.template_type)}
+                  caption={`${TEMPLATE_LABELS[row.template_type as TemplateType] ?? row.template_type} · ${relativeDate(row.created_at)}`}
+                  onOpen={row.has_snapshot ? () => restore(row) : (row.thumbnail_url ? () => setPreviewRow(row) : undefined)}
+                  actions={[
+                    ...(row.has_snapshot ? [
+                      { title: 'Clone — start from a copy', icon: (busyId === row.id ? <Loader2 size={12} className="animate-spin" /> : <Copy size={12} strokeWidth={1.5} />), onClick: () => restore(row) },
+                      { title: 'Edit — reopen this asset', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => restore(row) },
+                    ] : []),
+                    ...(row.thumbnail_url ? [
+                      { title: 'Preview', icon: <Eye size={12} strokeWidth={1.5} />, onClick: () => setPreviewRow(row) },
+                    ] : []),
+                    { title: 'Remove from my list', icon: <Trash2 size={12} strokeWidth={1.5} />, onClick: () => setConfirmDelete({ kind: 'export', row }) },
+                  ]}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
 
-      {/* Drag handle — the split line. Templates re-flow via their own measure. */}
+      {/* Drag handle      {/* Drag handle — the split line. Templates re-flow via their own measure. */}
       <div
         onPointerDown={onDragStart}
         title="Drag to resize"
@@ -456,6 +503,19 @@ export function MyWorkSidebar() {
       >
         <div className="h-full w-px bg-gray-200 dark:bg-line-subtle transition-colors group-hover/handle:bg-gray-400 dark:group-hover/handle:bg-content-secondary" />
       </div>
+
+      {/* Draft preview lightbox — large live render of the current design. */}
+      {previewDraft && createPortal(
+        <div
+          className="fixed inset-0 z-[1100] bg-black/80 flex items-center justify-center p-10 cursor-zoom-out"
+          onClick={() => setPreviewDraft(null)}
+        >
+          <div className="relative w-full h-full max-w-5xl">
+            <DraftLiveRender draft={previewDraft} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />
+          </div>
+        </div>,
+        document.body,
+      )}
 
       {/* Preview lightbox — portaled for the same stacking-context reason. */}
       {previewRow && createPortal(
