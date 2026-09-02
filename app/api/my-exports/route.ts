@@ -37,7 +37,7 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(searchParams.get('page')) || 1)
 
   try {
-    const { logs, total } = await getExportLogs({ exportedBy: by, page, limit: 60, excludeHidden: true })
+    const { logs, total } = await getExportLogs({ exportedBy: by, page, limit: 60 })
     return NextResponse.json({ logs, total })
   } catch (error) {
     console.error('My exports fetch failed:', error)

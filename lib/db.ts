@@ -71,9 +71,6 @@ export async function getExportLogs(opts: {
   search?: string
   startDate?: string
   endDate?: string
-  /** My Work passes true so user-deleted rows disappear from THEIR list.
-   *  Admin omits it and keeps seeing everything. */
-  excludeHidden?: boolean
 }): Promise<{ logs: ExportLog[]; total: number }> {
   const page = opts.page || 1
   const limit = opts.limit || 50
@@ -103,9 +100,10 @@ export async function getExportLogs(opts: {
     conditions.push(`created_at <= $${paramIndex++}`)
     values.push(opts.endDate)
   }
-  if (opts.excludeHidden) {
-    conditions.push('hidden_at IS NULL')
-  }
+  // Deleted rows are gone for EVERYONE — admin included. hidden_at is the
+  // mechanism (row + blob survive, recoverable only via SQL), but no view
+  // in the product surfaces hidden rows.
+  conditions.push('hidden_at IS NULL')
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
@@ -133,12 +131,12 @@ export async function getExportLogs(opts: {
  */
 export async function getExportStats(): Promise<ExportStats> {
   const [totalResult, todayResult, weekResult, templateResult, personResult, dailyResult] = await Promise.all([
-    sql`SELECT COUNT(*) as count FROM export_logs`,
-    sql`SELECT COUNT(*) as count FROM export_logs WHERE created_at >= CURRENT_DATE`,
-    sql`SELECT COUNT(*) as count FROM export_logs WHERE created_at >= NOW() - INTERVAL '7 days'`,
-    sql`SELECT template_type, COUNT(*) as count FROM export_logs GROUP BY template_type ORDER BY count DESC`,
-    sql`SELECT exported_by, COUNT(*) as count FROM export_logs WHERE exported_by IS NOT NULL GROUP BY exported_by ORDER BY count DESC`,
-    sql`SELECT DATE(created_at) as date, COUNT(*) as count FROM export_logs WHERE created_at >= NOW() - INTERVAL '30 days' GROUP BY DATE(created_at) ORDER BY date ASC`,
+    sql`SELECT COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL`,
+    sql`SELECT COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND created_at >= CURRENT_DATE`,
+    sql`SELECT COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND created_at >= NOW() - INTERVAL '7 days'`,
+    sql`SELECT template_type, COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL GROUP BY template_type ORDER BY count DESC`,
+    sql`SELECT exported_by, COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND exported_by IS NOT NULL GROUP BY exported_by ORDER BY count DESC`,
+    sql`SELECT DATE(created_at) as date, COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND created_at >= NOW() - INTERVAL '30 days' GROUP BY DATE(created_at) ORDER BY date ASC`,
   ])
 
   const byTemplate: Record<string, number> = {}
