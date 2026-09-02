@@ -93,6 +93,21 @@ function matchesSearch(row: ExportRow, q: string): boolean {
   return hay.includes(q.toLowerCase())
 }
 
+function draftMatchesFilter(d: DraftState, filter: TypeFilter): boolean {
+  if (filter === 'all') return true
+  const t = d.templateType
+  if (filter === 'pdf') return t.endsWith('-pdf') || t === 'executive-overview'
+  if (filter === 'email') return t.startsWith('email') || t.startsWith('newsletter')
+  if (filter === 'social') return t.startsWith('social')
+  return t.startsWith('website')
+}
+
+function draftMatchesSearch(d: DraftState, q: string): boolean {
+  if (!q) return true
+  const hay = `${draftDisplayTitle(d)} ${TEMPLATE_LABELS[d.templateType as TemplateType] ?? d.templateType}`.toLowerCase()
+  return hay.includes(q.toLowerCase())
+}
+
 /** Channel icon per template family — mirrors the home filter chips. */
 function channelIcon(templateType: string): LucideIcon {
   if (templateType.startsWith('email')) return Mail
@@ -329,7 +344,21 @@ export function MyWorkSidebar() {
       if (!data.snapshot || (data.snapshot_version ?? DRAFT_SHAPE_VERSION) !== DRAFT_SHAPE_VERSION) {
         throw new Error('incompatible snapshot')
       }
-      loadExportSnapshotIntoEditor(data.snapshot as Record<string, unknown>)
+      // Row columns UNDER the snapshot: older direct-export snapshots don't
+      // carry templateType/headline, and without the row fallback the editor
+      // fell back to whatever template the store last held — opening the
+      // wrong template entirely.
+      loadExportSnapshotIntoEditor({
+        templateType: row.template_type,
+        headline: row.headline ?? '',
+        ...(data.snapshot as Record<string, unknown>),
+      })
+      // The design is back in draft state — its card becomes the (new) draft
+      // the editor is about to auto-save, so the export row leaves this
+      // user's list (soft-hide; admin + file untouched). One card per
+      // design: editing never ADDS an item.
+      setRows((prev) => (prev ?? []).filter((r) => r.id !== row.id))
+      fetch(`/api/my-exports?id=${row.id}`, { method: 'DELETE' }).catch(() => { /* row returns on next load */ })
       setCurrentScreen('editor')
       router.push('/editor')
     } catch (error) {
@@ -445,7 +474,23 @@ export function MyWorkSidebar() {
     )
   }
 
-  const visible = (rows ?? []).filter((r) => matchesFilter(r, filter) && matchesSearch(r, query))
+  // ---- ONE list: "My Designs". A design is draft-backed (live render,
+  // editable in place) or export-backed (thumbnail from the log). New items
+  // appear ONLY via the template gallery or Clone; exporting swaps a card's
+  // backing (draft -> export row), editing an export swaps it back — the
+  // count never changes except by create/clone/delete.
+  type WorkItem =
+    | { kind: 'draft'; ts: number; entry: DraftEntry }
+    | { kind: 'export'; ts: number; row: ExportRow }
+  const items: WorkItem[] = [
+    ...drafts
+      .filter((e) => draftMatchesFilter(e.draft, filter) && draftMatchesSearch(e.draft, query))
+      .map((entry): WorkItem => ({ kind: 'draft', ts: entry.draft.savedAt ?? 0, entry })),
+    ...(rows ?? [])
+      .filter((r) => matchesFilter(r, filter) && matchesSearch(r, query))
+      .map((row): WorkItem => ({ kind: 'export', ts: Date.parse(row.created_at) || 0, row })),
+  ].sort((a, b) => b.ts - a.ts)
+  const totalCount = drafts.length + (rows?.length ?? 0)
 
   return (
     <aside
@@ -492,84 +537,74 @@ export function MyWorkSidebar() {
         ))}
       </div>
 
-      {/* Groups — independently scrolled from the template grid */}
-      <div className="mt-5 overflow-y-auto min-h-0 flex-1 pb-4 pr-2 flex flex-col gap-6 [scrollbar-width:thin] [scrollbar-color:rgb(209_213_219)_transparent] dark:[scrollbar-color:rgba(255,255,255,0.15)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-white/15">
-
-        {/* DRAFTS — every in-progress project, newest first */}
+      {/* The list — independently scrolled from the template grid */}
+      <div className="mt-5 overflow-y-auto min-h-0 flex-1 pb-4 pr-2 flex flex-col [scrollbar-width:thin] [scrollbar-color:rgb(209_213_219)_transparent] dark:[scrollbar-color:rgba(255,255,255,0.15)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-white/15">
         <div>
-          <GroupLabel>Drafts &middot; {drafts.length}</GroupLabel>
-          {drafts.length === 0 ? (
-            <div className="font-mono text-[9px] uppercase tracking-wide text-gray-300 dark:text-content-secondary/60 mt-2">
-              No drafts in progress
+          <GroupLabel>My Designs &middot; {rows === null ? drafts.length : totalCount}</GroupLabel>
+          {rows === null && (
+            <div className="flex items-center gap-2 text-gray-400 dark:text-content-secondary font-mono text-[10px] uppercase pt-3">
+              <Loader2 size={12} className="animate-spin" /> Loading
+            </div>
+          )}
+          {rows !== null && items.length === 0 ? (
+            <div className="font-mono text-[9px] uppercase leading-relaxed tracking-wide text-gray-300 dark:text-content-secondary/60 mt-2">
+              {totalCount === 0 ? 'Nothing yet — pick a template to start your first design.' : 'No matches.'}
             </div>
           ) : (
             <div className="flex flex-col gap-4 mt-2">
-              {drafts.map((entry) => {
-                const d = entry.draft
-                const label = TEMPLATE_LABELS[d.templateType as TemplateType] ?? d.templateType
+              {items.map((item) => {
+                if (item.kind === 'draft') {
+                  const { entry } = item
+                  const d = entry.draft
+                  const label = TEMPLATE_LABELS[d.templateType as TemplateType] ?? d.templateType
+                  return (
+                    <WorkCard
+                      key={entry.id}
+                      thumb={<DraftLiveRender draft={d} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />}
+                      title={draftDisplayTitle(d)}
+                      CaptionIcon={channelIcon(d.templateType)}
+                      caption={`${label} · saved ${relativeDate(d.savedAt)}`}
+                      onOpen={() => setPreviewDraft(d)}
+                      actions={[
+                        { title: 'Clone — duplicate this design', icon: <Copy size={12} strokeWidth={1.5} />, onClick: () => cloneDraft(entry) },
+                        { title: 'Edit', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => resumeDraft(entry.id) },
+                        { title: 'Preview', icon: <Eye size={12} strokeWidth={1.5} />, onClick: () => setPreviewDraft(d) },
+                        { title: 'Delete', icon: <Trash2 size={12} strokeWidth={1.5} />, onClick: () => setConfirmDelete({ kind: 'draft', entry }) },
+                      ]}
+                    />
+                  )
+                }
+                const { row } = item
                 return (
                   <WorkCard
-                    key={entry.id}
-                    thumb={<DraftLiveRender draft={d} colors={brand?.colors ?? null} typography={brand?.typography ?? null} />}
-                    title={draftDisplayTitle(d)}
-                    CaptionIcon={channelIcon(d.templateType)}
-                    caption={`${label} · saved ${relativeDate(d.savedAt)}`}
-                    onOpen={() => resumeDraft(entry.id)}
+                    key={`x${row.id}`}
+                    thumb={
+                      row.thumbnail_url && row.format !== 'pdf' ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={row.thumbnail_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center font-mono text-[9px] uppercase tracking-wide text-gray-400 dark:text-content-secondary">
+                          {row.format === 'pdf' ? 'PDF' : 'No preview'}
+                        </div>
+                      )
+                    }
+                    title={row.headline || (TEMPLATE_LABELS[row.template_type as TemplateType] ?? row.template_type)}
+                    CaptionIcon={channelIcon(row.template_type)}
+                    caption={`${TEMPLATE_LABELS[row.template_type as TemplateType] ?? row.template_type} · ${relativeDate(row.created_at)}`}
+                    onOpen={row.thumbnail_url ? () => setPreviewRow(row) : undefined}
                     actions={[
-                      { title: 'Clone — duplicate this draft', icon: <Copy size={12} strokeWidth={1.5} />, onClick: () => cloneDraft(entry) },
-                      { title: 'Edit — resume this draft', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => resumeDraft(entry.id) },
-                      { title: 'Preview', icon: <Eye size={12} strokeWidth={1.5} />, onClick: () => setPreviewDraft(d) },
-                      { title: 'Delete draft', icon: <Trash2 size={12} strokeWidth={1.5} />, onClick: () => setConfirmDelete({ kind: 'draft', entry }) },
+                      ...(row.has_snapshot ? [
+                        { title: 'Clone — duplicate this design', icon: (busyId === row.id ? <Loader2 size={12} className="animate-spin" /> : <Copy size={12} strokeWidth={1.5} />), onClick: () => cloneExportToDraft(row) },
+                        { title: 'Edit', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => restore(row) },
+                      ] : []),
+                      ...(row.thumbnail_url ? [
+                        { title: 'Preview', icon: <Eye size={12} strokeWidth={1.5} />, onClick: () => setPreviewRow(row) },
+                      ] : []),
+                      { title: 'Delete', icon: <Trash2 size={12} strokeWidth={1.5} />, onClick: () => setConfirmDelete({ kind: 'export', row }) },
                     ]}
                   />
                 )
               })}
-            </div>
-          )}
-        </div>
-
-        {/* EXPORTS — hairline + extra air separates it from DRAFTS */}
-        <div className="pt-6 border-t border-gray-200 dark:border-line-subtle">
-          <GroupLabel>Exports &middot; {rows?.length ?? '—'}</GroupLabel>
-          {rows === null ? (
-            <div className="flex items-center gap-2 text-gray-400 dark:text-content-secondary font-mono text-[10px] uppercase pt-3">
-              <Loader2 size={12} className="animate-spin" /> Loading
-            </div>
-          ) : visible.length === 0 ? (
-            <div className="font-mono text-[9px] uppercase leading-relaxed tracking-wide text-gray-300 dark:text-content-secondary/60 mt-2">
-              {rows.length === 0 ? 'Nothing yet — your exports will collect here.' : 'No matches.'}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4 mt-2">
-              {visible.map((row) => (
-                <WorkCard
-                  key={row.id}
-                  thumb={
-                    row.thumbnail_url && row.format !== 'pdf' ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={row.thumbnail_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center font-mono text-[9px] uppercase tracking-wide text-gray-400 dark:text-content-secondary">
-                        {row.format === 'pdf' ? 'PDF' : 'No preview'}
-                      </div>
-                    )
-                  }
-                  title={row.headline || (TEMPLATE_LABELS[row.template_type as TemplateType] ?? row.template_type)}
-                  CaptionIcon={channelIcon(row.template_type)}
-                  caption={`${TEMPLATE_LABELS[row.template_type as TemplateType] ?? row.template_type} · ${relativeDate(row.created_at)}`}
-                  onOpen={row.has_snapshot ? () => restore(row) : (row.thumbnail_url ? () => setPreviewRow(row) : undefined)}
-                  actions={[
-                    ...(row.has_snapshot ? [
-                      { title: 'Clone — copy to drafts', icon: (busyId === row.id ? <Loader2 size={12} className="animate-spin" /> : <Copy size={12} strokeWidth={1.5} />), onClick: () => cloneExportToDraft(row) },
-                      { title: 'Edit — reopen this asset', icon: <Pencil size={12} strokeWidth={1.5} />, onClick: () => restore(row) },
-                    ] : []),
-                    ...(row.thumbnail_url ? [
-                      { title: 'Preview', icon: <Eye size={12} strokeWidth={1.5} />, onClick: () => setPreviewRow(row) },
-                    ] : []),
-                    { title: 'Remove from my list', icon: <Trash2 size={12} strokeWidth={1.5} />, onClick: () => setConfirmDelete({ kind: 'export', row }) },
-                  ]}
-                />
-              ))}
             </div>
           )}
         </div>

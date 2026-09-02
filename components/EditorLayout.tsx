@@ -96,6 +96,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   // to be added here (and to `saveDraft`'s payload in store/index.ts).
   useEffect(() => {
     const timeoutId = setTimeout(() => {
+      // Teardown guard: leaving via the logo resets selection/screen before
+      // navigation lands, and a debounce firing in that window used to save
+      // `currentScreen: 'select'` + empty selection INTO the draft —
+      // corrupting the entry it had just deliberately saved.
+      if (useStore.getState().currentScreen === 'select') return
       saveDraft()
     }, 500)
     return () => clearTimeout(timeoutId)

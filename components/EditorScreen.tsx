@@ -904,9 +904,23 @@ export function EditorScreen() {
       }
 
       // Snapshot the full editor state alongside the export. The export log
-      // stores it so My Work's Clone/Edit can restore this exact asset later —
-      // same capture the queue serialization uses.
-      const assetSnapshot = captureEditorSnapshot(useStore.getState())
+      // stores it so My Work's Clone/Edit can restore this exact asset later.
+      // captureEditorSnapshot covers only the shared design fields — template,
+      // copy, and the per-template image crop must ride along explicitly or
+      // the restore falls back to whatever the store holds at click time
+      // (which once opened a different template entirely).
+      const snapState = useStore.getState()
+      const snapImg = snapState.thumbnailImageSettings?.[currentTemplate]
+      const assetSnapshot = {
+        ...captureEditorSnapshot(snapState),
+        templateType: currentTemplate,
+        headline: verbatimCopy.headline,
+        subhead: verbatimCopy.subhead,
+        body: verbatimCopy.body,
+        thumbnailImagePosition: snapImg?.position ?? { x: 0, y: 0 },
+        thumbnailImageZoom: snapImg?.zoom ?? 1,
+        thumbnailImageFilters: snapImg?.filters,
+      }
 
       const response = await fetch('/api/export', {
         method: 'POST',

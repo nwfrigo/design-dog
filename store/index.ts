@@ -1691,8 +1691,11 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
     set({
       // Resuming — bind auto-save to the resumed entry (newest when unspecified).
       activeDraftId: draftId ?? newestDraftId(),
-      currentScreen: draft.currentScreen || 'select',
-      selectedAssets: draft.selectedAssets,
+      // A draft never legitimately holds the picker screen (entries are only
+      // created after leaving it) — 'select' here is teardown corruption from
+      // older builds. Normalize so resume always lands in the editor.
+      currentScreen: !draft.currentScreen || draft.currentScreen === 'select' ? 'editor' : draft.currentScreen,
+      selectedAssets: draft.selectedAssets?.length ? draft.selectedAssets : [draft.templateType],
       currentAssetIndex: draft.currentAssetIndex,
       manualAssetCopies: draft.manualAssetCopies || {},
       manualAssetSettings: draft.manualAssetSettings || {},
