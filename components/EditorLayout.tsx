@@ -53,6 +53,26 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     // the auto-save never fires for an executive-overview edit, so a refresh
     // loses everything since the last incidental save.
     executiveOverviewDocument,
+    // Newer email-template fields (Cority Connect / EHS Accelerate / CCE) —
+    // watched so a lone background/event/detail edit still triggers a save
+    ccBackgroundVariant,
+    eventDate,
+    eventLocation,
+    signatureWorkshopName,
+    showSignatureWorkshopName,
+    showSignatureEventDetails,
+    invitationHeader,
+    invitationHeadline,
+    invitationEventTitle,
+    invitationEventDate,
+    invitationEventLocation,
+    invitationEventTime,
+    invitationEventTimeNote,
+    invitationBody,
+    cceEventTime,
+    showCceEventDate,
+    showCceEventLocation,
+    showCceEventTime,
   } = useStore()
 
   // Check if we're editing from queue
@@ -109,6 +129,25 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     customSizeDocument,
     // Executive-overview doc — same reasoning; it's the template's only store field.
     executiveOverviewDocument,
+    // Newer email-template fields
+    ccBackgroundVariant,
+    eventDate,
+    eventLocation,
+    signatureWorkshopName,
+    showSignatureWorkshopName,
+    showSignatureEventDetails,
+    invitationHeader,
+    invitationHeadline,
+    invitationEventTitle,
+    invitationEventDate,
+    invitationEventLocation,
+    invitationEventTime,
+    invitationEventTimeNote,
+    invitationBody,
+    cceEventTime,
+    showCceEventDate,
+    showCceEventLocation,
+    showCceEventTime,
   ])
 
   const handleLogoClick = () => {

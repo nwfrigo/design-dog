@@ -249,6 +249,26 @@ export interface DraftState {
   customSizeDocument: CustomSizeDocument | null
   // Executive Overview
   executiveOverviewDocument: ExecutiveOverviewDocument | null
+  // Newer email templates (Cority Connect 2026, EHS Accelerate, CCE) —
+  // each of these is store state a draft must carry to render/resume faithfully
+  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  eventDate: string
+  eventLocation: string
+  signatureWorkshopName: string
+  showSignatureWorkshopName: boolean
+  showSignatureEventDetails: boolean
+  invitationHeader: string
+  invitationHeadline: string
+  invitationEventTitle: string
+  invitationEventDate: string
+  invitationEventLocation: string
+  invitationEventTime: string
+  invitationEventTimeNote: string
+  invitationBody: string
+  cceEventTime: string
+  showCceEventDate: boolean
+  showCceEventLocation: boolean
+  showCceEventTime: boolean
 }
 
 // Bumped to 2 for the 1.5 Auto-Create sunset — drafts saved against
@@ -441,6 +461,24 @@ export function saveDraftToStorage(state: Partial<DraftState>, draftId?: string)
       customSizeDocument: state.customSizeDocument ?? null,
       // Executive Overview
       executiveOverviewDocument: state.executiveOverviewDocument ?? null,
+      ccBackgroundVariant: state.ccBackgroundVariant || 'dark-blue-1',
+      eventDate: state.eventDate ?? '',
+      eventLocation: state.eventLocation ?? '',
+      signatureWorkshopName: state.signatureWorkshopName ?? '',
+      showSignatureWorkshopName: state.showSignatureWorkshopName ?? true,
+      showSignatureEventDetails: state.showSignatureEventDetails ?? true,
+      invitationHeader: state.invitationHeader ?? '',
+      invitationHeadline: state.invitationHeadline ?? '',
+      invitationEventTitle: state.invitationEventTitle ?? '',
+      invitationEventDate: state.invitationEventDate ?? '',
+      invitationEventLocation: state.invitationEventLocation ?? '',
+      invitationEventTime: state.invitationEventTime ?? '',
+      invitationEventTimeNote: state.invitationEventTimeNote ?? '',
+      invitationBody: state.invitationBody ?? '',
+      cceEventTime: state.cceEventTime ?? '',
+      showCceEventDate: state.showCceEventDate ?? true,
+      showCceEventLocation: state.showCceEventLocation ?? true,
+      showCceEventTime: state.showCceEventTime ?? true,
     }
 
     // Upsert into the multi-draft list. No id (legacy caller) → update the
