@@ -40,6 +40,7 @@ These files live alongside this one in `.claude/`. Always consult the relevant r
 | `LESSONS.md` | Running log of QA feedback, error patterns, and design decisions — applied silently, graduated with approval |
 | `STAGE-AND-BENCH.md` | Stage & Bench editor substrate — architecture, registries, primitives, conventions (incl. the multi-page page-selector primitive §10 + the `chip`/icon editbar). Truth-source for what's in the substrate today. |
 | `CUSTOM-SIZE.md` | Custom-size feature — the arbitrary-dimension asset editor (layout engine, document model, editor, export). Built on Stage & Bench. |
+| `MY-DESIGNS.md` | My Designs / memory feature — identity (name picker, no auth), multi-draft storage, the design lifecycle (create/clone/export/edit/rename/delete), snapshot-at-export, soft delete, the homepage rail. |
 | `SUBSTRATE-DEBT.md` | Debt ledger for deferred substrate work. Each entry has a trigger condition naming when paying it down becomes urgent. |
 | `STAGE-BENCH-REFACTOR-POSTMORTEM.md` | Historical record of the 1.5 renovation — per-template scorecard, primitives shipped, lessons learned. Journal, not a plan. |
 | `GRADUATED_PENDING.md` | Queue of lessons proposed for promotion into reference docs — awaiting Nick's review |
@@ -181,7 +182,8 @@ Headline is NOT required. No red asterisks. All buttons (export, queue, save) wo
 ## Homepage
 
 ### Layout
-- Main area: Visual grid of templates by channel (Digital > Email, Social, Website, Newsletter)
+- Left rail: **My Designs** — the identity's drafts + exports as one list (collapsible, resizable; see `MY-DESIGNS.md`)
+- Main area: Visual grid of templates by channel (Digital > Email, Social, Website, Newsletter); 3 columns, re-flows to 2 when the rail squeezes it below 1080px
 - Expand-in-place interaction for channel categories
 - Only one channel expanded at a time
 
