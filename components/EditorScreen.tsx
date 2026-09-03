@@ -64,6 +64,8 @@ import { ZoomableImage } from './ZoomableImage'
 import { ImageCropModal } from './ImageCropModal'
 import { SimpleRichTextEditor } from './SimpleRichTextEditor'
 import { buildExportParams, type ExportParamState } from '@/lib/export-params'
+import { captureEditorSnapshot } from '@/lib/asset-snapshot'
+import { DRAFT_SHAPE_VERSION, deleteDraftById } from '@/lib/draft-storage'
 import { TEMPLATE_REGISTRY } from '@/lib/template-registry'
 import { EyeIcon } from './shared/EyeIcon'
 import type { TemplateInfo } from '@/lib/template-config'
@@ -895,14 +897,53 @@ export function EditorScreen() {
 
       const exportParams = buildExportParams(currentTemplate, exportScale, paramState)
 
+      // Executive overview names itself by the cover's intro headline — send
+      // it as the logged headline so My Work rows carry the real name.
+      if (currentTemplate === 'executive-overview' && executiveOverviewDocument?.introHeadline?.trim()) {
+        ;(exportParams as Record<string, unknown>).headline = executiveOverviewDocument.introHeadline.trim()
+      }
+
+      // Snapshot the full editor state alongside the export. The export log
+      // stores it so My Work's Clone/Edit can restore this exact asset later.
+      // captureEditorSnapshot covers only the shared design fields — template,
+      // copy, and the per-template image crop must ride along explicitly or
+      // the restore falls back to whatever the store holds at click time
+      // (which once opened a different template entirely).
+      const snapState = useStore.getState()
+      const snapImg = snapState.thumbnailImageSettings?.[currentTemplate]
+      const assetSnapshot = {
+        ...captureEditorSnapshot(snapState),
+        templateType: currentTemplate,
+        headline: verbatimCopy.headline,
+        subhead: verbatimCopy.subhead,
+        body: verbatimCopy.body,
+        thumbnailImagePosition: snapImg?.position ?? { x: 0, y: 0 },
+        thumbnailImageZoom: snapImg?.zoom ?? 1,
+        thumbnailImageFilters: snapImg?.filters,
+      }
+
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...exportParams, exportedBy }),
+        body: JSON.stringify({ ...exportParams, exportedBy, assetSnapshot, assetSnapshotVersion: DRAFT_SHAPE_VERSION }),
       })
 
       if (!response.ok) {
         throw new Error('Export failed')
+      }
+
+      // Draft lifecycle: a successful export MOVES the work from Drafts to
+      // Exports in My Work — the export row (with its snapshot) is now the
+      // record, so the draft entry is retired. Guarded to single-asset
+      // projects with an empty queue: a multi-asset project still holds
+      // unexported work, so its draft must survive. If the user keeps
+      // editing after exporting, the next auto-save recreates the entry —
+      // which is correct: it's in-progress again.
+      {
+        const s2 = useStore.getState()
+        if (s2.activeDraftId && s2.selectedAssets.length <= 1 && s2.exportQueue.length === 0) {
+          deleteDraftById(s2.activeDraftId)
+        }
       }
 
       const blob = await response.blob()

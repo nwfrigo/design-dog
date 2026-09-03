@@ -110,7 +110,7 @@ When variant is `'none'`:
 
 - **Asset selection:** `selectedAssets + currentAssetIndex` is the single asset-tracking model. Templates are added to `selectedAssets` from the homepage and navigated via tabs in the editor header.
 - **Queue editing:** `editingQueueItemId` tracks which queue item is being edited. Asset stays in queue during edit (not removed).
-- **Draft persistence:** `localStorage` key `design-dog-active-draft`, version-gated by `CURRENT_VERSION` in `lib/draft-storage.ts`. Single active project, auto-save on every state change. Bump the version when the draft shape changes incompatibly so existing drafts get cleared instead of silently corrupting.
+- **Draft persistence:** multi-draft, per identity — `localStorage` key `design-dog-drafts::<name>` holds a list of entries (`{id, draft, name?}`, newest-first, capped 20), version-gated per entry by `CURRENT_VERSION` in `lib/draft-storage.ts`. The store's `activeDraftId` binds the debounced auto-save to ONE entry. Bump the version when the draft shape changes incompatibly so stale entries get dropped instead of silently corrupting. Full model + lifecycle rules: `MY-DESIGNS.md`.
 
 ### Adding New Template State
 
@@ -118,7 +118,7 @@ When adding a new template with variants:
 1. Add variant state to `store/index.ts` (e.g., `reportVariant: 'image' as 'image' | 'none'`)
 2. Add setter action (e.g., `setReportVariant`)
 3. Add to `types/index.ts` AppState interface
-4. Add to draft-storage save/load
+4. Add to the six persistence sites — SNAPSHOT_FIELDS, DraftState + saveDraftToStorage, store saveDraft + loadDraft, EditorLayout auto-save deps (checklist in `MY-DESIGNS.md`; missing one silently drops the field from drafts)
 5. Add to `EditorScreen.tsx` store destructure
 
 **Theme support** uses a shared `theme` field (already in the store/types/snapshot pipeline) rather than per-template variant fields. For a new themed template: no new store fields needed — wire the `theme` prop through the template component, registry, export-params, and EditorScreen preview. Use `TEMPLATE_THEMES[theme]` from `lib/template-themes.ts` for all theme-keyed colors; never hard-code hex values for theme-sensitive surfaces.
@@ -190,7 +190,7 @@ useEffect(() => {
 2. Does it have store setters (e.g., `setStackerContentModules`)?
 3. Is there a `useEffect` that syncs local state → store on every change?
 4. Are those store fields in `EditorLayout.tsx` auto-save dependencies?
-5. Are those fields in `draft-storage.ts` save/load functions?
+5. Are those fields in all six persistence sites (SNAPSHOT_FIELDS, DraftState + saveDraftToStorage, store saveDraft/loadDraft, EditorLayout deps — see `MY-DESIGNS.md`)?
 
 **Reference:** `StackerEditorScreen.tsx` lines 1859-1867 shows the correct sync pattern.
 
@@ -246,7 +246,7 @@ Every new editable prop must appear in all of these locations:
 1. `types/index.ts` — Add to `ManualAssetSettings`, `QueuedAsset`, `GeneratedAsset`
 2. `lib/asset-snapshot.ts` — Add field name to `SNAPSHOT_FIELDS` (handles all 5 store serialization functions)
 3. `store/index.ts` — Add state field + setter to `AppState`
-4. `lib/draft-storage.ts` — Add to save/load if needed for draft persistence
+4. `lib/draft-storage.ts` + `store/index.ts` saveDraft/loadDraft + `EditorLayout.tsx` deps — the six persistence sites (`MY-DESIGNS.md`) if the field must survive in drafts
 5. `lib/export-params.ts` — Add to the template's param builder function
 6. `lib/template-registry.tsx` — Add to the template's `renderSchema.fields` (the dynamic render route at `app/render/[slug]/page.tsx` parses fields automatically from the schema — no separate render page needed)
 
@@ -354,10 +354,11 @@ This architecture is used by the single-asset editor (`EditorScreen.tsx`) and th
 | `/api/generate-stacker` | N/A | AI module generation for Stacker |
 | `/api/report-bug` | N/A | Bug report submission (Resend email) |
 | `/api/team-members` | N/A | GET: list team members; POST: add new name |
+| `/api/my-exports` | N/A | GET `?by=`: identity's visible exports; GET `?snapshot=id`: one snapshot; DELETE `?id=`: soft-hide (see `MY-DESIGNS.md`) |
 | `/api/admin/auth` | N/A | Admin login — checks `ADMIN_PASSWORD`, sets `dd-admin` cookie |
 | `/api/admin/exports` | N/A | Paginated export log with filters (admin only) |
 | `/api/admin/stats` | N/A | Aggregate export stats (admin only) |
-| `/api/admin/seed` | N/A | Creates DB tables + adds `thumbnail_url` column; safe to re-run |
+| `/api/admin/seed` | N/A | Creates DB tables + idempotent column migrations (`thumbnail_url`, `snapshot`, `snapshot_version`, `label`, `hidden_at`, indexes); safe to re-run |
 
 ### Upload Flow (Both Modes)
 
@@ -415,7 +416,7 @@ Every export is logged to a Neon Postgres database with metadata: who exported i
 
 Two tables live in Neon Postgres (provisioned via Vercel Marketplace, env var `POSTGRES_URL`):
 
-- **`export_logs`** — one row per export. Fields: `id`, `template_type`, `exported_by`, `headline`, `solution`, `format`, `scale`, `thumbnail_url`, `created_at`
+- **`export_logs`** — one row per export. Fields: `id`, `template_type`, `exported_by`, `headline`, `solution`, `format`, `scale`, `thumbnail_url`, `created_at`, `snapshot` (JSONB editor snapshot for clone/edit from My Designs), `snapshot_version`, `hidden_at` (soft delete — filtered from EVERY view including admin; SQL-only recovery), `label` (dormant, reserved). Indexed on `exported_by`.
 - **`team_members`** — the roster of known users. Fields: `id`, `name`, `created_at`
 
 Key functions:
@@ -423,6 +424,8 @@ Key functions:
 - `getExportStats()` — returns `{ total, today, thisWeek, byTemplate, byPerson, dailyCounts }`
 - `getExportLogs(filters)` — paginated query with optional filters
 - `getTeamMembers()` / `addTeamMember(name)` — team member CRUD
+- `getExportSnapshot(id)` — one row's snapshot blob (lists only select `has_snapshot`)
+- `hideExport(id)` — soft delete (`hidden_at = NOW()`); `getExportLogs` and all stats aggregates filter `hidden_at IS NULL` unconditionally
 
 **Schema changes:** Add new columns via `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` in `app/api/admin/seed/route.ts`. The seed endpoint is idempotent — safe to re-run in production to apply migrations.
 
@@ -434,6 +437,7 @@ Key functions:
 - **PNG exports:** Upload a screenshot thumbnail to Vercel Blob; `thumbnail_url` stores the blob URL. Admin shows the thumbnail in a lightbox.
 - **PDF exports:** Upload the actual PDF buffer to Vercel Blob; `thumbnail_url` stores the PDF blob URL. Admin shows a native `<embed>` lightbox for multi-page viewing.
 - **`exportedBy` is in `ROUTE_ONLY_KEYS`** — it's consumed by the API route and NOT forwarded as a render param
+- **`assetSnapshot` + `assetSnapshotVersion` ride the same body** (also `ROUTE_ONLY_KEYS`) and land on the row as JSONB — the basis for clone/edit from My Designs. Direct exports enrich `captureEditorSnapshot` with templateType/copy/image crop so the snapshot is self-contained; queue exports send the `QueuedAsset`. Details: `MY-DESIGNS.md`.
 
 All 4 export paths in the route must call `logExport`:
 1. Stacker PDF

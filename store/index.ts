@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, CustomSizeDocument, ExecutiveOverviewDocument } from '@/types'
-import { saveDraftToStorage, loadDraftFromStorage, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
+import { saveDraftToStorage, loadDraftFromStorage, loadDraftById, newDraftId, newestDraftId, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
 import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
 import { getDefaultVisibility, UNIVERSAL_FALLBACK_FLAGS, getBrandedSeed } from '@/lib/template-defaults'
@@ -476,6 +476,10 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Custom Size
   customSizeDocument: null as CustomSizeDocument | null,
   executiveOverviewDocument: null as ExecutiveOverviewDocument | null,
+  // Which entry in the multi-draft store auto-save writes to. Fresh id when a
+  // new project starts (leaving the template picker, or cloning); bound to the
+  // resumed entry's id on resume. Ephemeral — never serialized into drafts.
+  activeDraftId: null as string | null,
 
   // Email Cority Connect 2026
   ccBackgroundVariant: 'dark-blue-1' as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant,
@@ -1229,6 +1233,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         // branded seeds + flag overrides line up with the thumbnail.
         ...defaults,
         verbatimCopy: { ...initialVerbatimCopy },
+        // Leaving the picker = a NEW project → its own draft entry.
+        activeDraftId: newDraftId(),
       })
     }
   },
@@ -1236,6 +1242,8 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Navigate directly to editor with a single template (for single-click)
   goToEditorWithTemplate: (templateType: TemplateType) => {
     const defaults = getDefaultAssetSettings(templateType)
+    // Single-click from the picker = a NEW project → its own draft entry.
+    set({ activeDraftId: newDraftId() })
 
     // Social Carousel gets its own editor screen
     if (templateType === 'social-carousel') {
@@ -1304,6 +1312,40 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   clearQueue: () => {
     set({ exportQueue: [] })
+  },
+
+  /** My Work sidebar Clone/Edit: restore an export-time snapshot (fetched
+   *  from the export log) into the editor as a fresh working copy. Follows
+   *  editQueuedAsset's entering-the-editor shape, minus editingQueueItemId —
+   *  a clone is a NEW draft, not a queue edit, so nothing points back at the
+   *  original export and exporting again writes a new log row. */
+  loadExportSnapshotIntoEditor: (snapshot: Record<string, unknown>) => {
+    const state = get()
+    const restored = restoreEditorSnapshot(snapshot)
+    const templateType = (snapshot.templateType as TemplateType) ?? state.templateType
+    const position = (snapshot.thumbnailImagePosition as { x: number; y: number } | undefined) ?? { x: 0, y: 0 }
+    const zoom = (snapshot.thumbnailImageZoom as number | undefined) ?? 1
+    const filters = (snapshot.thumbnailImageFilters as ImageFilters | undefined) ?? NEUTRAL_FILTERS
+    set({
+      ...restored,
+      // A clone is a NEW project — its own draft entry, never the source's.
+      activeDraftId: newDraftId(),
+      currentScreen: 'editor',
+      templateType,
+      selectedAssets: [templateType],
+      currentAssetIndex: 0,
+      verbatimCopy: {
+        headline: (snapshot.headline as string) ?? '',
+        subhead: (snapshot.subhead as string) ?? '',
+        body: (snapshot.body as string) ?? '',
+        cta: '',
+      },
+      thumbnailImageSettings: {
+        ...state.thumbnailImageSettings,
+        [templateType]: { position, zoom, filters },
+      },
+      editingQueueItemId: null,
+    })
   },
 
   editQueuedAsset: (id: string) => {
@@ -1393,6 +1435,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
 
   reset: () =>
     set({
+      activeDraftId: null,
       currentScreen: 'select',
       contentMode: 'verbatim',
       verbatimCopy: { ...initialVerbatimCopy },
@@ -1477,6 +1520,13 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Draft persistence actions
   saveDraft: () => {
     const state = get()
+    // Bind a draft id lazily so every legacy entry path still saves; from
+    // then on auto-save upserts THIS entry instead of the newest one.
+    let id = state.activeDraftId
+    if (!id) {
+      id = newDraftId()
+      set({ activeDraftId: id })
+    }
     saveDraftToStorage({
       currentScreen: state.currentScreen,
       selectedAssets: state.selectedAssets,
@@ -1613,16 +1663,39 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Custom Size
       customSizeDocument: state.customSizeDocument,
       executiveOverviewDocument: state.executiveOverviewDocument,
-    })
+      ccBackgroundVariant: state.ccBackgroundVariant,
+      eventDate: state.eventDate,
+      eventLocation: state.eventLocation,
+      signatureWorkshopName: state.signatureWorkshopName,
+      showSignatureWorkshopName: state.showSignatureWorkshopName,
+      showSignatureEventDetails: state.showSignatureEventDetails,
+      invitationHeader: state.invitationHeader,
+      invitationHeadline: state.invitationHeadline,
+      invitationEventTitle: state.invitationEventTitle,
+      invitationEventDate: state.invitationEventDate,
+      invitationEventLocation: state.invitationEventLocation,
+      invitationEventTime: state.invitationEventTime,
+      invitationEventTimeNote: state.invitationEventTimeNote,
+      invitationBody: state.invitationBody,
+      cceEventTime: state.cceEventTime,
+      showCceEventDate: state.showCceEventDate,
+      showCceEventLocation: state.showCceEventLocation,
+      showCceEventTime: state.showCceEventTime,
+    }, id)
   },
 
-  loadDraft: () => {
-    const draft = loadDraftFromStorage()
+  loadDraft: (draftId?: string) => {
+    const draft = draftId ? loadDraftById(draftId) : loadDraftFromStorage()
     if (!draft) return false
 
     set({
-      currentScreen: draft.currentScreen || 'select',
-      selectedAssets: draft.selectedAssets,
+      // Resuming — bind auto-save to the resumed entry (newest when unspecified).
+      activeDraftId: draftId ?? newestDraftId(),
+      // A draft never legitimately holds the picker screen (entries are only
+      // created after leaving it) — 'select' here is teardown corruption from
+      // older builds. Normalize so resume always lands in the editor.
+      currentScreen: !draft.currentScreen || draft.currentScreen === 'select' ? 'editor' : draft.currentScreen,
+      selectedAssets: draft.selectedAssets?.length ? draft.selectedAssets : [draft.templateType],
       currentAssetIndex: draft.currentAssetIndex,
       manualAssetCopies: draft.manualAssetCopies || {},
       manualAssetSettings: draft.manualAssetSettings || {},
@@ -1791,6 +1864,24 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Custom Size
       customSizeDocument: draft.customSizeDocument ?? null,
       executiveOverviewDocument: draft.executiveOverviewDocument ?? null,
+      ccBackgroundVariant: draft.ccBackgroundVariant ?? 'dark-blue-1',
+      eventDate: draft.eventDate ?? '',
+      eventLocation: draft.eventLocation ?? '',
+      signatureWorkshopName: draft.signatureWorkshopName ?? '',
+      showSignatureWorkshopName: draft.showSignatureWorkshopName ?? true,
+      showSignatureEventDetails: draft.showSignatureEventDetails ?? true,
+      invitationHeader: draft.invitationHeader ?? '',
+      invitationHeadline: draft.invitationHeadline ?? '',
+      invitationEventTitle: draft.invitationEventTitle ?? '',
+      invitationEventDate: draft.invitationEventDate ?? '',
+      invitationEventLocation: draft.invitationEventLocation ?? '',
+      invitationEventTime: draft.invitationEventTime ?? '',
+      invitationEventTimeNote: draft.invitationEventTimeNote ?? '',
+      invitationBody: draft.invitationBody ?? '',
+      cceEventTime: draft.cceEventTime ?? '',
+      showCceEventDate: draft.showCceEventDate ?? true,
+      showCceEventLocation: draft.showCceEventLocation ?? true,
+      showCceEventTime: draft.showCceEventTime ?? true,
     })
     return true
   },

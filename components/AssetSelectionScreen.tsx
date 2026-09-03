@@ -125,6 +125,21 @@ export function AssetSelectionScreen() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Grid columns follow the CONTAINER, not the viewport: the My Work rail is
+  // resizable, so a media query can't see the space this grid actually has.
+  // 3-up by default; collapses to 2-up when squeezed below ~1080px.
+  const gridRef = useRef<HTMLDivElement>(null)
+  const [gridCols, setGridCols] = useState(3)
+  useEffect(() => {
+    const el = gridRef.current
+    if (!el) return
+    const compute = () => setGridCols(el.clientWidth < 1080 ? 2 : 3)
+    compute()
+    const ro = new ResizeObserver(compute)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   // Get all templates with channel info
   const allTemplates = useMemo(() => getAllTemplatesWithChannels(), [])
 
@@ -322,7 +337,7 @@ export function AssetSelectionScreen() {
         </div>
 
         {/* Template Grid — 3 cols on wider screens, 2 cols below. */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-12">
+        <div ref={gridRef} className={`grid gap-12 ${gridCols === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {/* Custom-size entry — arbitrary-dimension asset. Rendered through
               TemplateTileV2 (same chrome/footer/tokens as every other tile) with
               a full-bleed preview override: a themeable vector montage whose

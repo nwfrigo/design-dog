@@ -53,6 +53,26 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     // the auto-save never fires for an executive-overview edit, so a refresh
     // loses everything since the last incidental save.
     executiveOverviewDocument,
+    // Newer email-template fields (Cority Connect / EHS Accelerate / CCE) —
+    // watched so a lone background/event/detail edit still triggers a save
+    ccBackgroundVariant,
+    eventDate,
+    eventLocation,
+    signatureWorkshopName,
+    showSignatureWorkshopName,
+    showSignatureEventDetails,
+    invitationHeader,
+    invitationHeadline,
+    invitationEventTitle,
+    invitationEventDate,
+    invitationEventLocation,
+    invitationEventTime,
+    invitationEventTimeNote,
+    invitationBody,
+    cceEventTime,
+    showCceEventDate,
+    showCceEventLocation,
+    showCceEventTime,
   } = useStore()
 
   // Check if we're editing from queue
@@ -76,6 +96,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   // to be added here (and to `saveDraft`'s payload in store/index.ts).
   useEffect(() => {
     const timeoutId = setTimeout(() => {
+      // Teardown guard: leaving via the logo resets selection/screen before
+      // navigation lands, and a debounce firing in that window used to save
+      // `currentScreen: 'select'` + empty selection INTO the draft —
+      // corrupting the entry it had just deliberately saved.
+      if (useStore.getState().currentScreen === 'select') return
       saveDraft()
     }, 500)
     return () => clearTimeout(timeoutId)
@@ -109,6 +134,25 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     customSizeDocument,
     // Executive-overview doc — same reasoning; it's the template's only store field.
     executiveOverviewDocument,
+    // Newer email-template fields
+    ccBackgroundVariant,
+    eventDate,
+    eventLocation,
+    signatureWorkshopName,
+    showSignatureWorkshopName,
+    showSignatureEventDetails,
+    invitationHeader,
+    invitationHeadline,
+    invitationEventTitle,
+    invitationEventDate,
+    invitationEventLocation,
+    invitationEventTime,
+    invitationEventTimeNote,
+    invitationBody,
+    cceEventTime,
+    showCceEventDate,
+    showCceEventLocation,
+    showCceEventTime,
   ])
 
   const handleLogoClick = () => {

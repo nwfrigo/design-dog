@@ -5,6 +5,89 @@ import { UNIVERSAL_FALLBACK_FLAGS } from './template-defaults'
 
 const DRAFT_KEY = 'design-dog-active-draft'
 
+/**
+ * Multi-draft store: each identity keeps a LIST of drafts (a draft = a
+ * project), newest first, under `design-dog-drafts::<name>`. A fresh project
+ * gets a fresh id (the store assigns one when the user leaves the template
+ * picker); auto-save upserts the entry for the ACTIVE id, so parallel drafts
+ * no longer overwrite each other. Capped at MAX_DRAFTS, oldest falls off.
+ *
+ * Identity comes straight from localStorage (`design-dog-user`) so this stays
+ * a pure lib module. Migration adopts both earlier shapes — the original
+ * single bare key and the interim per-user single key — into the list so
+ * nobody loses in-flight work.
+ */
+// `name` is card metadata, not design state: unset, the card titles itself
+// from the design's headline; once set (rename, clone) it is decoupled —
+// later headline edits don't change it, and renames never touch the design.
+export type DraftEntry = { id: string; draft: DraftState; name?: string }
+
+const DRAFTS_KEY = 'design-dog-drafts'
+const MAX_DRAFTS = 20
+
+export function newDraftId(): string {
+  return `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+function draftsKey(): string {
+  if (typeof window === 'undefined') return DRAFTS_KEY
+  const user = localStorage.getItem('design-dog-user')
+  return user ? `${DRAFTS_KEY}::${user}` : DRAFTS_KEY
+}
+
+function readEntries(): DraftEntry[] {
+  if (typeof window === 'undefined') return []
+  try {
+    migrateLegacyDraft()
+    const stored = localStorage.getItem(draftsKey())
+    if (!stored) return []
+    const parsed = JSON.parse(stored) as { entries?: DraftEntry[] }
+    const entries = Array.isArray(parsed.entries) ? parsed.entries : []
+    // Version-gate per entry — one stale draft shouldn't nuke the list.
+    return entries
+      .filter((e) => e && e.id && e.draft && e.draft.version === CURRENT_VERSION)
+      .sort((a, b) => (b.draft.savedAt ?? 0) - (a.draft.savedAt ?? 0))
+  } catch {
+    return []
+  }
+}
+
+function writeEntries(entries: DraftEntry[]): void {
+  if (typeof window === 'undefined') return
+  try {
+    const capped = entries
+      .sort((a, b) => (b.draft.savedAt ?? 0) - (a.draft.savedAt ?? 0))
+      .slice(0, MAX_DRAFTS)
+    localStorage.setItem(draftsKey(), JSON.stringify({ entries: capped }))
+  } catch (error) {
+    console.error('Failed to write drafts:', error)
+  }
+}
+
+function migrateLegacyDraft(): void {
+  if (typeof window === 'undefined') return
+  try {
+    const listKey = draftsKey()
+    if (localStorage.getItem(listKey) !== null) return
+    const user = localStorage.getItem('design-dog-user')
+    const candidates = [user ? `${DRAFT_KEY}::${user}` : null, DRAFT_KEY].filter(Boolean) as string[]
+    for (const key of candidates) {
+      const legacy = localStorage.getItem(key)
+      if (!legacy) continue
+      try {
+        const draft = JSON.parse(legacy) as DraftState
+        if (draft.version === CURRENT_VERSION) {
+          localStorage.setItem(listKey, JSON.stringify({ entries: [{ id: newDraftId(), draft }] }))
+        }
+      } catch { /* unparseable legacy draft — drop it */ }
+      localStorage.removeItem(key)
+      return
+    }
+  } catch {
+    /* migration is best-effort */
+  }
+}
+
 export interface DraftState {
   version: number
   savedAt: number
@@ -169,6 +252,26 @@ export interface DraftState {
   customSizeDocument: CustomSizeDocument | null
   // Executive Overview
   executiveOverviewDocument: ExecutiveOverviewDocument | null
+  // Newer email templates (Cority Connect 2026, EHS Accelerate, CCE) —
+  // each of these is store state a draft must carry to render/resume faithfully
+  ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  eventDate: string
+  eventLocation: string
+  signatureWorkshopName: string
+  showSignatureWorkshopName: boolean
+  showSignatureEventDetails: boolean
+  invitationHeader: string
+  invitationHeadline: string
+  invitationEventTitle: string
+  invitationEventDate: string
+  invitationEventLocation: string
+  invitationEventTime: string
+  invitationEventTimeNote: string
+  invitationBody: string
+  cceEventTime: string
+  showCceEventDate: boolean
+  showCceEventLocation: boolean
+  showCceEventTime: boolean
 }
 
 // Bumped to 2 for the 1.5 Auto-Create sunset — drafts saved against
@@ -176,7 +279,12 @@ export interface DraftState {
 // etc.) and are cleared on next load.
 const CURRENT_VERSION = 2
 
-export function saveDraftToStorage(state: Partial<DraftState>): void {
+/** Draft-shape version, exported so export-time snapshots can be stamped with
+ *  the shape they were captured under (My Work clone refuses a mismatch
+ *  gracefully instead of restoring an incompatible shape). */
+export const DRAFT_SHAPE_VERSION = CURRENT_VERSION
+
+export function saveDraftToStorage(state: Partial<DraftState>, draftId?: string): void {
   if (typeof window === 'undefined') return
 
   try {
@@ -356,54 +464,91 @@ export function saveDraftToStorage(state: Partial<DraftState>): void {
       customSizeDocument: state.customSizeDocument ?? null,
       // Executive Overview
       executiveOverviewDocument: state.executiveOverviewDocument ?? null,
+      ccBackgroundVariant: state.ccBackgroundVariant || 'dark-blue-1',
+      eventDate: state.eventDate ?? '',
+      eventLocation: state.eventLocation ?? '',
+      signatureWorkshopName: state.signatureWorkshopName ?? '',
+      showSignatureWorkshopName: state.showSignatureWorkshopName ?? true,
+      showSignatureEventDetails: state.showSignatureEventDetails ?? true,
+      invitationHeader: state.invitationHeader ?? '',
+      invitationHeadline: state.invitationHeadline ?? '',
+      invitationEventTitle: state.invitationEventTitle ?? '',
+      invitationEventDate: state.invitationEventDate ?? '',
+      invitationEventLocation: state.invitationEventLocation ?? '',
+      invitationEventTime: state.invitationEventTime ?? '',
+      invitationEventTimeNote: state.invitationEventTimeNote ?? '',
+      invitationBody: state.invitationBody ?? '',
+      cceEventTime: state.cceEventTime ?? '',
+      showCceEventDate: state.showCceEventDate ?? true,
+      showCceEventLocation: state.showCceEventLocation ?? true,
+      showCceEventTime: state.showCceEventTime ?? true,
     }
 
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+    // Upsert into the multi-draft list. No id (legacy caller) → update the
+    // newest entry, creating one if the list is empty.
+    const entries = readEntries()
+    const id = draftId ?? entries[0]?.id ?? newDraftId()
+    const idx = entries.findIndex((e) => e.id === id)
+    if (idx >= 0) entries[idx] = { ...entries[idx], id, draft }
+    else entries.unshift({ id, draft })
+    writeEntries(entries)
   } catch (error) {
     console.error('Failed to save draft:', error)
   }
 }
 
+/** Newest draft (banner + legacy callers). */
 export function loadDraftFromStorage(): DraftState | null {
-  if (typeof window === 'undefined') return null
+  return readEntries()[0]?.draft ?? null
+}
 
+/** All of this identity's drafts, newest first (My Work sidebar). */
+export function listDrafts(): DraftEntry[] {
+  return readEntries()
+}
+
+export function loadDraftById(id: string): DraftState | null {
+  return readEntries().find((e) => e.id === id)?.draft ?? null
+}
+
+/** Set an entry's display name — card metadata only. The design (and its
+ *  headline) is untouched, savedAt is untouched (no reorder), and auto-save
+ *  preserves the name from then on. */
+export function renameDraft(id: string, name: string): void {
+  if (typeof window === 'undefined') return
   try {
-    const stored = localStorage.getItem(DRAFT_KEY)
-    if (!stored) return null
-
-    const draft = JSON.parse(stored) as DraftState
-
-    // Version check - if version mismatch, clear and return null
-    if (draft.version !== CURRENT_VERSION) {
-      clearDraft()
-      return null
-    }
-
-    return draft
-  } catch (error) {
-    console.error('Failed to load draft:', error)
-    return null
+    const entries = readEntries()
+    const idx = entries.findIndex((e) => e.id === id)
+    if (idx === -1) return
+    entries[idx] = { ...entries[idx], name }
+    writeEntries(entries)
+  } catch {
+    /* quota/private-browsing — rename just doesn't stick */
   }
 }
 
-export function clearDraft(): void {
-  if (typeof window === 'undefined') return
+export function deleteDraftById(id: string): void {
+  writeEntries(readEntries().filter((e) => e.id !== id))
+}
 
-  try {
-    localStorage.removeItem(DRAFT_KEY)
-  } catch (error) {
-    console.error('Failed to clear draft:', error)
-  }
+/** Id of the newest draft — what the banner's Start Over targets. */
+export function newestDraftId(): string | null {
+  return readEntries()[0]?.id ?? null
+}
+
+/** Legacy signature: clears the NEWEST draft (the one the banner shows).
+ *  Sidebar deletes pass an explicit id via deleteDraftById. */
+export function clearDraft(): void {
+  const newest = readEntries()[0]
+  if (newest) deleteDraftById(newest.id)
 }
 
 export function hasDraft(): boolean {
   if (typeof window === 'undefined') return false
 
   try {
-    const stored = localStorage.getItem(DRAFT_KEY)
-    if (!stored) return false
-
-    const draft = JSON.parse(stored) as DraftState
+    const draft = readEntries()[0]?.draft
+    if (!draft) return false
 
     // Check if draft has any actual content
     const hasAssets = draft.selectedAssets.length > 0
@@ -441,10 +586,8 @@ export function getDraftAssetCount(): number {
   if (typeof window === 'undefined') return 0
 
   try {
-    const stored = localStorage.getItem(DRAFT_KEY)
-    if (!stored) return 0
-
-    const draft = JSON.parse(stored) as DraftState
+    const draft = readEntries()[0]?.draft
+    if (!draft) return 0
     const selectedCount = draft.selectedAssets.length
     const queueCount = draft.exportQueue.length
 

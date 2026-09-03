@@ -1,50 +1,28 @@
 /**
- * Config for the 1.5 launch info modal — a 4-page "what's new" walkthrough
- * that opens once per browser, collapses to a bottom-left toast on close,
- * and persists indefinitely (manual delete when the window has run its
- * course).
+ * Config for the "Introducing 'My Work'" info modal — a one-page
+ * announcement that opens once per browser, collapses to a bottom-left
+ * "See what's new" toast on close, and persists indefinitely (manual
+ * delete when the window has run its course).
+ *
+ * Same machinery as the 1.5 launch modal it replaced (Figma `660:3063`,
+ * previously `399:3711`) — new content, new storage key so it re-fires
+ * for everyone on startup.
  *
  * **Ephemeral feature.** All state and assets are scoped to this directory
  * for easy deletion. The whole `components/InfoModal/` folder + the mount
- * in `app/layout.tsx` + the four PNGs in `public/assets/info-modal/` are
- * the surface to remove.
+ * in `app/layout.tsx` + `public/assets/info-modal/` are the surface to
+ * remove.
  */
 
 /** localStorage key — set to '1' after the user closes the modal once.
- *  Presence flips the default state from modal → toast. */
-export const INFO_MODAL_STORAGE_KEY = 'dd-1-5-info-seen'
+ *  Presence flips the default state from modal → toast. Keyed per
+ *  announcement so a new campaign re-opens for users who saw the last. */
+export const INFO_MODAL_STORAGE_KEY = 'dd-my-work-info-seen'
 
-export type InfoModalFeature = {
-  id: 'direct-edit' | 'drag-drop' | 'diy-spacing' | 'image-editing'
-  label: string
-  description: string
-  imageSrc: string
+export const INFO_MODAL_COPY = {
+  headingLine1: 'Introducing',
+  headingLine2: '‘My Work’',
+  body:
+    'View and edit drafts, clone previous designs, and manage your Design Dog work in one place. You know, like a normal app.',
+  imageSrc: '/assets/info-modal/my-work.png',
 }
-
-export const INFO_MODAL_FEATURES: InfoModalFeature[] = [
-  {
-    id: 'direct-edit',
-    label: 'Direct editing',
-    description:
-      'No more scanning from sidebar to design. Edit text and images, right on the asset.',
-    imageSrc: '/assets/info-modal/edit.png',
-  },
-  {
-    id: 'drag-drop',
-    label: 'Drag and drop',
-    description: 'Add or remove content by dragging it right off the design.',
-    imageSrc: '/assets/info-modal/drag.png',
-  },
-  {
-    id: 'diy-spacing',
-    label: 'DIY spacing',
-    description: "Wouldn't it be nice to just change the spacing yourself? Done.",
-    imageSrc: '/assets/info-modal/space.png',
-  },
-  {
-    id: 'image-editing',
-    label: 'Image editing',
-    description: "Edit images or use presets to get that 'Cority look' in the app.",
-    imageSrc: '/assets/info-modal/image.png',
-  },
-]

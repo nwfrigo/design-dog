@@ -10,6 +10,10 @@ export interface ExportLog {
   scale: number
   thumbnail_url: string | null
   created_at: string
+  /** True when a restorable snapshot exists (list queries return the flag,
+   *  not the blob — snapshots are fetched one at a time on Clone). */
+  has_snapshot?: boolean
+  snapshot_version?: number | null
 }
 
 export interface ExportStats {
@@ -32,9 +36,14 @@ export function logExport(data: {
   format?: string
   scale?: number
   thumbnailUrl?: string
+  /** Editor state captured at export time (SNAPSHOT_FIELDS shape). Restoring
+   *  it is what the My Work sidebar's Clone/Edit do. Optional: legacy callers
+   *  and failures leave it NULL, which the UI renders as download-only. */
+  snapshot?: Record<string, unknown>
+  snapshotVersion?: number
 }): void {
   sql`
-    INSERT INTO export_logs (template_type, exported_by, headline, solution, format, scale, thumbnail_url)
+    INSERT INTO export_logs (template_type, exported_by, headline, solution, format, scale, thumbnail_url, snapshot, snapshot_version)
     VALUES (
       ${data.templateType},
       ${data.exportedBy || null},
@@ -42,7 +51,9 @@ export function logExport(data: {
       ${data.solution || null},
       ${data.format || 'png'},
       ${data.scale || 1},
-      ${data.thumbnailUrl || null}
+      ${data.thumbnailUrl || null},
+      ${data.snapshot ? JSON.stringify(data.snapshot) : null},
+      ${data.snapshotVersion ?? null}
     )
   `.catch((err) => {
     console.error('Failed to log export:', err)
@@ -89,11 +100,18 @@ export async function getExportLogs(opts: {
     conditions.push(`created_at <= $${paramIndex++}`)
     values.push(opts.endDate)
   }
+  // Deleted rows are gone for EVERYONE — admin included. hidden_at is the
+  // mechanism (row + blob survive, recoverable only via SQL), but no view
+  // in the product surfaces hidden rows.
+  conditions.push('hidden_at IS NULL')
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const countQuery = `SELECT COUNT(*) as count FROM export_logs ${where}`
-  const dataQuery = `SELECT * FROM export_logs ${where} ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`
+  // Explicit columns: snapshots can be multi-KB JSONB, and lists (admin page,
+  // My Work sidebar) only need to know whether one EXISTS. The blob itself is
+  // fetched per-row by getExportSnapshot when the user actually clones.
+  const dataQuery = `SELECT id, template_type, exported_by, headline, solution, format, scale, thumbnail_url, created_at, snapshot_version, (snapshot IS NOT NULL) AS has_snapshot FROM export_logs ${where} ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`
 
   const allValues = [...values, limit, offset]
 
@@ -113,12 +131,12 @@ export async function getExportLogs(opts: {
  */
 export async function getExportStats(): Promise<ExportStats> {
   const [totalResult, todayResult, weekResult, templateResult, personResult, dailyResult] = await Promise.all([
-    sql`SELECT COUNT(*) as count FROM export_logs`,
-    sql`SELECT COUNT(*) as count FROM export_logs WHERE created_at >= CURRENT_DATE`,
-    sql`SELECT COUNT(*) as count FROM export_logs WHERE created_at >= NOW() - INTERVAL '7 days'`,
-    sql`SELECT template_type, COUNT(*) as count FROM export_logs GROUP BY template_type ORDER BY count DESC`,
-    sql`SELECT exported_by, COUNT(*) as count FROM export_logs WHERE exported_by IS NOT NULL GROUP BY exported_by ORDER BY count DESC`,
-    sql`SELECT DATE(created_at) as date, COUNT(*) as count FROM export_logs WHERE created_at >= NOW() - INTERVAL '30 days' GROUP BY DATE(created_at) ORDER BY date ASC`,
+    sql`SELECT COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL`,
+    sql`SELECT COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND created_at >= CURRENT_DATE`,
+    sql`SELECT COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND created_at >= NOW() - INTERVAL '7 days'`,
+    sql`SELECT template_type, COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL GROUP BY template_type ORDER BY count DESC`,
+    sql`SELECT exported_by, COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND exported_by IS NOT NULL GROUP BY exported_by ORDER BY count DESC`,
+    sql`SELECT DATE(created_at) as date, COUNT(*) as count FROM export_logs WHERE hidden_at IS NULL AND created_at >= NOW() - INTERVAL '30 days' GROUP BY DATE(created_at) ORDER BY date ASC`,
   ])
 
   const byTemplate: Record<string, number> = {}
@@ -149,6 +167,33 @@ export async function getExportStats(): Promise<ExportStats> {
 /**
  * Get all team members from the database.
  */
+/** The one-row snapshot fetch behind Clone/Edit in the My Work sidebar. */
+export async function getExportSnapshot(id: number): Promise<{
+  snapshot: Record<string, unknown> | null
+  snapshot_version: number | null
+  template_type: string
+} | null> {
+  const result = await sql`
+    SELECT snapshot, snapshot_version, template_type FROM export_logs WHERE id = ${id}
+  `
+  if (result.rows.length === 0) return null
+  const row = result.rows[0]
+  return {
+    snapshot: (row.snapshot as Record<string, unknown> | null) ?? null,
+    snapshot_version: (row.snapshot_version as number | null) ?? null,
+    template_type: row.template_type as string,
+  }
+}
+
+/** Soft-hide an export from its owner's My Work list. The row, thumbnail and
+ *  Blob file all remain — admin dashboards are unaffected. */
+export async function hideExport(id: number): Promise<boolean> {
+  const result = await sql`
+    UPDATE export_logs SET hidden_at = NOW() WHERE id = ${id} AND hidden_at IS NULL
+  `
+  return (result.rowCount ?? 0) > 0
+}
+
 export async function getTeamMembers(): Promise<{ id: number; name: string }[]> {
   const result = await sql`SELECT id, name FROM team_members ORDER BY name ASC`
   return result.rows as { id: number; name: string }[]

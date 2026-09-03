@@ -8,6 +8,7 @@ import { TemplateRenderer } from './shared/TemplateRenderer'
 import { Dropdown } from './canvas-editor/editbar/Dropdown'
 import { getQueueTextFields } from '@/lib/template-registry'
 import { buildExportParamsFromAsset } from '@/lib/export-params'
+import { DRAFT_SHAPE_VERSION } from '@/lib/draft-storage'
 import {
   fetchColorsConfig,
   fetchTypographyConfig,
@@ -96,7 +97,9 @@ export function ExportQueueScreen() {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...exportParams, exportedBy }),
+        // A queued asset IS an editor snapshot (snapshotToQueuedAsset), so it
+        // doubles as the export-time capture for My Work's Clone/Edit.
+        body: JSON.stringify({ ...exportParams, exportedBy, assetSnapshot: asset, assetSnapshotVersion: DRAFT_SHAPE_VERSION }),
       })
 
       if (!response.ok) throw new Error('Export failed')
