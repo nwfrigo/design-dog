@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { AI_MODEL } from '@/lib/ai-model'
 import brandVoiceConfig from '@/config/brand-voice.json'
 import type { TemplateType } from '@/types'
 import {
@@ -94,7 +95,7 @@ Respond in JSON format only, no markdown code blocks:
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: AI_MODEL,
         max_tokens: 1024,
         messages: [{ role: 'user', content: prompt }],
       })

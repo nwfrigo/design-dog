@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { AI_MODEL } from '@/lib/ai-model'
 import { generateModulePromptSection, createModuleFromAI, SOLUTION_CATEGORIES } from '@/lib/stacker-modules'
 import type { StackerModule, SolutionCategory } from '@/types'
 
@@ -197,7 +198,7 @@ Generate the document structure now.`
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
+          model: AI_MODEL,
           max_tokens: 4096,
           messages: [
             {
@@ -265,7 +266,7 @@ ${JSON.stringify(generatedContent.modules, null, 2)}
 Verify every numerical figure in the generated modules against the raw source data. Return the corrected modules array as JSON.`
 
           const validationResponse = await anthropic.messages.create({
-            model: 'claude-sonnet-4-20250514',
+            model: AI_MODEL,
             max_tokens: 4096,
             messages: [{ role: 'user', content: validationUserPrompt }],
             system: validationSystemPrompt,
@@ -373,7 +374,7 @@ Verify every numerical figure in the generated modules against the raw source da
           documentTitle: generatedContent.documentTitle || 'Generated Document',
           activeCategories: generatedContent.activeCategories || ['safety'],
           debug: {
-            model: 'claude-sonnet-4-20250514',
+            model: AI_MODEL,
             moduleCount: fullModules.length,
             contentModuleCount: generatedContent.modules.length,
             rawResponse: textContent.text,

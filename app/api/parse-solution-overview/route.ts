@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { AI_MODEL } from '@/lib/ai-model'
 import mammoth from 'mammoth'
 
 // Expected structure from Claude extraction
@@ -98,7 +99,7 @@ Notes:
 Return ONLY valid JSON, no additional text.`
 
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: AI_MODEL,
       max_tokens: 4096,
       messages: [
         {
@@ -108,8 +109,12 @@ Return ONLY valid JSON, no additional text.`
       ],
     })
 
-    // Extract the text content from Claude's response
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : ''
+    // Extract the text content from Claude's response. Find the text block
+    // rather than assuming it's first — current models can lead with a
+    // thinking block on complex prompts (every other AI route already does
+    // this).
+    const textBlock = message.content.find((block) => block.type === 'text')
+    const responseText = textBlock && textBlock.type === 'text' ? textBlock.text : ''
 
     // Parse the JSON response
     let extractedContent: SolutionOverviewContent

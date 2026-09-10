@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { AI_MODEL } from '@/lib/ai-model'
 import mammoth from 'mammoth'
 import officeparser from 'officeparser'
 
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       const fileBase64 = fileBuffer.toString('base64')
 
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: AI_MODEL,
         max_tokens: 8192,
         messages: [
           {
@@ -106,7 +107,7 @@ Return the extracted text content directly - no JSON, no markdown code blocks, j
         content: textBlock.text,
         source: fileType,
         debug: {
-          model: 'claude-sonnet-4-20250514',
+          model: AI_MODEL,
           fileSizeBytes: fileBuffer.byteLength,
           fileSizeMB: (fileBuffer.byteLength / 1024 / 1024).toFixed(2),
         },

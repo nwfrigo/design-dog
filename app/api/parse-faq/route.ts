@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { AI_MODEL } from '@/lib/ai-model'
 import mammoth from 'mammoth'
 
 const anthropic = new Anthropic({
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
       const pdfBase64 = docBuffer.toString('base64')
 
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: AI_MODEL,
         max_tokens: 8192,
         messages: [
           {
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
 
       // Send text to Claude for extraction
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: AI_MODEL,
         max_tokens: 8192,
         messages: [
           {

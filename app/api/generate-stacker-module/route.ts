@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { AI_MODEL } from '@/lib/ai-model'
 import { generateSingleModulePromptSection, createModuleFromAI } from '@/lib/stacker-modules'
 import type { StackerModule } from '@/types'
 
@@ -89,7 +90,7 @@ Generate the module content now.`
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
+          model: AI_MODEL,
           max_tokens: 1024,
           messages: [{ role: 'user', content: userPrompt }],
           system: systemPrompt,

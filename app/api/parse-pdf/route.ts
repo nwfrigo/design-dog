@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { AI_MODEL } from '@/lib/ai-model'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         response = await anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
+          model: AI_MODEL,
           max_tokens: 4096,
           messages: [
             {
@@ -151,7 +152,7 @@ Respond in JSON format only, no markdown code blocks:
       extracted: extractedContent,
       debug: {
         method: 'claude-base64',
-        model: 'claude-sonnet-4-20250514',
+        model: AI_MODEL,
         fileSizeBytes: pdfBuffer.byteLength,
         fileSizeMB: (pdfBuffer.byteLength / 1024 / 1024).toFixed(2),
         extractedFields: Object.keys(extractedContent).filter(k => extractedContent[k] !== null),
