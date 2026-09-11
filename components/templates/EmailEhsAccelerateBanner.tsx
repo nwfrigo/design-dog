@@ -3,6 +3,7 @@
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
+import { PartnerLogo } from '@/components/shared/PartnerLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { RichText } from '@/components/shared/RichText'
 
@@ -11,13 +12,18 @@ import { RichText } from '@/components/shared/RichText'
  *  is wrapped as an independent <Editable>. */
 export type EmailEhsAccelerateBannerBlockId =
   | 'logo'
+  | 'partnerLogo'
   | 'headline'
   | 'body'
   | 'eventDate'
   | 'eventLocation'
   | 'cta'
 
+export const EHS_BANNER_PARTNER_LOGO = { default: 44, min: 16, max: 96 }
+
 export interface EmailEhsAccelerateBannerProps {
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number
   headline?: string
   body?: string
   showBody?: boolean
@@ -34,6 +40,8 @@ export interface EmailEhsAccelerateBannerProps {
 }
 
 export function EmailEhsAccelerateBanner({
+  partnerLogoUrl,
+  partnerLogoHeight = EHS_BANNER_PARTNER_LOGO.default,
   headline,
   body,
   showBody = true,
@@ -92,6 +100,13 @@ export function EmailEhsAccelerateBanner({
           overflow: 'hidden',
         }}>
           <EhsAccelerateLogo width={218} />
+        </div>
+      ))}
+
+      {/* Partner logo — top-right, opposite the lockup. Independent slot. */}
+      {wrapBlock('partnerLogo', (
+        <div style={{ position: 'absolute', right: 30, top: 39, display: 'flex', justifyContent: 'flex-end' }}>
+          <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={!!renderBlock} />
         </div>
       ))}
 

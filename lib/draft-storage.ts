@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateType, CopyContent, ManualAssetSettings, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, StackAlign, CustomSizeDocument, ExecutiveOverviewDocument } from '@/types'
+import type { TemplateType, CopyContent, ManualAssetSettings, QueuedAsset, ThumbnailImageSettings, FaqPage, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, AppScreen, SolutionOverviewBenefit, SolutionOverviewFeature, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, StackAlign, CustomSizeDocument, ExecutiveOverviewDocument, PartnerLogoSettings } from '@/types'
 import { UNIVERSAL_FALLBACK_FLAGS } from './template-defaults'
 
 const DRAFT_KEY = 'design-dog-active-draft'
@@ -252,6 +252,8 @@ export interface DraftState {
   customSizeDocument: CustomSizeDocument | null
   // Executive Overview
   executiveOverviewDocument: ExecutiveOverviewDocument | null
+  // Partner-logo slots (EHS+ Accelerate family) — per-template keyed map
+  partnerLogoSettings: PartnerLogoSettings
   // Newer email templates (Cority Connect 2026, EHS Accelerate, CCE) —
   // each of these is store state a draft must carry to render/resume faithfully
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
@@ -464,6 +466,7 @@ export function saveDraftToStorage(state: Partial<DraftState>, draftId?: string)
       customSizeDocument: state.customSizeDocument ?? null,
       // Executive Overview
       executiveOverviewDocument: state.executiveOverviewDocument ?? null,
+      partnerLogoSettings: state.partnerLogoSettings ?? {},
       ccBackgroundVariant: state.ccBackgroundVariant || 'dark-blue-1',
       eventDate: state.eventDate ?? '',
       eventLocation: state.eventLocation ?? '',

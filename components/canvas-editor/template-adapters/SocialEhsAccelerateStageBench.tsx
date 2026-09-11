@@ -3,9 +3,11 @@
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 
 import { useStore } from '@/store'
+import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
   SocialEhsAccelerate,
+  SOCIAL_EHS_PARTNER_LOGO,
   type SocialEhsAccelerateBlockId,
 } from '../../templates/SocialEhsAccelerate'
 
@@ -27,6 +29,10 @@ export const SocialEhsAccelerateStageBench = defineStageBenchAdapter<SocialEhsAc
       iconKey: 'logo',
       kind: 'image',
       benchable: false,
+    },
+    {
+      blockId: 'partnerLogo', label: 'Partner logo', iconKey: 'image', kind: 'image', benchable: false,
+      size: { default: SOCIAL_EHS_PARTNER_LOGO.default, min: SOCIAL_EHS_PARTNER_LOGO.min, max: SOCIAL_EHS_PARTNER_LOGO.max, step: 1 },
     },
     {
       blockId: 'headline',
@@ -57,7 +63,12 @@ export const SocialEhsAccelerateStageBench = defineStageBenchAdapter<SocialEhsAc
     { id: 'stackAlign', kind: 'stack', label: 'content stack' },
   ],
   contentStack: { templateKey: 'social-ehs-accelerate' },
+  childImages: [
+    { blockId: 'partnerLogo', placeholderSrc: '', frameWidth: 120, frameHeight: 32, replaceOnly: true },
+  ],
   useStoreBindings: () => {
+    const partnerLogo = useStore((s) => s.partnerLogoSettings['social-ehs-accelerate'])
+    const setPartnerLogo = useStore((s) => s.setPartnerLogo)
     const verbatimCopy = useStore((s) => s.verbatimCopy)
     const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
     const ctaText = useStore((s) => s.ctaText)
@@ -83,6 +94,10 @@ export const SocialEhsAccelerateStageBench = defineStageBenchAdapter<SocialEhsAc
     return {
       slotState: {
         logo: {},
+        partnerLogo: {
+          fontSize: partnerLogo?.height ?? SOCIAL_EHS_PARTNER_LOGO.default,
+          setFontSize: (v) => setPartnerLogo('social-ehs-accelerate', { height: v }),
+        },
         headline: {
           value: verbatimCopy.headline || '',
           visible: showHeadline,
@@ -115,10 +130,23 @@ export const SocialEhsAccelerateStageBench = defineStageBenchAdapter<SocialEhsAc
         gaps,
         setGap: (key, value) => setTemplateGap('social-ehs-accelerate', key, value),
       },
+      childImages: {
+        partnerLogo: {
+          url: partnerLogo?.url ?? undefined,
+          position: { x: 0, y: 0 },
+          zoom: 1,
+          filters: NEUTRAL_FILTERS,
+          setUrl: (url) => setPartnerLogo('social-ehs-accelerate', { url }),
+          setSettings: () => {},
+        },
+      },
+      extras: { partnerLogoUrl: partnerLogo?.url ?? null },
     }
   },
   renderTemplate: (ctx) => (
     <SocialEhsAccelerate
+      partnerLogoUrl={ctx.extras.partnerLogoUrl as string | null}
+      partnerLogoHeight={ctx.fontSizeOf('partnerLogo') ?? SOCIAL_EHS_PARTNER_LOGO.default}
       headline={ctx.textOf('headline')}
       subhead={ctx.textOf('subhead')}
       ctaText={ctx.textOf('cta')}

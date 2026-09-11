@@ -433,6 +433,11 @@ export interface ManualAssetSettings {
   executiveOverviewDocument: ExecutiveOverviewDocument | null
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  partnerLogoSettings: PartnerLogoSettings
+  // Flat mirrors of the per-template partner slot — the render route parses
+  // schema params into these; live assets carry the map above instead.
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number | null
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
@@ -472,6 +477,12 @@ export interface ImageSettings {
 }
 
 export type ThumbnailImageSettings = Partial<Record<TemplateType, ImageSettings>>
+
+// Partner-logo slot (EHS+ Accelerate family): independent per template —
+// keyed map like ThumbnailImageSettings, one entry per template that
+// declares a partner slot. `height: null` = use the template's own default.
+export type PartnerLogoSetting = { url: string | null; height: number | null }
+export type PartnerLogoSettings = Partial<Record<TemplateType, PartnerLogoSetting>>
 
 // Export Queue Types
 export interface QueuedAsset {
@@ -626,6 +637,11 @@ export interface QueuedAsset {
   executiveOverviewDocument: ExecutiveOverviewDocument | null
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  partnerLogoSettings: PartnerLogoSettings
+  // Flat mirrors of the per-template partner slot — the render route parses
+  // schema params into these; live assets carry the map above instead.
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number | null
   // Email EHS Accelerate Banner specific
   eventDate: string
   eventLocation: string
@@ -861,6 +877,11 @@ export interface AppState {
 
   // Email Cority Connect 2026
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
+  partnerLogoSettings: PartnerLogoSettings
+  // Flat mirrors of the per-template partner slot — the render route parses
+  // schema params into these; live assets carry the map above instead.
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number | null
 
   // Email EHS Accelerate Banner
   eventDate: string
@@ -901,6 +922,7 @@ export interface AppState {
   setThumbnailImageUrl: (url: string | null) => void
   // Per-template image settings (uses current templateType as key)
   setThumbnailImageSettings: (templateType: TemplateType, settings: ImageSettings) => void
+  setPartnerLogo: (templateType: TemplateType, patch: Partial<PartnerLogoSetting>) => void
   getThumbnailImageSettings: (templateType: TemplateType) => ImageSettings
   setEyebrow: (eyebrow: string) => void
   setSolution: (solution: string) => void

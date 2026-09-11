@@ -11,6 +11,8 @@ export const emailEhsAccelerateInvitationRegistration: StageBenchRegistrationDat
   Template: EmailEhsAccelerateInvitation,
   Adapter: EmailEhsAccelerateInvitationStageBench,
   renderProps: (asset, colors, typography) => ({
+    partnerLogoUrl: asset.partnerLogoUrl ?? asset.partnerLogoSettings?.['email-ehs-accelerate-invitation']?.url ?? null,
+    partnerLogoHeight: asset.partnerLogoHeight ?? asset.partnerLogoSettings?.['email-ehs-accelerate-invitation']?.height ?? undefined,
     invitationHeader: asset.invitationHeader || "You're Invited",
     invitationHeadline: asset.invitationHeadline || '',
     invitationEventTitle: asset.invitationEventTitle || '',
@@ -36,6 +38,8 @@ export const emailEhsAccelerateInvitationRegistration: StageBenchRegistrationDat
     height: 595,
     background: '#ffffff',
     fields: [
+      { param: 'partnerLogoUrl', parser: 'stringOrNull' },
+      { param: 'partnerLogoHeight', parser: 'numberOrUndefined' },
       { param: 'invitationHeader', parser: 'string', default: "You're Invited" },
       { param: 'invitationHeadline', parser: 'string', default: 'Exclusive EHS+ Leader Workshop' },
       { param: 'invitationEventTitle', parser: 'string', default: 'EHS+ Accelerate: Tech Convergence Workshop' },
@@ -47,6 +51,8 @@ export const emailEhsAccelerateInvitationRegistration: StageBenchRegistrationDat
     ],
   },
   exportBuilder: (s) => ({
+    partnerLogoUrl: s.partnerLogoSettings['email-ehs-accelerate-invitation']?.url ?? null,
+    partnerLogoHeight: s.partnerLogoSettings['email-ehs-accelerate-invitation']?.height ?? undefined,
     invitationHeader: s.invitationHeader || '',
     invitationHeadline: s.invitationHeadline || '',
     invitationEventTitle: s.invitationEventTitle || '',

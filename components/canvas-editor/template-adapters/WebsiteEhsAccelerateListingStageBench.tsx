@@ -3,10 +3,12 @@
 import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 
 import { useStore } from '@/store'
+import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
   WebsiteEhsAccelerateListing,
+  WEB_EHS_PARTNER_LOGO,
   type WebsiteEhsAccelerateListingBlockId,
 } from '../../templates/WebsiteEhsAccelerateListing'
 
@@ -24,6 +26,10 @@ export const WebsiteEhsAccelerateListingStageBench =
     templateId: 'website-ehs-accelerate-listing',
     slots: [
       { blockId: 'logo', label: 'Logo', iconKey: 'logo', kind: 'image', benchable: false },
+      {
+        blockId: 'partnerLogo', label: 'Partner logo', iconKey: 'image', kind: 'image', benchable: false,
+        size: { default: WEB_EHS_PARTNER_LOGO.default, min: WEB_EHS_PARTNER_LOGO.min, max: WEB_EHS_PARTNER_LOGO.max, step: 1 },
+      },
       {
         blockId: 'eyebrow',
         label: 'Eyebrow',
@@ -88,7 +94,12 @@ export const WebsiteEhsAccelerateListingStageBench =
       { id: 'stackAlign', kind: 'stack', label: 'content stack' },
     ],
     contentStack: { templateKey: 'website-ehs-accelerate-listing', maxGap: 96 },
+    childImages: [
+      { blockId: 'partnerLogo', placeholderSrc: '', frameWidth: 120, frameHeight: 32, replaceOnly: true },
+    ],
     useStoreBindings: () => {
+      const partnerLogo = useStore((s) => s.partnerLogoSettings['website-ehs-accelerate-listing'])
+      const setPartnerLogo = useStore((s) => s.setPartnerLogo)
       const eyebrow = useStore((s) => s.eyebrow)
       const setEyebrow = useStore((s) => s.setEyebrow)
       const verbatimCopy = useStore((s) => s.verbatimCopy)
@@ -124,6 +135,10 @@ export const WebsiteEhsAccelerateListingStageBench =
       return {
         slotState: {
           logo: {},
+          partnerLogo: {
+            fontSize: partnerLogo?.height ?? WEB_EHS_PARTNER_LOGO.default,
+            setFontSize: (v) => setPartnerLogo('website-ehs-accelerate-listing', { height: v }),
+          },
           eyebrow: {
             value: eyebrow,
             visible: showEyebrow,
@@ -157,10 +172,23 @@ export const WebsiteEhsAccelerateListingStageBench =
           gaps,
           setGap: (key, value) => setTemplateGap('website-ehs-accelerate-listing', key, value),
         },
+        childImages: {
+          partnerLogo: {
+            url: partnerLogo?.url ?? undefined,
+            position: { x: 0, y: 0 },
+            zoom: 1,
+            filters: NEUTRAL_FILTERS,
+            setUrl: (url) => setPartnerLogo('website-ehs-accelerate-listing', { url }),
+            setSettings: () => {},
+          },
+        },
+        extras: { partnerLogoUrl: partnerLogo?.url ?? null },
       }
     },
     renderTemplate: (ctx) => (
       <WebsiteEhsAccelerateListing
+        partnerLogoUrl={ctx.extras.partnerLogoUrl as string | null}
+        partnerLogoHeight={ctx.fontSizeOf('partnerLogo') ?? WEB_EHS_PARTNER_LOGO.default}
         eyebrow={ctx.textOf('eyebrow')}
         headline={ctx.textOf('headline')}
         subhead={ctx.textOf('subhead')}

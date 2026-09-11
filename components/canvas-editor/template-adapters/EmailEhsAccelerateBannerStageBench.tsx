@@ -7,8 +7,10 @@ import { useStore } from '@/store'
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
   EmailEhsAccelerateBanner,
+  EHS_BANNER_PARTNER_LOGO,
   type EmailEhsAccelerateBannerBlockId,
 } from '../../templates/EmailEhsAccelerateBanner'
+import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 
 /**
  * Stage & Bench adapter for email-ehs-accelerate-banner.
@@ -23,6 +25,12 @@ export const EmailEhsAccelerateBannerStageBench =
     templateId: 'email-ehs-accelerate-banner',
     slots: [
       { blockId: 'logo', label: 'Logo', iconKey: 'logo', kind: 'image', benchable: false },
+      // Drag-resizable partner mark — one height scalar, aspect locked in the
+      // template (width: auto). Same mechanics as exec-overview's cover slot.
+      {
+        blockId: 'partnerLogo', label: 'Partner logo', iconKey: 'image', kind: 'image', benchable: false,
+        size: { default: EHS_BANNER_PARTNER_LOGO.default, min: EHS_BANNER_PARTNER_LOGO.min, max: EHS_BANNER_PARTNER_LOGO.max, step: 1 },
+      },
       {
         blockId: 'headline',
         label: 'Headline',
@@ -67,6 +75,9 @@ export const EmailEhsAccelerateBannerStageBench =
         content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
       },
     ],
+    childImages: [
+      { blockId: 'partnerLogo', placeholderSrc: '', frameWidth: 120, frameHeight: 32, replaceOnly: true },
+    ],
     useStoreBindings: () => {
       const verbatimCopy = useStore((s) => s.verbatimCopy)
       const setVerbatimCopy = useStore((s) => s.setVerbatimCopy)
@@ -80,10 +91,16 @@ export const EmailEhsAccelerateBannerStageBench =
       const setShowBody = useStore((s) => s.setShowBody)
       const headlineFontSize = useStore((s) => s.headlineFontSize)
       const setHeadlineFontSize = useStore((s) => s.setHeadlineFontSize)
+      const partnerLogo = useStore((s) => s.partnerLogoSettings['email-ehs-accelerate-banner'])
+      const setPartnerLogo = useStore((s) => s.setPartnerLogo)
 
       return {
         slotState: {
           logo: {},
+          partnerLogo: {
+            fontSize: partnerLogo?.height ?? EHS_BANNER_PARTNER_LOGO.default,
+            setFontSize: (v) => setPartnerLogo('email-ehs-accelerate-banner', { height: v }),
+          },
           headline: {
             value: verbatimCopy.headline || '',
             fontSize: headlineFontSize ?? undefined,
@@ -109,10 +126,23 @@ export const EmailEhsAccelerateBannerStageBench =
             setValue: setCtaText,
           },
         },
+        childImages: {
+          partnerLogo: {
+            url: partnerLogo?.url ?? undefined,
+            position: { x: 0, y: 0 },
+            zoom: 1,
+            filters: NEUTRAL_FILTERS,
+            setUrl: (url) => setPartnerLogo('email-ehs-accelerate-banner', { url }),
+            setSettings: () => {},
+          },
+        },
+        extras: { partnerLogoUrl: partnerLogo?.url ?? null },
       }
     },
     renderTemplate: (ctx) => (
       <EmailEhsAccelerateBanner
+        partnerLogoUrl={ctx.extras.partnerLogoUrl as string | null}
+        partnerLogoHeight={ctx.fontSizeOf('partnerLogo') ?? EHS_BANNER_PARTNER_LOGO.default}
         headline={ctx.textOf('headline')}
         body={ctx.textOf('body')}
         showBody={ctx.visibilityOf('body')}

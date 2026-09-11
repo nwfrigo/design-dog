@@ -7,8 +7,10 @@ import { useStore } from '@/store'
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
   EmailEhsAccelerateSignature,
+  EHS_SIGNATURE_PARTNER_LOGO,
   type EmailEhsAccelerateSignatureBlockId,
 } from '../../templates/EmailEhsAccelerateSignature'
+import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 
 /**
  * Stage & Bench adapter for email-ehs-accelerate-signature.
@@ -23,6 +25,10 @@ export const EmailEhsAccelerateSignatureStageBench =
     templateId: 'email-ehs-accelerate-signature',
     slots: [
       { blockId: 'logo', label: 'Logo', iconKey: 'logo', kind: 'image', benchable: false },
+      {
+        blockId: 'partnerLogo', label: 'Partner logo', iconKey: 'image', kind: 'image', benchable: false,
+        size: { default: EHS_SIGNATURE_PARTNER_LOGO.default, min: EHS_SIGNATURE_PARTNER_LOGO.min, max: EHS_SIGNATURE_PARTNER_LOGO.max, step: 1 },
+      },
       {
         blockId: 'eventDate',
         label: 'Date',
@@ -57,7 +63,12 @@ export const EmailEhsAccelerateSignatureStageBench =
         content: { format: 'plain', placeholder: SLOT_PLACEHOLDERS.cta },
       },
     ],
+    childImages: [
+      { blockId: 'partnerLogo', placeholderSrc: '', frameWidth: 120, frameHeight: 32, replaceOnly: true },
+    ],
     useStoreBindings: () => {
+      const partnerLogo = useStore((s) => s.partnerLogoSettings['email-ehs-accelerate-signature'])
+      const setPartnerLogo = useStore((s) => s.setPartnerLogo)
       const signatureWorkshopName = useStore((s) => s.signatureWorkshopName)
       const setSignatureWorkshopName = useStore((s) => s.setSignatureWorkshopName)
       const eventDate = useStore((s) => s.eventDate)
@@ -76,6 +87,10 @@ export const EmailEhsAccelerateSignatureStageBench =
       return {
         slotState: {
           logo: {},
+          partnerLogo: {
+            fontSize: partnerLogo?.height ?? EHS_SIGNATURE_PARTNER_LOGO.default,
+            setFontSize: (v) => setPartnerLogo('email-ehs-accelerate-signature', { height: v }),
+          },
           eventDate: {
             value: eventDate,
             visible: showSignatureEventDetails,
@@ -99,11 +114,23 @@ export const EmailEhsAccelerateSignatureStageBench =
             setVisible: setShowCta,
           },
         },
-        extras: { showSignatureEventDetails },
+        childImages: {
+          partnerLogo: {
+            url: partnerLogo?.url ?? undefined,
+            position: { x: 0, y: 0 },
+            zoom: 1,
+            filters: NEUTRAL_FILTERS,
+            setUrl: (url) => setPartnerLogo('email-ehs-accelerate-signature', { url }),
+            setSettings: () => {},
+          },
+        },
+        extras: { showSignatureEventDetails, partnerLogoUrl: partnerLogo?.url ?? null },
       }
     },
     renderTemplate: (ctx) => (
       <EmailEhsAccelerateSignature
+        partnerLogoUrl={ctx.extras.partnerLogoUrl as string | null}
+        partnerLogoHeight={ctx.fontSizeOf('partnerLogo') ?? EHS_SIGNATURE_PARTNER_LOGO.default}
         workshopName={ctx.textOf('workshopName')}
         eventDate={ctx.textOf('eventDate')}
         eventLocation={ctx.textOf('eventLocation')}

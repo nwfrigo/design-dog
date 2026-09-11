@@ -12,16 +12,22 @@ import {
   type ContentStackBlock,
 } from '@/components/canvas-editor/ContentStack'
 import { RichText } from '@/components/shared/RichText'
+import { PartnerLogo } from '@/components/shared/PartnerLogo'
 
 /** Logical IDs for editable blocks + the `logo` topAnchor (always-visible,
  *  brand-locked baked-in lockup). */
 export type SocialEhsAccelerateBlockId =
   | 'logo'
+  | 'partnerLogo'
   | 'headline'
   | 'subhead'
   | 'cta'
 
+export const SOCIAL_EHS_PARTNER_LOGO = { default: 56, min: 24, max: 140 }
+
 export interface SocialEhsAccelerateProps {
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number
   headline: string
   subhead: string
   ctaText: string
@@ -59,6 +65,8 @@ function isHtmlEmpty(html: string | undefined): boolean {
 
 
 export function SocialEhsAccelerate({
+  partnerLogoUrl,
+  partnerLogoHeight = SOCIAL_EHS_PARTNER_LOGO.default,
   headline,
   subhead,
   ctaText,
@@ -183,6 +191,15 @@ export function SocialEhsAccelerate({
        *  (stackAlign) and adjustable per-gap spacing. EhsAccelerate logo
        *  lockup is a topAnchor, always pinned to top regardless of stackAlign. */}
       <div style={contentStyle}>
+        {/* Partner logo — top-right, opposite the lockup topAnchor. Outside
+            the stack: absolutely positioned, so spacing/gaps are untouched. */}
+        {(renderBlock || partnerLogoUrl) && (
+          (renderBlock ?? ((_id: SocialEhsAccelerateBlockId, content: ReactNode) => content))('partnerLogo', (
+            <div style={{ position: 'absolute', right: 64, top: 64, display: 'flex', justifyContent: 'flex-end' }}>
+              <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={!!renderBlock} />
+            </div>
+          ))
+        )}
         <ContentStack<SocialEhsAccelerateBlockId>
           blocks={blocks}
           gaps={gaps}
