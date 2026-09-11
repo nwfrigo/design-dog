@@ -160,6 +160,8 @@ const SNAPSHOT_FIELDS = [
   'customSizeDocument',
   // Executive Overview
   'executiveOverviewDocument',
+  // Partner-logo slots (EHS+ Accelerate family) — per-template keyed map
+  'partnerLogoSettings',
   // Email Cority Connect 2026
   'ccBackgroundVariant',
   // Email EHS Accelerate Banner

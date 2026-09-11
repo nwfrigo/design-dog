@@ -89,7 +89,6 @@ const EMAIL_BANNER_TEMPLATES: TemplateInfo[] = [
     width: 420,
     height: 595,
     channelLabel: 'Event Invitation',
-    hidden: true,
   },
   {
     type: 'email-cority-customer-exchange-banner',

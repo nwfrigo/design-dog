@@ -21,10 +21,12 @@
 ### Events (event-scoped, grouped under Events filter in AssetSelectionScreen)
 - ✅ `email-cority-connect-2026` — EmailCorityConnect2026 (640×370px; Cority Connect event)
 - ✅ `email-ehs-accelerate-banner` — EmailEhsAccelerateBanner (600×373px; EHS+ Accelerate event)
-- ✅ 🙈 `email-ehs-accelerate-invitation` — EmailEhsAccelerateInvitation (420×595px; EHS+ Accelerate event; HTML body with bold/italic toolbar). Hidden from selection surfaces.
+- ✅ `email-ehs-accelerate-invitation` — EmailEhsAccelerateInvitation (420×595px; EHS+ Accelerate event; HTML body with bold/italic toolbar). Un-hidden 2026-09: appears in the gallery + Events › EHS+ Accelerate filter.
 - ✅ `email-ehs-accelerate-signature` — EmailEhsAccelerateSignature (400×100px; EHS+ Accelerate event; email signature banner)
 - ✅ `social-ehs-accelerate` — SocialEhsAccelerate (1200×628px; EHS+ Accelerate event; light bg with `<EhsAccelerateLogo>`, headline/subhead/CTA only)
 - ✅ `website-ehs-accelerate-listing` — WebsiteEhsAccelerateListing (800×450px; EHS+ Accelerate event; full-canvas bg image with opaque white right grid panel; mirrors `website-event-listing` minus colorway variants)
+
+  > **All 5 EHS+ Accelerate templates carry a drag-resizable partner-logo image slot** (`partnerLogo`) with executive-overview's mechanics: `size` on the slot descriptor → corner handles on one height scalar, aspect locked; `replaceOnly` image binding; dashed placeholder in-editor, renders nothing on export when unset. Shared mark: `components/shared/PartnerLogo.tsx`. Storage is the per-template keyed map `partnerLogoSettings` (independent per template — deliberately NO shared partner logo); per-template default/min/max height constants live in each template file.
 - ✅ `email-cority-customer-exchange-signature` — EmailCorityCustomerExchangeSignature (400×100px; Cority Customer Exchange event; bg image + coded `rgba(6,0,21,0.70)` right panel; date/location/time/CTA each with independent EyeIcon)
 - ✅ `email-cority-customer-exchange-banner` — EmailCorityCustomerExchangeBanner (640×300px; Cority Customer Exchange event; left dark panel with `<CorityCustomerExchangeStackedLogo>`, right content uses `justify-content: flex-end` so CTA pins bottom; uses 4-color enum selector via `ccBackgroundVariant`)
 
@@ -393,7 +395,7 @@ app/render/executive-overview/page.tsx  # bare Puppeteer render route (decodes t
 ### Slots & interactions
 - **Text** (headline, body, quote, tagline, card titles/bodies, stats, contact) — inline-editable, with per-slot line caps via `SlotContentSpec.maxLines` (headline 4, card title 1, card body 4).
 - **Chips** — `kind:'chip'`: `EditbarChip` `[hide | replace-icon]`, `IconRegistry` for the icon, inline label editing preserved.
-- **Images** (partner logo, hero, avatar) — always-on with empty-state placeholders. The **partner logo is drag-resizable**: it declares `size` on its slot descriptor, which lights up the substrate's `ResizeHandles` (§4.8a) and — because a resizable image must stay selected — flips it to *double*-click to open the image editor. One scalar (height) with `width: auto` keeps the ratio locked; the co-brand band is `width: fit-content` with `minWidth: 218` so the logo grows rightward instead of being squeezed. Hero supports crop + color filters/presets (`heroImageFilters`, applied via `filtersToCss`). Ships with a default hero. The partner-logo placeholder renders only in the editor (`interactive` prop) so it doesn't print when unset.
+- **Images** (partner logo, hero, avatar) — always-on with empty-state placeholders. The **partner logo is drag-resizable**: it declares `size` on its slot descriptor, which lights up the substrate's `ResizeHandles` (§4.8a) and — because a resizable image must stay selected — flips it to *double*-click to open the image editor. One scalar (height) with `width: auto` keeps the ratio locked; the co-brand band is `width: fit-content` with `minWidth: 218` so the logo grows rightward instead of being squeezed. Hero supports crop + color filters/presets (`heroImageFilters`, applied via `filtersToCss`). Ships with a default hero. The partner-logo placeholder renders only in the editor (`interactive` prop) so it doesn't print when unset. The `PartnerLogo` mark itself is shared (`components/shared/PartnerLogo.tsx`) — the 5 EHS+ Accelerate templates use it too, with the same mechanics but flat-store-backed via `partnerLogoSettings`.
 - Light-mode only (matches the design).
 
 ### Export

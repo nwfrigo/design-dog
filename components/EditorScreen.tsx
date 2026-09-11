@@ -433,6 +433,7 @@ export function EditorScreen() {
     customSizeDocument,
     // Executive Overview
     executiveOverviewDocument,
+    partnerLogoSettings,
   } = useStore()
 
   // Check if we're editing an item from the queue
@@ -775,6 +776,7 @@ export function EditorScreen() {
         verbatimCopy,
         customSizeDocument,
         executiveOverviewDocument,
+        partnerLogoSettings,
         solution,
         logoColor,
         showEyebrow,

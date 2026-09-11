@@ -3,6 +3,7 @@
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
+import { PartnerLogo } from '@/components/shared/PartnerLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 
 /** Track 2 (fixed-composition) editable block ids. eventDate and
@@ -11,12 +12,17 @@ import { ArrowIcon } from '@/components/shared/ArrowIcon'
  *  `showEventDetails` visibility flag in the bench. */
 export type EmailEhsAccelerateSignatureBlockId =
   | 'logo'
+  | 'partnerLogo'
   | 'eventDate'
   | 'eventLocation'
   | 'workshopName'
   | 'cta'
 
+export const EHS_SIGNATURE_PARTNER_LOGO = { default: 28, min: 12, max: 56 }
+
 export interface EmailEhsAccelerateSignatureProps {
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number
   eventDate: string
   eventLocation: string
   workshopName: string
@@ -33,6 +39,8 @@ export interface EmailEhsAccelerateSignatureProps {
 }
 
 export function EmailEhsAccelerateSignature({
+  partnerLogoUrl,
+  partnerLogoHeight = EHS_SIGNATURE_PARTNER_LOGO.default,
   eventDate,
   eventLocation,
   workshopName,
@@ -135,6 +143,14 @@ export function EmailEhsAccelerateSignature({
           overflow: 'hidden',
         }}>
           <EhsAccelerateLogo width={113} />
+        </div>
+      ))}
+
+      {/* Partner logo — between the lockup and the event details, centered
+          in the strip. The zone is narrow (x 144–248), hence the small cap. */}
+      {wrapBlock('partnerLogo', (
+        <div style={{ position: 'absolute', left: 144, top: 0, height: '100%', display: 'flex', alignItems: 'center' }}>
+          <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={!!renderBlock} maxWidth={100} />
         </div>
       ))}
 

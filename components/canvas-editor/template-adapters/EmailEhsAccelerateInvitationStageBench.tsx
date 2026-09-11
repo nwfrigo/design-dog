@@ -1,10 +1,12 @@
 'use client'
 
 import { useStore } from '@/store'
+import { NEUTRAL_FILTERS } from '@/lib/image-filters'
 
 import { defineStageBenchAdapter } from '../factory/defineStageBenchAdapter'
 import {
   EmailEhsAccelerateInvitation,
+  EHS_INVITATION_PARTNER_LOGO,
   type EmailEhsAccelerateInvitationBlockId,
 } from '../../templates/EmailEhsAccelerateInvitation'
 
@@ -31,6 +33,10 @@ export const EmailEhsAccelerateInvitationStageBench =
   defineStageBenchAdapter<EmailEhsAccelerateInvitationBlockId>({
     templateId: 'email-ehs-accelerate-invitation',
     slots: [
+      {
+        blockId: 'partnerLogo', label: 'Partner logo', iconKey: 'image', kind: 'image', benchable: false,
+        size: { default: EHS_INVITATION_PARTNER_LOGO.default, min: EHS_INVITATION_PARTNER_LOGO.min, max: EHS_INVITATION_PARTNER_LOGO.max, step: 1 },
+      },
       {
         blockId: 'invitationHeader',
         label: 'Header',
@@ -95,7 +101,12 @@ export const EmailEhsAccelerateInvitationStageBench =
       },
     ],
     stageBar: [],
+    childImages: [
+      { blockId: 'partnerLogo', placeholderSrc: '', frameWidth: 120, frameHeight: 32, replaceOnly: true },
+    ],
     useStoreBindings: () => {
+      const partnerLogo = useStore((s) => s.partnerLogoSettings['email-ehs-accelerate-invitation'])
+      const setPartnerLogo = useStore((s) => s.setPartnerLogo)
       const invitationHeader = useStore((s) => s.invitationHeader)
       const setInvitationHeader = useStore((s) => s.setInvitationHeader)
       const invitationHeadline = useStore((s) => s.invitationHeadline)
@@ -115,6 +126,10 @@ export const EmailEhsAccelerateInvitationStageBench =
 
       return {
         slotState: {
+          partnerLogo: {
+            fontSize: partnerLogo?.height ?? EHS_INVITATION_PARTNER_LOGO.default,
+            setFontSize: (v) => setPartnerLogo('email-ehs-accelerate-invitation', { height: v }),
+          },
           invitationHeader: { value: invitationHeader, setValue: setInvitationHeader },
           invitationHeadline: { value: invitationHeadline, setValue: setInvitationHeadline },
           invitationEventTitle: { value: invitationEventTitle, setValue: setInvitationEventTitle },
@@ -124,10 +139,23 @@ export const EmailEhsAccelerateInvitationStageBench =
           invitationEventTimeNote: { value: invitationEventTimeNote, setValue: setInvitationEventTimeNote },
           invitationBody: { value: invitationBody, setValue: setInvitationBody },
         },
+        childImages: {
+          partnerLogo: {
+            url: partnerLogo?.url ?? undefined,
+            position: { x: 0, y: 0 },
+            zoom: 1,
+            filters: NEUTRAL_FILTERS,
+            setUrl: (url) => setPartnerLogo('email-ehs-accelerate-invitation', { url }),
+            setSettings: () => {},
+          },
+        },
+        extras: { partnerLogoUrl: partnerLogo?.url ?? null },
       }
     },
     renderTemplate: (ctx) => (
       <EmailEhsAccelerateInvitation
+        partnerLogoUrl={ctx.extras.partnerLogoUrl as string | null}
+        partnerLogoHeight={ctx.fontSizeOf('partnerLogo') ?? EHS_INVITATION_PARTNER_LOGO.default}
         invitationHeader={ctx.textOf('invitationHeader')}
         invitationHeadline={ctx.textOf('invitationHeadline')}
         invitationEventTitle={ctx.textOf('invitationEventTitle')}

@@ -11,6 +11,8 @@ export const emailEhsAccelerateSignatureRegistration: StageBenchRegistrationData
   Template: EmailEhsAccelerateSignature,
   Adapter: EmailEhsAccelerateSignatureStageBench,
   renderProps: (asset, colors, typography) => ({
+    partnerLogoUrl: asset.partnerLogoUrl ?? asset.partnerLogoSettings?.['email-ehs-accelerate-signature']?.url ?? null,
+    partnerLogoHeight: asset.partnerLogoHeight ?? asset.partnerLogoSettings?.['email-ehs-accelerate-signature']?.height ?? undefined,
     workshopName: asset.signatureWorkshopName || '',
     eventDate: asset.eventDate || '',
     eventLocation: asset.eventLocation || '',
@@ -31,6 +33,8 @@ export const emailEhsAccelerateSignatureRegistration: StageBenchRegistrationData
     height: 100,
     background: '#ffffff',
     fields: [
+      { param: 'partnerLogoUrl', parser: 'stringOrNull' },
+      { param: 'partnerLogoHeight', parser: 'numberOrUndefined' },
       { param: 'workshopName', parser: 'string', default: '' },
       { param: 'eventDate', parser: 'string', default: '' },
       { param: 'eventLocation', parser: 'string', default: '' },
@@ -41,6 +45,8 @@ export const emailEhsAccelerateSignatureRegistration: StageBenchRegistrationData
     ],
   },
   exportBuilder: (s) => ({
+    partnerLogoUrl: s.partnerLogoSettings['email-ehs-accelerate-signature']?.url ?? null,
+    partnerLogoHeight: s.partnerLogoSettings['email-ehs-accelerate-signature']?.height ?? undefined,
     workshopName: s.signatureWorkshopName || '',
     eventDate: s.eventDate || '',
     eventLocation: s.eventLocation || '',

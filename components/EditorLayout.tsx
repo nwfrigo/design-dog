@@ -55,6 +55,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     executiveOverviewDocument,
     // Newer email-template fields (Cority Connect / EHS Accelerate / CCE) —
     // watched so a lone background/event/detail edit still triggers a save
+    partnerLogoSettings,
     ccBackgroundVariant,
     eventDate,
     eventLocation,
@@ -135,6 +136,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     // Executive-overview doc — same reasoning; it's the template's only store field.
     executiveOverviewDocument,
     // Newer email-template fields
+    partnerLogoSettings,
     ccBackgroundVariant,
     eventDate,
     eventLocation,

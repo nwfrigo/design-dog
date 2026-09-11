@@ -4,6 +4,7 @@ import { CSSProperties, type ReactNode } from 'react'
 import type { TypographyConfig } from '@/lib/brand-config'
 import { NEUTRAL_FILTERS, applyGrayscaleBoolean, filtersToCss, type ImageFilters } from '@/lib/image-filters'
 import { CorityLogo } from '@/components/shared/CorityLogo'
+import { PartnerLogo } from '@/components/shared/PartnerLogo'
 import {
   EXEC_TOKENS as T,
   EXEC_PAGE_W,
@@ -146,7 +147,7 @@ export function Page1({
           {showPartnerLogo && (
             <div style={{ position: 'absolute', left: EXEC_LOGO_LEFT, top: '50%', transform: 'translateY(-50%)' }}>
               {wrapBlock('partnerLogo', (
-                <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={interactive} />
+                <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={interactive} maxWidth={EXEC_LOGO_MAX_WIDTH} borderColor={T.border} labelColor={T.textSecondary} />
               ))}
             </div>
           )}
@@ -205,59 +206,8 @@ export function Page1({
 /* Image sub-components                                                */
 /* ------------------------------------------------------------------ */
 
-function PartnerLogo({
-  url,
-  height,
-  interactive,
-}: {
-  url?: string | null
-  height: number
-  interactive?: boolean
-}) {
-  if (!url) {
-    // In export/preview an un-set partner logo renders nothing (so it doesn't
-    // print); in the editor it's a subtle clickable placeholder.
-    if (!interactive) return null
-    return (
-      <div style={{
-        width: height * (78 / EXEC_LOGO_HEIGHT_DEFAULT),
-        height,
-        flexShrink: 0,
-        border: `1px dashed ${T.border}`,
-        borderRadius: 2,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 6,
-        letterSpacing: 0.6,
-        textTransform: 'uppercase',
-        color: T.textSecondary,
-      }}>
-        Partner logo
-      </div>
-    )
-  }
-  return (
-    <img
-      src={url}
-      alt=""
-      data-export-image="true"
-      // Height is the only driver — `width: auto` keeps the intrinsic aspect,
-      // so scaling stays locked. maxWidth tracks height at the original
-      // 18px→100px proportion rather than a fixed ceiling, which would
-      // otherwise letterbox wide logos as soon as the user scaled up.
-      style={{
-        height,
-        width: 'auto',
-        flexShrink: 0,
-        maxWidth: EXEC_LOGO_MAX_WIDTH,
-        objectFit: 'contain',
-        display: 'block',
-      }}
-    />
-  )
-}
-
+// PartnerLogo extracted to components/shared/PartnerLogo (the EHS+ Accelerate
+// templates share it); exec passes its own theme + width ceiling below.
 function HeroImage({
   url,
   position,

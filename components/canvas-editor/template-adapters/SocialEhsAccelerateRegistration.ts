@@ -22,6 +22,8 @@ export const socialEhsAccelerateRegistration: StageBenchRegistrationData = {
   Template: SocialEhsAccelerate,
   Adapter: SocialEhsAccelerateStageBench,
   renderProps: (asset, colors, typography) => ({
+    partnerLogoUrl: asset.partnerLogoUrl ?? asset.partnerLogoSettings?.['social-ehs-accelerate']?.url ?? null,
+    partnerLogoHeight: asset.partnerLogoHeight ?? asset.partnerLogoSettings?.['social-ehs-accelerate']?.height ?? undefined,
     headline: asset.headline || '',
     subhead: asset.subhead || '',
     ctaText: asset.ctaText || '',
@@ -44,6 +46,8 @@ export const socialEhsAccelerateRegistration: StageBenchRegistrationData = {
     height: 628,
     background: '#FFFFFF',
     fields: [
+      { param: 'partnerLogoUrl', parser: 'stringOrNull' },
+      { param: 'partnerLogoHeight', parser: 'numberOrUndefined' },
       { param: 'headline', parser: 'string', default: '' },
       { param: 'subhead', parser: 'string', default: '' },
       { param: 'ctaText', parser: 'string', default: '' },
@@ -57,6 +61,8 @@ export const socialEhsAccelerateRegistration: StageBenchRegistrationData = {
     ],
   },
   exportBuilder: (s) => ({
+    partnerLogoUrl: s.partnerLogoSettings['social-ehs-accelerate']?.url ?? null,
+    partnerLogoHeight: s.partnerLogoSettings['social-ehs-accelerate']?.height ?? undefined,
     headline: s.verbatimCopy.headline || '',
     subhead: s.verbatimCopy.subhead || '',
     ctaText: s.ctaText || '',

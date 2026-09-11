@@ -147,6 +147,8 @@ cd ~/claude-projects/design-dog/web
 npm run dev
 ```
 
+`.claude/launch.json` also defines `design-dog-dev` so Claude's Browser pane can run the same `npm run dev` on :3000 as a managed, stoppable server when none is running — never alongside a user-run server.
+
 ### Commit Pattern
 - Build check before commit: `npm run build`
 - Commit with descriptive message

@@ -85,6 +85,13 @@ fields were in snapshots but not drafts):
 5. `store/index.ts` → `loadDraft` `set()` (with a default for old drafts)
 6. `components/EditorLayout.tsx` → auto-save deps (destructure + array)
 
+If the field also feeds exports, two more: `lib/export-params.ts`
+(`ExportParamState` + its mapper) and `EditorScreen.tsx`'s `paramState`
+literal. `partnerLogoSettings` (the EHS+ Accelerate partner slots) is the
+worked example of all eight sites; per-template keyed maps like it and
+`thumbnailImageSettings` need NO `goToAsset` shuffling — the key IS the
+template.
+
 ---
 
 ## The design lifecycle (one card per design)

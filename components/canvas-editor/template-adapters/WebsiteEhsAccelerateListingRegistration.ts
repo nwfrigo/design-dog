@@ -12,6 +12,8 @@ export const websiteEhsAccelerateListingRegistration: StageBenchRegistrationData
   Template: WebsiteEhsAccelerateListing,
   Adapter: WebsiteEhsAccelerateListingStageBench,
   renderProps: (asset, colors, typography) => ({
+    partnerLogoUrl: asset.partnerLogoUrl ?? asset.partnerLogoSettings?.['website-ehs-accelerate-listing']?.url ?? null,
+    partnerLogoHeight: asset.partnerLogoHeight ?? asset.partnerLogoSettings?.['website-ehs-accelerate-listing']?.height ?? undefined,
     eyebrow: asset.eyebrow || '',
     headline: asset.headline || '',
     subhead: asset.subhead,
@@ -34,6 +36,8 @@ export const websiteEhsAccelerateListingRegistration: StageBenchRegistrationData
     height: 450,
     background: '#FFFFFF',
     fields: [
+      { param: 'partnerLogoUrl', parser: 'stringOrNull' },
+      { param: 'partnerLogoHeight', parser: 'numberOrUndefined' },
       { param: 'eyebrow', parser: 'string', default: '' },
       { param: 'headline', parser: 'string', default: '' },
       { param: 'subhead', parser: 'string', default: '' },
@@ -52,6 +56,8 @@ export const websiteEhsAccelerateListingRegistration: StageBenchRegistrationData
     ],
   },
   exportBuilder: (s) => ({
+    partnerLogoUrl: s.partnerLogoSettings['website-ehs-accelerate-listing']?.url ?? null,
+    partnerLogoHeight: s.partnerLogoSettings['website-ehs-accelerate-listing']?.height ?? undefined,
     gridDetail1Text: s.gridDetail1Text,
     gridDetail2Text: s.gridDetail2Text,
     gridDetail3Text: s.gridDetail3Text,

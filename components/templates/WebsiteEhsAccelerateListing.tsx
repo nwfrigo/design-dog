@@ -7,6 +7,7 @@ import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import type { StackAlign } from '@/types'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
+import { PartnerLogo } from '@/components/shared/PartnerLogo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import {
   ContentStack,
@@ -18,6 +19,7 @@ import {
  *  column). */
 export type WebsiteEhsAccelerateListingBlockId =
   | 'logo'
+  | 'partnerLogo'
   | 'eyebrow'
   | 'headline'
   | 'subhead'
@@ -28,7 +30,11 @@ export type WebsiteEhsAccelerateListingBlockId =
 
 type WebsiteEhsAccelerateListingStackId = 'eyebrow' | 'headline' | 'subhead'
 
+export const WEB_EHS_PARTNER_LOGO = { default: 36, min: 14, max: 72 }
+
 export interface WebsiteEhsAccelerateListingProps {
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number
   eyebrow: string
   headline: string
   subhead: string
@@ -65,6 +71,8 @@ const PANEL_BG = '#FFFFFF'
 const DEFAULT_GAP = 25.10
 
 export function WebsiteEhsAccelerateListing({
+  partnerLogoUrl,
+  partnerLogoHeight = WEB_EHS_PARTNER_LOGO.default,
   eyebrow,
   headline,
   subhead,
@@ -252,16 +260,24 @@ export function WebsiteEhsAccelerateListing({
           />
         </div>
 
-        {/* EHS+ Accelerate lockup pinned to bottom of left column */}
-        {wrapBlock('logo', (
-          <div style={{
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            display: 'inline-flex',
-          }}>
-            <EhsAccelerateLogo width={254} />
-          </div>
-        ))}
+        {/* EHS+ Accelerate lockup pinned to bottom of left column, with the
+            partner logo beside it — each an independent block/slot. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          {wrapBlock('logo', (
+            <div style={{
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              display: 'inline-flex',
+            }}>
+              <EhsAccelerateLogo width={254} />
+            </div>
+          ))}
+          {wrapBlock('partnerLogo', (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={!!renderBlock} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Right opaque grid panel (covers right ~300px of bg). */}

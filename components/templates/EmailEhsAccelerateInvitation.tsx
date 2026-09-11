@@ -2,6 +2,7 @@
 
 import { type ReactNode } from 'react'
 import { EhsAccelerateLogo } from '@/components/shared/EhsAccelerateLogo'
+import { PartnerLogo } from '@/components/shared/PartnerLogo'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { RichText } from '@/components/shared/RichText'
 import { PlainText } from '@/components/shared/PlainText'
@@ -9,6 +10,7 @@ import { PlainText } from '@/components/shared/PlainText'
 /** Editable block ids for Stage & Bench wiring. Logo + RSVP button +
  *  background image are brand-locked. */
 export type EmailEhsAccelerateInvitationBlockId =
+  | 'partnerLogo'
   | 'invitationHeader'
   | 'invitationHeadline'
   | 'invitationEventTitle'
@@ -18,7 +20,11 @@ export type EmailEhsAccelerateInvitationBlockId =
   | 'invitationEventTimeNote'
   | 'invitationBody'
 
+export const EHS_INVITATION_PARTNER_LOGO = { default: 28, min: 12, max: 56 }
+
 export interface EmailEhsAccelerateInvitationProps {
+  partnerLogoUrl?: string | null
+  partnerLogoHeight?: number
   invitationHeader: string
   invitationHeadline: string
   invitationEventTitle: string
@@ -41,6 +47,8 @@ export interface EmailEhsAccelerateInvitationProps {
 const DEFAULT_BODY = `<p>Cority is bringing together a select group of senior leaders for a free half-day, in-person event.</p><p>This intimate, curated session is designed for senior EHS&amp;S and IT leaders who are shaping the future of EHS+. Together, we'll explore:</p><ul><li>Why tech and data consolidation matters now more than ever to drive performance advantage</li><li>Powerful yet practical ways to minimise risk with AI</li><li>Customer stories of going from fragmented to future-ready systems</li><li>Practical frameworks for mapping your modernisation journey</li></ul><p>Beyond insights, this is a rare chance to unplug and connect with like-minded peers in a VIP setting. Seats are limited to keep discussions meaningful.</p><p>We hope to see you there!</p>`
 
 export function EmailEhsAccelerateInvitation({
+  partnerLogoUrl,
+  partnerLogoHeight = EHS_INVITATION_PARTNER_LOGO.default,
   invitationHeader,
   invitationHeadline,
   invitationEventTitle,
@@ -76,6 +84,14 @@ export function EmailEhsAccelerateInvitation({
       <div style={{ position: 'absolute', left: 256, top: 27, width: 136, height: 44, overflow: 'hidden' }}>
         <EhsAccelerateLogo width={136} />
       </div>
+
+      {/* Partner logo — beside the lockup (to its left), vertically centered
+          on the lockup's 44px band. Independent slot. */}
+      {wrapBlock('partnerLogo', (
+        <div style={{ position: 'absolute', right: 172, top: 27, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <PartnerLogo url={partnerLogoUrl} height={partnerLogoHeight} interactive={!!renderBlock} maxWidth={110} />
+        </div>
+      ))}
 
       {/* "You're Invited" header */}
       {wrapBlock('invitationHeader', (

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, ImageSettings, ThumbnailImageSettings, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, CustomSizeDocument, ExecutiveOverviewDocument } from '@/types'
+import type { AppState, CopyContent, ManualAssetSettings, AppScreen, ContentMode, TemplateType, QueuedAsset, ImageSettings, ThumbnailImageSettings, PartnerLogoSettings, PartnerLogoSetting, SolutionOverviewBenefit, SolutionOverviewFeature, SolutionCategory, SolutionOverviewPage, SolutionOverviewCtaOption, FaqPage, FaqContentBlock, StackerModule, StackerLogoChipModule, StackerHeaderModule, StackerFooterModule, CarouselSlide, CarouselSlideType, LogoColor, ColorStyle, HeadingSize, TextAlignment, CtaStyle, ImageLayout, NewsletterImageSize, GridDetailType, SpeakerCount, ImageVariant, WebinarVariant, EventListingVariant, CustomerLibraryVariant, FloatingBannerVariant, FloatingBannerMobileVariant, FloatingBannerMobileArrowType, NewsletterTopBannerVariant, TemplateTheme, CustomSizeDocument, ExecutiveOverviewDocument } from '@/types'
 import { saveDraftToStorage, loadDraftFromStorage, loadDraftById, newDraftId, newestDraftId, clearDraft as clearDraftStorage, type DraftState } from '@/lib/draft-storage'
 import { captureEditorSnapshot, restoreEditorSnapshot, snapshotToQueuedAsset } from '@/lib/asset-snapshot'
 import { NEUTRAL_FILTERS, type ImageFilters } from '@/lib/image-filters'
@@ -279,6 +279,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   thumbnailImageUrl: null,
   // Per-template image settings (decoupled per template)
   thumbnailImageSettings: {} as ThumbnailImageSettings,
+  partnerLogoSettings: {} as PartnerLogoSettings,
   eyebrow: '',
   solution: 'environmental',
   logoColor: 'black',
@@ -530,6 +531,16 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       thumbnailImageSettings: {
         ...state.thumbnailImageSettings,
         [templateType]: settings,
+      },
+    }))
+  },
+  // Partner-logo slot — independent per template (keyed map). Patch merges
+  // so setting the url doesn't clobber a resized height and vice versa.
+  setPartnerLogo: (templateType: TemplateType, patch: Partial<PartnerLogoSetting>) => {
+    set((state) => ({
+      partnerLogoSettings: {
+        ...state.partnerLogoSettings,
+        [templateType]: { url: null, height: null, ...state.partnerLogoSettings[templateType], ...patch },
       },
     }))
   },
@@ -817,7 +828,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, templateGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, customSizeDocument, executiveOverviewDocument, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, partnerLogoSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, templateGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, customSizeDocument, executiveOverviewDocument, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -835,6 +846,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         eyebrow,
         solution,
         ctaText,
+        partnerLogoSettings,
         gridDetail1Text,
         gridDetail2Text,
         gridDetail3Text,
@@ -968,6 +980,9 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         eyebrow: verbatimCopy.headline ? eyebrow : '',
         solution: targetTemplateDefaults.solution,
         ctaText: '',
+        // Per-template keyed — carrying the live map across assets keeps each
+        // template's own partner logo, which is exactly the independence rule.
+        partnerLogoSettings,
         gridDetail1Text: '',
         gridDetail2Text: '',
         gridDetail3Text: '',
@@ -1451,6 +1466,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       templateType: 'website-thumbnail',
       thumbnailImageUrl: null,
       thumbnailImageSettings: {},
+      partnerLogoSettings: {},
       eyebrow: 'Eyebrow',
       solution: 'environmental',
       logoColor: 'black',
@@ -1663,6 +1679,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Custom Size
       customSizeDocument: state.customSizeDocument,
       executiveOverviewDocument: state.executiveOverviewDocument,
+      partnerLogoSettings: state.partnerLogoSettings,
       ccBackgroundVariant: state.ccBackgroundVariant,
       eventDate: state.eventDate,
       eventLocation: state.eventLocation,
@@ -1864,6 +1881,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Custom Size
       customSizeDocument: draft.customSizeDocument ?? null,
       executiveOverviewDocument: draft.executiveOverviewDocument ?? null,
+      partnerLogoSettings: draft.partnerLogoSettings ?? {},
       ccBackgroundVariant: draft.ccBackgroundVariant ?? 'dark-blue-1',
       eventDate: draft.eventDate ?? '',
       eventLocation: draft.eventLocation ?? '',
