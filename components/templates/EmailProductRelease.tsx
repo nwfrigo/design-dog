@@ -24,6 +24,7 @@ export type EmailProductReleaseBlockId =
 export interface EmailProductReleaseProps {
   eyebrow: string
   headline: string
+  headlineFontSize?: number
   imageUrl: string
   imagePosition?: { x: number; y: number }
   imageZoom?: number
@@ -44,6 +45,7 @@ const HEADER_HEIGHT = 55
 export function EmailProductRelease({
   eyebrow,
   headline,
+  headlineFontSize,
   imageUrl,
   imagePosition = { x: 0, y: 0 },
   imageZoom = 1,
@@ -91,12 +93,16 @@ export function EmailProductRelease({
     </span>
   ))
 
+  // Size-adjustable so long product names ("Advanced Carbon Management") can
+  // shrink to fit the fixed 640×184 banner. Line-height keeps the native
+  // 46.10/36.88 = 1.25 ratio at every size.
+  const hlSize = headlineFontSize ?? 36.88
   const headlineNode: ReactNode = wrapBlock('headline', (
     <div style={{
       color: textColor,
-      fontSize: 36.88,
+      fontSize: hlSize,
       fontWeight: 300,
-      lineHeight: '46.10px',
+      lineHeight: `${(hlSize * 1.25).toFixed(2)}px`,
     }}>
       {wrapInline('headline', <RichText html={headline || 'GX2 2026.1'} />)}
     </div>

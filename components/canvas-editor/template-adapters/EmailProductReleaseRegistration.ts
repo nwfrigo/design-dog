@@ -13,6 +13,7 @@ export const emailProductReleaseRegistration: StageBenchRegistrationData = {
   renderProps: (asset, colors, typography) => ({
     eyebrow: asset.eyebrow || '',
     headline: asset.headline || '',
+    headlineFontSize: asset.headlineFontSize ?? undefined,
     imageUrl: asset.thumbnailImageUrl || '/assets/images/default_placeholder_image_1.png',
     imagePosition: asset.thumbnailImagePosition || { x: 0, y: 0 },
     imageZoom: asset.thumbnailImageZoom || 1,
@@ -28,6 +29,7 @@ export const emailProductReleaseRegistration: StageBenchRegistrationData = {
     fields: [
       { param: 'eyebrow', parser: 'string', default: '' },
       { param: 'headline', parser: 'string', default: '' },
+      { param: 'headlineFontSize', parser: 'numberOrUndefined' },
       { param: 'imageUrl', parser: 'string', default: '/assets/images/default_placeholder_image_1.png' },
       { param: 'imagePositionX', parser: 'number', default: 0 },
       { param: 'imagePositionY', parser: 'number', default: 0 },
@@ -59,6 +61,7 @@ export const emailProductReleaseRegistration: StageBenchRegistrationData = {
       imageFilterSaturation: f?.saturation ?? 0,
       eyebrow: s.eyebrow || 'Product Release',
       headline: s.verbatimCopy.headline || 'GX2 2026.1',
+      headlineFontSize: s.headlineFontSize ?? undefined,
     }
   },
 }

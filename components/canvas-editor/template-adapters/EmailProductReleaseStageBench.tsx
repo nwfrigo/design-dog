@@ -41,11 +41,14 @@ export const EmailProductReleaseStageBench =
         kind: 'text',
         benchable: false,
         content: { format: 'html', placeholder: SLOT_PLACEHOLDERS.headline },
+        size: { default: 37, min: 20, max: 48, step: 1 },
       },
       { blockId: 'image', label: 'Image', iconKey: 'image', kind: 'image', benchable: false },
     ],
     image: { blockId: 'image', placeholderSrc: IMAGE_PLACEHOLDER },
     useStoreBindings: () => {
+      const headlineFontSize = useStore((s) => s.headlineFontSize)
+      const setHeadlineFontSize = useStore((s) => s.setHeadlineFontSize)
       const eyebrow = useStore((s) => s.eyebrow)
       const setEyebrow = useStore((s) => s.setEyebrow)
       const verbatimCopy = useStore((s) => s.verbatimCopy)
@@ -71,7 +74,9 @@ export const EmailProductReleaseStageBench =
           },
           headline: {
             value: verbatimCopy.headline || '',
+            fontSize: headlineFontSize ?? undefined,
             setValue: (v) => setVerbatimCopy({ headline: v }),
+            setFontSize: setHeadlineFontSize,
           },
           image: {},
         },
@@ -94,6 +99,7 @@ export const EmailProductReleaseStageBench =
         <EmailProductRelease
           eyebrow={ctx.textOf('eyebrow')}
           headline={ctx.textOf('headline')}
+          headlineFontSize={ctx.fontSizeOf('headline')}
           imageUrl={ctx.image?.url ?? IMAGE_PLACEHOLDER}
           imagePosition={ctx.image?.position}
           imageZoom={ctx.image?.zoom}
