@@ -97,12 +97,18 @@ export function EmailProductRelease({
   // shrink to fit the fixed 640×184 banner. Line-height keeps the native
   // 46.10/36.88 = 1.25 ratio at every size.
   const hlSize = headlineFontSize ?? 36.88
+  // maxHeight + overflow keep the BLOCK's measured bounds inside the canvas:
+  // the editor stage frames itself around block bounds, so an unclamped
+  // multi-line headline used to inflate the stage frame (header shoved up,
+  // image short of full bleed, phantom bottom padding).
   const headlineNode: ReactNode = wrapBlock('headline', (
     <div style={{
       color: textColor,
       fontSize: hlSize,
       fontWeight: 300,
       lineHeight: `${(hlSize * 1.25).toFixed(2)}px`,
+      maxHeight: '100%',
+      overflow: 'hidden',
     }}>
       {wrapInline('headline', <RichText html={headline || 'GX2 2026.1'} />)}
     </div>
@@ -158,10 +164,20 @@ export function EmailProductRelease({
           {eyebrowNode}
         </div>
 
+        {/* Headline cell — vertically centered on the native single-line
+            center (y = 96 + 46.10/2), so the default renders pixel-identical
+            while longer/multi-line text grows symmetrically and clips INSIDE
+            the canvas instead of breaking the stage frame. */}
         <div style={{
           position: 'absolute',
           left: 27,
-          top: 96,
+          right: 0,
+          top: 74.1,
+          bottom: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          overflow: 'hidden',
         }}>
           {headlineNode}
         </div>
