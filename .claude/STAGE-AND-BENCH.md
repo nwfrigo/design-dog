@@ -225,6 +225,8 @@ Screen → design conversion reads the live scale off the stage node (`getBoundi
 
 **Layout caveat.** Resizing only *looks* like it works if the surrounding layout can accommodate growth. A fixed-width flex row will silently squeeze the element instead (this is what happened to executive-overview's co-brand band — fixed `width: 218` + `space-between` clamped the logo). Give the mark `flexShrink: 0` and let the container size to content (`minWidth` for the design's resting width, `width: fit-content` to grow).
 
+**Bounds caveat (vertical).** The stage frames itself around block bounds, so a variable-height text block that can outgrow the canvas *inflates the stage frame* — the canvas reads shifted/cut with phantom padding even though the template root is fixed-size with `overflow: hidden` (email-product-release's headline shipped this: a full-size two-line name extended 24px past the 164px canvas). Any slot whose text can grow (resizable font, multi-line) must be clamped INSIDE the canvas: put it in a fixed cell anchored to the canvas edges (flex-centered reads best) and give the wrapped block `maxHeight: '100%'` + `overflow: hidden` so its *measured bounds* — not just its paint — stay inside. Oversized text then clips visibly on-canvas, which is the user's cue to use the size controls.
+
 ### 4.9 Bench rail
 
 `stage-bench/StageBenchBench.tsx`. Reads `useVisibilitySlots()`, renders one chip per hidden slot, plus a translucent preview chip when a stage block is being dragged toward the bench. Maps `slot.iconKey` → `BenchChipKind` via `ICON_KIND_TO_CHIP_KIND` (extendable via prop or by extending the default table).
