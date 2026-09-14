@@ -164,15 +164,15 @@ export function EmailProductRelease({
           {eyebrowNode}
         </div>
 
-        {/* Headline cell — vertically centered on the native single-line
-            center (y = 96 + 46.10/2), so the default renders pixel-identical
-            while longer/multi-line text grows symmetrically and clips INSIDE
-            the canvas instead of breaking the stage frame. */}
+        {/* Headline cell — spans the full text zone under the header rule
+            and vertically centers its content, so the headline sits balanced
+            in the gray space at every size/line count, and clips INSIDE the
+            canvas instead of breaking the stage frame. */}
         <div style={{
           position: 'absolute',
           left: 27,
           right: 0,
-          top: 74.1,
+          top: HEADER_HEIGHT,
           bottom: 0,
           display: 'flex',
           flexDirection: 'column',
