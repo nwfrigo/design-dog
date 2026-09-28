@@ -76,6 +76,13 @@ const EMAIL_BANNER_TEMPLATES: TemplateInfo[] = [
     height: 370,
   },
   {
+    type: 'email-cority-connect-2027',
+    label: 'Cority Connect 2027',
+    dimensions: '640 × 370px',
+    width: 640,
+    height: 370,
+  },
+  {
     type: 'email-ehs-accelerate-banner',
     label: 'EHS+ Accelerate Workshop',
     dimensions: '600 × 373px',

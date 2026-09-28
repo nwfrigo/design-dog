@@ -5,6 +5,7 @@ import { SLOT_PLACEHOLDERS } from '@/lib/slot-placeholders'
 import { CSSProperties, type ReactNode } from 'react'
 import type { ColorsConfig, TypographyConfig } from '@/lib/brand-config'
 import { CorityConnectLogo } from '@/components/shared/CorityConnectLogo'
+import { CorityConnect27Logo } from '@/components/shared/CorityConnect27Logo'
 import { ArrowIcon } from '@/components/shared/ArrowIcon'
 import { RichText } from '@/components/shared/RichText'
 
@@ -27,6 +28,9 @@ export type EmailCorityConnect2026BlockId =
   | 'cta'
 
 export interface EmailCorityConnect2026Props {
+  /** Event-year lockup. The 2027 template reuses this exact layout and
+   *  backgrounds with only the lockup swapped (EmailCorityConnect2027.tsx). */
+  year?: '2026' | '2027'
   headline: string
   body: string
   ctaText: string
@@ -55,6 +59,7 @@ function isHtmlEmpty(html: string | undefined): boolean {
 
 
 export function EmailCorityConnect2026({
+  year = '2026',
   headline,
   body,
   ctaText,
@@ -178,7 +183,9 @@ export function EmailCorityConnect2026({
           overflow: 'hidden',
         }}>
           {wrapBlock('logo', (
-            <CorityConnectLogo mode={mode} />
+            year === '2027'
+              ? <CorityConnect27Logo mode={mode} fontFamily={fontFamily} />
+              : <CorityConnectLogo mode={mode} />
           ))}
 
           <div style={{
