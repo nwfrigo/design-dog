@@ -167,6 +167,19 @@ export function TemplateRenderer({
         />
       )
 
+    case 'email-cority-connect-2027':
+      return (
+        <EmailCorityConnect2026
+          {...commonProps}
+          {...flags}
+          year="2027"
+          headline={PREVIEW_CONTENT.headline}
+          body={PREVIEW_CONTENT.body}
+          ctaText={PREVIEW_CONTENT.cta}
+          backgroundVariant="dark-blue-1"
+        />
+      )
+
     case 'email-ehs-accelerate-banner':
       return (
         <EmailEhsAccelerateBanner
