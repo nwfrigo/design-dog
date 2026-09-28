@@ -52,7 +52,7 @@ const EVENTS: { id: FilterType; label: string; templates: string[] }[] = [
   {
     id: 'event:cority-connect',
     label: 'Cority Connect',
-    templates: ['email-cority-connect-2026'],
+    templates: ['email-cority-connect-2026', 'email-cority-connect-2027'],
   },
   {
     id: 'event:ehs-accelerate',
