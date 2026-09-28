@@ -205,6 +205,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'customer-library': 'website',
   'custom-size': 'website', // generic; custom-size has no AI copy gen in v1
   'email-cority-connect-2026': 'email',
+  'email-cority-connect-2027': 'email',
   'email-ehs-accelerate-banner': 'email',
   'email-ehs-accelerate-invitation': 'email',
   'email-ehs-accelerate-signature': 'email',
