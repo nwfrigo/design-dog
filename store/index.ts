@@ -216,6 +216,7 @@ const getDefaultAssetSettings = (templateType?: TemplateType) => {
   customSizeDocument: null,
   // Executive Overview (2-page collateral)
   executiveOverviewDocument: null,
+  industryRoiDocument: null,
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: 'dark-blue-1' as import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant,
   // Email EHS Accelerate Banner specific
@@ -477,6 +478,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   // Custom Size
   customSizeDocument: null as CustomSizeDocument | null,
   executiveOverviewDocument: null as ExecutiveOverviewDocument | null,
+  industryRoiDocument: null as import('@/lib/industry-roi/document').IndustryRoiDocument | null,
   // Which entry in the multi-draft store auto-save writes to. Fresh id when a
   // new project starts (leaving the template picker, or cloning); bound to the
   // resumed entry's id on resume. Ephemeral — never serialized into drafts.
@@ -794,6 +796,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   setCarouselCurrentSlideIndex: (index: number) => set({ carouselCurrentSlideIndex: index }),
   setCustomSizeDocument: (doc: CustomSizeDocument | null) => set({ customSizeDocument: doc }),
   setExecutiveOverviewDocument: (doc: ExecutiveOverviewDocument | null) => set({ executiveOverviewDocument: doc }),
+  setIndustryRoiDocument: (doc: import('@/lib/industry-roi/document').IndustryRoiDocument | null) => set({ industryRoiDocument: doc }),
   setCcBackgroundVariant: (variant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant) => set({ ccBackgroundVariant: variant }),
   setEventDate: (date: string) => set({ eventDate: date }),
   setEventLocation: (location: string) => set({ eventLocation: location }),
@@ -828,7 +831,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
   },
   goToAsset: (index: number) => {
     const state = get()
-    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, partnerLogoSettings, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, templateGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, customSizeDocument, executiveOverviewDocument, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
+    const { selectedAssets, currentAssetIndex, verbatimCopy, manualAssetCopies, manualAssetSettings, eyebrow, solution, ctaText, gridDetail1Text, gridDetail2Text, gridDetail3Text, gridDetail4Text, thumbnailImageUrl, thumbnailImageSettings, partnerLogoSettings, industryRoiDocument, templateType, showBody, metadata, headlineFontSize, subheadFontSize, stackAlign, templateGaps, lineHeights, speaker1Name, speaker1Role, speaker1ImageUrl, speaker1ImagePosition, speaker1ImageZoom, speaker2Name, speaker2Role, speaker2ImageUrl, speaker2ImagePosition, speaker2ImageZoom, speaker3Name, speaker3Role, speaker3ImageUrl, speaker3ImagePosition, speaker3ImageZoom, ebookVariant, reportVariant, webinarVariant, eventListingVariant, customerLibraryVariant, floatingBannerVariant, floatingBannerMobileVariant, floatingBannerMobileArrowType, newsletterTopBannerVariant, theme, showSpeaker1, showSpeaker2, showSpeaker3, grayscale, solutionOverviewSolution, solutionOverviewSolutionName, solutionOverviewTagline, solutionOverviewCurrentPage, solutionOverviewHeroImageId, solutionOverviewHeroImageUrl, solutionOverviewHeroImagePosition, solutionOverviewHeroImageZoom, solutionOverviewHeroImageGrayscale, solutionOverviewPage2Header, solutionOverviewSectionHeader, solutionOverviewIntroParagraph, solutionOverviewKeySolutions, solutionOverviewQuoteText, solutionOverviewQuoteName, solutionOverviewQuoteTitle, solutionOverviewQuoteCompany, solutionOverviewBenefits, solutionOverviewFeatures, solutionOverviewScreenshotUrl, solutionOverviewScreenshotPosition, solutionOverviewScreenshotZoom, solutionOverviewScreenshotGrayscale, solutionOverviewCtaOption, solutionOverviewCtaUrl, solutionOverviewStat1Value, solutionOverviewStat1Label, solutionOverviewStat2Value, solutionOverviewStat2Label, solutionOverviewStat3Value, solutionOverviewStat3Label, solutionOverviewStat4Value, solutionOverviewStat4Label, solutionOverviewStat5Value, solutionOverviewStat5Label, carouselSlides, carouselCurrentSlideIndex, customSizeDocument, executiveOverviewDocument, ccBackgroundVariant, eventDate, eventLocation, signatureWorkshopName, showSignatureWorkshopName, showSignatureEventDetails, invitationHeader, invitationHeadline, invitationEventTitle, invitationEventDate, invitationEventLocation, invitationEventTime, invitationEventTimeNote, invitationBody, cceEventTime, showCceEventDate, showCceEventLocation, showCceEventTime } = state
     if (index >= 0 && index < selectedAssets.length) {
       // Get current image position/zoom from per-template settings
       // IMPORTANT: Use selectedAssets[currentAssetIndex] (the actual current template), NOT templateType
@@ -847,6 +850,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         solution,
         ctaText,
         partnerLogoSettings,
+        industryRoiDocument,
         gridDetail1Text,
         gridDetail2Text,
         gridDetail3Text,
@@ -983,6 +987,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         // Per-template keyed — carrying the live map across assets keeps each
         // template's own partner logo, which is exactly the independence rule.
         partnerLogoSettings,
+        industryRoiDocument,
         gridDetail1Text: '',
         gridDetail2Text: '',
         gridDetail3Text: '',
@@ -1206,6 +1211,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
         // Custom Size
         customSizeDocument: targetSettings.customSizeDocument ?? null,
         executiveOverviewDocument: targetSettings.executiveOverviewDocument ?? null,
+        industryRoiDocument: targetSettings.industryRoiDocument ?? null,
         // Email Cority Connect 2026
         ccBackgroundVariant: targetSettings.ccBackgroundVariant,
         // Email EHS Accelerate Banner
@@ -1679,6 +1685,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Custom Size
       customSizeDocument: state.customSizeDocument,
       executiveOverviewDocument: state.executiveOverviewDocument,
+      industryRoiDocument: state.industryRoiDocument,
       partnerLogoSettings: state.partnerLogoSettings,
       ccBackgroundVariant: state.ccBackgroundVariant,
       eventDate: state.eventDate,
@@ -1881,6 +1888,7 @@ export const useStore = create<AppState>()(subscribeWithSelector((set, get) => (
       // Custom Size
       customSizeDocument: draft.customSizeDocument ?? null,
       executiveOverviewDocument: draft.executiveOverviewDocument ?? null,
+      industryRoiDocument: draft.industryRoiDocument ?? null,
       partnerLogoSettings: draft.partnerLogoSettings ?? {},
       ccBackgroundVariant: draft.ccBackgroundVariant ?? 'dark-blue-1',
       eventDate: draft.eventDate ?? '',

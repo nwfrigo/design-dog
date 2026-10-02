@@ -3,7 +3,7 @@ import type { CustomSizeDocument } from '@/lib/custom-size/document'
 export type { CustomSizeDocument }
 import type { ExecutiveOverviewDocument } from '@/lib/executive-overview/document'
 export type { ExecutiveOverviewDocument }
-export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-ehs-accelerate-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-cority-connect-2027' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'email-ehs-accelerate-signature' | 'email-cority-customer-exchange-signature' | 'email-cority-customer-exchange-banner' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'social-ehs-accelerate' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'customer-library' | 'custom-size' | 'executive-overview'
+export type TemplateType = 'website-thumbnail' | 'website-press-release' | 'website-webinar' | 'website-event-listing' | 'website-ehs-accelerate-listing' | 'website-report' | 'website-floating-banner' | 'website-floating-banner-mobile' | 'email-grid' | 'email-image' | 'email-dark-gradient' | 'email-speakers' | 'email-product-release' | 'email-cority-connect-2026' | 'email-cority-connect-2027' | 'email-ehs-accelerate-banner' | 'email-ehs-accelerate-invitation' | 'email-ehs-accelerate-signature' | 'email-cority-customer-exchange-signature' | 'email-cority-customer-exchange-banner' | 'social-dark-gradient' | 'social-blue-gradient' | 'social-image' | 'social-image-meddbase' | 'social-grid-detail' | 'social-carousel' | 'social-ehs-accelerate' | 'newsletter-dark-gradient' | 'newsletter-blue-gradient' | 'newsletter-light' | 'newsletter-top-banner' | 'solution-overview-pdf' | 'faq-pdf' | 'stacker-pdf' | 'industry-roi' | 'customer-library' | 'custom-size' | 'executive-overview'
 
 // Shared variant/setting union types (extracted to avoid repeating inline unions)
 export type LogoColor = 'black' | 'orange' | 'white'
@@ -431,6 +431,7 @@ export interface ManualAssetSettings {
   customSizeDocument: CustomSizeDocument | null
   // Executive Overview (2-page collateral)
   executiveOverviewDocument: ExecutiveOverviewDocument | null
+  industryRoiDocument: import('@/lib/industry-roi/document').IndustryRoiDocument | null
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
   partnerLogoSettings: PartnerLogoSettings
@@ -635,6 +636,7 @@ export interface QueuedAsset {
   customSizeDocument: CustomSizeDocument | null
   // Executive Overview (2-page collateral)
   executiveOverviewDocument: ExecutiveOverviewDocument | null
+  industryRoiDocument: import('@/lib/industry-roi/document').IndustryRoiDocument | null
   // Email Cority Connect 2026 specific
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
   partnerLogoSettings: PartnerLogoSettings
@@ -874,6 +876,7 @@ export interface AppState {
   customSizeDocument: CustomSizeDocument | null
   // Executive Overview (2-page collateral)
   executiveOverviewDocument: ExecutiveOverviewDocument | null
+  industryRoiDocument: import('@/lib/industry-roi/document').IndustryRoiDocument | null
 
   // Email Cority Connect 2026
   ccBackgroundVariant: import('@/components/templates/EmailCorityConnect2026').CCBackgroundVariant
@@ -923,6 +926,7 @@ export interface AppState {
   // Per-template image settings (uses current templateType as key)
   setThumbnailImageSettings: (templateType: TemplateType, settings: ImageSettings) => void
   setPartnerLogo: (templateType: TemplateType, patch: Partial<PartnerLogoSetting>) => void
+  setIndustryRoiDocument: (doc: import('@/lib/industry-roi/document').IndustryRoiDocument | null) => void
   getThumbnailImageSettings: (templateType: TemplateType) => ImageSettings
   setEyebrow: (eyebrow: string) => void
   setSolution: (solution: string) => void

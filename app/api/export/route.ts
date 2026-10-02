@@ -117,6 +117,7 @@ const TEMPLATE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   'executive-overview': { width: 612, height: 792 },
   'faq-pdf': { width: 612, height: 792 },
   'stacker-pdf': { width: 612, height: 2000 }, // Dynamic height, this is a fallback
+  'industry-roi': { width: 612, height: 2000 }, // Dynamic height, this is a fallback
   'social-carousel': { width: 1080, height: 1080 },
   'customer-library': { width: 590, height: 330 },
 }
@@ -162,6 +163,8 @@ export async function POST(request: NextRequest) {
       'slidesData',
       // Custom-size: the whole document rides as one JSON-encoded param
       'customSizeConfig',
+      // Industry ROI: the whole document rides as one JSON-encoded param
+      'industryRoiConfig',
       // Executive Overview: the whole 2-page document rides as one JSON param
       'executiveOverviewConfig',
     ])
@@ -327,16 +330,18 @@ export async function POST(request: NextRequest) {
     const isExecutiveOverview = template === 'executive-overview' && body.page === 'all'
     const isFaqPdf = template === 'faq-pdf' && body.page === 'all'
     const isStackerPdf = template === 'stacker-pdf'
+    // Industry ROI shares the stacker measured-height single-long-page path
+    const isIndustryRoi = template === 'industry-roi'
     const isCarouselPdf = template === 'social-carousel' && body.page === 'all'
-    const isPdfExport = isSolutionOverviewPdf || isExecutiveOverview || isFaqPdf || isStackerPdf || isCarouselPdf
+    const isPdfExport = isSolutionOverviewPdf || isExecutiveOverview || isFaqPdf || isStackerPdf || isCarouselPdf || isIndustryRoi
     // For FAQ PDF, calculate pages from the pages array; for SO PDF, fixed at 3 pages
     // For Stacker PDF, use a tall initial viewport (will measure actual height later)
     // For Carousel PDF, calculate from number of slides
     const numPages = isFaqPdf ? (body.numPages || 1) : isCarouselPdf ? (body.numSlides || 1) : isExecutiveOverview ? 2 : 3
-    const viewportHeight = isStackerPdf ? 4000 : (isPdfExport ? height * numPages : height)
+    const viewportHeight = (isStackerPdf || isIndustryRoi) ? 4000 : (isPdfExport ? height * numPages : height)
 
     // For Stacker PDF export, use scale 1 to preserve thin CSS borders
-    const isStackerPdfExport = isStackerPdf && body.format === 'pdf'
+    const isStackerPdfExport = (isStackerPdf || isIndustryRoi) && body.format === 'pdf'
     const viewportScale = isStackerPdfExport ? 1 : scale
 
     await page.setViewport({
@@ -510,7 +515,7 @@ export async function POST(request: NextRequest) {
     await new Promise(resolve => setTimeout(resolve, 100))
 
     // For Stacker, measure actual content height and export as PNG or PDF based on format
-    if (isStackerPdf) {
+    if (isStackerPdf || isIndustryRoi) {
       // Reset body min-height to prevent min-h-screen (100vh) from inflating
       // the page beyond actual content — 100vh in a 4000px viewport creates
       // extra blank PDF pages
@@ -520,18 +525,18 @@ export async function POST(request: NextRequest) {
 
       // Use getBoundingClientRect for sub-pixel precision (offsetHeight rounds
       // to integer which can undercount by <1px, pushing the footer to page 2)
-      const actualHeight = await page.evaluate(() => {
-        const content = document.getElementById('stacker-content')
+      const actualHeight = await page.evaluate((contentId: string) => {
+        const content = document.getElementById(contentId)
         if (content) {
           return Math.ceil(content.getBoundingClientRect().height)
         }
         // Fallback to body measurement
         return document.body.scrollHeight
-      })
+      }, isIndustryRoi ? 'industry-roi-content' : 'stacker-content')
 
       console.log('Stacker actual height:', actualHeight)
 
-      const stackerFilename = body.filename || 'stacker-document'
+      const stackerFilename = body.filename || (isIndustryRoi ? 'industry-roi' : 'stacker-document')
 
       // Export as PDF if format is 'pdf'
       if (body.format === 'pdf') {

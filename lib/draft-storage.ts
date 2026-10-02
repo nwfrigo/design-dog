@@ -252,6 +252,7 @@ export interface DraftState {
   customSizeDocument: CustomSizeDocument | null
   // Executive Overview
   executiveOverviewDocument: ExecutiveOverviewDocument | null
+  industryRoiDocument: import('@/lib/industry-roi/document').IndustryRoiDocument | null
   // Partner-logo slots (EHS+ Accelerate family) — per-template keyed map
   partnerLogoSettings: PartnerLogoSettings
   // Newer email templates (Cority Connect 2026, EHS Accelerate, CCE) —
@@ -466,6 +467,7 @@ export function saveDraftToStorage(state: Partial<DraftState>, draftId?: string)
       customSizeDocument: state.customSizeDocument ?? null,
       // Executive Overview
       executiveOverviewDocument: state.executiveOverviewDocument ?? null,
+      industryRoiDocument: state.industryRoiDocument ?? null,
       partnerLogoSettings: state.partnerLogoSettings ?? {},
       ccBackgroundVariant: state.ccBackgroundVariant || 'dark-blue-1',
       eventDate: state.eventDate ?? '',

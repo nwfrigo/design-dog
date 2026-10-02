@@ -303,6 +303,13 @@ const COLLATERAL_TEMPLATES: TemplateInfo[] = [
     height: 792,
   },
   {
+    type: 'industry-roi',
+    label: 'Industry ROI',
+    dimensions: '612px wide • auto height',
+    width: 612,
+    height: 1980,
+  },
+  {
     type: 'customer-library',
     label: 'Customer Library',
     dimensions: '590 × 330px',
