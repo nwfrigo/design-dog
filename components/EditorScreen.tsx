@@ -433,6 +433,7 @@ export function EditorScreen() {
     customSizeDocument,
     // Executive Overview
     executiveOverviewDocument,
+    industryRoiDocument,
     partnerLogoSettings,
   } = useStore()
 
@@ -776,6 +777,7 @@ export function EditorScreen() {
         verbatimCopy,
         customSizeDocument,
         executiveOverviewDocument,
+        industryRoiDocument,
         partnerLogoSettings,
         solution,
         logoColor,

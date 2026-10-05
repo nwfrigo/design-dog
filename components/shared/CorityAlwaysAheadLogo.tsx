@@ -52,7 +52,14 @@ export const CorityAlwaysAheadLogo = ({
         xmlns="http://www.w3.org/2000/svg"
         viewBox={`0 0 ${TAGLINE_W} ${TAGLINE_H}`}
         width={TAGLINE_W * scale}
-        height={TAGLINE_H * scale}
+        // Ceil + visible overflow: the tagline renders ~3-6px tall, and
+        // Puppeteer's PDF rasterizer rounds fractional viewports DOWN,
+        // trimming the glyph bottoms (the sub-pixel export gotcha). The
+        // extra sliver of box absorbs the rounding; xMinYMin keeps the
+        // glyph scale width-driven and visually identical on screen.
+        height={Math.ceil(TAGLINE_H * scale)}
+        preserveAspectRatio="xMinYMin meet"
+        overflow="visible"
         fill={taglineFill}
         style={{
           position: 'absolute',

@@ -21,6 +21,7 @@ export interface ExportParamState {
   customSizeDocument: import('@/lib/custom-size/document').CustomSizeDocument | null
   executiveOverviewDocument: import('@/lib/executive-overview/document').ExecutiveOverviewDocument | null
   partnerLogoSettings: import('@/types').PartnerLogoSettings
+  industryRoiDocument: import('@/lib/industry-roi/document').IndustryRoiDocument | null
   solution: string
   logoColor: string
   showEyebrow: boolean
@@ -333,6 +334,7 @@ export function buildExportParamsFromAsset(
     customSizeDocument: (a.customSizeDocument as ExportParamState['customSizeDocument']) ?? null,
     executiveOverviewDocument: (a.executiveOverviewDocument as ExportParamState['executiveOverviewDocument']) ?? null,
     partnerLogoSettings: (a.partnerLogoSettings as ExportParamState['partnerLogoSettings']) ?? {},
+    industryRoiDocument: (a.industryRoiDocument as ExportParamState['industryRoiDocument']) ?? null,
     solution: (a.solution as string) || '',
     logoColor: (a.logoColor as string) || 'black',
     showEyebrow: a.showEyebrow !== false,

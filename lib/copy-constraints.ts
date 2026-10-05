@@ -201,6 +201,7 @@ const TEMPLATE_CATEGORY_MAP: Record<TemplateType, string> = {
   'solution-overview-pdf': 'collateral',
   'faq-pdf': 'collateral',
   'stacker-pdf': 'collateral',
+  'industry-roi': 'collateral',
   'executive-overview': 'collateral',
   'customer-library': 'website',
   'custom-size': 'website', // generic; custom-size has no AI copy gen in v1

@@ -38,6 +38,11 @@
 
 ## Multi-page templates: fixed count only (no reorder / add-remove)
 
+> **Partially paid (2026-10, industry-roi):** dynamic SLOT lists now exist —
+> `slots` in resolver form + on-canvas add/remove/reorder controls (see
+> STAGE-AND-BENCH.md §10.5). PAGE-level add/remove/reorder and cross-page
+> slot references remain open as described below.
+
 **What:** The multi-page primitive (`pages: { count, labels }` + `PageSelector`, STAGE-AND-BENCH.md §10) supports a **fixed** page count declared at build time. Users can't add, remove, or reorder pages, and there's no cross-page slot reference (a value edited on page 1 that echoes on page 2 must be two independent slots today — e.g. `executive-overview`'s partner name appears in both the page-1 headline and the page-2 tagline as separate editable slots).
 **Why deferred:** The first consumer (`executive-overview`) is a fixed 2-pager; dynamic page management is a FAQ-style paradigm (auto-pagination) that needs its own design. Shipping fixed-count keeps the primitive honest and small.
 **Cost to ignore:** A future variable-length multi-page asset (e.g. a paginated brief) can't reuse this primitive as-is; a user editing the partner name must type it on both pages.

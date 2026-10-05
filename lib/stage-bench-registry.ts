@@ -44,6 +44,7 @@ import { socialEhsAccelerateRegistration } from '@/components/canvas-editor/temp
 import { socialImageRegistration } from '@/components/canvas-editor/template-adapters/SocialImageRegistration'
 import { emailCorityConnect2026Registration } from '@/components/canvas-editor/template-adapters/EmailCorityConnect2026Registration'
 import { emailCorityConnect2027Registration } from '@/components/canvas-editor/template-adapters/EmailCorityConnect2027Registration'
+import { industryRoiRegistration } from '@/components/canvas-editor/template-adapters/IndustryRoiRegistration'
 import { newsletterBlueGradientRegistration } from '@/components/canvas-editor/template-adapters/NewsletterBlueGradientRegistration'
 import { newsletterDarkGradientRegistration } from '@/components/canvas-editor/template-adapters/NewsletterDarkGradientRegistration'
 import { newsletterLightRegistration } from '@/components/canvas-editor/template-adapters/NewsletterLightRegistration'
@@ -109,6 +110,7 @@ const REGISTRATIONS: ReadonlyArray<StageBenchRegistrationData> = [
   socialImageRegistration,
   emailCorityConnect2026Registration,
   emailCorityConnect2027Registration,
+  industryRoiRegistration,
   newsletterBlueGradientRegistration,
   newsletterDarkGradientRegistration,
   newsletterLightRegistration,

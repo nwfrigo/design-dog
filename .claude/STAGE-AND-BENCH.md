@@ -507,6 +507,33 @@ The multi-page paradigm the postmortem flagged as "would need a different shell 
 
 ---
 
+## 10.5 Dynamic slot lists (industry-roi precedent)
+
+`descriptor.slots` in resolver form can derive slots from the live document:
+industry-roi emits one label/value slot pair per ROI table row and one slot
+per risk bullet, keyed by document entry ids (`rowLabel:<id>`, `bullet:<id>`
+— template-literal id unions). The registries re-resolve when the arrays
+change; nothing else in the substrate needed to change. Add/remove/reorder
+are EDITOR-ONLY on-canvas controls rendered by the template behind
+`interactive` (ghost add-lines + per-item ↑/↓/×), calling immutable document
+helpers passed via props — exports never see the chrome. Use this pattern
+for any list-shaped content; the per-item slot ids must be stable (entry
+ids, not indexes) so selection/editing survives reorders.
+
+## 10.6 Editor zoom + stage column width
+
+`ScaledStage` applies a USER zoom multiplier (50–200%, floating −/%/＋
+control fixed to the viewport's bottom-right; clicking the % resets) on top
+of its auto-fit scale. View-only state. The scroll wrapper spans the FULL
+stage column (a fit-content wrapper inside the centered column clips an
+overflowing stage on BOTH edges, left side unreachable), with the stage box
+on auto margins — centered when it fits, left-aligned/scrollable when not.
+The stage-bar right rail (240px + gap) renders ONLY when the template has a
+stage bar — an empty rail squeezed no-stage-bar templates' columns and made
+zoom clip early. Fixed-output templates can set `descriptor.hideExportScale`
+to drop the resolution picker from the action row (industry-roi: always a
+612px PDF).
+
 ## 11. References
 
 - `components/canvas-editor/factory/defineStageBenchAdapter.tsx` — the factory; lone canonical adapter entry point.

@@ -53,6 +53,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     // the auto-save never fires for an executive-overview edit, so a refresh
     // loses everything since the last incidental save.
     executiveOverviewDocument,
+    industryRoiDocument,
     // Newer email-template fields (Cority Connect / EHS Accelerate / CCE) —
     // watched so a lone background/event/detail edit still triggers a save
     partnerLogoSettings,
@@ -135,6 +136,7 @@ export function EditorLayout({ children }: EditorLayoutProps) {
     customSizeDocument,
     // Executive-overview doc — same reasoning; it's the template's only store field.
     executiveOverviewDocument,
+    industryRoiDocument,
     // Newer email-template fields
     partnerLogoSettings,
     ccBackgroundVariant,

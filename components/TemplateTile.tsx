@@ -16,6 +16,8 @@ import { EmailDarkGradient } from '@/components/templates/EmailDarkGradient'
 import { EmailSpeakers } from '@/components/templates/EmailSpeakers'
 import { EmailProductRelease } from '@/components/templates/EmailProductRelease'
 import { EmailCorityConnect2026 } from '@/components/templates/EmailCorityConnect2026'
+import { IndustryRoi } from '@/components/templates/IndustryRoi'
+import { defaultIndustryRoiDocument } from '@/lib/industry-roi/document'
 import { EmailEhsAccelerateBanner } from '@/components/templates/EmailEhsAccelerateBanner'
 import { EmailEhsAccelerateInvitation } from '@/components/templates/EmailEhsAccelerateInvitation'
 import { EmailEhsAccelerateSignature } from '@/components/templates/EmailEhsAccelerateSignature'
@@ -691,6 +693,16 @@ export function TemplateRenderer({
           showPartnerLogo={true}
           showQuote={true}
           showQuoteAttribution={true}
+          typography={typography}
+          scale={scale}
+        />
+      )
+
+    case 'industry-roi':
+      return (
+        <IndustryRoi
+          doc={defaultIndustryRoiDocument()}
+          colors={colors}
           typography={typography}
           scale={scale}
         />

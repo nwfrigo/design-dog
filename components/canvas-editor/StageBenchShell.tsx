@@ -106,9 +106,14 @@ export function StageBenchShell({
             {actionRow && <div>{actionRow}</div>}
           </main>
 
-          <aside className="w-[240px] flex-shrink-0 flex flex-col gap-4">
-            {stageBar}
-          </aside>
+          {/* Right rail only exists when the template HAS a stage bar —
+              rendering it empty reserved 240px+gap that tall/zoomed stages
+              (industry-roi) need. */}
+          {stageBar ? (
+            <aside className="w-[240px] flex-shrink-0 flex flex-col gap-4">
+              {stageBar}
+            </aside>
+          ) : null}
         </div>
       </div>
     </div>
@@ -138,10 +143,16 @@ export function StageBenchShell({
  * The export render route is unaffected — it bypasses this shell and
  * renders the template directly at scale=1 for true-pixel output.
  */
+const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+
 function ScaledStage({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const stageRef = useRef<HTMLDivElement | null>(null)
   const [scale, setScale] = useState(1)
+  // User zoom multiplier on top of the auto-fit scale. View-only state —
+  // exports and drafts never see it. Floating −/%/＋ control bottom-right
+  // of the stage (sticky, so it stays in reach on tall documents).
+  const [zoom, setZoom] = useState(1)
   const [stageSize, setStageSize] = useState<{ w: number; h: number } | null>(null)
 
   useLayoutEffect(() => {
@@ -188,10 +199,12 @@ function ScaledStage({ children }: { children: ReactNode }) {
   // the outer (which has the post-scale dims, not transform-scaled) so
   // it renders crisp at 1 device pixel. Subtle enough to disappear
   // against dark templates; provides separation on light ones.
+  const effective = scale * zoom
+
   const outerStyle: React.CSSProperties = stageSize
     ? {
-        width: stageSize.w * scale,
-        height: stageSize.h * scale,
+        width: stageSize.w * effective,
+        height: stageSize.h * effective,
         position: 'relative',
         boxShadow: STAGE_EDGE_SHADOW,
       }
@@ -204,18 +217,72 @@ function ScaledStage({ children }: { children: ReactNode }) {
         left: 0,
         width: stageSize.w,
         height: stageSize.h,
-        transform: `scale(${scale})`,
+        transform: `scale(${effective})`,
         transformOrigin: 'top left',
         // Publish the live scale so descendants (e.g. spacing pills) can
         // counter-scale to stay at constant UI size.
-        ['--cs-scale' as string]: scale,
+        ['--cs-scale' as string]: effective,
       }
     : { ['--cs-scale' as string]: 1 }
 
+  const zi = ZOOM_STEPS.indexOf(zoom)
+  const zoomBtn =
+    'w-7 h-7 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-content-secondary dark:hover:text-content-primary disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-surface-secondary'
+
   return (
-    <div ref={containerRef} style={outerStyle}>
-      <div ref={stageRef} style={innerStyle}>
-        {children}
+    // The scroll wrapper only matters when zoomed past the column width —
+    // auto-fit alone never overflows. It must span the FULL column width
+    // (not fit-content): inside the centered flex column, a fit-content
+    // wrapper centers its overflow and clips BOTH edges, with the left one
+    // unreachable. Full-width + auto margins on the stage box centers it
+    // when it fits and left-aligns it scrollably when it doesn't.
+    <div style={{ width: '100%', position: 'relative' }}>
+      <div
+        className="[scrollbar-width:thin] [scrollbar-color:rgb(209_213_219)_transparent] dark:[scrollbar-color:rgba(255,255,255,0.2)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-white/20"
+        style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden', paddingBottom: 8 }}
+      >
+        <div ref={containerRef} style={{ ...outerStyle, marginInline: 'auto' }}>
+          <div ref={stageRef} style={innerStyle}>
+            {children}
+          </div>
+        </div>
+      </div>
+      {/* Floating zoom — fixed to the viewport's bottom-right so it stays
+          in reach anywhere in a tall document. (sticky can't work here: the
+          editor page wraps the stage in a full-height overflow-auto column,
+          so sticky pins to that element's bottom, not the viewport.) */}
+      <div
+        className="pointer-events-none flex justify-end"
+        style={{ position: 'fixed', bottom: 24, right: 28, zIndex: 30 }}
+      >
+        <div className="pointer-events-auto inline-flex items-center rounded border border-gray-300 dark:border-line-subtle shadow-sm overflow-hidden">
+          <button
+            type="button"
+            aria-label="Zoom out"
+            onClick={() => setZoom((z) => ZOOM_STEPS[Math.max(0, ZOOM_STEPS.indexOf(z) - 1)])}
+            disabled={zi <= 0}
+            className={`${zoomBtn} border-r border-gray-300 dark:border-line-subtle`}
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
+          </button>
+          <button
+            type="button"
+            title="Reset zoom"
+            onClick={() => setZoom(1)}
+            className="h-7 px-2 font-mono text-[10px] text-gray-600 dark:text-content-secondary bg-white dark:bg-surface-secondary cursor-pointer"
+          >
+            {Math.round(zoom * 100)}%
+          </button>
+          <button
+            type="button"
+            aria-label="Zoom in"
+            onClick={() => setZoom((z) => ZOOM_STEPS[Math.min(ZOOM_STEPS.length - 1, ZOOM_STEPS.indexOf(z) + 1)])}
+            disabled={zi >= ZOOM_STEPS.length - 1}
+            className={`${zoomBtn} border-l border-gray-300 dark:border-line-subtle`}
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          </button>
+        </div>
       </div>
     </div>
   )
