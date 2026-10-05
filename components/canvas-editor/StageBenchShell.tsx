@@ -106,9 +106,14 @@ export function StageBenchShell({
             {actionRow && <div>{actionRow}</div>}
           </main>
 
-          <aside className="w-[240px] flex-shrink-0 flex flex-col gap-4">
-            {stageBar}
-          </aside>
+          {/* Right rail only exists when the template HAS a stage bar —
+              rendering it empty reserved 240px+gap that tall/zoomed stages
+              (industry-roi) need. */}
+          {stageBar ? (
+            <aside className="w-[240px] flex-shrink-0 flex flex-col gap-4">
+              {stageBar}
+            </aside>
+          ) : null}
         </div>
       </div>
     </div>
