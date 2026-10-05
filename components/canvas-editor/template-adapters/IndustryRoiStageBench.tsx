@@ -65,6 +65,8 @@ const textSlot = (
 
 export const IndustryRoiStageBench = defineStageBenchAdapter<Id>({
   templateId: 'industry-roi',
+  // Always a 612px PDF — a resolution picker would be meaningless.
+  hideExportScale: true,
   slots: (bindings): SlotDescriptor<Id>[] => {
     const doc = (bindings.extras?.doc as IndustryRoiDocument | undefined) ?? defaultIndustryRoiDocument()
     return [

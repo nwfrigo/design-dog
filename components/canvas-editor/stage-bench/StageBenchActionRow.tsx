@@ -28,6 +28,9 @@ export interface StageBenchActionRowProps {
    *  when isEditingFromQueue is true; safe to pass a no-op otherwise. */
   onSaveToQueue: () => void
   onExport: () => void
+  /** Hide the resolution selector — fixed-output templates (industry-roi's
+   *  612px PDF) have no meaningful scale choice. */
+  hideScale?: boolean
 }
 
 export function StageBenchActionRow({
@@ -39,6 +42,7 @@ export function StageBenchActionRow({
   onAddToQueue,
   onSaveToQueue,
   onExport,
+  hideScale,
 }: StageBenchActionRowProps) {
   return (
     <ActionRow>
@@ -48,7 +52,7 @@ export function StageBenchActionRow({
       ) : (
         <ActionButton fn="add-to-queue" onClick={onAddToQueue} />
       )}
-      <ExportScaleSelect value={exportScale} onChange={onSetExportScale} />
+      {!hideScale && <ExportScaleSelect value={exportScale} onChange={onSetExportScale} />}
       <ActionButton fn="export" loading={isExporting} onClick={onExport} />
     </ActionRow>
   )

@@ -271,6 +271,8 @@ export type StageBenchAdapterDescriptor<TBlockId extends string> = {
   slots:
     | SlotDescriptor<TBlockId>[]
     | ((bindings: AdapterStoreBindings<TBlockId>, currentPage: number) => SlotDescriptor<TBlockId>[])
+  /** Hide the export resolution selector (fixed-output templates). */
+  hideExportScale?: boolean
   /** Static stage-bar item list, OR a resolver computed from live bindings each
    *  render (custom-size: hides THEME when the background is an image). Existing
    *  adapters pass an array and are unaffected. */
@@ -741,6 +743,7 @@ export function defineStageBenchAdapter<TBlockId extends string>(
         onAddToQueue={onAddToQueue}
         onSaveToQueue={onSaveToQueue}
         onExport={onExport}
+        hideScale={descriptor.hideExportScale}
       />
     )
     const controlsOnTop = descriptor.controlsPlacement === 'top'
