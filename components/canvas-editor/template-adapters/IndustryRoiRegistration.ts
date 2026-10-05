@@ -31,6 +31,7 @@ export const industryRoiRegistration: StageBenchRegistrationData = {
     // Nominal only — the template is variable-height flow; the export
     // route measures the real height before producing the PDF.
     height: 1980,
+    dynamicHeight: true,
     background: '#ffffff',
     assembleProps: (parsed) => {
       // jsonRecord parses a missing param to {} — shape-check, don't ??

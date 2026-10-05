@@ -212,6 +212,13 @@ export async function POST(request: NextRequest) {
       params.set('customSizeConfig', encodeURIComponent(JSON.stringify(body.customSizeConfig)))
     }
 
+    // Industry ROI: whole document blob rides as one JSON param (COMPLEX_KEYS
+    // excludes it from the generic loop, so it MUST be encoded here or the
+    // render falls back to the default document).
+    if (body.industryRoiConfig) {
+      params.set('industryRoiConfig', encodeURIComponent(JSON.stringify(body.industryRoiConfig)))
+    }
+
     // FAQ PDF: strip data URLs from image blocks (they'll be injected via Puppeteer)
     interface FaqImageData {
       blockId: string

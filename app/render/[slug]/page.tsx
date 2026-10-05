@@ -96,10 +96,13 @@ export default function DynamicRenderPage({
     <div
       style={{
         width: schema.width,
-        height: schema.height,
+        // Variable-height templates (industry-roi) grow with content; a fixed
+        // height here would clip the bottom while the export's measured PDF
+        // page stays full-length (white-strip cutoff).
+        height: schema.dynamicHeight ? 'auto' : schema.height,
         margin: 0,
         padding: 0,
-        overflow: 'hidden',
+        overflow: schema.dynamicHeight ? 'visible' : 'hidden',
         ...(background ? { background } : {}),
       }}
     >

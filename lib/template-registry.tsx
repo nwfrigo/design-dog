@@ -28,6 +28,9 @@ export interface TemplateRenderSchema {
   /** Template dimensions in pixels */
   width: number
   height: number
+  /** Variable-height flow template: the render page wrapper uses height:auto
+   *  (no clip) and the export route measures before producing the PDF. */
+  dynamicHeight?: boolean
   /** Static background color. Null = no background. */
   background: string | null
   /** Dynamic background — function of parsed field values. Takes precedence over static background. */
