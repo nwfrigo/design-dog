@@ -250,7 +250,7 @@ Every new editable prop must appear in all of these locations:
 5. `lib/export-params.ts` — Add to the template's param builder function
 6. `lib/template-registry.tsx` — Add to the template's `renderSchema.fields` (the dynamic render route at `app/render/[slug]/page.tsx` parses fields automatically from the schema — no separate render page needed)
 
-The export API route (`app/api/export/route.ts`) uses a generic forwarding loop — it auto-forwards all params from the request body to the render URL. No changes needed there when adding new props. Queue exports use `buildExportParamsFromAsset()` in `lib/export-params.ts`, which delegates to the same `buildExportParams()` builders — no separate field list to maintain.
+The export API route (`app/api/export/route.ts`) uses a generic forwarding loop — it auto-forwards all params from the request body to the render URL. No changes needed there when adding SIMPLE props. **Exception — COMPLEX_KEYS:** keys listed there are EXCLUDED from the loop and each needs a dedicated encoder block in the route (JSON-encode into the render URL, like `customSizeConfig` / `industryRoiConfig`); miss it and the render silently falls back to defaults — this shipped once as "exports show the starting template" on industry-roi. Variable-height templates set `renderSchema.dynamicHeight` (the render page wrapper stops clipping at the nominal height) and export through the measured single-long-page PDF branch shared with stacker-pdf (measure the content node, then `page.pdf` at 612 × measured px). Queue exports use `buildExportParamsFromAsset()` in `lib/export-params.ts`, which delegates to the same `buildExportParams()` builders — no separate field list to maintain.
 
 ### Export Gotchas
 
