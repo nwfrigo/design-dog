@@ -226,10 +226,17 @@ function ScaledStage({ children }: { children: ReactNode }) {
 
   return (
     // The scroll wrapper only matters when zoomed past the column width —
-    // auto-fit alone never overflows. maxWidth pins it to the flex column.
-    <div style={{ maxWidth: '100%', position: 'relative' }}>
-      <div style={{ maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
-        <div ref={containerRef} style={outerStyle}>
+    // auto-fit alone never overflows. It must span the FULL column width
+    // (not fit-content): inside the centered flex column, a fit-content
+    // wrapper centers its overflow and clips BOTH edges, with the left one
+    // unreachable. Full-width + auto margins on the stage box centers it
+    // when it fits and left-aligns it scrollably when it doesn't.
+    <div style={{ width: '100%', position: 'relative' }}>
+      <div
+        className="[scrollbar-width:thin] [scrollbar-color:rgb(209_213_219)_transparent] dark:[scrollbar-color:rgba(255,255,255,0.2)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-white/20"
+        style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden', paddingBottom: 8 }}
+      >
+        <div ref={containerRef} style={{ ...outerStyle, marginInline: 'auto' }}>
           <div ref={stageRef} style={innerStyle}>
             {children}
           </div>
