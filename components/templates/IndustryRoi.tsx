@@ -6,6 +6,7 @@ import { applyGrayscaleBoolean, filtersToCss, type ImageFilters } from '@/lib/im
 import { CorityAlwaysAheadLogo } from '@/components/shared/CorityAlwaysAheadLogo'
 import { CorityLogo } from '@/components/shared/CorityLogo'
 import { PartnerLogo } from '@/components/shared/PartnerLogo'
+import { RasterShadow } from '@/components/shared/RasterShadow'
 import { RichText } from '@/components/shared/RichText'
 import {
   ROI_TITLE_PREFIX,
@@ -75,7 +76,6 @@ const BORDER_DARK = '#41415e'
 const ORANGE = '#D35F0B'
 const GRAY_LIGHT = '#767676'
 const GRAY_DARK = '#969899'
-const COBALT_GLOW = 'rgba(0,128,255,0.3)'
 
 function croppedImageStyle(
   position: { x: number; y: number },
@@ -205,8 +205,11 @@ export function IndustryRoi({
         ))}
         {/* Left scrim — ~2/5 of the width solid-to-clear so the lockup always
             sits on white. Bottom fade keeps the title/intro row legible. */}
-        <div style={{ position: 'absolute', left: 0, top: 0, width: 367, height: 264, background: 'linear-gradient(to right, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0.86) 72%, rgba(255,255,255,0) 100%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', left: 0, bottom: 0, width: 612, height: 150, background: 'linear-gradient(to top, #ffffff 30%, rgba(255,255,255,0.86) 60%, rgba(255,255,255,0) 100%)', pointerEvents: 'none' }} />
+        {/* PNG overlays, not CSS gradients — see RasterShadow for why. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/assets/industry-roi/hero-fade-left.png" alt="" style={{ position: 'absolute', left: 0, top: 0, width: 367, height: 264, maxWidth: 'none', pointerEvents: 'none' }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/assets/industry-roi/hero-fade-bottom.png" alt="" style={{ position: 'absolute', left: 0, bottom: 0, width: 612, height: 150, maxWidth: 'none', pointerEvents: 'none' }} />
 
         <div style={{ position: 'absolute', left: 48, top: 72 }}>
           <CorityAlwaysAheadLogo height={32.67} />
@@ -281,10 +284,11 @@ export function IndustryRoi({
       {doc.showDidYouKnow && wrapBlock('didYouKnowSection', (
         <div style={{ background: INK, display: 'flex', flexDirection: 'column', gap: 20, padding: '40px 48px' }}>
           <div style={{
-            alignSelf: 'flex-start', background: INK, border: `0.75px solid ${BORDER_DARK}`, borderRadius: 6,
-            padding: 8, boxShadow: `0 0 6px ${COBALT_GLOW}`,
+            alignSelf: 'flex-start', position: 'relative', background: INK, border: `0.75px solid ${BORDER_DARK}`, borderRadius: 6,
+            padding: 8,
             fontSize: 10, fontWeight: 500, letterSpacing: 1.1, textTransform: 'uppercase', color: '#ffffff', lineHeight: 1,
           }}>
+            <RasterShadow src="/assets/industry-roi/glow-chip.png" spread={12} />
             Did you know?
           </div>
           {editableText('didYouKnowText', doc.didYouKnowText, { fontSize: 18, fontWeight: 350, lineHeight: 'normal', color: '#ffffff' }, 'Fact')}
@@ -298,11 +302,13 @@ export function IndustryRoi({
         <div style={{ fontSize: 14, fontWeight: 350, lineHeight: '18px', color: '#ffffff' }}>{ROI_BENEFITS_HEADER}</div>
         <div style={{ display: 'flex', gap: 12, width: '100%' }}>
           {ROI_BENEFIT_CARDS.map((card) => (
-            <div key={card.role} style={{
-              flex: '1 0 0', minWidth: 0, minHeight: 208, display: 'flex', flexDirection: 'column',
-              background: DARK_RAISED, border: `0.5px solid ${BORDER_DARK}`, borderRadius: 6,
-              overflow: 'hidden', boxShadow: `0 0 12px ${COBALT_GLOW}`,
-            }}>
+            <div key={card.role} style={{ flex: '1 0 0', minWidth: 0, position: 'relative', display: 'flex' }}>
+              <RasterShadow src="/assets/industry-roi/glow-card.png" spread={20} />
+              <div style={{
+                flex: '1 0 0', minWidth: 0, minHeight: 208, position: 'relative', display: 'flex', flexDirection: 'column',
+                background: DARK_RAISED, border: `0.5px solid ${BORDER_DARK}`, borderRadius: 6,
+                overflow: 'hidden',
+              }}>
               <div style={{ width: '100%', aspectRatio: '164 / 92', overflow: 'hidden', background: DARK_RAISED }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={card.image} alt="" data-export-image="true" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -310,6 +316,7 @@ export function IndustryRoi({
               <div style={{ background: INK, flex: '1 0 0', padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ fontSize: 8, fontWeight: 500, letterSpacing: 0.88, textTransform: 'uppercase', color: GRAY_DARK, lineHeight: 1 }}>{card.role}</div>
                 <div style={{ fontSize: 12, fontWeight: 350, lineHeight: '16px', color: '#ffffff' }}>{card.body}</div>
+              </div>
               </div>
             </div>
           ))}
@@ -397,11 +404,11 @@ export function IndustryRoi({
             <div key={r} style={{ display: 'flex', gap: 8 }}>
               {rowPills.map((pill) => (
                 <div key={pill} style={{
-                  background: '#ffffff', border: `0.75px solid ${BORDER_LIGHT}`, borderRadius: 6, padding: 8,
-                  boxShadow: '0 0 2px rgba(0,0,0,0.1)',
+                  position: 'relative', background: '#ffffff', border: `0.75px solid ${BORDER_LIGHT}`, borderRadius: 6, padding: 8,
                   fontSize: 8, fontWeight: 500, letterSpacing: 0.88, textTransform: 'uppercase', color: INK, lineHeight: 1,
                   whiteSpace: 'nowrap',
                 }}>
+                  <RasterShadow src="/assets/industry-roi/shadow-pill.png" spread={6} />
                   {pill}
                 </div>
               ))}
