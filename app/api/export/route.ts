@@ -565,7 +565,7 @@ export async function POST(request: NextRequest) {
         trackExport(template)
         const stackerPdfBuf = Buffer.from(pdfBuffer)
         const stackerPdfUrl = await uploadPdf(stackerPdfBuf, template)
-        await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: body.format || 'pdf', scale, thumbnailUrl: stackerPdfUrl , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion })
+        await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: body.format || 'pdf', scale, thumbnailUrl: stackerPdfUrl , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion, draftId: body.draftId })
         logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: body.format || 'pdf', scale } })
 
         return new NextResponse(stackerPdfBuf, {
@@ -593,7 +593,7 @@ export async function POST(request: NextRequest) {
       trackExport(template)
       const screenshotBuf1 = Buffer.from(screenshot)
       const thumbnailUrl1 = await uploadThumbnail(screenshotBuf1, template)
-      await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl1 , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion })
+      await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl1 , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion, draftId: body.draftId })
       logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: 'png', scale } })
 
       return new NextResponse(screenshotBuf1, {
@@ -620,7 +620,7 @@ export async function POST(request: NextRequest) {
       trackExport(template)
       const faqPdfBuf = Buffer.from(pdfBuffer)
       const faqPdfUrl = await uploadPdf(faqPdfBuf, template)
-      await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.title || body.headline || body.eyebrow, solution: body.solution, format: 'pdf', scale, thumbnailUrl: faqPdfUrl , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion })
+      await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.title || body.headline || body.eyebrow, solution: body.solution, format: 'pdf', scale, thumbnailUrl: faqPdfUrl , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion, draftId: body.draftId })
       logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: 'pdf', scale } })
 
       // Use document title for FAQ PDF filename, sanitized for filesystem
@@ -653,7 +653,7 @@ export async function POST(request: NextRequest) {
     trackExport(template)
     const screenshotBuf2 = Buffer.from(screenshot)
     const thumbnailUrl2 = await uploadThumbnail(screenshotBuf2, template)
-    await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl2 , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion })
+    await logExport({ templateType: template, exportedBy: body.exportedBy, headline: body.headline || body.eyebrow, solution: body.solution, format: 'png', scale, thumbnailUrl: thumbnailUrl2 , snapshot: body.assetSnapshot, snapshotVersion: body.assetSnapshotVersion, draftId: body.draftId })
     logEvent({ eventName: 'asset_exported', templateId: template, userId: body.exportedBy ?? null, props: { format: 'png', scale } })
 
     // Return the image

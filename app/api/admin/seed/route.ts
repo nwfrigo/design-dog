@@ -40,6 +40,10 @@ export async function POST(request: NextRequest) {
     await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS snapshot JSONB`
     await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS snapshot_version INTEGER`
     await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS label TEXT`
+    // draft_id: the localStorage draft entry an export came from. My Work
+    // uses it to keep one card per design — a live draft beats its own
+    // export rows. NULL on legacy rows (pre-link exports stay standalone).
+    await sql`ALTER TABLE export_logs ADD COLUMN IF NOT EXISTS draft_id TEXT`
     // Soft-hide for the My Work sidebar's Delete: removes the row from the
     // OWNER's UI only. Admin keeps seeing everything (its queries don't
     // exclude hidden rows) and the Blob file is untouched.

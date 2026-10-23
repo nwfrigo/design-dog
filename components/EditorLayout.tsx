@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
+import { hasDraftEntry } from '@/lib/draft-storage'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Header } from '@/components/Header'
 import { ReportBugModal, ReportBugLink } from '@/components/ReportBugModal'
@@ -160,7 +161,15 @@ export function EditorLayout({ children }: EditorLayoutProps) {
   ])
 
   const handleLogoClick = () => {
-    saveDraft() // Save before leaving
+    // Save before leaving — UNLESS the active draft was just retired by an
+    // export (id set, entry gone). Saving then would resurrect the deleted
+    // entry next to its export row, duplicating the design in My Work. If the
+    // user kept editing after exporting, the debounced auto-save has already
+    // legitimately recreated the entry, so this save proceeds as usual.
+    const { activeDraftId } = useStore.getState()
+    if (!activeDraftId || hasDraftEntry(activeDraftId)) {
+      saveDraft()
+    }
     setShowSaveToast(true)
     // Set screen to select and navigate after brief delay to show toast
     setTimeout(() => {

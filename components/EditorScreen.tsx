@@ -929,7 +929,7 @@ export function EditorScreen() {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...exportParams, exportedBy, assetSnapshot, assetSnapshotVersion: DRAFT_SHAPE_VERSION }),
+        body: JSON.stringify({ ...exportParams, exportedBy, assetSnapshot, assetSnapshotVersion: DRAFT_SHAPE_VERSION, draftId: snapState.activeDraftId }),
       })
 
       if (!response.ok) {

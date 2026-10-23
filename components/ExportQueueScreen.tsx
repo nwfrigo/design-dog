@@ -99,7 +99,7 @@ export function ExportQueueScreen() {
         headers: { 'Content-Type': 'application/json' },
         // A queued asset IS an editor snapshot (snapshotToQueuedAsset), so it
         // doubles as the export-time capture for My Work's Clone/Edit.
-        body: JSON.stringify({ ...exportParams, exportedBy, assetSnapshot: asset, assetSnapshotVersion: DRAFT_SHAPE_VERSION }),
+        body: JSON.stringify({ ...exportParams, exportedBy, assetSnapshot: asset, assetSnapshotVersion: DRAFT_SHAPE_VERSION, draftId: useStore.getState().activeDraftId }),
       })
 
       if (!response.ok) throw new Error('Export failed')

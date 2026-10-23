@@ -29,6 +29,13 @@ export function newDraftId(): string {
   return `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+/** True when a draft entry with this id exists in storage. An ACTIVE id with
+ *  no entry means the draft was just retired by an export — exit-time saves
+ *  check this so they don't resurrect it (see EditorLayout.handleLogoClick). */
+export function hasDraftEntry(id: string): boolean {
+  return readEntries().some((e) => e.id === id)
+}
+
 function draftsKey(): string {
   if (typeof window === 'undefined') return DRAFTS_KEY
   const user = localStorage.getItem('design-dog-user')
