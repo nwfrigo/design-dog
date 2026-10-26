@@ -58,6 +58,8 @@ type ExportRow = {
   created_at: string
   has_snapshot?: boolean
   snapshot_version?: number | null
+  /** The draft entry this export came from (NULL on pre-link rows). */
+  draft_id?: string | null
 }
 
 const COLLAPSE_KEY = 'design-dog-mywork-collapsed'
@@ -495,13 +497,22 @@ export function MyWorkSidebar() {
     if (target.kind === 'draft') {
       deleteDraftById(target.entry.id)
       setDrafts(listDrafts())
+      // Deleting a design deletes it wholesale: soft-hide any export rows
+      // linked to this draft too, so they don't resurface as orphan cards.
+      const linked = (rows ?? []).filter((r) => r.draft_id === target.entry.id)
+      if (linked.length > 0) {
+        setRows((prev) => (prev ?? []).filter((r) => r.draft_id !== target.entry.id))
+        for (const r of linked) {
+          fetch(`/api/my-exports?id=${r.id}`, { method: 'DELETE' }).catch(() => { /* row returns on next load */ })
+        }
+      }
       return
     }
     // Optimistic: drop from the list, then soft-hide server-side. Nothing is
     // destroyed — admin still sees the row and the file.
     setRows((prev) => (prev ?? []).filter((r) => r.id !== target.row.id))
     fetch(`/api/my-exports?id=${target.row.id}`, { method: 'DELETE' }).catch(() => { /* row returns on next load */ })
-  }, [confirmDelete])
+  }, [confirmDelete, rows])
 
   if (!user) return null
 
@@ -529,15 +540,20 @@ export function MyWorkSidebar() {
   type WorkItem =
     | { kind: 'draft'; ts: number; entry: DraftEntry }
     | { kind: 'export'; ts: number; row: ExportRow }
+  // One card per design: an export row whose source draft is live again (the
+  // user kept editing after exporting) yields to the draft card — the draft
+  // is the design's current state, the row is just its last exported file.
+  const liveDraftIds = new Set(drafts.map((e) => e.id))
+  const visibleRows = (rows ?? []).filter((r) => !r.draft_id || !liveDraftIds.has(r.draft_id))
   const items: WorkItem[] = [
     ...drafts
       .filter((e) => draftMatchesFilter(e.draft, filter) && entryMatchesSearch(e, query))
       .map((entry): WorkItem => ({ kind: 'draft', ts: entry.draft.savedAt ?? 0, entry })),
-    ...(rows ?? [])
+    ...visibleRows
       .filter((r) => matchesFilter(r, filter) && matchesSearch(r, query))
       .map((row): WorkItem => ({ kind: 'export', ts: Date.parse(row.created_at) || 0, row })),
   ].sort((a, b) => b.ts - a.ts)
-  const totalCount = drafts.length + (rows?.length ?? 0)
+  const totalCount = drafts.length + visibleRows.length
 
   return (
     <aside

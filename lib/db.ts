@@ -14,6 +14,10 @@ export interface ExportLog {
    *  not the blob — snapshots are fetched one at a time on Clone). */
   has_snapshot?: boolean
   snapshot_version?: number | null
+  /** The draft entry this export was made from. The My Work sidebar uses it
+   *  to keep one card per design: an export row whose draft is live again
+   *  (the user kept editing after exporting) yields to the draft card. */
+  draft_id?: string | null
 }
 
 export interface ExportStats {
@@ -41,9 +45,11 @@ export function logExport(data: {
    *  and failures leave it NULL, which the UI renders as download-only. */
   snapshot?: Record<string, unknown>
   snapshotVersion?: number
+  /** localStorage draft id the export came from (see ExportLog.draft_id). */
+  draftId?: string
 }): void {
   sql`
-    INSERT INTO export_logs (template_type, exported_by, headline, solution, format, scale, thumbnail_url, snapshot, snapshot_version)
+    INSERT INTO export_logs (template_type, exported_by, headline, solution, format, scale, thumbnail_url, snapshot, snapshot_version, draft_id)
     VALUES (
       ${data.templateType},
       ${data.exportedBy || null},
@@ -53,7 +59,8 @@ export function logExport(data: {
       ${data.scale || 1},
       ${data.thumbnailUrl || null},
       ${data.snapshot ? JSON.stringify(data.snapshot) : null},
-      ${data.snapshotVersion ?? null}
+      ${data.snapshotVersion ?? null},
+      ${data.draftId || null}
     )
   `.catch((err) => {
     console.error('Failed to log export:', err)
@@ -111,7 +118,7 @@ export async function getExportLogs(opts: {
   // Explicit columns: snapshots can be multi-KB JSONB, and lists (admin page,
   // My Work sidebar) only need to know whether one EXISTS. The blob itself is
   // fetched per-row by getExportSnapshot when the user actually clones.
-  const dataQuery = `SELECT id, template_type, exported_by, headline, solution, format, scale, thumbnail_url, created_at, snapshot_version, (snapshot IS NOT NULL) AS has_snapshot FROM export_logs ${where} ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`
+  const dataQuery = `SELECT id, template_type, exported_by, headline, solution, format, scale, thumbnail_url, created_at, snapshot_version, draft_id, (snapshot IS NOT NULL) AS has_snapshot FROM export_logs ${where} ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`
 
   const allValues = [...values, limit, offset]
 
